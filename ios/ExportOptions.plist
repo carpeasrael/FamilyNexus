@@ -8,7 +8,7 @@
 	<string>automatic</string>
 	<!-- Vor dem Export eintragen: Apple-Entwickler-Team-ID (10 Zeichen) -->
 	<key>teamID</key>
-	<string>HIER_TEAM_ID_EINTRAGEN</string>
+	<string>LWGTDX5B34</string>
 	<key>uploadSymbols</key>
 	<true/>
 	<key>manageAppVersionAndBuildNumber</key>
