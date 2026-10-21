@@ -68,6 +68,27 @@ Der Herausgeber betreibt keinen Server und erhält keine Daten. Die App sendet D
 7. **Richtlinien:** *Konto-Löschung* (5.1.1 v): Die App legt keine Konten an → nicht anwendbar; lokale Datenlöschung ist vorhanden. *Anmeldung mit Apple:* nur bei Drittanbieter-Anmeldung nötig → nicht anwendbar. *Nutzerinhalte* (1.2): Nachrichten gehen nur zwischen eingeladenen Familienmitgliedern; Moderatoren können Mitglieder entfernen, eine „Melden/Blockieren“-Funktion fehlt (siehe OFFEN.md) – Rückfragen der Review darauf vorbereiten.
 8. **Review-Hinweise:** `store/metadata/ios/review_notes.txt` einfügen und Prüfkonto (Punkt 1.6) angeben.
 
+### 4a. In Xcode zum Hochladen vorbereiten (iOS und macOS)
+
+Einmalig je Plattform (Team-ID: developer.apple.com → Membership):
+
+1. App-ID `de.inneso.familynexus` registrieren (Developer-Portal → Identifiers) und in App Store Connect je Plattform einen App-Eintrag anlegen (iOS und macOS können unter einem Eintrag mit derselben Bundle-ID laufen).
+2. Team-ID in `ios/ExportOptions.plist` **und** `macos/ExportOptions.plist` eintragen (`HIER_TEAM_ID_EINTRAGEN` ersetzen).
+3. Versionen kommen aus `pubspec.yaml` (`1.0.1+2` → Version 1.0.1, Build 2) und gelten für beide Plattformen; vor jedem Upload die Buildnummer erhöhen.
+
+Archiv bauen (die Skripte setzen Obfuskierung und Debug-Symbole, ein reines „Product → Archive“ in Xcode ohne vorherigen Flutter-Build tut das nicht):
+
+| Plattform | Befehl | Ergebnis |
+|---|---|---|
+| iOS | `tool/build_ios_release.sh` | signierte IPA in `build/ios/ipa/` |
+| macOS | `tool/build_macos_release.sh` | signiertes Paket in `build/macos/export/` |
+| macOS | `tool/build_macos_release.sh --xcode` | Archiv, das sich im Xcode-Organizer öffnet (Distribute App → App Store Connect → Upload) |
+| beide | `… --check` | nur Übersetzbarkeit, ohne Signatur (kein Upload möglich) |
+
+Alternativ in Xcode: `ios/Runner.xcworkspace` bzw. `macos/Runner.xcworkspace` öffnen → Target *Runner* → *Signing & Capabilities* → Team wählen (*Automatically manage signing*) → *Product → Archive* → Organizer → *Distribute App*. Vorher einmal `tool/build_*_release.sh --check` laufen lassen.
+
+Stand der Vorbereitung (ohne Signatur geprüft, 2026-10-22): iOS-Release 30 MB, macOS-Release 67 MB (arm64 + x86_64); Version 1.0.1 (2); macOS: App-Sandbox mit `network.client` und `files.user-selected.read-write`, Kategorie *Produktivität* (`LSApplicationCategoryType`), Mindestversion macOS 12; iOS: iPhone, Mindestversion iOS 15, `PrivacyInfo.xcprivacy` ohne Tracking. Offen bleiben Signatur, Team-ID und App-Store-Connect-Einträge, die ein Apple-Entwicklerkonto brauchen.
+
 ## 5. Screenshots
 
 `store/screenshots/` enthält je sechs Aufnahmen für iPhone (6,9″, `ios-6.9/`) und Android-Telefon (`android-phone/`) mit **erfundenen Beispieldaten** (Fake-Server, kein Netzwerk), erzeugt mit `tool/preview/` (siehe `store/screenshots/README.md`). Es fehlen: iPhone 6,5″ (aus 6,9″ skalierbar), Tablet-Aufnahmen (nicht nötig, solange iPad nicht unterstützt wird; Play verlangt sie nur optional). Für die Veröffentlichung prüfen oder durch eigene ersetzen; Pflichtgrößen siehe oben.
