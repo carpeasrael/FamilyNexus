@@ -39,3 +39,6 @@ key.properties
 
 # Interner Erzeugungs-Prompt (enthält lokale Pfade)
 Prompt_FamilyNexus.md
+
+# Versehentlich angelegtes lokales Swift-Paket (eigenes Git-Repo)
+ios/MyLibrary/
