@@ -59,6 +59,12 @@ Release signing: `android/key.properties` (not checked in) with `storeFile`, `st
 `keyPassword`. Without this file the release APK intentionally stays unsigned (no fallback to the debug key).
 Obfuscation debug symbols are written to `debug-info/` (not checked in) – keep them to read stack traces.
 
+**Signed APK via GitHub Actions:** pushing a version tag (`git tag -a v1.0.2 -m … && git push origin v1.0.2`, tag must
+match the `pubspec.yaml` version) runs `.github/workflows/release.yml`. It builds a signed, obfuscated release APK
+(arm64 + armv7), attaches it with a SHA-256 file to the GitHub release and keeps the debug symbols as a private workflow
+artifact. Required repository secrets: `ANDROID_KEYSTORE_BASE64` (`base64 -i upload-keystore.jks`),
+`ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`. Without them the workflow fails early.
+
 ## Tests
 
 ```sh

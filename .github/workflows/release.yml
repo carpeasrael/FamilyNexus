@@ -1,0 +1,121 @@
+name: Release
+
+# Builds a signed release APK for every pushed version tag (v*) and attaches it to the GitHub release.
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   ANDROID_KEYSTORE_BASE64   upload keystore, base64-encoded (base64 -i upload-keystore.jks)
+#   ANDROID_KEYSTORE_PASSWORD keystore password
+#   ANDROID_KEY_ALIAS         key alias (e.g. upload)
+#   ANDROID_KEY_PASSWORD      key password
+on:
+  push:
+    tags: [ "v*" ]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to build and attach the APK to (e.g. v1.0.1)
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Check signing secrets
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PW: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          for v in KEYSTORE STORE_PW ALIAS KEY_PW; do
+            if [ -z "${!v}" ]; then echo "::error::Missing repository secret for $v (see header of release.yml)"; exit 1; fi
+          done
+
+      - name: Check tag matches pubspec version
+        run: |
+          name=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
+          if [ "v$name" != "$TAG" ]; then echo "::error::Tag $TAG does not match pubspec version $name"; exit 1; fi
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      # vodozemac (cryptography) is built from source via Rust during the Android build.
+      - name: Install Rust toolchain
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup target add aarch64-linux-android armv7-linux-androideabi
+
+      - name: Restore signing key
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PW: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          umask 077
+          printf '%s' "$KEYSTORE" | base64 -d > "$RUNNER_TEMP/upload-keystore.jks"
+          {
+            echo "storeFile=$RUNNER_TEMP/upload-keystore.jks"
+            echo "storePassword=$STORE_PW"
+            echo "keyAlias=$ALIAS"
+            echo "keyPassword=$KEY_PW"
+          } > android/key.properties
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate localizations
+        run: flutter gen-l10n
+
+      - name: Build signed release APK
+        run: |
+          mkdir -p debug-info
+          flutter build apk --release --obfuscate --split-debug-info=debug-info \
+            --target-platform android-arm,android-arm64
+
+      - name: Verify signature
+        run: |
+          apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$apksigner" verify --verbose build/app/outputs/flutter-apk/app-release.apk | head -5
+
+      - name: Prepare release files
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk "dist/FamilyNexus-${TAG}.apk"
+          (cd dist && sha256sum "FamilyNexus-${TAG}.apk" > "FamilyNexus-${TAG}.apk.sha256")
+
+      # Obfuscation symbols are needed to read stack traces; keep them private (not a release asset).
+      - uses: actions/upload-artifact@v7
+        with:
+          name: debug-info-${{ env.TAG }}
+          path: debug-info/
+          retention-days: 90
+
+      - name: Attach to GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "FamilyNexus ${TAG#v}" --generate-notes --verify-tag
+          fi
+          gh release upload "$TAG" dist/* --clobber
+
+      - name: Remove signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/upload-keystore.jks" android/key.properties
