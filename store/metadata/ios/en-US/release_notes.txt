@@ -1,0 +1,1 @@
+First release: family calendar, family and direct chats, shopping list, online status, end-to-end encryption over Matrix.

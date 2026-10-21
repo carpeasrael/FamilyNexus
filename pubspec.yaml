@@ -1,0 +1,59 @@
+name: family_nexus
+description: "FamilyNexus – Familienkalender und Messenger. Local-first, Matrix-E2EE."
+publish_to: 'none'
+version: 1.0.0+1
+license: AGPL-3.0-or-later
+
+environment:
+  sdk: ^3.13.5
+
+# Alle Versionen sind exakt gepinnt (siehe docs/ENTSCHEIDUNGEN.md, docs/ABHAENGIGKEITEN.md).
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: 0.20.3
+  matrix: 14.2.0
+  flutter_vodozemac: 0.9.0
+  sqflite_sqlcipher: 3.4.1
+  flutter_secure_storage: 11.2.0
+  path: 1.9.1
+  http: 1.6.0
+  uuid: 4.6.0
+  file_picker: 13.1.0
+  timezone: 0.11.2
+  flutter_timezone: 5.1.1
+  flutter_local_notifications: 22.3.2
+  qr: 4.0.0
+  local_auth: 3.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: 6.0.0
+  path_provider: 2.1.6
+  sqflite_common_ffi: 2.4.4
+  vodozemac: 0.9.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    - assets/fonts/OFL-spacegrotesk.txt
+    - assets/fonts/OFL-ibmplexsans.txt
+    - assets/fonts/OFL-ibmplexmono.txt
+  fonts:
+    - family: SpaceGrotesk
+      fonts:
+        - asset: assets/fonts/SpaceGrotesk-Variable.ttf
+    - family: IBMPlexSans
+      fonts:
+        - asset: assets/fonts/IBMPlexSans-Variable.ttf
+    - family: IBMPlexMono
+      fonts:
+        - asset: assets/fonts/IBMPlexMono-Regular.ttf
+        - asset: assets/fonts/IBMPlexMono-Medium.ttf
+          weight: 500

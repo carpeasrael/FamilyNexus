@@ -1,0 +1,353 @@
+import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/data/platform/reminder_scheduler.dart';
+import 'package:family_nexus/domain/calendar_event.dart';
+import 'package:family_nexus/domain/family.dart';
+import 'package:family_nexus/domain/recurrence.dart';
+import 'package:family_nexus/domain/server.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import '../support/fake_matrix.dart';
+import '../support/test_app.dart';
+
+final DateTime _now = DateTime.utc(2026, 3, 20, 10); // 11:00 in Berlin
+
+Future<TestApp> _app() => buildTestApp(clock: () => _now);
+
+Future<void> _start(WidgetTester tester, TestApp app, {String? tab}) async {
+  tester.view.physicalSize = const Size(900, 2400);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+  await tester.pumpWidget(FamilyNexusApp(services: app.services));
+  await tester.pumpAndSettle();
+  if (tab != null) {
+    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(tab)));
+    await tester.pumpAndSettle();
+  }
+}
+
+Future<FakeMatrixGateway> _joinBen(TestApp app) async {
+  final ben = app.server.newDevice();
+  await ben.login(server: ServerUrl.tryParse(app.server.host)!, username: 'ben', password: 'geheim456');
+  final room = app.gateway.familyRoom!;
+  app.server.addMember(room, '@ben:fake.test');
+  ben.attachFamilyRoom(room.id);
+  return ben;
+}
+
+void main() {
+  testWidgets('Schließen der Oberfläche entfernt geplante Erinnerungen NICHT (nur Abmeldung)', (tester) async {
+    final app = await _app();
+    await _start(tester, app);
+    await app.services.calendar!.create(
+      title: 'Bleibt',
+      start: DateTime.utc(2026, 3, 22, 9),
+      end: DateTime.utc(2026, 3, 22, 10),
+      visibility: EventVisibility.private,
+    );
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpAndSettle();
+    expect(app.scheduler.cancelled, 0);
+    expect(app.scheduler.last, isNotEmpty);
+  });
+
+  group('Termin anlegen über das Formular', () {
+    testWidgets('geteilter Termin erscheint im Kalender und wird in den Familienraum gesendet', (tester) async {
+      final app = await _app();
+      await _start(tester, app, tab: 'Kalender');
+      await tester.tap(find.byTooltip('Neuer Termin'));
+      await tester.pumpAndSettle();
+      expect(find.text('Neuer Termin'), findsWidgets);
+      await tester.enterText(find.widgetWithText(TextFormField, 'Titel'), 'Elternabend');
+      // Standard ist privat; Teilen ist eine bewusste Entscheidung.
+      expect(find.text('Nur auf deinen eigenen Geräten. Wird nie an die Familie gesendet.'), findsOneWidget);
+      await tester.tap(find.text('Geteilt'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Elternabend'), findsOneWidget);
+      expect(find.text('Geteilt'), findsWidgets, reason: 'Sichtbarkeit als Text, nicht nur Farbe');
+      final stored = (await app.events.all()).single;
+      expect(stored.title, 'Elternabend');
+      expect(stored.isShared, isTrue);
+      expect(stored.start, DateTime.utc(2026, 3, 20, 11)); // 12:00 Berlin = 11:00Z
+      await tester.pump(const Duration(seconds: 1));
+      await app.services.calendar!.sync.publishPending();
+      expect(app.server.log.where((e) => e.type == 'de.inneso.familynexus.event'), hasLength(1));
+    });
+
+    testWidgets('privater Termin wird nur in den privaten Raum gesendet', (tester) async {
+      final app = await _app();
+      await _start(tester, app, tab: 'Kalender');
+      await tester.tap(find.byTooltip('Neuer Termin'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.widgetWithText(TextFormField, 'Titel'), 'Arzt');
+      expect(find.text('Nur auf deinen eigenen Geräten. Wird nie an die Familie gesendet.'), findsOneWidget);
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      await app.services.calendar!.sync.publishPending();
+      expect(app.server.log.where((e) => e.type == 'de.inneso.familynexus.event'), isEmpty);
+      expect(app.server.log.where((e) => e.type == 'de.inneso.familynexus.private_event'), hasLength(1));
+      expect(find.text('Privat'), findsWidgets);
+    });
+
+    testWidgets('leerer Titel und Ende vor Beginn werden abgelehnt', (tester) async {
+      final app = await _app();
+      await _start(tester, app, tab: 'Kalender');
+      await tester.tap(find.byTooltip('Neuer Termin'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      expect(find.text('Bitte einen Titel eingeben.'), findsOneWidget);
+      expect(await app.events.all(), isEmpty);
+    });
+
+    testWidgets('Wiederholung: wöchentlich mit Anzahl', (tester) async {
+      final app = await _app();
+      await _start(tester, app, tab: 'Kalender');
+      await tester.tap(find.byTooltip('Neuer Termin'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.widgetWithText(TextFormField, 'Titel'), 'Turnen');
+      await tester.ensureVisible(find.text('Wöchentlich'));
+      await tester.tap(find.text('Wöchentlich'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Nach Anzahl'));
+      await tester.tap(find.text('Nach Anzahl'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.widgetWithText(TextFormField, 'Anzahl'), '3');
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      final e = (await app.events.all()).single;
+      expect(e.recurrence.frequency, Frequency.weekly);
+      expect(e.recurrence.count, 3);
+    });
+  });
+
+  group('Ansichten', () {
+    Future<CalendarEvent> seed(TestApp app) => app.services.calendarBuilder!('@anna:fake.test').then((c) async {
+          final e = await c.service.create(
+            title: 'Zahnarzt',
+            start: DateTime.utc(2026, 3, 20, 13),
+            end: DateTime.utc(2026, 3, 20, 14),
+            timeZone: 'Europe/Berlin',
+            visibility: EventVisibility.shared,
+          );
+          c.dispose();
+          return e;
+        });
+
+    for (final view in <String>['Tag', 'Woche', 'Monat', 'Agenda']) {
+      testWidgets('Ansicht „$view“ zeigt den Termin von heute', (tester) async {
+        final app = await _app();
+        await seed(app);
+        await _start(tester, app, tab: 'Kalender');
+        await tester.tap(find.widgetWithText(ButtonSegment<Object?>, view).evaluate().isEmpty ? find.text(view).first : find.text(view).first);
+        await tester.pumpAndSettle();
+        expect(find.text('Zahnarzt'), findsOneWidget, reason: view);
+        expect(find.textContaining('14:00 – 15:00'), findsOneWidget);
+      });
+    }
+
+    testWidgets('Personenfilter blendet Termine anderer aus', (tester) async {
+      final app = await _app();
+      final ben = await _joinBen(app);
+      await seed(app);
+      final room = app.gateway.familyRoom!;
+      expect(room.membership['@ben:fake.test'], MemberStatus.joined);
+      // Bens Termin per Signal-Pfad einspielen
+      final c = await app.services.calendarBuilder!('@anna:fake.test');
+      c.dispose();
+      await _start(tester, app, tab: 'Kalender');
+      final cal = app.services.calendar!;
+      await cal.service.applyIncoming(CalendarEvent(
+        id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        ownerId: '@ben:fake.test',
+        title: 'Fußball',
+        start: DateTime.utc(2026, 3, 20, 15),
+        end: DateTime.utc(2026, 3, 20, 16),
+        timeZone: 'Europe/Berlin',
+        updatedAt: DateTime.utc(2026, 3, 1),
+        visibility: EventVisibility.shared,
+      ));
+      await cal.load();
+      await tester.pumpAndSettle();
+      expect(find.text('Zahnarzt'), findsOneWidget);
+      expect(find.text('Fußball'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilterChip, 'Ben'));
+      await tester.pumpAndSettle();
+      expect(find.text('Zahnarzt'), findsNothing);
+      expect(find.text('Fußball'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilterChip, 'Alle'));
+      await tester.pumpAndSettle();
+      expect(find.text('Zahnarzt'), findsOneWidget);
+      expect(ben.userId, '@ben:fake.test');
+    });
+  });
+
+  group('Detail, Zusage, Löschen', () {
+    testWidgets('Zusage wird lokal gespeichert und an die Familie gesendet', (tester) async {
+      final app = await _app();
+      await _joinBen(app);
+      await _start(tester, app, tab: 'Kalender');
+      final cal = app.services.calendar!;
+      final e = await cal.create(
+        title: 'Grillen',
+        start: DateTime.utc(2026, 3, 20, 16),
+        end: DateTime.utc(2026, 3, 20, 18),
+        visibility: EventVisibility.shared,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Grillen'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Zusagen'));
+      await tester.pumpAndSettle();
+      expect(cal.myRsvp(e.id), RsvpStatus.accepted);
+      await cal.sync.publishPending();
+      expect(app.server.log.where((x) => x.type == 'de.inneso.familynexus.rsvp'), hasLength(1));
+      await tester.tap(find.text('Vielleicht'));
+      await tester.pumpAndSettle();
+      expect(cal.myRsvp(e.id), RsvpStatus.maybe);
+    });
+
+    testWidgets('Fremde Termine sind schreibgeschützt', (tester) async {
+      final app = await _app();
+      await _start(tester, app, tab: 'Kalender');
+      final cal = app.services.calendar!;
+      await cal.service.applyIncoming(CalendarEvent(
+        id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        ownerId: '@ben:fake.test',
+        title: 'Bens Termin',
+        start: DateTime.utc(2026, 3, 20, 15),
+        end: DateTime.utc(2026, 3, 20, 16),
+        timeZone: 'Europe/Berlin',
+        updatedAt: DateTime.utc(2026, 3, 1),
+        visibility: EventVisibility.shared,
+      ));
+      await cal.load();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Bens Termin'));
+      await tester.pumpAndSettle();
+      expect(find.text('Nur der Ersteller kann diesen Termin ändern.'), findsOneWidget);
+      expect(find.byTooltip('Termin bearbeiten'), findsNothing);
+      expect(find.byTooltip('Termin löschen'), findsNothing);
+    });
+
+    testWidgets('Einzelnes Vorkommen einer Serie löschen erzeugt eine Ausnahme', (tester) async {
+      final app = await _app();
+      await _start(tester, app, tab: 'Kalender');
+      final cal = app.services.calendar!;
+      final e = await cal.create(
+        title: 'Chor',
+        start: DateTime.utc(2026, 3, 20, 17),
+        end: DateTime.utc(2026, 3, 20, 18),
+        visibility: EventVisibility.private,
+        recurrence: const Recurrence(frequency: Frequency.weekly, count: 3),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Chor'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Termin löschen'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Nur dieses'));
+      await tester.pumpAndSettle();
+      final after = (await app.events.get(e.id))!;
+      expect(after.deleted, isFalse);
+      expect(after.recurrence.exdates, <String>{'2026-03-20'});
+      expect(after.version, 2);
+    });
+
+    testWidgets('Löschen entfernt den Termin und bietet Rückmeldung', (tester) async {
+      final app = await _app();
+      await _start(tester, app, tab: 'Kalender');
+      final cal = app.services.calendar!;
+      await cal.create(
+        title: 'Einmalig',
+        start: DateTime.utc(2026, 3, 20, 17),
+        end: DateTime.utc(2026, 3, 20, 18),
+        visibility: EventVisibility.shared,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Einmalig'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Termin löschen'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, 'Löschen'));
+      await tester.pumpAndSettle();
+      expect(find.text('Einmalig'), findsNothing);
+      expect((await app.events.all()).single.deleted, isTrue);
+    });
+  });
+
+  group('Chat-Karte', () {
+    testWidgets('geteilter Termin als Karte im Chat mit direkter Zu-/Absage', (tester) async {
+      final app = await _app();
+      await _start(tester, app);
+      final cal = app.services.calendar!;
+      final e = await cal.create(
+        title: 'Pizzaabend',
+        start: DateTime.utc(2026, 3, 21, 17),
+        end: DateTime.utc(2026, 3, 21, 19),
+        visibility: EventVisibility.shared,
+      );
+      await cal.shareInChat(e);
+      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+      await tester.pumpAndSettle();
+      expect(find.text('Pizzaabend'), findsWidgets);
+      await tester.tap(find.text('Absagen').last);
+      await tester.pumpAndSettle();
+      expect(cal.myRsvp(e.id), RsvpStatus.declined);
+    });
+
+    testWidgets('private Termine lassen sich nicht im Chat teilen', (tester) async {
+      final app = await _app();
+      await _start(tester, app);
+      final cal = app.services.calendar!;
+      final e = await cal.create(
+        title: 'Geheim',
+        start: DateTime.utc(2026, 3, 21, 17),
+        end: DateTime.utc(2026, 3, 21, 19),
+        visibility: EventVisibility.private,
+      );
+      await expectLater(cal.shareInChat(e), throwsA(anything));
+      expect(app.gateway.messages, isEmpty);
+    });
+  });
+
+  group('Heute', () {
+    testWidgets('zeigt nächste Termine, geplante Erinnerungen und ungelesene Nachrichten', (tester) async {
+      final app = await _app();
+      final ben = await _joinBen(app);
+      await _start(tester, app);
+      final cal = app.services.calendar!;
+      await cal.create(
+        title: 'Schwimmen',
+        start: DateTime.utc(2026, 3, 21, 8),
+        end: DateTime.utc(2026, 3, 21, 9),
+        visibility: EventVisibility.shared,
+      );
+      await ben.sendMessage('Hallo');
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.text('Schwimmen'), findsOneWidget);
+      expect(find.text('1 ungelesene Nachricht'), findsOneWidget);
+      expect(find.text('1 Erinnerung geplant'), findsOneWidget);
+      await tester.tap(find.text('Chat öffnen'));
+      await tester.pumpAndSettle();
+      expect(app.gateway.unreadCount, 0);
+    });
+
+    testWidgets('Hinweis und „Erlauben“, wenn Benachrichtigungen blockiert sind', (tester) async {
+      final app = await _app();
+      app.scheduler.current = ReminderPermission.notificationsDenied;
+      await _start(tester, app);
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      expect(find.text('Benachrichtigungen sind blockiert. Ohne sie erscheinen keine Erinnerungen.'), findsOneWidget);
+      await tester.tap(find.text('Erlauben'));
+      await tester.pumpAndSettle();
+      expect(app.scheduler.requested, 1);
+    });
+  });
+}

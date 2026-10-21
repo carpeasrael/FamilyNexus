@@ -1,0 +1,25 @@
+import 'package:flutter/services.dart';
+
+import '../../core/app_log.dart';
+
+/// Bildschirmschutz hinter Schnittstelle. Android: FLAG_SECURE (keine Screenshots, leere Vorschau).
+/// iOS: Sichtschutz im App-Umschalter und bei Bildschirmaufnahme (Screenshots lassen sich nicht verhindern).
+/// macOS: Fenster werden von Bildschirmaufnahmen ausgenommen (`NSWindow.sharingType = .none`).
+abstract class ScreenProtection {
+  Future<void> setSecure(bool secure);
+}
+
+class PlatformScreenProtection implements ScreenProtection {
+  static const MethodChannel _channel = MethodChannel('de.inneso.familynexus/window');
+
+  @override
+  Future<void> setSecure(bool secure) async {
+    try {
+      await _channel.invokeMethod<void>('setSecure', secure);
+    } on MissingPluginException {
+      // Plattform ohne Adapter (z. B. Tests): kein Schutz möglich.
+    } on PlatformException catch (e) {
+      AppLog.e('screen', 'Bildschirmschutz konnte nicht gesetzt werden', e);
+    }
+  }
+}

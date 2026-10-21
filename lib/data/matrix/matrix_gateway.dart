@@ -1,0 +1,238 @@
+import 'package:flutter/foundation.dart';
+
+import '../../domain/calendar_event.dart';
+import '../../domain/calendar_signal.dart';
+import '../../domain/chat.dart';
+import '../../domain/family.dart';
+import '../../domain/invite_link.dart';
+import '../../domain/presence.dart';
+import '../../domain/security.dart';
+import '../../domain/server.dart';
+import '../../domain/shopping.dart';
+
+enum SessionState { loggedOut, ready }
+
+/// Fehlerarten, die die UI lokalisiert darstellt. Enthalten nie Inhalte.
+enum GatewayError {
+  invalidCredentials,
+  serverUnreachable,
+  serverUnsupported,
+  notAllowed,
+  attachmentRejected,
+  invalidInput,
+  notFound,
+  encryptionUnavailable,
+
+  /// Der Server verlangt eine erneute Passwortbestätigung.
+  reauthRequired,
+  alreadyExists,
+  rateLimited,
+  unknown,
+}
+
+class GatewayException implements Exception {
+  const GatewayException(this.error);
+  final GatewayError error;
+
+  @override
+  String toString() => 'GatewayException(${error.name})';
+}
+
+/// Einzige Schnittstelle zwischen App und Matrix (E-04).
+///
+/// Zusicherungen aller Implementierungen:
+/// * Räume der App sind immer Ende-zu-Ende-verschlüsselt (kein Abschalten).
+/// * Rechte (Moderator) werden hier erneut geprüft, nicht nur in der UI.
+/// * Fehler enthalten keine Nachrichteninhalte.
+abstract class MatrixGateway implements Listenable {
+  SessionState get session;
+  String? get userId;
+
+  /// Server, an dem die Sitzung läuft (nur wenn angemeldet).
+  ServerUrl? get server;
+
+  /// Die Familie des Nutzers oder `null`, solange keine gegründet/beigetreten ist.
+  Family? get family;
+
+  /// Nachrichten des Familienchats, älteste zuerst (Kurzform für `messagesIn(ChatThread.familyId)`).
+  List<ChatMessage> get messages;
+
+  /// Alle Gespräche: Familienchat zuerst, danach die Einzelchats mit aktuellen Familienmitgliedern
+  /// (nach Anzeigename). Einzelchats mit Entfernten oder nicht verschlüsselte Räume fehlen (E-39).
+  List<ChatThread> get threads;
+
+  /// Nachrichten eines Gesprächs, älteste zuerst; leer für unbekannte Gespräche.
+  List<ChatMessage> messagesIn(String threadId);
+
+  /// `true`, sobald der erste Abgleich mit dem Server stattgefunden hat (oder
+  /// lokale Daten einer früheren Sitzung vorliegen). Davor ist „keine Familie“
+  /// nicht aussagekräftig.
+  bool get initialSyncDone;
+
+  /// Anzahl ungelesener Chatnachrichten aller Gespräche (ohne eigene).
+  int get unreadCount;
+
+  /// Ungelesene Nachrichten eines Gesprächs.
+  int unreadIn(String threadId);
+
+  /// Markiert ein Gespräch bis zur letzten Nachricht als gelesen (private Lesebestätigung).
+  Future<void> markChatRead({String threadId = ChatThread.familyId});
+
+  /// Lädt ältere Nachrichten eines Gesprächs nach (Paginierung).
+  Future<void> loadOlderMessages({String threadId = ChatThread.familyId});
+
+  /// Eröffnet einen Einzelchat mit einem beigetretenen Familienmitglied (oder liefert den
+  /// vorhandenen) und gibt die Gesprächskennung zurück. Der Raum ist immer verschlüsselt (E-39).
+  Future<String> startDirectChat(String userId);
+
+  /// Stellt eine gespeicherte Sitzung wieder her (falls vorhanden).
+  Future<void> restore();
+
+  /// Prüft Erreichbarkeit/Protokollversion und ermittelt den Betreiber.
+  Future<ServerInfo> probeServer(ServerUrl url);
+
+  Future<void> login({
+    required ServerUrl server,
+    required String username,
+    required String password,
+  });
+
+  Future<void> logout();
+
+  /// Gibt alle Ressourcen frei (Datenbank schließen), z. B. vor der vollständigen Löschung.
+  Future<void> close();
+
+  /// Gründet die Familie: privater, verschlüsselter Raum (E-12).
+  Future<void> createFamily(String name);
+
+  Future<void> sendMessage(String text, {String? replyToId, String threadId = ChatThread.familyId});
+  Future<void> sendReaction(String messageId, String emoji, {String threadId = ChatThread.familyId});
+
+  /// Prüft gegen die [AttachmentPolicy] und sendet.
+  Future<void> sendAttachment({
+    required String fileName,
+    required Uint8List bytes,
+    String? replyToId,
+    String threadId = ChatThread.familyId,
+  });
+
+  /// Wiederholt das Senden einer fehlgeschlagenen Nachricht.
+  Future<void> retryMessage(String messageId, {String threadId = ChatThread.familyId});
+
+  // --------------------------------------------- Sicherheit und Verifizierung
+
+  SecurityState get securityState;
+
+  /// Aktualisiert Geräteliste und Schlüsselstatus vom Server.
+  Future<void> refreshSecurity();
+
+  /// Alle Geräte des eigenen Kontos.
+  List<DeviceEntry> get devices;
+
+  /// Laufende Geräte-/Personenverifizierung (oder `null`).
+  VerificationInfo? get verification;
+
+  /// Richtet beim ersten Gerät Schlüssel-Backup und Cross-Signing ein. Verlangt der Server eine
+  /// Passwortbestätigung und ist [password] nicht gesetzt, wird `reauthRequired` gemeldet
+  /// (das Passwort wird nie gespeichert). Liefert den Wiederherstellungsschlüssel, der
+  /// **einmalig** angezeigt werden muss.
+  Future<String> setUpSecurity({String? password});
+
+  /// Stellt mit dem Wiederherstellungsschlüssel das Backup wieder her und verifiziert dieses Gerät.
+  Future<void> restoreSecurity(String recoveryKey);
+
+  /// Startet eine Emoji-Verifizierung mit einem eigenen Gerät ([deviceId]) oder, ohne
+  /// [deviceId], mit einer anderen Person.
+  Future<void> startVerification({required String userId, String? deviceId});
+
+  Future<void> acceptVerification();
+
+  /// Antwort auf den Emoji-Vergleich.
+  Future<void> confirmEmojiMatch(bool matches);
+
+  Future<void> cancelVerification();
+
+  /// Akzeptiert den geänderten Cross-Signing-Schlüssel eines Mitglieds und hebt die Sperre
+  /// seiner Geräte auf. Erst nach persönlicher Prüfung (z. B. Emoji-Vergleich) aufrufen.
+  Future<void> acceptIdentityChange(String userId);
+
+  // ------------------------------------------------- Einladungen und Rollen
+
+  /// Offene Einladungen in Räume (noch nicht angenommen).
+  List<PendingInvitation> get invitations;
+
+  /// `true`, solange eine eigene Beitrittsanfrage (Knock) auf Bestätigung wartet.
+  bool get joinRequestPending;
+
+  /// Zieht die eigene wartende Beitrittsanfrage zurück.
+  Future<void> cancelJoinRequest();
+
+  /// Moderator: erzeugt einen zeitlich begrenzten, einmaligen Einladungslink/QR-Inhalt.
+  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity});
+
+  /// Sendet eine Beitrittsanfrage für den (geprüften, nicht abgelaufenen) Link.
+  Future<void> requestToJoin(InviteLink link);
+
+  /// Moderator: lädt eine Matrix-ID direkt ein.
+  Future<void> inviteUser(String userId);
+
+  /// Moderator: bestätigt eine Beitrittsanfrage (→ Einladung); nur mit gültigem eigenem Link.
+  Future<void> approveRequest(String userId);
+
+  /// Moderator: lehnt eine Beitrittsanfrage ab oder zieht eine Einladung zurück.
+  Future<void> rejectRequest(String userId);
+
+  /// Moderator: ernennt ein Mitglied zum Moderator (Power-Level 50).
+  Future<void> promote(String userId);
+
+  /// Moderator: entfernt ein Mitglied; die Raumschlüssel werden rotiert.
+  Future<void> removeMember(String userId);
+
+  Future<void> renameFamily(String name);
+
+  /// Nimmt eine Einladung an; ab dann ist der Raum die Familie dieses Kontos.
+  Future<void> acceptInvitation(String roomId);
+
+  Future<void> declineInvitation(String roomId);
+
+  // ------------------------------------------------------------ Kalender
+
+  /// Empfangene Kalender-Ereignisse (auch Wiederholungen bereits bekannter und
+  /// eigene Echos; der Empfänger muss idempotent sein).
+  Stream<CalendarSignal> get calendarSignals;
+
+  /// Sendet einen **geteilten** Termin verschlüsselt in den Familienraum.
+  /// Wirft [GatewayException] (`invalidInput`) für nicht geteilte Termine.
+  Future<void> publishSharedEvent(CalendarEvent event);
+
+  /// Sendet einen **privaten** Termin ausschließlich in den privaten Raum des
+  /// eigenen Kontos (Geräte-Sync). Nie in den Familienraum.
+  Future<void> publishPrivateEvent(CalendarEvent event);
+
+  Future<void> publishRsvp(String eventId, RsvpStatus status, DateTime timestamp);
+
+  /// Teilt einen geteilten Termin als Karte im Chat.
+  Future<void> shareEventInChat(CalendarEvent event);
+
+  /// Lädt (und entschlüsselt) einen Anhang. Wird nie automatisch geöffnet.
+  Future<Uint8List> loadAttachment(String messageId, {String threadId = ChatThread.familyId});
+
+  // ------------------------------------------------------- Online-Status
+
+  /// Letzte bekannte Meldungen der anderen beigetretenen Familienmitglieder (nur Arbeitsspeicher).
+  /// Mit [PresenceBoard.evaluate] zum Anzeigezeitpunkt auswerten.
+  Map<String, PresenceStamp> get presence;
+
+  /// Meldet den eigenen Zustand als Ende-zu-Ende-verschlüsselte Gerätenachricht an die Geräte der
+  /// beigetretenen Familienmitglieder (alle oder nur [onlyTo]). [ask] bittet online befindliche
+  /// Geräte um eine Antwort (nur zusammen mit [online]). Es gibt nie einen Klartext-Weg (E-38).
+  Future<void> announcePresence({required bool online, bool ask = false, String? onlyTo});
+
+  /// Mitglieder, die um eine Statusantwort gebeten haben.
+  Stream<String> get presenceAsks;
+
+  // -------------------------------------------------------- Einkaufszettel
+
+  /// Sendet einen Eintrag der Einkaufsliste verschlüsselt in den Familienraum (E-40).
+  Future<void> publishShoppingItem(ShoppingItem item);
+}

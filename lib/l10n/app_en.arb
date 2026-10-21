@@ -1,0 +1,779 @@
+{
+  "@@locale": "en",
+  "appName": "FamilyNexus",
+  "tabToday": "Today",
+  "tabCalendar": "Calendar",
+  "tabChat": "Chat",
+  "tabFamily": "Family",
+  "tabSettings": "Settings",
+  "emptyToday": "No events yet. Upcoming events will show up here.",
+  "emptyCalendar": "The calendar is still empty.",
+  "emptyChat": "No messages yet.",
+  "emptyFamily": "No family has been set up yet.",
+  "settingsSectionDisplay": "Appearance",
+  "settingsSectionPrivacy": "Privacy",
+  "settingsSectionAbout": "About",
+  "settingsLanguage": "Language",
+  "languageSystem": "Device language",
+  "languageGerman": "Deutsch",
+  "languageEnglish": "English",
+  "settingsTheme": "Theme",
+  "themeSystem": "Follow device",
+  "themeDark": "Dark",
+  "themeLight": "Light",
+  "settingsReduceEffects": "Reduce effects",
+  "settingsReduceEffectsHint": "Less blur and glow, more opaque surfaces.",
+  "settingsSecureScreen": "Screen protection",
+  "settingsSecureScreenHint": "Blocks screenshots and hides the app in the app switcher.",
+  "settingsLicense": "License: AGPL-3.0-or-later",
+  "settingsNoTelemetry": "No telemetry, no ads, no analytics.",
+  "loading": "Loading …",
+  "errorGeneric": "Something went wrong.",
+  "retry": "Try again",
+  "startupFailedTitle": "Local data unreadable",
+  "startupFailedBody": "The encrypted database could not be opened, for example because the device key is no longer available. For safety nothing was changed. You can reset the local data and set up again; data on the server and on other devices is kept.",
+  "startupRetry": "Try again",
+  "startupReset": "Reset local data",
+  "startupResetConfirmTitle": "Really delete local data?",
+  "startupResetConfirmBody": "All data of this app on this device will be deleted permanently.",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "next": "Next",
+  "back": "Back",
+  "done": "Done",
+  "save": "Save",
+  "close": "Close",
+  "onbStep": "Step {current} of {total}",
+  "@onbStep": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "onbTitleLanguage": "Welcome to FamilyNexus",
+  "onbIntro": "Family calendar and messenger in one app. Your data stays on your devices and travels only end-to-end encrypted over Matrix.",
+  "onbPoint1": "No telemetry, no ads, no analytics.",
+  "onbPoint2": "Chat and shared events are end-to-end encrypted.",
+  "onbPoint3": "Private events never leave your own devices.",
+  "onbTitleServer": "Choose a server",
+  "serverDefault": "Default server ({host})",
+  "@serverDefault": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "serverCustom": "Own server",
+  "serverUrlLabel": "Server address (https)",
+  "serverUrlInvalid": "Please enter a valid https address.",
+  "serverCheck": "Check server",
+  "serverChecking": "Checking …",
+  "serverOk": "Server reachable (Matrix {version})",
+  "@serverOk": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "serverOperator": "Operator: {name}",
+  "@serverOperator": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "serverNoPassword": "This server does not allow password sign-in.",
+  "serverMetadataNote": "The server cannot see content, but it does see metadata such as who writes to whom and when. Use your own server to avoid that.",
+  "onbTitleAccount": "Sign in",
+  "accountUsername": "Username",
+  "accountPassword": "Password",
+  "accountLogin": "Sign in",
+  "accountLoggingIn": "Signing in …",
+  "accountHint": "You need an existing Matrix account on the chosen server. Create new accounts with the operator.",
+  "onbTitleFamily": "Family",
+  "familyName": "Family name",
+  "familyCreate": "Create family",
+  "familyCreating": "Creating …",
+  "familyCreateHint": "You become a moderator. Later, invite a second moderator so the family can still act if a device is lost.",
+  "familyMinorsNote": "Children can be members. Please obtain the consent of their legal guardians.",
+  "familyRoleModerator": "Moderator",
+  "familyRoleMember": "Member",
+  "familyMembers": "Members",
+  "familySecondModerator": "Recommendation: appoint a second moderator.",
+  "statusInvited": "Invited",
+  "statusRequested": "Request",
+  "errInvalidCredentials": "Username or password is wrong.",
+  "errServerUnreachable": "Server not reachable. Check your connection.",
+  "errServerUnsupported": "This server is not supported.",
+  "errNotAllowed": "You do not have permission for this.",
+  "errAttachmentRejected": "This attachment is not allowed (type or size).",
+  "errInvalidInput": "Please check your input.",
+  "errNotFound": "Not found.",
+  "errEncryption": "Encryption unavailable. Nothing will be sent.",
+  "errUnknown": "Unknown error.",
+  "chatHint": "Write a message",
+  "chatSend": "Send",
+  "chatAttach": "Attach file",
+  "chatReply": "Reply",
+  "chatReplyingTo": "Replying to {name}",
+  "@chatReplyingTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatCancelReply": "Cancel reply",
+  "chatReact": "React",
+  "chatRetry": "Sending failed – tap to retry",
+  "chatSending": "Sending …",
+  "chatEncryptedNote": "End-to-end encrypted",
+  "chatAttachmentBlocked": "Attachment blocked (type or size not allowed)",
+  "chatLoadAttachment": "Load attachment",
+  "chatSaveAttachment": "Save",
+  "chatMessageFrom": "Message from {name}",
+  "@chatMessageFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatYou": "You",
+  "logout": "Sign out",
+  "settingsAccount": "Account",
+  "settingsServer": "Server",
+  "serverContactUnknown": "Contact: not specified",
+  "serverContact": "Contact: {contact}",
+  "@serverContact": {
+    "placeholders": {
+      "contact": {
+        "type": "String"
+      }
+    }
+  },
+  "errAlreadyExists": "This account already has a family.",
+  "errRateLimited": "Too many requests. Please try again later.",
+  "chatUndecryptable": "Message cannot be decrypted",
+  "syncing": "Syncing …",
+  "reminderTitle": "Reminder",
+  "reminderBody": "Event in {duration}",
+  "@reminderBody": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderChannelName": "Reminders",
+  "reminderChannelDescription": "Reminders for events. They never show any content.",
+  "durationNow": "0 minutes",
+  "durationMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+  "@durationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHours": "{count, plural, =1{1 hour} other{{count} hours}}",
+  "@durationHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "durationDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@durationDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reminderBefore": "{duration} before",
+  "@reminderBefore": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderAtStart": "At start time",
+  "remindersTitle": "Reminders",
+  "remindersHint": "Reminders are local notifications on this device. They never show title or location.",
+  "remindersPermissionNotifications": "Notifications are blocked. Without them no reminders appear.",
+  "remindersPermissionExact": "Exact alarms are not allowed. Reminders may be late.",
+  "remindersAllow": "Allow",
+  "remindersPlanned": "{count, plural, =0{No reminders scheduled} =1{1 reminder scheduled} other{{count} reminders scheduled}}",
+  "@remindersPlanned": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersDefault": "Default reminder",
+  "remindersNone": "None",
+  "viewDay": "Day",
+  "viewWeek": "Week",
+  "viewMonth": "Month",
+  "viewAgenda": "Agenda",
+  "calendarToday": "Today",
+  "calendarPrevious": "Previous",
+  "calendarNext": "Next",
+  "calendarAll": "Everyone",
+  "calendarFilterPerson": "Filter by person",
+  "calendarNoEvents": "No events",
+  "calendarAllDay": "All day",
+  "calendarNewEvent": "New event",
+  "calendarEventsOnDay": "{count, plural, =0{No events} =1{1 event} other{{count} events}}",
+  "@calendarEventsOnDay": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "todayNext": "Upcoming events",
+  "todayUnread": "Unread messages",
+  "todayUnreadCount": "{count, plural, =0{No unread messages} =1{1 unread message} other{{count} unread messages}}",
+  "@todayUnreadCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "todayNoUpcoming": "No events in the next 30 days.",
+  "todayOpenChat": "Open chat",
+  "visibilityPrivate": "Private",
+  "visibilityShared": "Shared",
+  "visibilityPrivateHint": "Only on your own devices. Never sent to the family.",
+  "visibilitySharedHint": "Sent encrypted to the family. Members see the event and can accept or decline.",
+  "visibilityChangeNote": "Content already sent to the family stays on their devices, even if you make the event private later.",
+  "eventNew": "New event",
+  "eventEdit": "Edit event",
+  "eventTitle": "Title",
+  "eventTitleRequired": "Please enter a title.",
+  "eventAllDay": "All day",
+  "eventStart": "Start",
+  "eventEnd": "End",
+  "eventEndBeforeStart": "The end is before the start.",
+  "eventLocation": "Location",
+  "eventNote": "Note",
+  "eventColor": "Color",
+  "eventColorName": "Color {number}",
+  "@eventColorName": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "eventAttendees": "Attendees",
+  "eventVisibility": "Visibility",
+  "eventTimeZone": "Time zone: {zone}",
+  "@eventTimeZone": {
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "eventSaveError": "The event could not be saved.",
+  "eventRepeat": "Repeat",
+  "repeatNone": "None",
+  "repeatDaily": "Daily",
+  "repeatWeekly": "Weekly",
+  "repeatMonthly": "Monthly",
+  "repeatYearly": "Yearly",
+  "repeatEvery": "Every",
+  "repeatUnitDays": "days",
+  "repeatUnitWeeks": "weeks",
+  "repeatUnitMonths": "months",
+  "repeatUnitYears": "years",
+  "repeatEnds": "Ends",
+  "repeatEndsNever": "Never",
+  "repeatEndsOn": "On date",
+  "repeatEndsAfter": "After count",
+  "repeatCount": "Count",
+  "repeatUntil": "Last day",
+  "repeatSummaryDaily": "{count, plural, =1{Daily} other{Every {count} days}}",
+  "@repeatSummaryDaily": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "repeatSummaryWeekly": "{count, plural, =1{Weekly} other{Every {count} weeks}}",
+  "@repeatSummaryWeekly": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "repeatSummaryMonthly": "{count, plural, =1{Monthly} other{Every {count} months}}",
+  "@repeatSummaryMonthly": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "repeatSummaryYearly": "{count, plural, =1{Yearly} other{Every {count} years}}",
+  "@repeatSummaryYearly": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "weekdayMon": "Mon",
+  "weekdayTue": "Tue",
+  "weekdayWed": "Wed",
+  "weekdayThu": "Thu",
+  "weekdayFri": "Fri",
+  "weekdaySat": "Sat",
+  "weekdaySun": "Sun",
+  "eventDelete": "Delete event",
+  "eventDeleteConfirm": "Really delete this event?",
+  "eventDeleteSeriesConfirm": "Delete all occurrences or just this one?",
+  "eventDeleteThis": "Only this one",
+  "eventDeleteAll": "All",
+  "eventShareInChat": "Share in chat",
+  "eventShared": "Shared in chat",
+  "eventOwner": "By {name}",
+  "@eventOwner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventOwnerYou": "By you",
+  "eventRsvp": "Response",
+  "rsvpAccept": "Accept",
+  "rsvpDecline": "Decline",
+  "rsvpMaybe": "Maybe",
+  "rsvpAccepted": "Accepted",
+  "rsvpDeclined": "Declined",
+  "rsvpMaybeStatus": "Maybe",
+  "rsvpNone": "No response",
+  "eventHistory": "History",
+  "eventVersion": "Version {version}",
+  "@eventVersion": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "eventRecurring": "Repeats",
+  "eventCancelled": "Deleted",
+  "eventReadOnly": "Only the creator can change this event.",
+  "eventYourReminders": "Your reminders",
+  "eventResetReminders": "Use default",
+  "chatEventCard": "Event",
+  "chatEventMissing": "Event not available",
+  "settingsReminders": "Reminders",
+  "repeatUntilInvalid": "The last repeat date is before the first event.",
+  "errReauth": "Please confirm your password.",
+  "securityTitle": "Key backup",
+  "securityIntro": "So that only your own devices can read your encrypted messages and events, you now set up a key backup.",
+  "securitySetupButton": "Set up key backup",
+  "securitySettingUp": "Setting up …",
+  "securityKeyTitle": "Your recovery key",
+  "securityKeyHint": "Write it down on paper and keep it safe. It is shown only now. Without it and without a verified device, your messages are lost if you lose all devices.",
+  "securityKeySaved": "I have written the key down safely.",
+  "securityRestoreTitle": "Verify this device",
+  "securityRestoreIntro": "Your account is already protected. Verify this device with another one of your devices or with your recovery key.",
+  "securityVerifyWithDevice": "Verify with another device",
+  "securityNoOtherDevice": "No other device found. Use the recovery key.",
+  "securityRestoreKeyLabel": "Recovery key",
+  "securityRestoreButton": "Restore with key",
+  "securityRestoring": "Restoring …",
+  "securityRestoreFailed": "The key does not match.",
+  "securityPasswordTitle": "Confirm password",
+  "securityPasswordHint": "The server asks for your password. It is not stored.",
+  "securityStatusReady": "This device is verified.",
+  "securityStatusNeeds": "This device is not verified yet.",
+  "securityDevices": "Devices of your account",
+  "securityDeviceThis": "This device",
+  "securityDeviceVerified": "Verified",
+  "securityDeviceUnverified": "Not verified",
+  "securityVerifyDevice": "Verify",
+  "securityVerifyPerson": "Verify",
+  "verifyTitle": "Verification",
+  "verifyIncoming": "{peer} wants to start a verification.",
+  "@verifyIncoming": {
+    "placeholders": {
+      "peer": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyWaiting": "Waiting for the other side …",
+  "verifyCompare": "Compare these symbols with the ones on the other device. They must match in the same order.",
+  "verifyMatch": "They match",
+  "verifyNoMatch": "They do not match",
+  "verifyWaitingConfirm": "Waiting for the other side to confirm …",
+  "verifyDone": "Verified.",
+  "verifyCancelled": "The verification was cancelled.",
+  "accept": "Accept",
+  "decline": "Decline",
+  "familyManage": "Management",
+  "familyInvite": "Invite a member",
+  "familyInviteLinkTitle": "Invitation link",
+  "familyInviteLinkHint": "Valid for 24 hours. Whoever opens the link only sends a request – you confirm it.",
+  "familyInviteShowQr": "Show QR code",
+  "familyInviteCopyLink": "Copy link",
+  "familyInviteCopied": "Link copied.",
+  "familyInviteById": "Invite Matrix ID",
+  "familyInviteByIdHint": "@name:server",
+  "familyInviteSend": "Invite",
+  "familyInviteInvalidId": "Please enter a valid Matrix ID.",
+  "familyInviteSent": "Invitation sent.",
+  "familyRequests": "Join requests",
+  "familyRequestApprove": "Approve",
+  "familyRequestReject": "Reject",
+  "familyMemberPromote": "Make moderator",
+  "familyMemberRemove": "Remove",
+  "familyMemberRemoveConfirm": "Really remove {name} from the family? Room keys are renewed; {name} can no longer read new content.",
+  "@familyMemberRemoveConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "familyMemberPromoteConfirm": "Make {name} a moderator? Moderators can invite, promote and remove.",
+  "@familyMemberPromoteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "familyRename": "Change family name",
+  "familyRenamed": "Name changed.",
+  "familyDone": "Done.",
+  "familyOnlyModerators": "Only moderators manage the family.",
+  "joinTitle": "Join a family",
+  "joinHint": "Paste an invitation link or open the link or QR code with the camera app.",
+  "joinLinkLabel": "Invitation link",
+  "joinLinkInvalid": "This link is invalid or expired.",
+  "joinSend": "Send join request",
+  "joinConfirmTitle": "Request to join?",
+  "joinConfirmBody": "You ask to join the family on server {server}. Invited by {inviter}. A moderator must confirm.",
+  "@joinConfirmBody": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      },
+      "inviter": {
+        "type": "String"
+      }
+    }
+  },
+  "joinPending": "Request sent. Waiting for a moderator to confirm.",
+  "joinCancel": "Withdraw request",
+  "invitationsTitle": "Invitations",
+  "invitationFrom": "Invitation from {inviter}",
+  "@invitationFrom": {
+    "placeholders": {
+      "inviter": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCreateOrJoin": "Create a new family or join an existing one.",
+  "onbCreateTab": "Create",
+  "onbJoinTab": "Join",
+  "onbChangeAccount": "Sign out",
+  "lockTitle": "FamilyNexus is locked",
+  "lockHint": "Confirm with your device credentials (PIN, pattern, password or biometrics).",
+  "lockUnlock": "Unlock",
+  "lockReason": "Unlock FamilyNexus",
+  "settingsLock": "App lock",
+  "settingsLockHint": "Locks the app after inactivity. Confirmation uses your device lock; the app stores no PIN of its own.",
+  "settingsLockUnavailable": "No secure screen lock is set up on this device.",
+  "settingsLockFailed": "The confirmation was not successful.",
+  "settingsLockTimeout": "Lock after",
+  "lockImmediately": "Immediately",
+  "lock1min": "1 minute",
+  "lock5min": "5 minutes",
+  "lock15min": "15 minutes",
+  "settingsPrivacyPolicy": "Privacy policy",
+  "settingsDeleteData": "Delete all local data",
+  "settingsDeleteDataHint": "Signs you out and deletes the database, keys and reminders on this device.",
+  "deleteDataTitle": "Delete all local data?",
+  "deleteDataBody": "All data of this app on this device will be deleted permanently and you will be signed out. Messages and shared events on other family members' devices cannot technically be deleted. Your account on the server remains; ask the server operator to delete it.",
+  "deleteDataConfirm": "Delete permanently",
+  "privacyTitle": "Privacy policy",
+  "privacy1Title": "Who processes your data?",
+  "privacy1Body": "FamilyNexus is free software (AGPL-3.0). The app sends no data to its developers and contains no telemetry, advertising or analytics. The operator of the Matrix server you choose is responsible for processing on the server; it is shown during setup.",
+  "privacy2Title": "What data exists?",
+  "privacy2Body": "Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted (SQLCipher) on your device. The key is held in the Android keystore and never in a file.",
+  "privacy3Title": "What does the server see?",
+  "privacy3Body": "Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm). The server only sees encrypted events. Metadata such as account ID, timestamps, room size and devices remains visible to the operator. Use your own server to avoid that.",
+  "privacy4Title": "Private events",
+  "privacy4Body": "Private events are never sent to the family. Between your own devices they are synchronised through a private, encrypted room that only your account belongs to.",
+  "privacy5Title": "Reminders and notifications",
+  "privacy5Body": "Reminders are local notifications. They never show title, location or note, only “Event in …”. There is no third-party push service.",
+  "privacy6Title": "Permissions",
+  "privacy6Body": "Internet (connection to the server), notifications and exact alarms (reminders), boot notification (re-schedule reminders) and device credentials (app lock). No contacts, location, camera or microphone are needed.",
+  "privacy7Title": "Backup and deletion",
+  "privacy7Body": "Android backups are switched off. If you deliberately save an attachment with “Save”, the decrypted file lies outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. Messages on other members' devices cannot technically be force-deleted. Your recovery key is the only way to rescue messages after losing all devices – keep it safe.",
+  "privacy8Title": "Children",
+  "privacy8Body": "Children can be family members. This requires the consent of their legal guardians; accounts of minors go through invitation and confirmation by a moderator.",
+  "privacy9Title": "Your rights",
+  "privacy9Body": "You can request access, correction and deletion at any time. You manage local data in this app; server data with your server's operator.",
+  "familyRequestCheckValid": "Valid invitation link",
+  "familyRequestCheckExpired": "Link expired",
+  "familyRequestCheckUnknown": "Unknown link – not issued by you",
+  "familyRequestApproveConfirm": "Add {user} to the family? The invitation link is used up.",
+  "@familyRequestApproveConfirm": {
+    "placeholders": {
+      "user": {
+        "type": "String"
+      }
+    }
+  },
+  "identityVerified": "Verified",
+  "identityPinned": "Not checked in person",
+  "identityUnknown": "No keys known",
+  "identityChanged": "Identity changed",
+  "identityChangedWarning": "{name}'s security key has changed. Their devices are blocked until you have checked each other in person using the emoji comparison.",
+  "@identityChangedWarning": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "identityAccept": "Accept change",
+  "identityAcceptConfirm": "Only accept after you have checked in person (e.g. via emoji comparison). Continue?",
+  "invitationUnexpectedWarning": "This invitation does not belong to a join request of yours. Only accept it if you know {inviter} and expected the invitation.",
+  "@invitationUnexpectedWarning": {
+    "placeholders": {
+      "inviter": {
+        "type": "String"
+      }
+    }
+  },
+  "memberActionsTooltip": "Actions for {name}",
+  "@memberActionsTooltip": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "familyInviteConfirm": "Invite {user}? Invitees receive the family's message keys even before accepting – only invite people you know for certain.",
+  "@familyInviteConfirm": {
+    "placeholders": {
+      "user": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentSaveWarning": "The file is decrypted and saved unencrypted in the folder you choose. It stays there after logging out or deleting app data. Continue?",
+  "tabShopping": "Shopping",
+  "settingsShareOnlineStatus": "Share online status",
+  "settingsShareOnlineStatusHint": "Shows your family when you are using the app. It is sent end-to-end encrypted to family members' devices only. When off, you appear offline to others.",
+  "presenceOnline": "Online",
+  "presenceOffline": "Offline",
+  "presenceUnknown": "Status unknown",
+  "presenceLastSeen": "Last online {ago}",
+  "@presenceLastSeen": {
+    "placeholders": {
+      "ago": {
+        "type": "String"
+      }
+    }
+  },
+  "presenceAgoNow": "just now",
+  "presenceAgoMinutes": "{count} min ago",
+  "@presenceAgoMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "presenceAgoHours": "{count} h ago",
+  "@presenceAgoHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "presenceAgoDays": "{count} d ago",
+  "@presenceAgoDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "presenceSelfHidden": "Your status is not shared",
+  "presenceSelf": "You are online",
+  "presenceOf": "{name}: {status}",
+  "@presenceOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "chatThreads": "Conversations",
+  "chatThreadFamily": "Family chat {name}",
+  "@chatThreadFamily": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatThreadDirect": "Direct chat with {name}",
+  "@chatThreadDirect": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatUnreadCount": "{count} unread",
+  "@chatUnreadCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatDirectNote": "Only between you and {name}, end-to-end encrypted",
+  "@chatDirectNote": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatDirectNotAvailable": "This conversation is no longer available.",
+  "familyWriteMessage": "Send message",
+  "shoppingTitle": "Shopping list",
+  "shoppingNote": "Shared with your family, end-to-end encrypted",
+  "shoppingHintItem": "What do you need?",
+  "shoppingHintQuantity": "Quantity (optional)",
+  "shoppingAdd": "Add",
+  "shoppingEmpty": "The shopping list is empty. Add something above.",
+  "shoppingOpenHeader": "To buy ({count})",
+  "@shoppingOpenHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shoppingDoneHeader": "Done ({count})",
+  "@shoppingDoneHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shoppingClearDone": "Remove done items",
+  "shoppingClearConfirm": "Remove {count} done items for the whole family?",
+  "@shoppingClearConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shoppingCleared": "{count} items removed",
+  "@shoppingCleared": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shoppingEditTitle": "Edit item",
+  "shoppingEdit": "Edit",
+  "shoppingDelete": "Delete",
+  "shoppingMarkDone": "Mark {name} as done",
+  "@shoppingMarkDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shoppingMarkOpen": "Put {name} back on the list",
+  "@shoppingMarkOpen": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shoppingLastBy": "last changed by {name}",
+  "@shoppingLastBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shoppingLimit": "The shopping list is full (at most 300 items). Remove done items.",
+  "shoppingInvalid": "This item is invalid (empty, too long or with forbidden characters).",
+  "todayOnlineHeader": "Who is online",
+  "todayNobodyOnline": "Nobody else is online right now.",
+  "todayShoppingOpen": "Shopping list: {count} open",
+  "@todayShoppingOpen": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacy10Title": "Online status, direct chats, shopping list",
+  "privacy10Body": "The online status (\"online\" or \"offline\" with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. The server only sees metadata such as timing and size.",
+  "onbFamilyFound": "Found family “{name}” – you are already a member. Finishing setup.",
+  "@onbFamilyFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsAccent": "Accent colour",
+  "settingsAccentHint": "Neon colour for buttons, selection and highlights. Applies to the light and the dark design.",
+  "accentTeal": "Teal",
+  "accentMagenta": "Magenta",
+  "accentViolet": "Violet",
+  "accentSky": "Sky blue",
+  "accentLime": "Lime",
+  "accentOrange": "Orange",
+  "accentRose": "Rose",
+  "accentGreen": "Green",
+  "menuOpen": "Open menu",
+  "menuTitle": "Menu"
+}

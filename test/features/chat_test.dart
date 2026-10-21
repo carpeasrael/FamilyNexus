@@ -1,0 +1,131 @@
+import 'dart:typed_data';
+
+import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/data/matrix/matrix_gateway.dart';
+import 'package:family_nexus/domain/family.dart';
+import 'package:family_nexus/domain/server.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import '../support/fake_matrix.dart';
+import '../support/test_app.dart';
+
+/// Lässt Ben dem Familienraum beitreten und liefert sein Gerät.
+Future<FakeMatrixGateway> _joinBen(TestApp app) async {
+  final ben = app.server.newDevice();
+  await ben.login(server: ServerUrl.tryParse(app.server.host)!, username: 'ben', password: 'geheim456');
+  final room = app.gateway.familyRoom!;
+  room.membership['@ben:${app.server.host}'] = MemberStatus.joined;
+  ben.attachFamilyRoom(room.id);
+  return ben;
+}
+
+Future<void> _openChat(WidgetTester tester, TestApp app) async {
+  await tester.pumpWidget(FamilyNexusApp(services: app.services));
+  await tester.pumpAndSettle();
+  await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  testWidgets('Nachricht senden erscheint im Verlauf, Eingabe wird geleert', (tester) async {
+    final app = await buildTestApp();
+    await _openChat(tester, app);
+    expect(find.text('Noch keine Nachrichten.'), findsOneWidget);
+    expect(find.text('Ende-zu-Ende-verschlüsselt'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'Hallo Familie');
+    await tester.tap(find.byTooltip('Senden'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Hallo Familie'), findsOneWidget);
+    expect(tester.widget<TextField>(find.byType(TextField)).controller!.text, isEmpty);
+    expect(app.gateway.messages.single.body, 'Hallo Familie');
+  });
+
+  testWidgets('Nachricht von Ben wird mit Absendernamen angezeigt', (tester) async {
+    final app = await buildTestApp();
+    final ben = await _joinBen(app);
+    await ben.sendMessage('Ich bin da');
+    await _openChat(tester, app);
+    expect(find.text('Ich bin da'), findsOneWidget);
+    expect(find.text('Ben'), findsOneWidget);
+  });
+
+  testWidgets('Antworten zeigt Zitat; Abbrechen entfernt die Vorschau', (tester) async {
+    final app = await buildTestApp();
+    final ben = await _joinBen(app);
+    await ben.sendMessage('Wer holt die Kinder ab?');
+    await _openChat(tester, app);
+
+    await tester.longPress(find.text('Wer holt die Kinder ab?'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Antworten'));
+    await tester.pumpAndSettle();
+    expect(find.text('Antwort an Ben'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'Ich');
+    await tester.tap(find.byTooltip('Senden'));
+    await tester.pumpAndSettle();
+
+    final reply = app.gateway.messages.last;
+    expect(reply.replyToId, app.gateway.messages.first.id);
+    expect(find.text('Antwort an Ben'), findsNothing);
+  });
+
+  testWidgets('Reaktion wird gesendet und gezählt', (tester) async {
+    final app = await buildTestApp();
+    final ben = await _joinBen(app);
+    await ben.sendMessage('Pizza heute?');
+    await _openChat(tester, app);
+
+    await tester.longPress(find.text('Pizza heute?'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('👍'));
+    await tester.pumpAndSettle();
+
+    expect(app.gateway.messages.first.reactions['👍'], <String>{'@anna:fake.test'});
+    expect(find.text('👍 1'), findsOneWidget);
+  });
+
+  test('Anhänge: erlaubt/abgelehnt über die Richtlinie', () async {
+    final app = await buildTestApp();
+    final png = Uint8List.fromList(<int>[0x89, 0x50, 0x4E, 0x47, 0, 0]);
+    await app.gateway.sendAttachment(fileName: '../foto.png', bytes: png);
+    expect(app.gateway.messages.single.attachment!.name, 'foto.png');
+
+    for (final bad in <(String, Uint8List)>[
+      ('virus.exe', png),
+      ('getarnt.png', Uint8List.fromList(<int>[0x4D, 0x5A, 0, 0])),
+      ('leer.png', Uint8List(0)),
+    ]) {
+      await expectLater(
+        app.gateway.sendAttachment(fileName: bad.$1, bytes: bad.$2),
+        throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.attachmentRejected)),
+        reason: bad.$1,
+      );
+    }
+    expect(app.gateway.messages.length, 1);
+  });
+
+  test('leere/überlange Eingaben werden abgelehnt', () async {
+    final app = await buildTestApp();
+    await expectLater(app.gateway.sendMessage('   '), throwsA(isA<GatewayException>()));
+    await expectLater(app.gateway.sendReaction('x', ''), throwsA(isA<GatewayException>()));
+    await expectLater(app.gateway.createFamily('x' * 61), throwsA(isA<GatewayException>()));
+  });
+
+  test('eine bestehende Familie wird nie überschrieben', () async {
+    final app = await buildTestApp();
+    await expectLater(
+      app.gateway.createFamily('Zweite Familie'),
+      throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.alreadyExists)),
+    );
+    expect(app.gateway.family!.name, 'Familie Test');
+  });
+
+  test('der Fake kennt keinen unverschlüsselten Raum', () async {
+    final app = await buildTestApp();
+    expect(app.gateway.familyRoom!.encrypted, isTrue);
+  });
+}

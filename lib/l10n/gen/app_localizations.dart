@@ -1,0 +1,2594 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart' as intl;
+
+import 'app_localizations_de.dart';
+import 'app_localizations_en.dart';
+
+// ignore_for_file: type=lint
+
+/// Callers can lookup localized strings with an instance of AppLocalizations
+/// returned by `AppLocalizations.of(context)`.
+///
+/// Applications need to include `AppLocalizations.delegate()` in their app's
+/// `localizationDelegates` list, and the locales they support in the app's
+/// `supportedLocales` list. For example:
+///
+/// ```dart
+/// import 'gen/app_localizations.dart';
+///
+/// return MaterialApp(
+///   localizationsDelegates: AppLocalizations.localizationsDelegates,
+///   supportedLocales: AppLocalizations.supportedLocales,
+///   home: MyApplicationHome(),
+/// );
+/// ```
+///
+/// ## Update pubspec.yaml
+///
+/// Please make sure to update your pubspec.yaml to include the following
+/// packages:
+///
+/// ```yaml
+/// dependencies:
+///   # Internationalization support.
+///   flutter_localizations:
+///     sdk: flutter
+///   intl: any # Use the pinned version from flutter_localizations
+///
+///   # Rest of dependencies
+/// ```
+///
+/// ## iOS Applications
+///
+/// iOS applications define key application metadata, including supported
+/// locales, in an Info.plist file that is built into the application bundle.
+/// To configure the locales supported by your app, you’ll need to edit this
+/// file.
+///
+/// First, open your project’s ios/Runner.xcworkspace Xcode workspace file.
+/// Then, in the Project Navigator, open the Info.plist file under the Runner
+/// project’s Runner folder.
+///
+/// Next, select the Information Property List item, select Add Item from the
+/// Editor menu, then select Localizations from the pop-up menu.
+///
+/// Select and expand the newly-created Localizations item then, for each
+/// locale your application supports, add a new item and select the locale
+/// you wish to add from the pop-up menu in the Value field. This list should
+/// be consistent with the languages listed in the AppLocalizations.supportedLocales
+/// property.
+abstract class AppLocalizations {
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+
+  final String localeName;
+
+  static AppLocalizations of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+  }
+
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
+
+  /// A list of this localizations delegate along with the default localizations
+  /// delegates.
+  ///
+  /// Returns a list of localizations delegates containing this delegate along with
+  /// GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate,
+  /// and GlobalWidgetsLocalizations.delegate.
+  ///
+  /// Additional delegates can be added by appending to this list in
+  /// MaterialApp. This list does not have to be used at all if a custom list
+  /// of delegates is preferred or required.
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
+
+  /// A list of this localizations delegate's supported locales.
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('de'),
+    Locale('en'),
+  ];
+
+  /// No description provided for @appName.
+  ///
+  /// In de, this message translates to:
+  /// **'FamilyNexus'**
+  String get appName;
+
+  /// No description provided for @tabToday.
+  ///
+  /// In de, this message translates to:
+  /// **'Heute'**
+  String get tabToday;
+
+  /// No description provided for @tabCalendar.
+  ///
+  /// In de, this message translates to:
+  /// **'Kalender'**
+  String get tabCalendar;
+
+  /// No description provided for @tabChat.
+  ///
+  /// In de, this message translates to:
+  /// **'Chat'**
+  String get tabChat;
+
+  /// No description provided for @tabFamily.
+  ///
+  /// In de, this message translates to:
+  /// **'Familie'**
+  String get tabFamily;
+
+  /// No description provided for @tabSettings.
+  ///
+  /// In de, this message translates to:
+  /// **'Einstellungen'**
+  String get tabSettings;
+
+  /// No description provided for @emptyToday.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Termine. Sobald Termine anstehen, erscheinen sie hier.'**
+  String get emptyToday;
+
+  /// No description provided for @emptyCalendar.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Kalender ist noch leer.'**
+  String get emptyCalendar;
+
+  /// No description provided for @emptyChat.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Nachrichten.'**
+  String get emptyChat;
+
+  /// No description provided for @emptyFamily.
+  ///
+  /// In de, this message translates to:
+  /// **'Es ist noch keine Familie eingerichtet.'**
+  String get emptyFamily;
+
+  /// No description provided for @settingsSectionDisplay.
+  ///
+  /// In de, this message translates to:
+  /// **'Darstellung'**
+  String get settingsSectionDisplay;
+
+  /// No description provided for @settingsSectionPrivacy.
+  ///
+  /// In de, this message translates to:
+  /// **'Datenschutz'**
+  String get settingsSectionPrivacy;
+
+  /// No description provided for @settingsSectionAbout.
+  ///
+  /// In de, this message translates to:
+  /// **'Über die App'**
+  String get settingsSectionAbout;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In de, this message translates to:
+  /// **'Sprache'**
+  String get settingsLanguage;
+
+  /// No description provided for @languageSystem.
+  ///
+  /// In de, this message translates to:
+  /// **'Gerätesprache'**
+  String get languageSystem;
+
+  /// No description provided for @languageGerman.
+  ///
+  /// In de, this message translates to:
+  /// **'Deutsch'**
+  String get languageGerman;
+
+  /// No description provided for @languageEnglish.
+  ///
+  /// In de, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
+
+  /// No description provided for @settingsTheme.
+  ///
+  /// In de, this message translates to:
+  /// **'Design'**
+  String get settingsTheme;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In de, this message translates to:
+  /// **'Wie Gerät'**
+  String get themeSystem;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In de, this message translates to:
+  /// **'Dunkel'**
+  String get themeDark;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In de, this message translates to:
+  /// **'Hell'**
+  String get themeLight;
+
+  /// No description provided for @settingsReduceEffects.
+  ///
+  /// In de, this message translates to:
+  /// **'Effekte reduzieren'**
+  String get settingsReduceEffects;
+
+  /// No description provided for @settingsReduceEffectsHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Weniger Unschärfe und Leuchten, deckendere Flächen.'**
+  String get settingsReduceEffectsHint;
+
+  /// No description provided for @settingsSecureScreen.
+  ///
+  /// In de, this message translates to:
+  /// **'Bildschirmschutz'**
+  String get settingsSecureScreen;
+
+  /// No description provided for @settingsSecureScreenHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Blockiert Screenshots und verbirgt die App in der Übersicht.'**
+  String get settingsSecureScreenHint;
+
+  /// No description provided for @settingsLicense.
+  ///
+  /// In de, this message translates to:
+  /// **'Lizenz: AGPL-3.0-or-later'**
+  String get settingsLicense;
+
+  /// No description provided for @settingsNoTelemetry.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Telemetrie, keine Werbung, keine Analyse.'**
+  String get settingsNoTelemetry;
+
+  /// No description provided for @loading.
+  ///
+  /// In de, this message translates to:
+  /// **'Lädt …'**
+  String get loading;
+
+  /// No description provided for @errorGeneric.
+  ///
+  /// In de, this message translates to:
+  /// **'Etwas ist schiefgelaufen.'**
+  String get errorGeneric;
+
+  /// No description provided for @retry.
+  ///
+  /// In de, this message translates to:
+  /// **'Erneut versuchen'**
+  String get retry;
+
+  /// No description provided for @startupFailedTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Lokale Daten nicht lesbar'**
+  String get startupFailedTitle;
+
+  /// No description provided for @startupFailedBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Die verschlüsselte Datenbank konnte nicht geöffnet werden, zum Beispiel weil der Schlüssel des Geräts nicht mehr verfügbar ist. Aus Sicherheitsgründen wurde nichts verändert. Du kannst die lokalen Daten zurücksetzen und neu einrichten; Daten auf dem Server und anderen Geräten bleiben erhalten.'**
+  String get startupFailedBody;
+
+  /// No description provided for @startupRetry.
+  ///
+  /// In de, this message translates to:
+  /// **'Erneut versuchen'**
+  String get startupRetry;
+
+  /// No description provided for @startupReset.
+  ///
+  /// In de, this message translates to:
+  /// **'Lokale Daten zurücksetzen'**
+  String get startupReset;
+
+  /// No description provided for @startupResetConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Lokale Daten wirklich löschen?'**
+  String get startupResetConfirmTitle;
+
+  /// No description provided for @startupResetConfirmBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Daten dieser App auf diesem Gerät werden unwiderruflich gelöscht.'**
+  String get startupResetConfirmBody;
+
+  /// No description provided for @cancel.
+  ///
+  /// In de, this message translates to:
+  /// **'Abbrechen'**
+  String get cancel;
+
+  /// No description provided for @delete.
+  ///
+  /// In de, this message translates to:
+  /// **'Löschen'**
+  String get delete;
+
+  /// No description provided for @next.
+  ///
+  /// In de, this message translates to:
+  /// **'Weiter'**
+  String get next;
+
+  /// No description provided for @back.
+  ///
+  /// In de, this message translates to:
+  /// **'Zurück'**
+  String get back;
+
+  /// No description provided for @done.
+  ///
+  /// In de, this message translates to:
+  /// **'Fertig'**
+  String get done;
+
+  /// No description provided for @save.
+  ///
+  /// In de, this message translates to:
+  /// **'Speichern'**
+  String get save;
+
+  /// No description provided for @close.
+  ///
+  /// In de, this message translates to:
+  /// **'Schließen'**
+  String get close;
+
+  /// No description provided for @onbStep.
+  ///
+  /// In de, this message translates to:
+  /// **'Schritt {current} von {total}'**
+  String onbStep(int current, int total);
+
+  /// No description provided for @onbTitleLanguage.
+  ///
+  /// In de, this message translates to:
+  /// **'Willkommen bei FamilyNexus'**
+  String get onbTitleLanguage;
+
+  /// No description provided for @onbIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Familienkalender und Messenger in einer App. Deine Daten bleiben auf deinen Geräten und wandern nur Ende-zu-Ende-verschlüsselt über Matrix.'**
+  String get onbIntro;
+
+  /// No description provided for @onbPoint1.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Telemetrie, keine Werbung, keine Analyse.'**
+  String get onbPoint1;
+
+  /// No description provided for @onbPoint2.
+  ///
+  /// In de, this message translates to:
+  /// **'Chat und geteilte Termine sind Ende-zu-Ende-verschlüsselt.'**
+  String get onbPoint2;
+
+  /// No description provided for @onbPoint3.
+  ///
+  /// In de, this message translates to:
+  /// **'Private Termine verlassen nie deine eigenen Geräte.'**
+  String get onbPoint3;
+
+  /// No description provided for @onbTitleServer.
+  ///
+  /// In de, this message translates to:
+  /// **'Server wählen'**
+  String get onbTitleServer;
+
+  /// No description provided for @serverDefault.
+  ///
+  /// In de, this message translates to:
+  /// **'Standardserver ({host})'**
+  String serverDefault(String host);
+
+  /// No description provided for @serverCustom.
+  ///
+  /// In de, this message translates to:
+  /// **'Eigener Server'**
+  String get serverCustom;
+
+  /// No description provided for @serverUrlLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Server-Adresse (https)'**
+  String get serverUrlLabel;
+
+  /// No description provided for @serverUrlInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte eine gültige https-Adresse eingeben.'**
+  String get serverUrlInvalid;
+
+  /// No description provided for @serverCheck.
+  ///
+  /// In de, this message translates to:
+  /// **'Server prüfen'**
+  String get serverCheck;
+
+  /// No description provided for @serverChecking.
+  ///
+  /// In de, this message translates to:
+  /// **'Prüfe …'**
+  String get serverChecking;
+
+  /// No description provided for @serverOk.
+  ///
+  /// In de, this message translates to:
+  /// **'Server erreichbar (Matrix {version})'**
+  String serverOk(String version);
+
+  /// No description provided for @serverOperator.
+  ///
+  /// In de, this message translates to:
+  /// **'Betreiber: {name}'**
+  String serverOperator(String name);
+
+  /// No description provided for @serverNoPassword.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Server erlaubt keine Anmeldung mit Passwort.'**
+  String get serverNoPassword;
+
+  /// No description provided for @serverMetadataNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt. Wer das vermeiden möchte, nutzt einen eigenen Server.'**
+  String get serverMetadataNote;
+
+  /// No description provided for @onbTitleAccount.
+  ///
+  /// In de, this message translates to:
+  /// **'Anmelden'**
+  String get onbTitleAccount;
+
+  /// No description provided for @accountUsername.
+  ///
+  /// In de, this message translates to:
+  /// **'Benutzername'**
+  String get accountUsername;
+
+  /// No description provided for @accountPassword.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwort'**
+  String get accountPassword;
+
+  /// No description provided for @accountLogin.
+  ///
+  /// In de, this message translates to:
+  /// **'Anmelden'**
+  String get accountLogin;
+
+  /// No description provided for @accountLoggingIn.
+  ///
+  /// In de, this message translates to:
+  /// **'Melde an …'**
+  String get accountLoggingIn;
+
+  /// No description provided for @accountHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Du brauchst ein bestehendes Matrix-Konto auf dem gewählten Server. Neue Konten legst du beim Betreiber an.'**
+  String get accountHint;
+
+  /// No description provided for @onbTitleFamily.
+  ///
+  /// In de, this message translates to:
+  /// **'Familie'**
+  String get onbTitleFamily;
+
+  /// No description provided for @familyName.
+  ///
+  /// In de, this message translates to:
+  /// **'Name der Familie'**
+  String get familyName;
+
+  /// No description provided for @familyCreate.
+  ///
+  /// In de, this message translates to:
+  /// **'Familie gründen'**
+  String get familyCreate;
+
+  /// No description provided for @familyCreating.
+  ///
+  /// In de, this message translates to:
+  /// **'Lege an …'**
+  String get familyCreating;
+
+  /// No description provided for @familyCreateHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Du wirst Moderator. Lade später einen zweiten Moderator ein, damit die Familie bei Geräteverlust handlungsfähig bleibt.'**
+  String get familyCreateHint;
+
+  /// No description provided for @familyMinorsNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Kinder können Mitglied werden. Bitte hole dafür die Einwilligung der Sorgeberechtigten ein.'**
+  String get familyMinorsNote;
+
+  /// No description provided for @familyRoleModerator.
+  ///
+  /// In de, this message translates to:
+  /// **'Moderator'**
+  String get familyRoleModerator;
+
+  /// No description provided for @familyRoleMember.
+  ///
+  /// In de, this message translates to:
+  /// **'Mitglied'**
+  String get familyRoleMember;
+
+  /// No description provided for @familyMembers.
+  ///
+  /// In de, this message translates to:
+  /// **'Mitglieder'**
+  String get familyMembers;
+
+  /// No description provided for @familySecondModerator.
+  ///
+  /// In de, this message translates to:
+  /// **'Empfehlung: Ernenne einen zweiten Moderator.'**
+  String get familySecondModerator;
+
+  /// No description provided for @statusInvited.
+  ///
+  /// In de, this message translates to:
+  /// **'Eingeladen'**
+  String get statusInvited;
+
+  /// No description provided for @statusRequested.
+  ///
+  /// In de, this message translates to:
+  /// **'Anfrage'**
+  String get statusRequested;
+
+  /// No description provided for @errInvalidCredentials.
+  ///
+  /// In de, this message translates to:
+  /// **'Benutzername oder Passwort stimmen nicht.'**
+  String get errInvalidCredentials;
+
+  /// No description provided for @errServerUnreachable.
+  ///
+  /// In de, this message translates to:
+  /// **'Server nicht erreichbar. Prüfe die Verbindung.'**
+  String get errServerUnreachable;
+
+  /// No description provided for @errServerUnsupported.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Server wird nicht unterstützt.'**
+  String get errServerUnsupported;
+
+  /// No description provided for @errNotAllowed.
+  ///
+  /// In de, this message translates to:
+  /// **'Dafür fehlt die Berechtigung.'**
+  String get errNotAllowed;
+
+  /// No description provided for @errAttachmentRejected.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Anhang ist nicht erlaubt (Typ oder Größe).'**
+  String get errAttachmentRejected;
+
+  /// No description provided for @errInvalidInput.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte Eingabe prüfen.'**
+  String get errInvalidInput;
+
+  /// No description provided for @errNotFound.
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht gefunden.'**
+  String get errNotFound;
+
+  /// No description provided for @errEncryption.
+  ///
+  /// In de, this message translates to:
+  /// **'Verschlüsselung nicht verfügbar. Es wird nichts gesendet.'**
+  String get errEncryption;
+
+  /// No description provided for @errUnknown.
+  ///
+  /// In de, this message translates to:
+  /// **'Unbekannter Fehler.'**
+  String get errUnknown;
+
+  /// No description provided for @chatHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachricht schreiben'**
+  String get chatHint;
+
+  /// No description provided for @chatSend.
+  ///
+  /// In de, this message translates to:
+  /// **'Senden'**
+  String get chatSend;
+
+  /// No description provided for @chatAttach.
+  ///
+  /// In de, this message translates to:
+  /// **'Datei anhängen'**
+  String get chatAttach;
+
+  /// No description provided for @chatReply.
+  ///
+  /// In de, this message translates to:
+  /// **'Antworten'**
+  String get chatReply;
+
+  /// No description provided for @chatReplyingTo.
+  ///
+  /// In de, this message translates to:
+  /// **'Antwort an {name}'**
+  String chatReplyingTo(String name);
+
+  /// No description provided for @chatCancelReply.
+  ///
+  /// In de, this message translates to:
+  /// **'Antwort abbrechen'**
+  String get chatCancelReply;
+
+  /// No description provided for @chatReact.
+  ///
+  /// In de, this message translates to:
+  /// **'Reagieren'**
+  String get chatReact;
+
+  /// No description provided for @chatRetry.
+  ///
+  /// In de, this message translates to:
+  /// **'Senden fehlgeschlagen – tippen zum Wiederholen'**
+  String get chatRetry;
+
+  /// No description provided for @chatSending.
+  ///
+  /// In de, this message translates to:
+  /// **'Wird gesendet …'**
+  String get chatSending;
+
+  /// No description provided for @chatEncryptedNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Ende-zu-Ende-verschlüsselt'**
+  String get chatEncryptedNote;
+
+  /// No description provided for @chatAttachmentBlocked.
+  ///
+  /// In de, this message translates to:
+  /// **'Anhang blockiert (Typ oder Größe nicht erlaubt)'**
+  String get chatAttachmentBlocked;
+
+  /// No description provided for @chatLoadAttachment.
+  ///
+  /// In de, this message translates to:
+  /// **'Anhang laden'**
+  String get chatLoadAttachment;
+
+  /// No description provided for @chatSaveAttachment.
+  ///
+  /// In de, this message translates to:
+  /// **'Speichern'**
+  String get chatSaveAttachment;
+
+  /// No description provided for @chatMessageFrom.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachricht von {name}'**
+  String chatMessageFrom(String name);
+
+  /// No description provided for @chatYou.
+  ///
+  /// In de, this message translates to:
+  /// **'Du'**
+  String get chatYou;
+
+  /// No description provided for @logout.
+  ///
+  /// In de, this message translates to:
+  /// **'Abmelden'**
+  String get logout;
+
+  /// No description provided for @settingsAccount.
+  ///
+  /// In de, this message translates to:
+  /// **'Konto'**
+  String get settingsAccount;
+
+  /// No description provided for @settingsServer.
+  ///
+  /// In de, this message translates to:
+  /// **'Server'**
+  String get settingsServer;
+
+  /// No description provided for @serverContactUnknown.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakt: nicht angegeben'**
+  String get serverContactUnknown;
+
+  /// No description provided for @serverContact.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakt: {contact}'**
+  String serverContact(String contact);
+
+  /// No description provided for @errAlreadyExists.
+  ///
+  /// In de, this message translates to:
+  /// **'Es gibt bereits eine Familie für dieses Konto.'**
+  String get errAlreadyExists;
+
+  /// No description provided for @errRateLimited.
+  ///
+  /// In de, this message translates to:
+  /// **'Zu viele Anfragen. Bitte später erneut versuchen.'**
+  String get errRateLimited;
+
+  /// No description provided for @chatUndecryptable.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachricht kann nicht entschlüsselt werden'**
+  String get chatUndecryptable;
+
+  /// No description provided for @syncing.
+  ///
+  /// In de, this message translates to:
+  /// **'Synchronisiere …'**
+  String get syncing;
+
+  /// No description provided for @reminderTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Erinnerung'**
+  String get reminderTitle;
+
+  /// No description provided for @reminderBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Termin in {duration}'**
+  String reminderBody(String duration);
+
+  /// No description provided for @reminderChannelName.
+  ///
+  /// In de, this message translates to:
+  /// **'Erinnerungen'**
+  String get reminderChannelName;
+
+  /// No description provided for @reminderChannelDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Erinnerungen an Termine. Sie zeigen keine Inhalte an.'**
+  String get reminderChannelDescription;
+
+  /// No description provided for @durationNow.
+  ///
+  /// In de, this message translates to:
+  /// **'0 Minuten'**
+  String get durationNow;
+
+  /// No description provided for @durationMinutes.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Minute} other{{count} Minuten}}'**
+  String durationMinutes(int count);
+
+  /// No description provided for @durationHours.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Stunde} other{{count} Stunden}}'**
+  String durationHours(int count);
+
+  /// No description provided for @durationDays.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Tag} other{{count} Tage}}'**
+  String durationDays(int count);
+
+  /// No description provided for @reminderBefore.
+  ///
+  /// In de, this message translates to:
+  /// **'{duration} vorher'**
+  String reminderBefore(String duration);
+
+  /// No description provided for @reminderAtStart.
+  ///
+  /// In de, this message translates to:
+  /// **'Zur Startzeit'**
+  String get reminderAtStart;
+
+  /// No description provided for @remindersTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Erinnerungen'**
+  String get remindersTitle;
+
+  /// No description provided for @remindersHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Erinnerungen sind lokale Benachrichtigungen dieses Geräts. Sie zeigen nie Titel oder Ort.'**
+  String get remindersHint;
+
+  /// No description provided for @remindersPermissionNotifications.
+  ///
+  /// In de, this message translates to:
+  /// **'Benachrichtigungen sind blockiert. Ohne sie erscheinen keine Erinnerungen.'**
+  String get remindersPermissionNotifications;
+
+  /// No description provided for @remindersPermissionExact.
+  ///
+  /// In de, this message translates to:
+  /// **'Genaue Alarme sind nicht erlaubt. Erinnerungen können sich verspäten.'**
+  String get remindersPermissionExact;
+
+  /// No description provided for @remindersAllow.
+  ///
+  /// In de, this message translates to:
+  /// **'Erlauben'**
+  String get remindersAllow;
+
+  /// No description provided for @remindersPlanned.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{Keine Erinnerung geplant} =1{1 Erinnerung geplant} other{{count} Erinnerungen geplant}}'**
+  String remindersPlanned(int count);
+
+  /// No description provided for @remindersDefault.
+  ///
+  /// In de, this message translates to:
+  /// **'Standard-Erinnerung'**
+  String get remindersDefault;
+
+  /// No description provided for @remindersNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine'**
+  String get remindersNone;
+
+  /// No description provided for @viewDay.
+  ///
+  /// In de, this message translates to:
+  /// **'Tag'**
+  String get viewDay;
+
+  /// No description provided for @viewWeek.
+  ///
+  /// In de, this message translates to:
+  /// **'Woche'**
+  String get viewWeek;
+
+  /// No description provided for @viewMonth.
+  ///
+  /// In de, this message translates to:
+  /// **'Monat'**
+  String get viewMonth;
+
+  /// No description provided for @viewAgenda.
+  ///
+  /// In de, this message translates to:
+  /// **'Agenda'**
+  String get viewAgenda;
+
+  /// No description provided for @calendarToday.
+  ///
+  /// In de, this message translates to:
+  /// **'Heute'**
+  String get calendarToday;
+
+  /// No description provided for @calendarPrevious.
+  ///
+  /// In de, this message translates to:
+  /// **'Zurück'**
+  String get calendarPrevious;
+
+  /// No description provided for @calendarNext.
+  ///
+  /// In de, this message translates to:
+  /// **'Weiter'**
+  String get calendarNext;
+
+  /// No description provided for @calendarAll.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle'**
+  String get calendarAll;
+
+  /// No description provided for @calendarFilterPerson.
+  ///
+  /// In de, this message translates to:
+  /// **'Nach Person filtern'**
+  String get calendarFilterPerson;
+
+  /// No description provided for @calendarNoEvents.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Termine'**
+  String get calendarNoEvents;
+
+  /// No description provided for @calendarAllDay.
+  ///
+  /// In de, this message translates to:
+  /// **'Ganztägig'**
+  String get calendarAllDay;
+
+  /// No description provided for @calendarNewEvent.
+  ///
+  /// In de, this message translates to:
+  /// **'Neuer Termin'**
+  String get calendarNewEvent;
+
+  /// No description provided for @calendarEventsOnDay.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{Keine Termine} =1{1 Termin} other{{count} Termine}}'**
+  String calendarEventsOnDay(int count);
+
+  /// No description provided for @todayNext.
+  ///
+  /// In de, this message translates to:
+  /// **'Nächste Termine'**
+  String get todayNext;
+
+  /// No description provided for @todayUnread.
+  ///
+  /// In de, this message translates to:
+  /// **'Ungelesene Nachrichten'**
+  String get todayUnread;
+
+  /// No description provided for @todayUnreadCount.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{Keine ungelesenen Nachrichten} =1{1 ungelesene Nachricht} other{{count} ungelesene Nachrichten}}'**
+  String todayUnreadCount(int count);
+
+  /// No description provided for @todayNoUpcoming.
+  ///
+  /// In de, this message translates to:
+  /// **'In den nächsten 30 Tagen stehen keine Termine an.'**
+  String get todayNoUpcoming;
+
+  /// No description provided for @todayOpenChat.
+  ///
+  /// In de, this message translates to:
+  /// **'Chat öffnen'**
+  String get todayOpenChat;
+
+  /// No description provided for @visibilityPrivate.
+  ///
+  /// In de, this message translates to:
+  /// **'Privat'**
+  String get visibilityPrivate;
+
+  /// No description provided for @visibilityShared.
+  ///
+  /// In de, this message translates to:
+  /// **'Geteilt'**
+  String get visibilityShared;
+
+  /// No description provided for @visibilityPrivateHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur auf deinen eigenen Geräten. Wird nie an die Familie gesendet.'**
+  String get visibilityPrivateHint;
+
+  /// No description provided for @visibilitySharedHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Verschlüsselt an die Familie gesendet. Mitglieder sehen den Termin und können zu- oder absagen.'**
+  String get visibilitySharedHint;
+
+  /// No description provided for @visibilityChangeNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Bereits an die Familie gesendete Inhalte bleiben auf deren Geräten, auch wenn du den Termin später privat machst.'**
+  String get visibilityChangeNote;
+
+  /// No description provided for @eventNew.
+  ///
+  /// In de, this message translates to:
+  /// **'Neuer Termin'**
+  String get eventNew;
+
+  /// No description provided for @eventEdit.
+  ///
+  /// In de, this message translates to:
+  /// **'Termin bearbeiten'**
+  String get eventEdit;
+
+  /// No description provided for @eventTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Titel'**
+  String get eventTitle;
+
+  /// No description provided for @eventTitleRequired.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte einen Titel eingeben.'**
+  String get eventTitleRequired;
+
+  /// No description provided for @eventAllDay.
+  ///
+  /// In de, this message translates to:
+  /// **'Ganztägig'**
+  String get eventAllDay;
+
+  /// No description provided for @eventStart.
+  ///
+  /// In de, this message translates to:
+  /// **'Beginn'**
+  String get eventStart;
+
+  /// No description provided for @eventEnd.
+  ///
+  /// In de, this message translates to:
+  /// **'Ende'**
+  String get eventEnd;
+
+  /// No description provided for @eventEndBeforeStart.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Ende liegt vor dem Beginn.'**
+  String get eventEndBeforeStart;
+
+  /// No description provided for @eventLocation.
+  ///
+  /// In de, this message translates to:
+  /// **'Ort'**
+  String get eventLocation;
+
+  /// No description provided for @eventNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Notiz'**
+  String get eventNote;
+
+  /// No description provided for @eventColor.
+  ///
+  /// In de, this message translates to:
+  /// **'Farbe'**
+  String get eventColor;
+
+  /// No description provided for @eventColorName.
+  ///
+  /// In de, this message translates to:
+  /// **'Farbe {number}'**
+  String eventColorName(int number);
+
+  /// No description provided for @eventAttendees.
+  ///
+  /// In de, this message translates to:
+  /// **'Teilnehmer'**
+  String get eventAttendees;
+
+  /// No description provided for @eventVisibility.
+  ///
+  /// In de, this message translates to:
+  /// **'Sichtbarkeit'**
+  String get eventVisibility;
+
+  /// No description provided for @eventTimeZone.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeitzone: {zone}'**
+  String eventTimeZone(String zone);
+
+  /// No description provided for @eventSaveError.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Termin konnte nicht gespeichert werden.'**
+  String get eventSaveError;
+
+  /// No description provided for @eventRepeat.
+  ///
+  /// In de, this message translates to:
+  /// **'Wiederholung'**
+  String get eventRepeat;
+
+  /// No description provided for @repeatNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine'**
+  String get repeatNone;
+
+  /// No description provided for @repeatDaily.
+  ///
+  /// In de, this message translates to:
+  /// **'Täglich'**
+  String get repeatDaily;
+
+  /// No description provided for @repeatWeekly.
+  ///
+  /// In de, this message translates to:
+  /// **'Wöchentlich'**
+  String get repeatWeekly;
+
+  /// No description provided for @repeatMonthly.
+  ///
+  /// In de, this message translates to:
+  /// **'Monatlich'**
+  String get repeatMonthly;
+
+  /// No description provided for @repeatYearly.
+  ///
+  /// In de, this message translates to:
+  /// **'Jährlich'**
+  String get repeatYearly;
+
+  /// No description provided for @repeatEvery.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle'**
+  String get repeatEvery;
+
+  /// No description provided for @repeatUnitDays.
+  ///
+  /// In de, this message translates to:
+  /// **'Tage'**
+  String get repeatUnitDays;
+
+  /// No description provided for @repeatUnitWeeks.
+  ///
+  /// In de, this message translates to:
+  /// **'Wochen'**
+  String get repeatUnitWeeks;
+
+  /// No description provided for @repeatUnitMonths.
+  ///
+  /// In de, this message translates to:
+  /// **'Monate'**
+  String get repeatUnitMonths;
+
+  /// No description provided for @repeatUnitYears.
+  ///
+  /// In de, this message translates to:
+  /// **'Jahre'**
+  String get repeatUnitYears;
+
+  /// No description provided for @repeatEnds.
+  ///
+  /// In de, this message translates to:
+  /// **'Endet'**
+  String get repeatEnds;
+
+  /// No description provided for @repeatEndsNever.
+  ///
+  /// In de, this message translates to:
+  /// **'Nie'**
+  String get repeatEndsNever;
+
+  /// No description provided for @repeatEndsOn.
+  ///
+  /// In de, this message translates to:
+  /// **'Am Datum'**
+  String get repeatEndsOn;
+
+  /// No description provided for @repeatEndsAfter.
+  ///
+  /// In de, this message translates to:
+  /// **'Nach Anzahl'**
+  String get repeatEndsAfter;
+
+  /// No description provided for @repeatCount.
+  ///
+  /// In de, this message translates to:
+  /// **'Anzahl'**
+  String get repeatCount;
+
+  /// No description provided for @repeatUntil.
+  ///
+  /// In de, this message translates to:
+  /// **'Letzter Tag'**
+  String get repeatUntil;
+
+  /// No description provided for @repeatSummaryDaily.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{Täglich} other{Alle {count} Tage}}'**
+  String repeatSummaryDaily(int count);
+
+  /// No description provided for @repeatSummaryWeekly.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{Wöchentlich} other{Alle {count} Wochen}}'**
+  String repeatSummaryWeekly(int count);
+
+  /// No description provided for @repeatSummaryMonthly.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{Monatlich} other{Alle {count} Monate}}'**
+  String repeatSummaryMonthly(int count);
+
+  /// No description provided for @repeatSummaryYearly.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{Jährlich} other{Alle {count} Jahre}}'**
+  String repeatSummaryYearly(int count);
+
+  /// No description provided for @weekdayMon.
+  ///
+  /// In de, this message translates to:
+  /// **'Mo'**
+  String get weekdayMon;
+
+  /// No description provided for @weekdayTue.
+  ///
+  /// In de, this message translates to:
+  /// **'Di'**
+  String get weekdayTue;
+
+  /// No description provided for @weekdayWed.
+  ///
+  /// In de, this message translates to:
+  /// **'Mi'**
+  String get weekdayWed;
+
+  /// No description provided for @weekdayThu.
+  ///
+  /// In de, this message translates to:
+  /// **'Do'**
+  String get weekdayThu;
+
+  /// No description provided for @weekdayFri.
+  ///
+  /// In de, this message translates to:
+  /// **'Fr'**
+  String get weekdayFri;
+
+  /// No description provided for @weekdaySat.
+  ///
+  /// In de, this message translates to:
+  /// **'Sa'**
+  String get weekdaySat;
+
+  /// No description provided for @weekdaySun.
+  ///
+  /// In de, this message translates to:
+  /// **'So'**
+  String get weekdaySun;
+
+  /// No description provided for @eventDelete.
+  ///
+  /// In de, this message translates to:
+  /// **'Termin löschen'**
+  String get eventDelete;
+
+  /// No description provided for @eventDeleteConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Diesen Termin wirklich löschen?'**
+  String get eventDeleteConfirm;
+
+  /// No description provided for @eventDeleteSeriesConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Vorkommen oder nur dieses löschen?'**
+  String get eventDeleteSeriesConfirm;
+
+  /// No description provided for @eventDeleteThis.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur dieses'**
+  String get eventDeleteThis;
+
+  /// No description provided for @eventDeleteAll.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle'**
+  String get eventDeleteAll;
+
+  /// No description provided for @eventShareInChat.
+  ///
+  /// In de, this message translates to:
+  /// **'Im Chat teilen'**
+  String get eventShareInChat;
+
+  /// No description provided for @eventShared.
+  ///
+  /// In de, this message translates to:
+  /// **'Im Chat geteilt'**
+  String get eventShared;
+
+  /// No description provided for @eventOwner.
+  ///
+  /// In de, this message translates to:
+  /// **'Von {name}'**
+  String eventOwner(String name);
+
+  /// No description provided for @eventOwnerYou.
+  ///
+  /// In de, this message translates to:
+  /// **'Von dir'**
+  String get eventOwnerYou;
+
+  /// No description provided for @eventRsvp.
+  ///
+  /// In de, this message translates to:
+  /// **'Antwort'**
+  String get eventRsvp;
+
+  /// No description provided for @rsvpAccept.
+  ///
+  /// In de, this message translates to:
+  /// **'Zusagen'**
+  String get rsvpAccept;
+
+  /// No description provided for @rsvpDecline.
+  ///
+  /// In de, this message translates to:
+  /// **'Absagen'**
+  String get rsvpDecline;
+
+  /// No description provided for @rsvpMaybe.
+  ///
+  /// In de, this message translates to:
+  /// **'Vielleicht'**
+  String get rsvpMaybe;
+
+  /// No description provided for @rsvpAccepted.
+  ///
+  /// In de, this message translates to:
+  /// **'Zugesagt'**
+  String get rsvpAccepted;
+
+  /// No description provided for @rsvpDeclined.
+  ///
+  /// In de, this message translates to:
+  /// **'Abgesagt'**
+  String get rsvpDeclined;
+
+  /// No description provided for @rsvpMaybeStatus.
+  ///
+  /// In de, this message translates to:
+  /// **'Vielleicht'**
+  String get rsvpMaybeStatus;
+
+  /// No description provided for @rsvpNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Antwort'**
+  String get rsvpNone;
+
+  /// No description provided for @eventHistory.
+  ///
+  /// In de, this message translates to:
+  /// **'Verlauf'**
+  String get eventHistory;
+
+  /// No description provided for @eventVersion.
+  ///
+  /// In de, this message translates to:
+  /// **'Version {version}'**
+  String eventVersion(int version);
+
+  /// No description provided for @eventRecurring.
+  ///
+  /// In de, this message translates to:
+  /// **'Wiederholt'**
+  String get eventRecurring;
+
+  /// No description provided for @eventCancelled.
+  ///
+  /// In de, this message translates to:
+  /// **'Gelöscht'**
+  String get eventCancelled;
+
+  /// No description provided for @eventReadOnly.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur der Ersteller kann diesen Termin ändern.'**
+  String get eventReadOnly;
+
+  /// No description provided for @eventYourReminders.
+  ///
+  /// In de, this message translates to:
+  /// **'Deine Erinnerungen'**
+  String get eventYourReminders;
+
+  /// No description provided for @eventResetReminders.
+  ///
+  /// In de, this message translates to:
+  /// **'Standard verwenden'**
+  String get eventResetReminders;
+
+  /// No description provided for @chatEventCard.
+  ///
+  /// In de, this message translates to:
+  /// **'Termin'**
+  String get chatEventCard;
+
+  /// No description provided for @chatEventMissing.
+  ///
+  /// In de, this message translates to:
+  /// **'Termin nicht verfügbar'**
+  String get chatEventMissing;
+
+  /// No description provided for @settingsReminders.
+  ///
+  /// In de, this message translates to:
+  /// **'Erinnerungen'**
+  String get settingsReminders;
+
+  /// No description provided for @repeatUntilInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Das letzte Datum der Wiederholung liegt vor dem ersten Termin.'**
+  String get repeatUntilInvalid;
+
+  /// No description provided for @errReauth.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte bestätige dein Passwort.'**
+  String get errReauth;
+
+  /// No description provided for @securityTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Schlüsselsicherung'**
+  String get securityTitle;
+
+  /// No description provided for @securityIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Damit nur deine eigenen Geräte deine verschlüsselten Nachrichten und Termine lesen können, richtest du jetzt eine Schlüsselsicherung ein.'**
+  String get securityIntro;
+
+  /// No description provided for @securitySetupButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Schlüsselsicherung einrichten'**
+  String get securitySetupButton;
+
+  /// No description provided for @securitySettingUp.
+  ///
+  /// In de, this message translates to:
+  /// **'Richte ein …'**
+  String get securitySettingUp;
+
+  /// No description provided for @securityKeyTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Wiederherstellungsschlüssel'**
+  String get securityKeyTitle;
+
+  /// No description provided for @securityKeyHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Notiere ihn auf Papier und bewahre ihn sicher auf. Er wird nur jetzt angezeigt. Ohne ihn und ohne ein verifiziertes Gerät sind deine Nachrichten bei Verlust aller Geräte unwiederbringlich.'**
+  String get securityKeyHint;
+
+  /// No description provided for @securityKeySaved.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich habe den Schlüssel sicher notiert.'**
+  String get securityKeySaved;
+
+  /// No description provided for @securityRestoreTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieses Gerät verifizieren'**
+  String get securityRestoreTitle;
+
+  /// No description provided for @securityRestoreIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Konto ist bereits abgesichert. Verifiziere dieses Gerät mit einem anderen deiner Geräte oder mit deinem Wiederherstellungsschlüssel.'**
+  String get securityRestoreIntro;
+
+  /// No description provided for @securityVerifyWithDevice.
+  ///
+  /// In de, this message translates to:
+  /// **'Mit einem anderen Gerät verifizieren'**
+  String get securityVerifyWithDevice;
+
+  /// No description provided for @securityNoOtherDevice.
+  ///
+  /// In de, this message translates to:
+  /// **'Kein anderes Gerät gefunden. Nutze den Wiederherstellungsschlüssel.'**
+  String get securityNoOtherDevice;
+
+  /// No description provided for @securityRestoreKeyLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Wiederherstellungsschlüssel'**
+  String get securityRestoreKeyLabel;
+
+  /// No description provided for @securityRestoreButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Mit Schlüssel wiederherstellen'**
+  String get securityRestoreButton;
+
+  /// No description provided for @securityRestoring.
+  ///
+  /// In de, this message translates to:
+  /// **'Stelle wieder her …'**
+  String get securityRestoring;
+
+  /// No description provided for @securityRestoreFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Schlüssel passt nicht.'**
+  String get securityRestoreFailed;
+
+  /// No description provided for @securityPasswordTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwort bestätigen'**
+  String get securityPasswordTitle;
+
+  /// No description provided for @securityPasswordHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Server verlangt dein Passwort zur Bestätigung. Es wird nicht gespeichert.'**
+  String get securityPasswordHint;
+
+  /// No description provided for @securityStatusReady.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieses Gerät ist verifiziert.'**
+  String get securityStatusReady;
+
+  /// No description provided for @securityStatusNeeds.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieses Gerät ist noch nicht verifiziert.'**
+  String get securityStatusNeeds;
+
+  /// No description provided for @securityDevices.
+  ///
+  /// In de, this message translates to:
+  /// **'Geräte deines Kontos'**
+  String get securityDevices;
+
+  /// No description provided for @securityDeviceThis.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieses Gerät'**
+  String get securityDeviceThis;
+
+  /// No description provided for @securityDeviceVerified.
+  ///
+  /// In de, this message translates to:
+  /// **'Verifiziert'**
+  String get securityDeviceVerified;
+
+  /// No description provided for @securityDeviceUnverified.
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht verifiziert'**
+  String get securityDeviceUnverified;
+
+  /// No description provided for @securityVerifyDevice.
+  ///
+  /// In de, this message translates to:
+  /// **'Verifizieren'**
+  String get securityVerifyDevice;
+
+  /// No description provided for @securityVerifyPerson.
+  ///
+  /// In de, this message translates to:
+  /// **'Verifizieren'**
+  String get securityVerifyPerson;
+
+  /// No description provided for @verifyTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Verifizierung'**
+  String get verifyTitle;
+
+  /// No description provided for @verifyIncoming.
+  ///
+  /// In de, this message translates to:
+  /// **'{peer} möchte die Verifizierung starten.'**
+  String verifyIncoming(String peer);
+
+  /// No description provided for @verifyWaiting.
+  ///
+  /// In de, this message translates to:
+  /// **'Warte auf die Gegenseite …'**
+  String get verifyWaiting;
+
+  /// No description provided for @verifyCompare.
+  ///
+  /// In de, this message translates to:
+  /// **'Vergleiche diese Symbole mit denen auf dem anderen Gerät. Sie müssen in gleicher Reihenfolge übereinstimmen.'**
+  String get verifyCompare;
+
+  /// No description provided for @verifyMatch.
+  ///
+  /// In de, this message translates to:
+  /// **'Sie stimmen überein'**
+  String get verifyMatch;
+
+  /// No description provided for @verifyNoMatch.
+  ///
+  /// In de, this message translates to:
+  /// **'Sie stimmen nicht überein'**
+  String get verifyNoMatch;
+
+  /// No description provided for @verifyWaitingConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Warte auf Bestätigung der Gegenseite …'**
+  String get verifyWaitingConfirm;
+
+  /// No description provided for @verifyDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Verifiziert.'**
+  String get verifyDone;
+
+  /// No description provided for @verifyCancelled.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Verifizierung wurde abgebrochen.'**
+  String get verifyCancelled;
+
+  /// No description provided for @accept.
+  ///
+  /// In de, this message translates to:
+  /// **'Annehmen'**
+  String get accept;
+
+  /// No description provided for @decline.
+  ///
+  /// In de, this message translates to:
+  /// **'Ablehnen'**
+  String get decline;
+
+  /// No description provided for @familyManage.
+  ///
+  /// In de, this message translates to:
+  /// **'Verwaltung'**
+  String get familyManage;
+
+  /// No description provided for @familyInvite.
+  ///
+  /// In de, this message translates to:
+  /// **'Mitglied einladen'**
+  String get familyInvite;
+
+  /// No description provided for @familyInviteLinkTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladungslink'**
+  String get familyInviteLinkTitle;
+
+  /// No description provided for @familyInviteLinkHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Gültig 24 Stunden. Wer den Link öffnet, stellt nur eine Anfrage – du bestätigst sie.'**
+  String get familyInviteLinkHint;
+
+  /// No description provided for @familyInviteShowQr.
+  ///
+  /// In de, this message translates to:
+  /// **'QR-Code anzeigen'**
+  String get familyInviteShowQr;
+
+  /// No description provided for @familyInviteCopyLink.
+  ///
+  /// In de, this message translates to:
+  /// **'Link kopieren'**
+  String get familyInviteCopyLink;
+
+  /// No description provided for @familyInviteCopied.
+  ///
+  /// In de, this message translates to:
+  /// **'Link kopiert.'**
+  String get familyInviteCopied;
+
+  /// No description provided for @familyInviteById.
+  ///
+  /// In de, this message translates to:
+  /// **'Matrix-ID einladen'**
+  String get familyInviteById;
+
+  /// No description provided for @familyInviteByIdHint.
+  ///
+  /// In de, this message translates to:
+  /// **'@name:server'**
+  String get familyInviteByIdHint;
+
+  /// No description provided for @familyInviteSend.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladen'**
+  String get familyInviteSend;
+
+  /// No description provided for @familyInviteInvalidId.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte eine gültige Matrix-ID eingeben.'**
+  String get familyInviteInvalidId;
+
+  /// No description provided for @familyInviteSent.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladung gesendet.'**
+  String get familyInviteSent;
+
+  /// No description provided for @familyRequests.
+  ///
+  /// In de, this message translates to:
+  /// **'Beitrittsanfragen'**
+  String get familyRequests;
+
+  /// No description provided for @familyRequestApprove.
+  ///
+  /// In de, this message translates to:
+  /// **'Bestätigen'**
+  String get familyRequestApprove;
+
+  /// No description provided for @familyRequestReject.
+  ///
+  /// In de, this message translates to:
+  /// **'Ablehnen'**
+  String get familyRequestReject;
+
+  /// No description provided for @familyMemberPromote.
+  ///
+  /// In de, this message translates to:
+  /// **'Zum Moderator ernennen'**
+  String get familyMemberPromote;
+
+  /// No description provided for @familyMemberRemove.
+  ///
+  /// In de, this message translates to:
+  /// **'Entfernen'**
+  String get familyMemberRemove;
+
+  /// No description provided for @familyMemberRemoveConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} wirklich aus der Familie entfernen? Die Raumschlüssel werden erneuert; neue Inhalte kann {name} nicht mehr lesen.'**
+  String familyMemberRemoveConfirm(String name);
+
+  /// No description provided for @familyMemberPromoteConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} zum Moderator ernennen? Moderatoren können einladen, ernennen und entfernen.'**
+  String familyMemberPromoteConfirm(String name);
+
+  /// No description provided for @familyRename.
+  ///
+  /// In de, this message translates to:
+  /// **'Familienname ändern'**
+  String get familyRename;
+
+  /// No description provided for @familyRenamed.
+  ///
+  /// In de, this message translates to:
+  /// **'Name geändert.'**
+  String get familyRenamed;
+
+  /// No description provided for @familyDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Erledigt.'**
+  String get familyDone;
+
+  /// No description provided for @familyOnlyModerators.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur Moderatoren verwalten die Familie.'**
+  String get familyOnlyModerators;
+
+  /// No description provided for @joinTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Familie beitreten'**
+  String get joinTitle;
+
+  /// No description provided for @joinHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Füge einen Einladungslink ein oder öffne den Link bzw. QR-Code mit der Kamera-App.'**
+  String get joinHint;
+
+  /// No description provided for @joinLinkLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladungslink'**
+  String get joinLinkLabel;
+
+  /// No description provided for @joinLinkInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Link ist ungültig oder abgelaufen.'**
+  String get joinLinkInvalid;
+
+  /// No description provided for @joinSend.
+  ///
+  /// In de, this message translates to:
+  /// **'Beitrittsanfrage senden'**
+  String get joinSend;
+
+  /// No description provided for @joinConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Beitritt anfragen?'**
+  String get joinConfirmTitle;
+
+  /// No description provided for @joinConfirmBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Du fragst an, der Familie auf dem Server {server} beizutreten. Eingeladen hat {inviter}. Ein Moderator muss bestätigen.'**
+  String joinConfirmBody(String server, String inviter);
+
+  /// No description provided for @joinPending.
+  ///
+  /// In de, this message translates to:
+  /// **'Anfrage gesendet. Warte auf die Bestätigung eines Moderators.'**
+  String get joinPending;
+
+  /// No description provided for @joinCancel.
+  ///
+  /// In de, this message translates to:
+  /// **'Anfrage zurückziehen'**
+  String get joinCancel;
+
+  /// No description provided for @invitationsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladungen'**
+  String get invitationsTitle;
+
+  /// No description provided for @invitationFrom.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladung von {inviter}'**
+  String invitationFrom(String inviter);
+
+  /// No description provided for @onbCreateOrJoin.
+  ///
+  /// In de, this message translates to:
+  /// **'Gründe eine neue Familie oder tritt einer bestehenden bei.'**
+  String get onbCreateOrJoin;
+
+  /// No description provided for @onbCreateTab.
+  ///
+  /// In de, this message translates to:
+  /// **'Gründen'**
+  String get onbCreateTab;
+
+  /// No description provided for @onbJoinTab.
+  ///
+  /// In de, this message translates to:
+  /// **'Beitreten'**
+  String get onbJoinTab;
+
+  /// No description provided for @onbChangeAccount.
+  ///
+  /// In de, this message translates to:
+  /// **'Abmelden'**
+  String get onbChangeAccount;
+
+  /// No description provided for @lockTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'FamilyNexus ist gesperrt'**
+  String get lockTitle;
+
+  /// No description provided for @lockHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Bestätige mit der Geräteanmeldung (PIN, Muster, Passwort oder Biometrie).'**
+  String get lockHint;
+
+  /// No description provided for @lockUnlock.
+  ///
+  /// In de, this message translates to:
+  /// **'Entsperren'**
+  String get lockUnlock;
+
+  /// No description provided for @lockReason.
+  ///
+  /// In de, this message translates to:
+  /// **'FamilyNexus entsperren'**
+  String get lockReason;
+
+  /// No description provided for @settingsLock.
+  ///
+  /// In de, this message translates to:
+  /// **'App-Sperre'**
+  String get settingsLock;
+
+  /// No description provided for @settingsLockHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Sperrt die App nach Inaktivität. Die Bestätigung erfolgt mit der Sperre deines Geräts; die App speichert keine eigene PIN.'**
+  String get settingsLockHint;
+
+  /// No description provided for @settingsLockUnavailable.
+  ///
+  /// In de, this message translates to:
+  /// **'Auf diesem Gerät ist keine gesicherte Bildschirmsperre eingerichtet.'**
+  String get settingsLockUnavailable;
+
+  /// No description provided for @settingsLockFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Bestätigung war nicht erfolgreich.'**
+  String get settingsLockFailed;
+
+  /// No description provided for @settingsLockTimeout.
+  ///
+  /// In de, this message translates to:
+  /// **'Sperren nach'**
+  String get settingsLockTimeout;
+
+  /// No description provided for @lockImmediately.
+  ///
+  /// In de, this message translates to:
+  /// **'Sofort'**
+  String get lockImmediately;
+
+  /// No description provided for @lock1min.
+  ///
+  /// In de, this message translates to:
+  /// **'1 Minute'**
+  String get lock1min;
+
+  /// No description provided for @lock5min.
+  ///
+  /// In de, this message translates to:
+  /// **'5 Minuten'**
+  String get lock5min;
+
+  /// No description provided for @lock15min.
+  ///
+  /// In de, this message translates to:
+  /// **'15 Minuten'**
+  String get lock15min;
+
+  /// No description provided for @settingsPrivacyPolicy.
+  ///
+  /// In de, this message translates to:
+  /// **'Datenschutzerklärung'**
+  String get settingsPrivacyPolicy;
+
+  /// No description provided for @settingsDeleteData.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle lokalen Daten löschen'**
+  String get settingsDeleteData;
+
+  /// No description provided for @settingsDeleteDataHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Meldet dich ab und löscht Datenbank, Schlüssel und Erinnerungen auf diesem Gerät.'**
+  String get settingsDeleteDataHint;
+
+  /// No description provided for @deleteDataTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle lokalen Daten löschen?'**
+  String get deleteDataTitle;
+
+  /// No description provided for @deleteDataBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Daten dieser App auf diesem Gerät werden unwiderruflich gelöscht und du wirst abgemeldet. Nachrichten und geteilte Termine auf Geräten anderer Familienmitglieder lassen sich technisch nicht löschen. Dein Konto beim Server bleibt bestehen; zum Löschen wende dich an dessen Betreiber.'**
+  String get deleteDataBody;
+
+  /// No description provided for @deleteDataConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Endgültig löschen'**
+  String get deleteDataConfirm;
+
+  /// No description provided for @privacyTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Datenschutzerklärung'**
+  String get privacyTitle;
+
+  /// No description provided for @privacy1Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Wer verarbeitet deine Daten?'**
+  String get privacy1Title;
+
+  /// No description provided for @privacy1Body.
+  ///
+  /// In de, this message translates to:
+  /// **'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Verantwortlich für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Matrix-Servers; er wird bei der Einrichtung angezeigt.'**
+  String get privacy1Body;
+
+  /// No description provided for @privacy2Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Welche Daten gibt es?'**
+  String get privacy2Title;
+
+  /// No description provided for @privacy2Body.
+  ///
+  /// In de, this message translates to:
+  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt im Android-Schlüsselspeicher und nie in einer Datei.'**
+  String get privacy2Body;
+
+  /// No description provided for @privacy3Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Was sieht der Server?'**
+  String get privacy3Title;
+
+  /// No description provided for @privacy3Body.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm). Der Server sieht nur verschlüsselte Ereignisse. Metadaten wie Konto-ID, Zeitpunkte, Raumgröße und Geräte bleiben für den Betreiber sichtbar. Wer das vermeiden möchte, nutzt einen eigenen Server.'**
+  String get privacy3Body;
+
+  /// No description provided for @privacy4Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Private Termine'**
+  String get privacy4Title;
+
+  /// No description provided for @privacy4Body.
+  ///
+  /// In de, this message translates to:
+  /// **'Private Termine werden nie an die Familie gesendet. Zwischen deinen eigenen Geräten werden sie über einen privaten, verschlüsselten Raum abgeglichen, dem nur dein Konto angehört.'**
+  String get privacy4Body;
+
+  /// No description provided for @privacy5Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Erinnerungen und Benachrichtigungen'**
+  String get privacy5Title;
+
+  /// No description provided for @privacy5Body.
+  ///
+  /// In de, this message translates to:
+  /// **'Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“. Es gibt keinen Push-Dienst eines Dritten.'**
+  String get privacy5Body;
+
+  /// No description provided for @privacy6Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Berechtigungen'**
+  String get privacy6Title;
+
+  /// No description provided for @privacy6Body.
+  ///
+  /// In de, this message translates to:
+  /// **'Internet (Verbindung zum Server), Benachrichtigungen und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen) und Geräteanmeldung (App-Sperre). Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.'**
+  String get privacy6Body;
+
+  /// No description provided for @privacy7Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Sicherung und Löschung'**
+  String get privacy7Title;
+
+  /// No description provided for @privacy7Body.
+  ///
+  /// In de, this message translates to:
+  /// **'Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Wiederherstellungsschlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf.'**
+  String get privacy7Body;
+
+  /// No description provided for @privacy8Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Kinder'**
+  String get privacy8Title;
+
+  /// No description provided for @privacy8Body.
+  ///
+  /// In de, this message translates to:
+  /// **'Kinder können Familienmitglieder sein. Dafür ist die Einwilligung der Sorgeberechtigten nötig; Konten Minderjähriger laufen über die Einladung und Bestätigung eines Moderators.'**
+  String get privacy8Body;
+
+  /// No description provided for @privacy9Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Deine Rechte'**
+  String get privacy9Title;
+
+  /// No description provided for @privacy9Body.
+  ///
+  /// In de, this message translates to:
+  /// **'Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App; Serverdaten beim Betreiber deines Servers.'**
+  String get privacy9Body;
+
+  /// No description provided for @familyRequestCheckValid.
+  ///
+  /// In de, this message translates to:
+  /// **'Gültiger Einladungslink'**
+  String get familyRequestCheckValid;
+
+  /// No description provided for @familyRequestCheckExpired.
+  ///
+  /// In de, this message translates to:
+  /// **'Link abgelaufen'**
+  String get familyRequestCheckExpired;
+
+  /// No description provided for @familyRequestCheckUnknown.
+  ///
+  /// In de, this message translates to:
+  /// **'Unbekannter Link – nicht von dir ausgegeben'**
+  String get familyRequestCheckUnknown;
+
+  /// No description provided for @familyRequestApproveConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'{user} in die Familie aufnehmen? Der Einladungslink wird dabei verbraucht.'**
+  String familyRequestApproveConfirm(String user);
+
+  /// No description provided for @identityVerified.
+  ///
+  /// In de, this message translates to:
+  /// **'Verifiziert'**
+  String get identityVerified;
+
+  /// No description provided for @identityPinned.
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht persönlich geprüft'**
+  String get identityPinned;
+
+  /// No description provided for @identityUnknown.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Schlüssel bekannt'**
+  String get identityUnknown;
+
+  /// No description provided for @identityChanged.
+  ///
+  /// In de, this message translates to:
+  /// **'Identität geändert'**
+  String get identityChanged;
+
+  /// No description provided for @identityChangedWarning.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Sicherheitsschlüssel von {name} hat sich geändert. Seine Geräte sind gesperrt, bis ihr euch persönlich per Emoji-Vergleich geprüft habt.'**
+  String identityChangedWarning(String name);
+
+  /// No description provided for @identityAccept.
+  ///
+  /// In de, this message translates to:
+  /// **'Änderung akzeptieren'**
+  String get identityAccept;
+
+  /// No description provided for @identityAcceptConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Erst akzeptieren, wenn ihr euch persönlich (z. B. per Emoji-Vergleich) geprüft habt. Fortfahren?'**
+  String get identityAcceptConfirm;
+
+  /// No description provided for @invitationUnexpectedWarning.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Einladung gehört zu keiner Beitrittsanfrage von dir. Nimm sie nur an, wenn du {inviter} kennst und die Einladung erwartet hast.'**
+  String invitationUnexpectedWarning(String inviter);
+
+  /// No description provided for @memberActionsTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Aktionen für {name}'**
+  String memberActionsTooltip(String name);
+
+  /// No description provided for @familyInviteConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'{user} einladen? Eingeladene erhalten bereits vor der Annahme die Nachrichtenschlüssel der Familie – lade nur Personen ein, die du sicher kennst.'**
+  String familyInviteConfirm(String user);
+
+  /// No description provided for @attachmentSaveWarning.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Datei wird entschlüsselt und unverschlüsselt im gewählten Ordner gespeichert. Sie bleibt dort auch nach dem Abmelden oder Löschen der App-Daten erhalten. Fortfahren?'**
+  String get attachmentSaveWarning;
+
+  /// No description provided for @tabShopping.
+  ///
+  /// In de, this message translates to:
+  /// **'Einkauf'**
+  String get tabShopping;
+
+  /// No description provided for @settingsShareOnlineStatus.
+  ///
+  /// In de, this message translates to:
+  /// **'Online-Status teilen'**
+  String get settingsShareOnlineStatus;
+
+  /// No description provided for @settingsShareOnlineStatusHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeigt der Familie, wann du die App nutzt. Die Meldung geht nur Ende-zu-Ende-verschlüsselt an Geräte von Familienmitgliedern. Ausgeschaltet giltst du für andere als offline.'**
+  String get settingsShareOnlineStatusHint;
+
+  /// No description provided for @presenceOnline.
+  ///
+  /// In de, this message translates to:
+  /// **'Online'**
+  String get presenceOnline;
+
+  /// No description provided for @presenceOffline.
+  ///
+  /// In de, this message translates to:
+  /// **'Offline'**
+  String get presenceOffline;
+
+  /// No description provided for @presenceUnknown.
+  ///
+  /// In de, this message translates to:
+  /// **'Status unbekannt'**
+  String get presenceUnknown;
+
+  /// No description provided for @presenceLastSeen.
+  ///
+  /// In de, this message translates to:
+  /// **'Zuletzt online {ago}'**
+  String presenceLastSeen(String ago);
+
+  /// No description provided for @presenceAgoNow.
+  ///
+  /// In de, this message translates to:
+  /// **'gerade eben'**
+  String get presenceAgoNow;
+
+  /// No description provided for @presenceAgoMinutes.
+  ///
+  /// In de, this message translates to:
+  /// **'vor {count} Min.'**
+  String presenceAgoMinutes(int count);
+
+  /// No description provided for @presenceAgoHours.
+  ///
+  /// In de, this message translates to:
+  /// **'vor {count} Std.'**
+  String presenceAgoHours(int count);
+
+  /// No description provided for @presenceAgoDays.
+  ///
+  /// In de, this message translates to:
+  /// **'vor {count} Tg.'**
+  String presenceAgoDays(int count);
+
+  /// No description provided for @presenceSelfHidden.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Status wird nicht geteilt'**
+  String get presenceSelfHidden;
+
+  /// No description provided for @presenceSelf.
+  ///
+  /// In de, this message translates to:
+  /// **'Du bist online'**
+  String get presenceSelf;
+
+  /// No description provided for @presenceOf.
+  ///
+  /// In de, this message translates to:
+  /// **'{name}: {status}'**
+  String presenceOf(String name, String status);
+
+  /// No description provided for @chatThreads.
+  ///
+  /// In de, this message translates to:
+  /// **'Gespräche'**
+  String get chatThreads;
+
+  /// No description provided for @chatThreadFamily.
+  ///
+  /// In de, this message translates to:
+  /// **'Familienchat {name}'**
+  String chatThreadFamily(String name);
+
+  /// No description provided for @chatThreadDirect.
+  ///
+  /// In de, this message translates to:
+  /// **'Einzelchat mit {name}'**
+  String chatThreadDirect(String name);
+
+  /// No description provided for @chatUnreadCount.
+  ///
+  /// In de, this message translates to:
+  /// **'{count} ungelesen'**
+  String chatUnreadCount(int count);
+
+  /// No description provided for @chatDirectNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur zwischen dir und {name}, Ende-zu-Ende-verschlüsselt'**
+  String chatDirectNote(String name);
+
+  /// No description provided for @chatDirectNotAvailable.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieses Gespräch ist nicht mehr verfügbar.'**
+  String get chatDirectNotAvailable;
+
+  /// No description provided for @familyWriteMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachricht schreiben'**
+  String get familyWriteMessage;
+
+  /// No description provided for @shoppingTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Einkaufszettel'**
+  String get shoppingTitle;
+
+  /// No description provided for @shoppingNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Gemeinsam mit der Familie, Ende-zu-Ende-verschlüsselt'**
+  String get shoppingNote;
+
+  /// No description provided for @shoppingHintItem.
+  ///
+  /// In de, this message translates to:
+  /// **'Was wird gebraucht?'**
+  String get shoppingHintItem;
+
+  /// No description provided for @shoppingHintQuantity.
+  ///
+  /// In de, this message translates to:
+  /// **'Menge (optional)'**
+  String get shoppingHintQuantity;
+
+  /// No description provided for @shoppingAdd.
+  ///
+  /// In de, this message translates to:
+  /// **'Hinzufügen'**
+  String get shoppingAdd;
+
+  /// No description provided for @shoppingEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Einkaufszettel ist leer. Füge oben etwas hinzu.'**
+  String get shoppingEmpty;
+
+  /// No description provided for @shoppingOpenHeader.
+  ///
+  /// In de, this message translates to:
+  /// **'Zu besorgen ({count})'**
+  String shoppingOpenHeader(int count);
+
+  /// No description provided for @shoppingDoneHeader.
+  ///
+  /// In de, this message translates to:
+  /// **'Erledigt ({count})'**
+  String shoppingDoneHeader(int count);
+
+  /// No description provided for @shoppingClearDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Erledigte entfernen'**
+  String get shoppingClearDone;
+
+  /// No description provided for @shoppingClearConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'{count} erledigte Einträge für die ganze Familie entfernen?'**
+  String shoppingClearConfirm(int count);
+
+  /// No description provided for @shoppingCleared.
+  ///
+  /// In de, this message translates to:
+  /// **'{count} Einträge entfernt'**
+  String shoppingCleared(int count);
+
+  /// No description provided for @shoppingEditTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Eintrag bearbeiten'**
+  String get shoppingEditTitle;
+
+  /// No description provided for @shoppingEdit.
+  ///
+  /// In de, this message translates to:
+  /// **'Bearbeiten'**
+  String get shoppingEdit;
+
+  /// No description provided for @shoppingDelete.
+  ///
+  /// In de, this message translates to:
+  /// **'Löschen'**
+  String get shoppingDelete;
+
+  /// No description provided for @shoppingMarkDone.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} als erledigt markieren'**
+  String shoppingMarkDone(String name);
+
+  /// No description provided for @shoppingMarkOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} wieder auf die Liste setzen'**
+  String shoppingMarkOpen(String name);
+
+  /// No description provided for @shoppingLastBy.
+  ///
+  /// In de, this message translates to:
+  /// **'zuletzt von {name}'**
+  String shoppingLastBy(String name);
+
+  /// No description provided for @shoppingLimit.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Einkaufszettel ist voll (höchstens 300 Einträge). Entferne erledigte Einträge.'**
+  String get shoppingLimit;
+
+  /// No description provided for @shoppingInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Eintrag ist ungültig (leer, zu lang oder mit unzulässigen Zeichen).'**
+  String get shoppingInvalid;
+
+  /// No description provided for @todayOnlineHeader.
+  ///
+  /// In de, this message translates to:
+  /// **'Wer ist online'**
+  String get todayOnlineHeader;
+
+  /// No description provided for @todayNobodyOnline.
+  ///
+  /// In de, this message translates to:
+  /// **'Gerade ist sonst niemand online.'**
+  String get todayNobodyOnline;
+
+  /// No description provided for @todayShoppingOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'Einkaufszettel: {count} offen'**
+  String todayShoppingOpen(int count);
+
+  /// No description provided for @privacy10Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Online-Status, Einzelchats, Einkaufszettel'**
+  String get privacy10Title;
+
+  /// No description provided for @privacy10Body.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.'**
+  String get privacy10Body;
+
+  /// No description provided for @onbFamilyFound.
+  ///
+  /// In de, this message translates to:
+  /// **'Familie „{name}“ gefunden – du bist bereits Mitglied. Die Einrichtung wird abgeschlossen.'**
+  String onbFamilyFound(String name);
+
+  /// No description provided for @settingsAccent.
+  ///
+  /// In de, this message translates to:
+  /// **'Akzentfarbe'**
+  String get settingsAccent;
+
+  /// No description provided for @settingsAccentHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Neonfarbe für Schaltflächen, Auswahl und Hervorhebungen. Gilt im hellen und im dunklen Design.'**
+  String get settingsAccentHint;
+
+  /// No description provided for @accentTeal.
+  ///
+  /// In de, this message translates to:
+  /// **'Türkis'**
+  String get accentTeal;
+
+  /// No description provided for @accentMagenta.
+  ///
+  /// In de, this message translates to:
+  /// **'Magenta'**
+  String get accentMagenta;
+
+  /// No description provided for @accentViolet.
+  ///
+  /// In de, this message translates to:
+  /// **'Violett'**
+  String get accentViolet;
+
+  /// No description provided for @accentSky.
+  ///
+  /// In de, this message translates to:
+  /// **'Himmelblau'**
+  String get accentSky;
+
+  /// No description provided for @accentLime.
+  ///
+  /// In de, this message translates to:
+  /// **'Limette'**
+  String get accentLime;
+
+  /// No description provided for @accentOrange.
+  ///
+  /// In de, this message translates to:
+  /// **'Orange'**
+  String get accentOrange;
+
+  /// No description provided for @accentRose.
+  ///
+  /// In de, this message translates to:
+  /// **'Rosé'**
+  String get accentRose;
+
+  /// No description provided for @accentGreen.
+  ///
+  /// In de, this message translates to:
+  /// **'Grün'**
+  String get accentGreen;
+
+  /// No description provided for @menuOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'Menü öffnen'**
+  String get menuOpen;
+
+  /// No description provided for @menuTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Menü'**
+  String get menuTitle;
+}
+
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
+
+  @override
+  Future<AppLocalizations> load(Locale locale) {
+    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
+  }
+
+  @override
+  bool isSupported(Locale locale) =>
+      <String>['de', 'en'].contains(locale.languageCode);
+
+  @override
+  bool shouldReload(_AppLocalizationsDelegate old) => false;
+}
+
+AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when only language code is specified.
+  switch (locale.languageCode) {
+    case 'de':
+      return AppLocalizationsDe();
+    case 'en':
+      return AppLocalizationsEn();
+  }
+
+  throw FlutterError(
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.',
+  );
+}

@@ -1,0 +1,31 @@
+FamilyNexus bringt Familienkalender, Messenger und Einkaufszettel in einer App zusammen – ohne dass deine Daten bei einem zentralen Anbieter landen.
+
+KALENDER
+• Tag-, Wochen-, Monats- und Agenda-Ansicht, Filter nach Person
+• Private Termine bleiben auf deinen eigenen Geräten, geteilte Termine sehen alle in der Familie
+• Wiederholungen mit Ausnahmen, Zeitzonen, Zu- und Absagen
+• Lokale Erinnerungen – die Benachrichtigung verrät nie den Terminnamen
+
+CHAT
+• Familienchat und Einzelchats zwischen Mitgliedern
+• Nachrichten, Antworten, Reaktionen und Anhänge
+• Termine als Karte im Chat teilen und direkt zu- oder absagen
+• Online-Status der Familie (abschaltbar)
+
+EINKAUFSZETTEL
+• Gemeinsame Liste für die ganze Familie, auch offline nutzbar
+• Abhaken, bearbeiten, Mengen angeben, Erledigtes entfernen
+
+SICHERHEIT UND DATENSCHUTZ
+• Ende-zu-Ende-verschlüsselt über das offene Matrix-Protokoll (Chat, geteilte Termine, Einkaufszettel)
+• Lokal verschlüsselte Datenbank, Schlüssel im Schlüsselspeicher des Geräts
+• App-Sperre über die Geräteanmeldung, Bildschirmschutz
+• Keine Werbung, keine Tracker, keine Analyse
+• Eigener Server möglich – der öffentliche Server ist nur voreingestellt
+• Freie Software (AGPL-3.0), Quellcode einsehbar
+
+FAMILIE
+• Moderatoren laden ein (Link oder QR-Code), bestätigen Beitritte und verwalten Rollen
+• Neue Geräte werden per Emoji-Vergleich oder Wiederherstellungsschlüssel verifiziert
+
+Hinweis: Du brauchst ein Matrix-Konto (z. B. auf matrix.org oder deinem eigenen Server). FamilyNexus legt keine Konten an.

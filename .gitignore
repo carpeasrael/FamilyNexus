@@ -1,0 +1,41 @@
+# macOS / IDE
+.DS_Store
+.idea/
+*.iml
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+debug-info/
+
+# Plattform-Build-Artefakte
+android/build/
+android/.gradle/
+android/local.properties
+android/key.properties
+android/app/.cxx/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/ephemeral/
+macos/Pods/
+macos/Flutter/ephemeral/
+DerivedData/
+xcuserdata/
+
+# Signierung und Geheimnisse (niemals einchecken)
+*.jks
+*.keystore
+*.p12
+*.mobileprovision
+key.properties
+.env
+.env.*
+
+# Interner Erzeugungs-Prompt (enthält lokale Pfade)
+Prompt_FamilyNexus.md
