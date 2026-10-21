@@ -22,7 +22,7 @@ tun muss, steht in Abschnitt 1. Rechtliche Angaben sind Hinweise, keine Rechtsbe
 
 | Bereich | Stand |
 |---|---|
-| Version | `pubspec.yaml`: `1.0.0+1` (Name+Buildnummer). Jeder Upload braucht eine **höhere Buildnummer** (`+2`, …) |
+| Version | `pubspec.yaml`: `1.0.1+2` (Name+Buildnummer). Jeder Upload braucht eine **höhere Buildnummer** (`+2`, …) |
 | Kennungen | Android `de.inneso.familynexus`; iOS/macOS `de.inneso.familynexus` (vereinheitlicht) |
 | Symbole | `tool/make_icons.py` erzeugt alle Größen (Android adaptiv + Legacy, iOS ohne Alpha, macOS) sowie `store/graphics/` (Play-Symbol 512, App-Store-Symbol 1024, Funktionsgrafik 1024×500) |
 | Android | Release: R8/Shrink, `--obfuscate`, Symbole für native Bibliotheken, unsigniert ohne `key.properties`; **App Bundle:** `tool/build_release.sh aab` (≈ 79 MB) |
