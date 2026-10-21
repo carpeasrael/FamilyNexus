@@ -108,7 +108,7 @@ sondern auch zwischen einzelnen Mitgliedern; (3) Einkaufszettel. Entscheidungen:
 | 6.3 | Einkaufszettel: Datenmodell und Konfliktregel, Ereignisformat, lokale Ablage (Migration 3), Synchronisation inkl. Resync neuer Mitglieder, Oberfläche (Tab) |
 | 6.4 | Fake-Gateway, Unit-/Widget-Tests, E2E-Tests gegen Synapse (Status, Einzelchat, Einkaufszettel) |
 | 6.5 | Texte de/en, Datenschutztext, Review durch separaten Agenten, Funde beheben |
-| 6.6 | Doku: Concept.md, Prompt_FamilyNexus.md, README, ARCHITEKTUR, OFFEN, ENTSCHEIDUNGEN, REVIEW |
+| 6.6 | Doku: Concept.md, README, ARCHITEKTUR, OFFEN, ENTSCHEIDUNGEN, REVIEW |
 
 Abnahme 6:
 - [x] Online-Status verlässt das Gerät nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte von Familienmitgliedern; abschaltbar (Test)

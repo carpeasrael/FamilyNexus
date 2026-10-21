@@ -1,244 +1,244 @@
-# Konzeptentwurf: Familienterminplaner mit Matrix-Messenger
+# Concept Draft: Family Planner with Matrix Messenger
 
 Oct 20, 2026 · @CarpeAsrael
 
-> **Änderung Oct 21, 2026 (später):** Einstellungen liegen im Burger-Menü rechts oben statt in der Fußleiste; die Neon-Akzentfarbe ist frei wählbar (E-46).
+> **Change Oct 21, 2026 (later):** Settings moved to the burger menu at the top right instead of the bottom bar; the neon accent color is freely selectable (E-46).
 >
-> **Änderung Oct 21, 2026:** Erweitert um Online-Status der Familienmitglieder, Einzelchats zwischen Mitgliedern (vorher „optional“) und einen gemeinsamen Einkaufszettel (vorher unter „Später denkbar“). Betroffen sind Funktionsumfang, Rollen, Matrix-Modell, Bedrohungsmodell, Hauptbildschirme und Datenschutz; Begründungen in `docs/ENTSCHEIDUNGEN.md` (E-38 bis E-42).
+> **Change Oct 21, 2026:** Extended with online status of family members, direct chats between members (previously "optional") and a shared shopping list (previously under "Possible later"). Affected: feature scope, roles, Matrix model, threat model, main screens and privacy; rationale in `docs/ENTSCHEIDUNGEN.md` (E-38 to E-42).
 
-## Vision & Ziele
+## Vision & Goals
 
-Die App (Arbeitstitel „FamilyNexus“) vereint einen Familienkalender, einen Messenger und einen gemeinsamen Einkaufszettel in einer Anwendung, deren Daten ausschließlich auf den Geräten der Familie liegen und nur Ende-zu-Ende-verschlüsselt über das Matrix-Protokoll wandern.
+The app (working title "FamilyNexus") combines a family calendar, a messenger and a shared shopping list in one application whose data lives exclusively on the family's devices and travels only end-to-end encrypted via the Matrix protocol.
 
-**Zielgruppe:** Familien und Haushalte, die Termine koordinieren wollen, ohne ihre Daten einem zentralen Anbieter anzuvertrauen.
+**Target audience:** Families and households who want to coordinate appointments without entrusting their data to a central provider.
 
-**Leitprinzipien**
+**Guiding principles**
 
-- **Local-first:** Alle Daten liegen verschlüsselt auf dem Gerät; die App funktioniert auch offline.
-- **E2EE by default:** Kein Klartext verlässt das Gerät, weder Chat noch Termine.
-- **Server austauschbar:** Standardmäßig ein öffentlicher Matrix-Server, optional ein eigener Homeserver.
-- **Datensparsamkeit:** Keine Telemetrie, keine Werbung, keine Analyse-SDKs.
-- **Eine Codebasis:** Android, Windows, Linux, macOS, iOS und iPadOS.
-- **Zweisprachig:** Deutsch und Englisch von Anfang an.
+- **Local-first:** All data is stored encrypted on the device; the app also works offline.
+- **E2EE by default:** No plaintext leaves the device, neither chat nor appointments.
+- **Replaceable server:** A public Matrix server by default, optionally your own homeserver.
+- **Data minimization:** No telemetry, no advertising, no analytics SDKs.
+- **One codebase:** Android, Windows, Linux, macOS, iOS and iPadOS.
+- **Bilingual:** German and English from the start.
 
-## Funktionsumfang
+## Feature Scope
 
-Zwei Rollen steuern die Familie: Mitglieder nutzen Kalender und Chat, Moderatoren verwalten zusätzlich die Gruppe.
+Two roles govern the family: members use calendar and chat, moderators additionally manage the group.
 
-### Rollen und Rechte
+### Roles and Permissions
 
-| Funktion | Mitglied | Moderator |
+| Function | Member | Moderator |
 | --- | --- | --- |
-| Eigene Termine anlegen, ändern, löschen | Ja | Ja |
-| Private Termine (nur selbst sichtbar) | Ja | Ja |
-| Geteilte Termine (für die Familie sichtbar) | Ja | Ja |
-| Chat lesen und schreiben (Familienchat und Einzelchats) | Ja | Ja |
-| Einkaufszettel ansehen und ändern | Ja | Ja |
-| Online-Status der anderen sehen, eigenen Status teilen oder verbergen | Ja | Ja |
-| Neue Mitglieder einladen | Nein | Ja |
-| Mitglied zum Moderator ernennen | Nein | Ja |
-| Mitglied entfernen | Nein | Ja |
-| Server und Familienname konfigurieren | Nein | Ja |
+| Create, edit, delete own appointments | Yes | Yes |
+| Private appointments (visible only to oneself) | Yes | Yes |
+| Shared appointments (visible to the family) | Yes | Yes |
+| Read and write chat (family chat and direct chats) | Yes | Yes |
+| View and edit the shopping list | Yes | Yes |
+| See others' online status, share or hide own status | Yes | Yes |
+| Invite new members | No | Yes |
+| Promote a member to moderator | No | Yes |
+| Remove a member | No | Yes |
+| Configure server and family name | No | Yes |
 
-### Termine
+### Appointments
 
-- **Felder:** Titel, Beginn und Ende, ganztägig, Ort, Notiz, Wiederholung, Teilnehmer, Farbe, Sichtbarkeit.
-- **Privat:** Der Termin bleibt nur auf den eigenen Geräten, wird nie an Matrix gesendet und ist für andere nicht sichtbar.
-- **Shared:** Der Termin wird verschlüsselt in den Familienraum gesendet; Mitglieder sehen ihn und können antworten (Zusage, Absage, Vielleicht).
-- **Wiederholungen:** täglich, wöchentlich, monatlich, jährlich, jeweils mit Ausnahmen.
-- **Ansichten:** Tag, Woche, Monat, Agenda; Filter nach Person.
+- **Fields:** title, start and end, all-day, location, note, recurrence, participants, color, visibility.
+- **Private:** The appointment stays on the user's own devices only, is never sent to Matrix and is not visible to others.
+- **Shared:** The appointment is sent encrypted to the family room; members see it and can respond (accept, decline, maybe).
+- **Recurrences:** daily, weekly, monthly, yearly, each with exceptions.
+- **Views:** day, week, month, agenda; filter by person.
 
-### Erinnerungen
+### Reminders
 
-- Pro Termin eine oder mehrere Erinnerungen (z. B. 10 Minuten, 1 Stunde, 1 Tag vorher).
-- Erinnerungen sind **lokale Benachrichtigungen** auf dem jeweiligen Gerät. So verrät keine Push-Nachricht Termininhalte an Dritte.
-- Standard-Erinnerung pro Person einstellbar; geteilte Termine erlauben persönliche Erinnerungen pro Mitglied.
+- One or more reminders per appointment (e.g. 10 minutes, 1 hour, 1 day before).
+- Reminders are **local notifications** on the respective device. This way no push message reveals appointment contents to third parties.
+- Default reminder configurable per person; shared appointments allow personal reminders per member.
 
 ### Messenger
 
-- Gruppenchat der Familie und **Einzelchats** zwischen beigetretenen Mitgliedern (je Paar ein eigener verschlüsselter Raum; nach dem Entfernen eines Mitglieds entfällt das Gespräch).
-- Nachrichten, Bilder, Dateien, Antworten, Reaktionen.
-- Termine lassen sich im Chat teilen und direkt zu- oder absagen.
+- Family group chat and **direct chats** between joined members (one encrypted room per pair; the conversation ceases when a member is removed).
+- Messages, images, files, replies, reactions.
+- Appointments can be shared in the chat and accepted or declined directly.
 
-### Online-Status
+### Online Status
 
-- Die Familie sieht, wer gerade online ist: **Online** (App im Vordergrund, Lebenszeichen alle 2 Minuten), **Offline** (mit „zuletzt online vor …“) oder **Status unbekannt**. Angezeigt in der Mitgliederliste, im Chat (Gesprächsleiste, Einzelchat) und auf „Heute“; immer als Text und Form, nie nur als Farbe.
-- Der Status wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert. Er ist in den Einstellungen abschaltbar („Online-Status teilen“); dann gilt man für andere als offline.
+- The family sees who is online right now: **Online** (app in the foreground, heartbeat every 2 minutes), **Offline** (with "last online … ago") or **Status unknown**. Shown in the member list, in the chat (conversation bar, direct chat) and on "Today"; always as text and shape, never by color alone.
+- The status is sent only as an end-to-end encrypted device message to devices of joined family members and is never stored. It can be turned off in the settings ("Share online status"); others then see you as offline.
 
-### Einkaufszettel
+### Shopping List
 
-- Eine gemeinsame Liste je Familie: Eintrag (Text, Menge), abhaken, bearbeiten, löschen, „Erledigte entfernen“. Jedes Mitglied darf jeden Eintrag ändern; gleichzeitige Änderungen werden deterministisch zusammengeführt (höhere Version, dann spätere Zeit, dann Absender-ID).
-- Die Liste wird wie geteilte Termine verschlüsselt im Familienraum übertragen, liegt verschlüsselt auf dem Gerät und funktioniert offline (Warteschlange). Obergrenzen: 300 aktive Einträge, 1000 Datensätze.
+- One shared list per family: item (text, quantity), check off, edit, delete, "Remove completed". Every member may change every item; concurrent changes are merged deterministically (higher version, then later time, then sender ID).
+- The list is transmitted encrypted in the family room like shared appointments, is stored encrypted on the device and works offline (queue). Limits: 300 active items, 1000 records.
 
-### Einladungen
+### Invitations
 
-- Moderator erzeugt einen zeitlich begrenzten Einladungslink oder QR-Code.
-- Beitritt nur nach Bestätigung durch einen Moderator; zusätzlich Geräteverifizierung per Emoji-Vergleich oder QR-Scan.
+- A moderator creates a time-limited invitation link or QR code.
+- Joining only after confirmation by a moderator; additionally device verification by emoji comparison or QR scan.
 
-## Architektur
+## Architecture
 
-Jede Familie ist ein verschlüsselter Matrix-Raum: Die Geräte halten die Daten, der Server vermittelt nur.
+Each family is an encrypted Matrix room: the devices hold the data, the server only relays.
 
-&#91;embedded content: Architektur · zwei Geräte und ein Homeserver\]
+&#91;embedded content: Architecture · two devices and one homeserver\]
 
-Lokale Datenbank und Matrix-Schicht liegen auf jedem Gerät; der Homeserver leitet verschlüsselte Ereignisse weiter und kann sie nicht lesen.
+Local database and Matrix layer live on each device; the homeserver forwards encrypted events and cannot read them.
 
-### Matrix-Modell
+### Matrix Model
 
-| Element | Umsetzung |
+| Element | Implementation |
 | --- | --- |
-| Familie | Ein privater, verschlüsselter Matrix-Raum; Beitritt nur per Einladung |
-| Chat | Reguläre Matrix-Nachrichten im Familienraum, Einzelchats als eigene verschlüsselte Räume je Mitgliederpaar (`is_direct`, nur mit aktuellen Mitgliedern; Einladungen Fremder werden ignoriert) |
-| Online-Status | Verschlüsselte Gerätenachricht (Olm) `de.inneso.familynexus.presence` an die Geräte beigetretener Mitglieder; nur im Arbeitsspeicher, 5 Minuten gültig, abschaltbar |
-| Einkaufszettel | Eigener verschlüsselter Ereignistyp `de.inneso.familynexus.shopping` im Familienraum mit Eintrags-ID, Version, Zeitstempel und Löschmarke; lokal verschlüsselt gespeichert |
-| Geteilter Termin | Eigener verschlüsselter Ereignistyp im Raum mit Termin-ID, Version und Zusagestatus |
-| Privater Termin | Nur lokal gespeichert; Abgleich zwischen eigenen Geräten über einen privaten Raum, den nur das eigene Konto kennt |
-| Rollen | Matrix-Power-Levels: Mitglied 0, Moderator 50; das Recht, Rollen zu ändern, liegt ebenfalls auf 50 |
-| Einladungen | Matrix-Einladung, zusätzlich Link oder QR-Code mit Ablaufzeit |
-| Konflikte | Versionszähler pro Termin; bei gleichzeitiger Änderung gewinnt die neuere Version, die ältere bleibt im Verlauf |
-| Offline | Lokale Warteschlange, Versand sobald eine Verbindung besteht |
+| Family | One private, encrypted Matrix room; joining by invitation only |
+| Chat | Regular Matrix messages in the family room; direct chats as separate encrypted rooms per member pair (`is_direct`, only with current members; invitations from strangers are ignored) |
+| Online status | Encrypted device message (Olm) `de.inneso.familynexus.presence` to the devices of joined members; in memory only, valid for 5 minutes, can be turned off |
+| Shopping list | Dedicated encrypted event type `de.inneso.familynexus.shopping` in the family room with item ID, version, timestamp and deletion marker; stored encrypted locally |
+| Shared appointment | Dedicated encrypted event type in the room with appointment ID, version and response status |
+| Private appointment | Stored locally only; synchronized between own devices via a private room known only to the own account |
+| Roles | Matrix power levels: member 0, moderator 50; the right to change roles is also at 50 |
+| Invitations | Matrix invitation, additionally link or QR code with expiry time |
+| Conflicts | Version counter per appointment; on concurrent changes the newer version wins, the older one stays in the history |
+| Offline | Local queue, sent as soon as a connection exists |
 
-### Serverwahl
+### Server Choice
 
-- Bei der Ersteinrichtung ist ein öffentlicher Matrix-Server voreingestellt; die URL lässt sich durch einen eigenen Homeserver ersetzen.
-- Die App prüft Erreichbarkeit und Protokollversion des Servers und zeigt dessen Betreiber an.
-- Ein späterer Serverwechsel erfordert eine Migration der Familie (neuer Raum, neue Einladungen); dieser Ablauf ist einzuplanen.
+- During initial setup a public Matrix server is preselected; the URL can be replaced by your own homeserver.
+- The app checks the server's reachability and protocol version and shows its operator.
+- A later server change requires a migration of the family (new room, new invitations); this flow needs to be planned.
 
-## Sicherheit & Datenschutz
+## Security & Privacy
 
-Sicherheit hat Vorrang vor Komfort: Verschlüsselung ist nicht abschaltbar, und Klartext existiert nur im Arbeitsspeicher der laufenden App.
+Security takes precedence over convenience: encryption cannot be turned off, and plaintext exists only in the memory of the running app.
 
-### Speicherung auf dem Gerät
+### Storage on the Device
 
-- Lokale Datenbank (SQLite) mit vollständiger Verschlüsselung, z. B. SQLCipher mit AES-256.
-- Der Datenbankschlüssel liegt im Schlüsselspeicher des Betriebssystems: Keychain (macOS, iOS, iPadOS), Keystore (Android), Credential Manager bzw. DPAPI (Windows), Secret Service (Linux).
-- Optionale App-Sperre per PIN, Passwort oder Biometrie; automatische Sperre nach Inaktivität.
-- Anhänge und Medien werden im Dateisystem separat verschlüsselt abgelegt.
-- Keine Klartext-Vorschauen in Benachrichtigungen, Task-Switcher oder Backups (Screenshot-Schutz auf Wunsch).
+- Local database (SQLite) with full encryption, e.g. SQLCipher with AES-256.
+- The database key is stored in the operating system's key store: Keychain (macOS, iOS, iPadOS), Keystore (Android), Credential Manager or DPAPI (Windows), Secret Service (Linux).
+- Optional app lock via PIN, password or biometrics; automatic lock after inactivity.
+- Attachments and media are stored separately encrypted in the file system.
+- No plaintext previews in notifications, task switcher or backups (screenshot protection on request).
 
-### Ende-zu-Ende-Verschlüsselung
+### End-to-End Encryption
 
-- Matrix-E2EE mit Olm (1:1) und Megolm (Räume) für Chat **und** Termine; der Server sieht nur verschlüsselte Ereignisse.
-- Termine werden als verschlüsselte Raum-Ereignisse im Familienraum übertragen.
-- Geräteverifizierung per Cross-Signing; unverifizierte Geräte erhalten keine Schlüssel.
-- Beim Entfernen eines Mitglieds werden die Raumschlüssel rotiert, damit ausgeschiedene Personen keine neuen Inhalte lesen können.
-- Schlüssel-Backup nur mit eigener Wiederherstellungsphrase; der Server speichert nur verschlüsselte Sicherungen.
+- Matrix E2EE with Olm (1:1) and Megolm (rooms) for chat **and** appointments; the server sees only encrypted events.
+- Appointments are transmitted as encrypted room events in the family room.
+- Device verification via cross-signing; unverified devices receive no keys.
+- When a member is removed, the room keys are rotated so that departed persons cannot read new content.
+- Key backup only with a personal recovery phrase; the server stores only encrypted backups.
 
-### Bedrohungsmodell und Grenzen
+### Threat Model and Limits
 
-| Risiko | Gegenmaßnahme | Restrisiko |
+| Risk | Countermeasure | Residual risk |
 | --- | --- | --- |
-| Mitlesen auf dem Server | E2EE, Server sieht nur Chiffretext | Metadaten (wer, wann, Raumgröße, Takt der Statusmeldungen) bleiben sichtbar |
-| Gefälschter Online-Status | Nur verschlüsselt eingegangene Meldungen aktueller Familienmitglieder zählen; Format streng geprüft | Ein Mitglied kann nur seinen eigenen Status falsch melden |
-| Verlust oder Diebstahl des Geräts | Datenbankverschlüsselung, App-Sperre, Fernabmeldung der Sitzung | Schwache PIN schwächt den Schutz |
-| Fremdes Gerät in der Familie | Verifizierung, Moderator kann Geräte sperren | Nutzer überspringen die Verifizierung |
-| Kompromittierter öffentlicher Server | Eigener Homeserver möglich; E2EE schützt Inhalte | Server kann Dienst verweigern |
-| Schadcode über Anhänge | Keine automatische Ausführung, Typprüfung, Größenlimit | Zero-Day im Betriebssystem |
-| Lieferkette (Abhängigkeiten) | Gepinnte Versionen, SBOM, regelmäßige Audits | Neue Schwachstellen in Bibliotheken |
+| Eavesdropping on the server | E2EE, server sees only ciphertext | Metadata (who, when, room size, rhythm of status messages) remains visible |
+| Forged online status | Only encrypted messages received from current family members count; format strictly validated | A member can only misreport their own status |
+| Loss or theft of the device | Database encryption, app lock, remote sign-out of the session | A weak PIN weakens the protection |
+| Foreign device in the family | Verification, moderator can block devices | Users skip verification |
+| Compromised public server | Own homeserver possible; E2EE protects contents | Server can deny service |
+| Malicious code via attachments | No automatic execution, type check, size limit | Zero-day in the operating system |
+| Supply chain (dependencies) | Pinned versions, SBOM, regular audits | New vulnerabilities in libraries |
 
-### Datenschutz (DSGVO)
+### Privacy (GDPR)
 
-- Datenminimierung: Es wird nur gespeichert und übertragen, was die Funktion braucht. Der Online-Status verlässt das Gerät nur verschlüsselt, wird nie gespeichert und lässt sich abschalten.
-- Löschfunktion: Ein Mitglied kann sein Konto, seine Termine und lokale Daten vollständig löschen; Nachrichten auf anderen Geräten lassen sich technisch nicht erzwingen zu löschen und werden entsprechend ausgewiesen.
-- Kinder: Konten Minderjähriger laufen über Einladung und Freigabe eines Moderators; Hinweis auf Einwilligung der Sorgeberechtigten ist einzuplanen.
-- Transparenz: Datenschutzerklärung in beiden Sprachen, Hinweis auf den gewählten Server und dessen Betreiber bei der Einrichtung.
-- Vor der Veröffentlichung: unabhängiger Sicherheits-Review und Penetrationstest.
+- Data minimization: only what the function needs is stored and transmitted. The online status leaves the device only encrypted, is never stored and can be turned off.
+- Deletion: a member can completely delete their account, appointments and local data; deletion of messages on other devices cannot be technically enforced and is declared accordingly.
+- Children: accounts of minors go through invitation and approval by a moderator; a notice on the consent of legal guardians needs to be planned.
+- Transparency: privacy policy in both languages, notice on the chosen server and its operator during setup.
+- Before release: independent security review and penetration test.
 
-## Technologie-Stack & Plattformen
+## Technology Stack & Platforms
 
-Empfehlung: Flutter mit der Matrix-Bibliothek des Matrix-Dart-SDK, weil eine Codebasis alle sechs Zielplattformen abdeckt und die Glas-/Neon-Optik sich mit eigener Rendering-Engine pixelgenau umsetzen lässt. Die Einschätzung zu Reifegrad und Funktionsumfang der Bibliotheken ist vor Projektstart zu prüfen.
+Recommendation: Flutter with the Matrix library of the Matrix Dart SDK, because one codebase covers all six target platforms and the glass/neon look can be implemented pixel-perfectly with its own rendering engine. The assessment of the maturity and feature scope of the libraries is to be verified before project start.
 
-### Framework-Optionen
+### Framework Options
 
-| Option | Plattformen | Stärken | Schwächen |
+| Option | Platforms | Strengths | Weaknesses |
 | --- | --- | --- | --- |
-| Flutter (Dart) + Matrix-Dart-SDK | Android, iOS, iPadOS, Windows, Linux, macOS | Eine Codebasis, eigene Rendering-Engine für Glas-/Neon-Effekte, vorhandenes Matrix-SDK mit E2EE | Native Besonderheiten (Benachrichtigungen, Hintergrundbetrieb) brauchen Plugins |
-| Kotlin Multiplatform + Compose | Android, iOS, Desktop | Native Anbindung, Matrix Rust SDK nutzbar | Desktop-Reife und Linux-Support geringer, Glas-Effekte aufwändiger |
-| Tauri + Web-UI + Matrix Rust SDK | Desktop gut, Mobile jünger | Rust-Kern mit bewährter E2EE, leichtgewichtig | Mobile-Support weniger ausgereift |
-| Native je Plattform | alle | Beste Systemintegration | Sechs Codebasen, hoher Pflegeaufwand |
+| Flutter (Dart) + Matrix Dart SDK | Android, iOS, iPadOS, Windows, Linux, macOS | One codebase, own rendering engine for glass/neon effects, existing Matrix SDK with E2EE | Native specifics (notifications, background operation) need plugins |
+| Kotlin Multiplatform + Compose | Android, iOS, desktop | Native integration, Matrix Rust SDK usable | Lower desktop maturity and Linux support, glass effects more costly |
+| Tauri + web UI + Matrix Rust SDK | Desktop good, mobile newer | Rust core with proven E2EE, lightweight | Mobile support less mature |
+| Native per platform | all | Best system integration | Six codebases, high maintenance effort |
 
-### Architekturbausteine
+### Architecture Building Blocks
 
-- **Präsentation:** Flutter-UI mit zentralem Design-System (Farben, Glas, Neon als Tokens).
-- **Domäne:** Kalender-Logik (Wiederholungen, Zeitzonen, Erinnerungen), unabhängig von der UI testbar.
-- **Daten:** Verschlüsselte lokale Datenbank als einzige Quelle der Wahrheit; Synchronisation über Matrix.
-- **Matrix-Schicht:** Anmeldung, Räume, E2EE, Ereignisse; Server-URL konfigurierbar.
-- **Lokalisierung:** ARB-Dateien für Deutsch und Englisch, Datums- und Zeitformate nach Gerätesprache.
-- **Benachrichtigungen:** Lokal geplante Erinnerungen; Push für neue Chat-Nachrichten über UnifiedPush bzw. APNs mit inhaltsleerem Payload.
+- **Presentation:** Flutter UI with a central design system (colors, glass, neon as tokens).
+- **Domain:** Calendar logic (recurrences, time zones, reminders), testable independently of the UI.
+- **Data:** Encrypted local database as the single source of truth; synchronization via Matrix.
+- **Matrix layer:** Sign-in, rooms, E2EE, events; server URL configurable.
+- **Localization:** ARB files for German and English, date and time formats according to the device language.
+- **Notifications:** Locally scheduled reminders; push for new chat messages via UnifiedPush or APNs with an empty payload.
 
-### Plattformhinweise
+### Platform Notes
 
-- **iOS/iPadOS/macOS:** Veröffentlichung über App Store; Hintergrundlimits beachten.
-- **Android:** Zuverlässige Erinnerungen über exakte Alarme; Akku-Optimierung der Hersteller berücksichtigen.
-- **Windows/Linux:** Paketierung als MSIX bzw. Flatpak/AppImage; Tray-Symbol für Erinnerungen.
-- **iPad und große Displays:** Adaptive Zwei-Spalten-Ansicht (Kalender plus Chat).
+- **iOS/iPadOS/macOS:** Distribution via the App Store; observe background limits.
+- **Android:** Reliable reminders via exact alarms; consider manufacturers' battery optimization.
+- **Windows/Linux:** Packaging as MSIX or Flatpak/AppImage; tray icon for reminders.
+- **iPad and large displays:** Adaptive two-column view (calendar plus chat).
 
 ## UX & Design
 
-Die Oberfläche kombiniert Glas (Glassmorphism) mit Neon-Akzenten auf dunklem Grund; als Farbbasis dient die AURORA-Palette (Teal #0f766e und #2dd4bf), ergänzt um Neon-Signalfarben.
+The interface combines glass (glassmorphism) with neon accents on a dark background; the AURORA palette (teal #0f766e and #2dd4bf) serves as the color base, complemented by neon signal colors.
 
-### Designsprache
+### Design Language
 
-- **Glas:** Halbtransparente Flächen mit Hintergrundunschärfe, feine helle Kanten, weiche Schatten.
-- **Neon:** Leuchtende Akzente für Auswahl, Fokus, aktuelle Zeit und Erinnerungen; Teal als Primärfarbe, Magenta und Violett als Sekundärakzente.
-- **Typografie:** Space Grotesk für Überschriften, IBM Plex Sans für Text, IBM Plex Mono für Uhrzeiten und Codes.
-- **Wählbare Akzentfarbe:** In den Einstellungen wählt jeder Nutzer seine Neon-Kontrastfarbe (Türkis als Standard, außerdem Magenta, Violett, Himmelblau, Limette, Orange, Rosé, Grün); sie färbt Schaltflächen, Auswahl und Hervorhebungen im hellen und dunklen Design und erfüllt überall WCAG AA (je Farbe eine leuchtende und eine abgedunkelte Variante).
-- **Farbe pro Person:** Jedes Familienmitglied erhält eine Neonfarbe für seine Termine.
-- **Modi:** Dunkel als Standard, helle Variante mit gedämpften Glasflächen.
+- **Glass:** Semi-transparent surfaces with background blur, fine light edges, soft shadows.
+- **Neon:** Glowing accents for selection, focus, current time and reminders; teal as primary color, magenta and violet as secondary accents.
+- **Typography:** Space Grotesk for headings, IBM Plex Sans for text, IBM Plex Mono for times and codes.
+- **Selectable accent color:** In the settings each user chooses their neon contrast color (turquoise as default, also magenta, violet, sky blue, lime, orange, rosé, green); it colors buttons, selection and highlights in the light and dark theme and meets WCAG AA everywhere (one glowing and one darkened variant per color).
+- **Color per person:** Each family member gets a neon color for their appointments.
+- **Modes:** Dark as default, light variant with muted glass surfaces.
 
-### Hauptbildschirme
+### Main Screens
 
-| Bildschirm | Inhalt |
+| Screen | Content |
 | --- | --- |
-| Heute | Nächste Termine, anstehende Erinnerungen, wer online ist, offene Einkaufseinträge, ungelesene Nachrichten |
-| Kalender | Tag-, Wochen-, Monats- und Agenda-Ansicht, Filter nach Person |
-| Termin | Anlegen und Bearbeiten, Schalter Privat/Shared, Erinnerungen, Teilnehmer |
-| Chat | Familienraum und Einzelchats (Gesprächsleiste mit Online-Status und Ungelesenem), Termine als Karten im Verlauf |
-| Einkauf | Gemeinsamer Einkaufszettel: offene und erledigte Einträge, Menge, Bearbeiten, „Erledigte entfernen“ |
-| Familie | Mitgliederliste mit Online-Status und „Nachricht schreiben“, Rollen, Einladungen, Geräteverifizierung (Moderator) |
-| Einstellungen | Sprache, Server, Sperre, Online-Status teilen, Benachrichtigungen, Backup, Design inkl. Akzentfarbe; erreichbar über das Burger-Menü rechts oben (nicht in der unteren Navigationsleiste) |
+| Today | Next appointments, upcoming reminders, who is online, open shopping items, unread messages |
+| Calendar | Day, week, month and agenda view, filter by person |
+| Appointment | Create and edit, Private/Shared switch, reminders, participants |
+| Chat | Family room and direct chats (conversation bar with online status and unread), appointments as cards in the history |
+| Shopping | Shared shopping list: open and completed items, quantity, edit, "Remove completed" |
+| Family | Member list with online status and "Send message", roles, invitations, device verification (moderator) |
+| Settings | Language, server, lock, share online status, notifications, backup, design incl. accent color; reachable via the burger menu at the top right (not in the bottom navigation bar) |
 
-### Barrierefreiheit und Sprache
+### Accessibility and Language
 
-- Kontrast nach WCAG 2.2 AA: Glasflächen erhalten einen Mindestkontrast zum Text, Neon dient nie als alleiniger Informationsträger.
-- Option „Effekte reduzieren“ (weniger Unschärfe und Leuchten), Unterstützung für Bildschirmleser und dynamische Schriftgrößen.
-- Deutsch und Englisch umschaltbar; Standard folgt der Gerätesprache, Texte liegen vollständig in Übersetzungsdateien.
-- Ersteinrichtung in vier Schritten: Sprache, Server (Standard oder eigener), Konto, Familie gründen oder beitreten.
+- Contrast per WCAG 2.2 AA: glass surfaces get a minimum contrast to the text, neon is never the sole carrier of information.
+- "Reduce effects" option (less blur and glow), support for screen readers and dynamic font sizes.
+- German and English switchable; default follows the device language, texts are fully in translation files.
+- Initial setup in four steps: language, server (default or own), account, create or join a family.
 
-## Roadmap, Risiken und offene Fragen
+## Roadmap, Risks and Open Questions
 
-Die Umsetzung läuft in vier Phasen; jede endet an einem Freigabe-Kriterium, das Sicherheit vor Funktionsumfang stellt.
+Implementation proceeds in four phases; each ends at a release criterion that puts security before feature scope.
 
-&#91;embedded content: Roadmap · 4 Phasen, 4 Freigabe-Kriterien\]
+&#91;embedded content: Roadmap · 4 phases, 4 release criteria\]
 
-Der Zeitplan hängt von Teamgröße und Framework-Entscheidung ab und wird nach Abstimmung ergänzt.
+The schedule depends on team size and framework decision and will be added after alignment.
 
-### Verbesserungsvorschläge
+### Improvement Suggestions
 
-- **Dritte Sichtbarkeitsstufe „Beschäftigt“:** Private Termine können ohne Titel und Details als belegte Zeit erscheinen, damit sich Termine besser koordinieren lassen.
-- **Mindestens zwei Moderatoren:** Die App empfiehlt beim Einrichten einen zweiten Moderator, damit die Familie bei Geräteverlust handlungsfähig bleibt.
-- **Verschlüsseltes Backup und Export:** Export von Terminen als ICS-Datei und eines vollständigen Sicherungsarchivs, geschützt mit einem eigenen Passwort. ICS-Importe werden als nicht vertrauenswürdig behandelt und geprüft.
-- **Vorlage für den eigenen Server:** Eine kurze Anleitung samt Konfigurationsvorlage für einen eigenen Matrix-Homeserver, damit die Option wirklich nutzbar ist.
-- **Sicherheitsstatus sichtbar machen:** Eine Anzeige in den Einstellungen zeigt, welche Geräte verifiziert sind und ob das Schlüssel-Backup eingerichtet ist.
-- **Später denkbar:** Weitere geteilte Listen (Aufgaben) und ein eingeschränkter Modus für Kinder. Der Einkaufszettel ist umgesetzt (Oct 21, 2026).
+- **Third visibility level "Busy":** Private appointments can appear as busy time without title and details, so that appointments can be coordinated better.
+- **At least two moderators:** During setup the app recommends a second moderator so that the family stays able to act if a device is lost.
+- **Encrypted backup and export:** Export of appointments as an ICS file and of a complete backup archive, protected with a separate password. ICS imports are treated as untrusted and validated.
+- **Template for your own server:** A short guide including a configuration template for your own Matrix homeserver, so that the option is actually usable.
+- **Make security status visible:** A display in the settings shows which devices are verified and whether the key backup is set up.
+- **Possible later:** Further shared lists (tasks) and a restricted mode for children. The shopping list is implemented (Oct 21, 2026).
 
-### Risiken
+### Risks
 
-| Risiko | Auswirkung | Gegenmaßnahme |
+| Risk | Impact | Countermeasure |
 | --- | --- | --- |
-| Reife der Matrix-Bibliothek je Plattform | E2EE-Funktionen fehlen oder verhalten sich unterschiedlich | Früher Prototyp in Phase 1, Alternative Rust-SDK offen halten |
-| Zuverlässigkeit lokaler Erinnerungen | Termine werden ohne Warnung verpasst, besonders auf Android und iOS | Systemspezifische Tests, Neuplanung nach Neustart, Hinweis bei fehlender Berechtigung |
-| Öffentlicher Standardserver | Ausfall, Regeln für Registrierung oder Ratenbegrenzung | Hinweis bei der Einrichtung, einfacher Wechsel auf eigenen Server |
-| Verlust aller Geräte eines Mitglieds | Schlüssel und private Termine weg | Schlüssel-Backup mit Wiederherstellungsphrase, verschlüsseltes Export-Archiv |
-| Metadaten auf dem Server | Rückschlüsse auf Familienstruktur und Aktivität | Transparenz in der Datenschutzerklärung, eigener Server als Option |
-| Aufwand für sechs Plattformen | Verzögerungen, uneinheitliche Qualität | Eine Codebasis, gemeinsame Tests, Plattformen nacheinander freigeben |
+| Maturity of the Matrix library per platform | E2EE features are missing or behave differently | Early prototype in phase 1, keep the Rust SDK alternative open |
+| Reliability of local reminders | Appointments are missed without warning, especially on Android and iOS | System-specific tests, rescheduling after restart, notice on missing permission |
+| Public default server | Outage, registration rules or rate limiting | Notice during setup, easy switch to your own server |
+| Loss of all devices of a member | Keys and private appointments gone | Key backup with recovery phrase, encrypted export archive |
+| Metadata on the server | Inferences about family structure and activity | Transparency in the privacy policy, own server as an option |
+| Effort for six platforms | Delays, inconsistent quality | One codebase, shared tests, release platforms one after another |
 
-### Offene Fragen
+### Open Questions
 
-- [ ] **Design:** Ich habe die AURORA-Farbwelt mit Glas und Neon kombiniert. Soll die App das inneso-Branding (Name, Logo) tragen oder neutral bleiben?
-- [ ] **Private Termine:** Sollen sie zwischen den eigenen Geräten eines Mitglieds synchronisiert werden (Annahme: ja, über einen privaten Raum)?
-- [ ] **Moderatorenrechte:** Dürfen Moderatoren geteilte Termine anderer ändern oder löschen, oder nur Mitglieder entfernen?
-- [ ] **Konten:** Legt die App neue Matrix-Konten an, oder melden sich Nutzer mit bestehenden Konten an?
-- [ ] **Minderjährige:** Sollen Kinder Mitglieder sein können, und braucht es dafür eine eigene Einschränkung?
-- [ ] **Verbreitung:** Open Source oder geschlossen, Veröffentlichung über die App Stores oder auch direkter Download?
-- [ ] **Matrix-Standardserver:** Welcher öffentliche Server soll voreingestellt sein?
+- [ ] **Design:** I combined the AURORA color world with glass and neon. Should the app carry the inneso branding (name, logo) or stay neutral?
+- [ ] **Private appointments:** Should they be synchronized between a member's own devices (assumption: yes, via a private room)?
+- [ ] **Moderator rights:** May moderators change or delete other people's shared appointments, or only remove members?
+- [ ] **Accounts:** Does the app create new Matrix accounts, or do users sign in with existing accounts?
+- [ ] **Minors:** Should children be able to be members, and does that require a separate restriction?
+- [ ] **Distribution:** Open source or closed, release via the app stores or also direct download?
+- [ ] **Matrix default server:** Which public server should be preselected?
