@@ -100,7 +100,13 @@ class InviteLink {
     if (u.scheme != scheme || u.host != host || u.userInfo.isNotEmpty || u.hasPort || u.hasFragment) return null;
     if (u.path.isNotEmpty && u.path != '/') return null;
     // Doppelte Parameter ablehnen (mehrdeutig).
-    final all = u.queryParametersAll;
+    final Map<String, List<String>> all;
+    try {
+      all = u.queryParametersAll;
+    } on FormatException {
+      // Ungültige Prozentkodierung (z. B. "%A"): der Zugriff dekodiert erst hier und würde sonst werfen.
+      return null;
+    }
     if (all.values.any((v) => v.length != 1)) return null;
     final q = <String, String>{for (final e in all.entries) e.key: e.value.single};
     if (q.keys.toSet().difference(const <String>{'v', 'room', 'via', 'inv', 'exp', 'n'}).isNotEmpty) return null;

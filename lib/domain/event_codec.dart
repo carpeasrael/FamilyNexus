@@ -165,6 +165,8 @@ class EventCodec {
     final st = c['status'];
     final ts = c['ts'];
     if (id is! String || !CalendarEvent.isValidId(id) || st is! String || ts is! int) return null;
+    // Außerhalb des darstellbaren Bereichs würfe fromMillisecondsSinceEpoch einen RangeError.
+    if (ts.abs() > 8640000000000000) return null;
     final when = DateTime.fromMillisecondsSinceEpoch(ts, isUtc: true);
     if (when.isBefore(CalendarEvent.minDate) || when.isAfter(CalendarEvent.maxDate)) return null;
     for (final s in RsvpStatus.values) {
