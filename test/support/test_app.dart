@@ -13,6 +13,7 @@ import 'package:family_nexus/features/settings/settings_controller.dart';
 
 import 'fake_device_auth.dart';
 import 'fake_links.dart';
+import 'fake_mail.dart';
 import 'fake_matrix.dart';
 import 'fake_scheduler.dart';
 import 'memory_event_store.dart';
@@ -31,6 +32,7 @@ class TestApp {
     required this.scheduler,
     required this.links,
     required this.auth,
+    required this.mail,
   });
 
   final AppServices services;
@@ -43,6 +45,7 @@ class TestApp {
   final FakeReminderScheduler scheduler;
   final FakeLinkSource links;
   final FakeDeviceAuth auth;
+  final FakeMailLauncher mail;
 }
 
 /// Baut die App-Dienste mit Fake-Matrix. `loggedIn: true` legt zusätzlich
@@ -78,6 +81,7 @@ Future<TestApp> buildTestApp({
   final scheduler = FakeReminderScheduler();
   final links = FakeLinkSource();
   final auth = FakeDeviceAuth();
+  final mail = FakeMailLauncher();
   final settingsController = await SettingsController.load(store);
   final services = AppServices(
     settings: settingsController,
@@ -87,6 +91,7 @@ Future<TestApp> buildTestApp({
     links: links,
     lock: AppLockController(settings: settingsController, auth: auth),
     scheduler: scheduler,
+    mail: mail,
     shoppingBuilder: (uid) async {
       final service = ShoppingService(store: shoppingStore, myUserId: uid, clock: clock);
       return ShoppingController(
@@ -115,6 +120,7 @@ Future<TestApp> buildTestApp({
     scheduler: scheduler,
     links: links,
     auth: auth,
+    mail: mail,
   );
 }
 

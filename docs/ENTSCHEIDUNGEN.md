@@ -240,6 +240,11 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Begründung:** Apple-Richtlinie 1.2 (Nutzerinhalte) verlangt Melden und Blockieren; die Lösung bleibt local-first und datensparsam (keine neuen Daten auf dem Server außer der Meldung selbst, die der Nutzer ausdrücklich auslöst).
 - **Grenzen:** siehe OFFEN.md (Termine, Einkaufszettel, Reaktionen, Online-Status und Ungelesen-Zähler blockierter Mitglieder bleiben unberührt).
 
+## E-49 Einladungen: E-Mail-Versand, Prüfung durch jeden Moderator, Einladungskarte (2026-10-22)
+- **Gewählt:** (1) *Link teilen:* Der Link-Dialog bietet neben QR-Code und Kopieren **„Per E-Mail senden“**: ein Entwurf im Mailprogramm (`mailto:` über `url_launcher` 6.3.3, hinter der Schnittstelle `MailLauncher`) mit Anleitung und Link, ohne Empfänger; ohne Mailprogramm wird der Link kopiert. Erzeugen dürfen Links weiterhin **nur Moderatoren** (Concept, E-10). (2) *Berechtigung:* Die Link-ID lag bisher nur in den Kontodaten des ausstellenden Moderators, ein zweiter Moderator sah jede Anfrage als „unbekannter Link“ und konnte nicht bestätigen. Jetzt vermerkt der Aussteller die ID zusätzlich als verschlüsseltes Raumereignis `de.inneso.familynexus.invite` (`InviteTicket`: nur ID und Ablauf, bei Verbrauch mit `used`); jeder Moderator liest die Vermerke **von Moderatoren** und prüft damit Anfragen, ein verbrauchter Link gilt bei allen als unbekannt. (3) *Eingeladenes Konto:* Hat ein angemeldetes Konto keine Familie, aber eine Einladung (Matrix-ID durch einen Moderator), zeigt die Einrichtung direkt eine Karte „Du wurdest eingeladen – „Familie“ beitreten“ mit Einladendem und Warnung bei unerwarteter Einladung; die Frage „Gründen oder Beitreten“ entfällt, hinter „Stattdessen eine andere Familie gründen oder beitreten“ bleibt sie erreichbar. Eine vom Moderator **bestätigte eigene Beitrittsanfrage** wird ohne weiteren Tipp angenommen.
+- **Verworfen:** Einladungen vollautomatisch ohne Tipp annehmen (jeder Fremde könnte ein Konto in seine Familie ziehen; die Entscheidung des Herausgebers war ein Bestätigungsschritt); Links durch alle Mitglieder (Concept: nur Moderatoren); Link-IDs als lesbarer Raumzustand (für den Serverbetreiber sichtbar); `share_plus` (größere Abhängigkeit, nur E-Mail gewünscht).
+- **Grenzen:** Der Vermerk erreicht Moderatoren, die dem Raum beitreten oder den Verlauf laden (Nachladen begrenzt); scheitert das Senden, bleibt der Link für den Aussteller gültig. Der E-Mail-Entwurf enthält den Link im Klartext, die Weitergabe liegt beim Mailanbieter des Nutzers (QR-Code zeigt den Link nur dem Gegenüber).
+
 ## Sicherheitsabweichungen
 
 ### SA-1 Schlüsselweitergabe vor Cross-Signing (Phase 2–3, **Sicherheitsabweichung**)
@@ -270,4 +275,3 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Vorgabe:** Keine Klartext-Vorschauen im Task-Switcher; Screenshot-Schutz auf Wunsch.
 - **Ist:** iOS erlaubt kein Sperren von Screenshots. Task-Switcher-Vorschau und Bildschirmaufnahme werden durch eine Abdeckung verhindert; Screenshots durch den Nutzer nicht.
 - **Status:** akzeptiert, in OFFEN geführt (Details E-43).
-

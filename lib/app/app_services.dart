@@ -5,6 +5,7 @@ import '../data/matrix/matrix_gateway.dart';
 import '../data/platform/file_access.dart';
 import '../data/platform/key_store.dart';
 import '../data/platform/link_source.dart';
+import '../data/platform/mail_launcher.dart';
 import '../data/platform/reminder_scheduler.dart';
 import '../data/platform/screen_protection.dart';
 import '../data/sync/presence_sync.dart';
@@ -35,6 +36,7 @@ class AppServices {
     this.calendarBuilder,
     this.shoppingBuilder,
     this.scheduler,
+    this.mail = const SystemMailLauncher(),
   });
 
   final SettingsController settings;
@@ -43,6 +45,9 @@ class AppServices {
   final FileAccess files;
   final LinkSource links;
   final AppLockController lock;
+
+  /// Öffnet das Mailprogramm für Einladungslinks (E-49).
+  final MailLauncher mail;
 
   /// Wird vom Start-Widget gesetzt: löscht alle lokalen Daten und startet neu.
   Future<void> Function()? onFullReset;

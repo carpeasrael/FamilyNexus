@@ -63,9 +63,7 @@ void main() {
 
       await s.anna.approveRequest('@ben:fake.test');
       await tester.pumpAndSettle();
-      expect(find.text('Einladungen'), findsOneWidget);
-      expect(find.text('Familie Test'), findsOneWidget);
-      await _tap(tester, 'Annehmen');
+      // Die eigene, bestätigte Anfrage wird ohne weiteren Tipp angenommen (E-49).
       expect(s.ben.gateway.family!.myRole, Role.member);
       expect(s.ben.store.data['onboardingDone'], 'true');
       expect(find.byType(NavigationBar), findsOneWidget, reason: 'Hauptansicht');
@@ -121,6 +119,34 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Dieser Link ist ungültig oder abgelaufen.'), findsOneWidget);
       expect(find.text('Beitritt anfragen?'), findsNothing);
+    });
+
+    testWidgets('Per Matrix-ID eingeladenes Konto: Einladungskarte statt „Gründen oder Beitreten“, ein Tipp genügt', (tester) async {
+      final s = await _benWithoutFamily();
+      await s.anna.inviteUser('@ben:fake.test');
+      await _pump(tester, s.ben);
+      expect(find.text('Du wurdest eingeladen'), findsOneWidget);
+      expect(find.text('Familie Test'), findsOneWidget);
+      expect(find.text('Einladung von @anna:fake.test'), findsOneWidget);
+      expect(find.textContaining('zu keiner Beitrittsanfrage'), findsOneWidget, reason: 'Warnung bei unerwarteter Einladung');
+      expect(find.byType(SegmentedButton<bool>), findsNothing, reason: 'keine Frage nach Gründen/Beitreten');
+      expect(find.text('Gründe eine neue Familie oder tritt einer bestehenden bei.'), findsNothing);
+      expect(s.ben.gateway.family, isNull, reason: 'ohne Tipp kein Beitritt');
+
+      await _tap(tester, '„Familie Test“ beitreten');
+      expect(s.ben.gateway.family!.myRole, Role.member);
+      expect(s.ben.store.data['onboardingDone'], 'true');
+      expect(find.byType(NavigationBar), findsOneWidget);
+    });
+
+    testWidgets('Trotz Einladung: „andere Familie gründen oder beitreten“ zeigt die Auswahl', (tester) async {
+      final s = await _benWithoutFamily();
+      await s.anna.inviteUser('@ben:fake.test');
+      await _pump(tester, s.ben);
+      await _tap(tester, 'Stattdessen eine andere Familie gründen oder beitreten');
+      expect(find.byType(SegmentedButton<bool>), findsOneWidget);
+      expect(find.text('Gründe eine neue Familie oder tritt einer bestehenden bei.'), findsOneWidget);
+      expect(s.ben.gateway.family, isNull);
     });
 
     testWidgets('Einladung ablehnen', (tester) async {

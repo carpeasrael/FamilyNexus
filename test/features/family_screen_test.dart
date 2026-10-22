@@ -1,6 +1,8 @@
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/domain/family.dart';
+import 'package:family_nexus/domain/invite_link.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/test_app.dart';
@@ -59,6 +61,37 @@ void main() {
     expect(link, startsWith('familynexus://join?'));
   });
 
+  testWidgets('Einladungslink per E-Mail: Entwurf mit Anleitung und Link, ohne Mailprogramm wird kopiert', (tester) async {
+    final app = await buildTestApp();
+    String? clipboard;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+      if (call.method == 'Clipboard.setData') clipboard = (call.arguments as Map<Object?, Object?>)['text'] as String?;
+      return null;
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+    await _openFamily(tester, app);
+    await tester.tap(find.text('QR-Code anzeigen'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Per E-Mail senden'));
+    await tester.pumpAndSettle();
+    final draft = app.mail.drafts.single;
+    expect(draft.subject, 'Einladung zu FamilyNexus');
+    expect(draft.body, contains('„Familie Test“'));
+    expect(draft.body, contains('familynexus://join?'));
+    expect(draft.body, contains('24 Stunden'));
+    final link = RegExp(r'familynexus://join\?\S+').firstMatch(draft.body)!.group(0)!;
+    expect(InviteLink.tryParse(link, now: DateTime.now()), isNotNull, reason: 'der Link im Entwurf ist gültig');
+
+    app.mail.available = false;
+    await tester.tap(find.text('Per E-Mail senden'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(app.mail.drafts, hasLength(1));
+    expect(find.text('Kein Mailprogramm gefunden. Der Link wurde stattdessen kopiert.'), findsOneWidget);
+    expect(clipboard, startsWith('familynexus://join?'), reason: 'Fallback kopiert den Link');
+  });
+
   testWidgets('Anfrage bestätigen und ablehnen', (tester) async {
     final app = await buildTestApp();
     final room = app.gateway.familyRoom!;
@@ -70,7 +103,7 @@ void main() {
     room.knockNonce['@cara:fake.test'] = 'f' * 32;
     await _openFamily(tester, app);
     expect(find.text('Gültiger Einladungslink'), findsOneWidget);
-    expect(find.text('Unbekannter Link – nicht von dir ausgegeben'), findsOneWidget);
+    expect(find.text('Unbekannter Link – von keinem Moderator ausgegeben'), findsOneWidget);
     expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Bestätigen').last).onPressed, isNull, reason: 'unbekannter Link nicht bestätigbar');
     await tester.tap(find.text('Bestätigen').first);
     await tester.pumpAndSettle();

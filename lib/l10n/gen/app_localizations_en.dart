@@ -1190,7 +1190,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get familyRequestCheckExpired => 'Link expired';
 
   @override
-  String get familyRequestCheckUnknown => 'Unknown link – not issued by you';
+  String get familyRequestCheckUnknown =>
+      'Unknown link – not issued by a moderator';
 
   @override
   String familyRequestApproveConfirm(String user) {
@@ -1542,4 +1543,30 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get privacy11Body =>
       'The app remembers blocked members only on this device (encrypted database); the list is not transmitted. If you report a message, the operator of your server receives the message ID, the chosen reason and your optional text. They cannot read the encrypted content.';
+
+  @override
+  String get familyInviteMail => 'Send by email';
+
+  @override
+  String get inviteMailSubject => 'Invitation to FamilyNexus';
+
+  @override
+  String inviteMailBody(String family, String link, String hours) {
+    return 'Hi,\n\nI am inviting you to our family \"$family\" on FamilyNexus (family calendar and messenger, end-to-end encrypted).\n\n1. Install the FamilyNexus app.\n2. During setup choose \"Join\" and paste this link – or open the link or scan the QR code with your camera app:\n\n$link\n\nThe link is valid for $hours hours. After that I will confirm your join request.';
+  }
+
+  @override
+  String get familyInviteMailFailed =>
+      'No mail app found. The link was copied instead.';
+
+  @override
+  String get onbInvitedTitle => 'You have been invited';
+
+  @override
+  String onbInvitedJoin(String family) {
+    return 'Join \"$family\"';
+  }
+
+  @override
+  String get onbInvitedOther => 'Create or join a different family instead';
 }

@@ -57,6 +57,13 @@ geteilt: Familienraum, privat: nur privater Raum des eigenen Kontos (Geräte-Syn
   → Familienraum (`de.inneso.familynexus.shopping`, E2EE); eingehend: `ShoppingCodec` (Format v1, `by` = Absender)
   → `ShoppingMerge`. Resync: der letzte Bearbeiter sendet seine aktiven Einträge bei neuen Mitgliedern erneut.
 
+## Einladungen (E-49)
+- Link: `InviteLink` (Format v1) + Vermerk `InviteTicket` als verschlüsseltes Raumereignis; `SdkMatrixGateway` führt die
+  Vermerke der Moderatoren (`_roomTickets`, `_usedTickets`) zusätzlich zu den eigenen Kontodaten und prüft damit
+  Beitrittsanfragen (`RequestCheck`). Teilen: QR, Kopieren, `MailLauncher` (`data/platform/mail_launcher.dart`, `url_launcher`).
+- Einrichtung: `FamilyStep` zeigt bei vorhandener Einladung die Einladungskarte statt der Auswahl Gründen/Beitreten; eigene,
+  bestätigte Beitrittsanfragen werden automatisch angenommen.
+
 ## Melden und Blockieren (E-48)
 - `domain/moderation.dart`: `ReportRequest` (Kategorie + bereinigter Freitext → Grundtext), `BlockedUsers` (defensives Lesen,
   Obergrenze 200), `visibleMessages`/`visibleThreads` (Filter). Die Blockierliste liegt als `blockedUsers` in `AppSettings`

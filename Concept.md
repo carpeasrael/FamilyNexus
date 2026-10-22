@@ -73,8 +73,9 @@ Two roles govern the family: members use calendar and chat, moderators additiona
 
 ### Invitations
 
-- A moderator creates a time-limited invitation link or QR code.
-- Joining only after confirmation by a moderator; additionally device verification by emoji comparison or QR scan.
+- A moderator creates a time-limited invitation link or QR code and can share it by email, QR code or copy. Only moderators create links.
+- Joining only after confirmation by any moderator (a link issued by one moderator can be checked by the others); additionally device verification by emoji comparison or QR scan.
+- A moderator can also invite an existing Matrix account by ID. When that account signs in without a family, the app shows the invitation directly ("You have been invited – join <family>") instead of asking whether to create or join; one tap confirms.
 
 ## Architecture
 

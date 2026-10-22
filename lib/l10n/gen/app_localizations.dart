@@ -2135,7 +2135,7 @@ abstract class AppLocalizations {
   /// No description provided for @familyRequestCheckUnknown.
   ///
   /// In de, this message translates to:
-  /// **'Unbekannter Link – nicht von dir ausgegeben'**
+  /// **'Unbekannter Link – von keinem Moderator ausgegeben'**
   String get familyRequestCheckUnknown;
 
   /// No description provided for @familyRequestApproveConfirm.
@@ -2701,6 +2701,48 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen.'**
   String get privacy11Body;
+
+  /// No description provided for @familyInviteMail.
+  ///
+  /// In de, this message translates to:
+  /// **'Per E-Mail senden'**
+  String get familyInviteMail;
+
+  /// No description provided for @inviteMailSubject.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladung zu FamilyNexus'**
+  String get inviteMailSubject;
+
+  /// No description provided for @inviteMailBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein (Familienkalender und Messenger, Ende-zu-Ende-verschlüsselt).\n\n1. Installiere die App FamilyNexus.\n2. Wähle bei der Einrichtung „Beitreten“ und füge diesen Link ein – oder öffne den Link bzw. scanne den QR-Code mit der Kamera-App:\n\n{link}\n\nDer Link ist {hours} Stunden gültig. Danach bestätige ich deinen Beitritt.'**
+  String inviteMailBody(String family, String link, String hours);
+
+  /// No description provided for @familyInviteMailFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Mailprogramm gefunden. Der Link wurde stattdessen kopiert.'**
+  String get familyInviteMailFailed;
+
+  /// No description provided for @onbInvitedTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Du wurdest eingeladen'**
+  String get onbInvitedTitle;
+
+  /// No description provided for @onbInvitedJoin.
+  ///
+  /// In de, this message translates to:
+  /// **'„{family}“ beitreten'**
+  String onbInvitedJoin(String family);
+
+  /// No description provided for @onbInvitedOther.
+  ///
+  /// In de, this message translates to:
+  /// **'Stattdessen eine andere Familie gründen oder beitreten'**
+  String get onbInvitedOther;
 }
 
 class _AppLocalizationsDelegate

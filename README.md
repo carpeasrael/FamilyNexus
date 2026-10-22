@@ -29,8 +29,9 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
   time), time zones, **private** (own devices only) and **shared** events (encrypted in the family room), accept/decline,
   share events as a card in the chat.
 - **Local reminders** without the event name in the notification.
-- **Family and roles:** member/moderator; invite via link/QR (single-use, time-limited) or Matrix ID, confirm join
-  requests, promote, remove (key rotation).
+- **Family and roles:** member/moderator; invite via link (share by email, QR code or copy; single-use, time-limited) or
+  Matrix ID, confirm join requests (any moderator can check and confirm a link issued by another), promote, remove (key
+  rotation). An invited account sees the invitation right after sign-in instead of the create/join question.
 - **Security:** encrypted local database (SQLCipher, key in the Android Keystore), app lock via device authentication,
   screen protection, device verification by emoji comparison, identity verification of members.
 - German/English, light/dark (glass/neon look based on the AURORA colors) with a **selectable neon accent color**

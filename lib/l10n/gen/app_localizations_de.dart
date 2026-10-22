@@ -1202,7 +1202,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get familyRequestCheckUnknown =>
-      'Unbekannter Link – nicht von dir ausgegeben';
+      'Unbekannter Link – von keinem Moderator ausgegeben';
 
   @override
   String familyRequestApproveConfirm(String user) {
@@ -1555,4 +1555,31 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get privacy11Body =>
       'Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen.';
+
+  @override
+  String get familyInviteMail => 'Per E-Mail senden';
+
+  @override
+  String get inviteMailSubject => 'Einladung zu FamilyNexus';
+
+  @override
+  String inviteMailBody(String family, String link, String hours) {
+    return 'Hallo,\n\nich lade dich in unsere Familie „$family“ bei FamilyNexus ein (Familienkalender und Messenger, Ende-zu-Ende-verschlüsselt).\n\n1. Installiere die App FamilyNexus.\n2. Wähle bei der Einrichtung „Beitreten“ und füge diesen Link ein – oder öffne den Link bzw. scanne den QR-Code mit der Kamera-App:\n\n$link\n\nDer Link ist $hours Stunden gültig. Danach bestätige ich deinen Beitritt.';
+  }
+
+  @override
+  String get familyInviteMailFailed =>
+      'Kein Mailprogramm gefunden. Der Link wurde stattdessen kopiert.';
+
+  @override
+  String get onbInvitedTitle => 'Du wurdest eingeladen';
+
+  @override
+  String onbInvitedJoin(String family) {
+    return '„$family“ beitreten';
+  }
+
+  @override
+  String get onbInvitedOther =>
+      'Stattdessen eine andere Familie gründen oder beitreten';
 }

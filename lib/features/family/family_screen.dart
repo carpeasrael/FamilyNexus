@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
+import '../../domain/invite_link.dart';
 import '../../domain/family.dart';
 import '../../domain/permissions.dart';
 import '../../domain/server.dart';
@@ -352,10 +353,25 @@ class _InvitePanelState extends State<_InvitePanel> {
             },
             child: Text(l.familyInviteCopyLink),
           ),
+          TextButton(onPressed: () => _sendMail(l, link), child: Text(l.familyInviteMail)),
           FilledButton(onPressed: () => Navigator.pop(c), child: Text(l.close)),
         ],
       ),
     );
+  }
+
+  /// Öffnet einen Mailentwurf mit Anleitung und Link; ohne Mailprogramm wird der Link kopiert.
+  Future<void> _sendMail(AppLocalizations l, String link) async {
+    final services = AppScope.read(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final family = widget.gateway.family?.name ?? '';
+    final ok = await services.mail.compose(
+      subject: l.inviteMailSubject,
+      body: l.inviteMailBody(family, link, '${InviteLink.defaultValidity.inHours}'),
+    );
+    if (ok) return;
+    await Clipboard.setData(ClipboardData(text: link));
+    messenger.showSnackBar(SnackBar(content: Text(l.familyInviteMailFailed)));
   }
 
   Future<void> _inviteById() async {

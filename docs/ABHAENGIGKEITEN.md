@@ -1,6 +1,6 @@
 # Abhängigkeiten (SBOM)
 
-Stand: 2026-10-21 · erzeugt mit `tool/sbom.py` aus `pubspec.lock` und pub.dev.
+Stand: 2026-10-22 · erzeugt mit `tool/sbom.py` aus `pubspec.lock` und pub.dev.
 
 Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive Versionen fixiert `pubspec.lock`. Spalte „Pub-Punkte“ = pub.dev-Bewertung (max. 160).
 
@@ -21,6 +21,7 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `qr` | direct main | 4.0.0 | 2026-05-16 | bsd-3-clause | 160 | ok |
 | `sqflite_sqlcipher` | direct main | 3.4.1 | 2026-08-04 | mit | 150 | ok |
 | `timezone` | direct main | 0.11.2 | 2026-10-12 | bsd-2-clause | 160 | ok |
+| `url_launcher` | direct main | 6.3.3 | 2026-10-02 | bsd-3-clause | 160 | ok |
 | `uuid` | direct main | 4.6.0 | 2026-07-15 | mit | 160 | ok |
 | `flutter_lints` | direct dev | 6.0.0 | 2025-05-27 | bsd-3-clause | 160 | ok |
 | `flutter_test` | direct dev | 0.0.0 | — | — | — | SDK/lokal |
@@ -123,6 +124,13 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `test_api` | transitive | 0.7.12 | 2026-04-27 | bsd-3-clause | 150 | neuer: 0.7.15 |
 | `typed_data` | transitive | 1.4.0 | 2024-10-17 | bsd-3-clause | 150 | ok |
 | `unorm_dart` | transitive | 0.3.3 | 2026-10-04 | mit | 150 | ok |
+| `url_launcher_android` | transitive | 6.3.33 | 2026-08-28 | bsd-3-clause | 160 | ok |
+| `url_launcher_ios` | transitive | 6.4.2 | 2026-08-28 | bsd-3-clause | 150 | ok |
+| `url_launcher_linux` | transitive | 3.2.3 | 2026-08-28 | bsd-3-clause | 150 | ok |
+| `url_launcher_macos` | transitive | 3.2.6 | 2026-08-28 | bsd-3-clause | 150 | ok |
+| `url_launcher_platform_interface` | transitive | 2.3.2 | 2024-02-15 | bsd-3-clause | 150 | ok |
+| `url_launcher_web` | transitive | 2.4.3 | 2026-05-05 | bsd-3-clause | 150 | ok |
+| `url_launcher_windows` | transitive | 3.1.6 | 2026-08-28 | bsd-3-clause | 160 | ok |
 | `vector_math` | transitive | 2.4.0 | 2026-06-03 | bsd-3-clause | 150 | neuer: 2.4.3 |
 | `vm_service` | transitive | 15.4.0 | 2026-10-15 | bsd-3-clause | 150 | ok |
 | `web` | transitive | 1.1.1 | 2025-02-26 | bsd-3-clause | 150 | ok |

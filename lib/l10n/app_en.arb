@@ -541,7 +541,7 @@
   "privacy9Body": "You can request access, correction and deletion at any time. You manage local data in this app; server data with your server's operator.",
   "familyRequestCheckValid": "Valid invitation link",
   "familyRequestCheckExpired": "Link expired",
-  "familyRequestCheckUnknown": "Unknown link – not issued by you",
+  "familyRequestCheckUnknown": "Unknown link – not issued by a moderator",
   "familyRequestApproveConfirm": "Add {user} to the family? The invitation link is used up.",
   "@familyRequestApproveConfirm": {
     "placeholders": {
@@ -841,5 +841,32 @@
   "settingsBlockedUsersHint": "Messages from blocked members are hidden.",
   "blockedUsersEmpty": "You have not blocked anyone.",
   "privacy11Title": "Reporting and blocking",
-  "privacy11Body": "The app remembers blocked members only on this device (encrypted database); the list is not transmitted. If you report a message, the operator of your server receives the message ID, the chosen reason and your optional text. They cannot read the encrypted content."
+  "privacy11Body": "The app remembers blocked members only on this device (encrypted database); the list is not transmitted. If you report a message, the operator of your server receives the message ID, the chosen reason and your optional text. They cannot read the encrypted content.",
+  "familyInviteMail": "Send by email",
+  "inviteMailSubject": "Invitation to FamilyNexus",
+  "inviteMailBody": "Hi,\n\nI am inviting you to our family \"{family}\" on FamilyNexus (family calendar and messenger, end-to-end encrypted).\n\n1. Install the FamilyNexus app.\n2. During setup choose \"Join\" and paste this link – or open the link or scan the QR code with your camera app:\n\n{link}\n\nThe link is valid for {hours} hours. After that I will confirm your join request.",
+  "@inviteMailBody": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      },
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "familyInviteMailFailed": "No mail app found. The link was copied instead.",
+  "onbInvitedTitle": "You have been invited",
+  "onbInvitedJoin": "Join \"{family}\"",
+  "@onbInvitedJoin": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      }
+    }
+  },
+  "onbInvitedOther": "Create or join a different family instead"
 }

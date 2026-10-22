@@ -17,6 +17,7 @@ import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/event_codec.dart';
 import '../../domain/invite_link.dart';
+import '../../domain/invite_ticket.dart';
 import '../../domain/moderation.dart';
 import '../../domain/permissions.dart';
 import '../../domain/presence.dart';
@@ -390,6 +391,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _presenceRoomId = null;
     _signaled.clear();
     _signalHistory.clear();
+    _roomTickets.clear();
+    _usedTickets.clear();
     _privateRoomIdCache = null;
     _privateVerified = null;
     _joinRequestCache = null;
@@ -974,7 +977,42 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       AppLog.e('gateway', 'Einladung konnte nicht vermerkt werden', e);
       throw _map(e);
     }
+    _roomTickets[nonce] = invites[nonce]!;
+    await _publishTicket(InviteTicket(nonce: nonce, expires: invites[nonce]!));
     return link;
+  }
+
+  /// Link-IDs, die Moderatoren im Familienraum vermerkt haben (`{id: Ablauf in Unix-Sekunden}`), und
+  /// verbrauchte IDs. Ergänzt die eigenen Kontodaten, damit jeder Moderator Anfragen prüfen kann (E-49).
+  final Map<String, int> _roomTickets = <String, int>{};
+  final Set<String> _usedTickets = <String>{};
+
+  /// Meldet einen Link-Vermerk an die anderen Moderatoren. Scheitert das, bleibt der Link für den
+  /// Aussteller selbst gültig; deshalb nur eine Warnung statt eines Fehlers.
+  Future<void> _publishTicket(InviteTicket ticket) async {
+    final room = _familyRoom();
+    if (room == null) return;
+    try {
+      await _sendCalendar(room, InviteTicket.type, ticket.encode());
+    } catch (e) {
+      AppLog.w('gateway', 'Link-Vermerk konnte nicht an andere Moderatoren gesendet werden');
+    }
+  }
+
+  /// Liest die Link-Vermerke aus dem Verlauf des Familienraums. Nur Vermerke von Moderatoren zählen.
+  void _readTickets(Room room, Timeline timeline) {
+    final nowSec = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
+    for (final e in timeline.events) {
+      if (e.type != InviteTicket.type || e.redacted || e.status.isError) continue;
+      if (room.getPowerLevelByUserId(e.senderId).level < PowerLevels.moderator) continue;
+      final t = InviteTicket.decode(e.content, nowSeconds: nowSec);
+      if (t == null) continue;
+      if (t.used) {
+        _usedTickets.add(t.nonce);
+      } else {
+        _roomTickets[t.nonce] = t.expires;
+      }
+    }
   }
 
   /// Beitrittsanfragen: Der Grund enthält die Link-ID (`FamilyNexus:<id>`).
@@ -984,7 +1022,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (reason == null || !reason.startsWith(knockReasonPrefix)) return RequestCheck.unknown;
     final nonce = reason.substring(knockReasonPrefix.length);
     if (!InviteLink.isNonce(nonce)) return RequestCheck.unknown;
-    final exp = _issuedInvites()[nonce];
+    if (_usedTickets.contains(nonce)) return RequestCheck.unknown;
+    final exp = _issuedInvites()[nonce] ?? _roomTickets[nonce];
     if (exp == null) return RequestCheck.unknown;
     return DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000 < exp ? RequestCheck.valid : RequestCheck.expired;
   }
@@ -1066,6 +1105,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     await _roomOp((room) => room.invite(userId));
     final nonce = _knockNonces[userId];
     if (nonce != null) {
+      _usedTickets.add(nonce);
+      await _publishTicket(InviteTicket(nonce: nonce, expires: _roomTickets[nonce] ?? _issuedInvites()[nonce] ?? DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000 + 60, used: true));
       final invites = _issuedInvites()..remove(nonce);
       try {
         await _storeInvites(invites);
@@ -1483,6 +1524,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       _timelineRoomId = room.id;
       _backfill(_timeline!).ignore();
     }
+    _readTickets(room, _timeline!);
     _family = _buildFamily(room, client.userID!);
     _messages = ChatMapper.messages(_timeline!);
     if (_presenceRoomId != room.id) {

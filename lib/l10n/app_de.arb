@@ -541,7 +541,7 @@
   "privacy9Body": "Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App; Serverdaten beim Betreiber deines Servers.",
   "familyRequestCheckValid": "Gültiger Einladungslink",
   "familyRequestCheckExpired": "Link abgelaufen",
-  "familyRequestCheckUnknown": "Unbekannter Link – nicht von dir ausgegeben",
+  "familyRequestCheckUnknown": "Unbekannter Link – von keinem Moderator ausgegeben",
   "familyRequestApproveConfirm": "{user} in die Familie aufnehmen? Der Einladungslink wird dabei verbraucht.",
   "@familyRequestApproveConfirm": {
     "placeholders": {
@@ -841,5 +841,32 @@
   "settingsBlockedUsersHint": "Nachrichten blockierter Mitglieder werden ausgeblendet.",
   "blockedUsersEmpty": "Du hast niemanden blockiert.",
   "privacy11Title": "Melden und Blockieren",
-  "privacy11Body": "Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen."
+  "privacy11Body": "Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen.",
+  "familyInviteMail": "Per E-Mail senden",
+  "inviteMailSubject": "Einladung zu FamilyNexus",
+  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein (Familienkalender und Messenger, Ende-zu-Ende-verschlüsselt).\n\n1. Installiere die App FamilyNexus.\n2. Wähle bei der Einrichtung „Beitreten“ und füge diesen Link ein – oder öffne den Link bzw. scanne den QR-Code mit der Kamera-App:\n\n{link}\n\nDer Link ist {hours} Stunden gültig. Danach bestätige ich deinen Beitritt.",
+  "@inviteMailBody": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      },
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "familyInviteMailFailed": "Kein Mailprogramm gefunden. Der Link wurde stattdessen kopiert.",
+  "onbInvitedTitle": "Du wurdest eingeladen",
+  "onbInvitedJoin": "„{family}“ beitreten",
+  "@onbInvitedJoin": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      }
+    }
+  },
+  "onbInvitedOther": "Stattdessen eine andere Familie gründen oder beitreten"
 }
