@@ -17,6 +17,8 @@ dependencies:
   matrix: 14.2.0
   flutter_vodozemac: 0.9.0
   sqflite_sqlcipher: 3.4.1
+  # Linux: SQLCipher über FFI (E-50); Bibliothek siehe `hooks` unten.
+  sqflite_common_ffi: 2.4.4
   flutter_secure_storage: 11.2.0
   path: 1.9.1
   http: 1.6.0
@@ -36,8 +38,17 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: 6.0.0
   path_provider: 2.1.6
-  sqflite_common_ffi: 2.4.4
   vodozemac: 0.9.0
+
+# SQLite für sqflite_common_ffi: unter Linux die System-Bibliothek libsqlcipher.so (im Flatpak aus dem
+# Quellcode gebaut, flatpak/de.inneso.familynexus.yml), kein heruntergeladenes Binary. Android/iOS/macOS
+# nutzen weiter sqflite_sqlcipher; dort wird über diesen Weg nichts gebündelt oder geladen (E-50).
+hooks:
+  user_defines:
+    sqlite3:
+      source: system
+      name: sqlite3
+      name_linux: sqlcipher
 
 flutter:
   uses-material-design: true

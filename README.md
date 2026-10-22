@@ -1,6 +1,6 @@
 # FamilyNexus
 
-Family calendar and messenger for Android, iOS and macOS – **local-first**, end-to-end encrypted via the
+Family calendar and messenger for Android, iOS, macOS and Linux – **local-first**, end-to-end encrypted via the
 [Matrix](https://matrix.org) protocol. Built with Flutter (Android; iOS verified in the simulator since phase 6; the
 codebase is platform-neutral, platform code lives in clearly separated adapters under `lib/data/platform/`, `android/`
 and `ios/`).
@@ -46,6 +46,8 @@ Not included / known limitations: see [`docs/OFFEN.md`](docs/OFFEN.md).
 | Flutter 3.47.x (Dart 3.13) | Build and tests |
 | JDK 17, Android SDK (platform 35/36, build tools, NDK via Gradle) | Android build |
 | Rust (`rustup`, Android targets) | `vodozemac` (cryptography) is built from source during the Android build |
+| Linux: clang, CMake, Ninja, GTK 3, libsecret, SQLCipher (`libsqlcipher.so`) | Linux build, and `flutter test` on Linux hosts |
+| `flatpak`, `flatpak-builder` (optional) | Linux Flatpak bundle (`tool/build_flatpak.sh`) |
 | Docker (optional) | Local test homeserver for the end-to-end tests |
 
 ## Build and run
@@ -56,6 +58,8 @@ flutter run                      # Debug on device/emulator
 flutter build apk --debug        # Debug APK
 flutter build macos --debug       # macOS (Apple Silicon), start: open build/macos/Build/Products/Debug/FamilyNexus.app
 flutter build ios --simulator --debug   # iOS (simulator); needs Xcode, CocoaPods, Rust targets for iOS (see docs/OFFEN.md)
+flutter build linux --debug       # Linux (x86_64), start: build/linux/x64/debug/bundle/familynexus
+tool/build_flatpak.sh --install   # Linux release as Flatpak bundle (build/flatpak/), installs it for the current user
 tool/build_release.sh            # Release with --obfuscate (unsigned without android/key.properties)
 ```
 
@@ -69,6 +73,9 @@ and a signed App Bundle (`.aab`, all ABIs, for Google Play), attaches both with 
 debug symbols as a private workflow artifact. Running the workflow by hand (*Run workflow*, choose `aab`) rebuilds only the bundle for an
 existing tag and leaves the APK asset untouched. Required repository secrets: `ANDROID_KEYSTORE_BASE64` (`base64 -i upload-keystore.jks`),
 `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`. Without them the workflow fails early.
+The same workflow then builds the Linux Flatpak bundle (`FamilyNexus-v<version>.flatpak`, x86_64, needs no secrets) with
+`tool/build_flatpak.sh` and attaches it as well; *Run workflow* with `flatpak` rebuilds only that bundle. Install with
+`flatpak install --user FamilyNexus-v<version>.flatpak` (the GNOME runtime comes from Flathub).
 
 ## Tests
 
@@ -90,7 +97,7 @@ without `FN_E2E`).
 
 Preparation for Google Play and the App Store (versions, icons, store texts, privacy, build scripts, checklists):
 [`docs/STORE.md`](docs/STORE.md); contents of the listings under `store/`. Release bundles:
-`tool/build_release.sh aab`, `tool/build_ios_release.sh`.
+`tool/build_release.sh aab`, `tool/build_ios_release.sh`, `tool/build_flatpak.sh` (Linux).
 
 ## Own server, privacy
 

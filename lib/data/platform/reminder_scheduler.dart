@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -36,14 +39,26 @@ abstract class ReminderScheduler {
 }
 
 class LocalReminderScheduler implements ReminderScheduler {
-  LocalReminderScheduler([FlutterLocalNotificationsPlugin? plugin])
-      : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
+  LocalReminderScheduler([FlutterLocalNotificationsPlugin? plugin, bool? inAppTimers])
+      : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
+        _inAppTimers = inAppTimers ?? Platform.isLinux;
 
   final FlutterLocalNotificationsPlugin _plugin;
   static const String _channelId = 'reminders';
   String _channelName = 'Erinnerungen';
   String _channelDescription = '';
   bool _ready = false;
+
+  /// Linux (E-50): Das Plugin kann dort nicht im Voraus planen (`zonedSchedule` fehlt). Die App hält die
+  /// Erinnerungen selbst und zeigt fällige an, solange sie läuft. Geprüft wird gegen die Uhrzeit (nicht mit
+  /// einem langen Timer), damit Erinnerungen auch nach einem Standby noch erscheinen.
+  final bool _inAppTimers;
+  List<_InAppReminder> _inApp = const <_InAppReminder>[];
+  Timer? _tick;
+  static const Duration tickInterval = Duration(seconds: 30);
+
+  /// Verpasste Erinnerungen (z. B. Rechner im Standby) erscheinen nur, wenn sie höchstens so alt sind.
+  static const Duration staleAfter = Duration(minutes: 30);
 
   AndroidFlutterLocalNotificationsPlugin? get _android =>
       _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
@@ -80,6 +95,7 @@ class LocalReminderScheduler implements ReminderScheduler {
           requestBadgePermission: false,
           requestSoundPermission: false,
         ),
+        linux: LinuxInitializationSettings(defaultActionName: 'FamilyNexus'),
       ),
     );
     _ready = true;
@@ -129,6 +145,7 @@ class LocalReminderScheduler implements ReminderScheduler {
     required String Function(int minutesBefore) bodyFor,
   }) async {
     if (!_ready) return;
+    if (_inAppTimers) return _replaceInApp(planned, title: title, bodyFor: bodyFor);
     final android = _android;
     try {
       await _plugin.cancelAllPendingNotifications();
@@ -171,12 +188,61 @@ class LocalReminderScheduler implements ReminderScheduler {
     }
   }
 
+  void _replaceInApp(
+    List<PlannedReminder> planned, {
+    required String title,
+    required String Function(int minutesBefore) bodyFor,
+  }) {
+    _inApp = <_InAppReminder>[
+      for (final r in planned) _InAppReminder(r.id, r.fireAt.toUtc(), title, bodyFor(r.minutesBefore)),
+    ];
+    _tick?.cancel();
+    _tick = _inApp.isEmpty ? null : Timer.periodic(tickInterval, (_) => fireDue());
+    fireDue();
+  }
+
+  /// Zeigt fällige Erinnerungen (Linux); öffentlich nur für Tests.
+  Future<void> fireDue([DateTime? now]) async {
+    final t = (now ?? DateTime.now()).toUtc();
+    final due = _inApp.where((r) => !r.fireAt.isAfter(t)).toList();
+    if (due.isEmpty) return;
+    _inApp = _inApp.where((r) => r.fireAt.isAfter(t)).toList();
+    if (_inApp.isEmpty) {
+      _tick?.cancel();
+      _tick = null;
+    }
+    for (final r in due) {
+      if (t.difference(r.fireAt) > staleAfter) continue;
+      try {
+        await _plugin.show(
+          id: r.id,
+          title: r.title,
+          body: r.body,
+          notificationDetails: const NotificationDetails(linux: LinuxNotificationDetails()),
+        );
+      } catch (e) {
+        AppLog.e('reminders', 'Erinnerung konnte nicht angezeigt werden', e);
+      }
+    }
+  }
+
   @override
   Future<void> cancelAll() async {
+    _inApp = const <_InAppReminder>[];
+    _tick?.cancel();
+    _tick = null;
     try {
       await _plugin.cancelAll();
     } catch (e) {
       AppLog.e('reminders', 'Erinnerungen konnten nicht entfernt werden', e);
     }
   }
+}
+
+class _InAppReminder {
+  const _InAppReminder(this.id, this.fireAt, this.title, this.body);
+  final int id;
+  final DateTime fireAt;
+  final String title;
+  final String body;
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
@@ -78,12 +80,14 @@ class SettingsScreen extends StatelessWidget {
                 trailing: s.blockedUsers.isEmpty ? null : Text('${s.blockedUsers.length}'),
                 onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const BlockedUsersScreen())),
               ),
-              SwitchListTile(
-                title: Text(l.settingsSecureScreen),
-                subtitle: Text(l.settingsSecureScreenHint),
-                value: s.secureScreen,
-                onChanged: (v) => controller.update((c) => c.copyWith(secureScreen: v)),
-              ),
+              // Linux bietet keinen Schutz vor Bildschirmaufnahmen (SA-6): Schalter ausgeblendet.
+              if (!Platform.isLinux)
+                SwitchListTile(
+                  title: Text(l.settingsSecureScreen),
+                  subtitle: Text(l.settingsSecureScreenHint),
+                  value: s.secureScreen,
+                  onChanged: (v) => controller.update((c) => c.copyWith(secureScreen: v)),
+                ),
             ]),
             const SizedBox(height: 16),
             _Section(title: l.settingsSectionAbout, children: <Widget>[

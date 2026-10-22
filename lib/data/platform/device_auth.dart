@@ -39,3 +39,14 @@ class LocalDeviceAuth implements DeviceAuth {
     }
   }
 }
+
+/// Plattform ohne Geräteanmeldung für Apps (Linux, SA-6): Die App-Sperre lässt sich nicht einschalten.
+class UnavailableDeviceAuth implements DeviceAuth {
+  const UnavailableDeviceAuth();
+
+  @override
+  Future<bool> isAvailable() async => false;
+
+  @override
+  Future<bool> authenticate(String reason) async => false;
+}

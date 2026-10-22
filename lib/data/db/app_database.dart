@@ -4,6 +4,7 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite_sqlcipher/sqflite.dart';
 
 import '../platform/key_store.dart';
+import 'encrypted_db.dart';
 
 /// Der Datenbankschlüssel fehlt oder ist nicht mehr lesbar, obwohl die
 /// Datenbankdatei existiert. Es wird bewusst **kein** neuer Schlüssel erzeugt,
@@ -16,7 +17,8 @@ class KeyLostException implements Exception {
 
 /// Verschlüsselte App-Datenbank (SQLCipher, AES-256).
 ///
-/// Das Passwort stammt aus dem [KeyStore] (Android Keystore). Ohne dieses
+/// Das Passwort stammt aus dem [KeyStore] (Android Keystore, Schlüsselbund bzw.
+/// Secret Service unter Linux). Ohne dieses
 /// Passwort ist die Datei nicht lesbar.
 class AppDatabase {
   AppDatabase._(this.db);
@@ -100,7 +102,7 @@ class AppDatabase {
     String? directory,
     String name = fileName,
   }) async {
-    final dir = directory ?? await getDatabasesPath();
+    final dir = directory ?? await EncryptedDb.databasesPath();
     final path = p.join(dir, name);
     final key = await resolveKey(keyStore: keyStore, keyName: keyName, path: path);
     return openWithKey(path: path, key: key);
@@ -125,7 +127,7 @@ class AppDatabase {
     required String path,
     required String key,
   }) async {
-    final db = await openDatabase(
+    final db = await EncryptedDb.open(
       path,
       password: key,
       version: schemaVersion,
@@ -149,7 +151,7 @@ class AppDatabase {
 
   /// Löscht die Datei vollständig (Konto-/Datenlöschung).
   static Future<void> destroy({String? directory, String name = fileName}) async {
-    final dir = directory ?? await getDatabasesPath();
-    await deleteDatabase(p.join(dir, name));
+    final dir = directory ?? await EncryptedDb.databasesPath();
+    await EncryptedDb.delete(p.join(dir, name));
   }
 }

@@ -1,7 +1,7 @@
 name: Release
 
-# Builds a signed release APK and a signed Android App Bundle (AAB, for Google Play) for every pushed version tag (v*)
-# and attaches both, with SHA-256 files, to the GitHub release.
+# Builds a signed release APK, a signed Android App Bundle (AAB, for Google Play) and a Linux Flatpak bundle for every
+# pushed version tag (v*) and attaches them, with SHA-256 files, to the GitHub release.
 # Required repository secrets (Settings -> Secrets and variables -> Actions):
 #   ANDROID_KEYSTORE_BASE64   upload keystore, base64-encoded (base64 -i upload-keystore.jks)
 #   ANDROID_KEYSTORE_PASSWORD keystore password
@@ -16,9 +16,9 @@ on:
         description: Existing tag to build and attach the files to (e.g. v1.0.1)
         required: true
       build:
-        description: What to build; "aab" keeps an existing APK asset untouched
+        description: What to build; "aab" keeps an existing APK asset untouched, "flatpak" builds only the Linux bundle
         type: choice
-        options: [apk+aab, aab]
+        options: [apk+aab, aab, flatpak]
         default: apk+aab
 
 permissions:
@@ -26,6 +26,7 @@ permissions:
 
 jobs:
   apk:
+    if: github.event.inputs.build != 'flatpak'
     runs-on: ubuntu-latest
     env:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
@@ -146,3 +147,41 @@ jobs:
       - name: Remove signing key
         if: always()
         run: rm -f "$RUNNER_TEMP/upload-keystore.jks" android/key.properties
+
+  # Linux: Flatpak bundle (tool/build_flatpak.sh, manifest flatpak/de.inneso.familynexus.yml). Runs after the Android
+  # job so that only one job creates the GitHub release.
+  flatpak:
+    needs: apk
+    if: >-
+      always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
+      && github.event.inputs.build != 'aab'
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Check tag matches pubspec version
+        run: |
+          name=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
+          if [ "v$name" != "$TAG" ]; then echo "::error::Tag $TAG does not match pubspec version $name"; exit 1; fi
+
+      - name: Install Flatpak tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+
+      - name: Build Flatpak bundle
+        run: tool/build_flatpak.sh
+
+      - name: Attach to GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "FamilyNexus ${TAG#v}" --generate-notes --verify-tag
+          fi
+          gh release upload "$TAG" "build/flatpak/FamilyNexus-${TAG}.flatpak" "build/flatpak/FamilyNexus-${TAG}.flatpak.sha256" --clobber

@@ -28,6 +28,7 @@ import '../../domain/server.dart';
 import '../../domain/shopping.dart';
 import '../../domain/text_sanitizer.dart';
 import '../db/app_database.dart';
+import '../db/encrypted_db.dart';
 import '../platform/key_store.dart';
 import 'matrix_gateway.dart';
 import 'chat_mapper.dart';
@@ -38,7 +39,7 @@ import 'server_probe.dart';
 /// Produktive Implementierung auf Basis des Matrix-Dart-SDK (E-01).
 ///
 /// Sicherheitsrelevante Entscheidungen:
-/// * SDK-Datenbank: SQLCipher, eigener Schlüssel im Keystore.
+/// * SDK-Datenbank: SQLCipher, eigener Schlüssel im Keystore (Linux: Secret Service).
 /// * SDK-Logs werden auf AppLog umgeleitet (nur Typ des Fehlers) und nicht gesammelt.
 /// * Nachrichten werden ohne Markdown-Parsing und ohne Slash-Befehle gesendet.
 /// * Lesebestätigungen sind privat (`receiptsPublicByDefault: false`).
@@ -217,7 +218,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final existing = _client;
     if (existing != null) return existing;
     _hardenSdkLogging();
-    final dir = _dbDirectory ?? await sql.getDatabasesPath();
+    final dir = _dbDirectory ?? await EncryptedDb.databasesPath();
     final path = p.join(dir, matrixDbFileName);
     final key = await AppDatabase.resolveKey(
       keyStore: _keyStore,
@@ -225,7 +226,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       path: path,
     );
     final opener = _databaseOpener;
-    final db = opener != null ? await opener(path, key) : await sql.openDatabase(path, password: key, version: 1);
+    final db = opener != null ? await opener(path, key) : await EncryptedDb.open(path, password: key, version: 1);
     final database = await MatrixSdkDatabase.init('familynexus', database: db);
     final client = Client(
       'FamilyNexus',

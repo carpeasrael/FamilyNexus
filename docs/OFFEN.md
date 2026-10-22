@@ -93,6 +93,15 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 - Adaptive Zwei-Spalten-Ansicht (Kalender + Chat, Concept) für große Fenster ist nicht umgesetzt; die Oberfläche ist für Telefonbreite entworfen.
 - Rust-Ziel `aarch64-apple-darwin` (Apple Silicon) wird für die Krypto-Bibliothek gebraucht.
 
+## Linux (E-50)
+
+- Flatpak gebaut und gestartet (`tool/build_flatpak.sh --install`); nicht ausführlich bedient (Anmeldung gegen echten Server, Erinnerungen, Einladungslink aus dem Browser, Secret-Portal auf KDE/anderen Desktops).
+- **SA-6:** keine App-Sperre (keine Geräteanmeldung für Apps unter Linux) und kein Bildschirmschutz (Wayland/X11 bieten keinen).
+- Nur **x86_64** (Flutter liefert kein Linux-SDK für arm64 als Archiv). Der Build braucht Netzzugriff (pub, crates, Flutter-Engine) und ist deshalb nicht Flathub-konform; Verteilung als Bundle über GitHub-Releases (`flatpak install --user FamilyNexus-v….flatpak`, Laufzeit kommt von Flathub).
+- Erinnerungen erscheinen nur, solange die App läuft (keine Hintergrunddienste; Benachrichtigungen über `org.freedesktop.Notifications`). Ein Tray-Symbol (Concept) fehlt.
+- Ohne Flatpak (`flutter run -d linux`) braucht das System `libsqlcipher.so` (Arch/Manjaro: `sqlcipher`, Debian/Ubuntu: `libsqlcipher-dev`), libsecret und einen Secret Service; ohne SQLCipher startet die App bewusst nicht. Das gilt auch für `flutter test` auf Linux-Hosts.
+- Die adaptive Zwei-Spalten-Ansicht für große Fenster fehlt wie unter macOS.
+
 ## Betrieb / Build
 
 - Ende-zu-Ende-Tests laufen nur lokal gegen einen eigenen Synapse (`tool/e2e.sh`), nicht gegen Produktivserver.

@@ -25,6 +25,7 @@ ios/.symlinks/
 ios/Flutter/ephemeral/
 macos/Pods/
 macos/Flutter/ephemeral/
+linux/flutter/ephemeral/
 DerivedData/
 xcuserdata/
 

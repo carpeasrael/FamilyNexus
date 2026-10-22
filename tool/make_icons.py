@@ -55,6 +55,10 @@ mac.paste(inner, (80, 80), mask.crop((80, 80, S - 80, S - 80)))
 for n in (16, 32, 64, 128, 256, 512, 1024):
     save(mac, f"{mac_dir}/app_icon_{n}.png", n)
 
+# Linux (Flatpak, hicolor): gleiches abgerundetes Quadrat wie macOS
+for n in (128, 256, 512):
+    save(mac, f"flatpak/icons/{n}x{n}/de.inneso.familynexus.png", n)
+
 # Android: Legacy-Symbole + adaptives Symbol (Vordergrund PNG, Hintergrund Farbe/Verlauf)
 for folder, size in (("mdpi", 48), ("hdpi", 72), ("xhdpi", 96), ("xxhdpi", 144), ("xxxhdpi", 192)):
     rounded = Image.new("RGBA", (S, S), (0, 0, 0, 0))

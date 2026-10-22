@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
@@ -96,7 +97,7 @@ Future<AppServices> bootstrap({KeyStore? keyStore}) async {
     gateway: gateway,
     files: SystemFileAccess(),
     links: PlatformLinkSource(),
-    lock: AppLockController(settings: settings, auth: LocalDeviceAuth()),
+    lock: AppLockController(settings: settings, auth: Platform.isLinux ? const UnavailableDeviceAuth() : LocalDeviceAuth()),
     screenProtection: PlatformScreenProtection(),
     database: database,
     keyStore: keys,
