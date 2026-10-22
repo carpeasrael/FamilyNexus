@@ -4,6 +4,7 @@ import 'package:family_nexus/data/db/app_database.dart';
 import 'package:family_nexus/data/db/key_value_store.dart';
 import 'package:family_nexus/data/db/sql_event_store.dart';
 import 'package:family_nexus/data/db/sql_shopping_store.dart';
+import 'package:family_nexus/data/db/sql_task_store.dart';
 import 'package:family_nexus/domain/shopping.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/recurrence.dart';
@@ -188,9 +189,29 @@ void main() {
     await v2.close();
 
     final upgraded = await AppDatabase.openWithKey(path: path, key: key);
-    expect(await upgraded.db.getVersion(), 3);
+    expect(await upgraded.db.getVersion(), AppDatabase.schemaVersion);
     expect((await SqlEventStore(upgraded.db).get(_id1))!.title, 'Bleibt');
     expect(await SqlShoppingStore(upgraded.db).all(), isEmpty);
+    await upgraded.close();
+  });
+
+  testWidgets('Migration v3 → v4 legt die Aufgabentabellen an und erhält Termine', (tester) async {
+    final path = p.join(dir.path, 'm4.db');
+    const key = 'migration-key-5678';
+    final v3 = await openDatabase(path, password: key, version: 3, onCreate: (d, v) async {
+      for (var i = 0; i < 3; i++) {
+        await AppDatabase.migrations[i](d);
+      }
+    });
+    await SqlEventStore(v3).put(_ev(_id1, title: 'Bleibt'));
+    await v3.close();
+
+    final upgraded = await AppDatabase.openWithKey(path: path, key: key);
+    expect(await upgraded.db.getVersion(), AppDatabase.schemaVersion);
+    expect((await SqlEventStore(upgraded.db).get(_id1))!.title, 'Bleibt');
+    final tasks = SqlTaskStore(upgraded.db);
+    expect(await tasks.lists(), isEmpty);
+    expect(await tasks.log(), isEmpty);
     await upgraded.close();
   });
 }
