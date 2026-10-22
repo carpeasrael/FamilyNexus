@@ -1,1 +1,4 @@
-Erste Version: Familienkalender, Familien- und Einzelchats, Einkaufszettel, Online-Status, Ende-zu-Ende-Verschlüsselung über Matrix.
+Neu in 1.0.2:
+• Nachrichten melden: Nachricht lange drücken → „Nachricht melden“. Die Meldung geht an den Betreiber deines Servers; der verschlüsselte Inhalt wird nicht übertragen.
+• Mitglieder blockieren: Nachrichten und Einzelchat werden auf deinem Gerät ausgeblendet. Aufheben unter Einstellungen → Blockierte Mitglieder.
+• Datenschutzerklärung um Melden und Blockieren ergänzt.

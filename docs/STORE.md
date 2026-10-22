@@ -74,7 +74,7 @@ Einmalig je Plattform (Team-ID: developer.apple.com → Membership):
 
 1. App-ID `de.inneso.familynexus` registrieren (Developer-Portal → Identifiers) und in App Store Connect je Plattform einen App-Eintrag anlegen (iOS und macOS können unter einem Eintrag mit derselben Bundle-ID laufen).
 2. Team-ID in `ios/ExportOptions.plist` **und** `macos/ExportOptions.plist` eintragen (`HIER_TEAM_ID_EINTRAGEN` ersetzen).
-3. Versionen kommen aus `pubspec.yaml` (`1.0.1+2` → Version 1.0.1, Build 2) und gelten für beide Plattformen; vor jedem Upload die Buildnummer erhöhen.
+3. Versionen kommen aus `pubspec.yaml` (`1.0.2+3` → Version 1.0.2, Build 3) und gelten für beide Plattformen; vor jedem Upload die Buildnummer erhöhen.
 
 Archiv bauen (die Skripte setzen Obfuskierung und Debug-Symbole, ein reines „Product → Archive“ in Xcode ohne vorherigen Flutter-Build tut das nicht):
 
@@ -87,7 +87,7 @@ Archiv bauen (die Skripte setzen Obfuskierung und Debug-Symbole, ein reines „P
 
 Alternativ in Xcode: `ios/Runner.xcworkspace` bzw. `macos/Runner.xcworkspace` öffnen → Target *Runner* → *Signing & Capabilities* → Team wählen (*Automatically manage signing*) → *Product → Archive* → Organizer → *Distribute App*. Vorher einmal `tool/build_*_release.sh --check` laufen lassen.
 
-Stand der Vorbereitung (ohne Signatur geprüft, 2026-10-22): iOS-Release 30 MB, macOS-Release 67 MB (arm64 + x86_64); Version 1.0.1 (2); macOS: App-Sandbox mit `network.client` und `files.user-selected.read-write`, Kategorie *Produktivität* (`LSApplicationCategoryType`), Mindestversion macOS 12; iOS: iPhone, Mindestversion iOS 15, `PrivacyInfo.xcprivacy` ohne Tracking. Offen bleiben Signatur, Team-ID und App-Store-Connect-Einträge, die ein Apple-Entwicklerkonto brauchen.
+Stand der Vorbereitung (ohne Signatur geprüft, 2026-10-22): iOS-Release 30 MB, macOS-Release 67 MB (arm64 + x86_64); Version 1.0.2 (3); macOS: App-Sandbox mit `network.client` und `files.user-selected.read-write`, Kategorie *Produktivität* (`LSApplicationCategoryType`), Mindestversion macOS 12; iOS: iPhone, Mindestversion iOS 15, `PrivacyInfo.xcprivacy` ohne Tracking. Offen bleiben Signatur, Team-ID und App-Store-Connect-Einträge, die ein Apple-Entwicklerkonto brauchen.
 
 ## 5. Screenshots
 
@@ -100,6 +100,6 @@ FamilyNexus steht unter AGPL-3.0 (E-02), weil die Matrix-Bibliothek und `vodozem
 ## 7. Ablauf pro Release
 
 1. `flutter analyze`, `flutter test`, `tool/e2e.sh`, `tool/device_tests.sh`, `tool/check_permissions.sh`.
-2. Version in `pubspec.yaml` erhöhen (`1.0.2+3` …); Neuerungen in `store/metadata/*/release_notes.txt` bzw. Play-Eintrag.
+2. Version in `pubspec.yaml` erhöhen (`1.0.2+3` …); Neuerungen in `store/metadata/*/*/release_notes.txt` (App Store höchstens 4000 Zeichen, Google Play höchstens 500 je Sprache) eintragen.
 3. Android: `tool/build_release.sh aab`; iOS: `tool/build_ios_release.sh`.
 4. Hochladen, interne Tests/TestFlight, danach freigeben.

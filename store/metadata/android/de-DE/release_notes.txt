@@ -1,0 +1,3 @@
+Neu in 1.0.2:
+• Nachrichten melden (Nachricht lange drücken); die Meldung geht an den Serverbetreiber, nie der verschlüsselte Inhalt.
+• Mitglieder blockieren: Nachrichten und Einzelchat werden auf dem Gerät ausgeblendet. Aufheben unter Einstellungen → Blockierte Mitglieder.
