@@ -51,7 +51,7 @@ Der Herausgeber betreibt keinen Server und erhält keine Daten. Die App sendet D
 
 | Datentyp | Erfasst? | Geteilt? | Hinweis |
 |---|---|---|---|
-| Nachrichten, Dateien, Kalenderereignisse, Einkaufsliste | ja, auf Wunsch des Nutzers an den gewählten Matrix-Server | nein (an Familienmitglieder, vom Nutzer gesteuert) | Ende-zu-Ende-verschlüsselt, „Daten werden bei der Übertragung verschlüsselt“: ja |
+| Nachrichten, Dateien, Kalenderereignisse, Einkaufsliste, Aufgabenlisten | ja, auf Wunsch des Nutzers an den gewählten Matrix-Server | nein (an Familienmitglieder, vom Nutzer gesteuert) | Ende-zu-Ende-verschlüsselt, „Daten werden bei der Übertragung verschlüsselt“: ja |
 | Nutzer-ID (Matrix-ID), Anzeigename | ja (Anmeldung am gewählten Server) | nein | nötig für die App-Funktion, nicht optional |
 | Standort, Kontakte, Fotos (automatisch), Gesundheit, Finanzen | nein | – | |
 | Kennungen für Werbung / Analyse / Absturzberichte | nein | – | keine Telemetrie, keine SDKs |
@@ -91,7 +91,7 @@ Stand der Vorbereitung (ohne Signatur geprüft, 2026-10-22): iOS-Release 30 MB, 
 
 ## 5. Screenshots
 
-`store/screenshots/` enthält je sechs Aufnahmen für iPhone (6,9″, `ios-6.9/`) und Android-Telefon (`android-phone/`) mit **erfundenen Beispieldaten** (Fake-Server, kein Netzwerk), erzeugt mit `tool/preview/` (siehe `store/screenshots/README.md`). Es fehlen: iPhone 6,5″ (aus 6,9″ skalierbar), Tablet-Aufnahmen (nicht nötig, solange iPad nicht unterstützt wird; Play verlangt sie nur optional). Für die Veröffentlichung prüfen oder durch eigene ersetzen; Pflichtgrößen siehe oben.
+`store/screenshots/` enthält je sechs Aufnahmen für iPhone (6,9″, `ios-6.9/`) und Android-Telefon (`android-phone/`) mit **erfundenen Beispieldaten** (Fake-Server, kein Netzwerk), erzeugt mit `tool/preview/` (siehe `store/screenshots/README.md`). Tablet-Aufnahmen (nicht nötig, solange iPad nicht unterstützt wird; Play verlangt sie nur optional). Für die Veröffentlichung prüfen oder durch eigene ersetzen; Pflichtgrößen siehe oben.
 
 ## 6. Rechtlicher Hinweis zur Lizenz (AGPL-3.0)
 
