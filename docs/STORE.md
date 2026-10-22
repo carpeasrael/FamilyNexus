@@ -61,7 +61,7 @@ Der Herausgeber betreibt keinen Server und erhält keine Daten. Die App sendet D
 
 1. **Vorbereiten:** Bundle-ID registrieren, in Xcode anmelden, Team-ID eintragen (Punkt 1.5). App in App Store Connect anlegen (Name `FamilyNexus`, Primärsprache Deutsch, SKU frei).
 2. **Bauen:** `tool/build_ios_release.sh` (erzeugt eine signierte IPA in `build/ios/ipa/`). Zum Hochladen: Xcode-Werkzeug **Transporter** oder `xcrun altool --upload-app`. Obfuskierungssymbole (`debug-info/`) aufbewahren.
-3. **Eintrag:** Texte aus `store/metadata/ios/`, Symbol `store/graphics/app-store-icon-1024.png`, Screenshots für 6,9″ (1320×2868) und 6,5″ (1284×2778 oder 1242×2688) – nur iPhone.
+3. **Eintrag:** Texte aus `store/metadata/ios/`, Symbol `store/graphics/app-store-icon-1024.png`, Screenshots für 6,9″ (1320×2868), 6,5″ (1284×2778 oder 1242×2688) und 6,1″/6,3″ (1179×2556 oder 1206×2622) – nur iPhone; App-Vorschauvideos (optional) 1920×886 bzw. 886×1920.
 4. **App-Datenschutz (Nährwertkennzeichen):** „Daten werden nicht erhoben“ ist zutreffend, weil der Herausgeber keine Daten erhält; Inhalte gehen verschlüsselt an den vom Nutzer gewählten Server. Beim Ausfüllen die Abschnitte 3 (Tabelle) und die `PrivacyInfo.xcprivacy` zugrunde legen; Bibliotheken bringen eigene Manifeste mit (im Xcode-Datenschutzbericht des Archivs prüfen).
 5. **Altersfreigabe:** Fragebogen: keine anstößigen Inhalte; Nachrichtenaustausch ja; kein freier Webzugang.
 6. **Verschlüsselung (Exportnachweis):** Die App verwendet Ende-zu-Ende-Verschlüsselung (Standardverfahren, keine proprietäre Kryptografie). Bei „Verwendet Ihre App Verschlüsselung?“ → *Ja*, Standardalgorithmen → die Ausnahme für Massenmarkt-/Standardverschlüsselung ist typisch, kann aber eine jährliche Selbstklassifizierung gegenüber der US-Behörde verlangen. Bewusst **nicht** in der `Info.plist` hinterlegt (`ITSAppUsesNonExemptEncryption`), damit der Herausgeber die Antwort bei jedem Upload ausdrücklich gibt.
@@ -91,7 +91,7 @@ Stand der Vorbereitung (ohne Signatur geprüft, 2026-10-22): iOS-Release 30 MB, 
 
 ## 5. Screenshots
 
-`store/screenshots/` enthält je sechs Aufnahmen für iPhone (6,9″, `ios-6.9/`) und Android-Telefon (`android-phone/`) mit **erfundenen Beispieldaten** (Fake-Server, kein Netzwerk), erzeugt mit `tool/preview/` (siehe `store/screenshots/README.md`). Tablet-Aufnahmen (nicht nötig, solange iPad nicht unterstützt wird; Play verlangt sie nur optional). Für die Veröffentlichung prüfen oder durch eigene ersetzen; Pflichtgrößen siehe oben.
+`store/screenshots/` enthält je sechs Aufnahmen für iPhone (6,9″ `ios-6.9/`, 6,5″ `ios-6.5/`, 6,3″ `ios-6.3/`) und Android-Telefon (`android-phone/`) mit **erfundenen Beispieldaten** (Fake-Server, kein Netzwerk), erzeugt mit `tool/preview/` (siehe `store/screenshots/README.md`). Tablet-Aufnahmen (nicht nötig, solange iPad nicht unterstützt wird; Play verlangt sie nur optional). Für die Veröffentlichung prüfen oder durch eigene ersetzen; Pflichtgrößen siehe oben.
 
 ## 6. Rechtlicher Hinweis zur Lizenz (AGPL-3.0)
 

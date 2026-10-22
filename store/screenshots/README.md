@@ -3,6 +3,7 @@
 Alle Aufnahmen zeigen **erfundene Beispieldaten** (Fake-Server, siehe `tool/preview/`).
 
 - `ios-6.9/` – iPhone 17 Pro Max (6,9″), 1320×2868: Heute, Kalender, Chat, Einzelchat, Einkauf, Familie (Flutter-Oberfläche ohne iOS-Statusleiste).
+- `ios-6.3/` – iPhone 17 Pro (6,3″, gilt auch für 6,1″), 1206×2622: nativ im Simulator aufgenommen (App Store Connect erlaubt für 6,1″/6,3″ 1179×2556 oder 1206×2622; App-Vorschauvideos 1920×886 bzw. 886×1920).
 - `ios-6.5/` – iPhone 6,5″, 1284×2778: aus `ios-6.9/` skaliert (Breite 1284, oben 12 px leerer Rand abgeschnitten, nicht verzerrt).
 - `android-phone/` – Android-Emulator (Pixel 8), 1200×2400 (seitlich aufgefüllt, damit das Seitenverhältnis die Play-Grenze von 2:1 einhält).
 
