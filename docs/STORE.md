@@ -22,7 +22,7 @@ tun muss, steht in Abschnitt 1. Rechtliche Angaben sind Hinweise, keine Rechtsbe
 
 | Bereich | Stand |
 |---|---|
-| Version | `pubspec.yaml`: `1.0.1+2` (Name+Buildnummer). Jeder Upload braucht eine **höhere Buildnummer** (`+2`, …) |
+| Version | `pubspec.yaml`: `1.0.2+3` (Name+Buildnummer). Jeder Upload braucht eine **höhere Buildnummer** (`+2`, …) |
 | Kennungen | Android `de.inneso.familynexus`; iOS/macOS `de.inneso.familynexus` (vereinheitlicht) |
 | Symbole | `tool/make_icons.py` erzeugt alle Größen (Android adaptiv + Legacy, iOS ohne Alpha, macOS) sowie `store/graphics/` (Play-Symbol 512, App-Store-Symbol 1024, Funktionsgrafik 1024×500) |
 | Android | Release: R8/Shrink, `--obfuscate`, Symbole für native Bibliotheken, unsigniert ohne `key.properties`; **App Bundle:** `tool/build_release.sh aab` (≈ 79 MB) |
@@ -100,6 +100,6 @@ FamilyNexus steht unter AGPL-3.0 (E-02), weil die Matrix-Bibliothek und `vodozem
 ## 7. Ablauf pro Release
 
 1. `flutter analyze`, `flutter test`, `tool/e2e.sh`, `tool/device_tests.sh`, `tool/check_permissions.sh`.
-2. Version in `pubspec.yaml` erhöhen (`1.0.1+2` …); Neuerungen in `store/metadata/*/release_notes.txt` bzw. Play-Eintrag.
+2. Version in `pubspec.yaml` erhöhen (`1.0.2+3` …); Neuerungen in `store/metadata/*/release_notes.txt` bzw. Play-Eintrag.
 3. Android: `tool/build_release.sh aab`; iOS: `tool/build_ios_release.sh`.
 4. Hochladen, interne Tests/TestFlight, danach freigeben.
