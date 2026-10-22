@@ -1,6 +1,7 @@
 name: Release
 
-# Builds a signed release APK for every pushed version tag (v*) and attaches it to the GitHub release.
+# Builds a signed release APK and a signed Android App Bundle (AAB, for Google Play) for every pushed version tag (v*)
+# and attaches both, with SHA-256 files, to the GitHub release.
 # Required repository secrets (Settings -> Secrets and variables -> Actions):
 #   ANDROID_KEYSTORE_BASE64   upload keystore, base64-encoded (base64 -i upload-keystore.jks)
 #   ANDROID_KEYSTORE_PASSWORD keystore password
@@ -12,8 +13,13 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing tag to build and attach the APK to (e.g. v1.0.1)
+        description: Existing tag to build and attach the files to (e.g. v1.0.1)
         required: true
+      build:
+        description: What to build; "aab" keeps an existing APK asset untouched
+        type: choice
+        options: [apk+aab, aab]
+        default: apk+aab
 
 permissions:
   contents: write
@@ -23,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      BUILD: ${{ github.event.inputs.build || 'apk+aab' }}
 
     steps:
       - uses: actions/checkout@v6
@@ -59,7 +66,7 @@ jobs:
       - name: Install Rust toolchain
         run: |
           rustup toolchain install stable --profile minimal
-          rustup target add aarch64-linux-android armv7-linux-androideabi
+          rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 
       - name: Restore signing key
         env:
@@ -83,27 +90,47 @@ jobs:
       - name: Generate localizations
         run: flutter gen-l10n
 
+      # Separate symbol directories: each build writes its own obfuscation symbols.
       - name: Build signed release APK
+        if: env.BUILD == 'apk+aab'
         run: |
-          mkdir -p debug-info
-          flutter build apk --release --obfuscate --split-debug-info=debug-info \
+          mkdir -p debug-info/apk
+          flutter build apk --release --obfuscate --split-debug-info=debug-info/apk \
             --target-platform android-arm,android-arm64
 
-      - name: Verify signature
+      - name: Verify APK signature
+        if: env.BUILD == 'apk+aab'
         run: |
           apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
           "$apksigner" verify --verbose build/app/outputs/flutter-apk/app-release.apk | head -5
 
+      # The App Bundle contains all ABIs (arm, arm64, x86_64); Google Play delivers the matching one per device.
+      - name: Build signed release App Bundle
+        run: |
+          mkdir -p debug-info/aab
+          flutter build appbundle --release --obfuscate --split-debug-info=debug-info/aab
+
+      - name: Verify AAB signature
+        run: |
+          jarsigner -verify build/app/outputs/bundle/release/app-release.aab | head -2
+          keytool -printcert -jarfile build/app/outputs/bundle/release/app-release.aab | grep -E "Owner|SHA256"
+
       - name: Prepare release files
         run: |
           mkdir -p dist
-          cp build/app/outputs/flutter-apk/app-release.apk "dist/FamilyNexus-${TAG}.apk"
-          (cd dist && sha256sum "FamilyNexus-${TAG}.apk" > "FamilyNexus-${TAG}.apk.sha256")
+          if [ "$BUILD" = "apk+aab" ]; then
+            cp build/app/outputs/flutter-apk/app-release.apk "dist/FamilyNexus-${TAG}.apk"
+          fi
+          cp build/app/outputs/bundle/release/app-release.aab "dist/FamilyNexus-${TAG}.aab"
+          cd dist
+          for f in "FamilyNexus-${TAG}.apk" "FamilyNexus-${TAG}.aab"; do
+            if [ -f "$f" ]; then sha256sum "$f" > "$f.sha256"; fi
+          done
 
       # Obfuscation symbols are needed to read stack traces; keep them private (not a release asset).
       - uses: actions/upload-artifact@v7
         with:
-          name: debug-info-${{ env.TAG }}
+          name: debug-info-${{ env.TAG }}-run${{ github.run_number }}
           path: debug-info/
           retention-days: 90
 
