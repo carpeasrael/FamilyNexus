@@ -38,6 +38,8 @@ Future<void> _tap(WidgetTester tester, String text) async {
 Future<({TestApp ben, FakeMatrixGateway anna, String link})> _benWithoutFamily({bool securityReady = true}) async {
   final annaApp = await buildTestApp();
   final server = annaApp.server;
+  // Die App prüft Links gegen die echte Uhr; eine feste Test-Uhr ließe sie nach 24 h ablaufen.
+  server.now = () => DateTime.now().toUtc();
   final link = await annaApp.gateway.createInviteLink();
   final ben = await buildTestApp(loggedIn: false, server: server);
   await ben.gateway.login(server: ServerUrl.tryParse(server.host)!, username: 'ben', password: 'geheim456');
