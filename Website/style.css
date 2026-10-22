@@ -1,0 +1,52 @@
+:root{--bg:#0b1220;--bg2:#101a2e;--card:#142038;--line:#26365a;--text:#e8eef9;--muted:#9fb0cc;--accent:#2dd4bf;--accent-ink:#04312c}
+@media (prefers-color-scheme:light){:root{--bg:#f6f9fc;--bg2:#eaf1f8;--card:#fff;--line:#d3deea;--text:#0f1b2d;--muted:#51627c;--accent:#0f766e;--accent-ink:#fff}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.65 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+header.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--text);text-decoration:none;font-size:1.1rem}
+.brand img{width:32px;height:32px;border-radius:8px}
+nav a{color:var(--muted);text-decoration:none;margin-left:18px;font-size:.95rem}
+nav a:hover{color:var(--accent)}
+.hero{padding:64px 0 48px;background:radial-gradient(900px 400px at 80% -10%,color-mix(in srgb,var(--accent) 22%,transparent),transparent)}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.15;margin:0 0 16px}
+h2{font-size:clamp(1.5rem,3.4vw,2.1rem);margin:0 0 12px}
+h3{margin:0 0 6px;font-size:1.1rem}
+.lead{color:var(--muted);font-size:1.15rem;margin:0 0 28px}
+.hero img.shot{width:100%;max-width:300px;justify-self:center;border-radius:28px;border:1px solid var(--line);box-shadow:0 30px 70px rgba(0,0,0,.35)}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:12px 20px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);text-decoration:none;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn small{display:block;font-weight:400;font-size:.75rem;opacity:.8;line-height:1.2}
+.btn.soon{opacity:.6;cursor:default;pointer-events:none}
+section{padding:56px 0}
+section.alt{background:var(--bg2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:28px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+.card p{margin:0;color:var(--muted)}
+.shots{display:flex;gap:18px;overflow-x:auto;padding:8px 4px 20px;margin-top:24px;scroll-snap-type:x mandatory}
+.shots figure{margin:0;flex:0 0 230px;scroll-snap-align:start}
+.shots img{width:100%;border-radius:20px;border:1px solid var(--line);display:block}
+.shots figcaption{text-align:center;color:var(--muted);font-size:.9rem;margin-top:8px}
+.dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:24px}
+.dl .btn{justify-content:center;flex-direction:column;text-align:center;padding:20px}
+.note{color:var(--muted);font-size:.9rem;margin-top:18px}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:.92rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between}
+footer a{color:var(--muted)}
+.doc{max-width:760px;padding:48px 16px 64px}
+.doc h2{margin-top:36px;font-size:1.4rem}
+.doc .todo{background:color-mix(in srgb,#f59e0b 18%,transparent);border:1px solid #f59e0b;border-radius:10px;padding:10px 14px}
+@media(max-width:760px){.hero .wrap{grid-template-columns:1fr}.hero{padding-top:40px}nav a{margin-left:12px}}
+.badge{display:inline-flex;align-items:center}
+.badge img{display:block;height:48px;width:auto}
+.badge.soon{opacity:.55;pointer-events:none}
+.os{display:block;width:44px;height:44px;background:currentColor;-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat}
+.os-macos{--ico:url(img/os-macos.svg)}
+.os-windows{--ico:url(img/os-windows.svg)}
+.os-img{display:block;height:44px;width:auto}
