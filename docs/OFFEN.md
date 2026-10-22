@@ -18,6 +18,8 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 | Mehrere Familien je Konto | Eine Familie je Konto. |
 | Gruppenchats außer dem Familienchat | Einzelchats gibt es nur zwischen zwei Mitgliedern (E-39). |
 | Mehrere Einkaufslisten, Kategorien, Preise | Eine gemeinsame Liste je Familie (E-40). |
+| Erinnerungen und Benachrichtigung zum Periodenwechsel bei Aufgabenlisten | Der Erinnerungs-Planer kennt nur Termine und ersetzt bei `replaceAll` alle geplanten Benachrichtigungen (E-51). |
+| Nachträgliches Abhaken früherer Perioden, Fälligkeitszeiten, Unteraufgaben | Umfang (E-51). |
 | Familie selbst verlassen | Mitglieder werden nur durch Moderatoren entfernt; Austritt (`leave`) fehlt in der Oberfläche. Das Recht auf Löschung wird über die lokale Löschung und die Kontolöschung beim Betreiber wahrgenommen. |
 | Server durch Moderator ändern | Der Server ist in den Einstellungen nur lesbar; Wechsel = neue Familie/neue Anmeldung. |
 | Löschmarken beim „Alle lokalen Daten löschen“ | Geteilte Termine bleiben bei den anderen Geräten bestehen; vor dem Löschen sollten sie einzeln gelöscht werden. |
@@ -34,6 +36,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
   Paar, gilt auf beiden Seiten der mit der kleinsten Raum-ID; Nachrichten im anderen Raum sind dann unsichtbar.
   Einzelchats werden nur nach vollständig geladener Mitgliederliste angezeigt; Einladungen Fremder bleiben unbeantwortet
   liegen (nicht abgelehnt).
+- **Aufgabenlisten (E-51):** Der „Reset“ ist ein abgeleiteter Zustand (Periodenschlüssel), kein Ereignis; er wirkt auf jedem Gerät beim nächsten Neuzeichnen (Minutentakt, beim Öffnen). Rechte (nur Moderatoren legen an, nur die zugewiesene Person hakt ab) werden bei manipulierten Geräten nur beim Empfang durchgesetzt. Wird die zugewiesene Person entfernt, bleibt die Liste bestehen, abgehakt werden kann erst nach Neuzuweisung. Ein Zeitzonenwechsel der Liste verschiebt Periodengrenzen. Der Backfill ist auf 20 Seiten/5000 Signale begrenzt; ältere Verlaufseinträge fehlen ggf. auf neuen Geräten.
 - **Einkaufszettel (E-40):** Ein Mitglied mit manipuliertem Gerät kann Einträge ändern oder löschen wie jedes Mitglied
   (Versionssprünge sind begrenzt); Schaden begrenzt auf die Liste. Sind 300 aktive Einträge erreicht, muss man
   erledigte entfernen. Der Resync für neue Mitglieder sendet nur Einträge, die man zuletzt selbst bearbeitet hat; Einträge

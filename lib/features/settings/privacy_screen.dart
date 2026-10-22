@@ -22,6 +22,7 @@ class PrivacyScreen extends StatelessWidget {
       (l.privacy9Title, l.privacy9Body),
       (l.privacy10Title, l.privacy10Body),
       (l.privacy11Title, l.privacy11Body),
+      (l.privacy12Title, l.privacy12Body),
     ];
     return Scaffold(
       appBar: AppBar(title: Text(l.privacyTitle)),

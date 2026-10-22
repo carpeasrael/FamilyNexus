@@ -868,5 +868,124 @@
       }
     }
   },
-  "onbInvitedOther": "Stattdessen eine andere Familie gründen oder beitreten"
+  "onbInvitedOther": "Stattdessen eine andere Familie gründen oder beitreten",
+  "tasksTitle": "Aufgaben",
+  "tasksNote": "Nur Moderatoren legen Listen an. Abhaken kann nur die zugewiesene Person.",
+  "tasksEmpty": "Noch keine Aufgabenlisten.",
+  "tasksSectionMine": "Mir zugewiesen",
+  "tasksSectionOthers": "Weitere Listen",
+  "tasksNew": "Neue Aufgabenliste",
+  "tasksEditTitle": "Aufgabenliste bearbeiten",
+  "tasksFieldTitle": "Titel",
+  "tasksFieldAssignee": "Zugewiesen an",
+  "tasksFieldInterval": "Wiederholung",
+  "tasksFieldItems": "Punkte (einer pro Zeile)",
+  "tasksIntervalDaily": "Täglich",
+  "tasksIntervalWeekly": "Wöchentlich",
+  "tasksIntervalMonthly": "Monatlich",
+  "tasksResetDaily": "Startet jeden Tag um Mitternacht neu",
+  "tasksResetWeekly": "Startet jeden Montag neu",
+  "tasksResetMonthly": "Startet am Monatsersten neu",
+  "tasksAssignedTo": "Zugewiesen an {name}",
+  "@tasksAssignedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksProgress": "{done} von {total} erledigt",
+  "@tasksProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "tasksDelete": "Liste löschen",
+  "tasksDeleteConfirm": "Liste „{title}“ löschen?",
+  "@tasksDeleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksMarkDone": "{item} als erledigt markieren",
+  "@tasksMarkDone": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksMarkUndone": "Erledigung von {item} zurücknehmen",
+  "@tasksMarkUndone": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksCommentTitle": "Erledigt",
+  "tasksCommentHint": "Kommentar (optional)",
+  "tasksConfirmDone": "Erledigt",
+  "tasksDoneOn": "Erledigt am {date} um {time}",
+  "@tasksDoneOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksHistory": "Verlauf",
+  "tasksHistoryEmpty": "Noch keine Einträge.",
+  "tasksHistoryDone": "{item} erledigt",
+  "@tasksHistoryDone": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksHistoryUndone": "{item} zurückgenommen",
+  "@tasksHistoryUndone": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksHistoryLine": "{name} · {date} {time}",
+  "@tasksHistoryLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksInvalid": "Bitte Titel, Person und mindestens einen Punkt angeben.",
+  "tasksLimit": "Grenze erreicht: zu viele Aufgabenlisten, Punkte oder Einträge.",
+  "todayTasksOpen": "Aufgaben für dich: {count} offen",
+  "@todayTasksOpen": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacy12Title": "Aufgabenlisten",
+  "privacy12Body": "Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur Metadaten wie Zeitpunkte und Größe."
 }

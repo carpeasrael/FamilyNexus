@@ -93,6 +93,28 @@ class AppDatabase {
           data TEXT NOT NULL
         )''');
     },
+    // v4: Aufgabenlisten und Protokoll (E-51)
+    (db) async {
+      await db.execute('''
+        CREATE TABLE task_lists (
+          id TEXT PRIMARY KEY NOT NULL,
+          version INTEGER NOT NULL,
+          published INTEGER NOT NULL DEFAULT 0,
+          deleted INTEGER NOT NULL,
+          author TEXT NOT NULL,
+          data TEXT NOT NULL
+        )''');
+      await db.execute('''
+        CREATE TABLE task_log (
+          id TEXT PRIMARY KEY NOT NULL,
+          list_id TEXT NOT NULL,
+          at_ms INTEGER NOT NULL,
+          published INTEGER NOT NULL DEFAULT 0,
+          author TEXT NOT NULL,
+          data TEXT NOT NULL
+        )''');
+      await db.execute('CREATE INDEX task_log_list ON task_log (list_id, at_ms)');
+    },
   ];
 
   static int get schemaVersion => migrations.length;

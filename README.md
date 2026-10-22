@@ -25,6 +25,10 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
   and can be turned off under *Settings → Privacy → Share online status*.
 - **Shopping list:** shared family list (item, quantity, check off, edit, delete, "Remove completed"), transmitted and
   stored encrypted, offline-capable, deterministic merge of concurrent changes.
+- **Task lists:** moderators create lists with items and assign them to a family member; they repeat daily, weekly or
+  monthly and start over automatically at the period boundary (midnight, Monday, 1st of the month, in the list's time
+  zone). Only the assigned person ticks items off (optional comment); date and time are logged in a history that is kept
+  across resets. Transmitted and stored encrypted, offline-capable.
 - **Calendar** with day/week/month/agenda views, person filter, recurrences (including exceptions, daylight saving
   time), time zones, **private** (own devices only) and **shared** events (encrypted in the family room), accept/decline,
   share events as a card in the chat.

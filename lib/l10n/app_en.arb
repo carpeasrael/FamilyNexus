@@ -868,5 +868,124 @@
       }
     }
   },
-  "onbInvitedOther": "Create or join a different family instead"
+  "onbInvitedOther": "Create or join a different family instead",
+  "tasksTitle": "Tasks",
+  "tasksNote": "Only moderators create lists. Only the assigned person can tick items off.",
+  "tasksEmpty": "No task lists yet.",
+  "tasksSectionMine": "Assigned to me",
+  "tasksSectionOthers": "Other lists",
+  "tasksNew": "New task list",
+  "tasksEditTitle": "Edit task list",
+  "tasksFieldTitle": "Title",
+  "tasksFieldAssignee": "Assigned to",
+  "tasksFieldInterval": "Repeats",
+  "tasksFieldItems": "Items (one per line)",
+  "tasksIntervalDaily": "Daily",
+  "tasksIntervalWeekly": "Weekly",
+  "tasksIntervalMonthly": "Monthly",
+  "tasksResetDaily": "Restarts every day at midnight",
+  "tasksResetWeekly": "Restarts every Monday",
+  "tasksResetMonthly": "Restarts on the 1st of each month",
+  "tasksAssignedTo": "Assigned to {name}",
+  "@tasksAssignedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksProgress": "{done} of {total} done",
+  "@tasksProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "tasksDelete": "Delete list",
+  "tasksDeleteConfirm": "Delete list “{title}”?",
+  "@tasksDeleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksMarkDone": "Mark {item} as done",
+  "@tasksMarkDone": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksMarkUndone": "Undo completion of {item}",
+  "@tasksMarkUndone": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksCommentTitle": "Done",
+  "tasksCommentHint": "Comment (optional)",
+  "tasksConfirmDone": "Done",
+  "tasksDoneOn": "Done on {date} at {time}",
+  "@tasksDoneOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksHistory": "History",
+  "tasksHistoryEmpty": "No entries yet.",
+  "tasksHistoryDone": "{item} done",
+  "@tasksHistoryDone": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksHistoryUndone": "{item} undone",
+  "@tasksHistoryUndone": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksHistoryLine": "{name} · {date} {time}",
+  "@tasksHistoryLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksInvalid": "Please enter a title, a person and at least one item.",
+  "tasksLimit": "Limit reached: too many task lists, items or entries.",
+  "todayTasksOpen": "Tasks for you: {count} open",
+  "@todayTasksOpen": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacy12Title": "Task lists",
+  "privacy12Body": "Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. The server only sees metadata such as times and size."
 }

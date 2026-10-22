@@ -8,6 +8,7 @@ import '../calendar/event_detail_screen.dart';
 import '../calendar/event_editor_screen.dart';
 import '../calendar/event_tile.dart';
 import '../presence/presence_view.dart';
+import '../tasks/tasks_screen.dart';
 import '../../domain/family.dart';
 import '../../domain/presence.dart';
 
@@ -32,7 +33,7 @@ class TodayScreen extends StatelessWidget {
         child: const Icon(Icons.add),
       ),
       body: ListenableBuilder(
-        listenable: Listenable.merge(<Listenable>[c, services.gateway, ?reminders, ?services.shopping]),
+        listenable: Listenable.merge(<Listenable>[c, services.gateway, ?reminders, ?services.shopping, ?services.tasks]),
         builder: (context, _) {
           final upcoming = c.upcoming(limit: 5);
           final unread = services.gateway.unreadCount;
@@ -70,6 +71,15 @@ class TodayScreen extends StatelessWidget {
                 title: l.shoppingTitle,
                 trailing: TextButton(onPressed: onOpenShopping, child: Text(l.tabShopping)),
                 child: Text(l.todayShoppingOpen(services.shopping!.openCount)),
+              ),
+            if (services.tasks != null)
+              SectionCard(
+                title: l.tasksTitle,
+                trailing: TextButton(
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const TasksScreen())),
+                  child: Text(l.tasksTitle),
+                ),
+                child: Text(l.todayTasksOpen(services.tasks!.myOpenCount)),
               ),
             SectionCard(
               title: l.todayUnread,

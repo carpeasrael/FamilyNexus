@@ -17,6 +17,8 @@ class TimeZones {
   static tz.Location? tryGet(String name) {
     ensureInitialized();
     if (name.isEmpty || name.length > 64) return null;
+    // Rückfallname der Gerätezeitzone; fehlt als Eintrag in der Datenbank, ist aber eine gültige Zone.
+    if (name == 'UTC') return tz.UTC;
     try {
       return tz.getLocation(name);
     } on tz.LocationNotFoundException {

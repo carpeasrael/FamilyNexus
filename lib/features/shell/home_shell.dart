@@ -8,6 +8,7 @@ import '../family/family_screen.dart';
 import '../settings/privacy_screen.dart';
 import '../settings/settings_screen.dart';
 import '../shopping/shopping_screen.dart';
+import '../tasks/tasks_screen.dart';
 import '../today/today_screen.dart';
 
 /// Hauptgerüst mit fünf Bereichen; Einstellungen liegen im Menü oben rechts.
@@ -138,6 +139,11 @@ class _MenuDrawer extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Semantics(header: true, child: Text(l.menuTitle, style: Theme.of(context).textTheme.titleLarge)),
+          ),
+          ListTile(
+            leading: const Icon(Icons.checklist_outlined),
+            title: Text(l.tasksTitle),
+            onTap: () => open(const TasksScreen()),
           ),
           ListTile(
             leading: const Icon(Icons.settings_outlined),

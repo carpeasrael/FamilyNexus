@@ -10,6 +10,7 @@ import 'package:family_nexus/domain/moderation.dart';
 import 'package:family_nexus/domain/permissions.dart';
 import 'package:family_nexus/domain/presence.dart';
 import 'package:family_nexus/domain/shopping.dart';
+import 'package:family_nexus/domain/tasks.dart';
 import 'package:family_nexus/domain/security.dart';
 import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/family.dart';
@@ -133,6 +134,8 @@ class FakeMatrixServer {
           EventCodec.sharedType => SharedEventSignal(e.sender, e.time, e.content),
           EventCodec.rsvpType => RsvpSignal(e.sender, e.time, e.content),
           ShoppingCodec.type => ShoppingSignal(e.sender, e.time, e.content),
+          TaskCodec.listType => TaskListSignal(e.sender, e.time, e.content),
+          TaskCodec.logType => TaskLogSignal(e.sender, e.time, e.content),
           _ => null,
         };
       }
@@ -919,6 +922,42 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       throw const GatewayException(GatewayError.invalidInput);
     }
     fake.post(room, _userId!, ShoppingCodec.type, content);
+  }
+
+  // ----------------------------------------------------------- Aufgabenlisten
+
+  @override
+  Future<void> publishTaskList(TaskList list) async {
+    _requireSession();
+    _require();
+    if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
+    final room = familyRoom;
+    if (room == null) throw const GatewayException(GatewayError.notFound);
+    if (list.by != _userId) throw const GatewayException(GatewayError.invalidInput);
+    final Map<String, Object?> content;
+    try {
+      content = TaskCodec.encodeList(list);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    fake.post(room, _userId!, TaskCodec.listType, content);
+  }
+
+  @override
+  Future<void> publishTaskLog(TaskLogEntry entry) async {
+    _requireSession();
+    _require();
+    if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
+    final room = familyRoom;
+    if (room == null) throw const GatewayException(GatewayError.notFound);
+    if (entry.by != _userId) throw const GatewayException(GatewayError.invalidInput);
+    final Map<String, Object?> content;
+    try {
+      content = TaskCodec.encodeLog(entry);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    fake.post(room, _userId!, TaskCodec.logType, content);
   }
 }
 

@@ -10,6 +10,7 @@ import '../../domain/presence.dart';
 import '../../domain/security.dart';
 import '../../domain/server.dart';
 import '../../domain/shopping.dart';
+import '../../domain/tasks.dart';
 
 enum SessionState { loggedOut, ready }
 
@@ -241,4 +242,12 @@ abstract class MatrixGateway implements Listenable {
 
   /// Sendet einen Eintrag der Einkaufsliste verschlüsselt in den Familienraum (E-40).
   Future<void> publishShoppingItem(ShoppingItem item);
+
+  // ----------------------------------------------------------- Aufgabenlisten
+
+  /// Sendet eine Aufgabenliste (Definition) verschlüsselt in den Familienraum (E-51).
+  Future<void> publishTaskList(TaskList list);
+
+  /// Sendet einen Protokolleintrag einer Aufgabenliste verschlüsselt in den Familienraum (E-51).
+  Future<void> publishTaskLog(TaskLogEntry entry);
 }

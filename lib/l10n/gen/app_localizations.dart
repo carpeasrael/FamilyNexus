@@ -2743,6 +2743,228 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Stattdessen eine andere Familie gründen oder beitreten'**
   String get onbInvitedOther;
+
+  /// No description provided for @tasksTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Aufgaben'**
+  String get tasksTitle;
+
+  /// No description provided for @tasksNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur Moderatoren legen Listen an. Abhaken kann nur die zugewiesene Person.'**
+  String get tasksNote;
+
+  /// No description provided for @tasksEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Aufgabenlisten.'**
+  String get tasksEmpty;
+
+  /// No description provided for @tasksSectionMine.
+  ///
+  /// In de, this message translates to:
+  /// **'Mir zugewiesen'**
+  String get tasksSectionMine;
+
+  /// No description provided for @tasksSectionOthers.
+  ///
+  /// In de, this message translates to:
+  /// **'Weitere Listen'**
+  String get tasksSectionOthers;
+
+  /// No description provided for @tasksNew.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Aufgabenliste'**
+  String get tasksNew;
+
+  /// No description provided for @tasksEditTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Aufgabenliste bearbeiten'**
+  String get tasksEditTitle;
+
+  /// No description provided for @tasksFieldTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Titel'**
+  String get tasksFieldTitle;
+
+  /// No description provided for @tasksFieldAssignee.
+  ///
+  /// In de, this message translates to:
+  /// **'Zugewiesen an'**
+  String get tasksFieldAssignee;
+
+  /// No description provided for @tasksFieldInterval.
+  ///
+  /// In de, this message translates to:
+  /// **'Wiederholung'**
+  String get tasksFieldInterval;
+
+  /// No description provided for @tasksFieldItems.
+  ///
+  /// In de, this message translates to:
+  /// **'Punkte (einer pro Zeile)'**
+  String get tasksFieldItems;
+
+  /// No description provided for @tasksIntervalDaily.
+  ///
+  /// In de, this message translates to:
+  /// **'Täglich'**
+  String get tasksIntervalDaily;
+
+  /// No description provided for @tasksIntervalWeekly.
+  ///
+  /// In de, this message translates to:
+  /// **'Wöchentlich'**
+  String get tasksIntervalWeekly;
+
+  /// No description provided for @tasksIntervalMonthly.
+  ///
+  /// In de, this message translates to:
+  /// **'Monatlich'**
+  String get tasksIntervalMonthly;
+
+  /// No description provided for @tasksResetDaily.
+  ///
+  /// In de, this message translates to:
+  /// **'Startet jeden Tag um Mitternacht neu'**
+  String get tasksResetDaily;
+
+  /// No description provided for @tasksResetWeekly.
+  ///
+  /// In de, this message translates to:
+  /// **'Startet jeden Montag neu'**
+  String get tasksResetWeekly;
+
+  /// No description provided for @tasksResetMonthly.
+  ///
+  /// In de, this message translates to:
+  /// **'Startet am Monatsersten neu'**
+  String get tasksResetMonthly;
+
+  /// No description provided for @tasksAssignedTo.
+  ///
+  /// In de, this message translates to:
+  /// **'Zugewiesen an {name}'**
+  String tasksAssignedTo(String name);
+
+  /// No description provided for @tasksProgress.
+  ///
+  /// In de, this message translates to:
+  /// **'{done} von {total} erledigt'**
+  String tasksProgress(int done, int total);
+
+  /// No description provided for @tasksDelete.
+  ///
+  /// In de, this message translates to:
+  /// **'Liste löschen'**
+  String get tasksDelete;
+
+  /// No description provided for @tasksDeleteConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Liste „{title}“ löschen?'**
+  String tasksDeleteConfirm(String title);
+
+  /// No description provided for @tasksMarkDone.
+  ///
+  /// In de, this message translates to:
+  /// **'{item} als erledigt markieren'**
+  String tasksMarkDone(String item);
+
+  /// No description provided for @tasksMarkUndone.
+  ///
+  /// In de, this message translates to:
+  /// **'Erledigung von {item} zurücknehmen'**
+  String tasksMarkUndone(String item);
+
+  /// No description provided for @tasksCommentTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Erledigt'**
+  String get tasksCommentTitle;
+
+  /// No description provided for @tasksCommentHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Kommentar (optional)'**
+  String get tasksCommentHint;
+
+  /// No description provided for @tasksConfirmDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Erledigt'**
+  String get tasksConfirmDone;
+
+  /// No description provided for @tasksDoneOn.
+  ///
+  /// In de, this message translates to:
+  /// **'Erledigt am {date} um {time}'**
+  String tasksDoneOn(String date, String time);
+
+  /// No description provided for @tasksHistory.
+  ///
+  /// In de, this message translates to:
+  /// **'Verlauf'**
+  String get tasksHistory;
+
+  /// No description provided for @tasksHistoryEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Einträge.'**
+  String get tasksHistoryEmpty;
+
+  /// No description provided for @tasksHistoryDone.
+  ///
+  /// In de, this message translates to:
+  /// **'{item} erledigt'**
+  String tasksHistoryDone(String item);
+
+  /// No description provided for @tasksHistoryUndone.
+  ///
+  /// In de, this message translates to:
+  /// **'{item} zurückgenommen'**
+  String tasksHistoryUndone(String item);
+
+  /// No description provided for @tasksHistoryLine.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} · {date} {time}'**
+  String tasksHistoryLine(String name, String date, String time);
+
+  /// No description provided for @tasksInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte Titel, Person und mindestens einen Punkt angeben.'**
+  String get tasksInvalid;
+
+  /// No description provided for @tasksLimit.
+  ///
+  /// In de, this message translates to:
+  /// **'Grenze erreicht: zu viele Aufgabenlisten, Punkte oder Einträge.'**
+  String get tasksLimit;
+
+  /// No description provided for @todayTasksOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'Aufgaben für dich: {count} offen'**
+  String todayTasksOpen(int count);
+
+  /// No description provided for @privacy12Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Aufgabenlisten'**
+  String get privacy12Title;
+
+  /// No description provided for @privacy12Body.
+  ///
+  /// In de, this message translates to:
+  /// **'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.'**
+  String get privacy12Body;
 }
 
 class _AppLocalizationsDelegate

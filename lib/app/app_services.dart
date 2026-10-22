@@ -14,6 +14,7 @@ import '../features/calendar/calendar_controller.dart';
 import '../features/lock/app_lock_controller.dart';
 import '../features/reminders/reminder_coordinator.dart';
 import '../features/shopping/shopping_controller.dart';
+import '../features/tasks/tasks_controller.dart';
 import '../features/settings/settings_controller.dart';
 
 /// Erzeugt den Kalender für den angemeldeten Nutzer (inkl. lokaler Ablage).
@@ -21,6 +22,9 @@ typedef CalendarBuilder = Future<CalendarController> Function(String userId);
 
 /// Erzeugt den Einkaufszettel für den angemeldeten Nutzer (inkl. lokaler Ablage).
 typedef ShoppingBuilder = Future<ShoppingController> Function(String userId);
+
+/// Erzeugt die Aufgabenlisten für den angemeldeten Nutzer (inkl. lokaler Ablage).
+typedef TasksBuilder = Future<TasksController> Function(String userId);
 
 /// Gemeinsame Dienste der App; wird über [AppScope] bereitgestellt.
 class AppServices {
@@ -35,6 +39,7 @@ class AppServices {
     this.keyStore,
     this.calendarBuilder,
     this.shoppingBuilder,
+    this.tasksBuilder,
     this.scheduler,
     this.mail = const SystemMailLauncher(),
   });
@@ -64,10 +69,12 @@ class AppServices {
   final KeyStore? keyStore;
   final CalendarBuilder? calendarBuilder;
   final ShoppingBuilder? shoppingBuilder;
+  final TasksBuilder? tasksBuilder;
   final ReminderScheduler? scheduler;
 
   CalendarController? calendar;
   ShoppingController? shopping;
+  TasksController? tasks;
   PresenceSync? presence;
   ReminderCoordinator? reminders;
   String? _calendarUser;
@@ -86,6 +93,8 @@ class AppServices {
     c.start();
     final sb = shoppingBuilder;
     if (sb != null) (shopping = await sb(uid)).start();
+    final tb = tasksBuilder;
+    if (tb != null) (tasks = await tb(uid)).start();
     final p = PresenceSync(gateway: gateway, enabled: () => settings.settings.shareOnlineStatus);
     presence = p;
     settings.addListener(p.update);
@@ -114,6 +123,8 @@ class AppServices {
     }
     shopping?.dispose();
     shopping = null;
+    tasks?.dispose();
+    tasks = null;
     calendar?.dispose();
     calendar = null;
     _calendarUser = null;

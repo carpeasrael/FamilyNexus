@@ -1,5 +1,6 @@
 import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/shopping.dart';
+import '../../domain/tasks.dart';
 import '../../l10n/gen/app_localizations.dart';
 
 /// Lokalisierter Text zu einem Fehler. Zeigt nie Rohtexte von Servern oder Ausnahmen.
@@ -25,6 +26,14 @@ String errorText(AppLocalizations l, Object error) {
       ShoppingError.invalid => l.shoppingInvalid,
       ShoppingError.notFound => l.errNotFound,
       ShoppingError.limit => l.shoppingLimit,
+    };
+  }
+  if (error is TaskException) {
+    return switch (error.error) {
+      TaskError.invalid => l.tasksInvalid,
+      TaskError.notFound => l.errNotFound,
+      TaskError.limit => l.tasksLimit,
+      TaskError.notAllowed => l.errNotAllowed,
     };
   }
   return l.errUnknown;

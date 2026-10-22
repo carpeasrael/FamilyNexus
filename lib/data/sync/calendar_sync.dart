@@ -104,6 +104,8 @@ class CalendarSync {
           await store.putRsvp(r.eventId, s.sender, r.status, r.timestamp);
           onChanged?.call();
         case ShoppingSignal():
+        case TaskListSignal():
+        case TaskLogSignal():
           break; // gehört dem Einkaufszettel (ShoppingSync)
         case MemberJoinedSignal():
           // Zuverlässig: erneut zum Senden vormerken; die Warteschlange (mit Wiederholung)

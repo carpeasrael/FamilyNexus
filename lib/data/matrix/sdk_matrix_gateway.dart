@@ -26,6 +26,7 @@ import '../../domain/chat.dart';
 import '../../domain/family.dart';
 import '../../domain/server.dart';
 import '../../domain/shopping.dart';
+import '../../domain/tasks.dart';
 import '../../domain/text_sanitizer.dart';
 import '../db/app_database.dart';
 import '../db/encrypted_db.dart';
@@ -1617,6 +1618,10 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         _emit(RsvpSignal(e.senderId, e.originServerTs, c));
       } else if (shared && e.type == ShoppingCodec.type) {
         _emit(ShoppingSignal(e.senderId, e.originServerTs, c));
+      } else if (shared && e.type == TaskCodec.listType) {
+        _emit(TaskListSignal(e.senderId, e.originServerTs, c));
+      } else if (shared && e.type == TaskCodec.logType) {
+        _emit(TaskLogSignal(e.senderId, e.originServerTs, c));
       } else if (!shared && e.type == EventCodec.privateType) {
         _emit(PrivateEventSignal(e.senderId, e.originServerTs, c));
       } else if (e.type == EventTypes.Encrypted) {
@@ -2044,6 +2049,48 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       rethrow;
     } catch (e) {
       AppLog.e('gateway', 'Einkaufseintrag konnte nicht gesendet werden', e);
+      throw _map(e);
+    }
+  }
+
+  // ----------------------------------------------------------- Aufgabenlisten
+
+  @override
+  Future<void> publishTaskList(TaskList list) async {
+    final room = _requireEncryptedRoom();
+    if (list.by != _client?.userID) throw const GatewayException(GatewayError.invalidInput);
+    final Map<String, Object?> content;
+    try {
+      content = TaskCodec.encodeList(list);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    try {
+      await _sendCalendar(room, TaskCodec.listType, content);
+    } on GatewayException {
+      rethrow;
+    } catch (e) {
+      AppLog.e('gateway', 'Aufgabenliste konnte nicht gesendet werden', e);
+      throw _map(e);
+    }
+  }
+
+  @override
+  Future<void> publishTaskLog(TaskLogEntry entry) async {
+    final room = _requireEncryptedRoom();
+    if (entry.by != _client?.userID) throw const GatewayException(GatewayError.invalidInput);
+    final Map<String, Object?> content;
+    try {
+      content = TaskCodec.encodeLog(entry);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    try {
+      await _sendCalendar(room, TaskCodec.logType, content);
+    } on GatewayException {
+      rethrow;
+    } catch (e) {
+      AppLog.e('gateway', 'Protokolleintrag konnte nicht gesendet werden', e);
       throw _map(e);
     }
   }

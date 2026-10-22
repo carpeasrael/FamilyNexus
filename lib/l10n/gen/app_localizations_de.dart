@@ -1582,4 +1582,139 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get onbInvitedOther =>
       'Stattdessen eine andere Familie gründen oder beitreten';
+
+  @override
+  String get tasksTitle => 'Aufgaben';
+
+  @override
+  String get tasksNote =>
+      'Nur Moderatoren legen Listen an. Abhaken kann nur die zugewiesene Person.';
+
+  @override
+  String get tasksEmpty => 'Noch keine Aufgabenlisten.';
+
+  @override
+  String get tasksSectionMine => 'Mir zugewiesen';
+
+  @override
+  String get tasksSectionOthers => 'Weitere Listen';
+
+  @override
+  String get tasksNew => 'Neue Aufgabenliste';
+
+  @override
+  String get tasksEditTitle => 'Aufgabenliste bearbeiten';
+
+  @override
+  String get tasksFieldTitle => 'Titel';
+
+  @override
+  String get tasksFieldAssignee => 'Zugewiesen an';
+
+  @override
+  String get tasksFieldInterval => 'Wiederholung';
+
+  @override
+  String get tasksFieldItems => 'Punkte (einer pro Zeile)';
+
+  @override
+  String get tasksIntervalDaily => 'Täglich';
+
+  @override
+  String get tasksIntervalWeekly => 'Wöchentlich';
+
+  @override
+  String get tasksIntervalMonthly => 'Monatlich';
+
+  @override
+  String get tasksResetDaily => 'Startet jeden Tag um Mitternacht neu';
+
+  @override
+  String get tasksResetWeekly => 'Startet jeden Montag neu';
+
+  @override
+  String get tasksResetMonthly => 'Startet am Monatsersten neu';
+
+  @override
+  String tasksAssignedTo(String name) {
+    return 'Zugewiesen an $name';
+  }
+
+  @override
+  String tasksProgress(int done, int total) {
+    return '$done von $total erledigt';
+  }
+
+  @override
+  String get tasksDelete => 'Liste löschen';
+
+  @override
+  String tasksDeleteConfirm(String title) {
+    return 'Liste „$title“ löschen?';
+  }
+
+  @override
+  String tasksMarkDone(String item) {
+    return '$item als erledigt markieren';
+  }
+
+  @override
+  String tasksMarkUndone(String item) {
+    return 'Erledigung von $item zurücknehmen';
+  }
+
+  @override
+  String get tasksCommentTitle => 'Erledigt';
+
+  @override
+  String get tasksCommentHint => 'Kommentar (optional)';
+
+  @override
+  String get tasksConfirmDone => 'Erledigt';
+
+  @override
+  String tasksDoneOn(String date, String time) {
+    return 'Erledigt am $date um $time';
+  }
+
+  @override
+  String get tasksHistory => 'Verlauf';
+
+  @override
+  String get tasksHistoryEmpty => 'Noch keine Einträge.';
+
+  @override
+  String tasksHistoryDone(String item) {
+    return '$item erledigt';
+  }
+
+  @override
+  String tasksHistoryUndone(String item) {
+    return '$item zurückgenommen';
+  }
+
+  @override
+  String tasksHistoryLine(String name, String date, String time) {
+    return '$name · $date $time';
+  }
+
+  @override
+  String get tasksInvalid =>
+      'Bitte Titel, Person und mindestens einen Punkt angeben.';
+
+  @override
+  String get tasksLimit =>
+      'Grenze erreicht: zu viele Aufgabenlisten, Punkte oder Einträge.';
+
+  @override
+  String todayTasksOpen(int count) {
+    return 'Aufgaben für dich: $count offen';
+  }
+
+  @override
+  String get privacy12Title => 'Aufgabenlisten';
+
+  @override
+  String get privacy12Body =>
+      'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.';
 }

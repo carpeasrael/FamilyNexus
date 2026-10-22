@@ -10,9 +10,14 @@ import '../data/db/app_database.dart';
 import '../data/db/key_value_store.dart';
 import '../data/db/sql_event_store.dart';
 import '../data/db/sql_shopping_store.dart';
+import '../data/db/sql_task_store.dart';
 import '../data/sync/shopping_sync.dart';
+import '../data/sync/task_sync.dart';
+import '../domain/permissions.dart';
 import '../domain/shopping.dart';
+import '../domain/tasks.dart';
 import '../features/shopping/shopping_controller.dart';
+import '../features/tasks/tasks_controller.dart';
 import '../data/matrix/sdk_matrix_gateway.dart';
 import '../data/platform/device_time_zone.dart';
 import '../data/platform/device_auth.dart';
@@ -78,6 +83,7 @@ Future<AppServices> bootstrap({KeyStore? keyStore}) async {
       if (previous != null && previous != owner) {
         await store.wipe();
         await SqlShoppingStore(database.db).wipe();
+        await SqlTaskStore(database.db).wipe();
         await scheduler.cancelAll();
       }
       await kv.write('calendarOwner', owner);
@@ -91,6 +97,21 @@ Future<AppServices> bootstrap({KeyStore? keyStore}) async {
         service: service,
         store: store,
         sync: ShoppingSync(gateway: gateway, service: service, store: store),
+      );
+    },
+    tasksBuilder: (userId) async {
+      final store = SqlTaskStore(database.db);
+      final service = TaskService(
+        store: store,
+        myUserId: userId,
+        isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
+      );
+      return TasksController(
+        service: service,
+        store: store,
+        sync: TaskSync(gateway: gateway, service: service, store: store),
+        gateway: gateway,
+        zoneName: await SystemDeviceTimeZone().current(),
       );
     },
     settings: settings,

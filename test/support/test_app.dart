@@ -5,6 +5,10 @@ import 'package:family_nexus/app/calendar_factory.dart';
 import 'package:family_nexus/data/sync/shopping_sync.dart';
 import 'package:family_nexus/domain/shopping.dart';
 import 'package:family_nexus/features/shopping/shopping_controller.dart';
+import 'package:family_nexus/data/sync/task_sync.dart';
+import 'package:family_nexus/domain/permissions.dart';
+import 'package:family_nexus/domain/tasks.dart';
+import 'package:family_nexus/features/tasks/tasks_controller.dart';
 import 'package:family_nexus/data/platform/file_access.dart';
 import 'package:family_nexus/features/lock/app_lock_controller.dart';
 import 'package:family_nexus/data/platform/screen_protection.dart';
@@ -18,6 +22,7 @@ import 'fake_matrix.dart';
 import 'fake_scheduler.dart';
 import 'memory_event_store.dart';
 import 'memory_shopping_store.dart';
+import 'memory_task_store.dart';
 import 'memory_stores.dart';
 
 class TestApp {
@@ -29,6 +34,7 @@ class TestApp {
     required this.store,
     required this.events,
     required this.shoppingStore,
+    required this.taskStore,
     required this.scheduler,
     required this.links,
     required this.auth,
@@ -42,6 +48,7 @@ class TestApp {
   final MemoryKeyValueStore store;
   final MemoryEventStore events;
   final MemoryShoppingStore shoppingStore;
+  final MemoryTaskStore taskStore;
   final FakeReminderScheduler scheduler;
   final FakeLinkSource links;
   final FakeDeviceAuth auth;
@@ -78,6 +85,7 @@ Future<TestApp> buildTestApp({
   if (lockEnabled) store.data['lockEnabled'] = 'true';
   final events = MemoryEventStore();
   final shoppingStore = MemoryShoppingStore();
+  final taskStore = MemoryTaskStore();
   final scheduler = FakeReminderScheduler();
   final links = FakeLinkSource();
   final auth = FakeDeviceAuth();
@@ -100,6 +108,22 @@ Future<TestApp> buildTestApp({
         sync: ShoppingSync(gateway: gateway, service: service, store: shoppingStore, retryInterval: const Duration(hours: 1)),
       );
     },
+    tasksBuilder: (uid) async {
+      final service = TaskService(
+        store: taskStore,
+        myUserId: uid,
+        isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
+        clock: clock,
+      );
+      return TasksController(
+        service: service,
+        store: taskStore,
+        sync: TaskSync(gateway: gateway, service: service, store: taskStore, retryInterval: const Duration(hours: 1)),
+        gateway: gateway,
+        zoneName: 'Europe/Berlin',
+        periodCheck: const Duration(hours: 1),
+      );
+    },
     calendarBuilder: (uid) async => buildCalendarController(
       store: events,
       gateway: gateway,
@@ -117,6 +141,7 @@ Future<TestApp> buildTestApp({
     store: store,
     events: events,
     shoppingStore: shoppingStore,
+    taskStore: taskStore,
     scheduler: scheduler,
     links: links,
     auth: auth,

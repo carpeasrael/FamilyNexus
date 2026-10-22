@@ -7,6 +7,9 @@ import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/presence.dart';
 import 'package:family_nexus/domain/security.dart';
 import 'package:family_nexus/domain/shopping.dart';
+import 'package:family_nexus/domain/task_period.dart';
+import 'package:family_nexus/domain/tasks.dart';
+import 'package:family_nexus/domain/time_zones.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' hide Role;
 
@@ -168,6 +171,63 @@ void main() {
       final dump = raw.chunk.map((e) => '${e.type} ${e.content}').join('\n');
       expect(dump, isNot(contains('GEHEIME-MILCH')));
       expect(raw.chunk.where((e) => e.type == ShoppingCodec.type), isEmpty, reason: 'nur als m.room.encrypted');
+    });
+
+    test('Aufgabenlisten: Liste und Protokolleintrag verschlüsselt im Familienraum, Server sieht keinen Klartext', () async {
+      final (a, b) = await _family('Aufgaben-Familie');
+      final lists = <TaskListSignal>[];
+      final logs = <TaskLogSignal>[];
+      final sub = b.calendarSignals.listen((s) {
+        if (s is TaskListSignal) lists.add(s);
+        if (s is TaskLogSignal) logs.add(s);
+      });
+      addTearDown(sub.cancel);
+      // Das Ereignisformat kennt Millisekunden; Mikrosekunden würden den Vergleich verfälschen.
+      final now = DateTime.fromMillisecondsSinceEpoch(DateTime.now().millisecondsSinceEpoch, isUtc: true);
+      final list = TaskList(
+        id: '00000000-0000-4000-8000-0000000000b1',
+        title: 'GEHEIME-LISTE',
+        assignee: b.userId!,
+        interval: TaskInterval.daily,
+        timeZone: 'Europe/Berlin',
+        items: const <TaskItem>[TaskItem(id: '00000000-0000-4000-8000-0000000000b2', title: 'GEHEIMER-PUNKT')],
+        by: a.userId!,
+        updatedAt: now,
+      );
+      await a.publishTaskList(list);
+      await E2e.until(() => lists.isNotEmpty, what: 'B erhält die Liste');
+      expect(TaskCodec.decodeList(lists.first.content, sender: lists.first.sender), list);
+
+      final loc = TimeZones.tryGet('Europe/Berlin')!;
+      final on = TaskPeriod.localDate(loc, now);
+      final entry = TaskLogEntry(
+        id: '00000000-0000-4000-8000-0000000000b3',
+        listId: list.id,
+        itemId: list.items.single.id,
+        periodKey: TaskPeriod.keyForDate(TaskInterval.daily, on)!,
+        doneOn: on,
+        at: now,
+        by: b.userId!,
+        comment: 'GEHEIMER-KOMMENTAR',
+      );
+      final gotA = <TaskLogSignal>[];
+      final subA = a.calendarSignals.listen((s) {
+        if (s is TaskLogSignal) gotA.add(s);
+      });
+      addTearDown(subA.cancel);
+      await b.publishTaskLog(entry);
+      await E2e.until(() => gotA.isNotEmpty, what: 'A erhält den Protokolleintrag');
+      expect(TaskCodec.decodeLog(gotA.first.content, sender: b.userId!), entry);
+
+      // Fremde Urheberschaft wird schon beim Senden verweigert.
+      await expectLater(a.publishTaskLog(entry), throwsA(isA<GatewayException>().having((e) => e.error, 'e', GatewayError.invalidInput)));
+
+      final raw = await a.sdkClient!.getRoomEvents(a.family!.roomId, Direction.b, limit: 60);
+      final dump = raw.chunk.map((e) => '${e.type} ${e.content}').join('\n');
+      for (final secret in <String>['GEHEIME-LISTE', 'GEHEIMER-PUNKT', 'GEHEIMER-KOMMENTAR']) {
+        expect(dump, isNot(contains(secret)));
+      }
+      expect(raw.chunk.where((e) => e.type == TaskCodec.listType || e.type == TaskCodec.logType), isEmpty);
     });
   });
 }

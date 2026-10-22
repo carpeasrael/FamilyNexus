@@ -1569,4 +1569,139 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onbInvitedOther => 'Create or join a different family instead';
+
+  @override
+  String get tasksTitle => 'Tasks';
+
+  @override
+  String get tasksNote =>
+      'Only moderators create lists. Only the assigned person can tick items off.';
+
+  @override
+  String get tasksEmpty => 'No task lists yet.';
+
+  @override
+  String get tasksSectionMine => 'Assigned to me';
+
+  @override
+  String get tasksSectionOthers => 'Other lists';
+
+  @override
+  String get tasksNew => 'New task list';
+
+  @override
+  String get tasksEditTitle => 'Edit task list';
+
+  @override
+  String get tasksFieldTitle => 'Title';
+
+  @override
+  String get tasksFieldAssignee => 'Assigned to';
+
+  @override
+  String get tasksFieldInterval => 'Repeats';
+
+  @override
+  String get tasksFieldItems => 'Items (one per line)';
+
+  @override
+  String get tasksIntervalDaily => 'Daily';
+
+  @override
+  String get tasksIntervalWeekly => 'Weekly';
+
+  @override
+  String get tasksIntervalMonthly => 'Monthly';
+
+  @override
+  String get tasksResetDaily => 'Restarts every day at midnight';
+
+  @override
+  String get tasksResetWeekly => 'Restarts every Monday';
+
+  @override
+  String get tasksResetMonthly => 'Restarts on the 1st of each month';
+
+  @override
+  String tasksAssignedTo(String name) {
+    return 'Assigned to $name';
+  }
+
+  @override
+  String tasksProgress(int done, int total) {
+    return '$done of $total done';
+  }
+
+  @override
+  String get tasksDelete => 'Delete list';
+
+  @override
+  String tasksDeleteConfirm(String title) {
+    return 'Delete list “$title”?';
+  }
+
+  @override
+  String tasksMarkDone(String item) {
+    return 'Mark $item as done';
+  }
+
+  @override
+  String tasksMarkUndone(String item) {
+    return 'Undo completion of $item';
+  }
+
+  @override
+  String get tasksCommentTitle => 'Done';
+
+  @override
+  String get tasksCommentHint => 'Comment (optional)';
+
+  @override
+  String get tasksConfirmDone => 'Done';
+
+  @override
+  String tasksDoneOn(String date, String time) {
+    return 'Done on $date at $time';
+  }
+
+  @override
+  String get tasksHistory => 'History';
+
+  @override
+  String get tasksHistoryEmpty => 'No entries yet.';
+
+  @override
+  String tasksHistoryDone(String item) {
+    return '$item done';
+  }
+
+  @override
+  String tasksHistoryUndone(String item) {
+    return '$item undone';
+  }
+
+  @override
+  String tasksHistoryLine(String name, String date, String time) {
+    return '$name · $date $time';
+  }
+
+  @override
+  String get tasksInvalid =>
+      'Please enter a title, a person and at least one item.';
+
+  @override
+  String get tasksLimit =>
+      'Limit reached: too many task lists, items or entries.';
+
+  @override
+  String todayTasksOpen(int count) {
+    return 'Tasks for you: $count open';
+  }
+
+  @override
+  String get privacy12Title => 'Task lists';
+
+  @override
+  String get privacy12Body =>
+      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. The server only sees metadata such as times and size.';
 }

@@ -34,3 +34,15 @@ class ShoppingSignal extends CalendarSignal {
   const ShoppingSignal(super.sender, super.timestamp, this.content);
   final Map<String, Object?> content;
 }
+
+/// Aufgabenliste (Definition) aus dem Familienraum (E-51).
+class TaskListSignal extends CalendarSignal {
+  const TaskListSignal(super.sender, super.timestamp, this.content);
+  final Map<String, Object?> content;
+}
+
+/// Protokolleintrag einer Aufgabenliste (erledigt/zurückgenommen) aus dem Familienraum (E-51).
+class TaskLogSignal extends CalendarSignal {
+  const TaskLogSignal(super.sender, super.timestamp, this.content);
+  final Map<String, Object?> content;
+}

@@ -8,6 +8,7 @@ import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/event_codec.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/server.dart';
+import 'package:family_nexus/domain/tasks.dart';
 import 'package:family_nexus/domain/text_sanitizer.dart';
 import 'package:family_nexus/domain/time_zones.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -297,6 +298,143 @@ void main() {
           fail('Ausnahme bei $m: $e');
         }
       }
+    });
+  });
+
+  group('Aufgabenlisten (fremde Ereignisse)', () {
+    const anna = '@anna:example.org';
+    const listId = '00000000-0000-4000-8000-000000000001';
+    const itemId = '00000000-0000-4000-8000-000000000002';
+    final list = TaskList(
+      id: listId,
+      title: 'Haushalt',
+      assignee: '@ben:example.org',
+      interval: TaskInterval.weekly,
+      timeZone: 'Europe/Berlin',
+      items: const <TaskItem>[TaskItem(id: itemId, title: 'Müll')],
+      by: anna,
+      updatedAt: _now,
+    );
+    final entry = TaskLogEntry(
+      id: '00000000-0000-4000-8000-0000000000a1',
+      listId: listId,
+      itemId: itemId,
+      periodKey: '2026-W43',
+      doneOn: '2026-10-22',
+      at: DateTime.utc(2026, 10, 22, 10),
+      by: '@ben:example.org',
+      comment: 'ok',
+    );
+
+    test('Listen: 3000 Mutationen, nie eine Ausnahme; Angenommenes ist gültig und vom Absender', () {
+      final r = Random(2024);
+      final base = TaskCodec.encodeList(list);
+      final keys = base.keys.toList();
+      for (var i = 0; i < 3000; i++) {
+        final m = Map<String, Object?>.of(base);
+        for (var j = 0; j < 1 + r.nextInt(3); j++) {
+          final k = keys[r.nextInt(keys.length)];
+          if (r.nextInt(6) == 0) {
+            m.remove(k);
+          } else {
+            m[k] = k == 'items' && r.nextBool()
+                ? <Object?>[
+                    for (var n = 0; n < r.nextInt(80); n++) <String, Object?>{'id': _randomValue(r), 'title': _randomValue(r)},
+                  ]
+                : _randomValue(r);
+          }
+        }
+        final TaskList? l;
+        try {
+          l = TaskCodec.decodeList(m, sender: anna);
+        } catch (e) {
+          fail('Ausnahme bei $m: $e');
+        }
+        if (l != null) {
+          expect(l.validate(), isEmpty, reason: '$m');
+          expect(l.by, anna);
+        }
+      }
+    });
+
+    test('Protokoll: 3000 Mutationen, nie eine Ausnahme; Angenommenes ist gültig und vom Absender', () {
+      final r = Random(2025);
+      final base = TaskCodec.encodeLog(entry);
+      final keys = base.keys.toList();
+      for (var i = 0; i < 3000; i++) {
+        final m = Map<String, Object?>.of(base);
+        for (var j = 0; j < 1 + r.nextInt(3); j++) {
+          final k = keys[r.nextInt(keys.length)];
+          if (r.nextInt(6) == 0) {
+            m.remove(k);
+          } else {
+            m[k] = r.nextInt(4) == 0 ? _mutate('${base[k]}', r) : _randomValue(r);
+          }
+        }
+        final TaskLogEntry? e;
+        try {
+          e = TaskCodec.decodeLog(m, sender: '@ben:example.org');
+        } catch (err) {
+          fail('Ausnahme bei $m: $err');
+        }
+        if (e != null) {
+          expect(e.validate(), isEmpty, reason: '$m');
+          expect(e.by, '@ben:example.org');
+        }
+      }
+    });
+
+    test('Fälschung in fremdem Namen, Zeit- und Periodenmanipulation', () {
+      final m = TaskCodec.encodeLog(entry);
+      expect(TaskCodec.decodeLog(m, sender: anna), isNull, reason: 'by != Absender');
+      for (final ts in <int>[1 << 62, -(1 << 62), DateTime.utc(1999).millisecondsSinceEpoch, DateTime.utc(2101).millisecondsSinceEpoch]) {
+        expect(TaskCodec.decodeLog({...m, 'ts': ts}, sender: '@ben:example.org'), isNull, reason: '$ts');
+      }
+      // Periode, die zu keinem Intervall des Datums passt (z. B. einen Monat in der Zukunft "vorab erledigen").
+      expect(TaskCodec.decodeLog({...m, 'period': '2026-11'}, sender: '@ben:example.org'), isNull);
+      expect(TaskCodec.decodeLog({...m, 'period': '2099-W01'}, sender: '@ben:example.org'), isNull);
+    });
+
+    test('Vorab- oder Rückdatierung zählt nicht: Datum muss zum Zeitpunkt in der Listenzone passen', () {
+      final wrongDay = TaskLogEntry(
+        id: entry.id,
+        listId: listId,
+        itemId: itemId,
+        periodKey: '2026-W43',
+        doneOn: '2026-10-23', // morgen
+        at: DateTime.utc(2026, 10, 22, 10),
+        by: entry.by,
+      );
+      expect(wrongDay.validate(), isEmpty, reason: 'in sich formal gültig');
+      expect(TaskProgress.isValidFor(list, wrongDay), isFalse, reason: 'aber Datum und Zeitpunkt passen nicht');
+      expect(TaskProgress.doneNow(list, <TaskLogEntry>[wrongDay], DateTime.utc(2026, 10, 23, 8)), isEmpty);
+    });
+
+    test('Nicht zugewiesene Person oder fremde Liste: Eintrag zählt nie', () {
+      final other = TaskLogEntry(
+        id: entry.id,
+        listId: listId,
+        itemId: itemId,
+        periodKey: '2026-W43',
+        doneOn: '2026-10-22',
+        at: entry.at,
+        by: '@cara:example.org',
+      );
+      expect(TaskProgress.doneNow(list, <TaskLogEntry>[other], entry.at), isEmpty);
+    });
+
+    test('Speicherschutz: zu viele Punkte, überlange Titel, doppelte IDs', () {
+      final m = TaskCodec.encodeList(list);
+      final many = <Object?>[
+        for (var i = 0; i < 51; i++) <String, Object?>{'id': '00000000-0000-4000-8000-${i.toString().padLeft(12, '0')}', 'title': 'x'},
+      ];
+      expect(TaskCodec.decodeList({...m, 'items': many}, sender: anna), isNull);
+      expect(TaskCodec.decodeList({...m, 'title': 'a' * 5000}, sender: anna), isNull);
+      final dup = <Object?>[
+        <String, Object?>{'id': itemId, 'title': 'a'},
+        <String, Object?>{'id': itemId, 'title': 'b'},
+      ];
+      expect(TaskCodec.decodeList({...m, 'items': dup}, sender: anna), isNull);
     });
   });
 

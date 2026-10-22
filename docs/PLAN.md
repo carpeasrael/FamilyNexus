@@ -117,6 +117,25 @@ Abnahme 6:
 - [x] Einkaufszettel: gleichzeitige Änderungen konvergieren deterministisch; Fremdformate/Überlängen werden verworfen (Tests, E2E)
 - [x] `flutter analyze` sauber, alle Tests grün, `flutter build apk --debug` erfolgreich, Doku aktuell
 
+## Phase 7 – Erweiterung: Aufgabenlisten (2026-10-22)
+
+Auftrag: Aufgabenlisten, die einem Familienmitglied zugewiesen werden, täglich/wöchentlich/monatlich neu starten, vom
+Mitglied mit optionalem Kommentar abgehakt werden (Datum wird protokolliert) und einen Verlauf haben. Entscheidung: E-51.
+
+| # | Teilaufgabe |
+|---|---|
+| 7.1 | Datenmodell (Liste + anfügendes Protokoll), Periodenschlüssel, Ereignisformat, Konfliktregel, Rechte |
+| 7.2 | Lokale Ablage (Migration 4), Synchronisation inkl. Resync, Gateway-Signale und -Senden |
+| 7.3 | Oberfläche: Menüeintrag, Übersicht, Detail mit Abhaken/Kommentar/Verlauf, Editor (Moderatoren), Karte auf „Heute“ |
+| 7.4 | Fake-Gateway, Unit-/Sync-/Widget-/Pentests, E2E gegen Synapse |
+| 7.5 | Texte de/en, Datenschutztext, Doku |
+
+Abnahme 7:
+- [x] Nur Moderatoren legen Listen an; nur die zugewiesene Person hakt ab; Verstöße werden beim Empfang verworfen (Tests)
+- [x] Reset zu Mitternacht/Wochen-/Monatswechsel in der Listenzone, auch über Sommerzeit und Jahresgrenzen; Verlauf bleibt (Tests)
+- [x] Fremdformate, gefälschte Absender, Zeit- und Periodenmanipulation werden verworfen (Pentests)
+- [x] Ende-zu-Ende verschlüsselt im Familienraum; Server sieht keinen Klartext (E2E)
+
 ## Risiken
 
 | Risiko | Gegenmaßnahme |
