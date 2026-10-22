@@ -1,4 +1,5 @@
-New in 1.0.2:
-• Report messages: long-press a message → "Report message". The report goes to the operator of your server; the encrypted content is not sent.
-• Block members: their messages and your direct chat are hidden on your device. Undo under Settings → Blocked members.
-• Privacy policy extended with reporting and blocking.
+New in 1.0.3:
+• Send invitation links by email: in the link dialog, "Send by email" opens a draft with instructions and the link (in addition to QR code and copy).
+• Invited accounts see the invitation right after sign-in – without the "Create or join" question. One tap is enough.
+• Confirmed join requests are accepted automatically.
+• Fixed: any moderator can check and confirm join requests for links issued by another moderator.

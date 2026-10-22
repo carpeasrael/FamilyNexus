@@ -1,3 +1,5 @@
-Neu in 1.0.2:
-• Nachrichten melden (Nachricht lange drücken); die Meldung geht an den Serverbetreiber, nie der verschlüsselte Inhalt.
-• Mitglieder blockieren: Nachrichten und Einzelchat werden auf dem Gerät ausgeblendet. Aufheben unter Einstellungen → Blockierte Mitglieder.
+Neu in 1.0.3:
+• Einladungslink per E-Mail senden (zusätzlich zu QR-Code und Kopieren).
+• Eingeladene Konten sehen nach der Anmeldung direkt die Einladung, ohne „Gründen oder Beitreten“.
+• Bestätigte Beitrittsanfragen werden automatisch angenommen.
+• Behoben: Jeder Moderator kann Anfragen für Links anderer Moderatoren bestätigen.
