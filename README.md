@@ -17,6 +17,9 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
 - **Family chat and direct chats** (encrypted): messages, replies, reactions, attachments (validated, never opened
   automatically), offline queue. Direct chats exist for every pair of joined members ("Send message" in the family view
   or via the conversation bar in the chat); invitations from strangers are ignored.
+- **Report and block:** report a message to the operator of your homeserver (reason + optional text; the encrypted content is
+  never sent) and block members locally on your device (messages and direct chat are hidden, undo under *Settings → Blocked
+  members*).
 - **Online status:** Which family members are online is shown in the member list, in the chat and on "Today" (text and
   dot, "last online … ago"). The status is sent end-to-end encrypted to devices of family members only, is never stored
   and can be turned off under *Settings → Privacy → Share online status*.

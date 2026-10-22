@@ -5,6 +5,7 @@ import '../../domain/calendar_signal.dart';
 import '../../domain/chat.dart';
 import '../../domain/family.dart';
 import '../../domain/invite_link.dart';
+import '../../domain/moderation.dart';
 import '../../domain/presence.dart';
 import '../../domain/security.dart';
 import '../../domain/server.dart';
@@ -115,6 +116,11 @@ abstract class MatrixGateway implements Listenable {
     String? replyToId,
     String threadId = ChatThread.familyId,
   });
+
+  /// Meldet eine **fremde** Nachricht beim Betreiber des Homeservers (Matrix `report`, E-48). Eigene Nachrichten
+  /// und unbekannte Ereignisse werden abgelehnt (`notAllowed`/`notFound`). Übertragen werden nur Raum,
+  /// Ereignis-ID und der Grundtext aus [ReportRequest.reason], nie der Nachrichteninhalt.
+  Future<void> reportMessage(ReportRequest request);
 
   /// Wiederholt das Senden einer fehlgeschlagenen Nachricht.
   Future<void> retryMessage(String messageId, {String threadId = ChatThread.familyId});

@@ -1456,4 +1456,90 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get menuTitle => 'Menu';
+
+  @override
+  String get chatReport => 'Report message';
+
+  @override
+  String chatBlockSender(String name) {
+    return 'Block $name';
+  }
+
+  @override
+  String get reportTitle => 'Report message';
+
+  @override
+  String reportIntro(String server) {
+    return 'The report goes to the operator of your server ($server). They cannot read the encrypted content. What is sent is the message ID, the chosen reason and your optional text – the operator can read that text.';
+  }
+
+  @override
+  String get reportCategorySpam => 'Spam or advertising';
+
+  @override
+  String get reportCategoryHarassment => 'Harassment or abuse';
+
+  @override
+  String get reportCategoryInappropriate => 'Inappropriate content';
+
+  @override
+  String get reportCategoryOther => 'Other reason';
+
+  @override
+  String get reportDetailsHint => 'Optional: What happened?';
+
+  @override
+  String get reportSend => 'Report';
+
+  @override
+  String get reportDone => 'Report sent.';
+
+  @override
+  String get reportBlockOffer => 'Block sender';
+
+  @override
+  String blockConfirmTitle(String name) {
+    return 'Block $name?';
+  }
+
+  @override
+  String blockConfirmBody(String name) {
+    return 'Messages and the direct chat of $name are hidden on this device. $name is not told and stays a member of the family. You can undo the block at any time in the settings.';
+  }
+
+  @override
+  String get blockConfirmAction => 'Block';
+
+  @override
+  String blockDone(String name) {
+    return '$name is blocked.';
+  }
+
+  @override
+  String get unblockAction => 'Unblock';
+
+  @override
+  String unblockDone(String name) {
+    return '$name is unblocked.';
+  }
+
+  @override
+  String get memberBlockedBadge => 'Blocked';
+
+  @override
+  String get settingsBlockedUsers => 'Blocked members';
+
+  @override
+  String get settingsBlockedUsersHint =>
+      'Messages from blocked members are hidden.';
+
+  @override
+  String get blockedUsersEmpty => 'You have not blocked anyone.';
+
+  @override
+  String get privacy11Title => 'Reporting and blocking';
+
+  @override
+  String get privacy11Body =>
+      'The app remembers blocked members only on this device (encrypted database); the list is not transmitted. If you report a message, the operator of your server receives the message ID, the chosen reason and your optional text. They cannot read the encrypted content.';
 }

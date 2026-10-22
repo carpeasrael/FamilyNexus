@@ -10,6 +10,7 @@ import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
 import '../calendar/event_editor_screen.dart' show kReminderChoices;
 import '../reminders/reminder_coordinator.dart';
+import '../moderation/blocked_users_screen.dart';
 import 'privacy_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -69,6 +70,13 @@ class SettingsScreen extends StatelessWidget {
                 subtitle: Text(l.settingsShareOnlineStatusHint),
                 value: s.shareOnlineStatus,
                 onChanged: (v) => controller.update((c) => c.copyWith(shareOnlineStatus: v)),
+              ),
+              ListTile(
+                leading: const Icon(Icons.block),
+                title: Text(l.settingsBlockedUsers),
+                subtitle: Text(l.settingsBlockedUsersHint),
+                trailing: s.blockedUsers.isEmpty ? null : Text('${s.blockedUsers.length}'),
+                onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const BlockedUsersScreen())),
               ),
               SwitchListTile(
                 title: Text(l.settingsSecureScreen),

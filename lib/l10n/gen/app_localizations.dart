@@ -2557,6 +2557,150 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Menü'**
   String get menuTitle;
+
+  /// No description provided for @chatReport.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachricht melden'**
+  String get chatReport;
+
+  /// No description provided for @chatBlockSender.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} blockieren'**
+  String chatBlockSender(String name);
+
+  /// No description provided for @reportTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachricht melden'**
+  String get reportTitle;
+
+  /// No description provided for @reportIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Meldung geht an den Betreiber deines Servers ({server}). Er kann den verschlüsselten Inhalt nicht lesen. Übertragen werden die Kennung der Nachricht, der gewählte Grund und dein optionaler Text – dieser Text ist für den Betreiber lesbar.'**
+  String reportIntro(String server);
+
+  /// No description provided for @reportCategorySpam.
+  ///
+  /// In de, this message translates to:
+  /// **'Spam oder Werbung'**
+  String get reportCategorySpam;
+
+  /// No description provided for @reportCategoryHarassment.
+  ///
+  /// In de, this message translates to:
+  /// **'Belästigung oder Beleidigung'**
+  String get reportCategoryHarassment;
+
+  /// No description provided for @reportCategoryInappropriate.
+  ///
+  /// In de, this message translates to:
+  /// **'Unangemessener Inhalt'**
+  String get reportCategoryInappropriate;
+
+  /// No description provided for @reportCategoryOther.
+  ///
+  /// In de, this message translates to:
+  /// **'Anderer Grund'**
+  String get reportCategoryOther;
+
+  /// No description provided for @reportDetailsHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Optional: Was ist passiert?'**
+  String get reportDetailsHint;
+
+  /// No description provided for @reportSend.
+  ///
+  /// In de, this message translates to:
+  /// **'Melden'**
+  String get reportSend;
+
+  /// No description provided for @reportDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Meldung gesendet.'**
+  String get reportDone;
+
+  /// No description provided for @reportBlockOffer.
+  ///
+  /// In de, this message translates to:
+  /// **'Absender blockieren'**
+  String get reportBlockOffer;
+
+  /// No description provided for @blockConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} blockieren?'**
+  String blockConfirmTitle(String name);
+
+  /// No description provided for @blockConfirmBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachrichten und der Einzelchat von {name} werden auf diesem Gerät ausgeblendet. {name} erfährt davon nichts und bleibt Mitglied der Familie. Du kannst die Blockierung jederzeit in den Einstellungen aufheben.'**
+  String blockConfirmBody(String name);
+
+  /// No description provided for @blockConfirmAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Blockieren'**
+  String get blockConfirmAction;
+
+  /// No description provided for @blockDone.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} ist blockiert.'**
+  String blockDone(String name);
+
+  /// No description provided for @unblockAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Blockierung aufheben'**
+  String get unblockAction;
+
+  /// No description provided for @unblockDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Blockierung von {name} aufgehoben.'**
+  String unblockDone(String name);
+
+  /// No description provided for @memberBlockedBadge.
+  ///
+  /// In de, this message translates to:
+  /// **'Blockiert'**
+  String get memberBlockedBadge;
+
+  /// No description provided for @settingsBlockedUsers.
+  ///
+  /// In de, this message translates to:
+  /// **'Blockierte Mitglieder'**
+  String get settingsBlockedUsers;
+
+  /// No description provided for @settingsBlockedUsersHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachrichten blockierter Mitglieder werden ausgeblendet.'**
+  String get settingsBlockedUsersHint;
+
+  /// No description provided for @blockedUsersEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Du hast niemanden blockiert.'**
+  String get blockedUsersEmpty;
+
+  /// No description provided for @privacy11Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Melden und Blockieren'**
+  String get privacy11Title;
+
+  /// No description provided for @privacy11Body.
+  ///
+  /// In de, this message translates to:
+  /// **'Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen.'**
+  String get privacy11Body;
 }
 
 class _AppLocalizationsDelegate

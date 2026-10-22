@@ -775,5 +775,71 @@
   "accentRose": "Rose",
   "accentGreen": "Green",
   "menuOpen": "Open menu",
-  "menuTitle": "Menu"
+  "menuTitle": "Menu",
+  "chatReport": "Report message",
+  "chatBlockSender": "Block {name}",
+  "@chatBlockSender": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reportTitle": "Report message",
+  "reportIntro": "The report goes to the operator of your server ({server}). They cannot read the encrypted content. What is sent is the message ID, the chosen reason and your optional text – the operator can read that text.",
+  "@reportIntro": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCategorySpam": "Spam or advertising",
+  "reportCategoryHarassment": "Harassment or abuse",
+  "reportCategoryInappropriate": "Inappropriate content",
+  "reportCategoryOther": "Other reason",
+  "reportDetailsHint": "Optional: What happened?",
+  "reportSend": "Report",
+  "reportDone": "Report sent.",
+  "reportBlockOffer": "Block sender",
+  "blockConfirmTitle": "Block {name}?",
+  "@blockConfirmTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "blockConfirmBody": "Messages and the direct chat of {name} are hidden on this device. {name} is not told and stays a member of the family. You can undo the block at any time in the settings.",
+  "@blockConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "blockConfirmAction": "Block",
+  "blockDone": "{name} is blocked.",
+  "@blockDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "unblockAction": "Unblock",
+  "unblockDone": "{name} is unblocked.",
+  "@unblockDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "memberBlockedBadge": "Blocked",
+  "settingsBlockedUsers": "Blocked members",
+  "settingsBlockedUsersHint": "Messages from blocked members are hidden.",
+  "blockedUsersEmpty": "You have not blocked anyone.",
+  "privacy11Title": "Reporting and blocking",
+  "privacy11Body": "The app remembers blocked members only on this device (encrypted database); the list is not transmitted. If you report a message, the operator of your server receives the message ID, the chosen reason and your optional text. They cannot read the encrypted content."
 }

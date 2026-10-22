@@ -12,6 +12,7 @@ import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../../ui/widgets/qr_view.dart';
 import '../common/error_text.dart';
+import '../moderation/moderation_actions.dart';
 import '../common/prompt_dialog.dart';
 import '../presence/presence_view.dart';
 
@@ -125,7 +126,9 @@ class _MemberTile extends StatelessWidget {
     final canRemove = Permissions.canRemove(family, m);
     final canVerify = m.status == MemberStatus.joined && m.userId != family.myUserId;
     final canAccept = canVerify && m.identity == IdentityStatus.changed;
-    final canWrite = canVerify && m.identity != IdentityStatus.changed;
+    final services = AppScope.of(context);
+    final blocked = ModerationActions.isBlocked(services, m.userId);
+    final canWrite = canVerify && m.identity != IdentityStatus.changed && !blocked;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: GlassCard(
@@ -135,6 +138,14 @@ class _MemberTile extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
               Text(m.displayName, style: Theme.of(context).textTheme.titleMedium),
               Text(m.userId, style: monoStyle(context, size: 12, color: t.textSecondary)),
+              if (blocked) ...<Widget>[
+                const SizedBox(height: 4),
+                Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                  Icon(Icons.block, size: 14, color: t.textSecondary),
+                  const SizedBox(width: 4),
+                  Text(l.memberBlockedBadge, style: Theme.of(context).textTheme.labelSmall),
+                ]),
+              ],
               if (m.status == MemberStatus.joined) ...<Widget>[
                 const SizedBox(height: 4),
                 PresenceStatusText(userId: m.userId),
@@ -177,6 +188,10 @@ class _MemberTile extends StatelessWidget {
                     if (await _confirm(context, l.familyMemberRemove, l.familyMemberRemoveConfirm(m.displayName), l.familyMemberRemove) && context.mounted) {
                       await _act(context, () => gateway.removeMember(m.userId), success: l.familyDone);
                     }
+                  case 'block':
+                    await ModerationActions.block(context, services, userId: m.userId, name: m.displayName);
+                  case 'unblock':
+                    await ModerationActions.unblock(context, services, userId: m.userId, name: m.displayName);
                   case 'verify':
                     await _act(context, () => gateway.startVerification(userId: m.userId));
                   case 'accept':
@@ -190,6 +205,11 @@ class _MemberTile extends StatelessWidget {
                 if (canAccept) PopupMenuItem<String>(value: 'accept', child: Text(l.identityAccept)),
                 if (canPromote) PopupMenuItem<String>(value: 'promote', child: Text(l.familyMemberPromote)),
                 if (canRemove) PopupMenuItem<String>(value: 'remove', child: Text(l.familyMemberRemove)),
+                if (canVerify)
+                  PopupMenuItem<String>(
+                    value: blocked ? 'unblock' : 'block',
+                    child: Text(blocked ? l.unblockAction : l.chatBlockSender(m.displayName)),
+                  ),
               ],
             ),
         ]),

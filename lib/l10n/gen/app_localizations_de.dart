@@ -1469,4 +1469,90 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get menuTitle => 'Menü';
+
+  @override
+  String get chatReport => 'Nachricht melden';
+
+  @override
+  String chatBlockSender(String name) {
+    return '$name blockieren';
+  }
+
+  @override
+  String get reportTitle => 'Nachricht melden';
+
+  @override
+  String reportIntro(String server) {
+    return 'Die Meldung geht an den Betreiber deines Servers ($server). Er kann den verschlüsselten Inhalt nicht lesen. Übertragen werden die Kennung der Nachricht, der gewählte Grund und dein optionaler Text – dieser Text ist für den Betreiber lesbar.';
+  }
+
+  @override
+  String get reportCategorySpam => 'Spam oder Werbung';
+
+  @override
+  String get reportCategoryHarassment => 'Belästigung oder Beleidigung';
+
+  @override
+  String get reportCategoryInappropriate => 'Unangemessener Inhalt';
+
+  @override
+  String get reportCategoryOther => 'Anderer Grund';
+
+  @override
+  String get reportDetailsHint => 'Optional: Was ist passiert?';
+
+  @override
+  String get reportSend => 'Melden';
+
+  @override
+  String get reportDone => 'Meldung gesendet.';
+
+  @override
+  String get reportBlockOffer => 'Absender blockieren';
+
+  @override
+  String blockConfirmTitle(String name) {
+    return '$name blockieren?';
+  }
+
+  @override
+  String blockConfirmBody(String name) {
+    return 'Nachrichten und der Einzelchat von $name werden auf diesem Gerät ausgeblendet. $name erfährt davon nichts und bleibt Mitglied der Familie. Du kannst die Blockierung jederzeit in den Einstellungen aufheben.';
+  }
+
+  @override
+  String get blockConfirmAction => 'Blockieren';
+
+  @override
+  String blockDone(String name) {
+    return '$name ist blockiert.';
+  }
+
+  @override
+  String get unblockAction => 'Blockierung aufheben';
+
+  @override
+  String unblockDone(String name) {
+    return 'Blockierung von $name aufgehoben.';
+  }
+
+  @override
+  String get memberBlockedBadge => 'Blockiert';
+
+  @override
+  String get settingsBlockedUsers => 'Blockierte Mitglieder';
+
+  @override
+  String get settingsBlockedUsersHint =>
+      'Nachrichten blockierter Mitglieder werden ausgeblendet.';
+
+  @override
+  String get blockedUsersEmpty => 'Du hast niemanden blockiert.';
+
+  @override
+  String get privacy11Title => 'Melden und Blockieren';
+
+  @override
+  String get privacy11Body =>
+      'Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen.';
 }

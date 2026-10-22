@@ -775,5 +775,71 @@
   "accentRose": "Rosé",
   "accentGreen": "Grün",
   "menuOpen": "Menü öffnen",
-  "menuTitle": "Menü"
+  "menuTitle": "Menü",
+  "chatReport": "Nachricht melden",
+  "chatBlockSender": "{name} blockieren",
+  "@chatBlockSender": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reportTitle": "Nachricht melden",
+  "reportIntro": "Die Meldung geht an den Betreiber deines Servers ({server}). Er kann den verschlüsselten Inhalt nicht lesen. Übertragen werden die Kennung der Nachricht, der gewählte Grund und dein optionaler Text – dieser Text ist für den Betreiber lesbar.",
+  "@reportIntro": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCategorySpam": "Spam oder Werbung",
+  "reportCategoryHarassment": "Belästigung oder Beleidigung",
+  "reportCategoryInappropriate": "Unangemessener Inhalt",
+  "reportCategoryOther": "Anderer Grund",
+  "reportDetailsHint": "Optional: Was ist passiert?",
+  "reportSend": "Melden",
+  "reportDone": "Meldung gesendet.",
+  "reportBlockOffer": "Absender blockieren",
+  "blockConfirmTitle": "{name} blockieren?",
+  "@blockConfirmTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "blockConfirmBody": "Nachrichten und der Einzelchat von {name} werden auf diesem Gerät ausgeblendet. {name} erfährt davon nichts und bleibt Mitglied der Familie. Du kannst die Blockierung jederzeit in den Einstellungen aufheben.",
+  "@blockConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "blockConfirmAction": "Blockieren",
+  "blockDone": "{name} ist blockiert.",
+  "@blockDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "unblockAction": "Blockierung aufheben",
+  "unblockDone": "Blockierung von {name} aufgehoben.",
+  "@unblockDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "memberBlockedBadge": "Blockiert",
+  "settingsBlockedUsers": "Blockierte Mitglieder",
+  "settingsBlockedUsersHint": "Nachrichten blockierter Mitglieder werden ausgeblendet.",
+  "blockedUsersEmpty": "Du hast niemanden blockiert.",
+  "privacy11Title": "Melden und Blockieren",
+  "privacy11Body": "Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen."
 }

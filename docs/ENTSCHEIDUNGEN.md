@@ -234,6 +234,12 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Nicht entschieden (Herausgeber):** `ITSAppUsesNonExemptEncryption` wird nicht gesetzt (Antwort bei jedem Upload bewusst); Entwicklerkonten, Impressum/Kontakt, Hosting der Datenschutzseite, Prüfkonto, Team-ID, rechtliche Prüfung AGPL ↔ App-Store-Bedingungen.
 - **Verworfen:** Generierter Upload-Schlüssel im Repository (Geheimnis); Standardsymbol von Flutter; Eintrag „Daten werden erhoben“ als Vorgabe (der Herausgeber erhält keine Daten – Details und Vorbehalte in STORE.md).
 
+## E-48 Melden und Blockieren von Nachrichten (2026-10-22)
+- **Gewählt:** *Melden:* Langdruck auf eine fremde Nachricht → Grund (Spam, Belästigung, unangemessen, anderer) und optionaler Freitext (höchstens 300 Zeichen, bereinigt) → Matrix `POST /rooms/{roomId}/report/{eventId}` an den Homeserver (`MatrixGateway.reportMessage`); eigene und unbekannte Nachrichten werden im Gateway abgelehnt, der Dialog sagt vorab, dass der Freitext für den Serverbetreiber lesbar ist, der Nachrichteninhalt aber nicht übertragen wird. Danach wird das Blockieren des Absenders angeboten. *Blockieren:* lokale Liste (`blockedUsers` in den Einstellungen der verschlüsselten Datenbank, höchstens 200 gültige Matrix-IDs); Nachrichten blockierter Absender und Einzelchats mit ihnen werden ausgeblendet (`visibleMessages`/`visibleThreads`, Domäne), „Nachricht schreiben“ entfällt; erreichbar aus dem Nachrichtenmenü und dem Mitgliedermenü, Aufheben in Einstellungen → Blockierte Mitglieder. Der Blockierte erfährt nichts und bleibt Mitglied.
+- **Verworfen:** Matrix-Ignorierliste (`m.ignored_user_list`): wirkt serverseitig auf alle Räume, lässt sich nicht sauber rückgängig machen (verlorene Historie) und gibt die Blockierung an den Server preis. Meldung an Moderatoren der Familie: ein eigener Ereignistyp wäre ein Protokollzusatz; Moderatoren können Mitglieder bereits entfernen.
+- **Begründung:** Apple-Richtlinie 1.2 (Nutzerinhalte) verlangt Melden und Blockieren; die Lösung bleibt local-first und datensparsam (keine neuen Daten auf dem Server außer der Meldung selbst, die der Nutzer ausdrücklich auslöst).
+- **Grenzen:** siehe OFFEN.md (Termine, Einkaufszettel, Reaktionen, Online-Status und Ungelesen-Zähler blockierter Mitglieder bleiben unberührt).
+
 ## Sicherheitsabweichungen
 
 ### SA-1 Schlüsselweitergabe vor Cross-Signing (Phase 2–3, **Sicherheitsabweichung**)

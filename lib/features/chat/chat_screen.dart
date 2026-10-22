@@ -6,6 +6,7 @@ import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../data/platform/file_access.dart';
 import '../../domain/chat.dart';
+import '../../domain/moderation.dart';
 import '../../domain/presence.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
@@ -14,6 +15,7 @@ import '../../ui/widgets/glass.dart';
 import '../calendar/event_detail_screen.dart' show RsvpButtons;
 import '../calendar/formatting.dart';
 import '../common/error_text.dart';
+import '../moderation/moderation_actions.dart';
 import '../presence/presence_view.dart';
 
 const List<String> _quickReactions = <String>['👍', '❤️', '😂', '🎉', '😮', '🙏'];
@@ -107,6 +109,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _actions(MatrixGateway g, ChatMessage m) async {
     final l = AppLocalizations.of(context);
+    final foreign = m.senderId != g.userId;
     await showModalBottomSheet<void>(
       context: context,
       builder: (c) => SafeArea(
@@ -141,6 +144,24 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
             ]),
           ),
+          if (foreign) ...<Widget>[
+            ListTile(
+              leading: const Icon(Icons.flag_outlined),
+              title: Text(l.chatReport),
+              onTap: () {
+                Navigator.pop(c);
+                ModerationActions.report(context, _services, message: m, threadId: _threadId).ignore();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.block),
+              title: Text(l.chatBlockSender(m.senderName)),
+              onTap: () {
+                Navigator.pop(c);
+                ModerationActions.block(context, _services, userId: m.senderId, name: m.senderName).ignore();
+              },
+            ),
+          ],
         ]),
       ),
     );
@@ -152,9 +173,10 @@ class _ChatScreenState extends State<ChatScreen> {
     final g = services.gateway;
     final l = AppLocalizations.of(context);
     return ListenableBuilder(
-      listenable: g,
+      listenable: Listenable.merge(<Listenable>[g, services.settings]),
       builder: (context, _) {
-        final threads = g.threads;
+        final blocked = services.settings.settings.blockedUsers;
+        final threads = visibleThreads(g.threads, blocked);
         // Verschwindet ein Gespräch (z. B. Mitglied entfernt), geht es zurück zum Familienchat.
         final current = threads.where((t) => t.id == _threadId).firstOrNull;
         if (current == null && _threadId != ChatThread.familyId) {
@@ -163,7 +185,7 @@ class _ChatScreenState extends State<ChatScreen> {
           });
         }
         final threadId = current?.id ?? ChatThread.familyId;
-        final msgs = g.messagesIn(threadId);
+        final msgs = visibleMessages(g.messagesIn(threadId), blocked, myUserId: g.userId);
         if (widget.active && g.unreadIn(threadId) > 0) {
           WidgetsBinding.instance.addPostFrameCallback((_) => g.markChatRead(threadId: threadId).ignore());
         }

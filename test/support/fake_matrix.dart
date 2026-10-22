@@ -6,6 +6,7 @@ import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/event_codec.dart';
 import 'package:family_nexus/domain/invite_link.dart';
+import 'package:family_nexus/domain/moderation.dart';
 import 'package:family_nexus/domain/permissions.dart';
 import 'package:family_nexus/domain/presence.dart';
 import 'package:family_nexus/domain/shopping.dart';
@@ -75,6 +76,10 @@ class FakeMatrixServer {
   /// Privater Raum je Konto (nur dieses Konto ist Mitglied).
   final Map<String, FakeRoom> privateRooms = <String, FakeRoom>{};
   final List<FakeEvent> log = <FakeEvent>[];
+
+  /// Meldungen an den Homeserver-Betreiber (Melder, Raum, Ereignis, Grundtext).
+  final List<({String reporter, String roomId, String eventId, String reason})> reports =
+      <({String reporter, String roomId, String eventId, String reason})>[];
 
   /// Einzelchat-Räume (immer verschlüsselt, genau zwei Beteiligte).
   final Map<String, FakeRoom> dmRooms = <String, FakeRoom>{};
@@ -792,6 +797,15 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final room = _chatRoom(threadId);
     if (emoji.isEmpty || emoji.length > 16) throw const GatewayException(GatewayError.invalidInput);
     fake.post(room, _userId!, 'm.reaction', <String, Object?>{'target': messageId, 'emoji': emoji});
+  }
+
+  @override
+  Future<void> reportMessage(ReportRequest request) async {
+    final room = _chatRoom(request.threadId);
+    final event = room.events.where((e) => e.id == request.messageId && e.type == 'm.room.message').firstOrNull;
+    if (event == null) throw const GatewayException(GatewayError.notFound);
+    if (event.sender == _userId) throw const GatewayException(GatewayError.notAllowed);
+    fake.reports.add((reporter: _userId!, roomId: room.id, eventId: event.id, reason: request.reason));
   }
 
   @override

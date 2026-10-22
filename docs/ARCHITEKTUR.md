@@ -57,6 +57,13 @@ geteilt: Familienraum, privat: nur privater Raum des eigenen Kontos (Geräte-Syn
   → Familienraum (`de.inneso.familynexus.shopping`, E2EE); eingehend: `ShoppingCodec` (Format v1, `by` = Absender)
   → `ShoppingMerge`. Resync: der letzte Bearbeiter sendet seine aktiven Einträge bei neuen Mitgliedern erneut.
 
+## Melden und Blockieren (E-48)
+- `domain/moderation.dart`: `ReportRequest` (Kategorie + bereinigter Freitext → Grundtext), `BlockedUsers` (defensives Lesen,
+  Obergrenze 200), `visibleMessages`/`visibleThreads` (Filter). Die Blockierliste liegt als `blockedUsers` in `AppSettings`
+  (verschlüsselte Datenbank, nur lokal).
+- `MatrixGateway.reportMessage` → Matrix `report`-Endpunkt; `features/moderation` enthält Meldedialog, Blockieren/Aufheben
+  und die Liste der Blockierten. Chat und Familie filtern bei der Anzeige; der Raum selbst bleibt unverändert.
+
 ## Sicherheitsgrundlagen
 - SQLCipher-Datenbank; 256-Bit-Zufallsschlüssel im Android Keystore (`flutter_secure_storage`), nie im Code/Dateien.
 - `allowBackup=false`, Extraktionsregeln, TLS-Pflicht (Network-Security-Config **und** `HttpsOnlyClient` in Dart),

@@ -17,6 +17,7 @@ import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/event_codec.dart';
 import '../../domain/invite_link.dart';
+import '../../domain/moderation.dart';
 import '../../domain/permissions.dart';
 import '../../domain/presence.dart';
 import '../../domain/security.dart';
@@ -1252,6 +1253,21 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       // Doppelte Reaktion: der Server lehnt sie ab; das ist kein Fehler für den Nutzer.
       if (e is MatrixException && e.errcode == 'M_DUPLICATE_ANNOTATION') return;
       AppLog.e('gateway', 'Reaktion konnte nicht gesendet werden', e);
+      throw _map(e);
+    }
+  }
+
+  @override
+  Future<void> reportMessage(ReportRequest request) async {
+    final room = _roomForThread(request.threadId);
+    if (room == null) throw const GatewayException(GatewayError.notFound);
+    final event = _findEvent(request.messageId, request.threadId);
+    if (event == null) throw const GatewayException(GatewayError.notFound);
+    if (event.senderId == _client?.userID) throw const GatewayException(GatewayError.notAllowed);
+    try {
+      await _client!.reportEvent(room.id, event.eventId, reason: request.reason);
+    } catch (e) {
+      AppLog.e('gateway', 'Meldung konnte nicht gesendet werden', e);
       throw _map(e);
     }
   }

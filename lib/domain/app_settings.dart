@@ -1,3 +1,4 @@
+import 'moderation.dart';
 import 'server.dart';
 
 enum AppThemeMode { system, dark, light }
@@ -21,6 +22,7 @@ class AppSettings {
     this.shareOnlineStatus = true,
     this.accent = AccentChoice.teal,
     this.defaultReminderMinutes = const <int>[10],
+    this.blockedUsers = const <String>[],
   });
 
   /// Öffentlicher Standardserver (E-07).
@@ -43,6 +45,9 @@ class AppSettings {
   final AccentChoice accent;
   final List<int> defaultReminderMinutes;
 
+  /// Lokal blockierte Matrix-IDs (E-48).
+  final List<String> blockedUsers;
+
   AppSettings copyWith({
     Object? languageCode = _unset,
     AppThemeMode? themeMode,
@@ -55,6 +60,7 @@ class AppSettings {
     bool? shareOnlineStatus,
     AccentChoice? accent,
     List<int>? defaultReminderMinutes,
+    List<String>? blockedUsers,
   }) =>
       AppSettings(
         languageCode:
@@ -69,6 +75,7 @@ class AppSettings {
         shareOnlineStatus: shareOnlineStatus ?? this.shareOnlineStatus,
         accent: accent ?? this.accent,
         defaultReminderMinutes: defaultReminderMinutes ?? this.defaultReminderMinutes,
+        blockedUsers: blockedUsers ?? this.blockedUsers,
       );
 
   static const Object _unset = Object();
@@ -85,6 +92,7 @@ class AppSettings {
         'shareOnlineStatus': '$shareOnlineStatus',
         'accent': accent.name,
         'defaultReminders': defaultReminderMinutes.join(','),
+        if (blockedUsers.isNotEmpty) 'blockedUsers': BlockedUsers.encode(blockedUsers),
       };
 
   /// Liest Einstellungen defensiv: unbekannte oder ungültige Werte fallen auf
@@ -114,6 +122,7 @@ class AppSettings {
       shareOnlineStatus: m['shareOnlineStatus'] != 'false',
       accent: AccentChoice.values.firstWhere((e) => e.name == m['accent'], orElse: () => d.accent),
       defaultReminderMinutes: m.containsKey('defaultReminders') ? reminders : d.defaultReminderMinutes,
+      blockedUsers: BlockedUsers.parse(m['blockedUsers']),
     );
   }
 

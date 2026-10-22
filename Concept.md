@@ -59,6 +59,7 @@ Two roles govern the family: members use calendar and chat, moderators additiona
 - Family group chat and **direct chats** between joined members (one encrypted room per pair; the conversation ceases when a member is removed).
 - Messages, images, files, replies, reactions.
 - Appointments can be shared in the chat and accepted or declined directly.
+- **Report and block:** Users can report a message to the operator of their homeserver (reason and optional text; the encrypted content is not sent) and block members locally, which hides their messages and direct chat on that device.
 
 ### Online Status
 

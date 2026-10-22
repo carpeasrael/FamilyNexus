@@ -77,7 +77,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 
 - **Nicht ohne den Herausgeber möglich:** Entwicklerkonten, Upload-Schlüssel (`tool/create_upload_key.sh`), Apple-Team-ID, Impressum/Kontakt und gehostete Datenschutzseite, Prüfkonto mit Wiederherstellungsschlüssel, Exportnachweis.
 - **Lizenz:** AGPL-3.0 (E-02) und App-Store-Nutzungsbedingungen sind rechtlich zu klären (STORE.md, Abschnitt 6) – ggf. Ausnahme der Rechteinhaber der AGPL-Bibliotheken oder Verteilung nur über Google Play/F-Droid/Direktdownload.
-- **Keine „Melden/Blockieren“-Funktion** für Nachrichten (nur Entfernen durch Moderatoren); der App Store kann dazu bei Apps mit Nutzerinhalten nachfragen.
+- **Melden/Blockieren (E-48):** Melden geht an den Betreiber des Homeservers (nicht an Moderatoren der Familie); Blockieren gilt nur lokal auf diesem Gerät und wirkt auf Chatnachrichten und Einzelchats. Geteilte Termine, Einkaufszettel-Einträge, Reaktionen und der Online-Status blockierter Mitglieder bleiben sichtbar; die Zähler für Ungelesenes zählen ihre Nachrichten weiter mit. Eine Meldung an die Moderatoren der Familie gibt es nicht.
 - Echtgerät-Tests (Android und iPhone) stehen aus; Store-Screenshots stammen von Emulator/Simulator mit Beispieldaten.
 
 ## iOS (E-43)
