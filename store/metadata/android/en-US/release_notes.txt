@@ -1,5 +1,4 @@
-New in 1.0.3:
-• Send invitation links by email (in addition to QR code and copy).
-• Invited accounts see the invitation right after sign-in, without "Create or join".
-• Confirmed join requests are accepted automatically.
-• Fixed: any moderator can confirm requests for links issued by other moderators.
+New in 1.0.4:
+• Task lists: moderators assign recurring lists to family members (daily, weekly, monthly). Tick items off with an optional comment, history with dates, automatic restart at the period boundary.
+• New "Tasks for you" card on "Today".
+• Fixed: tampered invitation links and event replies could crash the app.

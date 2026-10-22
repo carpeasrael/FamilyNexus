@@ -1,5 +1,7 @@
-New in 1.0.3:
-• Send invitation links by email: in the link dialog, "Send by email" opens a draft with instructions and the link (in addition to QR code and copy).
-• Invited accounts see the invitation right after sign-in – without the "Create or join" question. One tap is enough.
-• Confirmed join requests are accepted automatically.
-• Fixed: any moderator can check and confirm join requests for links issued by another moderator.
+New in 1.0.4:
+• Task lists: moderators create lists and assign them to a family member. Each list repeats daily, weekly or monthly and restarts automatically (at midnight, on Monday or on the 1st of the month, in the list's time zone).
+• Only the assigned person ticks items off, optionally with a comment. Date and time are recorded in a history that is kept across every restart of the list.
+• New "Tasks for you" card on "Today"; open the tasks from the menu.
+• Task lists are transmitted end-to-end encrypted like events and stored encrypted on the device.
+• Fixed: tampered invitation links (for example via QR code) and event replies could crash the app.
+• Fixed: devices whose time zone cannot be determined are now handled correctly as UTC.

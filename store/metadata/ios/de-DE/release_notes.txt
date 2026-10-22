@@ -1,5 +1,7 @@
-Neu in 1.0.3:
-• Einladungslink per E-Mail senden: Im Link-Dialog öffnet „Per E-Mail senden“ einen Entwurf mit Anleitung und Link (zusätzlich zu QR-Code und Kopieren).
-• Eingeladene Konten sehen nach der Anmeldung direkt die Einladung – ohne die Frage „Gründen oder Beitreten“. Ein Tipp genügt.
-• Bestätigte Beitrittsanfragen werden automatisch angenommen.
-• Behoben: Jeder Moderator kann Beitrittsanfragen für Links eines anderen Moderators prüfen und bestätigen.
+Neu in 1.0.4:
+• Aufgabenlisten: Moderatoren legen Listen an und weisen sie einem Familienmitglied zu. Jede Liste wiederholt sich täglich, wöchentlich oder monatlich und startet automatisch neu (um Mitternacht, am Montag bzw. am Monatsersten, in der Zeitzone der Liste).
+• Nur die zugewiesene Person hakt Punkte ab, optional mit Kommentar. Datum und Uhrzeit werden in einem Verlauf festgehalten, der bei jedem Neustart der Liste erhalten bleibt.
+• Neue Karte „Aufgaben für dich“ auf „Heute“; die Aufgaben erreichst du über das Menü.
+• Aufgabenlisten werden wie Termine Ende-zu-Ende-verschlüsselt übertragen und verschlüsselt auf dem Gerät gespeichert.
+• Behoben: Manipulierte Einladungslinks (z. B. per QR-Code) und Termin-Antworten konnten die App zum Absturz bringen.
+• Behoben: Geräte, deren Zeitzone nicht ermittelt werden kann, werden jetzt korrekt mit UTC behandelt.
