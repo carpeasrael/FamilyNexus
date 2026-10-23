@@ -78,7 +78,7 @@ class Chrome:
     def __init__(self, chrome, width=1100, height=800, port=9333):
         self.dir = tempfile.mkdtemp()
         self.proc = subprocess.Popen([chrome, '--headless=new', '--disable-gpu', '--no-sandbox', f'--user-data-dir={self.dir}',
-            f'--remote-debugging-port={port}', f'--window-size={width},{height}', '--lang=de-DE', 'about:blank'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            f'--remote-debugging-port={port}', f'--window-size={width},{height}', f'--lang={os.environ.get("WEB_SMOKE_BROWSER_LANG", "de-DE")}', 'about:blank'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
         for _ in range(60):
             try:
                 tabs = json.load(urllib.request.urlopen(f'http://127.0.0.1:{port}/json'))
@@ -90,6 +90,9 @@ class Chrome:
         self.ws.send('Page.enable'); self.ws.send('Runtime.enable'); self.ws.send('Log.enable')
         # Die App folgt der Browsersprache; die Prüfungen erwarten Deutsch (headless Chrome auf Linux meldet sonst en-US).
         self.ws.send('Emulation.setLocaleOverride', locale='de-DE')
+        ua = self.ws.send('Runtime.evaluate', expression='navigator.userAgent', returnByValue=True)['result']['value']
+        self.ws.send('Network.enable')
+        self.ws.send('Network.setUserAgentOverride', userAgent=ua, acceptLanguage='de-DE,de')
         self.ws.send('Emulation.setDeviceMetricsOverride', width=width, height=height, deviceScaleFactor=1, mobile=False)
     def goto(self, url, wait=8):
         self.ws.send('Page.navigate', url=url); time.sleep(wait)
@@ -138,6 +141,7 @@ def main():
         sys.exit('Chrome nicht gefunden')
     c = Chrome(chrome_path, port=9300 + os.getpid() % 500)
     failures = []
+    print('navigator.languages:', c.ws.send('Runtime.evaluate', expression='navigator.languages.join()', returnByValue=True)['result']['value'])
 
     def texts():
         # Semantik einschalten (Flutter legt sie erst auf Anforderung an) und alle Beschriftungen lesen.
