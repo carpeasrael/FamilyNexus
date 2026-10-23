@@ -775,6 +775,14 @@
   "accentRose": "Rosé",
   "accentGreen": "Grün",
   "menuOpen": "Menü öffnen",
+  "menuVersion": "Version {version}",
+  "@menuVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "menuTitle": "Menü",
   "chatReport": "Nachricht melden",
   "chatBlockSender": "{name} blockieren",

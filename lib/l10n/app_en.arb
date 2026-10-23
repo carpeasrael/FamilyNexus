@@ -775,6 +775,14 @@
   "accentRose": "Rose",
   "accentGreen": "Green",
   "menuOpen": "Open menu",
+  "menuVersion": "Version {version}",
+  "@menuVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "menuTitle": "Menu",
   "chatReport": "Report message",
   "chatBlockSender": "Block {name}",

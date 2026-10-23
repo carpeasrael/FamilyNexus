@@ -1468,6 +1468,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get menuOpen => 'Menü öffnen';
 
   @override
+  String menuVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
   String get menuTitle => 'Menü';
 
   @override

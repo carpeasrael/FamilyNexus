@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
+import '../../app/app_version.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../calendar/calendar_screen.dart';
 import '../chat/chat_screen.dart';
@@ -154,6 +155,15 @@ class _MenuDrawer extends StatelessWidget {
             leading: const Icon(Icons.privacy_tip_outlined),
             title: Text(l.settingsPrivacyPolicy),
             onTap: () => open(const PrivacyScreen()),
+          ),
+          const Spacer(),
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              l.menuVersion(appVersion),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
           ),
         ]),
       ),

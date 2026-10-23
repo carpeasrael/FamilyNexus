@@ -2552,6 +2552,12 @@ abstract class AppLocalizations {
   /// **'Menü öffnen'**
   String get menuOpen;
 
+  /// No description provided for @menuVersion.
+  ///
+  /// In de, this message translates to:
+  /// **'Version {version}'**
+  String menuVersion(String version);
+
   /// No description provided for @menuTitle.
   ///
   /// In de, this message translates to:
