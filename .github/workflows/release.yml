@@ -1,6 +1,6 @@
 name: Release
 
-# Builds a signed release APK, a signed Android App Bundle (AAB, for Google Play), a Linux Flatpak bundle, a Windows
+# Builds a signed release APK, a signed Android App Bundle (AAB, for Google Play), a Linux Flatpak bundle and AppImage, a Windows
 # zip (exe + DLLs), a notarized macOS DMG and the web app (zip, also published on GitHub Pages) for every pushed version
 # tag (v*) and attaches them, with SHA-256 files, to the GitHub release. The App Store packages (iOS IPA, macOS pkg)
 # are kept as workflow artifacts for the upload with Transporter.
@@ -22,12 +22,12 @@ on:
         description: Existing tag to build and attach the files to (e.g. v1.0.1)
         required: true
       build:
-        description: What to build; "aab" keeps an existing APK asset untouched, "flatpak" builds only the Linux bundle, "windows" only the Windows zip, "web" only the web app, "apple" only DMG and App Store packages
+        description: What to build; "aab" keeps an existing APK asset untouched, "flatpak" builds only the Linux bundle, "appimage" only the AppImage, "windows" only the Windows zip, "web" only the web app, "apple" only DMG and App Store packages
         type: choice
-        options: [apk+aab, aab, flatpak, windows, web, apple]
+        options: [apk+aab, aab, flatpak, appimage, windows, web, apple]
         default: apk+aab
       ref:
-        description: 'Only for "flatpak", "windows", "web" and "apple" - branch or commit to build instead of the tag (the file is still attached to the tag release)'
+        description: 'Only for "flatpak", "appimage", "windows", "web" and "apple" - branch or commit to build instead of the tag (the file is still attached to the tag release)'
         required: false
 
 permissions:
@@ -37,7 +37,7 @@ jobs:
   apk:
     if: >-
       github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows' && github.event.inputs.build != 'web'
-      && github.event.inputs.build != 'apple'
+      && github.event.inputs.build != 'apple' && github.event.inputs.build != 'appimage'
     runs-on: ubuntu-latest
     env:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
@@ -166,7 +166,7 @@ jobs:
     if: >-
       always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
       && github.event.inputs.build != 'aab' && github.event.inputs.build != 'windows' && github.event.inputs.build != 'web'
-      && github.event.inputs.build != 'apple'
+      && github.event.inputs.build != 'apple' && github.event.inputs.build != 'appimage'
     runs-on: ubuntu-latest
     env:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
@@ -198,6 +198,58 @@ jobs:
           fi
           gh release upload "$TAG" "build/flatpak/FamilyNexus-${TAG}.flatpak" "build/flatpak/FamilyNexus-${TAG}.flatpak.sha256" --clobber
 
+  # Linux: AppImage (tool/build_appimage.sh) on Ubuntu 22.04, so glibc 2.35 is the minimum on the user's system.
+  # Bundles SQLCipher built from source; GTK 3, libsecret and OpenSSL 3 come from the system.
+  appimage:
+    needs: apk
+    if: >-
+      always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
+      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows'
+      && github.event.inputs.build != 'web' && github.event.inputs.build != 'apple'
+    runs-on: ubuntu-22.04
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'appimage') && github.event.inputs.ref || env.TAG }}
+
+      - name: Check tag matches pubspec version
+        run: |
+          name=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
+          if [ "v$name" != "$TAG" ]; then echo "::error::Tag $TAG does not match pubspec version $name"; exit 1; fi
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev libssl-dev
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.7"
+          channel: stable
+          cache: true
+
+      - name: Build AppImage
+        run: tool/build_appimage.sh
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: debug-info-appimage-${{ env.TAG }}-run${{ github.run_number }}
+          path: debug-info/
+          retention-days: 90
+
+      - name: Attach to GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "FamilyNexus ${TAG#v}" --generate-notes --verify-tag
+          fi
+          gh release upload "$TAG" "build/appimage/FamilyNexus-${TAG}-x86_64.AppImage" \
+            "build/appimage/FamilyNexus-${TAG}-x86_64.AppImage.sha256" --clobber
+
   # Windows: zip with familynexus.exe, Flutter runtime, SQLCipher (built from source with vcpkg, E-52) and the VC++
   # runtime DLLs. Runs after the Android job so that only one job creates the GitHub release.
   windows:
@@ -205,7 +257,7 @@ jobs:
     if: >-
       always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
       && github.event.inputs.build != 'aab' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'web'
-      && github.event.inputs.build != 'apple'
+      && github.event.inputs.build != 'apple' && github.event.inputs.build != 'appimage'
     runs-on: windows-latest
     defaults:
       run:
@@ -291,7 +343,7 @@ jobs:
     if: >-
       always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
       && github.event.inputs.build != 'aab' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows'
-      && github.event.inputs.build != 'web'
+      && github.event.inputs.build != 'web' && github.event.inputs.build != 'appimage'
     runs-on: macos-latest
     env:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
@@ -422,7 +474,7 @@ jobs:
     if: >-
       always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
       && github.event.inputs.build != 'aab' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows'
-      && github.event.inputs.build != 'apple'
+      && github.event.inputs.build != 'apple' && github.event.inputs.build != 'appimage'
     runs-on: ubuntu-latest
     env:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}

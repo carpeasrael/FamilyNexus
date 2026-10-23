@@ -276,6 +276,12 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Verworfen:** unverschlüsselt speichern (widerspricht dem Datenschutzversprechen); nur im Arbeitsspeicher (jeder Start neu aufsetzen, Matrix-Geräteschlüssel gingen verloren); eigener Schlüsselspeicher in IndexedDB mit nicht exportierbarem Schlüssel allein (ohne Passwort liest ihn jedes Skript der Seite); Shared Worker von `sqflite_common_ffi_web` (zusätzliche Binärdatei, kein Gewinn); vorgefertigtes vodozemac-WebAssembly (gibt es nicht als Download).
 - **Grenzen:** in OFFEN.md.
 
+## E-54 Linux zusätzlich als AppImage (2026-10-23)
+- **Frage:** Wie kommt die App auf Linux-Systeme ohne Flatpak?
+- **Gewählt:** AppImage (x86_64) aus derselben Codebasis wie E-50, gebaut mit `tool/build_appimage.sh` auf Ubuntu 22.04 (glibc 2.35 als Untergrenze). Mitgeliefert wird nur SQLCipher 4.19.0, aus dem Quellcode mit denselben Flags wie im Flatpak (`-Bsymbolic`); GTK 3, libsecret und OpenSSL 3 kommen vom System. `AppRun` setzt `LD_LIBRARY_PATH` auf einen Ordner, der **nur** `libsqlcipher.so` enthält, damit gestartete Programme (Browser über `url_launcher`) keine fremden Bibliotheken erben. Werkzeuge mit fester Version und Prüfsumme: appimagetool 1.9.1 und die statische type2-runtime 20251108 (kein libfuse2 auf dem Zielsystem nötig). Release-Workflow hängt `FamilyNexus-v<Version>-x86_64.AppImage` an.
+- **Verworfen:** GTK und OpenSSL mitliefern (linuxdeploy-Plugins): deutlich größer und Konflikte mit den Themes/Modulen des Systems; vorgefertigte SQLCipher-Binaries (siehe E-50).
+- **Grenzen:** Einladungslinks (`familynexus:`) und Menüeintrag werden nicht automatisch registriert (erst mit einem Integrationswerkzeug wie Gear Lever/AppImageLauncher); keine Sandbox wie im Flatpak; SA-6 gilt unverändert.
+
 ## Sicherheitsabweichungen
 
 ### SA-1 Schlüsselweitergabe vor Cross-Signing (Phase 2–3, **Sicherheitsabweichung**)

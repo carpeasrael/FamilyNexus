@@ -66,6 +66,7 @@ flutter build macos --debug       # macOS (Apple Silicon), start: open build/mac
 flutter build ios --simulator --debug   # iOS (simulator); needs Xcode, CocoaPods, Rust targets for iOS (see docs/OFFEN.md)
 flutter build linux --debug       # Linux (x86_64), start: build/linux/x64/debug/bundle/familynexus
 tool/build_flatpak.sh --install   # Linux release as Flatpak bundle (build/flatpak/), installs it for the current user
+tool/build_appimage.sh            # Linux release as AppImage (build/appimage/); best run on Ubuntu 22.04 (glibc baseline)
 tool/build_release.sh            # Release with --obfuscate (unsigned without android/key.properties)
 ```
 
@@ -82,6 +83,8 @@ existing tag and leaves the APK asset untouched. Required repository secrets: `A
 The same workflow then builds the Linux Flatpak bundle (`FamilyNexus-v<version>.flatpak`, x86_64, needs no secrets) with
 `tool/build_flatpak.sh` and attaches it as well; *Run workflow* with `flatpak` rebuilds only that bundle. Install with
 `flatpak install --user FamilyNexus-v<version>.flatpak` (the GNOME runtime comes from Flathub).
+An AppImage (`FamilyNexus-v<version>-x86_64.AppImage`, built by `tool/build_appimage.sh` on Ubuntu 22.04) is attached too: `chmod +x` and run it;
+it brings SQLCipher and needs GTK 3, libsecret and OpenSSL 3 from the system (E-54). *Run workflow* with `appimage` rebuilds only that file.
 A third job builds the Windows zip (`FamilyNexus-v<version>-windows-x64.zip`: unzip and run `familynexus.exe`; unsigned, so SmartScreen
 warns on first start); *Run workflow* with `windows` rebuilds only that zip, and the optional `ref` input builds from a branch while attaching
 the file to the tag's release.
