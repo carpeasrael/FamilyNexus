@@ -15,11 +15,15 @@ import 'package:integration_test/integration_test.dart';
 
 import '../tool/preview/preview_data.dart';
 
+// Sprache der Aufnahmen: --dart-define=SHOTS_LANG=en (Standard de); die Dateien landen dann in .../fn_store_shots_<sprache>.
+const _lang = String.fromEnvironment('SHOTS_LANG', defaultValue: 'de');
+
 void main() {
+  const en = _lang == 'en';
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('Store-Screenshots', (tester) async {
-    final services = await buildPreviewServices();
+    final services = await buildPreviewServices(lang: _lang);
     // macOS hat kein takeScreenshot: Die Oberfläche wird in Mac-App-Store-Größe (2560×1600, Faktor 2) selbst gerendert.
     final rootKey = GlobalKey();
     if (Platform.isMacOS) {
@@ -32,12 +36,12 @@ void main() {
     await tester.pumpAndSettle(const Duration(seconds: 2));
     // Im iOS-Simulator darf die App auf den Mac schreiben (dort liegen die Dateien nach dem Lauf);
     // sonst in den temporären Ordner der App.
-    Directory dir = Directory('${Directory.systemTemp.path}/store_shots');
+    Directory dir = Directory('${Directory.systemTemp.path}/store_shots_$_lang');
     if (Platform.isIOS) {
       try {
-        dir = Directory('/tmp/fn_store_shots')..createSync(recursive: true);
+        dir = Directory('/tmp/fn_store_shots_$_lang')..createSync(recursive: true);
       } catch (_) {
-        dir = Directory('${Directory.systemTemp.path}/store_shots');
+        dir = Directory('${Directory.systemTemp.path}/store_shots_$_lang');
       }
     }
     dir.createSync(recursive: true);
@@ -66,7 +70,7 @@ void main() {
     }
 
     await shot('1-heute');
-    await tab('Kalender');
+    await tab(en ? 'Calendar' : 'Kalender');
     if (Platform.isMacOS) {
       // Auf der breiten Fläche zeigt die Monatsansicht die heutigen Termine nicht im Bild.
       await tester.tap(find.text('Agenda'));
@@ -78,9 +82,9 @@ void main() {
     await tester.tap(find.widgetWithText(ChoiceChip, 'Ben'));
     await tester.pumpAndSettle();
     await shot('4-einzelchat');
-    await tab('Einkauf');
+    await tab(en ? 'Shopping' : 'Einkauf');
     await shot('5-einkauf');
-    await tab('Familie');
+    await tab(en ? 'Family' : 'Familie');
     await shot('6-familie');
     // ignore: avoid_print
     print('SHOTS_DIR=${dir.path}');

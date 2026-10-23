@@ -3,8 +3,12 @@
 Alle Aufnahmen zeigen **erfundene Beispieldaten** (Fake-Server, siehe `tool/preview/`).
 
 - `ios-6.9/` – iPhone 17 Pro Max (6,9″), 1320×2868: Heute, Kalender, Chat, Einzelchat, Einkauf, Familie (Flutter-Oberfläche ohne iOS-Statusleiste).
+- `ios/` – **fertiges App-Store-Bilderpaket** (Bildunterschrift + Screenshot auf Markenhintergrund, PNG ohne Alpha, 6 Bilder je Sprache und Größe):
+  `ios/de-DE/` und `ios/en-US/`, je `1206x2622/` (6,1″/6,3″, Pflichtgröße) und `1320x2868/` (6,9″). Beispieldaten und Oberfläche sind je Sprache übersetzt.
+  Reihenfolge nach Apple-Hinweisen (stärkste Funktion zuerst, kurze Texte, Motiv mittig, keine Preise/URLs/Auszeichnungen).
+  Neu erzeugen: Rohaufnahmen je Größe/Sprache mit `flutter test integration_test/store_screenshots_test.dart -d <Simulator> --dart-define=SHOTS_LANG=de|en`
+  (Dateien in `/tmp/fn_store_shots_<sprache>`) nach `<roh>/<breite>-<sprache>/` kopieren, dann `python3 tool/preview/compose_store_images.py <roh> store/screenshots/ios`.
 - `ios-6.3/` – iPhone 17 Pro (6,3″, gilt auch für 6,1″), 1206×2622: nativ im Simulator aufgenommen (App Store Connect erlaubt für 6,1″/6,3″ 1179×2556 oder 1206×2622; App-Vorschauvideos 1920×886 bzw. 886×1920).
-- `ios-6.5/` – iPhone 6,5″, 1284×2778: aus `ios-6.9/` skaliert (Breite 1284, oben 12 px leerer Rand abgeschnitten, nicht verzerrt).
 - `android-phone/` – Android-Emulator (Pixel 8), 1200×2400 (seitlich aufgefüllt, damit das Seitenverhältnis die Play-Grenze von 2:1 einhält).
 
 - `macos-2560x1600/` – Mac App Store (2560×1600): dieselben Motive, Kalender in der Agenda-Ansicht (die Monatsansicht streckt sich auf der breiten Fläche). Reine Flutter-Oberfläche ohne Fensterrahmen.

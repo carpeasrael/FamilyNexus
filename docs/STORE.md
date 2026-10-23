@@ -22,7 +22,7 @@ tun muss, steht in Abschnitt 1. Rechtliche Angaben sind Hinweise, keine Rechtsbe
 
 | Bereich | Stand |
 |---|---|
-| Version | `pubspec.yaml`: `1.0.3+4` (Name+Buildnummer). Jeder Upload braucht eine **höhere Buildnummer** (`+2`, …) |
+| Version | `pubspec.yaml`: `1.0.4+5` (Name+Buildnummer). Jeder Upload braucht eine **höhere Buildnummer** (`+2`, …) |
 | Kennungen | Android `de.inneso.familynexus`; iOS/macOS `de.inneso.familynexus` (vereinheitlicht) |
 | Symbole | `tool/make_icons.py` erzeugt alle Größen (Android adaptiv + Legacy, iOS ohne Alpha, macOS) sowie `store/graphics/` (Play-Symbol 512, App-Store-Symbol 1024, Funktionsgrafik 1024×500) |
 | Android | Release: R8/Shrink, `--obfuscate`, Symbole für native Bibliotheken, unsigniert ohne `key.properties`; **App Bundle:** `tool/build_release.sh aab` (≈ 79 MB) |
@@ -61,7 +61,7 @@ Der Herausgeber betreibt keinen Server und erhält keine Daten. Die App sendet D
 
 1. **Vorbereiten:** Bundle-ID registrieren, in Xcode anmelden, Team-ID eintragen (Punkt 1.5). App in App Store Connect anlegen (Name `FamilyNexus`, Primärsprache Deutsch, SKU frei).
 2. **Bauen:** `tool/build_ios_release.sh` (erzeugt eine signierte IPA in `build/ios/ipa/`). Zum Hochladen: Xcode-Werkzeug **Transporter** oder `xcrun altool --upload-app`. Obfuskierungssymbole (`debug-info/`) aufbewahren.
-3. **Eintrag:** Texte aus `store/metadata/ios/`, Symbol `store/graphics/app-store-icon-1024.png`, Screenshots für 6,9″ (1320×2868), 6,5″ (1284×2778 oder 1242×2688) und 6,1″/6,3″ (1179×2556 oder 1206×2622) – nur iPhone; App-Vorschauvideos (optional) 1920×886 bzw. 886×1920.
+3. **Eintrag:** Texte aus `store/metadata/ios/`, Symbol `store/graphics/app-store-icon-1024.png`, Screenshots für 6,9″ (1320×2868) und 6,1″/6,3″ (1179×2556 oder 1206×2622) – nur iPhone; App-Vorschauvideos (optional) 1920×886 bzw. 886×1920.
 4. **App-Datenschutz (Nährwertkennzeichen):** „Daten werden nicht erhoben“ ist zutreffend, weil der Herausgeber keine Daten erhält; Inhalte gehen verschlüsselt an den vom Nutzer gewählten Server. Beim Ausfüllen die Abschnitte 3 (Tabelle) und die `PrivacyInfo.xcprivacy` zugrunde legen; Bibliotheken bringen eigene Manifeste mit (im Xcode-Datenschutzbericht des Archivs prüfen).
 5. **Altersfreigabe:** Fragebogen: keine anstößigen Inhalte; Nachrichtenaustausch ja; kein freier Webzugang.
 6. **Verschlüsselung (Exportnachweis):** Die App verwendet Ende-zu-Ende-Verschlüsselung (Standardverfahren, keine proprietäre Kryptografie). Bei „Verwendet Ihre App Verschlüsselung?“ → *Ja*, Standardalgorithmen → die Ausnahme für Massenmarkt-/Standardverschlüsselung ist typisch, kann aber eine jährliche Selbstklassifizierung gegenüber der US-Behörde verlangen. Bewusst **nicht** in der `Info.plist` hinterlegt (`ITSAppUsesNonExemptEncryption`), damit der Herausgeber die Antwort bei jedem Upload ausdrücklich gibt.
@@ -74,7 +74,7 @@ Einmalig je Plattform (Team-ID: developer.apple.com → Membership):
 
 1. App-ID `de.inneso.familynexus` registrieren (Developer-Portal → Identifiers) und in App Store Connect je Plattform einen App-Eintrag anlegen (iOS und macOS können unter einem Eintrag mit derselben Bundle-ID laufen).
 2. Team-ID in `ios/ExportOptions.plist` **und** `macos/ExportOptions.plist` eintragen (`HIER_TEAM_ID_EINTRAGEN` ersetzen).
-3. Versionen kommen aus `pubspec.yaml` (`1.0.3+4` → Version 1.0.3, Build 4) und gelten für beide Plattformen; vor jedem Upload die Buildnummer erhöhen.
+3. Versionen kommen aus `pubspec.yaml` (`1.0.4+5` → Version 1.0.4, Build 5) und gelten für beide Plattformen; vor jedem Upload die Buildnummer erhöhen.
 
 Archiv bauen (die Skripte setzen Obfuskierung und Debug-Symbole, ein reines „Product → Archive“ in Xcode ohne vorherigen Flutter-Build tut das nicht):
 
@@ -87,11 +87,11 @@ Archiv bauen (die Skripte setzen Obfuskierung und Debug-Symbole, ein reines „P
 
 Alternativ in Xcode: `ios/Runner.xcworkspace` bzw. `macos/Runner.xcworkspace` öffnen → Target *Runner* → *Signing & Capabilities* → Team wählen (*Automatically manage signing*) → *Product → Archive* → Organizer → *Distribute App*. Vorher einmal `tool/build_*_release.sh --check` laufen lassen.
 
-Stand der Vorbereitung (ohne Signatur geprüft, 2026-10-22): iOS-Release 30 MB, macOS-Release 67 MB (arm64 + x86_64); Version 1.0.3 (4); macOS: App-Sandbox mit `network.client` und `files.user-selected.read-write`, Kategorie *Produktivität* (`LSApplicationCategoryType`), Mindestversion macOS 12; iOS: iPhone, Mindestversion iOS 15, `PrivacyInfo.xcprivacy` ohne Tracking. Offen bleiben Signatur, Team-ID und App-Store-Connect-Einträge, die ein Apple-Entwicklerkonto brauchen.
+Stand der Vorbereitung (ohne Signatur geprüft, 2026-10-22): iOS-Release 30 MB, macOS-Release 67 MB (arm64 + x86_64); Version 1.0.4 (5); macOS: App-Sandbox mit `network.client` und `files.user-selected.read-write`, Kategorie *Produktivität* (`LSApplicationCategoryType`), Mindestversion macOS 12; iOS: iPhone, Mindestversion iOS 15, `PrivacyInfo.xcprivacy` ohne Tracking. Offen bleiben Signatur, Team-ID und App-Store-Connect-Einträge, die ein Apple-Entwicklerkonto brauchen.
 
 ## 5. Screenshots
 
-`store/screenshots/` enthält je sechs Aufnahmen für iPhone (6,9″ `ios-6.9/`, 6,5″ `ios-6.5/`, 6,3″ `ios-6.3/`) und Android-Telefon (`android-phone/`) mit **erfundenen Beispieldaten** (Fake-Server, kein Netzwerk), erzeugt mit `tool/preview/` (siehe `store/screenshots/README.md`). Tablet-Aufnahmen (nicht nötig, solange iPad nicht unterstützt wird; Play verlangt sie nur optional). Für die Veröffentlichung prüfen oder durch eigene ersetzen; Pflichtgrößen siehe oben.
+`store/screenshots/ios/` ist das **fertige Bilderpaket** für den App Store (de-DE und en-US, 1206×2622 und 1320×2868, mit kurzen Bildunterschriften nach den Asset-Best-Practices von Apple); die Rohaufnahmen liegen daneben. `store/screenshots/` enthält je sechs Aufnahmen für iPhone (6,9″ `ios-6.9/`, 6,3″ `ios-6.3/`) und Android-Telefon (`android-phone/`) mit **erfundenen Beispieldaten** (Fake-Server, kein Netzwerk), erzeugt mit `tool/preview/` (siehe `store/screenshots/README.md`). Tablet-Aufnahmen (nicht nötig, solange iPad nicht unterstützt wird; Play verlangt sie nur optional). Für die Veröffentlichung prüfen oder durch eigene ersetzen; Pflichtgrößen siehe oben.
 
 ## 6. Rechtlicher Hinweis zur Lizenz (AGPL-3.0)
 
@@ -100,6 +100,6 @@ FamilyNexus steht unter AGPL-3.0 (E-02), weil die Matrix-Bibliothek und `vodozem
 ## 7. Ablauf pro Release
 
 1. `flutter analyze`, `flutter test`, `tool/e2e.sh`, `tool/device_tests.sh`, `tool/check_permissions.sh`.
-2. Version in `pubspec.yaml` erhöhen (`1.0.3+4` …); Neuerungen in `store/metadata/*/*/release_notes.txt` (App Store höchstens 4000 Zeichen, Google Play höchstens 500 je Sprache) eintragen.
+2. Version in `pubspec.yaml` erhöhen (`1.0.4+5` …); Neuerungen in `store/metadata/*/*/release_notes.txt` (App Store höchstens 4000 Zeichen, Google Play höchstens 500 je Sprache) eintragen.
 3. Android: `tool/build_release.sh aab`; iOS: `tool/build_ios_release.sh`.
 4. Hochladen, interne Tests/TestFlight, danach freigeben.

@@ -9,15 +9,17 @@ import 'package:family_nexus/domain/time_zones.dart';
 import '../../test/support/fake_matrix.dart';
 import '../../test/support/test_app.dart';
 
-/// Baut die Dienste mit erfundenen Beispieldaten.
-Future<AppServices> buildPreviewServices() async {
+/// Baut die Dienste mit erfundenen Beispieldaten ([lang]: `de` oder `en`, Oberfläche und Beispieltexte).
+Future<AppServices> buildPreviewServices({String lang = 'de'}) async {
+  final en = lang == 'en';
+  String t(String de, String enText) => en ? enText : de;
   TimeZones.ensureInitialized();
   final server = FakeMatrixServer();
   server.addAccount('anna', 'geheim123', displayName: 'Anna');
   server.addAccount('ben', 'geheim456', displayName: 'Ben');
   server.addAccount('clara', 'x', displayName: 'Clara');
-  final app = await buildTestApp(server: server, secureScreen: false, screenProtection: PlatformScreenProtection());
-  await app.gateway.renameFamily('Familie Berger');
+  final app = await buildTestApp(lang: lang, server: server, secureScreen: false, screenProtection: PlatformScreenProtection());
+  await app.gateway.renameFamily(t('Familie Berger', 'Berger Family'));
   final room = app.gateway.familyRoom!;
   final ben = server.newDevice();
   await ben.login(server: ServerUrl.tryParse(server.host)!, username: 'ben', password: 'geheim456');
@@ -29,11 +31,11 @@ Future<AppServices> buildPreviewServices() async {
   clara.attachFamilyRoom(room.id);
   await ben.announcePresence(online: true);
   await clara.announcePresence(online: false);
-  await ben.sendMessage('Wer holt Lena heute vom Training ab?');
-  await app.gateway.sendMessage('Ich übernehme das, ich bin um 16 Uhr dort.');
-  await clara.sendMessage('Danke! Ich bringe das Abendessen mit 🍝');
+  await ben.sendMessage(t('Wer holt Lena heute vom Training ab?', 'Who is picking Lena up from practice today?'));
+  await app.gateway.sendMessage(t('Ich übernehme das, ich bin um 16 Uhr dort.', 'I will do it, I will be there at 4 pm.'));
+  await clara.sendMessage(t('Danke! Ich bringe das Abendessen mit 🍝', 'Thanks! I will bring dinner 🍝'));
   final dm = await ben.startDirectChat(app.gateway.userId!);
-  await ben.sendMessage('Kannst du auf dem Heimweg Milch mitbringen?', threadId: dm);
+  await ben.sendMessage(t('Kannst du auf dem Heimweg Milch mitbringen?', 'Can you pick up milk on your way home?'), threadId: dm);
 
   final s = app.services;
   await s.openCalendar();
@@ -48,13 +50,13 @@ Future<AppServices> buildPreviewServices() async {
         location: place ?? '',
         colorIndex: color,
       ).then((_) {});
-  await ev('Elternabend Grundschule', 0, 19, 90, place: 'Aula', color: 1);
-  await ev('Zahnarzt Lena', 1, 9, 45, place: 'Praxis Dr. Berg', color: 2);
-  await ev('Fußballtraining', 2, 16, 90, place: 'Sportplatz', color: 3);
-  await ev('Familienessen bei Oma', 4, 12, 180, color: 0);
-  await ev('Geburtstag Ben', 6, 15, 120, color: 5);
+  await ev(t('Elternabend Grundschule', 'Parent evening'), 0, 19, 90, place: t('Aula', 'Assembly hall'), color: 1);
+  await ev(t('Zahnarzt Lena', 'Lena dentist'), 1, 9, 45, place: t('Praxis Dr. Berg', 'Dr. Berg Practice'), color: 2);
+  await ev(t('Fußballtraining', 'Soccer practice'), 2, 16, 90, place: t('Sportplatz', 'Sports field'), color: 3);
+  await ev(t('Familienessen bei Oma', 'Family dinner at Grandma’s'), 4, 12, 180, color: 0);
+  await ev(t('Geburtstag Ben', 'Ben’s birthday'), 6, 15, 120, color: 5);
 
-  for (final t in <(String, String)>[('Milch', '2 Liter'), ('Vollkornbrot', ''), ('Äpfel', '1 kg'), ('Nudeln', '500 g'), ('Tomaten', '6 Stück')]) {
+  for (final t in <(String, String)>[(t('Milch', 'Milk'), t('2 Liter', '2 liters')), (t('Vollkornbrot', 'Whole-grain bread'), ''), (t('Äpfel', 'Apples'), '1 kg'), (t('Nudeln', 'Pasta'), '500 g'), (t('Tomaten', 'Tomatoes'), t('6 Stück', '6 pieces'))]) {
     await s.shopping!.add(t.$1, quantity: t.$2);
   }
   await s.shopping!.setChecked(s.shopping!.items.last.id, true);
