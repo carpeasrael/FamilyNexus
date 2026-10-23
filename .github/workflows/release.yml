@@ -223,13 +223,17 @@ jobs:
       - name: Build SQLCipher
         run: vcpkg install sqlcipher:x64-windows
 
+      # Only the two DLLs SQLCipher needs go into the app (vcpkg also installs a plain sqlite3.dll, Tcl and more). The
+      # load test runs against exactly this set, so a missing dependency fails the build instead of the user's start.
       - name: Check SQLCipher library
         run: |
           bin="$VCPKG_INSTALLATION_ROOT/installed/x64-windows/bin"
           ls -l "$bin"
-          python - "$bin" <<'PY'
+          mkdir -p sqlcipher-dlls
+          cp "$bin/sqlcipher.dll" "$bin/libcrypto-3-x64.dll" sqlcipher-dlls/
+          python - sqlcipher-dlls <<'PY'
           import ctypes, os, sys
-          d = sys.argv[1]
+          d = os.path.abspath(sys.argv[1])
           os.add_dll_directory(d)
           lib = ctypes.CDLL(os.path.join(d, "sqlcipher.dll"))
           lib.sqlite3_libversion.restype = ctypes.c_char_p
@@ -246,7 +250,7 @@ jobs:
       - name: Assemble zip
         run: |
           out="build/windows/x64/runner/Release"
-          cp "$VCPKG_INSTALLATION_ROOT"/installed/x64-windows/bin/*.dll "$out/"
+          cp sqlcipher-dlls/*.dll "$out/"
           for f in msvcp140.dll vcruntime140.dll vcruntime140_1.dll; do cp "/c/Windows/System32/$f" "$out/"; done
           ls -l "$out"
           mkdir -p dist
