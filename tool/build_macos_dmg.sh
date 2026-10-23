@@ -35,9 +35,12 @@ else
   app="$export_dir/FamilyNexus.app"
   dmg="build/macos/dmg/FamilyNexus-v${version}-macos.dmg"
   codesign --verify --strict --deep "$app"
-  codesign -d --entitlements - "$app" 2>&1 | grep -q 'com.apple.security.app-sandbox' \
+  # Ausgabe zuerst einlesen: `grep -q` in einer Pipe beendet codesign vorzeitig (SIGPIPE) und lässt pipefail fehlschlagen.
+  entitlements=$(codesign -d --entitlements - "$app" 2>&1)
+  grep -q 'com.apple.security.app-sandbox' <<<"$entitlements" \
     || { echo "FEHLER: App-Sandbox fehlt in der exportierten App." >&2; exit 1; }
-  codesign -d -vv "$app" 2>&1 | grep -q 'flags=.*runtime' \
+  details=$(codesign -d -vv "$app" 2>&1)
+  grep -q 'flags=.*runtime' <<<"$details" \
     || { echo "FEHLER: Hardened Runtime fehlt (Notarisierung würde abgelehnt)." >&2; exit 1; }
 fi
 # DMG mit App und Verknüpfung auf /Programme zum Hineinziehen.
