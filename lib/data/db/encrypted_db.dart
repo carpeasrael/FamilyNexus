@@ -6,24 +6,28 @@ import 'package:sqflite_sqlcipher/sqflite.dart';
 
 /// Öffnet verschlüsselte SQLCipher-Datenbanken plattformabhängig (E-50).
 ///
-/// Android/iOS/macOS nutzen `sqflite_sqlcipher`, Linux `sqflite_common_ffi` mit
-/// der System-Bibliothek `libsqlcipher.so`. Beide liefern dieselbe
-/// `sqflite`-Schnittstelle.
+/// Android/iOS/macOS nutzen `sqflite_sqlcipher`, Linux und Windows `sqflite_common_ffi` mit
+/// `libsqlcipher.so` bzw. `sqlcipher.dll`. Beide liefern dieselbe `sqflite`-Schnittstelle.
 class EncryptedDb {
   const EncryptedDb._();
 
   static const _linuxAppId = 'de.inneso.familynexus';
 
-  static bool get _useFfi => Platform.isLinux;
+  static bool get _useFfi => Platform.isLinux || Platform.isWindows;
 
   /// Verzeichnis der Datenbankdateien.
   static Future<String> databasesPath() async {
     if (!_useFfi) return getDatabasesPath();
     final env = Platform.environment;
-    final xdg = env['XDG_DATA_HOME'];
-    final base = (xdg != null && xdg.isNotEmpty)
-        ? xdg
-        : p.join(env['HOME'] ?? '.', '.local', 'share');
+    final String base;
+    if (Platform.isWindows) {
+      // %LOCALAPPDATA%: nicht im Roaming-Profil, die Datenbank bleibt auf dem Gerät.
+      final local = env['LOCALAPPDATA'];
+      base = (local != null && local.isNotEmpty) ? local : p.join(env['USERPROFILE'] ?? '.', 'AppData', 'Local');
+    } else {
+      final xdg = env['XDG_DATA_HOME'];
+      base = (xdg != null && xdg.isNotEmpty) ? xdg : p.join(env['HOME'] ?? '.', '.local', 'share');
+    }
     final dir = Directory(p.join(base, _linuxAppId, 'databases'));
     await dir.create(recursive: true);
     return dir.path;

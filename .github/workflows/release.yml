@@ -1,7 +1,7 @@
 name: Release
 
-# Builds a signed release APK, a signed Android App Bundle (AAB, for Google Play) and a Linux Flatpak bundle for every
-# pushed version tag (v*) and attaches them, with SHA-256 files, to the GitHub release.
+# Builds a signed release APK, a signed Android App Bundle (AAB, for Google Play), a Linux Flatpak bundle and a Windows
+# zip (exe + DLLs) for every pushed version tag (v*) and attaches them, with SHA-256 files, to the GitHub release.
 # Required repository secrets (Settings -> Secrets and variables -> Actions):
 #   ANDROID_KEYSTORE_BASE64   upload keystore, base64-encoded (base64 -i upload-keystore.jks)
 #   ANDROID_KEYSTORE_PASSWORD keystore password
@@ -16,12 +16,12 @@ on:
         description: Existing tag to build and attach the files to (e.g. v1.0.1)
         required: true
       build:
-        description: What to build; "aab" keeps an existing APK asset untouched, "flatpak" builds only the Linux bundle
+        description: What to build; "aab" keeps an existing APK asset untouched, "flatpak" builds only the Linux bundle, "windows" only the Windows zip
         type: choice
-        options: [apk+aab, aab, flatpak]
+        options: [apk+aab, aab, flatpak, windows]
         default: apk+aab
       ref:
-        description: 'Only for "flatpak" - branch or commit to build instead of the tag (the file is still attached to the tag release)'
+        description: 'Only for "flatpak" and "windows" - branch or commit to build instead of the tag (the file is still attached to the tag release)'
         required: false
 
 permissions:
@@ -29,7 +29,7 @@ permissions:
 
 jobs:
   apk:
-    if: github.event.inputs.build != 'flatpak'
+    if: github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows'
     runs-on: ubuntu-latest
     env:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
@@ -157,7 +157,7 @@ jobs:
     needs: apk
     if: >-
       always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
-      && github.event.inputs.build != 'aab'
+      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'windows'
     runs-on: ubuntu-latest
     env:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
@@ -188,3 +188,83 @@ jobs:
             gh release create "$TAG" --title "FamilyNexus ${TAG#v}" --generate-notes --verify-tag
           fi
           gh release upload "$TAG" "build/flatpak/FamilyNexus-${TAG}.flatpak" "build/flatpak/FamilyNexus-${TAG}.flatpak.sha256" --clobber
+
+  # Windows: zip with familynexus.exe, Flutter runtime, SQLCipher (built from source with vcpkg, E-52) and the VC++
+  # runtime DLLs. Runs after the Android job so that only one job creates the GitHub release.
+  windows:
+    needs: apk
+    if: >-
+      always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
+      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'flatpak'
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'windows') && github.event.inputs.ref || env.TAG }}
+
+      - name: Check tag matches pubspec version
+        run: |
+          name=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
+          if [ "v$name" != "$TAG" ]; then echo "::error::Tag $TAG does not match pubspec version $name"; exit 1; fi
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.7"
+          channel: stable
+          cache: true
+
+      # SQLCipher from source (OpenSSL backend); no prebuilt database binary is downloaded.
+      - name: Build SQLCipher
+        run: vcpkg install sqlcipher:x64-windows
+
+      - name: Check SQLCipher library
+        run: |
+          bin="$VCPKG_INSTALLATION_ROOT/installed/x64-windows/bin"
+          ls -l "$bin"
+          python - "$bin" <<'PY'
+          import ctypes, os, sys
+          d = sys.argv[1]
+          os.add_dll_directory(d)
+          lib = ctypes.CDLL(os.path.join(d, "sqlcipher.dll"))
+          lib.sqlite3_libversion.restype = ctypes.c_char_p
+          lib.sqlite3_key
+          print("SQLite", lib.sqlite3_libversion().decode(), "with codec (sqlite3_key present)")
+          PY
+
+      - name: Build Windows app
+        run: |
+          flutter pub get
+          mkdir -p debug-info
+          flutter build windows --release --obfuscate --split-debug-info=debug-info
+
+      - name: Assemble zip
+        run: |
+          out="build/windows/x64/runner/Release"
+          cp "$VCPKG_INSTALLATION_ROOT"/installed/x64-windows/bin/*.dll "$out/"
+          for f in msvcp140.dll vcruntime140.dll vcruntime140_1.dll; do cp "/c/Windows/System32/$f" "$out/"; done
+          ls -l "$out"
+          mkdir -p dist
+          name="FamilyNexus-${TAG}-windows-x64.zip"
+          powershell -NoProfile -Command "Compress-Archive -Path '$out/*' -DestinationPath 'dist/$name' -Force"
+          (cd dist && sha256sum "$name" > "$name.sha256")
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: debug-info-windows-${{ env.TAG }}-run${{ github.run_number }}
+          path: debug-info/
+          retention-days: 90
+
+      - name: Attach to GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "FamilyNexus ${TAG#v}" --generate-notes --verify-tag
+          fi
+          gh release upload "$TAG" dist/* --clobber

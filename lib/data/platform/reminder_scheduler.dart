@@ -41,7 +41,7 @@ abstract class ReminderScheduler {
 class LocalReminderScheduler implements ReminderScheduler {
   LocalReminderScheduler([FlutterLocalNotificationsPlugin? plugin, bool? inAppTimers])
       : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
-        _inAppTimers = inAppTimers ?? Platform.isLinux;
+        _inAppTimers = inAppTimers ?? (Platform.isLinux || Platform.isWindows);
 
   final FlutterLocalNotificationsPlugin _plugin;
   static const String _channelId = 'reminders';
@@ -49,7 +49,8 @@ class LocalReminderScheduler implements ReminderScheduler {
   String _channelDescription = '';
   bool _ready = false;
 
-  /// Linux (E-50): Das Plugin kann dort nicht im Voraus planen (`zonedSchedule` fehlt). Die App hält die
+  /// Linux (E-50) und Windows (E-52): Das Plugin kann dort nicht verlässlich im Voraus planen
+  /// (Linux: `zonedSchedule` fehlt; Windows: Planung braucht eine registrierte App-Kennung). Die App hält die
   /// Erinnerungen selbst und zeigt fällige an, solange sie läuft. Geprüft wird gegen die Uhrzeit (nicht mit
   /// einem langen Timer), damit Erinnerungen auch nach einem Standby noch erscheinen.
   final bool _inAppTimers;

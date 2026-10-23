@@ -43,12 +43,14 @@ dev_dependencies:
 # SQLite für sqflite_common_ffi: unter Linux die System-Bibliothek libsqlcipher.so (im Flatpak aus dem
 # Quellcode gebaut, flatpak/de.inneso.familynexus.yml), kein heruntergeladenes Binary. Android/iOS/macOS
 # nutzen weiter sqflite_sqlcipher; dort wird über diesen Weg nichts gebündelt oder geladen (E-50).
+# Windows: sqlcipher.dll (im Release-Workflow mit vcpkg aus dem Quellcode gebaut und neben die exe gelegt, E-52).
 hooks:
   user_defines:
     sqlite3:
       source: system
       name: sqlite3
       name_linux: sqlcipher
+      name_windows: sqlcipher
 
 flutter:
   uses-material-design: true

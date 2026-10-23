@@ -80,8 +80,8 @@ class SettingsScreen extends StatelessWidget {
                 trailing: s.blockedUsers.isEmpty ? null : Text('${s.blockedUsers.length}'),
                 onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const BlockedUsersScreen())),
               ),
-              // Linux bietet keinen Schutz vor Bildschirmaufnahmen (SA-6): Schalter ausgeblendet.
-              if (!Platform.isLinux)
+              // Linux und Windows bieten keinen Schutz vor Bildschirmaufnahmen (SA-6): Schalter ausgeblendet.
+              if (!Platform.isLinux && !Platform.isWindows)
                 SwitchListTile(
                   title: Text(l.settingsSecureScreen),
                   subtitle: Text(l.settingsSecureScreenHint),
