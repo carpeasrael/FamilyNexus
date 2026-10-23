@@ -357,6 +357,8 @@ jobs:
 
   web-deploy:
     needs: web
+    # always(): `web` hängt hinter dem übersprungenen Android-Job; ohne dies würde auch dieser Job übersprungen.
+    if: always() && needs.web.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       pages: write
