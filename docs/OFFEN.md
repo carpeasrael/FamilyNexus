@@ -119,6 +119,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 - **SA-7:** Schutz hängt am Browser-Passwort; kein Bildschirmschutz, keine App-Sperre, kein Hardware-Schlüsselspeicher. Nicht auf fremden/gemeinsam genutzten Rechnern verwenden. Der Browser kann Website-Daten bei Speichermangel oder auf Wunsch löschen; dann ist die lokale Datenbank samt Tresor weg (Wiederherstellungsschlüssel der Matrix-Sicherung bereithalten).
 - Passwort vergessen = alle lokalen Daten löschen. Keine Passwortänderung in der App.
 - Der Matrix-Server muss Browseranfragen von `https://carpeasrael.github.io` erlauben (CORS; Synapse tut das standardmäßig) und per `https` erreichbar sein.
+- Das Zip im Release ist für den Betrieb am Stamm einer Adresse gebaut (`<base href="/">`); für einen Unterpfad die Zeile in `index.html` anpassen. Auf GitHub Pages läuft die Fassung für `/FamilyNexus/`.
 - Keine Erinnerungen und keine Benachrichtigungen (kein Hintergrunddienst im Browser). Einladungslinks (`familynexus://`) öffnen nichts automatisch: Link in der App einfügen. Keine Zwei-Spalten-Ansicht für große Fenster.
 - Nur ein Tab gleichzeitig (Web Locks). Ältere Browser ohne Web Locks erzwingen das nicht.
 - IndexedDB schreibt verzögert: Schließt man den Tab unmittelbar nach einer Änderung, kann sie fehlen.

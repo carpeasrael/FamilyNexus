@@ -85,7 +85,7 @@ The same workflow then builds the Linux Flatpak bundle (`FamilyNexus-v<version>.
 A third job builds the Windows zip (`FamilyNexus-v<version>-windows-x64.zip`: unzip and run `familynexus.exe`; unsigned, so SmartScreen
 warns on first start); *Run workflow* with `windows` rebuilds only that zip, and the optional `ref` input builds from a branch while attaching
 the file to the tag's release.
-The web app (`tool/build_web.sh`; zip `FamilyNexus-v<version>-web.zip` for self-hosting) is built, tested in headless Chrome and published on
+The web app (`tool/build_web.sh`; zip `FamilyNexus-v<version>-web.zip` for self-hosting at the root of a domain; for another path edit `<base href>` in its `index.html`) is built, tested in headless Chrome and published on
 GitHub Pages (`https://carpeasrael.github.io/FamilyNexus/`) by the last two jobs; *Run workflow* with `web` redeploys only the web app.
 Your data stays in the browser, encrypted and protected by a password you choose; see `docs/ENTSCHEIDUNGEN.md` (E-53) for the limits.
 
