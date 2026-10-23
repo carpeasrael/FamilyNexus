@@ -7,10 +7,10 @@
 | | |
 |---|---|
 | Nom du produit | FamilyNexus |
-| Version | 1.0.3 (build 4) |
+| Version | 1.0.4 (build 5) |
 | Identifiant | `de.inneso.familynexus` |
 | Plateformes | iOS 15+, macOS 12+ |
-| Fournisseur / éditeur | **[nom, adresse, contact de l'éditeur – à compléter]** |
+| Fournisseur / éditeur | **Alexander Ziemer, Nahestr. 31, 55593 Rüdesheim, Germany** |
 | Code source | Public, licence AGPL-3.0-or-later : https://github.com/carpeasrael/FamilyNexus |
 | Fonction principale | Agenda familial, messagerie familiale et liste de courses partagée |
 | Diffusion | Apple App Store (grand public, gratuit, sans version spécifique) |

@@ -7,10 +7,10 @@
 | | |
 |---|---|
 | Product name | FamilyNexus |
-| Version | 1.0.3 (build 4) |
+| Version | 1.0.4 (build 5) |
 | Bundle identifier | `de.inneso.familynexus` |
 | Platforms | iOS 15+, macOS 12+ (Android build exists, not distributed through the App Store) |
-| Supplier / publisher | **[publisher name, address, contact – to be filled in by the publisher]** |
+| Supplier / publisher | **Alexander Ziemer, Nahestr. 31, 55593 Rüdesheim, Germany** |
 | Source code | Publicly available under AGPL-3.0-or-later: https://github.com/carpeasrael/FamilyNexus |
 | Primary function | Family calendar, family messenger and shared shopping list |
 | Distribution | Apple App Store (mass market, free of charge, no custom versions) |
