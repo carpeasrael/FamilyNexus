@@ -20,6 +20,9 @@ on:
         type: choice
         options: [apk+aab, aab, flatpak]
         default: apk+aab
+      ref:
+        description: 'Only for "flatpak" - branch or commit to build instead of the tag (the file is still attached to the tag release)'
+        required: false
 
 permissions:
   contents: write
@@ -162,7 +165,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ env.TAG }}
+          ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'flatpak') && github.event.inputs.ref || env.TAG }}
 
       - name: Check tag matches pubspec version
         run: |
