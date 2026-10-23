@@ -15,10 +15,11 @@ mkdir -p "$HOME"
 chmod +x rustup-init
 ./rustup-init -y --profile minimal --default-toolchain stable --no-modify-path
 
-# Das Flutter-Werkzeug ruft clang/clang++ auf; das GNOME-SDK liefert gcc. Schlanke Weiterleitung statt Erweiterung.
+# Das Flutter-Werkzeug ruft clang/clang++ auf; das GNOME-SDK liefert gcc. Schlanke Weiterleitung statt Erweiterung;
+# -Wno-error, weil die Plugin-Vorlagen mit -Werror auf clang abgestimmt sind (gcc meldet z. B. ignored-attributes).
 mkdir -p "$root/.toolchain"
-printf '#!/bin/sh\nexec gcc "$@"\n' > "$root/.toolchain/clang"
-printf '#!/bin/sh\nexec g++ "$@"\n' > "$root/.toolchain/clang++"
+printf '#!/bin/sh\nexec gcc "$@" -Wno-error\n' > "$root/.toolchain/clang"
+printf '#!/bin/sh\nexec g++ "$@" -Wno-error\n' > "$root/.toolchain/clang++"
 chmod +x "$root/.toolchain/clang" "$root/.toolchain/clang++"
 export PATH="$root/.toolchain:$PATH"
 
