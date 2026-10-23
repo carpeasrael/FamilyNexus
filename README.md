@@ -52,6 +52,7 @@ Not included / known limitations: see [`docs/OFFEN.md`](docs/OFFEN.md).
 | Rust (`rustup`, Android targets) | `vodozemac` (cryptography) is built from source during the Android build |
 | Linux: clang, CMake, Ninja, GTK 3, libsecret, SQLCipher (`libsqlcipher.so`) | Linux build, and `flutter test` on Linux hosts |
 | `flatpak`, `flatpak-builder` (optional) | Linux Flatpak bundle (`tool/build_flatpak.sh`) |
+| Windows: Visual Studio (C++ desktop), vcpkg (`sqlcipher:x64-windows`) | Windows build; the release workflow builds it on GitHub (no local script) |
 | Docker (optional) | Local test homeserver for the end-to-end tests |
 
 ## Build and run
@@ -80,6 +81,9 @@ existing tag and leaves the APK asset untouched. Required repository secrets: `A
 The same workflow then builds the Linux Flatpak bundle (`FamilyNexus-v<version>.flatpak`, x86_64, needs no secrets) with
 `tool/build_flatpak.sh` and attaches it as well; *Run workflow* with `flatpak` rebuilds only that bundle. Install with
 `flatpak install --user FamilyNexus-v<version>.flatpak` (the GNOME runtime comes from Flathub).
+A third job builds the Windows zip (`FamilyNexus-v<version>-windows-x64.zip`: unzip and run `familynexus.exe`; unsigned, so SmartScreen
+warns on first start); *Run workflow* with `windows` rebuilds only that zip, and the optional `ref` input builds from a branch while attaching
+the file to the tag's release.
 
 ## Tests
 
