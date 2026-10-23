@@ -78,7 +78,7 @@ class Chrome:
     def __init__(self, chrome, width=1100, height=800, port=9333):
         self.dir = tempfile.mkdtemp()
         self.proc = subprocess.Popen([chrome, '--headless=new', '--disable-gpu', '--no-sandbox', f'--user-data-dir={self.dir}',
-            f'--remote-debugging-port={port}', f'--window-size={width},{height}', 'about:blank'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            f'--remote-debugging-port={port}', f'--window-size={width},{height}', '--lang=de-DE', 'about:blank'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
         for _ in range(60):
             try:
                 tabs = json.load(urllib.request.urlopen(f'http://127.0.0.1:{port}/json'))
@@ -88,6 +88,8 @@ class Chrome:
                 time.sleep(0.5)
         self.ws = WS(page['webSocketDebuggerUrl'])
         self.ws.send('Page.enable'); self.ws.send('Runtime.enable'); self.ws.send('Log.enable')
+        # Die App folgt der Browsersprache; die Prüfungen erwarten Deutsch (headless Chrome auf Linux meldet sonst en-US).
+        self.ws.send('Emulation.setLocaleOverride', locale='de-DE')
         self.ws.send('Emulation.setDeviceMetricsOverride', width=width, height=height, deviceScaleFactor=1, mobile=False)
     def goto(self, url, wait=8):
         self.ws.send('Page.navigate', url=url); time.sleep(wait)
