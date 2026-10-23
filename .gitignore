@@ -43,3 +43,6 @@ Prompt_FamilyNexus.md
 
 # Versehentlich angelegtes lokales Swift-Paket (eigenes Git-Repo)
 ios/MyLibrary/
+
+# Lokale Release-Dateien (Binärdateien aus den GitHub-Releases)
+release/
