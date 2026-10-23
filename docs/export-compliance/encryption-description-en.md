@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | Product name | FamilyNexus |
-| Version | 1.0.4 (build 5) |
+| Version | 1.0.4 (build 6) |
 | Bundle identifier | `de.inneso.familynexus` |
 | Platforms | iOS 15+, macOS 12+ (Android build exists, not distributed through the App Store) |
 | Supplier / publisher | **Alexander Ziemer, Nahestr. 31, 55593 Rüdesheim, Germany** |

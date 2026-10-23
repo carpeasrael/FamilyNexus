@@ -1,6 +1,6 @@
 # Export Compliance für App Store Connect
 
-Stand: 2026-10-23, App-Version 1.0.4 (Build 5). **Dies ist keine Rechtsberatung.** Alle Einordnungen sind Vorschläge auf Grundlage
+Stand: 2026-10-23, App-Version 1.0.4 (Build 6). **Dies ist keine Rechtsberatung.** Alle Einordnungen sind Vorschläge auf Grundlage
 von Apples Anleitung und der Projektquellen; Stellen mit **[verify]** bzw. „[publisher to confirm]“ muss der Herausgeber selbst klären.
 Eingereicht oder hochgeladen wurde nichts; personenbezogene Angaben (Name, Anschrift) sind bewusst nicht eingetragen.
 
@@ -64,7 +64,7 @@ lassen). Welche Unterlagen ein Einzelentwickler ohne Firma braucht, klärt die A
    tool/set_export_compliance.sh <Schlüsselwert>
    ```
    Das setzt `ITSAppUsesNonExemptEncryption = true` und `ITSEncryptionExportComplianceCode` in `ios/Runner/Info.plist` und
-   `macos/Runner/Info.plist`. Danach **Buildnummer erhöhen** (`pubspec.yaml`, z. B. `1.0.4+6`), `tool/build_ios_release.sh` und
+   `macos/Runner/Info.plist`. Danach **Buildnummer erhöhen** (`pubspec.yaml`, z. B. `1.0.4+7`), `tool/build_ios_release.sh` und
    `tool/build_macos_release.sh` ausführen und hochladen. Ohne die Angabe in der Info.plist fragt App Store Connect bei jedem Upload erneut.
 7. **Ohne Unterlagen (Weg A):** `tool/set_export_compliance.sh --no-code` setzt nur `ITSAppUsesNonExemptEncryption = true`; die
    Fragen im Fragebogen beantwortest du weiterhin selbst, bis Apple einen Schlüsselwert vergibt oder die Angabe akzeptiert.
