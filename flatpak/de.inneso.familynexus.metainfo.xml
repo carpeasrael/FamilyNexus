@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>de.inneso.familynexus</id>
+  <name>FamilyNexus</name>
+  <summary>Private family calendar and messenger, end-to-end encrypted</summary>
+  <summary xml:lang="de">Privater Familienkalender und Messenger, Ende-zu-Ende-verschlüsselt</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>AGPL-3.0-or-later</project_license>
+  <developer_name>inneso</developer_name>
+  <url type="homepage">https://github.com/carpeasrael/FamilyNexus</url>
+  <url type="bugtracker">https://github.com/carpeasrael/FamilyNexus/issues</url>
+  <description>
+    <p>FamilyNexus brings a shared calendar, chats, shopping lists and task lists together for one family. Data is stored locally in an encrypted database and synchronised end-to-end encrypted over a Matrix homeserver of your choice.</p>
+    <p lang="de">FamilyNexus vereint gemeinsamen Kalender, Chats, Einkaufslisten und Aufgabenlisten einer Familie. Die Daten liegen lokal in einer verschlüsselten Datenbank und werden Ende-zu-Ende-verschlüsselt über einen Matrix-Server Ihrer Wahl abgeglichen.</p>
+  </description>
+  <launchable type="desktop-id">de.inneso.familynexus.desktop</launchable>
+  <provides>
+    <binary>familynexus</binary>
+  </provides>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="1.0.4" date="2026-10-23" />
+  </releases>
+</component>

@@ -1,0 +1,72 @@
+# Flatpak-Manifest (E-50). Der Bau braucht Netzzugriff (pub, crates, Flutter-Engine) und ist deshalb nicht
+# Flathub-konform; Verteilung als Bundle über GitHub-Releases (tool/build_flatpak.sh).
+app-id: de.inneso.familynexus
+runtime: org.gnome.Platform
+runtime-version: '51'
+sdk: org.gnome.Sdk
+command: familynexus
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  - --share=network
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.freedesktop.secrets
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /share/man
+modules:
+  # SQLCipher aus dem Quellcode: eigener Dateiname (libsqlcipher.so), verdrängt nicht das libsqlite3 der Laufzeit.
+  # -Bsymbolic: GTK lädt das System-libsqlite3 vorher; ohne dies würden interne Aufrufe dorthin umgebogen (Absturz).
+  - name: sqlcipher
+    buildsystem: autotools
+    config-opts:
+      - --enable-tempstore=yes
+      - --disable-tcl
+      - --disable-readline
+      - --disable-static
+    build-options:
+      env:
+        CFLAGS: -DSQLITE_HAS_CODEC -DSQLITE_TEMP_STORE=2 -O2
+        LDFLAGS: -lcrypto -Wl,-Bsymbolic
+    cleanup:
+      - /bin
+    sources:
+      - type: archive
+        url: https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v4.19.0.tar.gz
+        sha256: 7075f96cbabe45b4ecfc2e6b1745a625f856f695b0827a5506ce9ed85b906aa0
+
+  - name: familynexus
+    buildsystem: simple
+    build-options:
+      build-args:
+        - --share=network
+    build-commands:
+      - flatpak/build-app.sh
+    sources:
+      - type: dir
+        path: ..
+        skip:
+          - .git
+          - .dart_tool
+          - build
+          - coverage
+          - debug-info
+          - android
+          - ios
+          - macos
+          - integration_test
+          - test
+          - test_driver
+          - store
+          - docs
+      - type: archive
+        url: https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.47.7-stable.tar.xz
+        sha256: af7455f540df951184c7953fbe3cf884766e7541dacf8571f9f582db03dd6230
+        dest: .flutter-sdk
+        strip-components: 1
+      - type: file
+        url: https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init
+        sha256: 5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4

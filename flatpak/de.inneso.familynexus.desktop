@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=FamilyNexus
+GenericName=Family calendar and messenger
+GenericName[de]=Familienkalender und Messenger
+Comment=Private family calendar and messenger, end-to-end encrypted
+Comment[de]=Privater Familienkalender und Messenger, Ende-zu-Ende-verschlüsselt
+Exec=familynexus %u
+Icon=de.inneso.familynexus
+Terminal=false
+Categories=Network;InstantMessaging;Calendar;
+MimeType=x-scheme-handler/familynexus;
+StartupWMClass=de.inneso.familynexus
