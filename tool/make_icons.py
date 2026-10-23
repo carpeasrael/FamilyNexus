@@ -59,6 +59,10 @@ for n in (16, 32, 64, 128, 256, 512, 1024):
 for n in (128, 256, 512):
     save(mac, f"flatpak/icons/{n}x{n}/de.inneso.familynexus.png", n)
 
+# Windows: .ico mit mehreren Größen aus demselben abgerundeten Quadrat
+mac.convert("RGBA").save(os.path.join(ROOT, "windows/runner/resources/app_icon.ico"),
+                         sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
+
 # Android: Legacy-Symbole + adaptives Symbol (Vordergrund PNG, Hintergrund Farbe/Verlauf)
 for folder, size in (("mdpi", 48), ("hdpi", 72), ("xhdpi", 96), ("xxhdpi", 144), ("xxxhdpi", 192)):
     rounded = Image.new("RGBA", (S, S), (0, 0, 0, 0))
