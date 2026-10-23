@@ -46,3 +46,8 @@ ios/MyLibrary/
 
 # Lokale Release-Dateien (Binärdateien aus den GitHub-Releases)
 release/
+
+# Web-Version: von tool/web_assets.sh geholt bzw. gebaut
+web/sqlite3mc.wasm
+web/pkg/
+pubspec_overrides.yaml

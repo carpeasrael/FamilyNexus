@@ -1,7 +1,8 @@
 name: Release
 
-# Builds a signed release APK, a signed Android App Bundle (AAB, for Google Play), a Linux Flatpak bundle and a Windows
-# zip (exe + DLLs) for every pushed version tag (v*) and attaches them, with SHA-256 files, to the GitHub release.
+# Builds a signed release APK, a signed Android App Bundle (AAB, for Google Play), a Linux Flatpak bundle, a Windows
+# zip (exe + DLLs) and the web app (zip, also published on GitHub Pages) for every pushed version tag (v*) and attaches
+# them, with SHA-256 files, to the GitHub release.
 # Required repository secrets (Settings -> Secrets and variables -> Actions):
 #   ANDROID_KEYSTORE_BASE64   upload keystore, base64-encoded (base64 -i upload-keystore.jks)
 #   ANDROID_KEYSTORE_PASSWORD keystore password
@@ -16,12 +17,12 @@ on:
         description: Existing tag to build and attach the files to (e.g. v1.0.1)
         required: true
       build:
-        description: What to build; "aab" keeps an existing APK asset untouched, "flatpak" builds only the Linux bundle, "windows" only the Windows zip
+        description: What to build; "aab" keeps an existing APK asset untouched, "flatpak" builds only the Linux bundle, "windows" only the Windows zip, "web" only the web app
         type: choice
-        options: [apk+aab, aab, flatpak, windows]
+        options: [apk+aab, aab, flatpak, windows, web]
         default: apk+aab
       ref:
-        description: 'Only for "flatpak" and "windows" - branch or commit to build instead of the tag (the file is still attached to the tag release)'
+        description: 'Only for "flatpak", "windows" and "web" - branch or commit to build instead of the tag (the file is still attached to the tag release)'
         required: false
 
 permissions:
@@ -29,7 +30,7 @@ permissions:
 
 jobs:
   apk:
-    if: github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows'
+    if: github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows' && github.event.inputs.build != 'web'
     runs-on: ubuntu-latest
     env:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
@@ -157,7 +158,7 @@ jobs:
     needs: apk
     if: >-
       always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
-      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'windows'
+      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'windows' && github.event.inputs.build != 'web'
     runs-on: ubuntu-latest
     env:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
@@ -195,7 +196,7 @@ jobs:
     needs: apk
     if: >-
       always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
-      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'flatpak'
+      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'web'
     runs-on: windows-latest
     defaults:
       run:
@@ -272,3 +273,97 @@ jobs:
             gh release create "$TAG" --title "FamilyNexus ${TAG#v}" --generate-notes --verify-tag
           fi
           gh release upload "$TAG" dist/* --clobber
+
+  # Web: build with WebAssembly parts (SQLite3MultipleCiphers from a pinned release, vodozemac built from source),
+  # test in headless Chrome, attach a zip to the release and hand the files to the Pages deployment below (E-53).
+  web:
+    needs: apk
+    if: >-
+      always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
+      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows'
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'web') && github.event.inputs.ref || env.TAG }}
+
+      - name: Check tag matches pubspec version
+        run: |
+          name=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
+          if [ "v$name" != "$TAG" ]; then echo "::error::Tag $TAG does not match pubspec version $name"; exit 1; fi
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.7"
+          channel: stable
+          cache: true
+
+      # vodozemac for the browser: Rust nightly (build-std), wasm-pack, wasm-bindgen and the code generator are pinned.
+      - name: Rust toolchain for WebAssembly
+        run: rustup toolchain install nightly-2026-10-22 --profile minimal -c rust-src -t wasm32-unknown-unknown
+
+      - name: Cache Rust tools
+        id: tools
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin
+          key: web-tools-frb2.13.0-wasm-bindgen0.2.100-wasm-pack0.15.0-${{ runner.os }}
+
+      - name: Install Rust tools
+        if: steps.tools.outputs.cache-hit != 'true'
+        run: |
+          cargo install flutter_rust_bridge_codegen --version 2.13.0 --locked
+          cargo install wasm-bindgen-cli --version 0.2.100 --locked
+          cargo install wasm-pack --version 0.15.0 --locked
+
+      - name: Build web app
+        run: |
+          flutter pub get
+          WASM_RUSTUP_TOOLCHAIN=nightly-2026-10-22 tool/web_assets.sh
+          tool/web_matrix_patch.sh
+          tool/build_web.sh
+
+      - name: Self-test (database, vault, vodozemac) in headless Chrome
+        run: tool/web_selftest.sh
+
+      - name: Smoke test (start, vault, unlock) in headless Chrome
+        run: python3 tool/web_smoke.py google-chrome
+
+      - name: Build for GitHub Pages
+        run: BASE_HREF=/FamilyNexus/ tool/build_web.sh
+
+      - name: Zip for self-hosting
+        run: |
+          mkdir -p dist
+          name="FamilyNexus-${TAG}-web.zip"
+          (cd build/web_app && zip -qr "../../dist/$name" .)
+          (cd dist && sha256sum "$name" > "$name.sha256")
+
+      - name: Attach to GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "FamilyNexus ${TAG#v}" --generate-notes --verify-tag
+          fi
+          gh release upload "$TAG" dist/* --clobber
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web_app
+
+  web-deploy:
+    needs: web
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

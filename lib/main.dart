@@ -5,7 +5,11 @@ import 'app/app_services.dart';
 import 'app/bootstrap.dart';
 import 'app/quiet_zone.dart';
 import 'app/startup_failure.dart';
+import 'app/web_gate.dart';
 import 'core/app_log.dart';
+import 'core/platform_info.dart';
+import 'data/platform/key_store.dart';
+import 'data/platform/vault_key_store.dart';
 
 void main() => runInQuietZone(() {
       WidgetsFlutterBinding.ensureInitialized();
@@ -21,9 +25,26 @@ class _Bootstrapper extends StatefulWidget {
 }
 
 class _BootstrapperState extends State<_Bootstrapper> {
-  late Future<AppServices> _future = bootstrap();
+  /// Browser: Der Start wartet auf das Tresorpasswort (E-53); sonst gibt es keinen Tresor.
+  final VaultBackend? _vault = PlatformInfo.isWeb ? createWebVaultBackend() : null;
+  KeyStore? _webKeys;
+  Future<AppServices>? _future;
 
-  void _retry() => setState(() => _future = bootstrap());
+  @override
+  void initState() {
+    super.initState();
+    if (_vault == null) _future = bootstrap();
+  }
+
+  /// [relock]: Browser nach dem Löschen aller Daten wieder zur Passwortabfrage.
+  void _retry({bool relock = false}) => setState(() {
+        if (_vault == null) {
+          _future = bootstrap();
+          return;
+        }
+        if (relock) _webKeys = null;
+        _future = _webKeys == null ? null : bootstrap(keyStore: _webKeys);
+      });
 
   /// Vollständige lokale Löschung: abmelden, Datenbanken schließen und löschen, Schlüssel entfernen.
   Future<void> _fullReset(AppServices services) async {
@@ -41,16 +62,28 @@ class _BootstrapperState extends State<_Bootstrapper> {
     await services.gateway.close();
     await services.database?.close();
     await resetLocalData(keyStore: services.keyStore);
-    if (mounted) _retry();
+    if (mounted) _retry(relock: true);
   }
 
   Future<void> _reset() async {
-    await resetLocalData();
-    _retry();
+    await resetLocalData(keyStore: _webKeys);
+    _retry(relock: true);
   }
 
   @override
-  Widget build(BuildContext context) => FutureBuilder<AppServices>(
+  Widget build(BuildContext context) {
+    final vault = _vault;
+    if (vault != null && _webKeys == null) {
+      return WebUnlockApp(
+        backend: vault,
+        onWipe: () => wipeWebData(vault),
+        onUnlocked: (keys) => setState(() {
+          _webKeys = keys;
+          _future = bootstrap(keyStore: keys);
+        }),
+      );
+    }
+    return FutureBuilder<AppServices>(
         future: _future,
         builder: (context, snap) {
           if (snap.hasError) {
@@ -63,4 +96,5 @@ class _BootstrapperState extends State<_Bootstrapper> {
           return FamilyNexusApp(services: services);
         },
       );
+  }
 }

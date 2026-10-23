@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../core/app_log.dart';
+import '../../core/platform_info.dart';
 import '../../domain/reminder_planner.dart';
 import '../../domain/time_zones.dart';
 
@@ -41,7 +41,7 @@ abstract class ReminderScheduler {
 class LocalReminderScheduler implements ReminderScheduler {
   LocalReminderScheduler([FlutterLocalNotificationsPlugin? plugin, bool? inAppTimers])
       : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
-        _inAppTimers = inAppTimers ?? (Platform.isLinux || Platform.isWindows);
+        _inAppTimers = inAppTimers ?? PlatformInfo.usesInAppReminders;
 
   final FlutterLocalNotificationsPlugin _plugin;
   static const String _channelId = 'reminders';

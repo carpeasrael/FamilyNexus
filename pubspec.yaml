@@ -19,6 +19,10 @@ dependencies:
   sqflite_sqlcipher: 3.4.1
   # Linux: SQLCipher über FFI (E-50); Bibliothek siehe `hooks` unten.
   sqflite_common_ffi: 2.4.4
+  sqflite_common: 2.5.14
+  sqflite_common_ffi_web: 1.2.0
+  # Browser: SQLite3MultipleCiphers über package:sqlite3 (WebAssembly), siehe E-53.
+  sqlite3: 3.5.2
   flutter_secure_storage: 11.2.0
   path: 1.9.1
   http: 1.6.0
@@ -30,6 +34,7 @@ dependencies:
   qr: 4.0.0
   local_auth: 3.0.2
   url_launcher: 6.3.3
+  web: 1.1.1
 
 dev_dependencies:
   flutter_test:

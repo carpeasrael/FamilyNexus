@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <!-- Wird durch `--base-href` des Builds ersetzt (GitHub Pages: /FamilyNexus/). -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FamilyNexus – Familienkalender und Messenger. Local-first, Matrix-E2EE.">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#0b1d26">
+  <!--
+    Eigene Inhaltsrichtlinie (GitHub Pages setzt keine Header): nur Dateien dieser Adresse, Verbindungen nur per https
+    zum gewählten Matrix-Server. 'wasm-unsafe-eval' für CanvasKit, SQLite3MultipleCiphers und vodozemac (WebAssembly);
+    'unsafe-eval', weil die vodozemac-Anbindung (wasm-bindgen/flutter_rust_bridge) `new Function` nutzt. Es gibt keine
+    Inline-Skripte und keine fremden Skriptquellen.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https: blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="FamilyNexus">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>FamilyNexus</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    html, body { margin: 0; height: 100%; background: #0b1d26; }
+  </style>
+</head>
+<body>
+  <noscript>FamilyNexus braucht JavaScript. / FamilyNexus needs JavaScript.</noscript>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

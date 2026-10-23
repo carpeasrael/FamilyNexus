@@ -2965,6 +2965,108 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.'**
   String get privacy12Body;
+
+  /// No description provided for @webUnlockTitleCreate.
+  ///
+  /// In de, this message translates to:
+  /// **'Browser-Tresor einrichten'**
+  String get webUnlockTitleCreate;
+
+  /// No description provided for @webUnlockBodyCreate.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Browser speichert deine Daten verschlüsselt. Wähle dafür ein Passwort. Es wird nirgends gespeichert und kann nicht wiederhergestellt werden; wer es vergisst, kann nur alle lokalen Daten löschen und sich neu anmelden.'**
+  String get webUnlockBodyCreate;
+
+  /// No description provided for @webUnlockTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'FamilyNexus entsperren'**
+  String get webUnlockTitle;
+
+  /// No description provided for @webUnlockBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Gib das Passwort für diesen Browser ein.'**
+  String get webUnlockBody;
+
+  /// No description provided for @webPassword.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwort'**
+  String get webPassword;
+
+  /// No description provided for @webPasswordRepeat.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwort wiederholen'**
+  String get webPasswordRepeat;
+
+  /// No description provided for @webPasswordTooShort.
+  ///
+  /// In de, this message translates to:
+  /// **'Mindestens 10 Zeichen.'**
+  String get webPasswordTooShort;
+
+  /// No description provided for @webPasswordMismatch.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Passwörter stimmen nicht überein.'**
+  String get webPasswordMismatch;
+
+  /// No description provided for @webPasswordWrong.
+  ///
+  /// In de, this message translates to:
+  /// **'Falsches Passwort.'**
+  String get webPasswordWrong;
+
+  /// No description provided for @webUnlockAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Entsperren'**
+  String get webUnlockAction;
+
+  /// No description provided for @webCreateAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Tresor anlegen'**
+  String get webCreateAction;
+
+  /// No description provided for @webUnlockBusy.
+  ///
+  /// In de, this message translates to:
+  /// **'Wird entsperrt …'**
+  String get webUnlockBusy;
+
+  /// No description provided for @webForgotPassword.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwort vergessen? Alle lokalen Daten löschen'**
+  String get webForgotPassword;
+
+  /// No description provided for @webTabBusyTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'FamilyNexus ist schon geöffnet'**
+  String get webTabBusyTitle;
+
+  /// No description provided for @webTabBusyBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Die App läuft bereits in einem anderen Tab oder Fenster dieses Browsers. Zwei Tabs gleichzeitig würden die lokalen Daten beschädigen. Schließe den anderen Tab und versuche es erneut.'**
+  String get webTabBusyBody;
+
+  /// No description provided for @privacy13Title.
+  ///
+  /// In de, this message translates to:
+  /// **'Browser-Version'**
+  String get privacy13Title;
+
+  /// No description provided for @privacy13Body.
+  ///
+  /// In de, this message translates to:
+  /// **'In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz und keine Erinnerungen bei geschlossener Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach.'**
+  String get privacy13Body;
 }
 
 class _AppLocalizationsDelegate

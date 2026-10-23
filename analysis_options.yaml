@@ -9,6 +9,7 @@ analyzer:
     - linux/**
     - windows/**
     - lib/l10n/gen/**
+    - web/**
   language:
     strict-casts: true
     strict-raw-types: true

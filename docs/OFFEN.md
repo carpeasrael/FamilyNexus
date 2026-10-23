@@ -113,6 +113,18 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 - Nur **x64**. Erinnerungen erscheinen nur, solange die App läuft. Kein Installer (Zip zum Entpacken).
 - Die Plugin-Vorlagen brauchen unter neueren Visual-Studio-Versionen `_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS` (`windows/CMakeLists.txt`); entfällt, sobald `local_auth_windows` auf C++20-Coroutinen umgestellt ist.
 
+## Web-Version (E-53)
+
+- Gebaut und im Release-Workflow in Chrome (headless) geprüft: Datenbank-Verschlüsselung, Tresor, vodozemac, Start, Entsperren. **Nicht geprüft:** Anmeldung gegen einen echten Matrix-Server, Chat, Termine, Dateiauswahl, andere Browser (Firefox, Safari), Mobilbrowser, Installation als PWA.
+- **SA-7:** Schutz hängt am Browser-Passwort; kein Bildschirmschutz, keine App-Sperre, kein Hardware-Schlüsselspeicher. Nicht auf fremden/gemeinsam genutzten Rechnern verwenden. Der Browser kann Website-Daten bei Speichermangel oder auf Wunsch löschen; dann ist die lokale Datenbank samt Tresor weg (Wiederherstellungsschlüssel der Matrix-Sicherung bereithalten).
+- Passwort vergessen = alle lokalen Daten löschen. Keine Passwortänderung in der App.
+- Der Matrix-Server muss Browseranfragen von `https://carpeasrael.github.io` erlauben (CORS; Synapse tut das standardmäßig) und per `https` erreichbar sein.
+- Keine Erinnerungen und keine Benachrichtigungen (kein Hintergrunddienst im Browser). Einladungslinks (`familynexus://`) öffnen nichts automatisch: Link in der App einfügen. Keine Zwei-Spalten-Ansicht für große Fenster.
+- Nur ein Tab gleichzeitig (Web Locks). Ältere Browser ohne Web Locks erzwingen das nicht.
+- IndexedDB schreibt verzögert: Schließt man den Tab unmittelbar nach einer Änderung, kann sie fehlen.
+- `'unsafe-eval'` in der Inhaltsrichtlinie (vodozemac-Anbindung); entfällt, sobald die Anbindung ohne `new Function` auskommt.
+- Das SDK-Patch-Skript ist auf `matrix` 14.2.0 festgelegt und bricht bei jeder anderen Version ab (bewusst).
+
 ## Betrieb / Build
 
 - Ende-zu-Ende-Tests laufen nur lokal gegen einen eigenen Synapse (`tool/e2e.sh`), nicht gegen Produktivserver.

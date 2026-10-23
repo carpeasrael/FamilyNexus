@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/platform_info.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/widgets/glass.dart';
 
@@ -23,6 +24,7 @@ class PrivacyScreen extends StatelessWidget {
       (l.privacy10Title, l.privacy10Body),
       (l.privacy11Title, l.privacy11Body),
       (l.privacy12Title, l.privacy12Body),
+      if (PlatformInfo.isWeb) (l.privacy13Title, l.privacy13Body),
     ];
     return Scaffold(
       appBar: AppBar(title: Text(l.privacyTitle)),

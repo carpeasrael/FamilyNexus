@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:path/path.dart' as p;
 import 'package:sqflite_sqlcipher/sqflite.dart';
 
@@ -137,7 +135,7 @@ class AppDatabase {
     required String keyName,
     required String path,
   }) async {
-    if (File(path).existsSync()) {
+    if (await EncryptedDb.exists(path)) {
       final existing = await keyStore.readKey(keyName);
       if (existing == null) throw const KeyLostException();
       return existing;

@@ -1,8 +1,8 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
+import '../../core/platform_info.dart';
 import '../../domain/app_settings.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../data/platform/reminder_scheduler.dart';
@@ -80,8 +80,8 @@ class SettingsScreen extends StatelessWidget {
                 trailing: s.blockedUsers.isEmpty ? null : Text('${s.blockedUsers.length}'),
                 onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const BlockedUsersScreen())),
               ),
-              // Linux und Windows bieten keinen Schutz vor Bildschirmaufnahmen (SA-6): Schalter ausgeblendet.
-              if (!Platform.isLinux && !Platform.isWindows)
+              // Linux, Windows und Browser bieten keinen Schutz vor Bildschirmaufnahmen (SA-6): Schalter ausgeblendet.
+              if (!PlatformInfo.hasNoScreenProtection)
                 SwitchListTile(
                   title: Text(l.settingsSecureScreen),
                   subtitle: Text(l.settingsSecureScreenHint),

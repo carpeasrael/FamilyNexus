@@ -19,11 +19,15 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `matrix` | direct main | 14.2.0 | 2026-10-20 | agpl-3.0 | 150 | ok |
 | `path` | direct main | 1.9.1 | 2024-10-17 | bsd-3-clause | 160 | ok |
 | `qr` | direct main | 4.0.0 | 2026-05-16 | bsd-3-clause | 160 | ok |
+| `sqflite_common` | direct main | 2.5.14 | — | bsd-2-clause | — | Web-Fabrik (E-53), vorher nur transitiv |
 | `sqflite_common_ffi` | direct main | 2.4.4 | 2026-10-13 | bsd-2-clause | 160 | ok |
+| `sqflite_common_ffi_web` | direct main | 1.2.0 | — | bsd-2-clause | — | nur Browser (E-53) |
 | `sqflite_sqlcipher` | direct main | 3.4.1 | 2026-08-04 | mit | 150 | ok |
+| `sqlite3` | direct main | 3.5.2 | — | mit | — | Browser: WebAssembly-Anbindung (E-53), vorher nur transitiv |
 | `timezone` | direct main | 0.11.2 | 2026-10-12 | bsd-2-clause | 160 | ok |
 | `url_launcher` | direct main | 6.3.3 | 2026-10-02 | bsd-3-clause | 160 | ok |
 | `uuid` | direct main | 4.6.0 | 2026-07-15 | mit | 160 | ok |
+| `web` | direct main | 1.1.1 | — | bsd-3-clause | — | Browser: WebCrypto, Web Locks (E-53), vorher nur transitiv |
 | `flutter_lints` | direct dev | 6.0.0 | 2025-05-27 | bsd-3-clause | 160 | ok |
 | `flutter_test` | direct dev | 0.0.0 | — | — | — | SDK/lokal |
 | `integration_test` | direct dev | 0.0.0 | — | — | — | SDK/lokal |

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
@@ -6,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_vodozemac/flutter_vodozemac.dart' as vod;
 
 import '../core/app_log.dart';
+import '../core/platform_info.dart';
 import '../data/db/app_database.dart';
 import '../data/db/key_value_store.dart';
 import '../data/db/sql_event_store.dart';
@@ -26,6 +26,7 @@ import '../data/platform/key_store.dart';
 import '../data/platform/link_source.dart';
 import '../data/platform/reminder_scheduler.dart';
 import '../data/platform/screen_protection.dart';
+import '../data/platform/vault_key_store.dart';
 import '../features/lock/app_lock_controller.dart';
 import '../features/settings/settings_controller.dart';
 import '../l10n/gen/app_localizations.dart';
@@ -68,10 +69,11 @@ Future<AppServices> bootstrap({KeyStore? keyStore}) async {
     // Offline/Serverfehler beim Start: Sitzung bleibt lokal bestehen, Sync holt auf.
   }
   final kv = SqlKeyValueStore(database.db);
-  final scheduler = LocalReminderScheduler();
+  // Browser: keine Erinnerungen (E-53); ohne Scheduler gibt es auch keinen Koordinator.
+  final LocalReminderScheduler? scheduler = PlatformInfo.isWeb ? null : LocalReminderScheduler();
   final lang = settings.settings.languageCode ?? WidgetsBinding.instance.platformDispatcher.locale.languageCode;
   final l10n = lookupAppLocalizations(Locale(lang == 'de' ? 'de' : 'en'));
-  await scheduler.initialize(channelName: l10n.reminderChannelName, channelDescription: l10n.reminderChannelDescription);
+  await scheduler?.initialize(channelName: l10n.reminderChannelName, channelDescription: l10n.reminderChannelDescription);
   return AppServices(
     scheduler: scheduler,
     calendarBuilder: (userId) async {
@@ -84,7 +86,7 @@ Future<AppServices> bootstrap({KeyStore? keyStore}) async {
         await store.wipe();
         await SqlShoppingStore(database.db).wipe();
         await SqlTaskStore(database.db).wipe();
-        await scheduler.cancelAll();
+        await scheduler?.cancelAll();
       }
       await kv.write('calendarOwner', owner);
       final zone = await SystemDeviceTimeZone().current();
@@ -118,7 +120,7 @@ Future<AppServices> bootstrap({KeyStore? keyStore}) async {
     gateway: gateway,
     files: SystemFileAccess(),
     links: PlatformLinkSource(),
-    lock: AppLockController(settings: settings, auth: Platform.isLinux ? const UnavailableDeviceAuth() : LocalDeviceAuth()),
+    lock: AppLockController(settings: settings, auth: PlatformInfo.hasNoDeviceAuth ? const UnavailableDeviceAuth() : LocalDeviceAuth()),
     screenProtection: PlatformScreenProtection(),
     database: database,
     keyStore: keys,
@@ -133,8 +135,15 @@ Future<void> resetLocalData({KeyStore? keyStore}) async {
   await (keyStore ?? SecureKeyStore()).deleteAll();
 }
 
+/// Browser: löscht Tresor und beide Datenbanken, ohne sie entsperrt zu haben (Passwort vergessen).
+Future<void> wipeWebData(VaultBackend vault) async {
+  await AppDatabase.destroy();
+  await AppDatabase.destroy(name: SdkMatrixGateway.matrixDbFileName);
+  await vault.destroy();
+}
+
 /// Entfernt geplante Erinnerungen, ohne die App vollständig initialisiert zu haben.
 class AppReminderCleanup {
   const AppReminderCleanup._();
-  static Future<void> cancelAll() => LocalReminderScheduler().cancelAll();
+  static Future<void> cancelAll() => PlatformInfo.isWeb ? Future<void>.value() : LocalReminderScheduler().cancelAll();
 }

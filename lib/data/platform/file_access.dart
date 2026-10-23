@@ -28,7 +28,8 @@ class SystemFileAccess implements FileAccess {
   Future<PickedFile?> pickFile() async {
     final file = await FilePicker.pickFile();
     if (file == null) return null;
-    final size = file.lengthSync() ?? await file.length();
+    // Browser: kein Dateipfad, `lengthSync` steht dort nicht zur Verfügung.
+    final size = kIsWeb ? await file.length() : (file.lengthSync() ?? await file.length());
     if (size == null || size > AttachmentPolicy.maxBytes) throw const FileTooLargeException();
     final bytes = await file.readAsBytes();
     // Der Auswahldialog kopiert die Datei in den App-Cache: Kopie sofort entfernen.

@@ -53,6 +53,7 @@ Not included / known limitations: see [`docs/OFFEN.md`](docs/OFFEN.md).
 | Linux: clang, CMake, Ninja, GTK 3, libsecret, SQLCipher (`libsqlcipher.so`) | Linux build, and `flutter test` on Linux hosts |
 | `flatpak`, `flatpak-builder` (optional) | Linux Flatpak bundle (`tool/build_flatpak.sh`) |
 | Windows: Visual Studio (C++ desktop), vcpkg (`sqlcipher:x64-windows`) | Windows build; the release workflow builds it on GitHub (no local script) |
+| Web: Rust nightly + `wasm32-unknown-unknown`, `wasm-pack`, `wasm-bindgen-cli` 0.2.100, `flutter_rust_bridge_codegen` 2.13.0, Chrome | Web build (`tool/build_web.sh`, tests `tool/web_selftest.sh`, `tool/web_smoke.py`) |
 | Docker (optional) | Local test homeserver for the end-to-end tests |
 
 ## Build and run
@@ -84,6 +85,9 @@ The same workflow then builds the Linux Flatpak bundle (`FamilyNexus-v<version>.
 A third job builds the Windows zip (`FamilyNexus-v<version>-windows-x64.zip`: unzip and run `familynexus.exe`; unsigned, so SmartScreen
 warns on first start); *Run workflow* with `windows` rebuilds only that zip, and the optional `ref` input builds from a branch while attaching
 the file to the tag's release.
+The web app (`tool/build_web.sh`; zip `FamilyNexus-v<version>-web.zip` for self-hosting) is built, tested in headless Chrome and published on
+GitHub Pages (`https://carpeasrael.github.io/FamilyNexus/`) by the last two jobs; *Run workflow* with `web` redeploys only the web app.
+Your data stays in the browser, encrypted and protected by a password you choose; see `docs/ENTSCHEIDUNGEN.md` (E-53) for the limits.
 
 ## Tests
 

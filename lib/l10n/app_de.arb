@@ -987,5 +987,22 @@
     }
   },
   "privacy12Title": "Aufgabenlisten",
-  "privacy12Body": "Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur Metadaten wie Zeitpunkte und Größe."
+  "privacy12Body": "Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.",
+  "webUnlockTitleCreate": "Browser-Tresor einrichten",
+  "webUnlockBodyCreate": "Dieser Browser speichert deine Daten verschlüsselt. Wähle dafür ein Passwort. Es wird nirgends gespeichert und kann nicht wiederhergestellt werden; wer es vergisst, kann nur alle lokalen Daten löschen und sich neu anmelden.",
+  "webUnlockTitle": "FamilyNexus entsperren",
+  "webUnlockBody": "Gib das Passwort für diesen Browser ein.",
+  "webPassword": "Passwort",
+  "webPasswordRepeat": "Passwort wiederholen",
+  "webPasswordTooShort": "Mindestens 10 Zeichen.",
+  "webPasswordMismatch": "Die Passwörter stimmen nicht überein.",
+  "webPasswordWrong": "Falsches Passwort.",
+  "webUnlockAction": "Entsperren",
+  "webCreateAction": "Tresor anlegen",
+  "webUnlockBusy": "Wird entsperrt …",
+  "webForgotPassword": "Passwort vergessen? Alle lokalen Daten löschen",
+  "webTabBusyTitle": "FamilyNexus ist schon geöffnet",
+  "webTabBusyBody": "Die App läuft bereits in einem anderen Tab oder Fenster dieses Browsers. Zwei Tabs gleichzeitig würden die lokalen Daten beschädigen. Schließe den anderen Tab und versuche es erneut.",
+  "privacy13Title": "Browser-Version",
+  "privacy13Body": "In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz und keine Erinnerungen bei geschlossener Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach."
 }

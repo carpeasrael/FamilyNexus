@@ -1704,4 +1704,58 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get privacy12Body =>
       'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. The server only sees metadata such as times and size.';
+
+  @override
+  String get webUnlockTitleCreate => 'Set up the browser vault';
+
+  @override
+  String get webUnlockBodyCreate =>
+      'This browser stores your data encrypted. Choose a password for it. It is not stored anywhere and cannot be recovered; if you forget it, the only way out is to delete all local data and sign in again.';
+
+  @override
+  String get webUnlockTitle => 'Unlock FamilyNexus';
+
+  @override
+  String get webUnlockBody => 'Enter the password for this browser.';
+
+  @override
+  String get webPassword => 'Password';
+
+  @override
+  String get webPasswordRepeat => 'Repeat password';
+
+  @override
+  String get webPasswordTooShort => 'At least 10 characters.';
+
+  @override
+  String get webPasswordMismatch => 'The passwords do not match.';
+
+  @override
+  String get webPasswordWrong => 'Wrong password.';
+
+  @override
+  String get webUnlockAction => 'Unlock';
+
+  @override
+  String get webCreateAction => 'Create vault';
+
+  @override
+  String get webUnlockBusy => 'Unlocking …';
+
+  @override
+  String get webForgotPassword => 'Forgot the password? Delete all local data';
+
+  @override
+  String get webTabBusyTitle => 'FamilyNexus is already open';
+
+  @override
+  String get webTabBusyBody =>
+      'The app is already running in another tab or window of this browser. Two tabs at the same time would corrupt the local data. Close the other tab and try again.';
+
+  @override
+  String get privacy13Title => 'Browser version';
+
+  @override
+  String get privacy13Body =>
+      'In the web version your data is stored encrypted in this browser (IndexedDB, SQLite3MultipleCiphers). The key is protected by your browser password, which is stored nowhere. There is no screen protection and no reminders while the page is closed. Do not use the web version on a foreign or shared computer. The page loads nothing from third parties.';
 }

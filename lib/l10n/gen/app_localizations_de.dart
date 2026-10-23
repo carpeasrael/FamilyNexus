@@ -1717,4 +1717,59 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get privacy12Body =>
       'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.';
+
+  @override
+  String get webUnlockTitleCreate => 'Browser-Tresor einrichten';
+
+  @override
+  String get webUnlockBodyCreate =>
+      'Dieser Browser speichert deine Daten verschlüsselt. Wähle dafür ein Passwort. Es wird nirgends gespeichert und kann nicht wiederhergestellt werden; wer es vergisst, kann nur alle lokalen Daten löschen und sich neu anmelden.';
+
+  @override
+  String get webUnlockTitle => 'FamilyNexus entsperren';
+
+  @override
+  String get webUnlockBody => 'Gib das Passwort für diesen Browser ein.';
+
+  @override
+  String get webPassword => 'Passwort';
+
+  @override
+  String get webPasswordRepeat => 'Passwort wiederholen';
+
+  @override
+  String get webPasswordTooShort => 'Mindestens 10 Zeichen.';
+
+  @override
+  String get webPasswordMismatch => 'Die Passwörter stimmen nicht überein.';
+
+  @override
+  String get webPasswordWrong => 'Falsches Passwort.';
+
+  @override
+  String get webUnlockAction => 'Entsperren';
+
+  @override
+  String get webCreateAction => 'Tresor anlegen';
+
+  @override
+  String get webUnlockBusy => 'Wird entsperrt …';
+
+  @override
+  String get webForgotPassword =>
+      'Passwort vergessen? Alle lokalen Daten löschen';
+
+  @override
+  String get webTabBusyTitle => 'FamilyNexus ist schon geöffnet';
+
+  @override
+  String get webTabBusyBody =>
+      'Die App läuft bereits in einem anderen Tab oder Fenster dieses Browsers. Zwei Tabs gleichzeitig würden die lokalen Daten beschädigen. Schließe den anderen Tab und versuche es erneut.';
+
+  @override
+  String get privacy13Title => 'Browser-Version';
+
+  @override
+  String get privacy13Body =>
+      'In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz und keine Erinnerungen bei geschlossener Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach.';
 }

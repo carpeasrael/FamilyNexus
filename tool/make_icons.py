@@ -59,6 +59,12 @@ for n in (16, 32, 64, 128, 256, 512, 1024):
 for n in (128, 256, 512):
     save(mac, f"flatpak/icons/{n}x{n}/de.inneso.familynexus.png", n)
 
+# Web (PWA): abgerundetes Quadrat, maskable vollflächig
+for n in (192, 512):
+    mac.resize((n, n), Image.LANCZOS).save(os.path.join(ROOT, f"web/icons/Icon-{n}.png"))
+    SRC.resize((n, n), Image.LANCZOS).save(os.path.join(ROOT, f"web/icons/Icon-maskable-{n}.png"))
+mac.resize((64, 64), Image.LANCZOS).save(os.path.join(ROOT, "web/favicon.png"))
+
 # Windows: .ico mit mehreren Größen aus demselben abgerundeten Quadrat
 mac.convert("RGBA").save(os.path.join(ROOT, "windows/runner/resources/app_icon.ico"),
                          sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
