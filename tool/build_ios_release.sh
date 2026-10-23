@@ -7,6 +7,8 @@
 # Das Archiv wird bewusst UNSIGNIERT gebaut und erst beim Export mit der Distribution-Signatur versehen.
 # Grund: `flutter build ipa` und ein signiertes `xcodebuild archive` verlangen ein Entwicklungsprofil und damit
 # ein beim Team registriertes Gerät; für den App Store ist beides nicht nötig.
+# In der CI (ohne Xcode-Anmeldung) signiert ein App-Store-Connect-API-Schlüssel: ASC_KEY_PATH (.p8), ASC_KEY_ID und
+# ASC_ISSUER_ID setzen; Xcode legt Zertifikat und Profil dann selbst an (cloudverwaltete Signatur).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.cargo/bin:$PATH"
@@ -20,10 +22,14 @@ team=$(sed -n '/<key>teamID<\/key>/{n;s/.*<string>\(.*\)<\/string>.*/\1/p;}' ios
 if [ -z "$team" ] || [ "$team" = "HIER_TEAM_ID_EINTRAGEN" ]; then
   echo "FEHLER: Team-ID in ios/ExportOptions.plist eintragen." >&2; exit 1
 fi
+auth=()
+if [ -n "${ASC_KEY_PATH:-}" ]; then
+  auth=(-authenticationKeyPath "$ASC_KEY_PATH" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID")
+fi
 archive=build/ios/FamilyNexus.xcarchive
 rm -rf "$archive" build/ios/ipa
 xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release -destination 'generic/platform=iOS' \
   -archivePath "$archive" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM="$team" archive
 xcodebuild -exportArchive -archivePath "$archive" -exportOptionsPlist ios/ExportOptions.plist \
-  -exportPath build/ios/ipa -allowProvisioningUpdates
+  -exportPath build/ios/ipa -allowProvisioningUpdates ${auth[@]+"${auth[@]}"}
 echo "IPA: build/ios/ipa/ – Hochladen mit Xcode „Transporter“ oder: xcrun altool --upload-app -f <ipa> -t ios (siehe docs/STORE.md)"

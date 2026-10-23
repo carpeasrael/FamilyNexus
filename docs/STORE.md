@@ -84,6 +84,14 @@ Archiv bauen (die Skripte setzen Obfuskierung und Debug-Symbole, ein reines „P
 | macOS | `tool/build_macos_release.sh` | signiertes Paket in `build/macos/export/` |
 | macOS | `tool/build_macos_release.sh --xcode` | Archiv, das sich im Xcode-Organizer öffnet (Distribute App → App Store Connect → Upload) |
 | beide | `… --check` | nur Übersetzbarkeit, ohne Signatur (kein Upload möglich) |
+| macOS (Download) | `tool/build_macos_dmg.sh` | Developer-ID-signierte, notarisierte DMG in `build/macos/dmg/` |
+
+**In der CI** (Job `apple` in `.github/workflows/release.yml`, läuft bei jedem Versions-Tag oder manuell mit `build=apple`): baut DMG, macOS-Paket und IPA auf einem macOS-Runner. Die DMG hängt am GitHub-Release, IPA und Paket liegen als Workflow-Artefakt `appstore-<tag>-run<n>` (zum Hochladen mit Transporter). Signiert wird cloudverwaltet über einen App-Store-Connect-API-Schlüssel, der zugleich die DMG notarisiert. Einmalig einrichten:
+
+1. App Store Connect → Benutzer und Zugriff → Integrationen → App-Store-Connect-API: Schlüssel mit Rolle **Admin** anlegen (nötig, damit Xcode Distribution- und Developer-ID-Zertifikate cloudverwaltet anlegen darf), `.p8` herunterladen.
+2. Repository-Secrets: `APPLE_API_KEY_BASE64` (`base64 -i AuthKey_XXXX.p8`), `APPLE_API_KEY_ID`, `APPLE_API_ISSUER_ID`.
+
+Ohne diese Secrets baut der Job nur eine unsignierte DMG zum Testen (Artefakt `macos-unsigned-…`, nicht am Release).
 
 Alternativ in Xcode: `ios/Runner.xcworkspace` bzw. `macos/Runner.xcworkspace` öffnen → Target *Runner* → *Signing & Capabilities* → Team wählen (*Automatically manage signing*) → *Product → Archive* → Organizer → *Distribute App*. Vorher einmal `tool/build_*_release.sh --check` laufen lassen.
 
