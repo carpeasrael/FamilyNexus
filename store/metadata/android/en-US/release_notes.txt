@@ -1,4 +1,3 @@
-New in 1.0.4:
-• Task lists: moderators assign recurring lists to family members (daily, weekly, monthly). Tick items off with an optional comment, history with dates, automatic restart at the period boundary.
-• New "Tasks for you" card on "Today".
-• Fixed: tampered invitation links and event replies could crash the app.
+New in 1.0.5:
+• The app version is now shown at the bottom of the menu.
+• FamilyNexus is now also available for Windows, Linux (Flatpak) and in the browser.

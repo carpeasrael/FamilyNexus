@@ -1,7 +1,3 @@
-Neu in 1.0.4:
-• Aufgabenlisten: Moderatoren legen Listen an und weisen sie einem Familienmitglied zu. Jede Liste wiederholt sich täglich, wöchentlich oder monatlich und startet automatisch neu (um Mitternacht, am Montag bzw. am Monatsersten, in der Zeitzone der Liste).
-• Nur die zugewiesene Person hakt Punkte ab, optional mit Kommentar. Datum und Uhrzeit werden in einem Verlauf festgehalten, der bei jedem Neustart der Liste erhalten bleibt.
-• Neue Karte „Aufgaben für dich“ auf „Heute“; die Aufgaben erreichst du über das Menü.
-• Aufgabenlisten werden wie Termine Ende-zu-Ende-verschlüsselt übertragen und verschlüsselt auf dem Gerät gespeichert.
-• Behoben: Manipulierte Einladungslinks (z. B. per QR-Code) und Termin-Antworten konnten die App zum Absturz bringen.
-• Behoben: Geräte, deren Zeitzone nicht ermittelt werden kann, werden jetzt korrekt mit UTC behandelt.
+Neu in 1.0.5:
+• Die App-Version wird jetzt unten im Menü angezeigt.
+• FamilyNexus gibt es jetzt auch für Windows, Linux (Flatpak) und im Browser.

@@ -1,4 +1,3 @@
-Neu in 1.0.4:
-• Aufgabenlisten: Moderatoren weisen Familienmitgliedern wiederkehrende Listen zu (täglich, wöchentlich, monatlich). Abhaken mit optionalem Kommentar, Verlauf mit Datum, automatischer Neustart zum Periodenwechsel.
-• Neue Karte „Aufgaben für dich“ auf „Heute“.
-• Behoben: Manipulierte Einladungslinks und Termin-Antworten konnten die App zum Absturz bringen.
+Neu in 1.0.5:
+• Die App-Version wird jetzt unten im Menü angezeigt.
+• FamilyNexus gibt es jetzt auch für Windows, Linux (Flatpak) und im Browser.

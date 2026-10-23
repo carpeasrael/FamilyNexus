@@ -1,7 +1,7 @@
 name: family_nexus
 description: "FamilyNexus – Familienkalender und Messenger. Local-first, Matrix-E2EE."
 publish_to: 'none'
-version: 1.0.4+6
+version: 1.0.5+7
 license: AGPL-3.0-or-later
 
 environment:
