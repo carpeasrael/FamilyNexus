@@ -21,18 +21,16 @@ modules:
   # SQLCipher aus dem Quellcode: eigener Dateiname (libsqlcipher.so), verdrängt nicht das libsqlite3 der Laufzeit.
   # -Bsymbolic: GTK lädt das System-libsqlite3 vorher; ohne dies würden interne Aufrufe dorthin umgebogen (Absturz).
   - name: sqlcipher
-    buildsystem: autotools
-    config-opts:
-      - --enable-tempstore=yes
-      - --disable-tcl
-      - --disable-readline
-      - --disable-static
-    build-options:
-      env:
-        CFLAGS: -DSQLITE_HAS_CODEC -DSQLITE_TEMP_STORE=2 -O2
-        LDFLAGS: -lcrypto -Wl,-Bsymbolic
-    cleanup:
-      - /bin
+    buildsystem: simple
+    build-commands:
+      - >-
+        ./configure --prefix=/app --with-tempstore=yes --disable-readline --dll-basename=libsqlcipher
+        CFLAGS="-O2 -DSQLITE_HAS_CODEC -DSQLITE_EXTRA_INIT=sqlcipher_extra_init -DSQLITE_EXTRA_SHUTDOWN=sqlcipher_extra_shutdown"
+        LDFLAGS="-lcrypto -Wl,-Bsymbolic"
+      - make -j"$FLATPAK_BUILDER_N_JOBS" libsqlcipher.so
+      - readelf -d libsqlcipher.so | grep -E 'NEEDED|SONAME'
+      - readelf -d libsqlcipher.so | grep -q 'libcrypto'
+      - install -Dm755 libsqlcipher.so /app/lib/libsqlcipher.so
     sources:
       - type: archive
         url: https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v4.19.0.tar.gz
