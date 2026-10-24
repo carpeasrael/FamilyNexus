@@ -1,8 +1,8 @@
 New in 1.1.0:
-• Simple setup without technical terms: start a family, get invited or sign in.
-• Create your account in the app (matrix.org via its page).
-• Invitation links take newcomers straight to joining.
-• Emergency key: clearly explained, copyable, savable as a file.
-• Tasks: description and repeats such as Mon–Fri, on Wednesdays, the 2nd Tuesday or the 20th.
-• iPhone: the keyboard closes when you tap outside.
+• Simple setup: start a family, get invited or sign in.
+• Create your account in the app.
+• Invitation links with clear messages, valid for 1, 3 or 7 days.
+• Making moderators works reliably.
+• Emergency key: copyable or savable as a file.
+• Tasks with description and repeats (e.g. Mon–Fri, 2nd Tuesday).
 Please update all devices in your family.

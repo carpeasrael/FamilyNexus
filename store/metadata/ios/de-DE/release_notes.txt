@@ -1,7 +1,8 @@
 Neu in 1.1.0:
 • Einfache Einrichtung ohne Fachbegriffe: Familie gründen, eingeladen werden oder anmelden.
 • Konto direkt in der App anlegen (matrix.org über dessen Seite).
-• Einladungslink führt Neue direkt zum Beitritt.
+• Einladungslink führt Neue direkt zum Beitritt, mit klaren Meldungen, wenn ein Link nicht passt. Gültigkeit wählbar: 1, 3 oder 7 Tage.
+• Mitglieder zum Moderator ernennen klappt auch mehrmals hintereinander zuverlässig.
 • Notfall-Schlüssel: verständlich, kopierbar, als Datei speicherbar.
 • Aufgaben: Erklärung und Wiederholung z. B. Mo–Fr, mittwochs, am 2. Dienstag oder am 20.
 • iPhone: Tastatur schließt beim Tippen daneben.
