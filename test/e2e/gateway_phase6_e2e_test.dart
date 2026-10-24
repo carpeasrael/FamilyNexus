@@ -173,6 +173,33 @@ void main() {
       expect(raw.chunk.where((e) => e.type == ShoppingCodec.type), isEmpty, reason: 'nur als m.room.encrypted');
     });
 
+    test('Issue #1: Liste v2 (Erklärung, monatlich am letzten Freitag) wird verschlüsselt übertragen und gleich gelesen', () async {
+      final (a, b) = await _family('Regel-Familie');
+      final lists = <TaskListSignal>[];
+      final sub = b.calendarSignals.listen((s) {
+        if (s is TaskListSignal) lists.add(s);
+      });
+      addTearDown(sub.cancel);
+      final now = DateTime.fromMillisecondsSinceEpoch(DateTime.now().millisecondsSinceEpoch, isUtc: true);
+      final list = TaskList(
+        id: '00000000-0000-4000-8000-0000000000c1',
+        title: 'Abrechnung',
+        description: 'GEHEIME-ERKLÄRUNG\nzweite Zeile',
+        assignee: b.userId!,
+        rule: const TaskRule.monthlyByWeekday(TaskRule.last, DateTime.friday),
+        timeZone: 'Europe/Berlin',
+        items: const <TaskItem>[TaskItem(id: '00000000-0000-4000-8000-0000000000c2', title: 'Belege')],
+        by: a.userId!,
+        updatedAt: now,
+      );
+      await a.publishTaskList(list);
+      await E2e.until(() => lists.isNotEmpty, what: 'B erhält die Liste');
+      expect(lists.first.content['v'], 2);
+      expect(TaskCodec.decodeList(lists.first.content, sender: lists.first.sender), list);
+      final raw = await a.sdkClient!.getRoomEvents(a.family!.roomId, Direction.b, limit: 60);
+      expect(raw.chunk.map((e) => '${e.content}').join('\n'), isNot(contains('GEHEIME-ERKLÄRUNG')));
+    });
+
     test('Aufgabenlisten: Liste und Protokolleintrag verschlüsselt im Familienraum, Server sieht keinen Klartext', () async {
       final (a, b) = await _family('Aufgaben-Familie');
       final lists = <TaskListSignal>[];

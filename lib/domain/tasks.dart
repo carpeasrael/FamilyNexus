@@ -3,13 +3,20 @@ import 'package:uuid/uuid.dart';
 import 'calendar_event.dart';
 import 'server.dart';
 import 'task_period.dart';
+import 'task_rule.dart';
 import 'task_store.dart';
 import 'time_zones.dart';
 
 export 'task_period.dart' show TaskInterval;
+export 'task_rule.dart' show TaskRepeat, TaskRule;
 
 final RegExp _badText = RegExp(
   '[\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF]',
+);
+
+/// Wie [_badText], erlaubt aber Zeilenumbrüche (mehrzeilige Erklärung).
+final RegExp _badDescription = RegExp(
+  '[\\u0000-\\u0009\\u000B-\\u001F\\u007F-\\u009F\\u061C\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF]',
 );
 
 /// Ein Punkt einer Aufgabenliste.
@@ -26,26 +33,31 @@ class TaskItem {
   int get hashCode => Object.hash(id, title);
 }
 
-/// Definition einer Aufgabenliste (E-51): Titel, zugewiesene Person, Intervall, Punkte.
+/// Definition einer Aufgabenliste (E-51, E-58): Titel, optionale Erklärung, zugewiesene Person,
+/// Wiederholungsregel, Punkte.
 ///
 /// Nur Moderatoren legen Listen an oder ändern sie. Gleichzeitige Änderungen konvergieren über
 /// [TaskMerge] (höhere Version, dann Zeit, dann Absender-ID). Erledigungen stehen **nicht** hier,
 /// sondern im anfügenden Protokoll ([TaskLogEntry]).
 class TaskList {
-  const TaskList({
+  /// [rule] legt fest, wann die Liste erneuert wird; ohne Angabe gilt das bisherige [interval].
+  TaskList({
     required this.id,
     required this.title,
     required this.assignee,
-    required this.interval,
+    TaskInterval interval = TaskInterval.daily,
+    TaskRule? rule,
     required this.timeZone,
     required this.items,
     required this.by,
     required this.updatedAt,
+    this.description = '',
     this.deleted = false,
     this.version = 1,
-  });
+  }) : rule = rule ?? TaskRule.fromInterval(interval);
 
   static const int maxTitle = 100;
+  static const int maxDescription = 500;
   static const int maxItems = 50;
   static const int maxVersion = 1000000;
 
@@ -62,7 +74,15 @@ class TaskList {
 
   /// Matrix-ID der Person, der die Liste zugewiesen ist.
   final String assignee;
-  final TaskInterval interval;
+
+  /// Wann die Liste neu startet (E-58).
+  final TaskRule rule;
+
+  /// Optionale Erklärung des Moderators (z. B. was genau zu tun ist).
+  final String description;
+
+  /// Grobe Einordnung der [rule] (täglich, wöchentlich, monatlich).
+  TaskInterval get interval => rule.interval;
 
   /// IANA-Zeitzone, in der Periodengrenzen (Mitternacht, Wochen- und Monatswechsel) gelten.
   final String timeZone;
@@ -83,6 +103,8 @@ class TaskList {
     if (!updatedAt.isUtc || updatedAt.isBefore(CalendarEvent.minDate) || updatedAt.isAfter(CalendarEvent.maxDate)) p.add('time');
     if (TimeZones.tryGet(timeZone) == null) p.add('tz');
     if (title.runes.length > maxTitle || _badText.hasMatch(title)) p.add('title');
+    if (!rule.isValid) p.add('rule');
+    if (description.runes.length > maxDescription || _badDescription.hasMatch(description)) p.add('description');
     if (items.length > maxItems) p.add('items');
     final seen = <String>{};
     for (final i in items) {
@@ -91,7 +113,7 @@ class TaskList {
       if (t.trim().isEmpty || t.runes.length > maxTitle || _badText.hasMatch(t)) p.add('item-title');
     }
     if (deleted) {
-      if (title.isNotEmpty || items.isNotEmpty) p.add('tombstone');
+      if (title.isNotEmpty || items.isNotEmpty || description.isNotEmpty) p.add('tombstone');
     } else if (title.trim().isEmpty) {
       p.add('title');
     }
@@ -100,8 +122,9 @@ class TaskList {
 
   TaskList copyWith({
     String? title,
+    String? description,
     String? assignee,
-    TaskInterval? interval,
+    TaskRule? rule,
     String? timeZone,
     List<TaskItem>? items,
     bool? deleted,
@@ -112,8 +135,9 @@ class TaskList {
       TaskList(
         id: id,
         title: title ?? this.title,
+        description: description ?? this.description,
         assignee: assignee ?? this.assignee,
-        interval: interval ?? this.interval,
+        rule: rule ?? this.rule,
         timeZone: timeZone ?? this.timeZone,
         items: items ?? this.items,
         deleted: deleted ?? this.deleted,
@@ -127,8 +151,9 @@ class TaskList {
       other is TaskList &&
       other.id == id &&
       other.title == title &&
+      other.description == description &&
       other.assignee == assignee &&
-      other.interval == interval &&
+      other.rule == rule &&
       other.timeZone == timeZone &&
       _sameItems(other.items, items) &&
       other.deleted == deleted &&
@@ -145,7 +170,8 @@ class TaskList {
   }
 
   @override
-  int get hashCode => Object.hash(id, title, assignee, interval, timeZone, Object.hashAll(items), deleted, version, by, updatedAt);
+  int get hashCode =>
+      Object.hash(id, title, description, assignee, rule, timeZone, Object.hashAll(items), deleted, version, by, updatedAt);
 }
 
 enum TaskLogKind { done, undone }
@@ -199,12 +225,23 @@ class TaskLogEntry {
     if (!at.isUtc || at.isBefore(CalendarEvent.minDate) || at.isAfter(CalendarEvent.maxDate)) p.add('time');
     if (TaskPeriod.parseDate(doneOn) == null) {
       p.add('doneOn');
-    } else if (!TaskPeriod.isKey(periodKey) ||
-        !TaskInterval.values.any((i) => TaskPeriod.keyForDate(i, doneOn) == periodKey)) {
+    } else if (!TaskPeriod.isKey(periodKey) || !_plausiblePeriod(periodKey, doneOn)) {
       p.add('period');
     }
     if (comment.runes.length > maxComment || _badText.hasMatch(comment)) p.add('comment');
     return p;
+  }
+
+  /// Bisherige Schlüssel passen zu einem Intervall; Schlüssel neuer Regeln (E-58) sind das Startdatum
+  /// der Periode und liegen höchstens eine Periodenlänge vor dem Erledigungsdatum. Ob der Schlüssel
+  /// zur Regel der Liste passt, prüft [TaskProgress.isValidFor].
+  static bool _plausiblePeriod(String key, String doneOn) {
+    if (TaskInterval.values.any((i) => TaskPeriod.keyForDate(i, doneOn) == key)) return true;
+    final k = TaskPeriod.parseDate(key);
+    final d = TaskPeriod.parseDate(doneOn)!;
+    if (k == null) return false;
+    final diff = DateTime.utc(d.y, d.m, d.d).difference(DateTime.utc(k.y, k.m, k.d)).inDays;
+    return diff >= 0 && diff < TaskRule.maxPeriodDays;
   }
 
   @override
@@ -224,13 +261,19 @@ class TaskLogEntry {
   int get hashCode => Object.hash(id, listId, itemId, periodKey, doneOn, at, kind, comment, by);
 }
 
-/// Ereignisformat v1 der Aufgabenlisten: verschlüsselte Raumereignisse im Familienraum (E-51).
+/// Ereignisformat der Aufgabenlisten: verschlüsselte Raumereignisse im Familienraum (E-51, E-58).
+///
+/// Listen mit bisheriger Regel und ohne Erklärung bleiben im Format v1, damit ältere App-Versionen sie
+/// unverändert lesen. Listen mit neuer Regel oder Erklärung verwenden v2 (zusätzlich `rule`, `note`);
+/// ältere Versionen verwerfen sie vollständig, statt sie mit falschen Perioden anzuzeigen.
+/// Protokolleinträge bleiben v1 (nur die Schlüssel neuer Regeln sind Startdaten).
 class TaskCodec {
   const TaskCodec._();
 
   static const String listType = 'de.inneso.familynexus.tasklist';
   static const String logType = 'de.inneso.familynexus.taskdone';
   static const int schema = 1;
+  static const int listSchemaV2 = 2;
 
   static int get _minMs => CalendarEvent.minDate.millisecondsSinceEpoch;
   static int get _maxMs => CalendarEvent.maxDate.millisecondsSinceEpoch;
@@ -238,8 +281,9 @@ class TaskCodec {
   static Map<String, Object?> encodeList(TaskList l) {
     final problems = l.validate();
     if (problems.isNotEmpty) throw StateError('Ungültige Liste: ${problems.join(',')}');
+    final v2 = !l.rule.isLegacy || l.description.isNotEmpty;
     return <String, Object?>{
-      'v': schema,
+      'v': v2 ? listSchemaV2 : schema,
       'id': l.id,
       'by': l.by,
       'version': l.version,
@@ -247,6 +291,8 @@ class TaskCodec {
       'title': l.title,
       'assignee': l.assignee,
       'interval': l.interval.name,
+      if (v2) 'rule': l.rule.toJson(),
+      if (v2) 'note': l.description,
       'tz': l.timeZone,
       'items': <Object?>[
         for (final i in l.items) <String, Object?>{'id': i.id, 'title': i.title},
@@ -257,7 +303,8 @@ class TaskCodec {
 
   /// `null` bei ungültigem Inhalt. `by` muss mit [sender] übereinstimmen (kein Schreiben in fremdem Namen).
   static TaskList? decodeList(Map<String, Object?> c, {required String sender}) {
-    if (!MatrixIds.isUserId(sender) || c['v'] != schema) return null;
+    final v = c['v'];
+    if (!MatrixIds.isUserId(sender) || (v != schema && v != listSchemaV2)) return null;
     final id = c['id'];
     final by = c['by'];
     final version = c['version'];
@@ -275,6 +322,17 @@ class TaskCodec {
     if (title.length > TaskList.maxTitle * 2 || items.length > TaskList.maxItems) return null;
     final parsedInterval = TaskInterval.values.where((i) => i.name == interval);
     if (parsedInterval.isEmpty) return null;
+    TaskRule? rule;
+    var note = '';
+    if (v == listSchemaV2) {
+      rule = TaskRule.fromJson(c['rule']);
+      final n = c['note'];
+      if (rule == null || rule.interval != parsedInterval.first || n is! String) return null;
+      if (n.length > TaskList.maxDescription * 2) return null;
+      note = n;
+    } else if (c.containsKey('rule') || c.containsKey('note')) {
+      return null; // v1 kennt diese Felder nicht: mehrdeutig
+    }
     final out = <TaskItem>[];
     for (final e in items) {
       if (e is! Map<String, Object?>) return null;
@@ -288,6 +346,8 @@ class TaskCodec {
       title: title,
       assignee: assignee,
       interval: parsedInterval.first,
+      rule: rule,
+      description: note,
       timeZone: zone,
       items: out,
       deleted: deleted,
@@ -362,7 +422,7 @@ class TaskMerge {
   }
 
   static String _tie(TaskList l) =>
-      '${l.deleted}|${l.title}|${l.assignee}|${l.interval.name}|${l.timeZone}|${l.items.map((i) => '${i.id}=${i.title}').join(',')}';
+      '${l.deleted}|${l.title}|${l.description}|${l.assignee}|${l.rule}|${l.timeZone}|${l.items.map((i) => '${i.id}=${i.title}').join(',')}';
 }
 
 /// Abgeleiteter Zustand einer Liste: was ist in der **aktuellen** Periode erledigt? (E-51)
@@ -376,14 +436,14 @@ class TaskProgress {
     final loc = TimeZones.tryGet(list.timeZone);
     if (loc == null) return false;
     if (TaskPeriod.localDate(loc, e.at) != e.doneOn) return false;
-    return TaskPeriod.keyForDate(list.interval, e.doneOn) == e.periodKey;
+    return list.rule.keyForDate(e.doneOn) == e.periodKey;
   }
 
   /// Erledigte Punkte der aktuellen Periode: Punkt-ID → maßgeblicher Eintrag.
   static Map<String, TaskLogEntry> doneNow(TaskList list, Iterable<TaskLogEntry> log, DateTime now) {
     final loc = TimeZones.tryGet(list.timeZone);
     if (loc == null) return const <String, TaskLogEntry>{};
-    final current = TaskPeriod.key(list.interval, loc, now);
+    final current = list.rule.key(loc, now);
     final latest = <String, TaskLogEntry>{};
     final known = {for (final i in list.items) i.id};
     for (final e in log) {
@@ -477,10 +537,21 @@ class TaskService {
     if (l.validate().isNotEmpty) throw const TaskException(TaskError.invalid);
   }
 
+  /// Erklärung: Leerraum je Zeile vereinheitlicht, höchstens zwei Leerzeilen in Folge.
+  static String _normDescription(String s) => s
+      .replaceAll('\r\n', '\n')
+      .split('\n')
+      .map((line) => line.replaceAll(RegExp(r'[ \t]+'), ' ').trim())
+      .join('\n')
+      .replaceAll(RegExp(r'\n{3,}'), '\n\n')
+      .trim();
+
   Future<TaskList> createList({
     required String title,
     required String assignee,
-    required TaskInterval interval,
+    TaskInterval interval = TaskInterval.daily,
+    TaskRule? rule,
+    String description = '',
     required String timeZone,
     required List<String> items,
   }) =>
@@ -489,8 +560,10 @@ class TaskService {
         final list = TaskList(
           id: _newId(),
           title: _norm(title),
+          description: _normDescription(description),
           assignee: assignee,
           interval: interval,
+          rule: rule,
           timeZone: timeZone,
           items: _items(items),
           by: myUserId,
@@ -513,7 +586,9 @@ class TaskService {
     String id, {
     required String title,
     required String assignee,
-    required TaskInterval interval,
+    TaskInterval? interval,
+    TaskRule? rule,
+    String? description,
     required List<String> items,
   }) =>
       _serial(() async {
@@ -523,8 +598,9 @@ class TaskService {
         if (current.version >= TaskList.maxVersion) throw const TaskException(TaskError.limit);
         final next = current.copyWith(
           title: _norm(title),
+          description: description == null ? null : _normDescription(description),
           assignee: assignee,
-          interval: interval,
+          rule: rule ?? (interval == null ? null : TaskRule.fromInterval(interval)),
           items: _items(items, current.items),
           version: current.version + 1,
           by: myUserId,
@@ -542,6 +618,7 @@ class TaskService {
         if (current.version >= TaskList.maxVersion) throw const TaskException(TaskError.limit);
         final next = current.copyWith(
           title: '',
+          description: '',
           items: const <TaskItem>[],
           deleted: true,
           version: current.version + 1,
@@ -573,7 +650,7 @@ class TaskService {
           id: _newId(),
           listId: listId,
           itemId: itemId,
-          periodKey: TaskPeriod.keyForDate(list.interval, on)!,
+          periodKey: list.rule.keyForDate(on)!,
           doneOn: on,
           at: at,
           by: myUserId,

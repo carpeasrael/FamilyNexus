@@ -844,8 +844,6 @@
   "tasksIntervalWeekly": "Wöchentlich",
   "tasksIntervalMonthly": "Monatlich",
   "tasksResetDaily": "Startet jeden Tag um Mitternacht neu",
-  "tasksResetWeekly": "Startet jeden Montag neu",
-  "tasksResetMonthly": "Startet am Monatsersten neu",
   "tasksAssignedTo": "Zugewiesen an {name}",
   "@tasksAssignedTo": {
     "placeholders": {
@@ -1247,6 +1245,105 @@
         "type": "String"
       },
       "inviter": {
+        "type": "String"
+      }
+    }
+  },
+  "weekdayLongMon": "Montag",
+  "weekdayLongTue": "Dienstag",
+  "weekdayLongWed": "Mittwoch",
+  "weekdayLongThu": "Donnerstag",
+  "weekdayLongFri": "Freitag",
+  "weekdayLongSat": "Samstag",
+  "weekdayLongSun": "Sonntag",
+  "tasksBadgeWeekdays": "Mo–Fr",
+  "tasksFieldDescription": "Erklärung (optional)",
+  "tasksDescriptionHint": "z. B. was genau zu tun ist",
+  "tasksRepeatMonthlyWeekday": "Monatlich nach Wochentag",
+  "tasksRepeatMonthlyDate": "Monatlich nach Datum",
+  "tasksDailyAllDays": "Alle Wochentage (auch Samstag und Sonntag)",
+  "tasksDailyWeekdays": "Montag bis Freitag (ohne Wochenende)",
+  "tasksFieldWeekday": "Wochentag",
+  "tasksFieldOrdinal": "Welcher",
+  "tasksFieldDay": "Tag des Monats",
+  "tasksOrdinal1": "Erster",
+  "tasksOrdinal2": "Zweiter",
+  "tasksOrdinal3": "Dritter",
+  "tasksOrdinal4": "Vierter",
+  "tasksOrdinalLast": "Letzter",
+  "tasksOrdinalInText1": "ersten",
+  "tasksOrdinalInText2": "zweiten",
+  "tasksOrdinalInText3": "dritten",
+  "tasksOrdinalInText4": "vierten",
+  "tasksOrdinalInTextLast": "letzten",
+  "tasksRuleWeekdays": "Montag bis Freitag",
+  "tasksRuleWeekly": "Wöchentlich am {weekday}",
+  "@tasksRuleWeekly": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksRuleMonthlyWeekday": "Monatlich am {ordinal} {weekday}",
+  "@tasksRuleMonthlyWeekday": {
+    "placeholders": {
+      "ordinal": {
+        "type": "String"
+      },
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksRuleMonthlyDate": "Monatlich am {day}.",
+  "@tasksRuleMonthlyDate": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tasksResetWeekdays": "Startet montags bis freitags neu, nicht am Wochenende",
+  "tasksResetWeeklyOn": "Startet jeden {weekday} neu",
+  "@tasksResetWeeklyOn": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksResetMonthlyWeekday": "Startet jeden Monat am {ordinal} {weekday} neu",
+  "@tasksResetMonthlyWeekday": {
+    "placeholders": {
+      "ordinal": {
+        "type": "String"
+      },
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksResetMonthlyDate": "Startet jeden Monat am {day}. neu",
+  "@tasksResetMonthlyDate": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tasksResetMonthlyDateShort": "Startet jeden Monat am {day}. neu – in Monaten ohne diesen Tag am letzten Tag des Monats",
+  "@tasksResetMonthlyDateShort": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tasksNextReset": "Nächster Neustart: {date}",
+  "@tasksNextReset": {
+    "placeholders": {
+      "date": {
         "type": "String"
       }
     }

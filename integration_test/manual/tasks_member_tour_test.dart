@@ -44,8 +44,8 @@ void main() {
     await tester.pumpAndSettle();
     await anna.services.openCalendar();
     final a = anna.services.tasks!;
-    await a.create(title: 'Bens Zimmer', assignee: ben.gateway.userId!, interval: TaskInterval.weekly, items: ['Bett machen', 'Boden saugen']);
-    await a.create(title: 'Annas Steuer', assignee: anna.gateway.userId!, interval: TaskInterval.monthly, items: ['Belege sortieren']);
+    await a.create(title: 'Bens Zimmer', assignee: ben.gateway.userId!, rule: TaskRule.fromInterval(TaskInterval.weekly), items: ['Bett machen', 'Boden saugen']);
+    await a.create(title: 'Annas Steuer', assignee: anna.gateway.userId!, rule: TaskRule.fromInterval(TaskInterval.monthly), items: ['Belege sortieren']);
     await a.sync.publishPending();
     await ben.services.tasks!.sync.idle();
     await ben.services.tasks!.load();

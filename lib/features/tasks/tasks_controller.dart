@@ -89,7 +89,7 @@ class TasksController extends ChangeNotifier {
 
   String _periodSignature() => _lists.map((l) {
         final loc = TimeZones.tryGet(l.timeZone);
-        return loc == null ? '' : '${l.id}=${TaskPeriod.key(l.interval, loc, now)}';
+        return loc == null ? '' : '${l.id}=${l.rule.key(loc, now)}';
       }).join('|');
 
   void _checkPeriods() {
@@ -112,13 +112,29 @@ class TasksController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Tag des nächsten Neustarts der Liste (Kalenderdatum in der Zeitzone der Liste), `null` bei unbekannter Zone.
+  DateTime? nextReset(TaskList list) {
+    final loc = TimeZones.tryGet(list.timeZone);
+    if (loc == null) return null;
+    final today = TaskPeriod.parseDate(TaskPeriod.localDate(loc, now))!;
+    return list.rule.nextStartAfter(DateTime.utc(today.y, today.m, today.d));
+  }
+
   Future<TaskList> create({
     required String title,
     required String assignee,
-    required TaskInterval interval,
+    required TaskRule rule,
+    String description = '',
     required List<String> items,
   }) async {
-    final l = await service.createList(title: title, assignee: assignee, interval: interval, timeZone: zoneName, items: items);
+    final l = await service.createList(
+      title: title,
+      assignee: assignee,
+      rule: rule,
+      description: description,
+      timeZone: zoneName,
+      items: items,
+    );
     await _changed();
     return l;
   }
@@ -127,10 +143,11 @@ class TasksController extends ChangeNotifier {
     String id, {
     required String title,
     required String assignee,
-    required TaskInterval interval,
+    required TaskRule rule,
+    String description = '',
     required List<String> items,
   }) async {
-    await service.updateList(id, title: title, assignee: assignee, interval: interval, items: items);
+    await service.updateList(id, title: title, assignee: assignee, rule: rule, description: description, items: items);
     await _changed();
   }
 
