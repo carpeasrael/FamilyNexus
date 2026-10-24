@@ -23,12 +23,15 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 | Mehrere Einkaufslisten, Kategorien, Preise | Eine gemeinsame Liste je Familie (E-40). |
 | Erinnerungen und Benachrichtigung zum Periodenwechsel bei Aufgabenlisten | Der Erinnerungs-Planer kennt nur Termine und ersetzt bei `replaceAll` alle geplanten Benachrichtigungen (E-51). |
 | Nachträgliches Abhaken früherer Perioden, Fälligkeitszeiten, Unteraufgaben | Umfang (E-51). |
+| Mehrere Wochentage je Liste (z. B. Montag und Donnerstag), „alle zwei Wochen“ | Nicht verlangt (Issue #1); Regeln sind genau eine Art je Liste (E-58). |
 | Familie selbst verlassen | Mitglieder werden nur durch Moderatoren entfernt; Austritt (`leave`) fehlt in der Oberfläche. Das Recht auf Löschung wird über die lokale Löschung und die Kontolöschung beim Betreiber wahrgenommen. |
 | Server durch Moderator ändern | Der Server ist in den Einstellungen nur lesbar; Wechsel = neue Familie/neue Anmeldung. |
 | Löschmarken beim „Alle lokalen Daten löschen“ | Geteilte Termine bleiben bei den anderen Geräten bestehen; vor dem Löschen sollten sie einzeln gelöscht werden. |
 | Chat-Benachrichtigungen (auch lokal) | Keine; siehe E-16. |
 
 ## Bekannte Einschränkungen
+
+- **Aufgabenlisten mit neuen Regeln oder Erklärung (E-58)** sind für App-Versionen vor dieser Änderung unsichtbar (Format v2); umgestellte Listen bleiben dort auf der letzten v1-Fassung stehen.
 
 - **Einrichtung (E-55–E-57):** Zusatzschritte „Bedingungen“ und „kein Roboter“ (reCAPTCHA) sind nur gegen den Fake geprüft;
   der lokale Test-Synapse verlangt sie nicht. Die OAuth-Anmeldung (matrix.org) ist automatisch nur gegen den Fake geprüft,

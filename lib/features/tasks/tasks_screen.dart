@@ -9,17 +9,65 @@ import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
 import 'tasks_controller.dart';
 
-String _intervalLabel(AppLocalizations l, TaskInterval i) => switch (i) {
-      TaskInterval.daily => l.tasksIntervalDaily,
-      TaskInterval.weekly => l.tasksIntervalWeekly,
-      TaskInterval.monthly => l.tasksIntervalMonthly,
+/// Kurzlabel für die Kachel (Täglich, Mo–Fr, Wöchentlich, Monatlich).
+String _badgeLabel(AppLocalizations l, TaskRule r) => switch (r.kind) {
+      TaskRepeat.everyDay => l.tasksIntervalDaily,
+      TaskRepeat.weekdays => l.tasksBadgeWeekdays,
+      TaskRepeat.weekly => l.tasksIntervalWeekly,
+      TaskRepeat.monthlyByWeekday || TaskRepeat.monthlyByDate => l.tasksIntervalMonthly,
     };
 
-String _resetLabel(AppLocalizations l, TaskInterval i) => switch (i) {
-      TaskInterval.daily => l.tasksResetDaily,
-      TaskInterval.weekly => l.tasksResetWeekly,
-      TaskInterval.monthly => l.tasksResetMonthly,
+List<String> _weekdayNames(AppLocalizations l) => <String>[
+      l.weekdayLongMon,
+      l.weekdayLongTue,
+      l.weekdayLongWed,
+      l.weekdayLongThu,
+      l.weekdayLongFri,
+      l.weekdayLongSat,
+      l.weekdayLongSun,
+    ];
+
+/// „Erster“ … „Letzter“ (Auswahlliste).
+String _ordinalLabel(AppLocalizations l, int o) => switch (o) {
+      1 => l.tasksOrdinal1,
+      2 => l.tasksOrdinal2,
+      3 => l.tasksOrdinal3,
+      4 => l.tasksOrdinal4,
+      _ => l.tasksOrdinalLast,
     };
+
+/// „ersten“ … „letzten“ (im Satz: „am zweiten Dienstag“).
+String _ordinalInText(AppLocalizations l, int o) => switch (o) {
+      1 => l.tasksOrdinalInText1,
+      2 => l.tasksOrdinalInText2,
+      3 => l.tasksOrdinalInText3,
+      4 => l.tasksOrdinalInText4,
+      _ => l.tasksOrdinalInTextLast,
+    };
+
+/// Ausgeschriebene Regel, z. B. „Monatlich am zweiten Dienstag“.
+String _ruleLabel(AppLocalizations l, TaskRule r) {
+  final days = _weekdayNames(l);
+  return switch (r.kind) {
+    TaskRepeat.everyDay => l.tasksIntervalDaily,
+    TaskRepeat.weekdays => l.tasksRuleWeekdays,
+    TaskRepeat.weekly => l.tasksRuleWeekly(days[r.weekday! - 1]),
+    TaskRepeat.monthlyByWeekday => l.tasksRuleMonthlyWeekday(_ordinalInText(l, r.ordinal!), days[r.weekday! - 1]),
+    TaskRepeat.monthlyByDate => l.tasksRuleMonthlyDate(r.day!),
+  };
+}
+
+/// Wann die Liste neu startet.
+String _resetLabel(AppLocalizations l, TaskRule r) {
+  final days = _weekdayNames(l);
+  return switch (r.kind) {
+    TaskRepeat.everyDay => l.tasksResetDaily,
+    TaskRepeat.weekdays => l.tasksResetWeekdays,
+    TaskRepeat.weekly => l.tasksResetWeeklyOn(days[r.weekday! - 1]),
+    TaskRepeat.monthlyByWeekday => l.tasksResetMonthlyWeekday(_ordinalInText(l, r.ordinal!), days[r.weekday! - 1]),
+    TaskRepeat.monthlyByDate => r.day! > 28 ? l.tasksResetMonthlyDateShort(r.day!) : l.tasksResetMonthlyDate(r.day!),
+  };
+}
 
 String _nameOf(AppServices s, TasksController c, AppLocalizations l, String id) =>
     id == c.me ? l.chatYou : (s.gateway.family?.member(id)?.displayName ?? id);
@@ -116,7 +164,7 @@ class _ListTile extends StatelessWidget {
             style: TextStyle(color: t.textSecondary),
           ),
           isThreeLine: true,
-          trailing: StatusBadge(label: _intervalLabel(l, list.interval), color: t.primary),
+          trailing: StatusBadge(label: _badgeLabel(l, list.rule), color: t.primary),
           onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => TaskDetailScreen(listId: list.id))),
         ),
       ),
@@ -203,8 +251,22 @@ class TaskDetailScreen extends StatelessWidget {
           body: SafeArea(
             child: ListView(padding: const EdgeInsets.fromLTRB(12, 8, 12, 24), children: <Widget>[
               Text(l.tasksAssignedTo(_nameOf(services, c, l, list.assignee)), style: Theme.of(context).textTheme.titleSmall),
-              Text('${_intervalLabel(l, list.interval)} · ${_resetLabel(l, list.interval)}',
+              Text('${_ruleLabel(l, list.rule)} · ${_resetLabel(l, list.rule)}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary)),
+              if (c.nextReset(list) case final next?)
+                Text(l.tasksNextReset(material.formatFullDate(next)),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary)),
+              if (list.description.isNotEmpty) ...<Widget>[
+                const SizedBox(height: 8),
+                GlassCard(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                    Icon(Icons.info_outline, size: 18, color: t.textSecondary),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(list.description)),
+                  ]),
+                ),
+              ],
               const SizedBox(height: 4),
               Text(l.tasksProgress(done.length, list.items.length), style: Theme.of(context).textTheme.bodySmall),
               const SizedBox(height: 8),
@@ -323,7 +385,12 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
   late final TextEditingController _title = TextEditingController(text: widget.existing?.title ?? '');
   late final TextEditingController _items =
       TextEditingController(text: widget.existing?.items.map((i) => i.title).join('\n') ?? '');
-  late TaskInterval _interval = widget.existing?.interval ?? TaskInterval.daily;
+  late final TextEditingController _description = TextEditingController(text: widget.existing?.description ?? '');
+  late _RepeatMode _mode;
+  bool _includeWeekend = true;
+  int _weekday = DateTime.monday;
+  int _ordinal = 1;
+  int _day = 1;
   String? _assignee;
   bool _busy = false;
 
@@ -331,14 +398,33 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
   void initState() {
     super.initState();
     _assignee = widget.existing?.assignee;
+    final r = widget.existing?.rule ?? const TaskRule.everyDay();
+    _mode = switch (r.kind) {
+      TaskRepeat.everyDay || TaskRepeat.weekdays => _RepeatMode.daily,
+      TaskRepeat.weekly => _RepeatMode.weekly,
+      TaskRepeat.monthlyByWeekday => _RepeatMode.monthlyByWeekday,
+      TaskRepeat.monthlyByDate => _RepeatMode.monthlyByDate,
+    };
+    _includeWeekend = r.kind != TaskRepeat.weekdays;
+    _weekday = r.weekday ?? DateTime.monday;
+    _ordinal = r.ordinal ?? 1;
+    _day = r.day ?? 1;
   }
 
   @override
   void dispose() {
     _title.dispose();
+    _description.dispose();
     _items.dispose();
     super.dispose();
   }
+
+  TaskRule get _rule => switch (_mode) {
+        _RepeatMode.daily => _includeWeekend ? const TaskRule.everyDay() : const TaskRule.weekdays(),
+        _RepeatMode.weekly => TaskRule.weekly(_weekday),
+        _RepeatMode.monthlyByWeekday => TaskRule.monthlyByWeekday(_ordinal, _weekday),
+        _RepeatMode.monthlyByDate => TaskRule.monthlyByDate(_day),
+      };
 
   Future<void> _save() async {
     final l = AppLocalizations.of(context);
@@ -353,9 +439,22 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
     try {
       final existing = widget.existing;
       if (existing == null) {
-        await widget.controller.create(title: _title.text, assignee: assignee, interval: _interval, items: items);
+        await widget.controller.create(
+          title: _title.text,
+          assignee: assignee,
+          rule: _rule,
+          description: _description.text,
+          items: items,
+        );
       } else {
-        await widget.controller.update(existing.id, title: _title.text, assignee: assignee, interval: _interval, items: items);
+        await widget.controller.update(
+          existing.id,
+          title: _title.text,
+          assignee: assignee,
+          rule: _rule,
+          description: _description.text,
+          items: items,
+        );
       }
       if (mounted) nav.pop();
     } catch (e) {
@@ -364,6 +463,72 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
         if (context.mounted) _toast(context, errorText(l, e));
       }
     }
+  }
+
+  /// Wiederholung (Issue #1): Art, dann die passenden Angaben; darunter, wann die Liste neu startet.
+  List<Widget> _repeatFields(AppLocalizations l) {
+    final days = _weekdayNames(l);
+    DropdownButtonFormField<int> weekdayField() => DropdownButtonFormField<int>(
+          key: ValueKey<String>('weekday-$_mode'),
+          initialValue: _weekday,
+          decoration: InputDecoration(labelText: l.tasksFieldWeekday),
+          items: <DropdownMenuItem<int>>[
+            for (var i = 1; i <= 7; i++) DropdownMenuItem<int>(value: i, child: Text(days[i - 1])),
+          ],
+          onChanged: (v) => setState(() => _weekday = v ?? _weekday),
+        );
+    return <Widget>[
+      DropdownButtonFormField<_RepeatMode>(
+        initialValue: _mode,
+        decoration: InputDecoration(labelText: l.tasksFieldInterval),
+        items: <DropdownMenuItem<_RepeatMode>>[
+          DropdownMenuItem<_RepeatMode>(value: _RepeatMode.daily, child: Text(l.tasksIntervalDaily)),
+          DropdownMenuItem<_RepeatMode>(value: _RepeatMode.weekly, child: Text(l.tasksIntervalWeekly)),
+          DropdownMenuItem<_RepeatMode>(value: _RepeatMode.monthlyByWeekday, child: Text(l.tasksRepeatMonthlyWeekday)),
+          DropdownMenuItem<_RepeatMode>(value: _RepeatMode.monthlyByDate, child: Text(l.tasksRepeatMonthlyDate)),
+        ],
+        onChanged: (v) => setState(() => _mode = v ?? _mode),
+      ),
+      const SizedBox(height: 8),
+      switch (_mode) {
+        _RepeatMode.daily => RadioGroup<bool>(
+            groupValue: _includeWeekend,
+            onChanged: (v) => setState(() => _includeWeekend = v ?? _includeWeekend),
+            child: Column(children: <Widget>[
+              RadioListTile<bool>(contentPadding: EdgeInsets.zero, value: true, title: Text(l.tasksDailyAllDays)),
+              RadioListTile<bool>(contentPadding: EdgeInsets.zero, value: false, title: Text(l.tasksDailyWeekdays)),
+            ]),
+          ),
+        _RepeatMode.weekly => weekdayField(),
+        _RepeatMode.monthlyByWeekday => Row(children: <Widget>[
+            Expanded(
+              child: DropdownButtonFormField<int>(
+                initialValue: _ordinal,
+                decoration: InputDecoration(labelText: l.tasksFieldOrdinal),
+                items: <DropdownMenuItem<int>>[
+                  for (final o in <int>[1, 2, 3, 4, TaskRule.last]) DropdownMenuItem<int>(value: o, child: Text(_ordinalLabel(l, o))),
+                ],
+                onChanged: (v) => setState(() => _ordinal = v ?? _ordinal),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: weekdayField()),
+          ]),
+        _RepeatMode.monthlyByDate => DropdownButtonFormField<int>(
+            initialValue: _day,
+            decoration: InputDecoration(labelText: l.tasksFieldDay),
+            items: <DropdownMenuItem<int>>[
+              for (var d = 1; d <= 31; d++) DropdownMenuItem<int>(value: d, child: Text('$d.')),
+            ],
+            onChanged: (v) => setState(() => _day = v ?? _day),
+          ),
+      },
+      const SizedBox(height: 4),
+      Semantics(
+        liveRegion: true,
+        child: Text(_resetLabel(l, _rule), style: Theme.of(context).textTheme.bodySmall),
+      ),
+    ];
   }
 
   @override
@@ -383,6 +548,16 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
             textCapitalization: TextCapitalization.sentences,
             decoration: InputDecoration(labelText: l.tasksFieldTitle),
           ),
+          TextField(
+            controller: _description,
+            minLines: 2,
+            maxLines: 6,
+            maxLength: TaskList.maxDescription,
+            enableIMEPersonalizedLearning: false,
+            textCapitalization: TextCapitalization.sentences,
+            keyboardType: TextInputType.multiline,
+            decoration: InputDecoration(labelText: l.tasksFieldDescription, hintText: l.tasksDescriptionHint, alignLabelWithHint: true),
+          ),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
             initialValue: members.any((m) => m.userId == _assignee) ? _assignee : null,
@@ -394,14 +569,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
             onChanged: (v) => setState(() => _assignee = v),
           ),
           const SizedBox(height: 8),
-          DropdownButtonFormField<TaskInterval>(
-            initialValue: _interval,
-            decoration: InputDecoration(labelText: l.tasksFieldInterval, helperText: _resetLabel(l, _interval)),
-            items: <DropdownMenuItem<TaskInterval>>[
-              for (final i in TaskInterval.values) DropdownMenuItem<TaskInterval>(value: i, child: Text(_intervalLabel(l, i))),
-            ],
-            onChanged: (v) => setState(() => _interval = v ?? _interval),
-          ),
+          ..._repeatFields(l),
           const SizedBox(height: 8),
           TextField(
             controller: _items,
@@ -419,3 +587,5 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
     );
   }
 }
+
+enum _RepeatMode { daily, weekly, monthlyByWeekday, monthlyByDate }

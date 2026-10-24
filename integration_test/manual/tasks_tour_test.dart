@@ -25,8 +25,8 @@ void main() {
     await tester.pumpAndSettle();
     final tasks = app.services.tasks!;
     final me = app.gateway.userId!;
-    await tasks.create(title: 'Haushalt', assignee: me, interval: TaskInterval.daily, items: ['Müll raus', 'Spülmaschine ausräumen', 'Bad putzen']);
-    await tasks.create(title: 'Garten', assignee: me, interval: TaskInterval.weekly, items: ['Rasen mähen', 'Beete jäten']);
+    await tasks.create(title: 'Haushalt', assignee: me, rule: TaskRule.fromInterval(TaskInterval.daily), items: ['Müll raus', 'Spülmaschine ausräumen', 'Bad putzen']);
+    await tasks.create(title: 'Garten', assignee: me, rule: TaskRule.fromInterval(TaskInterval.weekly), items: ['Rasen mähen', 'Beete jäten']);
     await tester.pumpAndSettle();
 
     await _hold(tester); // 1 Heute mit Aufgaben-Karte

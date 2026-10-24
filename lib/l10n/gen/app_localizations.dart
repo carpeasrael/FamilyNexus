@@ -2696,18 +2696,6 @@ abstract class AppLocalizations {
   /// **'Startet jeden Tag um Mitternacht neu'**
   String get tasksResetDaily;
 
-  /// No description provided for @tasksResetWeekly.
-  ///
-  /// In de, this message translates to:
-  /// **'Startet jeden Montag neu'**
-  String get tasksResetWeekly;
-
-  /// No description provided for @tasksResetMonthly.
-  ///
-  /// In de, this message translates to:
-  /// **'Startet am Monatsersten neu'**
-  String get tasksResetMonthly;
-
   /// No description provided for @tasksAssignedTo.
   ///
   /// In de, this message translates to:
@@ -3595,6 +3583,228 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Achtung: Die Familie liegt bei {family}, die einladende Person aber bei {inviter}. Tritt nur bei, wenn du diese Einladung wirklich erwartet hast.'**
   String joinCardServerMismatch(String family, String inviter);
+
+  /// No description provided for @weekdayLongMon.
+  ///
+  /// In de, this message translates to:
+  /// **'Montag'**
+  String get weekdayLongMon;
+
+  /// No description provided for @weekdayLongTue.
+  ///
+  /// In de, this message translates to:
+  /// **'Dienstag'**
+  String get weekdayLongTue;
+
+  /// No description provided for @weekdayLongWed.
+  ///
+  /// In de, this message translates to:
+  /// **'Mittwoch'**
+  String get weekdayLongWed;
+
+  /// No description provided for @weekdayLongThu.
+  ///
+  /// In de, this message translates to:
+  /// **'Donnerstag'**
+  String get weekdayLongThu;
+
+  /// No description provided for @weekdayLongFri.
+  ///
+  /// In de, this message translates to:
+  /// **'Freitag'**
+  String get weekdayLongFri;
+
+  /// No description provided for @weekdayLongSat.
+  ///
+  /// In de, this message translates to:
+  /// **'Samstag'**
+  String get weekdayLongSat;
+
+  /// No description provided for @weekdayLongSun.
+  ///
+  /// In de, this message translates to:
+  /// **'Sonntag'**
+  String get weekdayLongSun;
+
+  /// No description provided for @tasksBadgeWeekdays.
+  ///
+  /// In de, this message translates to:
+  /// **'Mo–Fr'**
+  String get tasksBadgeWeekdays;
+
+  /// No description provided for @tasksFieldDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Erklärung (optional)'**
+  String get tasksFieldDescription;
+
+  /// No description provided for @tasksDescriptionHint.
+  ///
+  /// In de, this message translates to:
+  /// **'z. B. was genau zu tun ist'**
+  String get tasksDescriptionHint;
+
+  /// No description provided for @tasksRepeatMonthlyWeekday.
+  ///
+  /// In de, this message translates to:
+  /// **'Monatlich nach Wochentag'**
+  String get tasksRepeatMonthlyWeekday;
+
+  /// No description provided for @tasksRepeatMonthlyDate.
+  ///
+  /// In de, this message translates to:
+  /// **'Monatlich nach Datum'**
+  String get tasksRepeatMonthlyDate;
+
+  /// No description provided for @tasksDailyAllDays.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Wochentage (auch Samstag und Sonntag)'**
+  String get tasksDailyAllDays;
+
+  /// No description provided for @tasksDailyWeekdays.
+  ///
+  /// In de, this message translates to:
+  /// **'Montag bis Freitag (ohne Wochenende)'**
+  String get tasksDailyWeekdays;
+
+  /// No description provided for @tasksFieldWeekday.
+  ///
+  /// In de, this message translates to:
+  /// **'Wochentag'**
+  String get tasksFieldWeekday;
+
+  /// No description provided for @tasksFieldOrdinal.
+  ///
+  /// In de, this message translates to:
+  /// **'Welcher'**
+  String get tasksFieldOrdinal;
+
+  /// No description provided for @tasksFieldDay.
+  ///
+  /// In de, this message translates to:
+  /// **'Tag des Monats'**
+  String get tasksFieldDay;
+
+  /// No description provided for @tasksOrdinal1.
+  ///
+  /// In de, this message translates to:
+  /// **'Erster'**
+  String get tasksOrdinal1;
+
+  /// No description provided for @tasksOrdinal2.
+  ///
+  /// In de, this message translates to:
+  /// **'Zweiter'**
+  String get tasksOrdinal2;
+
+  /// No description provided for @tasksOrdinal3.
+  ///
+  /// In de, this message translates to:
+  /// **'Dritter'**
+  String get tasksOrdinal3;
+
+  /// No description provided for @tasksOrdinal4.
+  ///
+  /// In de, this message translates to:
+  /// **'Vierter'**
+  String get tasksOrdinal4;
+
+  /// No description provided for @tasksOrdinalLast.
+  ///
+  /// In de, this message translates to:
+  /// **'Letzter'**
+  String get tasksOrdinalLast;
+
+  /// No description provided for @tasksOrdinalInText1.
+  ///
+  /// In de, this message translates to:
+  /// **'ersten'**
+  String get tasksOrdinalInText1;
+
+  /// No description provided for @tasksOrdinalInText2.
+  ///
+  /// In de, this message translates to:
+  /// **'zweiten'**
+  String get tasksOrdinalInText2;
+
+  /// No description provided for @tasksOrdinalInText3.
+  ///
+  /// In de, this message translates to:
+  /// **'dritten'**
+  String get tasksOrdinalInText3;
+
+  /// No description provided for @tasksOrdinalInText4.
+  ///
+  /// In de, this message translates to:
+  /// **'vierten'**
+  String get tasksOrdinalInText4;
+
+  /// No description provided for @tasksOrdinalInTextLast.
+  ///
+  /// In de, this message translates to:
+  /// **'letzten'**
+  String get tasksOrdinalInTextLast;
+
+  /// No description provided for @tasksRuleWeekdays.
+  ///
+  /// In de, this message translates to:
+  /// **'Montag bis Freitag'**
+  String get tasksRuleWeekdays;
+
+  /// No description provided for @tasksRuleWeekly.
+  ///
+  /// In de, this message translates to:
+  /// **'Wöchentlich am {weekday}'**
+  String tasksRuleWeekly(String weekday);
+
+  /// No description provided for @tasksRuleMonthlyWeekday.
+  ///
+  /// In de, this message translates to:
+  /// **'Monatlich am {ordinal} {weekday}'**
+  String tasksRuleMonthlyWeekday(String ordinal, String weekday);
+
+  /// No description provided for @tasksRuleMonthlyDate.
+  ///
+  /// In de, this message translates to:
+  /// **'Monatlich am {day}.'**
+  String tasksRuleMonthlyDate(int day);
+
+  /// No description provided for @tasksResetWeekdays.
+  ///
+  /// In de, this message translates to:
+  /// **'Startet montags bis freitags neu, nicht am Wochenende'**
+  String get tasksResetWeekdays;
+
+  /// No description provided for @tasksResetWeeklyOn.
+  ///
+  /// In de, this message translates to:
+  /// **'Startet jeden {weekday} neu'**
+  String tasksResetWeeklyOn(String weekday);
+
+  /// No description provided for @tasksResetMonthlyWeekday.
+  ///
+  /// In de, this message translates to:
+  /// **'Startet jeden Monat am {ordinal} {weekday} neu'**
+  String tasksResetMonthlyWeekday(String ordinal, String weekday);
+
+  /// No description provided for @tasksResetMonthlyDate.
+  ///
+  /// In de, this message translates to:
+  /// **'Startet jeden Monat am {day}. neu'**
+  String tasksResetMonthlyDate(int day);
+
+  /// No description provided for @tasksResetMonthlyDateShort.
+  ///
+  /// In de, this message translates to:
+  /// **'Startet jeden Monat am {day}. neu – in Monaten ohne diesen Tag am letzten Tag des Monats'**
+  String tasksResetMonthlyDateShort(int day);
+
+  /// No description provided for @tasksNextReset.
+  ///
+  /// In de, this message translates to:
+  /// **'Nächster Neustart: {date}'**
+  String tasksNextReset(String date);
 }
 
 class _AppLocalizationsDelegate

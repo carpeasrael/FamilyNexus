@@ -1543,12 +1543,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tasksResetDaily => 'Restarts every day at midnight';
 
   @override
-  String get tasksResetWeekly => 'Restarts every Monday';
-
-  @override
-  String get tasksResetMonthly => 'Restarts on the 1st of each month';
-
-  @override
   String tasksAssignedTo(String name) {
     return 'Assigned to $name';
   }
@@ -2088,5 +2082,133 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String joinCardServerMismatch(String family, String inviter) {
     return 'Caution: the family is hosted at $family, but the inviting person at $inviter. Only join if you really expected this invitation.';
+  }
+
+  @override
+  String get weekdayLongMon => 'Monday';
+
+  @override
+  String get weekdayLongTue => 'Tuesday';
+
+  @override
+  String get weekdayLongWed => 'Wednesday';
+
+  @override
+  String get weekdayLongThu => 'Thursday';
+
+  @override
+  String get weekdayLongFri => 'Friday';
+
+  @override
+  String get weekdayLongSat => 'Saturday';
+
+  @override
+  String get weekdayLongSun => 'Sunday';
+
+  @override
+  String get tasksBadgeWeekdays => 'Mon–Fri';
+
+  @override
+  String get tasksFieldDescription => 'Description (optional)';
+
+  @override
+  String get tasksDescriptionHint => 'e.g. what exactly needs to be done';
+
+  @override
+  String get tasksRepeatMonthlyWeekday => 'Monthly by weekday';
+
+  @override
+  String get tasksRepeatMonthlyDate => 'Monthly by date';
+
+  @override
+  String get tasksDailyAllDays => 'Every day (including Saturday and Sunday)';
+
+  @override
+  String get tasksDailyWeekdays => 'Monday to Friday (no weekend)';
+
+  @override
+  String get tasksFieldWeekday => 'Weekday';
+
+  @override
+  String get tasksFieldOrdinal => 'Which';
+
+  @override
+  String get tasksFieldDay => 'Day of the month';
+
+  @override
+  String get tasksOrdinal1 => 'First';
+
+  @override
+  String get tasksOrdinal2 => 'Second';
+
+  @override
+  String get tasksOrdinal3 => 'Third';
+
+  @override
+  String get tasksOrdinal4 => 'Fourth';
+
+  @override
+  String get tasksOrdinalLast => 'Last';
+
+  @override
+  String get tasksOrdinalInText1 => 'first';
+
+  @override
+  String get tasksOrdinalInText2 => 'second';
+
+  @override
+  String get tasksOrdinalInText3 => 'third';
+
+  @override
+  String get tasksOrdinalInText4 => 'fourth';
+
+  @override
+  String get tasksOrdinalInTextLast => 'last';
+
+  @override
+  String get tasksRuleWeekdays => 'Monday to Friday';
+
+  @override
+  String tasksRuleWeekly(String weekday) {
+    return 'Weekly on $weekday';
+  }
+
+  @override
+  String tasksRuleMonthlyWeekday(String ordinal, String weekday) {
+    return 'Monthly on the $ordinal $weekday';
+  }
+
+  @override
+  String tasksRuleMonthlyDate(int day) {
+    return 'Monthly on day $day';
+  }
+
+  @override
+  String get tasksResetWeekdays =>
+      'Restarts Monday to Friday, not at the weekend';
+
+  @override
+  String tasksResetWeeklyOn(String weekday) {
+    return 'Restarts every $weekday';
+  }
+
+  @override
+  String tasksResetMonthlyWeekday(String ordinal, String weekday) {
+    return 'Restarts every month on the $ordinal $weekday';
+  }
+
+  @override
+  String tasksResetMonthlyDate(int day) {
+    return 'Restarts every month on day $day';
+  }
+
+  @override
+  String tasksResetMonthlyDateShort(int day) {
+    return 'Restarts every month on day $day – in months without that day on the last day of the month';
+  }
+
+  @override
+  String tasksNextReset(String date) {
+    return 'Next restart: $date';
   }
 }

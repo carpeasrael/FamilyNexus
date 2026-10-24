@@ -844,8 +844,6 @@
   "tasksIntervalWeekly": "Weekly",
   "tasksIntervalMonthly": "Monthly",
   "tasksResetDaily": "Restarts every day at midnight",
-  "tasksResetWeekly": "Restarts every Monday",
-  "tasksResetMonthly": "Restarts on the 1st of each month",
   "tasksAssignedTo": "Assigned to {name}",
   "@tasksAssignedTo": {
     "placeholders": {
@@ -1241,6 +1239,105 @@
         "type": "String"
       },
       "inviter": {
+        "type": "String"
+      }
+    }
+  },
+  "weekdayLongMon": "Monday",
+  "weekdayLongTue": "Tuesday",
+  "weekdayLongWed": "Wednesday",
+  "weekdayLongThu": "Thursday",
+  "weekdayLongFri": "Friday",
+  "weekdayLongSat": "Saturday",
+  "weekdayLongSun": "Sunday",
+  "tasksBadgeWeekdays": "Mon–Fri",
+  "tasksFieldDescription": "Description (optional)",
+  "tasksDescriptionHint": "e.g. what exactly needs to be done",
+  "tasksRepeatMonthlyWeekday": "Monthly by weekday",
+  "tasksRepeatMonthlyDate": "Monthly by date",
+  "tasksDailyAllDays": "Every day (including Saturday and Sunday)",
+  "tasksDailyWeekdays": "Monday to Friday (no weekend)",
+  "tasksFieldWeekday": "Weekday",
+  "tasksFieldOrdinal": "Which",
+  "tasksFieldDay": "Day of the month",
+  "tasksOrdinal1": "First",
+  "tasksOrdinal2": "Second",
+  "tasksOrdinal3": "Third",
+  "tasksOrdinal4": "Fourth",
+  "tasksOrdinalLast": "Last",
+  "tasksOrdinalInText1": "first",
+  "tasksOrdinalInText2": "second",
+  "tasksOrdinalInText3": "third",
+  "tasksOrdinalInText4": "fourth",
+  "tasksOrdinalInTextLast": "last",
+  "tasksRuleWeekdays": "Monday to Friday",
+  "tasksRuleWeekly": "Weekly on {weekday}",
+  "@tasksRuleWeekly": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksRuleMonthlyWeekday": "Monthly on the {ordinal} {weekday}",
+  "@tasksRuleMonthlyWeekday": {
+    "placeholders": {
+      "ordinal": {
+        "type": "String"
+      },
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksRuleMonthlyDate": "Monthly on day {day}",
+  "@tasksRuleMonthlyDate": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tasksResetWeekdays": "Restarts Monday to Friday, not at the weekend",
+  "tasksResetWeeklyOn": "Restarts every {weekday}",
+  "@tasksResetWeeklyOn": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksResetMonthlyWeekday": "Restarts every month on the {ordinal} {weekday}",
+  "@tasksResetMonthlyWeekday": {
+    "placeholders": {
+      "ordinal": {
+        "type": "String"
+      },
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksResetMonthlyDate": "Restarts every month on day {day}",
+  "@tasksResetMonthlyDate": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tasksResetMonthlyDateShort": "Restarts every month on day {day} – in months without that day on the last day of the month",
+  "@tasksResetMonthlyDateShort": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tasksNextReset": "Next restart: {date}",
+  "@tasksNextReset": {
+    "placeholders": {
+      "date": {
         "type": "String"
       }
     }

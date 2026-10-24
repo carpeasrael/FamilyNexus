@@ -62,6 +62,28 @@ void main() {
     expect(TaskProgress.doneNow(l, await anna.store.log(), server.now()).keys, [l.items.first.id]);
   });
 
+  test('Issue #1: Liste mit Erklärung und neuer Regel (v2) erreicht alle; Abhaken nutzt den Schlüssel der Regel', () async {
+    final l = await anna.service.createList(
+      title: 'Hausaufgaben',
+      assignee: ben.userId,
+      rule: const TaskRule.weekly(DateTime.wednesday),
+      description: 'Vor dem Abendessen.',
+      timeZone: 'Europe/Berlin',
+      items: ['Hefte packen'],
+    );
+    await anna.flush(others(anna));
+    for (final p in [ben, cara]) {
+      final got = await p.store.getList(l.id);
+      expect((got?.rule, got?.description), (const TaskRule.weekly(DateTime.wednesday), 'Vor dem Abendessen.'));
+    }
+    expect(server.log.where((e) => e.type == TaskCodec.listType).last.content['v'], 2);
+    final e = await ben.service.complete(l.id, l.items.single.id);
+    await ben.flush(others(ben));
+    // Test-Uhr: Mittwoch, 21.10.2026 → Periode beginnt an diesem Mittwoch.
+    expect(e.periodKey, '2026-10-21');
+    expect(TaskProgress.doneNow(l, await anna.store.log(), server.now()).keys, [l.items.single.id]);
+  });
+
   test('Nicht-Moderator kann keine Liste einschleusen', () async {
     final l = await newList();
     await anna.flush(others(anna));

@@ -88,6 +88,73 @@ void main() {
     expect(tester.widget<Checkbox>(find.byType(Checkbox).first).value, isFalse);
   });
 
+  testWidgets('Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern', (tester) async {
+    _tall(tester);
+    final now = DateTime.utc(2026, 10, 24, 8); // Samstag
+    final app = await buildTestApp(clock: () => now);
+    await _open(tester, app);
+    await _openTasks(tester);
+    await tester.tap(find.byTooltip('Neue Aufgabenliste'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'Titel'), 'Papiertonne');
+    await tester.enterText(find.widgetWithText(TextField, 'Erklärung (optional)'), 'Kartons vorher zerkleinern.');
+    await tester.enterText(find.widgetWithText(TextField, 'Punkte (einer pro Zeile)'), 'Tonne rausstellen');
+    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Du').last);
+    await tester.pumpAndSettle();
+
+    // Täglich bietet die Wahl mit/ohne Wochenende.
+    expect(find.text('Alle Wochentage (auch Samstag und Sonntag)'), findsOneWidget);
+    expect(find.text('Montag bis Freitag (ohne Wochenende)'), findsOneWidget);
+
+    await tester.tap(find.text('Täglich'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Monatlich nach Wochentag').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Erster'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Zweiter').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Montag'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Dienstag').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Startet jeden Monat am zweiten Dienstag neu'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+    await tester.pumpAndSettle();
+
+    final list = (await app.taskStore.lists()).single;
+    expect(list.rule, const TaskRule.monthlyByWeekday(2, DateTime.tuesday));
+    expect(list.description, 'Kartons vorher zerkleinern.');
+    expect(find.text('Monatlich'), findsOneWidget, reason: 'Kurzlabel auf der Kachel');
+
+    await tester.tap(find.text('Papiertonne'));
+    await tester.pumpAndSettle();
+    expect(find.text('Monatlich am zweiten Dienstag · Startet jeden Monat am zweiten Dienstag neu'), findsOneWidget);
+    expect(find.text('Kartons vorher zerkleinern.'), findsOneWidget);
+    expect(find.textContaining('Nächster Neustart:'), findsOneWidget);
+    expect(find.textContaining('10. November 2026'), findsOneWidget, reason: 'zweiter Dienstag im November');
+
+    // Ändern: monatlich am 31. (Hinweis zu kürzeren Monaten).
+    await tester.tap(find.byTooltip('Aufgabenliste bearbeiten'));
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(find.widgetWithText(TextField, 'Erklärung (optional)')).controller!.text, 'Kartons vorher zerkleinern.');
+    await tester.tap(find.text('Monatlich nach Wochentag'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Monatlich nach Datum').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('1.'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('31.').last, 200, scrollable: find.byType(Scrollable).last);
+    await tester.tap(find.text('31.').last);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('am letzten Tag des Monats'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+    await tester.pumpAndSettle();
+    expect((await app.taskStore.lists()).single.rule, const TaskRule.monthlyByDate(31));
+  });
+
   testWidgets('Mitglied ohne Moderatorenrecht: kein Anlegen; zugewiesene Liste kann abgehakt werden, fremde nicht', (tester) async {
     _tall(tester);
     final now = DateTime.utc(2026, 10, 22, 8);
