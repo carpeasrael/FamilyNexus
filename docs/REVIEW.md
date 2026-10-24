@@ -142,3 +142,30 @@ Separater Review-Agent (Quelltext des matrix-SDK 14.2.0 gegengeprüft; keine erf
 
 Testlücke (→ OFFEN): `_acceptDirectInvites`/`_eligibleDirectRooms`/`_onToDevice` laufen nur im Synapse-E2E, nicht als Unit-Test mit SDK-Fake.
 
+
+## Phase 8 (2026-10-24): Einfache Einrichtung, Kontoanlage, Einladen und Beitreten
+
+Separater Review-Agent über `774c009..HEAD` (SDK-Verhalten an matrix-14.2.0 gegengeprüft). Kein Fund „hoch“.
+
+| # | Schwere | Fund | Behebung |
+|---|---|---|---|
+| R1 | mittel | Beitrittskarte (für Beitretende die eigentliche Sicherheitsabfrage) zeigte nur Namen aus dem Link | Karte nennt immer den Anbieter der einladenden Person; deutliche Warnung, wenn er vom Server der Familie abweicht (E-56) |
+| R2 | mittel | Mobil: alter OAuth-Wartevorgang konnte den neuen abbrechen (geteilter Zustand) | Jeder Versuch ist ein eigenes `OAuthAttempt`; Test „ein neuer Versuch beendet den alten …“ |
+| R3 | mittel | „Zurück“ während der Browser-Anmeldung ließ sie weiterlaufen; Anmeldung landete auf der Startseite | „Zurück“ und `dispose` beenden Versuch und Registrierung; angemeldet in jedem Schritt vor der Absicherung → weiter; Test |
+| R4 | mittel | Passwort blieb nach Netzfehler mitten in der Registrierung im Gateway | Oberfläche und Gateway behalten die Registrierung nur bei vorübergehenden Fehlern; sonst und bei `dispose`, `login`, `startOAuth` verworfen; Test |
+| R5 | mittel | Leeren der Zwischenablage wirkt im Hintergrund oft nicht | Erneute Prüfung beim Zurückkehren; Android markiert den Schlüssel als vertraulich (`EXTRA_IS_SENSITIVE`); SA-8 ehrlich formuliert |
+| R6 | mittel | Vollständige ID + sofortiges Absenden schickte das Passwort an den bisherigen Anbieter | „Anmelden“ erst, wenn der Anbieter zur ID passt; Test |
+| R7 | mittel | Echte UIA-/OAuth-Logik nur über den Fake getestet | `test/data/sdk_registration_test.dart`: echtes `SdkMatrixGateway` gegen nachgestellte Antworten (Sitzung/Schritte, Zugangscode, Dummy-Schleife, Fehlerzuordnung, PKCE, state, Rücksprungprüfung, Token-Anfrage) |
+| R8 | niedrig | Fremder Rücksprung brach die echte Anmeldung ab | Fremder `state` → `oauthStateMismatch`, es wird weiter gewartet; Tests |
+| R9 | niedrig | OAuth-Metadaten auch bei Passwort-Anmeldung abgefragt | nur noch im OAuth-Weg |
+| R10 | niedrig | Vorübergehender Fehler zeigte „kein Konto möglich“ | 429/5xx/Netz → Fehler mit „Erneut versuchen“; Test |
+| R11 | niedrig | unstable-Pfad erkannt, den das SDK nicht nutzt | entfernt; Test |
+| R12 | niedrig | Token-/Widerrufs-Endpunkt nicht auf https geprüft | alle Endpunkte der SDK-Metadaten vor der Client-Anmeldung geprüft; Test |
+| R13 | niedrig | Eigener Link mit vielen Emoji zu lang | Namen werden gekürzt bzw. weggelassen; Test |
+| R14 | niedrig | Link in anderer Schreibweise nicht vorgemerkt; Wiederherstellung ohne `ownHost` | vereinheitlicht gespeichert (`InviteLink.normalized`), `ownHost` bei der Wiederherstellung; Test |
+| R15 | niedrig | Nicht lesbare Einladenden-ID ließ „Verbinde …“ stehen | Anbieterprüfung startet trotzdem (bisheriger Anbieter) |
+| R16 | niedrig | „Benutzername frei“ galt nach Anbieterwechsel weiter | erneute Prüfung bei Anbieterwechsel |
+| R17 | niedrig | Abfrage `POST /register` ohne `inhibit_login` | `{"inhibit_login": true}`; Status 200 wird protokolliert und ignoriert; Test |
+| R18 | niedrig | Texte: „Wir haben eine E-Mail …“, Hinweis zum Benutzernamen, „Einladungscode“ verwechselbar, „Server“ | korrigiert („Der Anbieter hat …“, „Zugangscode des Anbieters“, „Anbieter“) |
+| R19 | niedrig | Testplan nicht eingecheckt | eingecheckt |
+| R20 | niedrig | Gefälschter Link legt Konto beim Anbieter des Angreifers an | wie R1; Begründung in E-56 korrigiert |

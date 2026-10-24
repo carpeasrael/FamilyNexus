@@ -70,7 +70,7 @@ void main() {
     await tester.enterText(find.widgetWithText(TextField, 'E-Mail-Adresse'), 'emil@beispiel.de');
     await _tap(tester, 'Bestätigung senden');
     expect(app.server.emailsSent, <String>['emil@beispiel.de']);
-    expect(find.textContaining('Wir haben eine E-Mail an emil@beispiel.de geschickt.'), findsOneWidget);
+    expect(find.textContaining('Der Anbieter hat eine E-Mail an emil@beispiel.de geschickt.'), findsOneWidget);
 
     await _tap(tester, 'Ich habe bestätigt');
     expect(find.textContaining('Noch nicht bestätigt.'), findsOneWidget);
@@ -97,18 +97,18 @@ void main() {
     expect(find.widgetWithText(TextField, 'E-Mail-Adresse'), findsOneWidget);
   });
 
-  testWidgets('TP-REG-07 Einladungscode: falscher Code, dann richtiger', (tester) async {
+  testWidgets('TP-REG-07 Zugangscode des Anbieters: falscher Code, dann richtiger', (tester) async {
     final app = await buildTestApp(loggedIn: false);
     app.server.registrationFlows = <List<String>>[
       <String>[RegistrationFlows.token, RegistrationFlows.dummy],
     ];
     await _pump(tester, app);
     await _fillAndSubmit(tester);
-    await tester.enterText(find.widgetWithText(TextField, 'Einladungscode'), 'FALSCH');
+    await tester.enterText(find.widgetWithText(TextField, 'Zugangscode des Anbieters'), 'FALSCH');
     await _tap(tester, 'Weiter');
     expect(find.text('Der Code passt nicht. Bitte prüfe ihn.'), findsOneWidget);
     expect(app.gateway.userId, isNull);
-    await tester.enterText(find.widgetWithText(TextField, 'Einladungscode'), 'FAMILIE-2026');
+    await tester.enterText(find.widgetWithText(TextField, 'Zugangscode des Anbieters'), 'FAMILIE-2026');
     await _tap(tester, 'Weiter');
     expect(app.gateway.userId, '@emil:fake.test');
   });

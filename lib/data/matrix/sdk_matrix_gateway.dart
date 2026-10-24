@@ -309,9 +309,11 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   /// Setzt den Homeserver des SDK auf die geprüfte Adresse. Das SDK darf keine eigene
   /// `.well-known`-Abfrage machen (ungeprüfte Ziele, Weiterleitungen, Zwischenspeicherung).
-  Future<void> _useHomeserver(Client client, ServerUrl server) async {
+  Future<void> _useHomeserver(Client client, ServerUrl server, {bool oauth = false}) async {
     final base = _confirmedBase[server] ?? await _probe.resolveBase(server);
-    await client.checkHomeserver(base.uri, checkWellKnown: false, fetchAuthMetadata: true);
+    // Die OAuth-Metadaten nur für die Browser-Anmeldung abfragen: Fehlerseiten von Proxys würden
+    // sonst auch die Passwort-Anmeldung verhindern.
+    await client.checkHomeserver(base.uri, checkWellKnown: false, fetchAuthMetadata: oauth ? true : null);
     if (client.homeserver?.scheme != 'https') {
       client.homeserver = null;
       throw const GatewayException(GatewayError.serverUnsupported);
@@ -328,6 +330,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (!_usernameRe.hasMatch(user) || password.isEmpty || password.length > 1024) {
       throw const GatewayException(GatewayError.invalidInput);
     }
+    cancelRegistration();
     try {
       final client = await _ensureClient();
       await _useHomeserver(client, server);
@@ -452,7 +455,13 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
           ));
       }
     } on GatewayException catch (e) {
-      if (e.error != GatewayError.invalidInput && e.error != GatewayError.rateLimited) cancelRegistration();
+      const keep = <GatewayError>{
+        GatewayError.invalidInput,
+        GatewayError.rateLimited,
+        GatewayError.emailInUse,
+        GatewayError.serverUnreachable,
+      };
+      if (!keep.contains(e.error)) cancelRegistration();
       rethrow;
     } catch (e) {
       AppLog.e('gateway', 'Registrierungsschritt fehlgeschlagen', e);
@@ -555,9 +564,23 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (_client?.isLogged() ?? false) throw const GatewayException(GatewayError.notAllowed);
     final loopback = redirectUri.scheme == 'http' && redirectUri.host == '127.0.0.1';
     if (!loopback && redirectUri.scheme != oauthScheme) throw const GatewayException(GatewayError.invalidInput);
+    cancelRegistration();
     try {
       final client = await _ensureClient();
-      await _useHomeserver(client, server);
+      await _useHomeserver(client, server, oauth: true);
+      // Alle Endpunkte, über die Code, Verifier und Tokens laufen, müssen https sein – geprüft an genau
+      // den Metadaten, die das SDK anschließend verwendet.
+      final meta = await client.getAuthMetadata();
+      final endpoints = <Uri>[
+        meta.issuer,
+        meta.authorizationEndpoint,
+        meta.tokenEndpoint,
+        meta.registrationEndpoint,
+        meta.revocationEndpoint,
+      ];
+      if (endpoints.any((u) => u.scheme != 'https' || u.host.isEmpty || u.userInfo.isNotEmpty)) {
+        throw const GatewayException(GatewayError.serverUnsupported);
+      }
       final data = await client.registerOidcClient(
         redirectUris: <Uri>[redirectUri],
         applicationType: OidcApplicationType.native,
@@ -592,7 +615,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (session == null || client == null) throw const GatewayException(GatewayError.oauthCancelled);
     // Rücksprung nur an die eigene, gerade verwendete Adresse.
     if (callback.scheme != session.redirectUri.scheme || callback.path != session.redirectUri.path) {
-      throw const GatewayException(GatewayError.oauthCancelled);
+      throw const GatewayException(GatewayError.oauthStateMismatch);
     }
     final params = <String, String>{
       ...callback.queryParameters,
@@ -600,14 +623,15 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     };
     final code = params['code'];
     final state = params['state'];
-    if (params.containsKey('error') || code == null || state == null || state != session.state) {
-      // Ein fremder oder abgebrochener Rücksprung beendet den Versuch.
+    // Fremder Rücksprung (anderer Prozess, alte Anmeldung): verwerfen, die eigene läuft weiter.
+    if (state != session.state) throw const GatewayException(GatewayError.oauthStateMismatch);
+    if (params.containsKey('error') || code == null) {
       _oauth = null;
       throw const GatewayException(GatewayError.oauthCancelled);
     }
     _oauth = null;
     try {
-      await client.oidcLogin(session: session, code: code, state: state);
+      await client.oidcLogin(session: session, code: code, state: session.state);
       await _refresh();
     } catch (e) {
       AppLog.e('gateway', 'Anmeldung im Browser fehlgeschlagen', e);

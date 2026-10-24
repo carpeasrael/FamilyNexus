@@ -105,12 +105,9 @@ class ProviderController extends ChangeNotifier {
   Future<void> _probe(ServerUrl url, int run) async {
     try {
       final info = await gateway.probeServer(url);
-      RegistrationOptions? options;
-      try {
-        options = await gateway.registrationOptions(url);
-      } on GatewayException {
-        options = const RegistrationOptions(mode: RegistrationMode.disabled);
-      }
+      // Vorübergehende Fehler (Netz, Überlastung) melden wie bei der Serverprüfung – mit „Erneut
+      // versuchen“ statt eines falschen „kein Konto möglich“.
+      final options = await gateway.registrationOptions(url);
       if (run != _run || _disposed) return;
       _info = info;
       _options = options;

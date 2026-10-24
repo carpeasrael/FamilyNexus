@@ -142,5 +142,27 @@ void main() {
       expect(s.length, lessThanOrEqualTo(InviteLink.maxLength));
       expect(InviteLink.tryParse(s, now: now), isNotNull);
     });
+  
+    test('R13 viele Emoji in den Namen: Link wird gekürzt statt zu lang, bleibt lesbar', () {
+      final s = InviteLink.create(
+        roomId: '!${'r' * 40}:${'h' * 40}.example',
+        via: '${'h' * 40}.example',
+        inviter: '@${'u' * 40}:${'h' * 40}.example',
+        now: now,
+        nonce: nonce,
+        familyName: '👨‍👩‍👧' * 20,
+        inviterName: '🦄' * 40,
+      );
+      expect(s.length, lessThanOrEqualTo(InviteLink.maxLength));
+      expect(InviteLink.tryParse(s, now: now), isNotNull);
+    });
+
+    test('R14 Schreibweise wird vereinheitlicht (Schema in Kleinbuchstaben) und bleibt lesbar', () {
+      final raw = v2().replaceFirst('familynexus', 'FamilyNexus');
+      expect(InviteLink.tryParse(raw, now: now), isNotNull);
+      final n = InviteLink.normalized(' $raw ');
+      expect(n, startsWith('familynexus://join?'));
+      expect(InviteLink.tryParse(n, now: now)!.familyName, 'Familie Müller');
+    });
   });
 }

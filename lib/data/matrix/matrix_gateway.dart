@@ -40,6 +40,9 @@ enum GatewayError {
 
   /// Die Anmeldung im Browser wurde abgebrochen oder ist abgelaufen.
   oauthCancelled,
+
+  /// Rücksprung gehört nicht zur laufenden Anmeldung (fremder `state`); sie läuft weiter.
+  oauthStateMismatch,
   unknown,
 }
 
@@ -144,7 +147,8 @@ abstract class MatrixGateway implements Listenable {
   Future<Uri> startOAuth({required ServerUrl server, required Uri redirectUri, required bool create});
 
   /// Schließt die Anmeldung mit der Rücksprungadresse ab, die der Browser geöffnet hat.
-  /// Passt der `state` nicht oder fehlt der Code, wird `oauthCancelled` gemeldet.
+  /// Fremder `state`: `oauthStateMismatch` (die Anmeldung bleibt offen); Abbruch beim Anbieter oder
+  /// fehlender Code: `oauthCancelled`.
   Future<void> completeOAuth(Uri callback);
 
   /// Setzt den eigenen Anzeigenamen.

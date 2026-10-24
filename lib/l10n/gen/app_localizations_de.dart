@@ -176,7 +176,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get serverNoPassword =>
-      'Dieser Server erlaubt keine Anmeldung mit Passwort.';
+      'Bei diesem Anbieter ist keine Anmeldung mit Passwort möglich.';
 
   @override
   String get serverMetadataNote =>
@@ -245,7 +245,8 @@ class AppLocalizationsDe extends AppLocalizations {
       'Server nicht erreichbar. Prüfe die Verbindung.';
 
   @override
-  String get errServerUnsupported => 'Dieser Server wird nicht unterstützt.';
+  String get errServerUnsupported =>
+      'Dieser Anbieter wird von FamilyNexus nicht unterstützt. Bitte wähle unter „Erweitert“ einen anderen.';
 
   @override
   String get errNotAllowed => 'Dafür fehlt die Berechtigung.';
@@ -1733,7 +1734,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get regUsernameHint =>
-      'Damit meldest du dich an. Nur Kleinbuchstaben, Ziffern, Punkt und Bindestrich.';
+      'Damit meldest du dich an. 3 bis 32 Zeichen: Kleinbuchstaben, Ziffern, Punkt, Unterstrich oder Bindestrich.';
 
   @override
   String get regUsernameFree => 'Der Benutzername ist frei.';
@@ -1796,7 +1797,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String regEmailSent(String email) {
-    return 'Wir haben eine E-Mail an $email geschickt. Öffne sie und tippe auf den Link. Komm danach hierher zurück.';
+    return 'Der Anbieter hat eine E-Mail an $email geschickt. Öffne sie und tippe auf den Link. Komm danach hierher zurück.';
   }
 
   @override
@@ -1811,10 +1812,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get regTokenBody =>
-      'Dieser Anbieter braucht einen Einladungscode. Du bekommst ihn von der Person, die den Server betreibt.';
+      'Dieser Anbieter gibt Konten nur mit einem Zugangscode frei. Du bekommst ihn vom Anbieter (nicht der Einladungslink der Familie).';
 
   @override
-  String get regTokenLabel => 'Einladungscode';
+  String get regTokenLabel => 'Zugangscode des Anbieters';
 
   @override
   String get regTokenWrong => 'Der Code passt nicht. Bitte prüfe ihn.';
@@ -1999,13 +2000,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Kein Link? Bitte die Person, die dich einlädt, dir einen zu schicken.';
 
   @override
-  String joinCardBody(String family, String inviter) {
-    return 'Du trittst der Familie „$family“ bei. Eingeladen hat dich $inviter.';
+  String joinCardBody(String family, String inviter, String server) {
+    return 'Du trittst der Familie „$family“ bei. Eingeladen hat dich $inviter (Konto bei $server).';
   }
 
   @override
-  String joinCardBodyNoName(String inviter) {
-    return 'Du trittst einer Familie bei. Eingeladen hat dich $inviter.';
+  String joinCardBodyNoName(String inviter, String server) {
+    return 'Du trittst einer Familie bei. Eingeladen hat dich $inviter (Konto bei $server).';
   }
 
   @override
@@ -2098,4 +2099,9 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get errOAuthCancelled =>
       'Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal.';
+
+  @override
+  String joinCardServerMismatch(String family, String inviter) {
+    return 'Achtung: Die Familie liegt bei $family, die einladende Person aber bei $inviter. Tritt nur bei, wenn du diese Einladung wirklich erwartet hast.';
+  }
 }

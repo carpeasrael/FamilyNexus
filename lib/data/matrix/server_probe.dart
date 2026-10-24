@@ -160,18 +160,12 @@ class ServerProbe {
 
   /// Anmeldedienst des Anbieters (OAuth, MSC2965/Matrix 1.15), `null` bei klassischer Anmeldung.
   Future<Uri?> oauthIssuer(ServerUrl base) async {
-    for (final path in const <String>[
-      '/_matrix/client/v1/auth_metadata',
-      '/_matrix/client/unstable/org.matrix.msc2965/auth_metadata',
-    ]) {
-      final meta = await _getJson(base.uri.replace(path: path));
-      if (meta == null) continue;
-      final issuer = _httpsUri(meta['issuer']);
-      if (issuer != null && _httpsUri(meta['authorization_endpoint']) != null && _httpsUri(meta['registration_endpoint']) != null) {
-        return issuer;
-      }
-    }
-    return null;
+    // Nur der stabile Pfad: das SDK (getAuthMetadata) nutzt ausschließlich diesen.
+    final meta = await _getJson(base.uri.replace(path: '/_matrix/client/v1/auth_metadata'));
+    if (meta == null) return null;
+    final issuer = _httpsUri(meta['issuer']);
+    const required = <String>['authorization_endpoint', 'registration_endpoint', 'token_endpoint', 'revocation_endpoint'];
+    return issuer != null && required.every((k) => _httpsUri(meta[k]) != null) ? issuer : null;
   }
 
   /// Wie bei [url] ein Konto angelegt wird (E-55). Fragt erst den OAuth-Dienst ab, sonst die
@@ -182,15 +176,21 @@ class ServerProbe {
     final page = supportPage == null ? null : Uri.parse(supportPage);
     final issuer = await oauthIssuer(base);
     if (issuer != null) return RegistrationOptions(mode: RegistrationMode.oauth, webPage: issuer);
+    // Ohne Benutzername/Passwort und mit `inhibit_login`: selbst ein Server ohne Pflicht-UIA gäbe kein
+    // Token aus; Spezifikation: die erste Anfrage liefert nur die Abläufe (401).
     final (status, body) = await _send(
       'POST',
       base.uri.replace(path: '/_matrix/client/v3/register', queryParameters: <String, String>{'kind': 'user'}),
-      body: const <String, Object?>{},
+      body: const <String, Object?>{'inhibit_login': true},
     );
     if (status == 401 && body != null) {
       final flows = flowsFrom(body);
       if (RegistrationFlows.anySupported(flows)) return RegistrationOptions(mode: RegistrationMode.inApp, webPage: page);
     }
+    // Vorübergehende Fehler sind kein „keine Registrierung“: erneut versuchen lassen.
+    if (status == 429) throw const GatewayException(GatewayError.rateLimited);
+    if (status >= 500) throw const GatewayException(GatewayError.serverUnreachable);
+    if (status == 200) AppLog.w('probe', 'Server legte ohne Anmeldeschritte ein Konto an – ignoriert');
     return RegistrationOptions(mode: RegistrationMode.disabled, webPage: page);
   }
 

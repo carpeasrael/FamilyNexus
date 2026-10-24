@@ -68,7 +68,7 @@
       }
     }
   },
-  "serverNoPassword": "This server does not allow password sign-in.",
+  "serverNoPassword": "This provider does not allow signing in with a password.",
   "serverMetadataNote": "The server cannot see content, but it does see metadata such as who writes to whom and when. Use your own server to avoid that.",
   "onbTitleAccount": "Sign in",
   "accountUsername": "Username",
@@ -89,7 +89,7 @@
   "statusRequested": "Request",
   "errInvalidCredentials": "Username or password is wrong.",
   "errServerUnreachable": "Server not reachable. Check your connection.",
-  "errServerUnsupported": "This server is not supported.",
+  "errServerUnsupported": "FamilyNexus does not support this provider. Please choose another one under “Advanced”.",
   "errNotAllowed": "You do not have permission for this.",
   "errAttachmentRejected": "This attachment is not allowed (type or size).",
   "errInvalidInput": "Please check your input.",
@@ -976,7 +976,7 @@
   "regNameLabel": "What is your name?",
   "regNameHint": "e.g. Anna Miller",
   "regUsernameLabel": "Your username",
-  "regUsernameHint": "You sign in with it. Lowercase letters, digits, dot and hyphen only.",
+  "regUsernameHint": "You sign in with it. 3 to 32 characters: lowercase letters, digits, dot, underscore or hyphen.",
   "regUsernameFree": "This username is available.",
   "regUsernameTaken": "This username is already taken.",
   "regUsernameTakenSuggest": "Already taken – how about “{suggestion}”?",
@@ -1008,7 +1008,7 @@
   "regEmailLabel": "Email address",
   "regEmailInvalid": "Please enter a valid email address.",
   "regEmailSend": "Send confirmation",
-  "regEmailSent": "An email was sent to {email}. Open it and tap the link. Then come back here.",
+  "regEmailSent": "The provider sent an email to {email}. Open it and tap the link. Then come back here.",
   "@regEmailSent": {
     "placeholders": {
       "email": {
@@ -1019,8 +1019,8 @@
   "regEmailConfirmed": "I have confirmed",
   "regEmailResend": "Send email again",
   "regEmailNotYet": "Not confirmed yet. Please open the link in the email (also check your spam folder).",
-  "regTokenBody": "This provider needs an invitation code. You get it from the person who runs the server.",
-  "regTokenLabel": "Invitation code",
+  "regTokenBody": "This provider only activates accounts with an access code. You get it from the provider (it is not the family’s invitation link).",
+  "regTokenLabel": "Provider access code",
   "regTokenWrong": "The code does not match. Please check it.",
   "regCaptchaBody": "Please confirm briefly in the browser that you are not a robot. Afterwards you continue here automatically.",
   "regCaptchaOpen": "Open in browser",
@@ -1162,7 +1162,7 @@
   "inviteStepTitle": "Invitation",
   "inviteStepBody": "Paste the invitation link you received. Got a QR code? Scan it with the camera app – FamilyNexus then opens by itself.",
   "inviteStepNoLink": "No link? Ask the person inviting you to send you one.",
-  "joinCardBody": "You are joining the family “{family}”. You were invited by {inviter}.",
+  "joinCardBody": "You are joining the family “{family}”. You were invited by {inviter} (account at {server}).",
   "@joinCardBody": {
     "placeholders": {
       "family": {
@@ -1173,7 +1173,7 @@
       }
     }
   },
-  "joinCardBodyNoName": "You are joining a family. You were invited by {inviter}.",
+  "joinCardBodyNoName": "You are joining a family. You were invited by {inviter} (account at {server}).",
   "@joinCardBodyNoName": {
     "placeholders": {
       "inviter": {
@@ -1233,5 +1233,16 @@
   "errWeakPassword": "The password is too weak. Please use a longer one.",
   "errRegistrationDisabled": "The app cannot create an account with this provider. Create it on their website.",
   "errEmailInUse": "This email address is already used by another account.",
-  "errOAuthCancelled": "The sign-in in the browser was not completed. Please try again."
+  "errOAuthCancelled": "The sign-in in the browser was not completed. Please try again.",
+  "joinCardServerMismatch": "Caution: the family is hosted at {family}, but the inviting person at {inviter}. Only join if you really expected this invitation.",
+  "@joinCardServerMismatch": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      },
+      "inviter": {
+        "type": "String"
+      }
+    }
+  }
 }

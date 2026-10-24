@@ -138,7 +138,7 @@ class AppSettings {
 
   /// Nur kurze Links im App-Schema; die eigentliche Prüfung macht `InviteLink.tryParse`.
   static String? _validInvite(String? raw) =>
-      (raw != null && raw.length <= 1024 && raw.startsWith('familynexus://join?')) ? raw : null;
+      (raw != null && raw.length <= 1024 && raw.startsWith('familynexus://join')) ? raw : null;
 
   /// Nur gültige https-Server werden übernommen (gespeicherte Werte gelten als
   /// nicht vertrauenswürdig).

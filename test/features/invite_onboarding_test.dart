@@ -82,7 +82,7 @@ void main() {
       await _emergencyKey(tester);
 
       expect(find.text('Schritt 3 von 3'), findsOneWidget);
-      expect(find.text('Du trittst der Familie „Familie Test“ bei. Eingeladen hat dich Anna.'), findsOneWidget);
+      expect(find.text('Du trittst der Familie „Familie Test“ bei. Eingeladen hat dich Anna (Konto bei fake.test).'), findsOneWidget);
       expect(s.anna.gateway.family!.requests, isEmpty, reason: 'ohne Tipp wird nie angefragt (E-14)');
       await _tap(tester, 'Beitritt anfragen');
       expect(find.textContaining('Fast geschafft! Anna muss dich noch bestätigen.'), findsOneWidget);
@@ -187,16 +187,39 @@ void main() {
       expect(find.text('Notfall-Schlüssel erstellen'), findsOneWidget);
     });
 
-    testWidgets('TP-OAUTH-03 Rücksprung mit fremdem state wird abgelehnt', (tester) async {
+    testWidgets('TP-OAUTH-03 Rücksprung mit fremdem state wird verworfen, die echte Anmeldung läuft weiter (R8)', (tester) async {
       final app = await buildTestApp(loggedIn: false);
       app.server.registrationMode = RegistrationMode.oauth;
       await _pump(tester, app);
       await _tap(tester, 'Neue Familie gründen');
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
       app.oauth.deliver(app.gateway.oauthCallback('mallory', state: 'gefälscht'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(app.gateway.session, SessionState.loggedOut, reason: 'fremder Rücksprung meldet nie an');
+      expect(find.textContaining('Bitte im Browser bei fake.test fortfahren'), findsOneWidget, reason: 'weiter warten');
+      app.oauth.deliver(app.gateway.oauthCallback('greta'));
       await tester.pumpAndSettle();
-      expect(app.gateway.session, SessionState.loggedOut);
-      expect(find.text('Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal.'), findsOneWidget);
+      expect(app.gateway.userId, '@greta:fake.test');
+    });
+
+    testWidgets('R3 „Zurück“ während der Browser-Anmeldung beendet sie; ein neuer Versuch funktioniert', (tester) async {
+      final app = await buildTestApp(loggedIn: false);
+      app.server.registrationMode = RegistrationMode.oauth;
+      await _pump(tester, app);
+      await _tap(tester, 'Neue Familie gründen');
+      await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
+      expect(app.oauth.waiting, isTrue);
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(app.oauth.waiting, isFalse, reason: 'Versuch beendet');
+      expect(find.text('Neue Familie gründen'), findsOneWidget);
+      await _tap(tester, 'Neue Familie gründen');
+      await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
+      app.oauth.deliver(app.gateway.oauthCallback('hanna'));
+      await tester.pumpAndSettle();
+      expect(app.gateway.userId, '@hanna:fake.test');
+      expect(find.text('Notfall-Schlüssel erstellen'), findsOneWidget);
     });
 
     testWidgets('TP-OAUTH-04 Abbrechen bzw. Ablehnung beim Anbieter: verständliche Meldung, erneut möglich', (tester) async {
@@ -250,6 +273,17 @@ void main() {
         return null;
       });
       addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+      // Android-Weg: Schlüssel wird über den eigenen Kanal als „vertraulich“ kopiert.
+      const window = MethodChannel('de.inneso.familynexus/window');
+      var sensitive = 0;
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(window, (call) async {
+        if (call.method == 'copySecret') {
+          sensitive++;
+          clipboard = call.arguments as String;
+        }
+        return null;
+      });
+      addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(window, null));
       await _pump(tester, app);
       await _tap(tester, 'Ich habe schon ein Konto');
       await tester.enterText(find.widgetWithText(TextField, 'Benutzername'), 'anna');
@@ -261,6 +295,7 @@ void main() {
 
       await _tap(tester, 'Kopieren');
       expect(clipboard, key);
+      expect(sensitive, 1, reason: 'als vertraulich markiert (Android)');
       expect(find.textContaining('Die Zwischenablage wird nach einer Minute geleert.'), findsOneWidget);
       await tester.pump(const Duration(seconds: 61));
       await tester.pumpAndSettle();

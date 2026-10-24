@@ -56,7 +56,7 @@ void main() {
       await _tap(tester, 'Beitreten');
       await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), s.link);
       await _tap(tester, 'Weiter');
-      expect(find.text('Du trittst der Familie „Familie Test“ bei. Eingeladen hat dich Anna.'), findsOneWidget,
+      expect(find.text('Du trittst der Familie „Familie Test“ bei. Eingeladen hat dich Anna (Konto bei fake.test).'), findsOneWidget,
           reason: 'Namen statt technischer IDs');
       expect(find.textContaining('@anna:fake.test'), findsNothing, reason: 'ID nur unter „Details“');
       await _tap(tester, 'Details');

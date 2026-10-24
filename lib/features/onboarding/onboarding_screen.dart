@@ -86,14 +86,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _useInviteProvider(InviteLink invite) {
     final url = ServerUrl.tryParse(invite.inviterServer);
-    if (url != null) _provider.useStandard(url);
+    // Nicht lesbarer Servername: beim bisherigen Anbieter bleiben (sonst stünde „Verbinde …“ für immer).
+    url != null ? _provider.useStandard(url) : _provider.start();
   }
 
   /// Angemeldet (Konto erstellt oder Anmeldung): weiter zur Absicherung; abgemeldet: zurück.
   void _onGateway() {
     if (!mounted) return;
     final loggedIn = _s.gateway.session == SessionState.ready;
-    if (loggedIn && (_step == _Step.account || _step == _Step.login)) {
+    // Angemeldet in einem Schritt vor der Absicherung (auch nach „Zurück“ während der Browser-Anmeldung).
+    if (loggedIn && (_step == _Step.welcome || _step == _Step.inviteLink || _step == _Step.account || _step == _Step.login)) {
       setState(() => _step = _s.gateway.securityState == SecurityState.ready ? _Step.family : _Step.security);
     } else if (!loggedIn && (_step == _Step.security || _step == _Step.family)) {
       setState(() {
@@ -136,6 +138,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _back() {
+    // Laufende Anmeldung im Browser bzw. Registrierung beenden; sonst endete sie unbemerkt im Hintergrund.
+    _s.oauthRedirect?.cancel();
+    _s.gateway.cancelRegistration();
     setState(() {
       switch (_step) {
         case _Step.account when _path == OnboardingPath.invited && _withLinkStep:
