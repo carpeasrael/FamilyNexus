@@ -1,3 +1,6 @@
-New in 1.0.5:
-• The app version is now shown at the bottom of the menu.
-• FamilyNexus is now also available for Windows, Linux (Flatpak) and in the browser.
+New in 1.1.0:
+• Simple setup: start a new family, get invited or sign in – no technical terms.
+• Create your account right in the app; on matrix.org via its page with automatic return.
+• Invitation links take newcomers straight to "Create account" and joining.
+• Emergency key: clearly explained, copy it or save it as a file.
+Important: please update all devices in your family – older versions cannot open new invitation links.

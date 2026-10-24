@@ -28,4 +28,4 @@ FAMILY
 • Moderators invite (link or QR code), approve join requests and manage roles
 • New devices are verified by emoji comparison or recovery key
 
-Note: You need a Matrix account (for example on matrix.org or your own server). FamilyNexus does not create accounts.
+You create your account during setup – on matrix.org, another provider or your own server. An existing Matrix account works as well.

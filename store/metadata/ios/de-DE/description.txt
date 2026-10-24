@@ -28,4 +28,4 @@ FAMILIE
 • Moderatoren laden ein (Link oder QR-Code), bestätigen Beitritte und verwalten Rollen
 • Neue Geräte werden per Emoji-Vergleich oder Wiederherstellungsschlüssel verifiziert
 
-Hinweis: Du brauchst ein Matrix-Konto (z. B. auf matrix.org oder deinem eigenen Server). FamilyNexus legt keine Konten an.
+Ein Konto legst du bei der Einrichtung direkt an – bei matrix.org, einem anderen Anbieter oder deinem eigenen Server. Ein bestehendes Matrix-Konto funktioniert ebenso.
