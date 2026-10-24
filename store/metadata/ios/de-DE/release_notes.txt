@@ -1,6 +1,8 @@
 Neu in 1.1.0:
-• Einfache Einrichtung: Neue Familie gründen, eingeladen werden oder anmelden – ohne Fachbegriffe.
-• Konto direkt in der App anlegen; bei matrix.org über dessen Seite mit Rückkehr in die App.
-• Einladungslink führt Neue direkt zu „Konto erstellen“ und zum Beitritt.
-• Notfall-Schlüssel: verständlich erklärt, kopieren oder als Datei speichern.
-Wichtig: Bitte aktualisiert alle Geräte der Familie – ältere Versionen können neue Einladungslinks nicht öffnen.
+• Einfache Einrichtung ohne Fachbegriffe: Familie gründen, eingeladen werden oder anmelden.
+• Konto direkt in der App anlegen (matrix.org über dessen Seite).
+• Einladungslink führt Neue direkt zum Beitritt.
+• Notfall-Schlüssel: verständlich, kopierbar, als Datei speicherbar.
+• Aufgaben: Erklärung und Wiederholung z. B. Mo–Fr, mittwochs, am 2. Dienstag oder am 20.
+• iPhone: Tastatur schließt beim Tippen daneben.
+Bitte alle Geräte der Familie aktualisieren.
