@@ -22,7 +22,10 @@ void main() {
     await services.settings.update((s) => s.copyWith(languageCode: 'de'));
     await tester.pumpWidget(FamilyNexusApp(services: services));
     await tester.pumpAndSettle();
-    expect(find.text('Schritt 1 von 4'), findsOneWidget);
+    // Startseite der Einrichtung (E-55): drei Wege, noch keine Schrittanzeige.
+    expect(find.text('Neue Familie gründen'), findsOneWidget);
+    expect(find.text('Ich wurde eingeladen'), findsOneWidget);
+    expect(find.text('Ich habe schon ein Konto'), findsOneWidget);
     expect(services.gateway.session, SessionState.loggedOut);
     await resetLocalData(keyStore: ks);
   });
