@@ -186,3 +186,22 @@ Separater Review-Agent über `main..feature/task-repeat-rules`. Periodenberechnu
 | R7 | niedrig | Geräteuhr außerhalb 2000–2100 hätte geworfen | kein `!` mehr; Test |
 | R8 | niedrig | `update` ohne Erklärung hätte sie gelöscht | `String? description` durchgereicht; Test |
 | R9 | – | Testlücken (Löschmarke, v1-Liste im Editor, `nextStartAfter`, Zeitumstellung) | ergänzt |
+
+## Issue #6 (2026-10-24): Einladungslinks (E-59)
+
+Separater Review-Agent über `main..fix/invite-link-robust` (`extract` in Python nachgebaut).
+
+| # | Schwere | Fund | Behebung |
+|---|---|---|---|
+| R1 | hoch | Quoted-Printable-Erkennung verfälschte gültige Links mit Namen wie „3D-Club“; vorgemerkte Links nicht idempotent | QP nur zusätzlich, unveränderter Link zuerst; Tests (auch Neustart) |
+| R2 | mittel | Vor der Anmeldung wurde ein Heimnetz-Server aus `inv` ohne Warnung geprüft | erst nach Tipp „Mit … verbinden“, mit Warnung; Test |
+| R3 | mittel | Heimnetz-Familie + Konto auf anderem Server: Anfrage endete in „Bitte Eingabe prüfen“ | eigene Meldung, kein Anfrage-Knopf; Test |
+| R4 | mittel | Texte über 4096 Zeichen galten als „kein Einladungslink“ | bis 64 KiB durchsucht; Test |
+| R5 | niedrig | erster Treffer gewann (oft der alte Link) | erster gültiger gewinnt, sonst aussagekräftigster Grund; Test |
+| R6 | niedrig | Satzzeichen am Namensende fällt weg; Regex-Laufzeit | Länge begrenzt; Grenze in E-59 dokumentiert |
+| R7 | niedrig | lokale Endungen (`fritz.box`, `.local` …) galten als öffentlich | ergänzt; Test |
+| R8 | niedrig | erster Link bleibt nach Wechsel der Gültigkeit gültig | dokumentiert (E-59) |
+| R9 | niedrig | Vermerke 3–7 Tage alter Links ggf. außerhalb des geladenen Verlaufs anderer Moderatoren | dokumentiert (E-59) |
+| R10 | niedrig | veraltete Kommentare (`tryParse` statt `check`) | korrigiert |
+| R11 | niedrig | „1 Tag gültig“, unklares „aus diesem Netz“ | „einen Tag“, „im selben Netz (z. B. WLAN der Familie)“ |
+| R12 | – | Testlücken | ergänzt |

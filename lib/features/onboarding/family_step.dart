@@ -265,6 +265,10 @@ class _FamilyStepState extends State<FamilyStep> {
     final theme = Theme.of(context);
     final inviter = link.inviterName ?? MatrixIds.localpart(link.inviter);
     final family = link.familyName;
+    // Familie im Heimnetz, eigenes Konto auf einem anderen Server: die Server erreichen sich nicht, ein
+    // Beitritt ist unmöglich – klare Meldung statt einer Anfrage, die scheitert (Review R3).
+    final own = MatrixIds.serverName(_services.gateway.userId ?? '');
+    final unreachable = link.onLocalServer && own != null && own != link.via;
     // Überschrift „Familie beitreten“ steht in der Titelleiste der Einrichtung.
     return <Widget>[
       // Diese Karte ist für die beitretende Person die eigentliche Sicherheitsabfrage (E-37): Namen
@@ -273,7 +277,13 @@ class _FamilyStepState extends State<FamilyStep> {
           ? l.joinCardBodyNoName(inviter, link.inviterServer)
           : l.joinCardBody(family, inviter, link.inviterServer)),
       // Server im Heimnetz (IP, localhost, Name ohne Punkt): erlaubt, aber nur nach deutlicher Warnung (Issue #6).
-      if (link.onLocalServer) ...<Widget>[
+      if (unreachable) ...<Widget>[
+        const SizedBox(height: 8),
+        Semantics(
+          liveRegion: true,
+          child: Text(l.joinCardLocalOtherAccount(link.via, own), style: TextStyle(color: theme.colorScheme.error)),
+        ),
+      ] else if (link.onLocalServer) ...<Widget>[
         const SizedBox(height: 8),
         Semantics(
           liveRegion: true,
@@ -304,7 +314,8 @@ class _FamilyStepState extends State<FamilyStep> {
       ),
       Wrap(alignment: WrapAlignment.end, spacing: 8, runSpacing: 8, children: <Widget>[
         TextButton(onPressed: _busy ? null : _discard, child: Text(l.joinDiscard)),
-        FilledButton(onPressed: _busy ? null : () => _send(link), child: Text(_busy ? l.joinSending : l.joinSend)),
+        if (!unreachable)
+          FilledButton(onPressed: _busy ? null : () => _send(link), child: Text(_busy ? l.joinSending : l.joinSend)),
       ]),
     ];
   }

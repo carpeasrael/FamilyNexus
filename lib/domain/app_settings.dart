@@ -51,7 +51,7 @@ class AppSettings {
 
   /// Einladungslink, der vor der Anmeldung geöffnet wurde (E-56). Bleibt erhalten, falls das System
   /// die App beendet, während die Person im Browser ihr Konto anlegt. Rohtext, wird beim Lesen erneut
-  /// streng geprüft.
+  /// streng geprüft (`InviteLink.check`).
   final String? pendingInvite;
 
   AppSettings copyWith({
@@ -136,7 +136,7 @@ class AppSettings {
     );
   }
 
-  /// Nur kurze Links im App-Schema; die eigentliche Prüfung macht `InviteLink.tryParse`.
+  /// Nur kurze Links im App-Schema; die eigentliche Prüfung macht `InviteLink.check`.
   static String? _validInvite(String? raw) =>
       (raw != null && raw.length <= 1024 && raw.startsWith('familynexus://join')) ? raw : null;
 

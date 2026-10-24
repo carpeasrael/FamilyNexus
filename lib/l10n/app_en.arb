@@ -1346,7 +1346,7 @@
   "joinLinkDamaged": "The link is incomplete or damaged – this often happens when forwarding it. Please copy it again completely or scan the QR code.",
   "joinLinkExpired": "This invitation link has expired. Please ask the person inviting you for a new link.",
   "joinLinkNewerVersion": "This link comes from a newer version of FamilyNexus. Please update the app and try again.",
-  "joinCardLocalServer": "Caution: this family is hosted on a server in a home network ({server}). It can only be reached from that network. Only continue if you expected this invitation.",
+  "joinCardLocalServer": "Caution: this family is hosted on a server in a home network ({server}). It can only be reached when your device is on the same network (e.g. the family’s Wi-Fi). Only continue if you expected this invitation.",
   "@joinCardLocalServer": {
     "placeholders": {
       "server": {
@@ -1366,6 +1366,41 @@
   "@familyInviteLinkHint": {
     "placeholders": {
       "validity": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteValidityInSentence": "{days, plural, =1{one day} other{{days} days}}",
+  "joinCardLocalOtherAccount": "This family is hosted on a server in a home network ({family}). With your account at {own} you cannot join it. Create an account at {family} instead (sign out and choose “I was invited”).",
+  "advLocalConsent": "The invitation points to a server in a home network ({host}). Only connect if you expected the invitation and are on the same network (e.g. the family’s Wi-Fi).",
+  "advLocalConnect": "Connect to {host}",
+  "@inviteValidityInSentence": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@joinCardLocalOtherAccount": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      },
+      "own": {
+        "type": "String"
+      }
+    }
+  },
+  "@advLocalConsent": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "@advLocalConnect": {
+    "placeholders": {
+      "host": {
         "type": "String"
       }
     }

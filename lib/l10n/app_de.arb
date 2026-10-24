@@ -1352,7 +1352,7 @@
   "joinLinkDamaged": "Der Link ist unvollständig oder beschädigt – oft passiert das beim Weiterleiten. Bitte kopiere ihn noch einmal vollständig oder scanne den QR-Code.",
   "joinLinkExpired": "Dieser Einladungslink ist abgelaufen. Bitte die Person, die dich einlädt, um einen neuen Link.",
   "joinLinkNewerVersion": "Dieser Link stammt aus einer neueren Version von FamilyNexus. Bitte aktualisiere die App und versuche es noch einmal.",
-  "joinCardLocalServer": "Achtung: Diese Familie liegt auf einem Server im Heimnetz ({server}). Er ist nur aus diesem Netz erreichbar. Fahre nur fort, wenn du diese Einladung erwartet hast.",
+  "joinCardLocalServer": "Achtung: Diese Familie liegt auf einem Server im Heimnetz ({server}). Er ist nur erreichbar, wenn dein Gerät im selben Netz ist (z. B. im WLAN der Familie). Fahre nur fort, wenn du diese Einladung erwartet hast.",
   "@joinCardLocalServer": {
     "placeholders": {
       "server": {
@@ -1372,6 +1372,41 @@
   "@familyInviteLinkHint": {
     "placeholders": {
       "validity": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteValidityInSentence": "{days, plural, =1{einen Tag} other{{days} Tage}}",
+  "@inviteValidityInSentence": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "joinCardLocalOtherAccount": "Diese Familie liegt auf einem Server im Heimnetz ({family}). Mit deinem Konto bei {own} kannst du ihr nicht beitreten. Lege stattdessen ein Konto bei {family} an (dazu abmelden und „Ich wurde eingeladen“ wählen).",
+  "@joinCardLocalOtherAccount": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      },
+      "own": {
+        "type": "String"
+      }
+    }
+  },
+  "advLocalConsent": "Die Einladung verweist auf einen Server im Heimnetz ({host}). Verbinde dich nur, wenn du die Einladung erwartet hast und im selben Netz bist (z. B. im WLAN der Familie).",
+  "@advLocalConsent": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "advLocalConnect": "Mit {host} verbinden",
+  "@advLocalConnect": {
+    "placeholders": {
+      "host": {
         "type": "String"
       }
     }

@@ -87,7 +87,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _useInviteProvider(InviteLink invite) {
     final url = ServerUrl.tryParse(invite.inviterServer);
     // Nicht lesbarer Servername: beim bisherigen Anbieter bleiben (sonst stünde „Verbinde …“ für immer).
-    url != null ? _provider.useStandard(url) : _provider.start();
+    // Server im Heimnetz: erst nach Zustimmung verbinden (Review R2).
+    url != null ? _provider.useStandard(url, askFirst: InviteLink.isLocalServer(invite.inviterServer)) : _provider.start();
   }
 
   /// Angemeldet (Konto erstellt oder Anmeldung): weiter zur Absicherung; abgemeldet: zurück.

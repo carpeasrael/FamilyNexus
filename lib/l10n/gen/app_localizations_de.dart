@@ -2247,7 +2247,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String joinCardLocalServer(String server) {
-    return 'Achtung: Diese Familie liegt auf einem Server im Heimnetz ($server). Er ist nur aus diesem Netz erreichbar. Fahre nur fort, wenn du diese Einladung erwartet hast.';
+    return 'Achtung: Diese Familie liegt auf einem Server im Heimnetz ($server). Er ist nur erreichbar, wenn dein Gerät im selben Netz ist (z. B. im WLAN der Familie). Fahre nur fort, wenn du diese Einladung erwartet hast.';
   }
 
   @override
@@ -2263,4 +2263,30 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get familyInviteValidityLabel => 'Gültig für';
+
+  @override
+  String inviteValidityInSentence(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days Tage',
+      one: 'einen Tag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String joinCardLocalOtherAccount(String family, String own) {
+    return 'Diese Familie liegt auf einem Server im Heimnetz ($family). Mit deinem Konto bei $own kannst du ihr nicht beitreten. Lege stattdessen ein Konto bei $family an (dazu abmelden und „Ich wurde eingeladen“ wählen).';
+  }
+
+  @override
+  String advLocalConsent(String host) {
+    return 'Die Einladung verweist auf einen Server im Heimnetz ($host). Verbinde dich nur, wenn du die Einladung erwartet hast und im selben Netz bist (z. B. im WLAN der Familie).';
+  }
+
+  @override
+  String advLocalConnect(String host) {
+    return 'Mit $host verbinden';
+  }
 }

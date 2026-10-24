@@ -77,7 +77,7 @@ class _InviteDialogState extends State<_InviteDialog> {
     final services = AppScope.read(context);
     final ok = await services.mail.compose(
       subject: l.inviteMailSubject,
-      body: l.inviteMailBody(widget.gateway.family?.name ?? '', _link, inviteValidityText(l, _validity)),
+      body: l.inviteMailBody(widget.gateway.family?.name ?? '', _link, inviteValiditySentence(l, _validity)),
     );
     if (ok) return;
     await Clipboard.setData(ClipboardData(text: _link));
@@ -111,7 +111,7 @@ class _InviteDialogState extends State<_InviteDialog> {
           const SizedBox(height: 8),
           OutlinedButton.icon(icon: const Icon(Icons.copy), onPressed: _busy ? null : _copy, label: Text(l.familyInviteCopyLink)),
           const SizedBox(height: 12),
-          Text(l.familyInviteLinkHint(inviteValidityText(l, _validity)), style: Theme.of(context).textTheme.bodySmall),
+          Text(l.familyInviteLinkHint(inviteValiditySentence(l, _validity)), style: Theme.of(context).textTheme.bodySmall),
         ]),
       ),
       actions: <Widget>[

@@ -36,6 +36,11 @@ class _ProviderSectionState extends State<ProviderSection> {
         final host = c.server?.host ?? '';
         final Widget status = switch (c.status) {
           ProviderStatus.empty => Text(l.advEnterProvider),
+          ProviderStatus.needsConsent => Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+              Text(l.advLocalConsent(host), style: TextStyle(color: theme.colorScheme.error)),
+              const SizedBox(height: 8),
+              FilledButton.tonal(onPressed: c.connect, child: Text(l.advLocalConnect(host))),
+            ]),
           ProviderStatus.checking => Row(children: <Widget>[
               const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
               const SizedBox(width: 8),

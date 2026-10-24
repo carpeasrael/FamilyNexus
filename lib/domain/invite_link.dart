@@ -80,13 +80,17 @@ class InviteLink {
     return i >= 0 && roomId.substring(i + 1) == via;
   }
 
-  /// Server im Heimnetz: `localhost`, IP-Adresse oder Name ohne Punkt (z. B. `nas`).
+  /// Server im Heimnetz: `localhost`, IP-Adresse, Name ohne Punkt (z. B. `nas`) oder eine nur lokal
+  /// übliche Endung (`fritz.box`, `nas.local`, `*.lan`, `*.home.arpa`, `*.internal`, `*.localdomain`).
   static bool isLocalServer(String via) {
-    final host = via.contains(':') ? via.substring(0, via.lastIndexOf(':')) : via;
+    final host = (via.contains(':') ? via.substring(0, via.lastIndexOf(':')) : via).toLowerCase();
     if (host == 'localhost' || host.endsWith('.localhost')) return true;
     if (RegExp(r'^[0-9.]+$').hasMatch(host)) return true;
+    if (_localSuffixes.any(host.endsWith)) return true;
     return !host.contains('.');
   }
+
+  static const List<String> _localSuffixes = <String>['.local', '.lan', '.home.arpa', '.internal', '.box', '.localdomain'];
 
   static final RegExp _viaRe = RegExp(r'^[A-Za-z0-9.\-]{1,253}(:\d{1,5})?$');
 
@@ -227,8 +231,20 @@ class InviteLink {
   /// der Inhalt selbst wird genauso streng geprüft. Links auf Server im Heimnetz werden angenommen und
   /// mit [onLocalServer] markiert.
   static InviteLinkCheck check(String input, {required DateTime now, String? ownHost}) {
-    final candidate = extract(input);
-    if (candidate == null) return const InviteLinkCheck._(problem: InviteLinkProblem.notALink);
+    final candidates = _candidates(input);
+    if (candidates.isEmpty) return const InviteLinkCheck._(problem: InviteLinkProblem.notALink);
+    // Mehrere Fundstellen (z. B. alter und neuer Link in einer Mail): der erste gültige gewinnt; sonst der
+    // aussagekräftigste Grund (neuere Version vor abgelaufen vor beschädigt).
+    InviteLinkCheck? best;
+    for (final c in candidates) {
+      final result = _checkOne(c, now: now, ownHost: ownHost);
+      if (result.ok) return result;
+      if (best == null || result.problem!.index > best.problem!.index) best = result;
+    }
+    return best!;
+  }
+
+  static InviteLinkCheck _checkOne(String candidate, {required DateTime now, String? ownHost}) {
     final v = _versionOf(candidate);
     if (v != null && v > version) return const InviteLinkCheck._(problem: InviteLinkProblem.newerVersion);
     final link = _parse(candidate, now: now, ownHost: ownHost, allowLocal: true);
@@ -247,34 +263,54 @@ class InviteLink {
 
   static final RegExp _start = RegExp('$scheme://$host', caseSensitive: false);
   static final RegExp _qpHex = RegExp('=([0-9A-F]{2})');
+  static final RegExp _trailing = RegExp('[>"\'\u201C\u201D\u201E\u00AB\u00BB)\\].,;:!?]+\$');
 
-  /// Löst den Einladungslink aus einem Text (Mail, Messenger, Notiz) und repariert, was beim Weitergeben
-  /// typischerweise passiert: HTML-`&amp;`, nicht dekodiertes Quoted-Printable (`=3D`, `=` am Zeilenende),
-  /// Zeilenumbrüche mitten im Link, Klammern, Anführungszeichen und Satzzeichen am Ende. `null`, wenn
-  /// kein Link enthalten ist.
+  /// Längste Eingabe, die durchsucht wird (weitergeleitete Mails mit Zitat und Signatur passen hinein).
+  static const int maxInput = 65536;
+
+  /// Erster Kandidat aus [_candidates] (für Anzeige und Tests); `null`, wenn kein Link enthalten ist.
   static String? extract(String input) {
-    if (input.length > maxLength * 4) return null;
-    var t = input.replaceAll('&amp;', '&');
-    // Nur echtes Quoted-Printable (Großbuchstaben, `=3D` für jedes `=`); Link-IDs sind klein geschrieben.
-    if (t.contains('=3D')) {
-      t = t.replaceAll(RegExp(r'=\r?\n'), '').replaceAllMapped(_qpHex, (m) => String.fromCharCode(int.parse(m[1]!, radix: 16)));
+    final c = _candidates(input);
+    return c.isEmpty ? null : c.first;
+  }
+
+  /// Mögliche Links in einem Text (Mail, Messenger, Notiz), in der Reihenfolge, in der sie versucht werden.
+  /// Repariert, was beim Weitergeben typischerweise passiert: HTML-`&amp;`, Zeilenumbrüche mitten im Link,
+  /// Klammern, Anführungszeichen und Satzzeichen am Ende. Quoted-Printable (`=3D`, `=` am Zeilenende)
+  /// wird **nur zusätzlich** versucht – ein unveränderter Link geht immer vor, damit Namen wie „3D-Club“
+  /// nie verfälscht werden (Review R1). Ein Satzzeichen am Ende eines Namens kann dabei wegfallen.
+  static List<String> _candidates(String input) {
+    final text = (input.length > maxInput ? input.substring(0, maxInput) : input).replaceAll('&amp;', '&');
+    final variants = <String>[text];
+    if (text.contains('=3D') || RegExp(r'=\r?\n').hasMatch(text)) {
+      variants.add(text
+          .replaceAll(RegExp(r'=\r?\n'), '')
+          .replaceAllMapped(_qpHex, (m) => String.fromCharCode(int.parse(m[1]!, radix: 16))));
     }
-    final m = _start.firstMatch(t);
-    if (m == null) return null;
-    final parts = t.substring(m.start).split(RegExp(r'\s+'));
-    final buf = StringBuffer(parts.first);
-    // Ein Umbruch mitten im Link: weiter, solange das Stück davor mit `=`/`&` endet oder das nächste mit `&` beginnt.
-    for (final p in parts.skip(1)) {
-      final prev = buf.toString();
-      if (p.isEmpty || !(prev.endsWith('=') || prev.endsWith('&') || p.startsWith('&'))) break;
-      buf.write(p);
+    final out = <String>[];
+    for (final t in variants) {
+      for (final m in _start.allMatches(t).take(5)) {
+        final end = m.start + maxLength * 3 < t.length ? m.start + maxLength * 3 : t.length;
+        final parts = t.substring(m.start, end).split(RegExp(r'\s+'));
+        final buf = StringBuffer(parts.first);
+        // Ein Umbruch mitten im Link: weiter, solange das Stück davor mit `=`/`&` endet oder das nächste mit `&` beginnt.
+        for (final p in parts.skip(1)) {
+          final prev = buf.toString();
+          if (p.isEmpty || !(prev.endsWith('=') || prev.endsWith('&') || p.startsWith('&'))) break;
+          buf.write(p);
+        }
+        final raw = buf.toString();
+        if (raw.length > maxLength * 2) continue;
+        for (final c in <String>[raw.replaceFirst(_trailing, ''), raw]) {
+          if (c.isNotEmpty && c.length <= maxLength && !out.contains(c)) out.add(c);
+        }
+      }
     }
-    final s = buf.toString().replaceFirst(RegExp('[>"\'\u201C\u201D\u201E\u00AB\u00BB)\\].,;:!?]+\$'), '');
-    return s.isEmpty || s.length > maxLength ? null : s;
+    return out;
   }
 
   /// Einheitliche Schreibweise eines (bereits geprüften) Links zum Vormerken, z. B. Schema in
-  /// Kleinbuchstaben; ein Neustart liest ihn mit [tryParse] erneut.
+  /// Kleinbuchstaben; ein Neustart liest ihn mit [check] erneut (auch Links auf Heimnetz-Servern).
   static String normalized(String raw) {
     try {
       return Uri.parse(raw.trim()).toString();
