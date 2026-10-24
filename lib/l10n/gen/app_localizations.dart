@@ -1553,8 +1553,8 @@ abstract class AppLocalizations {
   /// No description provided for @familyInviteLinkHint.
   ///
   /// In de, this message translates to:
-  /// **'Der Link ist 24 Stunden gültig und nur einmal verwendbar. Wer ihn öffnet, schickt dir eine Anfrage – du bestätigst sie.'**
-  String get familyInviteLinkHint;
+  /// **'Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, schickt dir eine Anfrage – du bestätigst sie.'**
+  String familyInviteLinkHint(String validity);
 
   /// No description provided for @familyInviteShowQr.
   ///
@@ -1687,12 +1687,6 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Einladungslink'**
   String get joinLinkLabel;
-
-  /// No description provided for @joinLinkInvalid.
-  ///
-  /// In de, this message translates to:
-  /// **'Dieser Link ist ungültig oder abgelaufen.'**
-  String get joinLinkInvalid;
 
   /// No description provided for @joinSend.
   ///
@@ -2579,8 +2573,8 @@ abstract class AppLocalizations {
   /// No description provided for @inviteMailBody.
   ///
   /// In de, this message translates to:
-  /// **'Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ich bestätige dich, dann bist du dabei.\n\nDer Link ist {hours} Stunden gültig.'**
-  String inviteMailBody(String family, String link, String hours);
+  /// **'Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ich bestätige dich, dann bist du dabei.\n\nDer Link ist {validity} gültig.'**
+  String inviteMailBody(String family, String link, String validity);
 
   /// No description provided for @familyInviteMailFailed.
   ///
@@ -3811,6 +3805,48 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Die Erklärung ist zu lang. Bitte kürze sie etwas.'**
   String get tasksDescriptionTooLong;
+
+  /// No description provided for @joinLinkNotALink.
+  ///
+  /// In de, this message translates to:
+  /// **'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „familynexus://join“.'**
+  String get joinLinkNotALink;
+
+  /// No description provided for @joinLinkDamaged.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Link ist unvollständig oder beschädigt – oft passiert das beim Weiterleiten. Bitte kopiere ihn noch einmal vollständig oder scanne den QR-Code.'**
+  String get joinLinkDamaged;
+
+  /// No description provided for @joinLinkExpired.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Einladungslink ist abgelaufen. Bitte die Person, die dich einlädt, um einen neuen Link.'**
+  String get joinLinkExpired;
+
+  /// No description provided for @joinLinkNewerVersion.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Link stammt aus einer neueren Version von FamilyNexus. Bitte aktualisiere die App und versuche es noch einmal.'**
+  String get joinLinkNewerVersion;
+
+  /// No description provided for @joinCardLocalServer.
+  ///
+  /// In de, this message translates to:
+  /// **'Achtung: Diese Familie liegt auf einem Server im Heimnetz ({server}). Er ist nur aus diesem Netz erreichbar. Fahre nur fort, wenn du diese Einladung erwartet hast.'**
+  String joinCardLocalServer(String server);
+
+  /// No description provided for @inviteValidityDays.
+  ///
+  /// In de, this message translates to:
+  /// **'{days, plural, =1{1 Tag} other{{days} Tage}}'**
+  String inviteValidityDays(int days);
+
+  /// No description provided for @familyInviteValidityLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Gültig für'**
+  String get familyInviteValidityLabel;
 }
 
 class _AppLocalizationsDelegate

@@ -9,6 +9,7 @@ import '../../domain/invite_link.dart';
 import '../../domain/server.dart';
 import '../../domain/security.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../common/invite_link_text.dart';
 import '../security/verification_dialog.dart';
 import '../onboarding/onboarding_screen.dart';
 import 'home_shell.dart';
@@ -41,9 +42,9 @@ class _AppRootState extends State<AppRoot> {
   void _restorePendingInvite(AppServices services) {
     final raw = services.settings.settings.pendingInvite;
     if (raw == null || services.pendingInvite.value != null) return;
-    final link = InviteLink.tryParse(raw, now: DateTime.now(), ownHost: MatrixIds.serverName(services.gateway.userId ?? ''));
-    if (link != null && link.isValidAt(DateTime.now()) && services.gateway.family == null) {
-      services.pendingInvite.value = link;
+    final check = InviteLink.check(raw, now: DateTime.now(), ownHost: MatrixIds.serverName(services.gateway.userId ?? ''));
+    if (check.ok && services.gateway.family == null) {
+      services.pendingInvite.value = check.link;
     } else {
       // Nicht während des Aufbaus benachrichtigen.
       Future<void>.microtask(() => services.settings.update((c) => c.copyWith(pendingInvite: null))).ignore();
@@ -62,18 +63,20 @@ class _AppRootState extends State<AppRoot> {
     if (AppLinkOAuthRedirect.isCallback(raw)) return;
     final l = AppLocalizations.of(context);
     final ownHost = MatrixIds.serverName(services.gateway.userId ?? '');
-    final link = InviteLink.tryParse(raw, now: DateTime.now(), ownHost: ownHost);
+    final check = InviteLink.check(raw, now: DateTime.now(), ownHost: ownHost);
     final messenger = ScaffoldMessenger.maybeOf(context);
-    if (link == null || !link.isValidAt(DateTime.now())) {
-      messenger?.showSnackBar(SnackBar(content: Text(l.joinLinkInvalid)));
+    final problem = check.problem;
+    if (problem != null) {
+      messenger?.showSnackBar(SnackBar(content: Text(inviteLinkProblemText(l, problem))));
       return;
     }
+    final link = check.link!;
     if (services.gateway.family != null) {
       messenger?.showSnackBar(SnackBar(content: Text(l.joinAlreadyInFamily)));
       return;
     }
     // Vormerken (auch über einen Neustart hinweg); gehandelt wird erst nach Bestätigung.
-    services.settings.update((c) => c.copyWith(pendingInvite: InviteLink.normalized(raw))).ignore();
+    services.settings.update((c) => c.copyWith(pendingInvite: check.raw)).ignore();
     services.pendingInvite.value = link;
   }
 

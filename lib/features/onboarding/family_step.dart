@@ -8,6 +8,7 @@ import '../../domain/server.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
 import '../common/error_text.dart';
+import '../common/invite_link_text.dart';
 import '../family/invite_dialog.dart';
 
 /// Was der Familienschritt zuerst zeigt: gründen (Weg „Neue Familie“), beitreten (Weg „Eingeladen“)
@@ -107,15 +108,15 @@ class _FamilyStepState extends State<FamilyStep> {
   /// Eingefügter Link: prüfen und als Karte zeigen (gleicher Weg wie ein geöffneter Link).
   Future<void> _submitLink() async {
     final l = AppLocalizations.of(context);
-    final raw = _link.text.trim();
-    final link = InviteLink.tryParse(raw, now: DateTime.now(), ownHost: MatrixIds.serverName(_services.gateway.userId ?? ''));
-    if (link == null || !link.isValidAt(DateTime.now())) {
-      setState(() => _error = l.joinLinkInvalid);
+    final check = InviteLink.check(_link.text, now: DateTime.now(), ownHost: MatrixIds.serverName(_services.gateway.userId ?? ''));
+    final problem = check.problem;
+    if (problem != null) {
+      setState(() => _error = inviteLinkProblemText(l, problem));
       return;
     }
     _link.clear();
-    await _services.settings.update((c) => c.copyWith(pendingInvite: InviteLink.normalized(raw)));
-    _services.pendingInvite.value = link;
+    await _services.settings.update((c) => c.copyWith(pendingInvite: check.raw));
+    _services.pendingInvite.value = check.link;
   }
 
   Future<void> _discard() async {
@@ -127,7 +128,7 @@ class _FamilyStepState extends State<FamilyStep> {
   Future<void> _send(InviteLink link) async {
     final l = AppLocalizations.of(context);
     if (!link.isValidAt(DateTime.now())) {
-      setState(() => _error = l.joinLinkInvalid);
+      setState(() => _error = l.joinLinkExpired);
       return;
     }
     await _run(() async {
@@ -271,6 +272,14 @@ class _FamilyStepState extends State<FamilyStep> {
       Text(family == null
           ? l.joinCardBodyNoName(inviter, link.inviterServer)
           : l.joinCardBody(family, inviter, link.inviterServer)),
+      // Server im Heimnetz (IP, localhost, Name ohne Punkt): erlaubt, aber nur nach deutlicher Warnung (Issue #6).
+      if (link.onLocalServer) ...<Widget>[
+        const SizedBox(height: 8),
+        Semantics(
+          liveRegion: true,
+          child: Text(l.joinCardLocalServer(link.via), style: TextStyle(color: theme.colorScheme.error)),
+        ),
+      ],
       if (link.inviterServer != link.via) ...<Widget>[
         const SizedBox(height: 8),
         Semantics(

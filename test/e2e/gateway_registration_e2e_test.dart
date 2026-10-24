@@ -112,6 +112,24 @@ void main() {
       expect(guest.family!.name, 'Familie E2E');
     });
 
+    test('Issue #6: Link einer Familie auf einem Heimnetz-Server (localhost) vor der Anmeldung lesen und beitreten', () async {
+      final mod = await _registered('modl', 'Lena');
+      await mod.createFamily('Familie Heimnetz');
+      await E2e.until(() => mod.family != null, what: 'Familie');
+      final raw = await mod.createInviteLink(validity: const Duration(days: 7));
+      // Wie ein Neuling vor der Anmeldung: eigener Server noch unbekannt, Link aus einer HTML-Mail.
+      final check = InviteLink.check('Dein Link: <${raw.replaceAll('&', '&amp;')}>', now: DateTime.now());
+      expect(check.ok, isTrue, reason: '${check.problem}');
+      final link = check.link!;
+      expect(link.onLocalServer, isTrue, reason: 'Warnung auf der Beitrittskarte');
+      expect(link.expires.difference(DateTime.now().toUtc()).inHours, inInclusiveRange(167, 168));
+      expect(InviteLink.tryParse(raw, now: DateTime.now()), isNull, reason: 'strenge Prüfung ohne eigenen Server bleibt');
+      final guest = await _registered('gastl', 'Jonas');
+      await guest.requestToJoin(link);
+      await E2e.until(() => mod.family?.member(guest.userId!)?.status == MemberStatus.requested, what: 'Anfrage');
+      expect(mod.family!.member(guest.userId!)!.request, RequestCheck.valid);
+    });
+
     test('TP-E2E-04 direkte Einladung zeigt den Namen der einladenden Person', () async {
       final mod = await _registered('modb', 'Henriette');
       await mod.createFamily('Familie Namen');

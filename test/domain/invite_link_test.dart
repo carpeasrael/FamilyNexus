@@ -18,10 +18,11 @@ void main() {
     expect(l.roomId, '!abc123:matrix.org');
     expect(l.via, 'matrix.org');
     expect(l.inviter, '@mod:matrix.org');
-    expect(l.expires, now.add(const Duration(hours: 24)));
+    expect(l.expires, now.add(InviteLink.defaultValidity));
+    expect(InviteLink.defaultValidity, const Duration(days: 3), reason: 'Issue #6: Standard 3 Tage');
     expect(l.isValidAt(now), isTrue);
-    expect(l.isValidAt(now.add(const Duration(hours: 24))), isFalse, reason: 'Ablauf ist exklusiv');
-    expect(l.isValidAt(now.add(const Duration(days: 2))), isFalse);
+    expect(l.isValidAt(now.add(InviteLink.defaultValidity)), isFalse, reason: 'Ablauf ist exklusiv');
+    expect(l.isValidAt(now.add(const Duration(days: 4))), isFalse);
   });
 
   test('Port in via ist erlaubt', () {

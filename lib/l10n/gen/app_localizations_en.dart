@@ -868,8 +868,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get familyInviteLinkTitle => 'Invite someone';
 
   @override
-  String get familyInviteLinkHint =>
-      'The link is valid for 24 hours and can be used once. Whoever opens it sends you a request – you confirm it.';
+  String familyInviteLinkHint(String validity) {
+    return 'The link is valid for $validity and can be used once. Whoever opens it sends you a request – you confirm it.';
+  }
 
   @override
   String get familyInviteShowQr => 'Show QR code';
@@ -942,9 +943,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get joinLinkLabel => 'Invitation link';
-
-  @override
-  String get joinLinkInvalid => 'This link is invalid or expired.';
 
   @override
   String get joinSend => 'Request to join';
@@ -1477,8 +1475,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inviteMailSubject => 'Invitation to FamilyNexus';
 
   @override
-  String inviteMailBody(String family, String link, String hours) {
-    return 'Hello,\n\nI am inviting you to our family “$family” on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n$link\n\n3. Create your account.\n4. I confirm you, and you are in.\n\nThe link is valid for $hours hours.';
+  String inviteMailBody(String family, String link, String validity) {
+    return 'Hello,\n\nI am inviting you to our family “$family” on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n$link\n\n3. Create your account.\n4. I confirm you, and you are in.\n\nThe link is valid for $validity.';
   }
 
   @override
@@ -2215,4 +2213,39 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tasksDescriptionTooLong =>
       'The description is too long. Please shorten it a little.';
+
+  @override
+  String get joinLinkNotALink =>
+      'This is not an invitation link. An invitation link starts with “familynexus://join”.';
+
+  @override
+  String get joinLinkDamaged =>
+      'The link is incomplete or damaged – this often happens when forwarding it. Please copy it again completely or scan the QR code.';
+
+  @override
+  String get joinLinkExpired =>
+      'This invitation link has expired. Please ask the person inviting you for a new link.';
+
+  @override
+  String get joinLinkNewerVersion =>
+      'This link comes from a newer version of FamilyNexus. Please update the app and try again.';
+
+  @override
+  String joinCardLocalServer(String server) {
+    return 'Caution: this family is hosted on a server in a home network ($server). It can only be reached from that network. Only continue if you expected this invitation.';
+  }
+
+  @override
+  String inviteValidityDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get familyInviteValidityLabel => 'Valid for';
 }

@@ -85,10 +85,18 @@ void main() {
         validity: const Duration(hours: 1),
         nonce: '0123456789abcdef0123456789abcdef',
       );
-      for (final bad in <String>[expired, 'familynexus://join?v=1&room=x', 'hallo', s.link.replaceFirst('familynexus', 'https')]) {
-        await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), bad);
+      // Issue #6: je Ursache eine eigene, verständliche Meldung.
+      final cases = <String, String>{
+        expired: 'Dieser Einladungslink ist abgelaufen. Bitte die Person, die dich einlädt, um einen neuen Link.',
+        'familynexus://join?v=1&room=x': 'Der Link ist unvollständig oder beschädigt – oft passiert das beim Weiterleiten. Bitte kopiere ihn noch einmal vollständig oder scanne den QR-Code.',
+        'hallo': 'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „familynexus://join“.',
+        s.link.replaceFirst('familynexus', 'https'): 'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „familynexus://join“.',
+        s.link.replaceFirst('v=2', 'v=9'): 'Dieser Link stammt aus einer neueren Version von FamilyNexus. Bitte aktualisiere die App und versuche es noch einmal.',
+      };
+      for (final c in cases.entries) {
+        await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), c.key);
         await _tap(tester, 'Weiter');
-        expect(find.text('Dieser Link ist ungültig oder abgelaufen.'), findsOneWidget, reason: bad);
+        expect(find.text(c.value), findsOneWidget, reason: c.key);
       }
       expect(s.anna.family!.requests, isEmpty);
     });
@@ -120,7 +128,7 @@ void main() {
       await _pump(tester, s.ben);
       s.ben.links.controller.add('familynexus://join?v=1&room=!x:y&evil=1');
       await tester.pumpAndSettle();
-      expect(find.text('Dieser Link ist ungültig oder abgelaufen.'), findsOneWidget);
+      expect(find.text('Der Link ist unvollständig oder beschädigt – oft passiert das beim Weiterleiten. Bitte kopiere ihn noch einmal vollständig oder scanne den QR-Code.'), findsOneWidget);
       expect(find.widgetWithText(FilledButton, 'Beitritt anfragen'), findsNothing);
     });
 

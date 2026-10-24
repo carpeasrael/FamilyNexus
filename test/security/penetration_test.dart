@@ -149,8 +149,8 @@ void main() {
     });
 
     test('abgelaufene und zu weit in der Zukunft liegende Links', () {
-      final past = InviteLink.tryParse(_validLink(), now: _now.add(const Duration(days: 2)));
-      expect(past == null || !past.isValidAt(_now.add(const Duration(days: 2))), isTrue);
+      final past = InviteLink.tryParse(_validLink(), now: _now.add(const Duration(days: 8)));
+      expect(past == null || !past.isValidAt(_now.add(const Duration(days: 8))), isTrue);
       final far = InviteLink.tryParse(_validLink(), now: _now.subtract(const Duration(days: 30)));
       expect(far, isNull, reason: 'Ablauf Wochen nach "jetzt" = manipuliert');
     });

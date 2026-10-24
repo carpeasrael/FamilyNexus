@@ -399,7 +399,7 @@
   "familyManage": "Management",
   "familyInvite": "Invite a member",
   "familyInviteLinkTitle": "Invite someone",
-  "familyInviteLinkHint": "The link is valid for 24 hours and can be used once. Whoever opens it sends you a request – you confirm it.",
+  "familyInviteLinkHint": "The link is valid for {validity} and can be used once. Whoever opens it sends you a request – you confirm it.",
   "familyInviteShowQr": "Show QR code",
   "familyInviteCopyLink": "Copy link",
   "familyInviteCopied": "Link copied.",
@@ -436,7 +436,6 @@
   "joinTitle": "Join a family",
   "joinHint": "Paste the invitation link or open the link or QR code with the camera app.",
   "joinLinkLabel": "Invitation link",
-  "joinLinkInvalid": "This link is invalid or expired.",
   "joinSend": "Request to join",
   "joinPending": "Almost done! Your request is on its way. As soon as it is confirmed, you are in.",
   "joinCancel": "Withdraw request",
@@ -804,7 +803,7 @@
   "privacy11Body": "The app remembers blocked members only on this device (encrypted database); the list is not transmitted. If you report a message, the operator of your server receives the message ID, the chosen reason and your optional text. They cannot read the encrypted content.",
   "familyInviteMail": "Send by email",
   "inviteMailSubject": "Invitation to FamilyNexus",
-  "inviteMailBody": "Hello,\n\nI am inviting you to our family “{family}” on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n{link}\n\n3. Create your account.\n4. I confirm you, and you are in.\n\nThe link is valid for {hours} hours.",
+  "inviteMailBody": "Hello,\n\nI am inviting you to our family “{family}” on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n{link}\n\n3. Create your account.\n4. I confirm you, and you are in.\n\nThe link is valid for {validity}.",
   "@inviteMailBody": {
     "placeholders": {
       "family": {
@@ -813,7 +812,7 @@
       "link": {
         "type": "String"
       },
-      "hours": {
+      "validity": {
         "type": "String"
       }
     }
@@ -1342,5 +1341,33 @@
       }
     }
   },
-  "tasksDescriptionTooLong": "The description is too long. Please shorten it a little."
+  "tasksDescriptionTooLong": "The description is too long. Please shorten it a little.",
+  "joinLinkNotALink": "This is not an invitation link. An invitation link starts with “familynexus://join”.",
+  "joinLinkDamaged": "The link is incomplete or damaged – this often happens when forwarding it. Please copy it again completely or scan the QR code.",
+  "joinLinkExpired": "This invitation link has expired. Please ask the person inviting you for a new link.",
+  "joinLinkNewerVersion": "This link comes from a newer version of FamilyNexus. Please update the app and try again.",
+  "joinCardLocalServer": "Caution: this family is hosted on a server in a home network ({server}). It can only be reached from that network. Only continue if you expected this invitation.",
+  "@joinCardLocalServer": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteValidityDays": "{days, plural, =1{1 day} other{{days} days}}",
+  "@inviteValidityDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "familyInviteValidityLabel": "Valid for",
+  "@familyInviteLinkHint": {
+    "placeholders": {
+      "validity": {
+        "type": "String"
+      }
+    }
+  }
 }
