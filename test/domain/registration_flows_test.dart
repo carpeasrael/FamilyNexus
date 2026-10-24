@@ -34,7 +34,7 @@ void main() {
         'privacy': <String, Object?>{
           'version': '1',
           'en': <String, Object?>{'name': 'Privacy', 'url': 'https://hs.example/privacy-en'},
-          'de': <String, Object?>{'name': 'Datenschutz‮', 'url': 'https://hs.example/privacy-de'},
+          'de': <String, Object?>{'name': 'Datenschutz\u202E', 'url': 'https://hs.example/privacy-de'},
         },
         'terms': <String, Object?>{
           'version': '2',
