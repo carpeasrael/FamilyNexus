@@ -78,6 +78,26 @@ void main() {
       expect(const TaskRule.monthlyByWeekday(2, DateTime.tuesday).nextStartAfter(DateTime.utc(2026, 10, 13)), DateTime.utc(2026, 11, 10));
       expect(const TaskRule.monthlyByDate(31).nextStartAfter(DateTime.utc(2026, 11, 5)), DateTime.utc(2026, 11, 30));
       expect(const TaskRule.weekly(DateTime.sunday).nextStartAfter(DateTime.utc(2026, 10, 24)), DateTime.utc(2026, 10, 25));
+      // Review R9: Freitag → Montag, 31. im Februar (Schaltjahr), letzter Wochentag über den Jahreswechsel.
+      expect(const TaskRule.weekdays().nextStartAfter(DateTime.utc(2026, 10, 24)), DateTime.utc(2026, 10, 26));
+      expect(const TaskRule.monthlyByDate(31).nextStartAfter(DateTime.utc(2028, 2, 1)), DateTime.utc(2028, 2, 29));
+      expect(const TaskRule.monthlyByDate(31).nextStartAfter(DateTime.utc(2027, 2, 1)), DateTime.utc(2027, 2, 28));
+      expect(const TaskRule.monthlyByWeekday(TaskRule.last, DateTime.friday).nextStartAfter(DateTime.utc(2026, 12, 25)),
+          DateTime.utc(2027, 1, 29));
+    });
+
+    test('Zeitumstellung: Schlüssel folgt dem lokalen Datum der Liste (Frühjahr und Herbst)', () {
+      final berlin = TimeZones.tryGet('Europe/Berlin')!;
+      const r = TaskRule.weekly(DateTime.sunday);
+      // 29.03.2026 (Sonntag) 0:30 MEZ = 28.03. 23:30 UTC; Umstellung um 2:00 auf MESZ.
+      expect(r.key(berlin, DateTime.utc(2026, 3, 28, 23, 30)), '2026-03-29');
+      expect(r.key(berlin, DateTime.utc(2026, 3, 28, 22, 59)), '2026-03-22', reason: 'noch Samstag 23:59 Ortszeit');
+      // 25.10.2026 (Sonntag): 0:30 MESZ = 24.10. 22:30 UTC.
+      expect(r.key(berlin, DateTime.utc(2026, 10, 24, 22, 30)), '2026-10-25');
+    });
+
+    test('R7: Geräteuhr außerhalb 2000–2100 führt nicht zum Absturz', () {
+      expect(const TaskRule.weekdays().key(TimeZones.utc, DateTime.utc(1999, 12, 31)), isNotEmpty);
     });
 
     test('Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)', () {

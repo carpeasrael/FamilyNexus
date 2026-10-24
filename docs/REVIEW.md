@@ -169,3 +169,20 @@ Separater Review-Agent über `774c009..HEAD` (SDK-Verhalten an matrix-14.2.0 geg
 | R18 | niedrig | Texte: „Wir haben eine E-Mail …“, Hinweis zum Benutzernamen, „Einladungscode“ verwechselbar, „Server“ | korrigiert („Der Anbieter hat …“, „Zugangscode des Anbieters“, „Anbieter“) |
 | R19 | niedrig | Testplan nicht eingecheckt | eingecheckt |
 | R20 | niedrig | Gefälschter Link legt Konto beim Anbieter des Angreifers an | wie R1; Begründung in E-56 korrigiert |
+
+## Issue #1 (2026-10-24): Erklärung und Wiederholungsregeln für Aufgabenlisten (E-58)
+
+Separater Review-Agent über `main..feature/task-repeat-rules`. Periodenberechnung unabhängig in Python nachgebaut und für alle
+78 Regeln an jedem Tag 2000–2100 geprüft: kein Fund (größter Abstand zum Start 34 Tage, Grenze 35 korrekt).
+
+| # | Schwere | Fund | Behebung |
+|---|---|---|---|
+| R1 | mittel | Löschmarke einer umgestellten Liste wurde als v2 gesendet – ältere Versionen hätten die Liste nie gelöscht | Löschmarke immer v1; Test |
+| R2 | mittel | Erklärung lehnte ZWJ/ZWNJ (zusammengesetzte Emojis) und einzelnes `\r` ab; irreführende Meldung | ZWJ/ZWNJ erlaubt, `\r` → Zeilenumbruch, eigene Meldung „Erklärung zu lang“; Tests |
+| R3 | mittel | Moderator mit älterer App überschreibt Regel/Erklärung | in älteren Versionen nicht verhinderbar; E-58 und OFFEN ergänzt |
+| R4 | niedrig | mehrdeutiges v2 (bisherige Regel ohne Erklärung) wurde angenommen | abgelehnt; Test |
+| R5 | niedrig | Verlauf verlor nach Regeländerung alte Einträge | Verlauf prüft nur Echtheit, nicht die aktuelle Regel; Test |
+| R6 | niedrig | Testname behauptete zu viel (gleiche Schlüssel bleiben erledigt) | Verhalten in E-58 festgehalten, Test ergänzt |
+| R7 | niedrig | Geräteuhr außerhalb 2000–2100 hätte geworfen | kein `!` mehr; Test |
+| R8 | niedrig | `update` ohne Erklärung hätte sie gelöscht | `String? description` durchgereicht; Test |
+| R9 | – | Testlücken (Löschmarke, v1-Liste im Editor, `nextStartAfter`, Zeitumstellung) | ergänzt |

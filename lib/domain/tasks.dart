@@ -14,9 +14,10 @@ final RegExp _badText = RegExp(
   '[\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF]',
 );
 
-/// Wie [_badText], erlaubt aber Zeilenumbrüche (mehrzeilige Erklärung).
+/// Wie [_badText], erlaubt aber Zeilenumbrüche (mehrzeilige Erklärung) sowie ZWNJ/ZWJ (U+200C/U+200D),
+/// ohne die zusammengesetzte Emojis (👨‍👩‍👧) und viele Schriften nicht darstellbar wären.
 final RegExp _badDescription = RegExp(
-  '[\\u0000-\\u0009\\u000B-\\u001F\\u007F-\\u009F\\u061C\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF]',
+  '[\\u0000-\\u0009\\u000B-\\u001F\\u007F-\\u009F\\u061C\\u200B\\u200E\\u200F\\u202A-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF]',
 );
 
 /// Ein Punkt einer Aufgabenliste.
@@ -329,6 +330,8 @@ class TaskCodec {
       final n = c['note'];
       if (rule == null || rule.interval != parsedInterval.first || n is! String) return null;
       if (n.length > TaskList.maxDescription * 2) return null;
+      // Eindeutige Form: v2 nur, wenn v1 nicht genügt (sonst ließen sich v1-Listen vor älteren Versionen verbergen).
+      if (rule.isLegacy && n.isEmpty) return null;
       note = n;
     } else if (c.containsKey('rule') || c.containsKey('note')) {
       return null; // v1 kennt diese Felder nicht: mehrdeutig
@@ -460,9 +463,17 @@ class TaskProgress {
     return c != 0 ? c > 0 : a.id.compareTo(b.id) > 0;
   }
 
-  /// Verlauf der Liste, neueste zuerst (nur gültige Einträge).
+  /// Eintrag ist echt (zugewiesene Person, Datum passt zum Zeitpunkt), unabhängig von der aktuellen Regel.
+  static bool _authentic(TaskList list, TaskLogEntry e) {
+    if (e.listId != list.id || e.by != list.assignee) return false;
+    final loc = TimeZones.tryGet(list.timeZone);
+    return loc != null && TaskPeriod.localDate(loc, e.at) == e.doneOn;
+  }
+
+  /// Verlauf der Liste, neueste zuerst. Auch Einträge aus der Zeit vor einer Regeländerung bleiben
+  /// sichtbar (Review R5); für den aktuellen Stand zählt dagegen nur [doneNow].
   static List<TaskLogEntry> history(TaskList list, Iterable<TaskLogEntry> log) =>
-      <TaskLogEntry>[for (final e in log) if (isValidFor(list, e)) e]
+      <TaskLogEntry>[for (final e in log) if (_authentic(list, e)) e]
         ..sort((a, b) {
           final c = b.at.compareTo(a.at);
           return c != 0 ? c : b.id.compareTo(a.id);
@@ -540,6 +551,7 @@ class TaskService {
   /// Erklärung: Leerraum je Zeile vereinheitlicht, höchstens zwei Leerzeilen in Folge.
   static String _normDescription(String s) => s
       .replaceAll('\r\n', '\n')
+      .replaceAll('\r', '\n')
       .split('\n')
       .map((line) => line.replaceAll(RegExp(r'[ \t]+'), ' ').trim())
       .join('\n')
@@ -619,6 +631,8 @@ class TaskService {
         final next = current.copyWith(
           title: '',
           description: '',
+          // Löschmarke immer im Format v1: ältere App-Versionen müssen das Löschen auch sehen (Review R1).
+          rule: TaskRule.fromInterval(current.interval),
           items: const <TaskItem>[],
           deleted: true,
           version: current.version + 1,

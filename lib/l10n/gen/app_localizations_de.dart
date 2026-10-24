@@ -2226,4 +2226,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String tasksNextReset(String date) {
     return 'Nächster Neustart: $date';
   }
+
+  @override
+  String get tasksDescriptionTooLong =>
+      'Die Erklärung ist zu lang. Bitte kürze sie etwas.';
 }
