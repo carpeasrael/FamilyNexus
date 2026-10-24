@@ -1465,7 +1465,17 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final f = _requireFamily();
     final m = _requireMember(f, userId);
     if (!Permissions.canPromote(f, m)) throw const GatewayException(GatewayError.notAllowed);
-    await _roomOp((room) => room.setPower(userId, PowerLevels.moderator));
+    // Der Stand kommt vom Server, nicht aus dem lokalen Zwischenspeicher: `Room.setPower` kopiert den
+    // Zwischenspeicher, und ein veralteter Stand (z. B. zweite Ernennung vor dem Abgleich) würde einen
+    // eben ernannten, gleichrangigen Moderator wieder herabstufen – der Server lehnt das ab (Issue #7).
+    await _roomOp((room) async {
+      final current = await room.client.getRoomStateWithKey(room.id, EventTypes.RoomPowerLevels, '');
+      final users = <String, Object?>{
+        if (current['users'] case final Map<String, Object?> known) ...known,
+        userId: PowerLevels.moderator,
+      };
+      await room.client.setRoomStateWithKey(room.id, EventTypes.RoomPowerLevels, '', <String, Object?>{...current, 'users': users});
+    });
   }
 
   @override

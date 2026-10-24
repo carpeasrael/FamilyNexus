@@ -132,6 +132,46 @@ void main() {
       await expectLater(b.removeMember(a.userId!), _error(GatewayError.notAllowed));
     });
 
+    test('Issue #7: Mitglied zum Moderator hochstufen – auch durch einen ernannten Moderator und mehrfach hintereinander', () async {
+      final a = await _login('mod');
+      await a.createFamily('Hochstufen');
+      await E2e.until(() => a.family != null);
+      final b = await _login('mem');
+      final c = await _login('dritter');
+      final d = await _login('vierter');
+      await _join(a, b);
+      await _join(a, c);
+      await _join(a, d);
+
+      // Ersteller ernennt B; B (ernannt, nicht Ersteller) ernennt C.
+      await a.promote(b.userId!);
+      await E2e.until(() => b.family?.myRole == Role.moderator, what: 'B ist Moderator');
+      await b.promote(c.userId!);
+      await E2e.until(() => a.family?.member(c.userId!)?.role == Role.moderator, what: 'C ist Moderator (aus A-Sicht)');
+      await E2e.until(() => c.family?.myRole == Role.moderator, what: 'C ist Moderator');
+
+      // Sofort danach ernennt A noch D, ohne den Abgleich abzuwarten.
+      await a.promote(d.userId!);
+      await E2e.until(() => d.family?.myRole == Role.moderator, what: 'D ist Moderator');
+      await E2e.until(() => a.family?.moderatorCount == 4, what: 'Vier Moderatoren');
+    });
+
+    test('Issue #7: zwei Ernennungen unmittelbar hintereinander (veralteter Zwischenspeicher)', () async {
+      final a = await _login('mod');
+      await a.createFamily('Hintereinander');
+      await E2e.until(() => a.family != null);
+      final b = await _login('mem');
+      final c = await _login('dritter');
+      await _join(a, b);
+      await _join(a, c);
+
+      await a.promote(b.userId!);
+      await a.promote(c.userId!); // ohne den Abgleich von B abzuwarten
+      await E2e.until(() => b.family?.myRole == Role.moderator, what: 'B ist Moderator');
+      await E2e.until(() => c.family?.myRole == Role.moderator, what: 'C ist Moderator');
+      await E2e.until(() => a.family?.moderatorCount == 3, what: 'Drei Moderatoren');
+    });
+
     test('Ablehnen einer Anfrage und abgelaufene/ungültige Links', () async {
       final a = await _login('mod');
       await a.createFamily('Ablehnen');

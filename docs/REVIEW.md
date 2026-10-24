@@ -205,3 +205,14 @@ Separater Review-Agent über `main..fix/invite-link-robust` (`extract` in Python
 | R10 | niedrig | veraltete Kommentare (`tryParse` statt `check`) | korrigiert |
 | R11 | niedrig | „1 Tag gültig“, unklares „aus diesem Netz“ | „einen Tag“, „im selben Netz (z. B. WLAN der Familie)“ |
 | R12 | – | Testlücken | ergänzt |
+
+## Issue #7 (2026-10-24): Hochstufen zum Moderator (E-60)
+
+Eigene Durchsicht der Änderung an `SdkMatrixGateway.promote`.
+
+| # | Schwere | Fund | Behebung |
+|---|---|---|---|
+| R1 | hoch | `Room.setPower` schrieb veralteten Zwischenspeicher zurück → Server lehnt Herabstufung eines Gleichrangigen ab (`notAllowed`) | Stand vom Server lesen (E-60); E2E-Test schlug vorher fehl |
+| R2 | niedrig | Zwei Moderatoren ernennen exakt gleichzeitig: eine Ernennung kann verloren gehen | dokumentiert (E-60), wiederholbar |
+| R3 | – | Weitere Aufrufer von `setPower` | keiner in `lib/` |
+
