@@ -24,21 +24,17 @@ void main() {
     await tester.pumpWidget(FamilyNexusApp(services: second.services));
     await tester.pumpAndSettle();
 
-    await _tapText(tester, 'Weiter'); // Sprache
-    await _tapText(tester, 'Eigener Server');
-    await tester.enterText(find.byType(TextField), 'fake.test');
-    await _tapText(tester, 'Server prüfen');
-    await _tapText(tester, 'Weiter');
+    await _tapText(tester, 'Ich habe schon ein Konto');
     await tester.enterText(find.widgetWithText(TextField, 'Benutzername'), 'anna');
     await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'geheim123');
+    await tester.pumpAndSettle();
     await _tapText(tester, 'Anmelden');
 
-    // Kein neuer Schlüssel: dieses Gerät ist unbekannt und muss verifiziert werden.
-    expect(find.text('Dieses Gerät verifizieren'), findsOneWidget);
-    expect(find.text('Schlüsselsicherung einrichten'), findsNothing);
-    await tester.enterText(find.widgetWithText(TextField, 'Wiederherstellungsschlüssel'), recoveryKey);
-    await _tapText(tester, 'Mit Schlüssel wiederherstellen');
-    await _tapText(tester, 'Weiter');
+    // Kein neuer Schlüssel: dieses Gerät ist unbekannt und muss freigeschaltet werden.
+    expect(find.text('Dieses Gerät freischalten'), findsWidgets);
+    expect(find.text('Notfall-Schlüssel erstellen'), findsNothing);
+    await tester.enterText(find.widgetWithText(TextField, 'Notfall-Schlüssel'), recoveryKey);
+    await _tapText(tester, 'Freischalten');
 
     // Die Familie besteht bereits: nichts gründen, die Einrichtung schließt sich ab.
     expect(second.services.settings.settings.onboardingDone, isTrue);
@@ -53,7 +49,7 @@ void main() {
     await second.gateway.login(server: ServerUrl.tryParse('fake.test')!, username: 'anna', password: 'geheim123');
     await tester.pumpWidget(FamilyNexusApp(services: second.services));
     await tester.pumpAndSettle();
-    expect(find.text('Dieses Gerät verifizieren'), findsOneWidget);
+    expect(find.text('Dieses Gerät freischalten'), findsWidgets);
     expect(find.textContaining('Gerät DEV1'), findsOneWidget, reason: 'das erste Gerät ist als Verifizierungspartner wählbar');
   });
 }

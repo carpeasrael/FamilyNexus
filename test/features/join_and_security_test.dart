@@ -49,18 +49,21 @@ Future<({TestApp ben, FakeMatrixGateway anna, String link})> _benWithoutFamily({
 
 void main() {
   group('Beitreten per Link', () {
-    testWidgets('Link einfügen → Bestätigung → Anfrage wartet → Moderator bestätigt → Einladung annehmen', (tester) async {
+    testWidgets('Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen', (tester) async {
       final s = await _benWithoutFamily();
       await _pump(tester, s.ben);
-      expect(find.text('Schritt 4 von 4'), findsOneWidget);
+      expect(find.text('Schritt 3 von 3'), findsOneWidget);
       await _tap(tester, 'Beitreten');
       await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), s.link);
-      await _tap(tester, 'Beitrittsanfrage senden');
-      expect(find.text('Beitritt anfragen?'), findsOneWidget);
-      expect(find.textContaining('@anna:fake.test'), findsOneWidget, reason: 'Einladende Person wird genannt');
-      await tester.tap(find.widgetWithText(FilledButton, 'Beitrittsanfrage senden').last);
-      await tester.pumpAndSettle();
-      expect(find.text('Anfrage gesendet. Warte auf die Bestätigung eines Moderators.'), findsOneWidget);
+      await _tap(tester, 'Weiter');
+      expect(find.text('Familie beitreten'), findsWidgets);
+      expect(find.text('Du trittst der Familie „Familie Test“ bei. Eingeladen hat dich Anna.'), findsOneWidget,
+          reason: 'Namen statt technischer IDs');
+      expect(find.textContaining('@anna:fake.test'), findsNothing, reason: 'ID nur unter „Details“');
+      await _tap(tester, 'Details');
+      expect(find.text('@anna:fake.test'), findsOneWidget);
+      await _tap(tester, 'Beitritt anfragen');
+      expect(find.textContaining('Fast geschafft! Anna muss dich noch bestätigen.'), findsOneWidget);
       expect(s.anna.family!.requests.single.userId, '@ben:fake.test');
 
       await s.anna.approveRequest('@ben:fake.test');
@@ -85,7 +88,7 @@ void main() {
       );
       for (final bad in <String>[expired, 'familynexus://join?v=1&room=x', 'hallo', s.link.replaceFirst('familynexus', 'https')]) {
         await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), bad);
-        await _tap(tester, 'Beitrittsanfrage senden');
+        await _tap(tester, 'Weiter');
         expect(find.text('Dieser Link ist ungültig oder abgelaufen.'), findsOneWidget, reason: bad);
       }
       expect(s.anna.family!.requests, isEmpty);
@@ -96,22 +99,21 @@ void main() {
       await _pump(tester, s.ben);
       await _tap(tester, 'Beitreten');
       await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), s.link);
-      await _tap(tester, 'Beitrittsanfrage senden');
-      await tester.tap(find.widgetWithText(FilledButton, 'Beitrittsanfrage senden').last);
-      await tester.pumpAndSettle();
+      await _tap(tester, 'Weiter');
+      await _tap(tester, 'Beitritt anfragen');
       await _tap(tester, 'Anfrage zurückziehen');
       expect(s.anna.family!.requests, isEmpty);
       expect(find.text('Einladungslink'), findsOneWidget);
     });
 
-    testWidgets('Deep Link/QR aus der Kamera-App: Bestätigungsdialog erscheint im Familienschritt', (tester) async {
+    testWidgets('Deep Link/QR aus der Kamera-App: Beitrittskarte erscheint im Familienschritt', (tester) async {
       final s = await _benWithoutFamily();
       s.ben.links.initial = s.link;
       await _pump(tester, s.ben);
-      expect(find.text('Beitritt anfragen?'), findsOneWidget);
-      await tester.tap(find.text('Abbrechen'));
-      await tester.pumpAndSettle();
+      expect(find.widgetWithText(FilledButton, 'Beitritt anfragen'), findsOneWidget);
+      await _tap(tester, 'Verwerfen');
       expect(s.anna.family!.requests, isEmpty, reason: 'ohne Bestätigung wird nie gesendet');
+      expect(s.ben.services.settings.settings.pendingInvite, isNull, reason: 'verworfener Link wird nicht aufbewahrt');
     });
 
     testWidgets('ungültiger Deep Link zeigt Hinweis und löst nichts aus', (tester) async {
@@ -120,7 +122,7 @@ void main() {
       s.ben.links.controller.add('familynexus://join?v=1&room=!x:y&evil=1');
       await tester.pumpAndSettle();
       expect(find.text('Dieser Link ist ungültig oder abgelaufen.'), findsOneWidget);
-      expect(find.text('Beitritt anfragen?'), findsNothing);
+      expect(find.widgetWithText(FilledButton, 'Beitritt anfragen'), findsNothing);
     });
 
     testWidgets('Per Matrix-ID eingeladenes Konto: Einladungskarte statt „Gründen oder Beitreten“, ein Tipp genügt', (tester) async {
@@ -129,8 +131,9 @@ void main() {
       await _pump(tester, s.ben);
       expect(find.text('Du wurdest eingeladen'), findsOneWidget);
       expect(find.text('Familie Test'), findsOneWidget);
-      expect(find.text('Einladung von @anna:fake.test'), findsOneWidget);
+      expect(find.text('Einladung von Anna'), findsOneWidget, reason: 'Name statt ID');
       expect(find.textContaining('zu keiner Beitrittsanfrage'), findsOneWidget, reason: 'Warnung bei unerwarteter Einladung');
+      expect(find.textContaining('@anna:fake.test'), findsOneWidget, reason: 'die Warnung nennt die vollständige ID (E-37)');
       expect(find.byType(SegmentedButton<bool>), findsNothing, reason: 'keine Frage nach Gründen/Beitreten');
       expect(find.text('Gründe eine neue Familie oder tritt einer bestehenden bei.'), findsNothing);
       expect(s.ben.gateway.family, isNull, reason: 'ohne Tipp kein Beitritt');
@@ -166,14 +169,15 @@ void main() {
       final app = await buildTestApp(loggedIn: false);
       await app.gateway.login(server: ServerUrl.tryParse('fake.test')!, username: 'anna', password: 'geheim123');
       await _pump(tester, app);
-      await _tap(tester, 'Schlüsselsicherung einrichten');
-      expect(find.text('Dein Wiederherstellungsschlüssel'), findsOneWidget);
+      await _tap(tester, 'Notfall-Schlüssel erstellen');
+      expect(find.textContaining('Er wird nur jetzt angezeigt.'), findsOneWidget);
       expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Weiter').first).onPressed, isNull);
       await tester.tap(find.byType(CheckboxListTile));
       await tester.pumpAndSettle();
       await _tap(tester, 'Weiter');
-      expect(find.text('Dein Wiederherstellungsschlüssel'), findsNothing, reason: 'Schlüssel verschwindet nach Bestätigung');
+      expect(find.textContaining('Er wird nur jetzt angezeigt.'), findsNothing, reason: 'Schlüssel verschwindet nach Bestätigung');
       expect(app.gateway.securityState, SecurityState.ready);
+      expect(find.byType(SegmentedButton<bool>), findsOneWidget, reason: 'automatisch weiter zum Familienschritt');
     });
 
     testWidgets('Server verlangt Passwort: Dialog, falsches Passwort scheitert, richtiges gelingt', (tester) async {
@@ -181,18 +185,18 @@ void main() {
       app.server.requirePasswordForSecurity = true;
       await app.gateway.login(server: ServerUrl.tryParse('fake.test')!, username: 'anna', password: 'geheim123');
       await _pump(tester, app);
-      await _tap(tester, 'Schlüsselsicherung einrichten');
+      await _tap(tester, 'Notfall-Schlüssel erstellen');
       expect(find.text('Passwort bestätigen'), findsOneWidget);
       await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'falsch');
       await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.widgetWithText(FilledButton, 'Weiter')));
       await tester.pumpAndSettle();
       expect(find.text('Benutzername oder Passwort stimmen nicht.'), findsOneWidget);
       expect(app.gateway.securityState, SecurityState.needsSetup);
-      await _tap(tester, 'Schlüsselsicherung einrichten');
+      await _tap(tester, 'Notfall-Schlüssel erstellen');
       await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'geheim123');
       await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.widgetWithText(FilledButton, 'Weiter')));
       await tester.pumpAndSettle();
-      expect(find.text('Dein Wiederherstellungsschlüssel'), findsOneWidget);
+      expect(find.textContaining('Er wird nur jetzt angezeigt.'), findsOneWidget);
     });
 
     testWidgets('zweites Gerät: Wiederherstellung mit Schlüssel (falscher, dann richtiger)', (tester) async {
@@ -201,14 +205,14 @@ void main() {
       final second = await buildTestApp(loggedIn: false, server: first.server);
       await second.gateway.login(server: ServerUrl.tryParse('fake.test')!, username: 'anna', password: 'geheim123');
       await _pump(tester, second);
-      expect(find.text('Dieses Gerät verifizieren'), findsOneWidget);
-      expect(find.textContaining('Mit einem anderen Gerät verifizieren'), findsOneWidget);
-      await tester.enterText(find.widgetWithText(TextField, 'Wiederherstellungsschlüssel'), 'falsch');
-      await _tap(tester, 'Mit Schlüssel wiederherstellen');
-      expect(find.text('Der Schlüssel passt nicht.'), findsOneWidget);
+      expect(find.text('Dieses Gerät freischalten'), findsWidgets);
+      expect(find.text('Mit „Gerät DEV1“ bestätigen'), findsOneWidget);
+      await tester.enterText(find.widgetWithText(TextField, 'Notfall-Schlüssel'), 'falsch');
+      await _tap(tester, 'Freischalten');
+      expect(find.text('Der Notfall-Schlüssel passt nicht. Bitte prüfe ihn noch einmal.'), findsOneWidget);
       expect(second.gateway.securityState, SecurityState.needsRestore);
-      await tester.enterText(find.widgetWithText(TextField, 'Wiederherstellungsschlüssel'), key);
-      await _tap(tester, 'Mit Schlüssel wiederherstellen');
+      await tester.enterText(find.widgetWithText(TextField, 'Notfall-Schlüssel'), key);
+      await _tap(tester, 'Freischalten');
       expect(second.gateway.securityState, SecurityState.ready);
     });
 
@@ -219,7 +223,7 @@ void main() {
       await _pump(tester, second);
 
       // Gerät 2 startet die Verifizierung mit Gerät 1.
-      await tester.tap(find.text('Mit einem anderen Gerät verifizieren: Gerät DEV1'));
+      await tester.tap(find.text('Mit „Gerät DEV1“ bestätigen'));
       await _pumpFrames(tester);
       expect(find.text('Warte auf die Gegenseite …'), findsOneWidget);
       // Gerät 1 erhält die Anfrage (eigene App-Instanz) und nimmt an.
@@ -280,6 +284,6 @@ void main() {
     expect(services.gateway.session.name, 'loggedOut');
     await _pump(tester, second);
     expect(find.byType(NavigationBar), findsNothing);
-    expect(find.text('Dieses Gerät verifizieren'), findsOneWidget);
+    expect(find.text('Dieses Gerät freischalten'), findsWidgets);
   });
 }

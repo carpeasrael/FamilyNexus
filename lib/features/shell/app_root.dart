@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
+import '../../data/platform/oauth_redirect.dart';
 import '../../domain/invite_link.dart';
+import '../../domain/server.dart';
 import '../../domain/security.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../security/verification_dialog.dart';
@@ -27,10 +29,25 @@ class _AppRootState extends State<AppRoot> {
   void initState() {
     super.initState();
     final services = AppScope.read(context);
+    _restorePendingInvite(services);
     _linkSub = services.links.links.listen((s) => _handleLink(services, s));
     services.links.initialLink().then((s) {
       if (s != null) _handleLink(services, s);
     }).ignore();
+  }
+
+  /// Vor der Anmeldung geöffneter Einladungslink (E-56): nach einem Neustart weiter verwenden,
+  /// sofern er noch gültig ist; sonst verwerfen.
+  void _restorePendingInvite(AppServices services) {
+    final raw = services.settings.settings.pendingInvite;
+    if (raw == null || services.pendingInvite.value != null) return;
+    final link = InviteLink.tryParse(raw, now: DateTime.now());
+    if (link != null && link.isValidAt(DateTime.now()) && services.gateway.family == null) {
+      services.pendingInvite.value = link;
+    } else {
+      // Nicht während des Aufbaus benachrichtigen.
+      Future<void>.microtask(() => services.settings.update((c) => c.copyWith(pendingInvite: null))).ignore();
+    }
   }
 
   @override
@@ -41,14 +58,22 @@ class _AppRootState extends State<AppRoot> {
 
   /// Einladungslink (Deep Link/QR): streng prüfen, nie automatisch handeln – nur vormerken.
   void _handleLink(AppServices services, String raw) {
+    // Rücksprung der Browser-Anmeldung: gehört dem wartenden OAuthRedirect, keine Einladung.
+    if (AppLinkOAuthRedirect.isCallback(raw)) return;
     final l = AppLocalizations.of(context);
-    final link = InviteLink.tryParse(raw, now: DateTime.now());
+    final ownHost = MatrixIds.serverName(services.gateway.userId ?? '');
+    final link = InviteLink.tryParse(raw, now: DateTime.now(), ownHost: ownHost);
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (link == null || !link.isValidAt(DateTime.now())) {
       messenger?.showSnackBar(SnackBar(content: Text(l.joinLinkInvalid)));
       return;
     }
-    if (services.gateway.family != null) return; // bereits in einer Familie
+    if (services.gateway.family != null) {
+      messenger?.showSnackBar(SnackBar(content: Text(l.joinAlreadyInFamily)));
+      return;
+    }
+    // Vormerken (auch über einen Neustart hinweg); gehandelt wird erst nach Bestätigung.
+    services.settings.update((c) => c.copyWith(pendingInvite: raw.trim())).ignore();
     services.pendingInvite.value = link;
   }
 

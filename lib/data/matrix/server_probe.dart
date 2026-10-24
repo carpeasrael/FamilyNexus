@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../core/app_log.dart';
+import '../../domain/registration.dart';
 import '../../domain/server.dart';
 import 'matrix_gateway.dart';
 
@@ -20,28 +21,37 @@ class ServerProbe {
   static const int _maxBytes = 64 * 1024;
 
   Future<Map<String, Object?>?> _getJson(Uri uri) async {
+    final (status, body) = await _send('GET', uri);
+    return status == 200 ? body : null;
+  }
+
+  /// Begrenzte, weiterleitungsfreie Anfrage. Liefert Status und (falls lesbar) das JSON-Objekt.
+  Future<(int, Map<String, Object?>?)> _send(String method, Uri uri, {Object? body}) async {
     try {
-      final req = http.Request('GET', uri)
+      final req = http.Request(method, uri)
         ..followRedirects = false
         ..headers['accept'] = 'application/json';
-      final res = await _client.send(req).timeout(timeout);
-      if (res.statusCode != 200) {
-        await res.stream.drain<void>();
-        return null;
+      if (body != null) {
+        req.headers['content-type'] = 'application/json';
+        req.body = json.encode(body);
       }
+      final res = await _client.send(req).timeout(timeout);
       final bytes = <int>[];
       await for (final chunk in res.stream.timeout(timeout)) {
         bytes.addAll(chunk);
-        if (bytes.length > _maxBytes) return null;
+        if (bytes.length > _maxBytes) return (res.statusCode, null);
       }
-      final decoded = json.decode(utf8.decode(bytes, allowMalformed: true));
-      return decoded is Map<String, Object?> ? decoded : null;
+      Object? decoded;
+      try {
+        decoded = json.decode(utf8.decode(bytes, allowMalformed: true));
+      } on FormatException {
+        decoded = null;
+      }
+      return (res.statusCode, decoded is Map<String, Object?> ? decoded : null);
     } on TimeoutException {
       throw const GatewayException(GatewayError.serverUnreachable);
     } on http.ClientException {
       throw const GatewayException(GatewayError.serverUnreachable);
-    } on FormatException {
-      return null;
     }
   }
 
@@ -104,6 +114,20 @@ class ServerProbe {
     final password = flowList is List<Object?> &&
         flowList.any((f) => f is Map<String, Object?> && f['type'] == 'm.login.password');
 
+    final (contact, supportPage) = await _support(url);
+    final issuer = await oauthIssuer(base);
+    return ServerInfo(
+      url: base,
+      versions: versionStrings,
+      supportsPasswordLogin: password,
+      contact: contact,
+      supportPage: supportPage,
+      usesOAuth: issuer != null,
+    );
+  }
+
+  /// Kontakt und Hilfeseite aus `/.well-known/matrix/support` (bereinigt; nur https-Seiten).
+  Future<(String?, String?)> _support(ServerUrl url) async {
     String? contact;
     String? supportPage;
     final support = await _getJson(url.uri.replace(path: '/.well-known/matrix/support'));
@@ -124,12 +148,78 @@ class ServerProbe {
         supportPage = page;
       }
     }
-    return ServerInfo(
-      url: base,
-      versions: versionStrings,
-      supportsPasswordLogin: password,
-      contact: contact,
-      supportPage: supportPage,
+    return (contact, supportPage);
+  }
+
+  /// Nur https-Adressen ohne Zugangsdaten.
+  static Uri? _httpsUri(Object? v) {
+    if (v is! String || v.length > 500) return null;
+    final u = Uri.tryParse(v);
+    return (u != null && u.scheme == 'https' && u.host.isNotEmpty && u.userInfo.isEmpty) ? u : null;
+  }
+
+  /// Anmeldedienst des Anbieters (OAuth, MSC2965/Matrix 1.15), `null` bei klassischer Anmeldung.
+  Future<Uri?> oauthIssuer(ServerUrl base) async {
+    for (final path in const <String>[
+      '/_matrix/client/v1/auth_metadata',
+      '/_matrix/client/unstable/org.matrix.msc2965/auth_metadata',
+    ]) {
+      final meta = await _getJson(base.uri.replace(path: path));
+      if (meta == null) continue;
+      final issuer = _httpsUri(meta['issuer']);
+      if (issuer != null && _httpsUri(meta['authorization_endpoint']) != null && _httpsUri(meta['registration_endpoint']) != null) {
+        return issuer;
+      }
+    }
+    return null;
+  }
+
+  /// Wie bei [url] ein Konto angelegt wird (E-55). Fragt erst den OAuth-Dienst ab, sonst die
+  /// Registrierungsabläufe (`POST /register` ohne Anmeldedaten liefert nur die Abläufe, legt nichts an).
+  Future<RegistrationOptions> registrationOptions(ServerUrl url) async {
+    final base = await resolveBase(url);
+    final (_, supportPage) = await _support(url);
+    final page = supportPage == null ? null : Uri.parse(supportPage);
+    final issuer = await oauthIssuer(base);
+    if (issuer != null) return RegistrationOptions(mode: RegistrationMode.oauth, webPage: issuer);
+    final (status, body) = await _send(
+      'POST',
+      base.uri.replace(path: '/_matrix/client/v3/register', queryParameters: <String, String>{'kind': 'user'}),
+      body: const <String, Object?>{},
     );
+    if (status == 401 && body != null) {
+      final flows = flowsFrom(body);
+      if (RegistrationFlows.anySupported(flows)) return RegistrationOptions(mode: RegistrationMode.inApp, webPage: page);
+    }
+    return RegistrationOptions(mode: RegistrationMode.disabled, webPage: page);
+  }
+
+  /// Abläufe aus einer UIA-Antwort (`{"flows":[{"stages":[…]}]}`), begrenzt und bereinigt.
+  static List<List<String>> flowsFrom(Map<String, Object?> body) {
+    final flows = body['flows'];
+    if (flows is! List<Object?>) return const <List<String>>[];
+    return <List<String>>[
+      for (final f in flows.take(20))
+        if (f is Map<String, Object?> && f['stages'] is List<Object?>)
+          (f['stages']! as List<Object?>).whereType<String>().where((s) => s.length <= 64).take(10).toList(),
+    ];
+  }
+
+  /// Ist der Benutzername bei [base] frei? Netz- und Serverfehler ergeben `unknown`.
+  Future<UsernameCheck> checkUsername(ServerUrl base, String username) async {
+    try {
+      final (status, body) = await _send(
+        'GET',
+        base.uri.replace(path: '/_matrix/client/v3/register/available', queryParameters: <String, String>{'username': username}),
+      );
+      if (status == 200 && body?['available'] == true) return UsernameCheck.available;
+      return switch (body?['errcode']) {
+        'M_USER_IN_USE' => UsernameCheck.taken,
+        'M_INVALID_USERNAME' || 'M_EXCLUSIVE' => UsernameCheck.invalid,
+        _ => UsernameCheck.unknown,
+      };
+    } on GatewayException {
+      return UsernameCheck.unknown;
+    }
   }
 }

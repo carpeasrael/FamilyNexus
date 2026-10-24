@@ -45,16 +45,22 @@ void main() {
     expect(manifest, contains('android.intent.action.BOOT_COMPLETED'));
   });
 
-  test('Einladungslinks: nur familynexus://join, kein anderes Schema, App-Links nicht automatisch bestätigt', () {
+  test('Links: nur familynexus://join und der OAuth-Rücksprung, kein http, App-Links nicht automatisch bestätigt', () {
     final filters = RegExp('<intent-filter>.*?</intent-filter>', dotAll: true).allMatches(manifest).map((m) => m.group(0)!).toList();
     final view = filters.where((f) => f.contains('android.intent.action.VIEW')).toList();
-    expect(view, hasLength(1));
-    expect(view.single, contains('android:scheme="familynexus"'));
-    expect(view.single, contains('android:host="join"'));
-    expect(view.single, isNot(contains('http')));
+    expect(view, hasLength(2));
+    final invite = view.singleWhere((f) => f.contains('android:scheme="familynexus"'));
+    expect(invite, contains('android:host="join"'));
+    final oauth = view.singleWhere((f) => f.contains('android:scheme="io.github.carpeasrael.familynexus"'));
+    expect(oauth, contains('android:path="/oauth"'));
+    for (final f in view) {
+      expect(f, isNot(contains('http')));
+      expect(f, isNot(contains('autoVerify')));
+    }
     final kotlin = File('android/app/src/main/kotlin/de/inneso/familynexus/MainActivity.kt').readAsStringSync();
-    expect(kotlin, contains('data.scheme != "familynexus"'));
-    expect(kotlin, contains('text.length <= 512'));
+    expect(kotlin, contains('data.scheme == "familynexus" && data.host == "join"'));
+    expect(kotlin, contains('data.scheme == "io.github.carpeasrael.familynexus" && data.path == "/oauth"'));
+    expect(kotlin, contains('text.length <= 2048'));
   });
 
   test('Debug-/Profil-Manifeste fügen nur INTERNET hinzu (Entwicklung)', () {

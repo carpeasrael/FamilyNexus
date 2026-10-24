@@ -41,6 +41,14 @@
 				<string>familynexus</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>de.inneso.familynexus.oauth</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>io.github.carpeasrael.familynexus</string>
+			</array>
+		</dict>
 	</array>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Zum Entsperren der App mit Face ID. / To unlock the app with Face ID.</string>

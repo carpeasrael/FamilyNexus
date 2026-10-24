@@ -52,11 +52,13 @@ void main() {
   testWidgets('Einladungslink als QR-Code: gültiger Link, 24 Stunden', (tester) async {
     final app = await buildTestApp();
     await _openFamily(tester, app);
-    await tester.tap(find.text('QR-Code anzeigen'));
+    await tester.tap(find.text('Jemanden einladen'));
     await tester.pumpAndSettle();
-    expect(find.text('Einladungslink'), findsOneWidget);
+    expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Jemanden einladen')), findsOneWidget);
     expect(find.bySemanticsLabel('QR-Code anzeigen'), findsWidgets);
-    expect(find.textContaining('Gültig 24 Stunden'), findsOneWidget);
+    expect(find.textContaining('24 Stunden gültig'), findsOneWidget);
+    expect(find.text('Per E-Mail senden'), findsOneWidget);
+    expect(find.text('Link kopieren'), findsOneWidget);
     final link = await app.gateway.createInviteLink();
     expect(link, startsWith('familynexus://join?'));
   });
@@ -70,7 +72,7 @@ void main() {
     });
     addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
     await _openFamily(tester, app);
-    await tester.tap(find.text('QR-Code anzeigen'));
+    await tester.tap(find.text('Jemanden einladen'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Per E-Mail senden'));
@@ -80,6 +82,8 @@ void main() {
     expect(draft.body, contains('„Familie Test“'));
     expect(draft.body, contains('familynexus://join?'));
     expect(draft.body, contains('24 Stunden'));
+    expect(draft.body, contains('„Ich wurde eingeladen“'), reason: 'Anleitung nennt den Weg in der App');
+    expect(draft.body, isNot(contains('Matrix')), reason: 'keine Fachbegriffe');
     final link = RegExp(r'familynexus://join\?\S+').firstMatch(draft.body)!.group(0)!;
     expect(InviteLink.tryParse(link, now: DateTime.now()), isNotNull, reason: 'der Link im Entwurf ist gültig');
 
@@ -146,11 +150,16 @@ void main() {
   testWidgets('Einladen per Matrix-ID prüft die Eingabe', (tester) async {
     final app = await buildTestApp();
     await _openFamily(tester, app);
-    await tester.enterText(find.widgetWithText(TextField, 'Matrix-ID einladen'), 'kein-mxid');
+    expect(find.widgetWithText(TextField, 'Per Benutzer-ID einladen'), findsNothing, reason: 'nur unter „Erweitert“');
+    await tester.ensureVisible(find.text('Erweitert'));
+    await tester.tap(find.text('Erweitert'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'Per Benutzer-ID einladen'), 'kein-mxid');
+    await tester.ensureVisible(find.text('Einladen'));
     await tester.tap(find.text('Einladen'));
     await tester.pumpAndSettle();
-    expect(find.text('Bitte eine gültige Matrix-ID eingeben.'), findsOneWidget);
-    await tester.enterText(find.widgetWithText(TextField, 'Matrix-ID einladen'), '@ben:fake.test');
+    expect(find.text('Bitte eine gültige Benutzer-ID eingeben, z. B. @anna:beispiel.de.'), findsOneWidget);
+    await tester.enterText(find.widgetWithText(TextField, 'Per Benutzer-ID einladen'), '@ben:fake.test');
     await tester.tap(find.text('Einladen'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Nachrichtenschlüssel der Familie'), findsOneWidget, reason: 'Rückfrage vor dem Einladen');

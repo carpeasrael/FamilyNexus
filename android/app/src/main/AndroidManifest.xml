@@ -47,6 +47,14 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="familynexus" android:host="join"/>
             </intent-filter>
+            <!-- Rücksprung der Anmeldung im Browser (OAuth, E-55). Nur Code und state; die App prüft
+                 den state gegen die eigene, gerade begonnene Anmeldung. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="io.github.carpeasrael.familynexus" android:path="/oauth"/>
+            </intent-filter>
         </activity>
         <!-- Lokale Erinnerungen: Das Plugin deklariert seine Empfänger nicht selbst.
              Ohne sie werden geplante Erinnerungen nie ausgelöst bzw. nach einem

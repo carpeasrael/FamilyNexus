@@ -1,11 +1,16 @@
 import 'server.dart';
+import 'text_sanitizer.dart';
 
-/// Einladungslink/QR-Inhalt (E-14):
-/// `familynexus://join?v=1&room=<roomId>&via=<server>&inv=<mxid>&exp=<unix-sekunden>`
+/// Einladungslink/QR-Inhalt (E-14, E-56):
+/// `familynexus://join?v=2&room=<roomId>&via=<server>&inv=<mxid>&exp=<unix-sekunden>&n=<id>[&f=<familie>][&by=<name>]`
 ///
 /// Der Link ist nicht vertrauenswürdig: strikte Prüfung aller Felder. Die
 /// Gültigkeitsdauer wird in der App durchgesetzt; die eigentliche Sperre ist
 /// die Bestätigung durch einen Moderator.
+///
+/// Version 1 (ohne `f`/`by`) wird weiterhin gelesen. Familien- und Einladendenname sind reine
+/// Anzeigehilfen für Neulinge, die vor der Anmeldung noch nichts vom Server abfragen können; sie
+/// werden bereinigt und nur als „laut Einladung“ gezeigt.
 class InviteLink {
   const InviteLink({
     required this.roomId,
@@ -13,12 +18,15 @@ class InviteLink {
     required this.inviter,
     required this.expires,
     required this.nonce,
+    this.familyName,
+    this.inviterName,
   });
 
   static const String scheme = 'familynexus';
   static const String host = 'join';
-  static const int version = 1;
-  static const int maxLength = 512;
+  static const int version = 2;
+  static const int maxLength = 1024;
+  static const int maxNameLength = 40;
   static const Duration defaultValidity = Duration(hours: 24);
   static const Duration maxValidity = Duration(days: 7);
 
@@ -34,6 +42,16 @@ class InviteLink {
   /// Zufalls-ID (hex), die der Moderator beim Erzeugen vermerkt; nur Anfragen mit
   /// bekannter, unverbrauchter ID werden bestätigt (S2).
   final String nonce;
+
+  /// Familienname laut Einladung (bereinigt, nicht vertrauenswürdig), `null` bei Version 1.
+  final String? familyName;
+
+  /// Anzeigename des Einladenden laut Einladung (bereinigt, nicht vertrauenswürdig).
+  final String? inviterName;
+
+  /// Servername des Einladenden (`@anna:beispiel.de` → `beispiel.de`). Neulinge legen ihr Konto
+  /// standardmäßig dort an; die Adresse wird wie jede Eingabe über `.well-known` aufgelöst.
+  String get inviterServer => inviter.substring(inviter.indexOf(':') + 1);
 
   static final RegExp _nonceRe = RegExp(r'^[0-9a-f]{32}$');
 
@@ -55,6 +73,13 @@ class InviteLink {
 
   static final RegExp _viaRe = RegExp(r'^[A-Za-z0-9.\-]{1,253}(:\d{1,5})?$');
 
+  /// Bereinigter Anzeigename oder `null`, wenn danach nichts übrig bleibt.
+  static String? _name(String? raw) {
+    if (raw == null) return null;
+    final c = TextSanitizer.clean(raw, max: maxNameLength);
+    return c.isEmpty ? null : c;
+  }
+
   /// Erzeugt den Link-Text.
   static String create({
     required String roomId,
@@ -64,6 +89,8 @@ class InviteLink {
     required String nonce,
     Duration validity = defaultValidity,
     String? ownHost,
+    String? familyName,
+    String? inviterName,
   }) {
     if (!MatrixIds.isRoomId(roomId) || !_viaRe.hasMatch(via) || !MatrixIds.isUserId(inviter) || !isNonce(nonce)) {
       throw ArgumentError('ungültige Einladungsdaten');
@@ -71,6 +98,8 @@ class InviteLink {
     if (validity <= Duration.zero || validity > maxValidity) throw ArgumentError('ungültige Gültigkeitsdauer');
     if (!viaMatchesRoom(roomId, via, ownHost: ownHost)) throw ArgumentError('Server passt nicht zum Raum');
     final exp = now.toUtc().add(validity).millisecondsSinceEpoch ~/ 1000;
+    final f = _name(familyName);
+    final by = _name(inviterName);
     return Uri(
       scheme: scheme,
       host: host,
@@ -81,9 +110,14 @@ class InviteLink {
         'inv': inviter,
         'exp': '$exp',
         'n': nonce,
+        'f': ?f,
+        'by': ?by,
       },
     ).toString();
   }
+
+  static const Set<String> _v1Keys = <String>{'v', 'room', 'via', 'inv', 'exp', 'n'};
+  static const Set<String> _v2Keys = <String>{..._v1Keys, 'f', 'by'};
 
   /// Liest einen Link. Liefert `null` bei jeder Abweichung (falsches Schema,
   /// fehlende/doppelte/zusätzliche Felder, ungültige Werte). Ob der Link
@@ -109,8 +143,12 @@ class InviteLink {
     }
     if (all.values.any((v) => v.length != 1)) return null;
     final q = <String, String>{for (final e in all.entries) e.key: e.value.single};
-    if (q.keys.toSet().difference(const <String>{'v', 'room', 'via', 'inv', 'exp', 'n'}).isNotEmpty) return null;
-    if (q['v'] != '$version') return null;
+    final allowed = switch (q['v']) {
+      '1' => _v1Keys,
+      '2' => _v2Keys,
+      _ => null,
+    };
+    if (allowed == null || q.keys.toSet().difference(allowed).isNotEmpty) return null;
     final room = q['room'];
     final via = q['via'];
     final inv = q['inv'];
@@ -125,7 +163,15 @@ class InviteLink {
     final expires = DateTime.fromMillisecondsSinceEpoch(exp * 1000, isUtc: true);
     // Unplausibel weit in der Zukunft = manipuliert.
     if (expires.isAfter(now.toUtc().add(maxValidity + const Duration(minutes: 5)))) return null;
-    return InviteLink(roomId: room, via: via, inviter: inv, expires: expires, nonce: nonce);
+    return InviteLink(
+      roomId: room,
+      via: via,
+      inviter: inv,
+      expires: expires,
+      nonce: nonce,
+      familyName: _name(q['f']),
+      inviterName: _name(q['by']),
+    );
   }
 
   bool isValidAt(DateTime now) => now.toUtc().isBefore(expires);

@@ -23,6 +23,7 @@ class AppSettings {
     this.accent = AccentChoice.teal,
     this.defaultReminderMinutes = const <int>[10],
     this.blockedUsers = const <String>[],
+    this.pendingInvite,
   });
 
   /// Öffentlicher Standardserver (E-07).
@@ -48,6 +49,11 @@ class AppSettings {
   /// Lokal blockierte Matrix-IDs (E-48).
   final List<String> blockedUsers;
 
+  /// Einladungslink, der vor der Anmeldung geöffnet wurde (E-56). Bleibt erhalten, falls das System
+  /// die App beendet, während die Person im Browser ihr Konto anlegt. Rohtext, wird beim Lesen erneut
+  /// streng geprüft.
+  final String? pendingInvite;
+
   AppSettings copyWith({
     Object? languageCode = _unset,
     AppThemeMode? themeMode,
@@ -61,6 +67,7 @@ class AppSettings {
     AccentChoice? accent,
     List<int>? defaultReminderMinutes,
     List<String>? blockedUsers,
+    Object? pendingInvite = _unset,
   }) =>
       AppSettings(
         languageCode:
@@ -76,6 +83,7 @@ class AppSettings {
         accent: accent ?? this.accent,
         defaultReminderMinutes: defaultReminderMinutes ?? this.defaultReminderMinutes,
         blockedUsers: blockedUsers ?? this.blockedUsers,
+        pendingInvite: identical(pendingInvite, _unset) ? this.pendingInvite : _validInvite(pendingInvite as String?),
       );
 
   static const Object _unset = Object();
@@ -93,6 +101,7 @@ class AppSettings {
         'accent': accent.name,
         'defaultReminders': defaultReminderMinutes.join(','),
         if (blockedUsers.isNotEmpty) 'blockedUsers': BlockedUsers.encode(blockedUsers),
+        'pendingInvite': ?pendingInvite,
       };
 
   /// Liest Einstellungen defensiv: unbekannte oder ungültige Werte fallen auf
@@ -123,8 +132,13 @@ class AppSettings {
       accent: AccentChoice.values.firstWhere((e) => e.name == m['accent'], orElse: () => d.accent),
       defaultReminderMinutes: m.containsKey('defaultReminders') ? reminders : d.defaultReminderMinutes,
       blockedUsers: BlockedUsers.parse(m['blockedUsers']),
+      pendingInvite: _validInvite(m['pendingInvite']),
     );
   }
+
+  /// Nur kurze Links im App-Schema; die eigentliche Prüfung macht `InviteLink.tryParse`.
+  static String? _validInvite(String? raw) =>
+      (raw != null && raw.length <= 1024 && raw.startsWith('familynexus://join?')) ? raw : null;
 
   /// Nur gültige https-Server werden übernommen (gespeicherte Werte gelten als
   /// nicht vertrauenswürdig).

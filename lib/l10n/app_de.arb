@@ -55,32 +55,11 @@
     }
   },
   "onbTitleLanguage": "Willkommen bei FamilyNexus",
-  "onbIntro": "Familienkalender und Messenger in einer App. Deine Daten bleiben auf deinen Geräten und wandern nur Ende-zu-Ende-verschlüsselt über Matrix.",
+  "onbIntro": "Kalender und Chat für deine Familie – privat und verschlüsselt. Keine Werbung, keine Datensammelei.",
   "onbPoint1": "Keine Telemetrie, keine Werbung, keine Analyse.",
   "onbPoint2": "Chat und geteilte Termine sind Ende-zu-Ende-verschlüsselt.",
   "onbPoint3": "Private Termine verlassen nie deine eigenen Geräte.",
-  "onbTitleServer": "Server wählen",
-  "serverDefault": "Standardserver ({host})",
-  "@serverDefault": {
-    "placeholders": {
-      "host": {
-        "type": "String"
-      }
-    }
-  },
-  "serverCustom": "Eigener Server",
-  "serverUrlLabel": "Server-Adresse (https)",
   "serverUrlInvalid": "Bitte eine gültige https-Adresse eingeben.",
-  "serverCheck": "Server prüfen",
-  "serverChecking": "Prüfe …",
-  "serverOk": "Server erreichbar (Matrix {version})",
-  "@serverOk": {
-    "placeholders": {
-      "version": {
-        "type": "String"
-      }
-    }
-  },
   "serverOperator": "Betreiber: {name}",
   "@serverOperator": {
     "placeholders": {
@@ -96,7 +75,6 @@
   "accountPassword": "Passwort",
   "accountLogin": "Anmelden",
   "accountLoggingIn": "Melde an …",
-  "accountHint": "Du brauchst ein bestehendes Matrix-Konto auf dem gewählten Server. Neue Konten legst du beim Betreiber an.",
   "onbTitleFamily": "Familie",
   "familyName": "Name der Familie",
   "familyCreate": "Familie gründen",
@@ -390,20 +368,6 @@
   "repeatUntilInvalid": "Das letzte Datum der Wiederholung liegt vor dem ersten Termin.",
   "errReauth": "Bitte bestätige dein Passwort.",
   "securityTitle": "Schlüsselsicherung",
-  "securityIntro": "Damit nur deine eigenen Geräte deine verschlüsselten Nachrichten und Termine lesen können, richtest du jetzt eine Schlüsselsicherung ein.",
-  "securitySetupButton": "Schlüsselsicherung einrichten",
-  "securitySettingUp": "Richte ein …",
-  "securityKeyTitle": "Dein Wiederherstellungsschlüssel",
-  "securityKeyHint": "Notiere ihn auf Papier und bewahre ihn sicher auf. Er wird nur jetzt angezeigt. Ohne ihn und ohne ein verifiziertes Gerät sind deine Nachrichten bei Verlust aller Geräte unwiederbringlich.",
-  "securityKeySaved": "Ich habe den Schlüssel sicher notiert.",
-  "securityRestoreTitle": "Dieses Gerät verifizieren",
-  "securityRestoreIntro": "Dein Konto ist bereits abgesichert. Verifiziere dieses Gerät mit einem anderen deiner Geräte oder mit deinem Wiederherstellungsschlüssel.",
-  "securityVerifyWithDevice": "Mit einem anderen Gerät verifizieren",
-  "securityNoOtherDevice": "Kein anderes Gerät gefunden. Nutze den Wiederherstellungsschlüssel.",
-  "securityRestoreKeyLabel": "Wiederherstellungsschlüssel",
-  "securityRestoreButton": "Mit Schlüssel wiederherstellen",
-  "securityRestoring": "Stelle wieder her …",
-  "securityRestoreFailed": "Der Schlüssel passt nicht.",
   "securityPasswordTitle": "Passwort bestätigen",
   "securityPasswordHint": "Der Server verlangt dein Passwort zur Bestätigung. Es wird nicht gespeichert.",
   "securityStatusReady": "Dieses Gerät ist verifiziert.",
@@ -434,15 +398,15 @@
   "decline": "Ablehnen",
   "familyManage": "Verwaltung",
   "familyInvite": "Mitglied einladen",
-  "familyInviteLinkTitle": "Einladungslink",
-  "familyInviteLinkHint": "Gültig 24 Stunden. Wer den Link öffnet, stellt nur eine Anfrage – du bestätigst sie.",
+  "familyInviteLinkTitle": "Jemanden einladen",
+  "familyInviteLinkHint": "Der Link ist 24 Stunden gültig und nur einmal verwendbar. Wer ihn öffnet, schickt dir eine Anfrage – du bestätigst sie.",
   "familyInviteShowQr": "QR-Code anzeigen",
   "familyInviteCopyLink": "Link kopieren",
   "familyInviteCopied": "Link kopiert.",
-  "familyInviteById": "Matrix-ID einladen",
+  "familyInviteById": "Per Benutzer-ID einladen",
   "familyInviteByIdHint": "@name:server",
   "familyInviteSend": "Einladen",
-  "familyInviteInvalidId": "Bitte eine gültige Matrix-ID eingeben.",
+  "familyInviteInvalidId": "Bitte eine gültige Benutzer-ID eingeben, z. B. @anna:beispiel.de.",
   "familyInviteSent": "Einladung gesendet.",
   "familyRequests": "Beitrittsanfragen",
   "familyRequestApprove": "Bestätigen",
@@ -470,23 +434,11 @@
   "familyDone": "Erledigt.",
   "familyOnlyModerators": "Nur Moderatoren verwalten die Familie.",
   "joinTitle": "Familie beitreten",
-  "joinHint": "Füge einen Einladungslink ein oder öffne den Link bzw. QR-Code mit der Kamera-App.",
+  "joinHint": "Füge den Einladungslink ein oder öffne den Link bzw. QR-Code mit der Kamera-App.",
   "joinLinkLabel": "Einladungslink",
   "joinLinkInvalid": "Dieser Link ist ungültig oder abgelaufen.",
-  "joinSend": "Beitrittsanfrage senden",
-  "joinConfirmTitle": "Beitritt anfragen?",
-  "joinConfirmBody": "Du fragst an, der Familie auf dem Server {server} beizutreten. Eingeladen hat {inviter}. Ein Moderator muss bestätigen.",
-  "@joinConfirmBody": {
-    "placeholders": {
-      "server": {
-        "type": "String"
-      },
-      "inviter": {
-        "type": "String"
-      }
-    }
-  },
-  "joinPending": "Anfrage gesendet. Warte auf die Bestätigung eines Moderators.",
+  "joinSend": "Beitritt anfragen",
+  "joinPending": "Fast geschafft! Deine Anfrage ist unterwegs. Sobald sie bestätigt ist, bist du dabei.",
   "joinCancel": "Anfrage zurückziehen",
   "invitationsTitle": "Einladungen",
   "invitationFrom": "Einladung von {inviter}",
@@ -852,7 +804,7 @@
   "privacy11Body": "Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen.",
   "familyInviteMail": "Per E-Mail senden",
   "inviteMailSubject": "Einladung zu FamilyNexus",
-  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein (Familienkalender und Messenger, Ende-zu-Ende-verschlüsselt).\n\n1. Installiere die App FamilyNexus.\n2. Wähle bei der Einrichtung „Beitreten“ und füge diesen Link ein – oder öffne den Link bzw. scanne den QR-Code mit der Kamera-App:\n\n{link}\n\nDer Link ist {hours} Stunden gültig. Danach bestätige ich deinen Beitritt.",
+  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ich bestätige dich, dann bist du dabei.\n\nDer Link ist {hours} Stunden gültig.",
   "@inviteMailBody": {
     "placeholders": {
       "family": {
@@ -1012,5 +964,275 @@
   "webTabBusyTitle": "FamilyNexus ist schon geöffnet",
   "webTabBusyBody": "Die App läuft bereits in einem anderen Tab oder Fenster dieses Browsers. Zwei Tabs gleichzeitig würden die lokalen Daten beschädigen. Schließe den anderen Tab und versuche es erneut.",
   "privacy13Title": "Browser-Version",
-  "privacy13Body": "In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz und keine Erinnerungen bei geschlossener Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach."
+  "privacy13Body": "In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz und keine Erinnerungen bei geschlossener Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach.",
+  "startCreateTitle": "Neue Familie gründen",
+  "startCreateBody": "Du richtest alles ein und lädst deine Familie danach ein.",
+  "startInvitedTitle": "Ich wurde eingeladen",
+  "startInvitedBody": "Du hast einen Link oder QR-Code bekommen.",
+  "startLoginTitle": "Ich habe schon ein Konto",
+  "startLoginBody": "Du nutzt FamilyNexus schon, z. B. auf einem anderen Gerät.",
+  "startHaveAccount": "Ich habe schon ein Konto",
+  "regTitle": "Konto erstellen",
+  "regNameLabel": "Wie heißt du?",
+  "regNameHint": "z. B. Anna Müller",
+  "regUsernameLabel": "Dein Benutzername",
+  "regUsernameHint": "Damit meldest du dich an. Nur Kleinbuchstaben, Ziffern, Punkt und Bindestrich.",
+  "regUsernameFree": "Der Benutzername ist frei.",
+  "regUsernameTaken": "Dieser Benutzername ist schon vergeben.",
+  "regUsernameTakenSuggest": "Schon vergeben – wie wäre es mit „{suggestion}“?",
+  "@regUsernameTakenSuggest": {
+    "placeholders": {
+      "suggestion": {
+        "type": "String"
+      }
+    }
+  },
+  "regUseSuggestion": "„{suggestion}“ verwenden",
+  "@regUseSuggestion": {
+    "placeholders": {
+      "suggestion": {
+        "type": "String"
+      }
+    }
+  },
+  "regUsernameInvalid": "Bitte 3 bis 32 Zeichen: Kleinbuchstaben, Ziffern, Punkt, Unterstrich oder Bindestrich.",
+  "regPasswordHint": "Mindestens 8 Zeichen. Mit Benutzername und Passwort meldest du dich später auch auf einem neuen Gerät an.",
+  "passwordShow": "Passwort anzeigen",
+  "passwordHide": "Passwort verbergen",
+  "regCreate": "Konto erstellen",
+  "regCreating": "Erstelle Konto …",
+  "regExtraTitle": "Noch ein kurzer Schritt",
+  "regTermsBody": "Der Anbieter möchte, dass du seinen Bedingungen zustimmst.",
+  "regTermsAgree": "Ich habe die Bedingungen gelesen und stimme zu.",
+  "regEmailBody": "Gib deine E-Mail-Adresse ein. Der Anbieter schickt dir einen Bestätigungslink. Die Adresse geht nur an den Anbieter, nicht an uns.",
+  "regEmailLabel": "E-Mail-Adresse",
+  "regEmailInvalid": "Bitte eine gültige E-Mail-Adresse eingeben.",
+  "regEmailSend": "Bestätigung senden",
+  "regEmailSent": "Wir haben eine E-Mail an {email} geschickt. Öffne sie und tippe auf den Link. Komm danach hierher zurück.",
+  "@regEmailSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "regEmailConfirmed": "Ich habe bestätigt",
+  "regEmailResend": "E-Mail erneut senden",
+  "regEmailNotYet": "Noch nicht bestätigt. Bitte öffne den Link in der E-Mail (auch im Spam-Ordner nachsehen).",
+  "regTokenBody": "Dieser Anbieter braucht einen Einladungscode. Du bekommst ihn von der Person, die den Server betreibt.",
+  "regTokenLabel": "Einladungscode",
+  "regTokenWrong": "Der Code passt nicht. Bitte prüfe ihn.",
+  "regCaptchaBody": "Bitte bestätige im Browser kurz, dass du kein Roboter bist. Danach geht es hier automatisch weiter.",
+  "regCaptchaOpen": "Im Browser öffnen",
+  "regCaptchaDone": "Ich bin fertig",
+  "regCaptchaNotYet": "Noch nicht abgeschlossen. Bitte beende die Bestätigung im Browser.",
+  "regOAuthIntro": "Bei {host} legst du dein Konto auf der Seite des Anbieters an. Danach kommst du automatisch hierher zurück.",
+  "@regOAuthIntro": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "regOAuthCreate": "Konto bei {host} erstellen",
+  "@regOAuthCreate": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "regExternalBody": "Bei {host} kann die App kein Konto anlegen. Erstelle es auf der Webseite des Anbieters und melde dich danach hier an.",
+  "@regExternalBody": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "regExternalOpen": "Webseite öffnen",
+  "regExternalLogin": "Ich habe ein Konto – anmelden",
+  "oauthWaiting": "Bitte im Browser bei {host} fortfahren … Danach geht es hier automatisch weiter.",
+  "@oauthWaiting": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "loginOAuthIntro": "Bei {host} meldest du dich auf der Seite des Anbieters an. Danach kommst du automatisch hierher zurück.",
+  "@loginOAuthIntro": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "loginOAuth": "Bei {host} anmelden",
+  "@loginOAuth": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "loginNoAccount": "Noch kein Konto? Jetzt erstellen",
+  "advTitle": "Erweitert",
+  "advServerInfo": "Dein Konto liegt bei {host}.",
+  "@advServerInfo": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "advChecking": "Verbinde mit {host} …",
+  "@advChecking": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "advEnterProvider": "Bitte gib die Adresse des Anbieters ein.",
+  "advUnreachable": "{host} ist gerade nicht erreichbar. Prüfe deine Internetverbindung.",
+  "@advUnreachable": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "advExplain": "FamilyNexus nutzt das offene Matrix-Netz. Dein Konto liegt bei einem Anbieter deiner Wahl – oder auf einem eigenen Server.",
+  "advStandardProvider": "{host} (empfohlen)",
+  "@advStandardProvider": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "advOtherProvider": "Anderen Anbieter verwenden",
+  "advProviderLabel": "Adresse des Anbieters",
+  "advProviderHint": "z. B. matrix.beispiel.de",
+  "keyTitle": "Dein Notfall-Schlüssel",
+  "keyIntro": "Deine Nachrichten und Termine sind verschlüsselt. Damit du sie auch auf einem neuen Handy wieder öffnen kannst, bekommst du jetzt einen Notfall-Schlüssel – wie einen Ersatzschlüssel für die Haustür.",
+  "keyCreate": "Notfall-Schlüssel erstellen",
+  "keyCreating": "Erstelle …",
+  "keyShownIntro": "Wenn du dein Handy verlierst, brauchst du diesen Schlüssel, um deine Nachrichten wiederzubekommen. Niemand sonst – auch wir nicht – kann ihn wiederherstellen. Er wird nur jetzt angezeigt.",
+  "keyCopy": "Kopieren",
+  "keyCopied": "Kopiert. Füge ihn z. B. in deinen Passwort-Manager ein. Die Zwischenablage wird nach einer Minute geleert.",
+  "keySave": "Als Datei speichern",
+  "keySavedFile": "Gespeichert. Bewahre die Datei sicher auf – am besten ausgedruckt.",
+  "keyPrintHint": "Tipp: Speichere die Datei und drucke sie aus – oder schreibe den Schlüssel auf Papier ab.",
+  "keySavedCheck": "Ich habe den Notfall-Schlüssel sicher aufbewahrt.",
+  "keyFileName": "FamilyNexus-Notfall-Schluessel.txt",
+  "keyFileBody": "FamilyNexus – Notfall-Schlüssel\n\nKonto: {user}\nAnbieter: {provider}\nErstellt am: {date}\n\nNotfall-Schlüssel:\n{key}\n\nSo nutzt du ihn: Installiere FamilyNexus auf dem neuen Gerät, wähle „Ich habe schon ein Konto“, melde dich an und gib bei „Dieses Gerät freischalten“ den Notfall-Schlüssel ein.\n\nBewahre dieses Blatt sicher auf und gib es niemandem.",
+  "@keyFileBody": {
+    "placeholders": {
+      "user": {
+        "type": "String"
+      },
+      "provider": {
+        "type": "String"
+      },
+      "key": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "keyRestoreTitle": "Dieses Gerät freischalten",
+  "keyRestoreIntro": "Dein Konto ist schon abgesichert. Schalte dieses Gerät frei – mit einem anderen Gerät, auf dem du angemeldet bist, oder mit deinem Notfall-Schlüssel.",
+  "keyVerifyWithDevice": "Mit „{device}“ bestätigen",
+  "@keyVerifyWithDevice": {
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "keyNoOtherDevice": "Kein anderes Gerät gefunden. Nutze deinen Notfall-Schlüssel.",
+  "keyRestoreLabel": "Notfall-Schlüssel",
+  "keyRestoreButton": "Freischalten",
+  "keyRestoring": "Schalte frei …",
+  "keyRestoreFailed": "Der Notfall-Schlüssel passt nicht. Bitte prüfe ihn noch einmal.",
+  "inviteStepTitle": "Einladung",
+  "inviteStepBody": "Füge den Einladungslink ein, den du bekommen hast. Hast du einen QR-Code? Scanne ihn mit der Kamera-App – FamilyNexus öffnet sich dann von selbst.",
+  "inviteStepNoLink": "Kein Link? Bitte die Person, die dich einlädt, dir einen zu schicken.",
+  "joinCardTitle": "Familie beitreten",
+  "joinCardBody": "Du trittst der Familie „{family}“ bei. Eingeladen hat dich {inviter}.",
+  "@joinCardBody": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      },
+      "inviter": {
+        "type": "String"
+      }
+    }
+  },
+  "joinCardBodyNoName": "Du trittst einer Familie bei. Eingeladen hat dich {inviter}.",
+  "@joinCardBodyNoName": {
+    "placeholders": {
+      "inviter": {
+        "type": "String"
+      }
+    }
+  },
+  "joinCardNote": "Angaben laut Einladung. {inviter} bestätigt deine Anfrage, danach bist du dabei.",
+  "@joinCardNote": {
+    "placeholders": {
+      "inviter": {
+        "type": "String"
+      }
+    }
+  },
+  "joinCardDetails": "Details",
+  "joinCardDetailsInviter": "Benutzer-ID der einladenden Person",
+  "joinCardDetailsServer": "Server der Familie",
+  "joinDiscard": "Verwerfen",
+  "joinSending": "Sende …",
+  "joinWaiting": "Fast geschafft! {inviter} muss dich noch bestätigen. Sag kurz Bescheid – du kannst die App so lange schließen.",
+  "@joinWaiting": {
+    "placeholders": {
+      "inviter": {
+        "type": "String"
+      }
+    }
+  },
+  "joinAlreadyInFamily": "Du bist bereits in einer Familie.",
+  "familyNameHint": "z. B. Familie Müller",
+  "familyCreatedTitle": "Fertig! „{name}“ ist eingerichtet.",
+  "@familyCreatedTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "familyCreatedBody": "Lade jetzt deine Familie ein – per QR-Code, E-Mail oder Link. Du kannst das auch später unter „Familie“ tun.",
+  "familyInviteNow": "Jetzt einladen",
+  "later": "Später",
+  "familySwitchToJoin": "Ich wurde doch eingeladen",
+  "familySwitchToCreate": "Stattdessen eine neue Familie gründen",
+  "familyInviteIntro": "Lade Familienmitglieder ein. Sie bekommen einen Link oder QR-Code und schicken dir eine Anfrage, die du bestätigst.",
+  "familyInviteSomeone": "Jemanden einladen",
+  "familyInviteScanHint": "Lass die Person diesen Code mit der Kamera ihres Handys scannen – oder schick ihr den Link.",
+  "familyRequestFrom": "{name} möchte beitreten",
+  "@familyRequestFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errUsernameTaken": "Dieser Benutzername ist schon vergeben.",
+  "errUsernameInvalid": "Dieser Benutzername ist nicht erlaubt. Bitte wähle einen anderen.",
+  "errWeakPassword": "Das Passwort ist zu schwach. Bitte nimm ein längeres Passwort.",
+  "errRegistrationDisabled": "Bei diesem Anbieter kann die App kein Konto anlegen. Erstelle es auf seiner Webseite.",
+  "errEmailInUse": "Diese E-Mail-Adresse wird schon für ein anderes Konto verwendet.",
+  "errOAuthCancelled": "Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal."
 }

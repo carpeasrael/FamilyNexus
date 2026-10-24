@@ -24,6 +24,7 @@ import '../data/platform/device_auth.dart';
 import '../data/platform/file_access.dart';
 import '../data/platform/key_store.dart';
 import '../data/platform/link_source.dart';
+import '../data/platform/oauth_redirect.dart';
 import '../data/platform/reminder_scheduler.dart';
 import '../data/platform/screen_protection.dart';
 import '../data/platform/vault_key_store.dart';
@@ -69,6 +70,7 @@ Future<AppServices> bootstrap({KeyStore? keyStore}) async {
     // Offline/Serverfehler beim Start: Sitzung bleibt lokal bestehen, Sync holt auf.
   }
   final kv = SqlKeyValueStore(database.db);
+  final links = PlatformLinkSource();
   // Browser: keine Erinnerungen (E-53); ohne Scheduler gibt es auch keinen Koordinator.
   final LocalReminderScheduler? scheduler = PlatformInfo.isWeb ? null : LocalReminderScheduler();
   final lang = settings.settings.languageCode ?? WidgetsBinding.instance.platformDispatcher.locale.languageCode;
@@ -119,7 +121,8 @@ Future<AppServices> bootstrap({KeyStore? keyStore}) async {
     settings: settings,
     gateway: gateway,
     files: SystemFileAccess(),
-    links: PlatformLinkSource(),
+    links: links,
+    oauthRedirect: OAuthRedirect.forPlatform(links),
     lock: AppLockController(settings: settings, auth: PlatformInfo.hasNoDeviceAuth ? const UnavailableDeviceAuth() : LocalDeviceAuth()),
     screenProtection: PlatformScreenProtection(),
     database: database,

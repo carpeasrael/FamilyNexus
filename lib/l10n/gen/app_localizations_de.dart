@@ -154,7 +154,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get onbIntro =>
-      'Familienkalender und Messenger in einer App. Deine Daten bleiben auf deinen Geräten und wandern nur Ende-zu-Ende-verschlüsselt über Matrix.';
+      'Kalender und Chat für deine Familie – privat und verschlüsselt. Keine Werbung, keine Datensammelei.';
 
   @override
   String get onbPoint1 => 'Keine Telemetrie, keine Werbung, keine Analyse.';
@@ -167,32 +167,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get onbPoint3 => 'Private Termine verlassen nie deine eigenen Geräte.';
 
   @override
-  String get onbTitleServer => 'Server wählen';
-
-  @override
-  String serverDefault(String host) {
-    return 'Standardserver ($host)';
-  }
-
-  @override
-  String get serverCustom => 'Eigener Server';
-
-  @override
-  String get serverUrlLabel => 'Server-Adresse (https)';
-
-  @override
   String get serverUrlInvalid => 'Bitte eine gültige https-Adresse eingeben.';
-
-  @override
-  String get serverCheck => 'Server prüfen';
-
-  @override
-  String get serverChecking => 'Prüfe …';
-
-  @override
-  String serverOk(String version) {
-    return 'Server erreichbar (Matrix $version)';
-  }
 
   @override
   String serverOperator(String name) {
@@ -221,10 +196,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get accountLoggingIn => 'Melde an …';
-
-  @override
-  String get accountHint =>
-      'Du brauchst ein bestehendes Matrix-Konto auf dem gewählten Server. Neue Konten legst du beim Betreiber an.';
 
   @override
   String get onbTitleFamily => 'Familie';
@@ -828,52 +799,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get securityTitle => 'Schlüsselsicherung';
 
   @override
-  String get securityIntro =>
-      'Damit nur deine eigenen Geräte deine verschlüsselten Nachrichten und Termine lesen können, richtest du jetzt eine Schlüsselsicherung ein.';
-
-  @override
-  String get securitySetupButton => 'Schlüsselsicherung einrichten';
-
-  @override
-  String get securitySettingUp => 'Richte ein …';
-
-  @override
-  String get securityKeyTitle => 'Dein Wiederherstellungsschlüssel';
-
-  @override
-  String get securityKeyHint =>
-      'Notiere ihn auf Papier und bewahre ihn sicher auf. Er wird nur jetzt angezeigt. Ohne ihn und ohne ein verifiziertes Gerät sind deine Nachrichten bei Verlust aller Geräte unwiederbringlich.';
-
-  @override
-  String get securityKeySaved => 'Ich habe den Schlüssel sicher notiert.';
-
-  @override
-  String get securityRestoreTitle => 'Dieses Gerät verifizieren';
-
-  @override
-  String get securityRestoreIntro =>
-      'Dein Konto ist bereits abgesichert. Verifiziere dieses Gerät mit einem anderen deiner Geräte oder mit deinem Wiederherstellungsschlüssel.';
-
-  @override
-  String get securityVerifyWithDevice => 'Mit einem anderen Gerät verifizieren';
-
-  @override
-  String get securityNoOtherDevice =>
-      'Kein anderes Gerät gefunden. Nutze den Wiederherstellungsschlüssel.';
-
-  @override
-  String get securityRestoreKeyLabel => 'Wiederherstellungsschlüssel';
-
-  @override
-  String get securityRestoreButton => 'Mit Schlüssel wiederherstellen';
-
-  @override
-  String get securityRestoring => 'Stelle wieder her …';
-
-  @override
-  String get securityRestoreFailed => 'Der Schlüssel passt nicht.';
-
-  @override
   String get securityPasswordTitle => 'Passwort bestätigen';
 
   @override
@@ -947,11 +872,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get familyInvite => 'Mitglied einladen';
 
   @override
-  String get familyInviteLinkTitle => 'Einladungslink';
+  String get familyInviteLinkTitle => 'Jemanden einladen';
 
   @override
   String get familyInviteLinkHint =>
-      'Gültig 24 Stunden. Wer den Link öffnet, stellt nur eine Anfrage – du bestätigst sie.';
+      'Der Link ist 24 Stunden gültig und nur einmal verwendbar. Wer ihn öffnet, schickt dir eine Anfrage – du bestätigst sie.';
 
   @override
   String get familyInviteShowQr => 'QR-Code anzeigen';
@@ -963,7 +888,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get familyInviteCopied => 'Link kopiert.';
 
   @override
-  String get familyInviteById => 'Matrix-ID einladen';
+  String get familyInviteById => 'Per Benutzer-ID einladen';
 
   @override
   String get familyInviteByIdHint => '@name:server';
@@ -972,7 +897,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get familyInviteSend => 'Einladen';
 
   @override
-  String get familyInviteInvalidId => 'Bitte eine gültige Matrix-ID eingeben.';
+  String get familyInviteInvalidId =>
+      'Bitte eine gültige Benutzer-ID eingeben, z. B. @anna:beispiel.de.';
 
   @override
   String get familyInviteSent => 'Einladung gesendet.';
@@ -1019,7 +945,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get joinHint =>
-      'Füge einen Einladungslink ein oder öffne den Link bzw. QR-Code mit der Kamera-App.';
+      'Füge den Einladungslink ein oder öffne den Link bzw. QR-Code mit der Kamera-App.';
 
   @override
   String get joinLinkLabel => 'Einladungslink';
@@ -1028,19 +954,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get joinLinkInvalid => 'Dieser Link ist ungültig oder abgelaufen.';
 
   @override
-  String get joinSend => 'Beitrittsanfrage senden';
-
-  @override
-  String get joinConfirmTitle => 'Beitritt anfragen?';
-
-  @override
-  String joinConfirmBody(String server, String inviter) {
-    return 'Du fragst an, der Familie auf dem Server $server beizutreten. Eingeladen hat $inviter. Ein Moderator muss bestätigen.';
-  }
+  String get joinSend => 'Beitritt anfragen';
 
   @override
   String get joinPending =>
-      'Anfrage gesendet. Warte auf die Bestätigung eines Moderators.';
+      'Fast geschafft! Deine Anfrage ist unterwegs. Sobald sie bestätigt ist, bist du dabei.';
 
   @override
   String get joinCancel => 'Anfrage zurückziehen';
@@ -1569,7 +1487,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String inviteMailBody(String family, String link, String hours) {
-    return 'Hallo,\n\nich lade dich in unsere Familie „$family“ bei FamilyNexus ein (Familienkalender und Messenger, Ende-zu-Ende-verschlüsselt).\n\n1. Installiere die App FamilyNexus.\n2. Wähle bei der Einrichtung „Beitreten“ und füge diesen Link ein – oder öffne den Link bzw. scanne den QR-Code mit der Kamera-App:\n\n$link\n\nDer Link ist $hours Stunden gültig. Danach bestätige ich deinen Beitritt.';
+    return 'Hallo,\n\nich lade dich in unsere Familie „$family“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n$link\n\n3. Lege dein Konto an.\n4. Ich bestätige dich, dann bist du dabei.\n\nDer Link ist $hours Stunden gültig.';
   }
 
   @override
@@ -1777,4 +1695,410 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get privacy13Body =>
       'In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz und keine Erinnerungen bei geschlossener Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach.';
+
+  @override
+  String get startCreateTitle => 'Neue Familie gründen';
+
+  @override
+  String get startCreateBody =>
+      'Du richtest alles ein und lädst deine Familie danach ein.';
+
+  @override
+  String get startInvitedTitle => 'Ich wurde eingeladen';
+
+  @override
+  String get startInvitedBody => 'Du hast einen Link oder QR-Code bekommen.';
+
+  @override
+  String get startLoginTitle => 'Ich habe schon ein Konto';
+
+  @override
+  String get startLoginBody =>
+      'Du nutzt FamilyNexus schon, z. B. auf einem anderen Gerät.';
+
+  @override
+  String get startHaveAccount => 'Ich habe schon ein Konto';
+
+  @override
+  String get regTitle => 'Konto erstellen';
+
+  @override
+  String get regNameLabel => 'Wie heißt du?';
+
+  @override
+  String get regNameHint => 'z. B. Anna Müller';
+
+  @override
+  String get regUsernameLabel => 'Dein Benutzername';
+
+  @override
+  String get regUsernameHint =>
+      'Damit meldest du dich an. Nur Kleinbuchstaben, Ziffern, Punkt und Bindestrich.';
+
+  @override
+  String get regUsernameFree => 'Der Benutzername ist frei.';
+
+  @override
+  String get regUsernameTaken => 'Dieser Benutzername ist schon vergeben.';
+
+  @override
+  String regUsernameTakenSuggest(String suggestion) {
+    return 'Schon vergeben – wie wäre es mit „$suggestion“?';
+  }
+
+  @override
+  String regUseSuggestion(String suggestion) {
+    return '„$suggestion“ verwenden';
+  }
+
+  @override
+  String get regUsernameInvalid =>
+      'Bitte 3 bis 32 Zeichen: Kleinbuchstaben, Ziffern, Punkt, Unterstrich oder Bindestrich.';
+
+  @override
+  String get regPasswordHint =>
+      'Mindestens 8 Zeichen. Mit Benutzername und Passwort meldest du dich später auch auf einem neuen Gerät an.';
+
+  @override
+  String get passwordShow => 'Passwort anzeigen';
+
+  @override
+  String get passwordHide => 'Passwort verbergen';
+
+  @override
+  String get regCreate => 'Konto erstellen';
+
+  @override
+  String get regCreating => 'Erstelle Konto …';
+
+  @override
+  String get regExtraTitle => 'Noch ein kurzer Schritt';
+
+  @override
+  String get regTermsBody =>
+      'Der Anbieter möchte, dass du seinen Bedingungen zustimmst.';
+
+  @override
+  String get regTermsAgree => 'Ich habe die Bedingungen gelesen und stimme zu.';
+
+  @override
+  String get regEmailBody =>
+      'Gib deine E-Mail-Adresse ein. Der Anbieter schickt dir einen Bestätigungslink. Die Adresse geht nur an den Anbieter, nicht an uns.';
+
+  @override
+  String get regEmailLabel => 'E-Mail-Adresse';
+
+  @override
+  String get regEmailInvalid => 'Bitte eine gültige E-Mail-Adresse eingeben.';
+
+  @override
+  String get regEmailSend => 'Bestätigung senden';
+
+  @override
+  String regEmailSent(String email) {
+    return 'Wir haben eine E-Mail an $email geschickt. Öffne sie und tippe auf den Link. Komm danach hierher zurück.';
+  }
+
+  @override
+  String get regEmailConfirmed => 'Ich habe bestätigt';
+
+  @override
+  String get regEmailResend => 'E-Mail erneut senden';
+
+  @override
+  String get regEmailNotYet =>
+      'Noch nicht bestätigt. Bitte öffne den Link in der E-Mail (auch im Spam-Ordner nachsehen).';
+
+  @override
+  String get regTokenBody =>
+      'Dieser Anbieter braucht einen Einladungscode. Du bekommst ihn von der Person, die den Server betreibt.';
+
+  @override
+  String get regTokenLabel => 'Einladungscode';
+
+  @override
+  String get regTokenWrong => 'Der Code passt nicht. Bitte prüfe ihn.';
+
+  @override
+  String get regCaptchaBody =>
+      'Bitte bestätige im Browser kurz, dass du kein Roboter bist. Danach geht es hier automatisch weiter.';
+
+  @override
+  String get regCaptchaOpen => 'Im Browser öffnen';
+
+  @override
+  String get regCaptchaDone => 'Ich bin fertig';
+
+  @override
+  String get regCaptchaNotYet =>
+      'Noch nicht abgeschlossen. Bitte beende die Bestätigung im Browser.';
+
+  @override
+  String regOAuthIntro(String host) {
+    return 'Bei $host legst du dein Konto auf der Seite des Anbieters an. Danach kommst du automatisch hierher zurück.';
+  }
+
+  @override
+  String regOAuthCreate(String host) {
+    return 'Konto bei $host erstellen';
+  }
+
+  @override
+  String regExternalBody(String host) {
+    return 'Bei $host kann die App kein Konto anlegen. Erstelle es auf der Webseite des Anbieters und melde dich danach hier an.';
+  }
+
+  @override
+  String get regExternalOpen => 'Webseite öffnen';
+
+  @override
+  String get regExternalLogin => 'Ich habe ein Konto – anmelden';
+
+  @override
+  String oauthWaiting(String host) {
+    return 'Bitte im Browser bei $host fortfahren … Danach geht es hier automatisch weiter.';
+  }
+
+  @override
+  String loginOAuthIntro(String host) {
+    return 'Bei $host meldest du dich auf der Seite des Anbieters an. Danach kommst du automatisch hierher zurück.';
+  }
+
+  @override
+  String loginOAuth(String host) {
+    return 'Bei $host anmelden';
+  }
+
+  @override
+  String get loginNoAccount => 'Noch kein Konto? Jetzt erstellen';
+
+  @override
+  String get advTitle => 'Erweitert';
+
+  @override
+  String advServerInfo(String host) {
+    return 'Dein Konto liegt bei $host.';
+  }
+
+  @override
+  String advChecking(String host) {
+    return 'Verbinde mit $host …';
+  }
+
+  @override
+  String get advEnterProvider => 'Bitte gib die Adresse des Anbieters ein.';
+
+  @override
+  String advUnreachable(String host) {
+    return '$host ist gerade nicht erreichbar. Prüfe deine Internetverbindung.';
+  }
+
+  @override
+  String get advExplain =>
+      'FamilyNexus nutzt das offene Matrix-Netz. Dein Konto liegt bei einem Anbieter deiner Wahl – oder auf einem eigenen Server.';
+
+  @override
+  String advStandardProvider(String host) {
+    return '$host (empfohlen)';
+  }
+
+  @override
+  String get advOtherProvider => 'Anderen Anbieter verwenden';
+
+  @override
+  String get advProviderLabel => 'Adresse des Anbieters';
+
+  @override
+  String get advProviderHint => 'z. B. matrix.beispiel.de';
+
+  @override
+  String get keyTitle => 'Dein Notfall-Schlüssel';
+
+  @override
+  String get keyIntro =>
+      'Deine Nachrichten und Termine sind verschlüsselt. Damit du sie auch auf einem neuen Handy wieder öffnen kannst, bekommst du jetzt einen Notfall-Schlüssel – wie einen Ersatzschlüssel für die Haustür.';
+
+  @override
+  String get keyCreate => 'Notfall-Schlüssel erstellen';
+
+  @override
+  String get keyCreating => 'Erstelle …';
+
+  @override
+  String get keyShownIntro =>
+      'Wenn du dein Handy verlierst, brauchst du diesen Schlüssel, um deine Nachrichten wiederzubekommen. Niemand sonst – auch wir nicht – kann ihn wiederherstellen. Er wird nur jetzt angezeigt.';
+
+  @override
+  String get keyCopy => 'Kopieren';
+
+  @override
+  String get keyCopied =>
+      'Kopiert. Füge ihn z. B. in deinen Passwort-Manager ein. Die Zwischenablage wird nach einer Minute geleert.';
+
+  @override
+  String get keySave => 'Als Datei speichern';
+
+  @override
+  String get keySavedFile =>
+      'Gespeichert. Bewahre die Datei sicher auf – am besten ausgedruckt.';
+
+  @override
+  String get keyPrintHint =>
+      'Tipp: Speichere die Datei und drucke sie aus – oder schreibe den Schlüssel auf Papier ab.';
+
+  @override
+  String get keySavedCheck =>
+      'Ich habe den Notfall-Schlüssel sicher aufbewahrt.';
+
+  @override
+  String get keyFileName => 'FamilyNexus-Notfall-Schluessel.txt';
+
+  @override
+  String keyFileBody(String user, String provider, String key, String date) {
+    return 'FamilyNexus – Notfall-Schlüssel\n\nKonto: $user\nAnbieter: $provider\nErstellt am: $date\n\nNotfall-Schlüssel:\n$key\n\nSo nutzt du ihn: Installiere FamilyNexus auf dem neuen Gerät, wähle „Ich habe schon ein Konto“, melde dich an und gib bei „Dieses Gerät freischalten“ den Notfall-Schlüssel ein.\n\nBewahre dieses Blatt sicher auf und gib es niemandem.';
+  }
+
+  @override
+  String get keyRestoreTitle => 'Dieses Gerät freischalten';
+
+  @override
+  String get keyRestoreIntro =>
+      'Dein Konto ist schon abgesichert. Schalte dieses Gerät frei – mit einem anderen Gerät, auf dem du angemeldet bist, oder mit deinem Notfall-Schlüssel.';
+
+  @override
+  String keyVerifyWithDevice(String device) {
+    return 'Mit „$device“ bestätigen';
+  }
+
+  @override
+  String get keyNoOtherDevice =>
+      'Kein anderes Gerät gefunden. Nutze deinen Notfall-Schlüssel.';
+
+  @override
+  String get keyRestoreLabel => 'Notfall-Schlüssel';
+
+  @override
+  String get keyRestoreButton => 'Freischalten';
+
+  @override
+  String get keyRestoring => 'Schalte frei …';
+
+  @override
+  String get keyRestoreFailed =>
+      'Der Notfall-Schlüssel passt nicht. Bitte prüfe ihn noch einmal.';
+
+  @override
+  String get inviteStepTitle => 'Einladung';
+
+  @override
+  String get inviteStepBody =>
+      'Füge den Einladungslink ein, den du bekommen hast. Hast du einen QR-Code? Scanne ihn mit der Kamera-App – FamilyNexus öffnet sich dann von selbst.';
+
+  @override
+  String get inviteStepNoLink =>
+      'Kein Link? Bitte die Person, die dich einlädt, dir einen zu schicken.';
+
+  @override
+  String get joinCardTitle => 'Familie beitreten';
+
+  @override
+  String joinCardBody(String family, String inviter) {
+    return 'Du trittst der Familie „$family“ bei. Eingeladen hat dich $inviter.';
+  }
+
+  @override
+  String joinCardBodyNoName(String inviter) {
+    return 'Du trittst einer Familie bei. Eingeladen hat dich $inviter.';
+  }
+
+  @override
+  String joinCardNote(String inviter) {
+    return 'Angaben laut Einladung. $inviter bestätigt deine Anfrage, danach bist du dabei.';
+  }
+
+  @override
+  String get joinCardDetails => 'Details';
+
+  @override
+  String get joinCardDetailsInviter => 'Benutzer-ID der einladenden Person';
+
+  @override
+  String get joinCardDetailsServer => 'Server der Familie';
+
+  @override
+  String get joinDiscard => 'Verwerfen';
+
+  @override
+  String get joinSending => 'Sende …';
+
+  @override
+  String joinWaiting(String inviter) {
+    return 'Fast geschafft! $inviter muss dich noch bestätigen. Sag kurz Bescheid – du kannst die App so lange schließen.';
+  }
+
+  @override
+  String get joinAlreadyInFamily => 'Du bist bereits in einer Familie.';
+
+  @override
+  String get familyNameHint => 'z. B. Familie Müller';
+
+  @override
+  String familyCreatedTitle(String name) {
+    return 'Fertig! „$name“ ist eingerichtet.';
+  }
+
+  @override
+  String get familyCreatedBody =>
+      'Lade jetzt deine Familie ein – per QR-Code, E-Mail oder Link. Du kannst das auch später unter „Familie“ tun.';
+
+  @override
+  String get familyInviteNow => 'Jetzt einladen';
+
+  @override
+  String get later => 'Später';
+
+  @override
+  String get familySwitchToJoin => 'Ich wurde doch eingeladen';
+
+  @override
+  String get familySwitchToCreate => 'Stattdessen eine neue Familie gründen';
+
+  @override
+  String get familyInviteIntro =>
+      'Lade Familienmitglieder ein. Sie bekommen einen Link oder QR-Code und schicken dir eine Anfrage, die du bestätigst.';
+
+  @override
+  String get familyInviteSomeone => 'Jemanden einladen';
+
+  @override
+  String get familyInviteScanHint =>
+      'Lass die Person diesen Code mit der Kamera ihres Handys scannen – oder schick ihr den Link.';
+
+  @override
+  String familyRequestFrom(String name) {
+    return '$name möchte beitreten';
+  }
+
+  @override
+  String get errUsernameTaken => 'Dieser Benutzername ist schon vergeben.';
+
+  @override
+  String get errUsernameInvalid =>
+      'Dieser Benutzername ist nicht erlaubt. Bitte wähle einen anderen.';
+
+  @override
+  String get errWeakPassword =>
+      'Das Passwort ist zu schwach. Bitte nimm ein längeres Passwort.';
+
+  @override
+  String get errRegistrationDisabled =>
+      'Bei diesem Anbieter kann die App kein Konto anlegen. Erstelle es auf seiner Webseite.';
+
+  @override
+  String get errEmailInUse =>
+      'Diese E-Mail-Adresse wird schon für ein anderes Konto verwendet.';
+
+  @override
+  String get errOAuthCancelled =>
+      'Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal.';
 }

@@ -7,6 +7,7 @@ import '../../domain/family.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/moderation.dart';
 import '../../domain/presence.dart';
+import '../../domain/registration.dart';
 import '../../domain/security.dart';
 import '../../domain/server.dart';
 import '../../domain/shopping.dart';
@@ -29,6 +30,16 @@ enum GatewayError {
   reauthRequired,
   alreadyExists,
   rateLimited,
+
+  // Kontoanlage (E-55)
+  usernameTaken,
+  usernameInvalid,
+  weakPassword,
+  registrationDisabled,
+  emailInUse,
+
+  /// Die Anmeldung im Browser wurde abgebrochen oder ist abgelaufen.
+  oauthCancelled,
   unknown,
 }
 
@@ -100,6 +111,44 @@ abstract class MatrixGateway implements Listenable {
   });
 
   Future<void> logout();
+
+  // ------------------------------------------------------ Kontoanlage (E-55)
+
+  /// Wie bei [server] ein Konto angelegt wird (klassisch in der App, im Browser oder gar nicht).
+  Future<RegistrationOptions> registrationOptions(ServerUrl server);
+
+  /// Ist der Benutzername frei? Netzfehler ergeben `unknown` statt einer Ausnahme.
+  Future<UsernameCheck> checkUsername(ServerUrl server, String username);
+
+  /// Startet die klassische Registrierung. Liefert den nächsten Zusatzschritt oder `null`, wenn das
+  /// Konto angelegt und die Sitzung bereit ist. Das Passwort bleibt nur im Arbeitsspeicher, bis die
+  /// Registrierung endet oder abgebrochen wird.
+  Future<RegistrationStage?> register({
+    required ServerUrl server,
+    required String username,
+    required String password,
+    required String displayName,
+
+    /// Bevorzugte Sprache für die Bedingungen des Anbieters.
+    String language = 'de',
+  });
+
+  /// Setzt die laufende Registrierung mit der Antwort der Person fort (wie [register]).
+  Future<RegistrationStage?> continueRegistration(RegistrationInput input);
+
+  /// Bricht eine laufende Registrierung ab und vergisst das Passwort.
+  void cancelRegistration();
+
+  /// Bereitet die Anmeldung bzw. Kontoanlage ([create]) beim Anbieter im Browser vor (OAuth) und
+  /// liefert die zu öffnende Adresse. [redirectUri] ist die Rücksprungadresse der App.
+  Future<Uri> startOAuth({required ServerUrl server, required Uri redirectUri, required bool create});
+
+  /// Schließt die Anmeldung mit der Rücksprungadresse ab, die der Browser geöffnet hat.
+  /// Passt der `state` nicht oder fehlt der Code, wird `oauthCancelled` gemeldet.
+  Future<void> completeOAuth(Uri callback);
+
+  /// Setzt den eigenen Anzeigenamen.
+  Future<void> setDisplayName(String name);
 
   /// Gibt alle Ressourcen frei (Datenbank schließen), z. B. vor der vollständigen Löschung.
   Future<void> close();

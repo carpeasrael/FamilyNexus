@@ -2,10 +2,12 @@ import 'package:flutter/widgets.dart';
 
 import '../data/db/app_database.dart';
 import '../data/matrix/matrix_gateway.dart';
+import '../data/platform/browser_launcher.dart';
 import '../data/platform/file_access.dart';
 import '../data/platform/key_store.dart';
 import '../data/platform/link_source.dart';
 import '../data/platform/mail_launcher.dart';
+import '../data/platform/oauth_redirect.dart';
 import '../data/platform/reminder_scheduler.dart';
 import '../data/platform/screen_protection.dart';
 import '../data/sync/presence_sync.dart';
@@ -42,6 +44,8 @@ class AppServices {
     this.tasksBuilder,
     this.scheduler,
     this.mail = const SystemMailLauncher(),
+    this.browser = const SystemBrowserLauncher(),
+    this.oauthRedirect,
   });
 
   final SettingsController settings;
@@ -53,6 +57,12 @@ class AppServices {
 
   /// Öffnet das Mailprogramm für Einladungslinks (E-49).
   final MailLauncher mail;
+
+  /// Öffnet Seiten des Anbieters (Anmeldung, Bedingungen, Captcha; E-55).
+  final BrowserLauncher browser;
+
+  /// Rücksprung der Anmeldung im Browser; `null` = auf dieser Plattform nicht verfügbar (Browser-App).
+  final OAuthRedirect? oauthRedirect;
 
   /// Wird vom Start-Widget gesetzt: löscht alle lokalen Daten und startet neu.
   Future<void> Function()? onFullReset;

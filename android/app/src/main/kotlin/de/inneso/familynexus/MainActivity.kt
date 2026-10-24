@@ -14,13 +14,18 @@ class MainActivity : FlutterFragmentActivity() {
     private var linkChannel: MethodChannel? = null
     private var initialLink: String? = null
 
-    /** Nur familynexus://join-Links mit begrenzter Länge werden an Dart weitergereicht. */
+    /**
+     * Nur familynexus://join-Links und der Rücksprung der Browser-Anmeldung (OAuth) mit begrenzter
+     * Länge werden an Dart weitergereicht.
+     */
     private fun linkFrom(intent: Intent?): String? {
         if (intent?.action != Intent.ACTION_VIEW) return null
         val data = intent.data ?: return null
-        if (data.scheme != "familynexus" || data.host != "join") return null
+        val invite = data.scheme == "familynexus" && data.host == "join"
+        val oauth = data.scheme == "io.github.carpeasrael.familynexus" && data.path == "/oauth"
+        if (!invite && !oauth) return null
         val text = data.toString()
-        return if (text.length <= 512) text else null
+        return if (text.length <= 2048) text else null
     }
 
     override fun onNewIntent(intent: Intent) {

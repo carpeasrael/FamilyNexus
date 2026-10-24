@@ -18,6 +18,12 @@ String errorText(AppLocalizations l, Object error) {
       GatewayError.reauthRequired => l.errReauth,
       GatewayError.alreadyExists => l.errAlreadyExists,
       GatewayError.rateLimited => l.errRateLimited,
+      GatewayError.usernameTaken => l.errUsernameTaken,
+      GatewayError.usernameInvalid => l.errUsernameInvalid,
+      GatewayError.weakPassword => l.errWeakPassword,
+      GatewayError.registrationDisabled => l.errRegistrationDisabled,
+      GatewayError.emailInUse => l.errEmailInUse,
+      GatewayError.oauthCancelled => l.errOAuthCancelled,
       GatewayError.unknown => l.errUnknown,
     };
   }

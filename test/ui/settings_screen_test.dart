@@ -75,7 +75,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(app.gateway.session.name, 'loggedOut');
     expect(app.scheduler.cancelled, greaterThan(0), reason: 'geplante Erinnerungen werden bei Abmeldung entfernt');
-    expect(find.textContaining('Schritt 3 von 4'), findsOneWidget);
+    expect(find.textContaining('Schritt 1 von 3'), findsOneWidget, reason: 'Abgemeldet: zurück zu „Anmelden“');
   });
 
   testWidgets('Datenschutzerklärung ist erreichbar (de)', (tester) async {

@@ -371,7 +371,7 @@ abstract class AppLocalizations {
   /// No description provided for @onbIntro.
   ///
   /// In de, this message translates to:
-  /// **'Familienkalender und Messenger in einer App. Deine Daten bleiben auf deinen Geräten und wandern nur Ende-zu-Ende-verschlüsselt über Matrix.'**
+  /// **'Kalender und Chat für deine Familie – privat und verschlüsselt. Keine Werbung, keine Datensammelei.'**
   String get onbIntro;
 
   /// No description provided for @onbPoint1.
@@ -392,53 +392,11 @@ abstract class AppLocalizations {
   /// **'Private Termine verlassen nie deine eigenen Geräte.'**
   String get onbPoint3;
 
-  /// No description provided for @onbTitleServer.
-  ///
-  /// In de, this message translates to:
-  /// **'Server wählen'**
-  String get onbTitleServer;
-
-  /// No description provided for @serverDefault.
-  ///
-  /// In de, this message translates to:
-  /// **'Standardserver ({host})'**
-  String serverDefault(String host);
-
-  /// No description provided for @serverCustom.
-  ///
-  /// In de, this message translates to:
-  /// **'Eigener Server'**
-  String get serverCustom;
-
-  /// No description provided for @serverUrlLabel.
-  ///
-  /// In de, this message translates to:
-  /// **'Server-Adresse (https)'**
-  String get serverUrlLabel;
-
   /// No description provided for @serverUrlInvalid.
   ///
   /// In de, this message translates to:
   /// **'Bitte eine gültige https-Adresse eingeben.'**
   String get serverUrlInvalid;
-
-  /// No description provided for @serverCheck.
-  ///
-  /// In de, this message translates to:
-  /// **'Server prüfen'**
-  String get serverCheck;
-
-  /// No description provided for @serverChecking.
-  ///
-  /// In de, this message translates to:
-  /// **'Prüfe …'**
-  String get serverChecking;
-
-  /// No description provided for @serverOk.
-  ///
-  /// In de, this message translates to:
-  /// **'Server erreichbar (Matrix {version})'**
-  String serverOk(String version);
 
   /// No description provided for @serverOperator.
   ///
@@ -487,12 +445,6 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Melde an …'**
   String get accountLoggingIn;
-
-  /// No description provided for @accountHint.
-  ///
-  /// In de, this message translates to:
-  /// **'Du brauchst ein bestehendes Matrix-Konto auf dem gewählten Server. Neue Konten legst du beim Betreiber an.'**
-  String get accountHint;
 
   /// No description provided for @onbTitleFamily.
   ///
@@ -1454,90 +1406,6 @@ abstract class AppLocalizations {
   /// **'Schlüsselsicherung'**
   String get securityTitle;
 
-  /// No description provided for @securityIntro.
-  ///
-  /// In de, this message translates to:
-  /// **'Damit nur deine eigenen Geräte deine verschlüsselten Nachrichten und Termine lesen können, richtest du jetzt eine Schlüsselsicherung ein.'**
-  String get securityIntro;
-
-  /// No description provided for @securitySetupButton.
-  ///
-  /// In de, this message translates to:
-  /// **'Schlüsselsicherung einrichten'**
-  String get securitySetupButton;
-
-  /// No description provided for @securitySettingUp.
-  ///
-  /// In de, this message translates to:
-  /// **'Richte ein …'**
-  String get securitySettingUp;
-
-  /// No description provided for @securityKeyTitle.
-  ///
-  /// In de, this message translates to:
-  /// **'Dein Wiederherstellungsschlüssel'**
-  String get securityKeyTitle;
-
-  /// No description provided for @securityKeyHint.
-  ///
-  /// In de, this message translates to:
-  /// **'Notiere ihn auf Papier und bewahre ihn sicher auf. Er wird nur jetzt angezeigt. Ohne ihn und ohne ein verifiziertes Gerät sind deine Nachrichten bei Verlust aller Geräte unwiederbringlich.'**
-  String get securityKeyHint;
-
-  /// No description provided for @securityKeySaved.
-  ///
-  /// In de, this message translates to:
-  /// **'Ich habe den Schlüssel sicher notiert.'**
-  String get securityKeySaved;
-
-  /// No description provided for @securityRestoreTitle.
-  ///
-  /// In de, this message translates to:
-  /// **'Dieses Gerät verifizieren'**
-  String get securityRestoreTitle;
-
-  /// No description provided for @securityRestoreIntro.
-  ///
-  /// In de, this message translates to:
-  /// **'Dein Konto ist bereits abgesichert. Verifiziere dieses Gerät mit einem anderen deiner Geräte oder mit deinem Wiederherstellungsschlüssel.'**
-  String get securityRestoreIntro;
-
-  /// No description provided for @securityVerifyWithDevice.
-  ///
-  /// In de, this message translates to:
-  /// **'Mit einem anderen Gerät verifizieren'**
-  String get securityVerifyWithDevice;
-
-  /// No description provided for @securityNoOtherDevice.
-  ///
-  /// In de, this message translates to:
-  /// **'Kein anderes Gerät gefunden. Nutze den Wiederherstellungsschlüssel.'**
-  String get securityNoOtherDevice;
-
-  /// No description provided for @securityRestoreKeyLabel.
-  ///
-  /// In de, this message translates to:
-  /// **'Wiederherstellungsschlüssel'**
-  String get securityRestoreKeyLabel;
-
-  /// No description provided for @securityRestoreButton.
-  ///
-  /// In de, this message translates to:
-  /// **'Mit Schlüssel wiederherstellen'**
-  String get securityRestoreButton;
-
-  /// No description provided for @securityRestoring.
-  ///
-  /// In de, this message translates to:
-  /// **'Stelle wieder her …'**
-  String get securityRestoring;
-
-  /// No description provided for @securityRestoreFailed.
-  ///
-  /// In de, this message translates to:
-  /// **'Der Schlüssel passt nicht.'**
-  String get securityRestoreFailed;
-
   /// No description provided for @securityPasswordTitle.
   ///
   /// In de, this message translates to:
@@ -1679,13 +1547,13 @@ abstract class AppLocalizations {
   /// No description provided for @familyInviteLinkTitle.
   ///
   /// In de, this message translates to:
-  /// **'Einladungslink'**
+  /// **'Jemanden einladen'**
   String get familyInviteLinkTitle;
 
   /// No description provided for @familyInviteLinkHint.
   ///
   /// In de, this message translates to:
-  /// **'Gültig 24 Stunden. Wer den Link öffnet, stellt nur eine Anfrage – du bestätigst sie.'**
+  /// **'Der Link ist 24 Stunden gültig und nur einmal verwendbar. Wer ihn öffnet, schickt dir eine Anfrage – du bestätigst sie.'**
   String get familyInviteLinkHint;
 
   /// No description provided for @familyInviteShowQr.
@@ -1709,7 +1577,7 @@ abstract class AppLocalizations {
   /// No description provided for @familyInviteById.
   ///
   /// In de, this message translates to:
-  /// **'Matrix-ID einladen'**
+  /// **'Per Benutzer-ID einladen'**
   String get familyInviteById;
 
   /// No description provided for @familyInviteByIdHint.
@@ -1727,7 +1595,7 @@ abstract class AppLocalizations {
   /// No description provided for @familyInviteInvalidId.
   ///
   /// In de, this message translates to:
-  /// **'Bitte eine gültige Matrix-ID eingeben.'**
+  /// **'Bitte eine gültige Benutzer-ID eingeben, z. B. @anna:beispiel.de.'**
   String get familyInviteInvalidId;
 
   /// No description provided for @familyInviteSent.
@@ -1811,7 +1679,7 @@ abstract class AppLocalizations {
   /// No description provided for @joinHint.
   ///
   /// In de, this message translates to:
-  /// **'Füge einen Einladungslink ein oder öffne den Link bzw. QR-Code mit der Kamera-App.'**
+  /// **'Füge den Einladungslink ein oder öffne den Link bzw. QR-Code mit der Kamera-App.'**
   String get joinHint;
 
   /// No description provided for @joinLinkLabel.
@@ -1829,25 +1697,13 @@ abstract class AppLocalizations {
   /// No description provided for @joinSend.
   ///
   /// In de, this message translates to:
-  /// **'Beitrittsanfrage senden'**
+  /// **'Beitritt anfragen'**
   String get joinSend;
-
-  /// No description provided for @joinConfirmTitle.
-  ///
-  /// In de, this message translates to:
-  /// **'Beitritt anfragen?'**
-  String get joinConfirmTitle;
-
-  /// No description provided for @joinConfirmBody.
-  ///
-  /// In de, this message translates to:
-  /// **'Du fragst an, der Familie auf dem Server {server} beizutreten. Eingeladen hat {inviter}. Ein Moderator muss bestätigen.'**
-  String joinConfirmBody(String server, String inviter);
 
   /// No description provided for @joinPending.
   ///
   /// In de, this message translates to:
-  /// **'Anfrage gesendet. Warte auf die Bestätigung eines Moderators.'**
+  /// **'Fast geschafft! Deine Anfrage ist unterwegs. Sobald sie bestätigt ist, bist du dabei.'**
   String get joinPending;
 
   /// No description provided for @joinCancel.
@@ -2723,7 +2579,7 @@ abstract class AppLocalizations {
   /// No description provided for @inviteMailBody.
   ///
   /// In de, this message translates to:
-  /// **'Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein (Familienkalender und Messenger, Ende-zu-Ende-verschlüsselt).\n\n1. Installiere die App FamilyNexus.\n2. Wähle bei der Einrichtung „Beitreten“ und füge diesen Link ein – oder öffne den Link bzw. scanne den QR-Code mit der Kamera-App:\n\n{link}\n\nDer Link ist {hours} Stunden gültig. Danach bestätige ich deinen Beitritt.'**
+  /// **'Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ich bestätige dich, dann bist du dabei.\n\nDer Link ist {hours} Stunden gültig.'**
   String inviteMailBody(String family, String link, String hours);
 
   /// No description provided for @familyInviteMailFailed.
@@ -3073,6 +2929,672 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz und keine Erinnerungen bei geschlossener Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach.'**
   String get privacy13Body;
+
+  /// No description provided for @startCreateTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Familie gründen'**
+  String get startCreateTitle;
+
+  /// No description provided for @startCreateBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Du richtest alles ein und lädst deine Familie danach ein.'**
+  String get startCreateBody;
+
+  /// No description provided for @startInvitedTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich wurde eingeladen'**
+  String get startInvitedTitle;
+
+  /// No description provided for @startInvitedBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Du hast einen Link oder QR-Code bekommen.'**
+  String get startInvitedBody;
+
+  /// No description provided for @startLoginTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich habe schon ein Konto'**
+  String get startLoginTitle;
+
+  /// No description provided for @startLoginBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Du nutzt FamilyNexus schon, z. B. auf einem anderen Gerät.'**
+  String get startLoginBody;
+
+  /// No description provided for @startHaveAccount.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich habe schon ein Konto'**
+  String get startHaveAccount;
+
+  /// No description provided for @regTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Konto erstellen'**
+  String get regTitle;
+
+  /// No description provided for @regNameLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Wie heißt du?'**
+  String get regNameLabel;
+
+  /// No description provided for @regNameHint.
+  ///
+  /// In de, this message translates to:
+  /// **'z. B. Anna Müller'**
+  String get regNameHint;
+
+  /// No description provided for @regUsernameLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Benutzername'**
+  String get regUsernameLabel;
+
+  /// No description provided for @regUsernameHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Damit meldest du dich an. Nur Kleinbuchstaben, Ziffern, Punkt und Bindestrich.'**
+  String get regUsernameHint;
+
+  /// No description provided for @regUsernameFree.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Benutzername ist frei.'**
+  String get regUsernameFree;
+
+  /// No description provided for @regUsernameTaken.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Benutzername ist schon vergeben.'**
+  String get regUsernameTaken;
+
+  /// No description provided for @regUsernameTakenSuggest.
+  ///
+  /// In de, this message translates to:
+  /// **'Schon vergeben – wie wäre es mit „{suggestion}“?'**
+  String regUsernameTakenSuggest(String suggestion);
+
+  /// No description provided for @regUseSuggestion.
+  ///
+  /// In de, this message translates to:
+  /// **'„{suggestion}“ verwenden'**
+  String regUseSuggestion(String suggestion);
+
+  /// No description provided for @regUsernameInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte 3 bis 32 Zeichen: Kleinbuchstaben, Ziffern, Punkt, Unterstrich oder Bindestrich.'**
+  String get regUsernameInvalid;
+
+  /// No description provided for @regPasswordHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Mindestens 8 Zeichen. Mit Benutzername und Passwort meldest du dich später auch auf einem neuen Gerät an.'**
+  String get regPasswordHint;
+
+  /// No description provided for @passwordShow.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwort anzeigen'**
+  String get passwordShow;
+
+  /// No description provided for @passwordHide.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwort verbergen'**
+  String get passwordHide;
+
+  /// No description provided for @regCreate.
+  ///
+  /// In de, this message translates to:
+  /// **'Konto erstellen'**
+  String get regCreate;
+
+  /// No description provided for @regCreating.
+  ///
+  /// In de, this message translates to:
+  /// **'Erstelle Konto …'**
+  String get regCreating;
+
+  /// No description provided for @regExtraTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch ein kurzer Schritt'**
+  String get regExtraTitle;
+
+  /// No description provided for @regTermsBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Anbieter möchte, dass du seinen Bedingungen zustimmst.'**
+  String get regTermsBody;
+
+  /// No description provided for @regTermsAgree.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich habe die Bedingungen gelesen und stimme zu.'**
+  String get regTermsAgree;
+
+  /// No description provided for @regEmailBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Gib deine E-Mail-Adresse ein. Der Anbieter schickt dir einen Bestätigungslink. Die Adresse geht nur an den Anbieter, nicht an uns.'**
+  String get regEmailBody;
+
+  /// No description provided for @regEmailLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'E-Mail-Adresse'**
+  String get regEmailLabel;
+
+  /// No description provided for @regEmailInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte eine gültige E-Mail-Adresse eingeben.'**
+  String get regEmailInvalid;
+
+  /// No description provided for @regEmailSend.
+  ///
+  /// In de, this message translates to:
+  /// **'Bestätigung senden'**
+  String get regEmailSend;
+
+  /// No description provided for @regEmailSent.
+  ///
+  /// In de, this message translates to:
+  /// **'Wir haben eine E-Mail an {email} geschickt. Öffne sie und tippe auf den Link. Komm danach hierher zurück.'**
+  String regEmailSent(String email);
+
+  /// No description provided for @regEmailConfirmed.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich habe bestätigt'**
+  String get regEmailConfirmed;
+
+  /// No description provided for @regEmailResend.
+  ///
+  /// In de, this message translates to:
+  /// **'E-Mail erneut senden'**
+  String get regEmailResend;
+
+  /// No description provided for @regEmailNotYet.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch nicht bestätigt. Bitte öffne den Link in der E-Mail (auch im Spam-Ordner nachsehen).'**
+  String get regEmailNotYet;
+
+  /// No description provided for @regTokenBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Anbieter braucht einen Einladungscode. Du bekommst ihn von der Person, die den Server betreibt.'**
+  String get regTokenBody;
+
+  /// No description provided for @regTokenLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladungscode'**
+  String get regTokenLabel;
+
+  /// No description provided for @regTokenWrong.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Code passt nicht. Bitte prüfe ihn.'**
+  String get regTokenWrong;
+
+  /// No description provided for @regCaptchaBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte bestätige im Browser kurz, dass du kein Roboter bist. Danach geht es hier automatisch weiter.'**
+  String get regCaptchaBody;
+
+  /// No description provided for @regCaptchaOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'Im Browser öffnen'**
+  String get regCaptchaOpen;
+
+  /// No description provided for @regCaptchaDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich bin fertig'**
+  String get regCaptchaDone;
+
+  /// No description provided for @regCaptchaNotYet.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch nicht abgeschlossen. Bitte beende die Bestätigung im Browser.'**
+  String get regCaptchaNotYet;
+
+  /// No description provided for @regOAuthIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Bei {host} legst du dein Konto auf der Seite des Anbieters an. Danach kommst du automatisch hierher zurück.'**
+  String regOAuthIntro(String host);
+
+  /// No description provided for @regOAuthCreate.
+  ///
+  /// In de, this message translates to:
+  /// **'Konto bei {host} erstellen'**
+  String regOAuthCreate(String host);
+
+  /// No description provided for @regExternalBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Bei {host} kann die App kein Konto anlegen. Erstelle es auf der Webseite des Anbieters und melde dich danach hier an.'**
+  String regExternalBody(String host);
+
+  /// No description provided for @regExternalOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'Webseite öffnen'**
+  String get regExternalOpen;
+
+  /// No description provided for @regExternalLogin.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich habe ein Konto – anmelden'**
+  String get regExternalLogin;
+
+  /// No description provided for @oauthWaiting.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte im Browser bei {host} fortfahren … Danach geht es hier automatisch weiter.'**
+  String oauthWaiting(String host);
+
+  /// No description provided for @loginOAuthIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Bei {host} meldest du dich auf der Seite des Anbieters an. Danach kommst du automatisch hierher zurück.'**
+  String loginOAuthIntro(String host);
+
+  /// No description provided for @loginOAuth.
+  ///
+  /// In de, this message translates to:
+  /// **'Bei {host} anmelden'**
+  String loginOAuth(String host);
+
+  /// No description provided for @loginNoAccount.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch kein Konto? Jetzt erstellen'**
+  String get loginNoAccount;
+
+  /// No description provided for @advTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Erweitert'**
+  String get advTitle;
+
+  /// No description provided for @advServerInfo.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Konto liegt bei {host}.'**
+  String advServerInfo(String host);
+
+  /// No description provided for @advChecking.
+  ///
+  /// In de, this message translates to:
+  /// **'Verbinde mit {host} …'**
+  String advChecking(String host);
+
+  /// No description provided for @advEnterProvider.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte gib die Adresse des Anbieters ein.'**
+  String get advEnterProvider;
+
+  /// No description provided for @advUnreachable.
+  ///
+  /// In de, this message translates to:
+  /// **'{host} ist gerade nicht erreichbar. Prüfe deine Internetverbindung.'**
+  String advUnreachable(String host);
+
+  /// No description provided for @advExplain.
+  ///
+  /// In de, this message translates to:
+  /// **'FamilyNexus nutzt das offene Matrix-Netz. Dein Konto liegt bei einem Anbieter deiner Wahl – oder auf einem eigenen Server.'**
+  String get advExplain;
+
+  /// No description provided for @advStandardProvider.
+  ///
+  /// In de, this message translates to:
+  /// **'{host} (empfohlen)'**
+  String advStandardProvider(String host);
+
+  /// No description provided for @advOtherProvider.
+  ///
+  /// In de, this message translates to:
+  /// **'Anderen Anbieter verwenden'**
+  String get advOtherProvider;
+
+  /// No description provided for @advProviderLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Adresse des Anbieters'**
+  String get advProviderLabel;
+
+  /// No description provided for @advProviderHint.
+  ///
+  /// In de, this message translates to:
+  /// **'z. B. matrix.beispiel.de'**
+  String get advProviderHint;
+
+  /// No description provided for @keyTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Notfall-Schlüssel'**
+  String get keyTitle;
+
+  /// No description provided for @keyIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Deine Nachrichten und Termine sind verschlüsselt. Damit du sie auch auf einem neuen Handy wieder öffnen kannst, bekommst du jetzt einen Notfall-Schlüssel – wie einen Ersatzschlüssel für die Haustür.'**
+  String get keyIntro;
+
+  /// No description provided for @keyCreate.
+  ///
+  /// In de, this message translates to:
+  /// **'Notfall-Schlüssel erstellen'**
+  String get keyCreate;
+
+  /// No description provided for @keyCreating.
+  ///
+  /// In de, this message translates to:
+  /// **'Erstelle …'**
+  String get keyCreating;
+
+  /// No description provided for @keyShownIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Wenn du dein Handy verlierst, brauchst du diesen Schlüssel, um deine Nachrichten wiederzubekommen. Niemand sonst – auch wir nicht – kann ihn wiederherstellen. Er wird nur jetzt angezeigt.'**
+  String get keyShownIntro;
+
+  /// No description provided for @keyCopy.
+  ///
+  /// In de, this message translates to:
+  /// **'Kopieren'**
+  String get keyCopy;
+
+  /// No description provided for @keyCopied.
+  ///
+  /// In de, this message translates to:
+  /// **'Kopiert. Füge ihn z. B. in deinen Passwort-Manager ein. Die Zwischenablage wird nach einer Minute geleert.'**
+  String get keyCopied;
+
+  /// No description provided for @keySave.
+  ///
+  /// In de, this message translates to:
+  /// **'Als Datei speichern'**
+  String get keySave;
+
+  /// No description provided for @keySavedFile.
+  ///
+  /// In de, this message translates to:
+  /// **'Gespeichert. Bewahre die Datei sicher auf – am besten ausgedruckt.'**
+  String get keySavedFile;
+
+  /// No description provided for @keyPrintHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Tipp: Speichere die Datei und drucke sie aus – oder schreibe den Schlüssel auf Papier ab.'**
+  String get keyPrintHint;
+
+  /// No description provided for @keySavedCheck.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich habe den Notfall-Schlüssel sicher aufbewahrt.'**
+  String get keySavedCheck;
+
+  /// No description provided for @keyFileName.
+  ///
+  /// In de, this message translates to:
+  /// **'FamilyNexus-Notfall-Schluessel.txt'**
+  String get keyFileName;
+
+  /// No description provided for @keyFileBody.
+  ///
+  /// In de, this message translates to:
+  /// **'FamilyNexus – Notfall-Schlüssel\n\nKonto: {user}\nAnbieter: {provider}\nErstellt am: {date}\n\nNotfall-Schlüssel:\n{key}\n\nSo nutzt du ihn: Installiere FamilyNexus auf dem neuen Gerät, wähle „Ich habe schon ein Konto“, melde dich an und gib bei „Dieses Gerät freischalten“ den Notfall-Schlüssel ein.\n\nBewahre dieses Blatt sicher auf und gib es niemandem.'**
+  String keyFileBody(String user, String provider, String key, String date);
+
+  /// No description provided for @keyRestoreTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieses Gerät freischalten'**
+  String get keyRestoreTitle;
+
+  /// No description provided for @keyRestoreIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Konto ist schon abgesichert. Schalte dieses Gerät frei – mit einem anderen Gerät, auf dem du angemeldet bist, oder mit deinem Notfall-Schlüssel.'**
+  String get keyRestoreIntro;
+
+  /// No description provided for @keyVerifyWithDevice.
+  ///
+  /// In de, this message translates to:
+  /// **'Mit „{device}“ bestätigen'**
+  String keyVerifyWithDevice(String device);
+
+  /// No description provided for @keyNoOtherDevice.
+  ///
+  /// In de, this message translates to:
+  /// **'Kein anderes Gerät gefunden. Nutze deinen Notfall-Schlüssel.'**
+  String get keyNoOtherDevice;
+
+  /// No description provided for @keyRestoreLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Notfall-Schlüssel'**
+  String get keyRestoreLabel;
+
+  /// No description provided for @keyRestoreButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Freischalten'**
+  String get keyRestoreButton;
+
+  /// No description provided for @keyRestoring.
+  ///
+  /// In de, this message translates to:
+  /// **'Schalte frei …'**
+  String get keyRestoring;
+
+  /// No description provided for @keyRestoreFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Notfall-Schlüssel passt nicht. Bitte prüfe ihn noch einmal.'**
+  String get keyRestoreFailed;
+
+  /// No description provided for @inviteStepTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladung'**
+  String get inviteStepTitle;
+
+  /// No description provided for @inviteStepBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Füge den Einladungslink ein, den du bekommen hast. Hast du einen QR-Code? Scanne ihn mit der Kamera-App – FamilyNexus öffnet sich dann von selbst.'**
+  String get inviteStepBody;
+
+  /// No description provided for @inviteStepNoLink.
+  ///
+  /// In de, this message translates to:
+  /// **'Kein Link? Bitte die Person, die dich einlädt, dir einen zu schicken.'**
+  String get inviteStepNoLink;
+
+  /// No description provided for @joinCardTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Familie beitreten'**
+  String get joinCardTitle;
+
+  /// No description provided for @joinCardBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Du trittst der Familie „{family}“ bei. Eingeladen hat dich {inviter}.'**
+  String joinCardBody(String family, String inviter);
+
+  /// No description provided for @joinCardBodyNoName.
+  ///
+  /// In de, this message translates to:
+  /// **'Du trittst einer Familie bei. Eingeladen hat dich {inviter}.'**
+  String joinCardBodyNoName(String inviter);
+
+  /// No description provided for @joinCardNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Angaben laut Einladung. {inviter} bestätigt deine Anfrage, danach bist du dabei.'**
+  String joinCardNote(String inviter);
+
+  /// No description provided for @joinCardDetails.
+  ///
+  /// In de, this message translates to:
+  /// **'Details'**
+  String get joinCardDetails;
+
+  /// No description provided for @joinCardDetailsInviter.
+  ///
+  /// In de, this message translates to:
+  /// **'Benutzer-ID der einladenden Person'**
+  String get joinCardDetailsInviter;
+
+  /// No description provided for @joinCardDetailsServer.
+  ///
+  /// In de, this message translates to:
+  /// **'Server der Familie'**
+  String get joinCardDetailsServer;
+
+  /// No description provided for @joinDiscard.
+  ///
+  /// In de, this message translates to:
+  /// **'Verwerfen'**
+  String get joinDiscard;
+
+  /// No description provided for @joinSending.
+  ///
+  /// In de, this message translates to:
+  /// **'Sende …'**
+  String get joinSending;
+
+  /// No description provided for @joinWaiting.
+  ///
+  /// In de, this message translates to:
+  /// **'Fast geschafft! {inviter} muss dich noch bestätigen. Sag kurz Bescheid – du kannst die App so lange schließen.'**
+  String joinWaiting(String inviter);
+
+  /// No description provided for @joinAlreadyInFamily.
+  ///
+  /// In de, this message translates to:
+  /// **'Du bist bereits in einer Familie.'**
+  String get joinAlreadyInFamily;
+
+  /// No description provided for @familyNameHint.
+  ///
+  /// In de, this message translates to:
+  /// **'z. B. Familie Müller'**
+  String get familyNameHint;
+
+  /// No description provided for @familyCreatedTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Fertig! „{name}“ ist eingerichtet.'**
+  String familyCreatedTitle(String name);
+
+  /// No description provided for @familyCreatedBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Lade jetzt deine Familie ein – per QR-Code, E-Mail oder Link. Du kannst das auch später unter „Familie“ tun.'**
+  String get familyCreatedBody;
+
+  /// No description provided for @familyInviteNow.
+  ///
+  /// In de, this message translates to:
+  /// **'Jetzt einladen'**
+  String get familyInviteNow;
+
+  /// No description provided for @later.
+  ///
+  /// In de, this message translates to:
+  /// **'Später'**
+  String get later;
+
+  /// No description provided for @familySwitchToJoin.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich wurde doch eingeladen'**
+  String get familySwitchToJoin;
+
+  /// No description provided for @familySwitchToCreate.
+  ///
+  /// In de, this message translates to:
+  /// **'Stattdessen eine neue Familie gründen'**
+  String get familySwitchToCreate;
+
+  /// No description provided for @familyInviteIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Lade Familienmitglieder ein. Sie bekommen einen Link oder QR-Code und schicken dir eine Anfrage, die du bestätigst.'**
+  String get familyInviteIntro;
+
+  /// No description provided for @familyInviteSomeone.
+  ///
+  /// In de, this message translates to:
+  /// **'Jemanden einladen'**
+  String get familyInviteSomeone;
+
+  /// No description provided for @familyInviteScanHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Lass die Person diesen Code mit der Kamera ihres Handys scannen – oder schick ihr den Link.'**
+  String get familyInviteScanHint;
+
+  /// No description provided for @familyRequestFrom.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} möchte beitreten'**
+  String familyRequestFrom(String name);
+
+  /// No description provided for @errUsernameTaken.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Benutzername ist schon vergeben.'**
+  String get errUsernameTaken;
+
+  /// No description provided for @errUsernameInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Benutzername ist nicht erlaubt. Bitte wähle einen anderen.'**
+  String get errUsernameInvalid;
+
+  /// No description provided for @errWeakPassword.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Passwort ist zu schwach. Bitte nimm ein längeres Passwort.'**
+  String get errWeakPassword;
+
+  /// No description provided for @errRegistrationDisabled.
+  ///
+  /// In de, this message translates to:
+  /// **'Bei diesem Anbieter kann die App kein Konto anlegen. Erstelle es auf seiner Webseite.'**
+  String get errRegistrationDisabled;
+
+  /// No description provided for @errEmailInUse.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese E-Mail-Adresse wird schon für ein anderes Konto verwendet.'**
+  String get errEmailInUse;
+
+  /// No description provided for @errOAuthCancelled.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal.'**
+  String get errOAuthCancelled;
 }
 
 class _AppLocalizationsDelegate
