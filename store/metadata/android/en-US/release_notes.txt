@@ -1,6 +1,8 @@
 New in 1.1.0:
-• Simple setup: start a new family, get invited or sign in – no technical terms.
-• Create your account right in the app; on matrix.org via its page with automatic return.
-• Invitation links take newcomers straight to "Create account" and joining.
-• Emergency key: clearly explained, copy it or save it as a file.
-Important: please update all devices in your family – older versions cannot open new invitation links.
+• Simple setup without technical terms: start a family, get invited or sign in.
+• Create your account in the app (matrix.org via its page).
+• Invitation links take newcomers straight to joining.
+• Emergency key: clearly explained, copyable, savable as a file.
+• Tasks: description and repeats such as Mon–Fri, on Wednesdays, the 2nd Tuesday or the 20th.
+• iPhone: the keyboard closes when you tap outside.
+Please update all devices in your family.
