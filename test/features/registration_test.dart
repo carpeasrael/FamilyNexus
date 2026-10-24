@@ -1,0 +1,204 @@
+import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/data/matrix/matrix_gateway.dart';
+import 'package:family_nexus/domain/registration.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import '../support/test_app.dart';
+
+Future<void> _pump(WidgetTester tester, TestApp app) async {
+  tester.view.physicalSize = const Size(900, 3000);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+  await tester.pumpWidget(FamilyNexusApp(services: app.services));
+  await tester.pumpAndSettle();
+}
+
+Future<void> _tap(WidgetTester tester, String text) async {
+  var f = find.widgetWithText(FilledButton, text);
+  if (f.evaluate().isEmpty) f = find.widgetWithText(OutlinedButton, text);
+  if (f.evaluate().isEmpty) f = find.widgetWithText(TextButton, text);
+  if (f.evaluate().isEmpty) f = find.text(text);
+  await tester.ensureVisible(f.first);
+  await tester.tap(f.first);
+  await tester.pumpAndSettle();
+}
+
+/// „Neue Familie gründen“ → Formular ausfüllen → „Konto erstellen“.
+Future<void> _fillAndSubmit(WidgetTester tester, {String name = 'Emil', String password = 'sicher-genug'}) async {
+  await _tap(tester, 'Neue Familie gründen');
+  await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), name);
+  await tester.pump(const Duration(milliseconds: 700));
+  await tester.pumpAndSettle();
+  await tester.enterText(find.widgetWithText(TextField, 'Passwort'), password);
+  await tester.pumpAndSettle();
+  await _tap(tester, 'Konto erstellen');
+}
+
+void main() {
+  testWidgets('TP-REG-05 Bedingungen: lesen im Browser, ohne Zustimmung kein Weiter', (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    app.server.registrationFlows = <List<String>>[
+      <String>[RegistrationFlows.terms],
+    ];
+    await _pump(tester, app);
+    await _fillAndSubmit(tester);
+    expect(find.text('Noch ein kurzer Schritt'), findsOneWidget);
+    expect(find.text('Der Anbieter möchte, dass du seinen Bedingungen zustimmst.'), findsOneWidget);
+    await _tap(tester, 'Nutzungsbedingungen');
+    expect(app.browser.opened.single.toString(), 'https://fake.test/terms');
+    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Weiter')).onPressed, isNull);
+    await tester.tap(find.byType(CheckboxListTile));
+    await tester.pumpAndSettle();
+    await _tap(tester, 'Weiter');
+    expect(app.gateway.userId, '@emil:fake.test');
+    expect(find.text('Notfall-Schlüssel erstellen'), findsOneWidget);
+  });
+
+  testWidgets('TP-REG-06 E-Mail: senden, „noch nicht bestätigt“, nach Bestätigung angelegt', (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    app.server.registrationFlows = <List<String>>[
+      <String>[RegistrationFlows.email],
+    ];
+    await _pump(tester, app);
+    await _fillAndSubmit(tester);
+    expect(find.textContaining('geht nur an den Anbieter'), findsOneWidget, reason: 'Datenschutzhinweis');
+    await tester.enterText(find.widgetWithText(TextField, 'E-Mail-Adresse'), 'keine-adresse');
+    await _tap(tester, 'Bestätigung senden');
+    expect(find.text('Bitte eine gültige E-Mail-Adresse eingeben.'), findsOneWidget);
+    expect(app.server.emailsSent, isEmpty);
+    await tester.enterText(find.widgetWithText(TextField, 'E-Mail-Adresse'), 'emil@beispiel.de');
+    await _tap(tester, 'Bestätigung senden');
+    expect(app.server.emailsSent, <String>['emil@beispiel.de']);
+    expect(find.textContaining('Wir haben eine E-Mail an emil@beispiel.de geschickt.'), findsOneWidget);
+
+    await _tap(tester, 'Ich habe bestätigt');
+    expect(find.textContaining('Noch nicht bestätigt.'), findsOneWidget);
+    expect(app.gateway.userId, isNull);
+
+    await _tap(tester, 'E-Mail erneut senden');
+    expect(app.server.emailsSent, hasLength(2));
+    app.server.emailConfirmed = true;
+    await _tap(tester, 'Ich habe bestätigt');
+    expect(app.gateway.userId, '@emil:fake.test');
+  });
+
+  testWidgets('TP-REG-06b bereits verwendete E-Mail-Adresse: Meldung, Schritt bleibt offen', (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    app.server.registrationFlows = <List<String>>[
+      <String>[RegistrationFlows.email],
+    ];
+    app.server.emailsInUse.add('anna@beispiel.de');
+    await _pump(tester, app);
+    await _fillAndSubmit(tester);
+    await tester.enterText(find.widgetWithText(TextField, 'E-Mail-Adresse'), 'anna@beispiel.de');
+    await _tap(tester, 'Bestätigung senden');
+    expect(find.text('Diese E-Mail-Adresse wird schon für ein anderes Konto verwendet.'), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'E-Mail-Adresse'), findsOneWidget);
+  });
+
+  testWidgets('TP-REG-07 Einladungscode: falscher Code, dann richtiger', (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    app.server.registrationFlows = <List<String>>[
+      <String>[RegistrationFlows.token, RegistrationFlows.dummy],
+    ];
+    await _pump(tester, app);
+    await _fillAndSubmit(tester);
+    await tester.enterText(find.widgetWithText(TextField, 'Einladungscode'), 'FALSCH');
+    await _tap(tester, 'Weiter');
+    expect(find.text('Der Code passt nicht. Bitte prüfe ihn.'), findsOneWidget);
+    expect(app.gateway.userId, isNull);
+    await tester.enterText(find.widgetWithText(TextField, 'Einladungscode'), 'FAMILIE-2026');
+    await _tap(tester, 'Weiter');
+    expect(app.gateway.userId, '@emil:fake.test');
+  });
+
+  testWidgets('TP-REG-08 „Kein Roboter“: im Browser öffnen, „Ich bin fertig“ prüft; Rückkehr in die App prüft automatisch', (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    app.server.registrationFlows = <List<String>>[
+      <String>[RegistrationFlows.recaptcha],
+    ];
+    await _pump(tester, app);
+    await _fillAndSubmit(tester);
+    expect(find.textContaining('dass du kein Roboter bist'), findsOneWidget);
+    await _tap(tester, 'Ich bin fertig');
+    expect(find.text('Noch nicht abgeschlossen. Bitte beende die Bestätigung im Browser.'), findsOneWidget);
+
+    await _tap(tester, 'Im Browser öffnen');
+    expect(app.browser.opened.last.host, 'fake.test');
+    app.server.captchaSolved = true;
+    // Rückkehr aus dem Browser: App wird wieder aktiv.
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+    expect(app.gateway.userId, '@emil:fake.test');
+  });
+
+  testWidgets('TP-REG-08b mehrere Schritte nacheinander (Bedingungen, dann Captcha)', (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    app.server.registrationFlows = <List<String>>[
+      <String>[RegistrationFlows.terms, RegistrationFlows.recaptcha],
+    ];
+    app.server.captchaSolved = true;
+    await _pump(tester, app);
+    await _fillAndSubmit(tester);
+    await tester.tap(find.byType(CheckboxListTile));
+    await tester.pumpAndSettle();
+    await _tap(tester, 'Weiter');
+    expect(find.textContaining('kein Roboter'), findsOneWidget);
+    await _tap(tester, 'Ich bin fertig');
+    expect(app.gateway.userId, '@emil:fake.test');
+  });
+
+  testWidgets('TP-REG-09 Registrierung beim Anbieter abgeschaltet: Webseite öffnen oder anmelden', (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    app.server.registrationMode = RegistrationMode.disabled;
+    await _pump(tester, app);
+    await _tap(tester, 'Neue Familie gründen');
+    expect(find.textContaining('kann die App kein Konto anlegen'), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'Wie heißt du?'), findsNothing);
+    await _tap(tester, 'Webseite öffnen');
+    expect(app.browser.opened.single.toString(), 'https://fake.test/signup');
+    await _tap(tester, 'Ich habe ein Konto – anmelden');
+    expect(find.widgetWithText(TextField, 'Benutzername'), findsOneWidget);
+  });
+
+  testWidgets('TP-REG-09b nur nicht unterstützte Schritte (Telefonnummer): wie abgeschaltet', (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    app.server.registrationFlows = <List<String>>[
+      <String>['m.login.msisdn'],
+    ];
+    await _pump(tester, app);
+    await _tap(tester, 'Neue Familie gründen');
+    expect(find.textContaining('kann die App kein Konto anlegen'), findsOneWidget);
+  });
+
+  testWidgets('TP-REG-10 Abbrechen eines Zusatzschritts vergisst das Passwort', (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    app.server.registrationFlows = <List<String>>[
+      <String>[RegistrationFlows.terms],
+    ];
+    await _pump(tester, app);
+    await _fillAndSubmit(tester);
+    expect(app.gateway.registrationInProgress, isTrue);
+    await _tap(tester, 'Abbrechen');
+    expect(app.gateway.registrationInProgress, isFalse, reason: 'Sitzung samt Passwort verworfen');
+    expect(find.widgetWithText(TextField, 'Wie heißt du?'), findsOneWidget);
+    expect(app.store.data.values.any((v) => v.contains('sicher-genug')), isFalse, reason: 'Passwort nie gespeichert');
+  });
+
+  testWidgets('Name inzwischen vergeben (Server meldet es beim Absenden): Meldung im Formular', (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    await _pump(tester, app);
+    await _tap(tester, 'Neue Familie gründen');
+    await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), 'Fritz');
+    await tester.pump(const Duration(milliseconds: 700));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'sicher-genug');
+    await tester.pumpAndSettle();
+    app.server.addAccount('fritz', 'anderes'); // jemand war schneller
+    await _tap(tester, 'Konto erstellen');
+    expect(find.text('Dieser Benutzername ist schon vergeben.'), findsWidgets);
+    expect(app.gateway.session, SessionState.loggedOut);
+  });
+}

@@ -9,6 +9,8 @@ import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/moderation.dart';
 import 'package:family_nexus/domain/permissions.dart';
 import 'package:family_nexus/domain/presence.dart';
+import 'package:family_nexus/domain/registration.dart';
+import 'package:family_nexus/domain/username_suggestion.dart';
 import 'package:family_nexus/domain/shopping.dart';
 import 'package:family_nexus/domain/tasks.dart';
 import 'package:family_nexus/domain/security.dart';
@@ -101,6 +103,35 @@ class FakeMatrixServer {
   /// Laufende simulierte Verifizierung (Initiator, Gegenseite).
   FakeVerification? verification;
 
+  // ------------------------------------------------- Kontoanlage (E-55)
+
+  /// Wie bei diesem Server ein Konto angelegt wird.
+  RegistrationMode registrationMode = RegistrationMode.inApp;
+
+  /// Angebotene UIA-Abläufe der klassischen Registrierung.
+  List<List<String>> registrationFlows = <List<String>>[
+    <String>[RegistrationFlows.dummy],
+  ];
+
+  /// Gültiger Einladungscode (Stufe `m.login.registration_token`).
+  String registrationToken = 'FAMILIE-2026';
+
+  /// Webseite des Anbieters für die Kontoanlage außerhalb der App.
+  Uri? registrationWebPage = Uri.parse('https://fake.test/signup');
+
+  /// Vom Test gesetzt: Captcha im Browser gelöst bzw. Bestätigungslink der E-Mail geöffnet.
+  bool captchaSolved = false;
+  bool emailConfirmed = false;
+
+  /// E-Mail-Adressen, an die eine Bestätigung ging, und bereits verwendete Adressen.
+  final List<String> emailsSent = <String>[];
+  final Set<String> emailsInUse = <String>{};
+
+  /// Zähler der Registrierungsanfragen (z. B. um zu prüfen, dass nichts gesendet wurde).
+  int registerCalls = 0;
+
+  bool hasAccount(String localpart) => _accounts.containsKey('@$localpart:$host');
+
   /// Test-Uhr (für Ablauf von Einladungslinks).
   DateTime Function() now = () => DateTime.utc(2026, 10, 21, 12);
 
@@ -113,6 +144,9 @@ class FakeMatrixServer {
   }
 
   String displayNameOf(String userId) => _accounts[userId]?.displayName ?? userId;
+
+  /// Passwort eines Kontos (nur Tests: belegt, dass die Registrierung das richtige Passwort übertrug).
+  String? passwordOf(String userId) => _accounts[userId]?.password;
 
   FakeMatrixGateway newDevice() => FakeMatrixGateway(this);
 
@@ -483,7 +517,13 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (uid == null) return const <PendingInvitation>[];
     return <PendingInvitation>[
       for (final id in fake.invites[uid] ?? const <String>[])
-        PendingInvitation(roomId: id, requested: fake.rooms[id]!.knockNonce.containsKey(uid), roomName: fake.rooms[id]!.name, inviterId: fake.rooms[id]!.power.entries.firstWhere((e) => e.value >= 50).key),
+        PendingInvitation(
+          roomId: id,
+          requested: fake.rooms[id]!.knockNonce.containsKey(uid),
+          roomName: fake.rooms[id]!.name,
+          inviterId: fake.rooms[id]!.power.entries.firstWhere((e) => e.value >= 50).key,
+          inviterName: fake.displayNameOf(fake.rooms[id]!.power.entries.firstWhere((e) => e.value >= 50).key),
+        ),
     ];
   }
 
@@ -519,6 +559,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       validity: validity,
       nonce: nonce,
       ownHost: fake.host,
+      familyName: f.name,
+      inviterName: fake.displayNameOf(f.myUserId),
     );
   }
 
@@ -725,16 +767,192 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return ServerInfo(
       url: url,
       versions: const <String>['v1.11'],
-      supportsPasswordLogin: true,
+      supportsPasswordLogin: fake.registrationMode != RegistrationMode.oauth,
       contact: fake.operatorName,
+      usesOAuth: fake.registrationMode == RegistrationMode.oauth,
     );
+  }
+
+  // ------------------------------------------------- Kontoanlage (E-55)
+
+  _FakeRegistration? _reg;
+  String? _oauthState;
+  bool _oauthCreate = false;
+  int _oauthSeq = 0;
+
+  /// Zuletzt vorbereitete Anmeldung im Browser (Adresse, die die App öffnen soll).
+  Uri? lastOAuthUri;
+
+  @override
+  Future<RegistrationOptions> registrationOptions(ServerUrl server) async {
+    _require();
+    if (server.host != fake.host) throw const GatewayException(GatewayError.serverUnreachable);
+    final mode = fake.registrationMode == RegistrationMode.inApp && !RegistrationFlows.anySupported(fake.registrationFlows)
+        ? RegistrationMode.disabled
+        : fake.registrationMode;
+    return RegistrationOptions(mode: mode, webPage: fake.registrationWebPage);
+  }
+
+  @override
+  Future<UsernameCheck> checkUsername(ServerUrl server, String username) async {
+    if (!fake.reachable) return UsernameCheck.unknown;
+    if (!UsernameSuggestion.isValid(username)) return UsernameCheck.invalid;
+    return fake.hasAccount(username) ? UsernameCheck.taken : UsernameCheck.available;
+  }
+
+  @override
+  Future<RegistrationStage?> register({
+    required ServerUrl server,
+    required String username,
+    required String password,
+    required String displayName,
+    String language = 'de',
+  }) async {
+    _require();
+    fake.registerCalls++;
+    if (_userId != null) throw const GatewayException(GatewayError.notAllowed);
+    if (server.host != fake.host) throw const GatewayException(GatewayError.serverUnreachable);
+    if (!UsernameSuggestion.isValid(username)) throw const GatewayException(GatewayError.usernameInvalid);
+    if (password.length < 8) throw const GatewayException(GatewayError.weakPassword);
+    if (fake.registrationMode != RegistrationMode.inApp) throw const GatewayException(GatewayError.registrationDisabled);
+    if (fake.hasAccount(username)) throw const GatewayException(GatewayError.usernameTaken);
+    if (!RegistrationFlows.anySupported(fake.registrationFlows)) throw const GatewayException(GatewayError.registrationDisabled);
+    _reg = _FakeRegistration(username, password, displayName.trim());
+    return _advance(null);
+  }
+
+  /// Nächster offener Schritt; `dummy` erledigt die App selbst.
+  RegistrationStage? _advance(String? tried) {
+    final r = _reg!;
+    final next = RegistrationFlows.next(fake.registrationFlows, r.completed);
+    switch (next) {
+      case null:
+        final id = fake.addAccount(r.username, r.password!, displayName: r.displayName.isEmpty ? r.username : r.displayName);
+        r.password = null;
+        _reg = null;
+        _userId = id;
+        _server = ServerUrl.tryParse(fake.host);
+        notifyListeners();
+        return null;
+      case RegistrationFlows.dummy:
+        r.completed.add(RegistrationFlows.dummy);
+        return _advance(RegistrationFlows.dummy);
+      case RegistrationFlows.terms:
+        return TermsStage(<TermsPolicy>[TermsPolicy(name: 'Nutzungsbedingungen', url: Uri.parse('https://${fake.host}/terms'))]);
+      case RegistrationFlows.token:
+        return TokenStage(wrong: tried == RegistrationFlows.token);
+      case RegistrationFlows.recaptcha:
+        return CaptchaStage(Uri.parse('https://${fake.host}/captcha?session=s1'), notDoneYet: tried == RegistrationFlows.recaptcha);
+      case RegistrationFlows.email:
+        return EmailStage(sent: r.emailSent, notConfirmedYet: tried == RegistrationFlows.email);
+      default:
+        throw const GatewayException(GatewayError.unknown);
+    }
+  }
+
+  /// `true`, solange eine Registrierung läuft (Test: Passwort liegt nur hier).
+  bool get registrationInProgress => _reg != null;
+
+  @override
+  Future<RegistrationStage?> continueRegistration(RegistrationInput input) async {
+    _require();
+    final r = _reg;
+    if (r == null) throw const GatewayException(GatewayError.notFound);
+    switch (input) {
+      case AcceptTerms():
+        r.completed.add(RegistrationFlows.terms);
+        return _advance(RegistrationFlows.terms);
+      case SubmitToken(:final token):
+        if (token.trim() == fake.registrationToken) r.completed.add(RegistrationFlows.token);
+        return _advance(RegistrationFlows.token);
+      case CaptchaDone():
+        if (fake.captchaSolved) r.completed.add(RegistrationFlows.recaptcha);
+        return _advance(RegistrationFlows.recaptcha);
+      case SubmitEmail(:final email):
+        if (!isPlausibleEmail(email)) throw const GatewayException(GatewayError.invalidInput);
+        if (fake.emailsInUse.contains(email.trim())) throw const GatewayException(GatewayError.emailInUse);
+        fake.emailsSent.add(email.trim());
+        r.emailSent = true;
+        return const EmailStage(sent: true);
+      case EmailConfirmed():
+        if (!r.emailSent) return const EmailStage();
+        if (fake.emailConfirmed) r.completed.add(RegistrationFlows.email);
+        return _advance(RegistrationFlows.email);
+    }
+  }
+
+  @override
+  void cancelRegistration() {
+    _reg?.password = null;
+    _reg = null;
+  }
+
+  @override
+  Future<Uri> startOAuth({required ServerUrl server, required Uri redirectUri, required bool create}) async {
+    _require();
+    if (_userId != null) throw const GatewayException(GatewayError.notAllowed);
+    if (server.host != fake.host || fake.registrationMode != RegistrationMode.oauth) {
+      throw const GatewayException(GatewayError.serverUnsupported);
+    }
+    _oauthState = 'state${++_oauthSeq}';
+    _oauthCreate = create;
+    final uri = Uri.https('account.${fake.host}', '/authorize', <String, String>{
+      'redirect_uri': '$redirectUri',
+      'state': _oauthState!,
+      'prompt': ?(create ? 'create' : null),
+    });
+    lastOAuthUri = uri;
+    return uri;
+  }
+
+  /// Test-Hilfe: Rücksprung, den der Anbieter nach Anmeldung bzw. Kontoanlage von [localpart] sendet.
+  Uri oauthCallback(String localpart, {Uri? redirect, String? state, bool denied = false}) {
+    final base = redirect ?? Uri.parse(lastOAuthUri!.queryParameters['redirect_uri']!);
+    return base.replace(queryParameters: <String, String>{
+      if (denied) 'error': 'access_denied' else 'code': localpart,
+      'state': state ?? lastOAuthUri!.queryParameters['state']!,
+    });
+  }
+
+  @override
+  Future<void> completeOAuth(Uri callback) async {
+    final expected = _oauthState;
+    _oauthState = null;
+    final p = callback.queryParameters;
+    final code = p['code'];
+    if (expected == null || p.containsKey('error') || code == null || p['state'] != expected) {
+      throw const GatewayException(GatewayError.oauthCancelled);
+    }
+    final id = '@$code:${fake.host}';
+    if (!fake._accounts.containsKey(id)) {
+      if (!_oauthCreate) throw const GatewayException(GatewayError.invalidCredentials);
+      fake.addAccount(code, 'oauth-only');
+    }
+    _userId = id;
+    _server = ServerUrl.tryParse(fake.host);
+    for (final r in fake.rooms.values) {
+      if (r.membership[id] == MemberStatus.joined) {
+        _familyRoomId = r.id;
+        break;
+      }
+    }
+    notifyListeners();
+  }
+
+  @override
+  Future<void> setDisplayName(String name) async {
+    _requireSession();
+    final n = name.trim();
+    if (n.isEmpty) throw const GatewayException(GatewayError.invalidInput);
+    fake._accounts[_userId]!.displayName = n;
+    fake.notifyAll();
   }
 
   @override
   Future<void> login({required ServerUrl server, required String username, required String password}) async {
     _require();
     if (server.host != fake.host) throw const GatewayException(GatewayError.serverUnreachable);
-    final account = fake._accounts['@$username:${fake.host}'];
+    final account = fake._accounts[username.startsWith('@') ? username : '@$username:${fake.host}'];
     if (account == null || account.password != password) {
       throw const GatewayException(GatewayError.invalidCredentials);
     }
@@ -755,6 +973,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   @override
   Future<void> logout() async {
+    cancelRegistration();
+    _oauthState = null;
     _userId = null;
     _server = null;
     _familyRoomId = null;
@@ -985,4 +1205,13 @@ class FakeVerification {
     VerificationEmoji(emoji: '📌', name: 'Pin'),
     VerificationEmoji(emoji: '🌍', name: 'Globe'),
   ];
+}
+
+class _FakeRegistration {
+  _FakeRegistration(this.username, this.password, this.displayName);
+  final String username;
+  String? password;
+  final String displayName;
+  final Set<String> completed = <String>{};
+  bool emailSent = false;
 }

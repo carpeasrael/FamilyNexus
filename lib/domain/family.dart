@@ -119,11 +119,28 @@ class Family {
 /// Einladung in einen Raum (noch nicht angenommen). Der Name stammt von einem
 /// Fremden und ist bereits bereinigt; angenommen wird nur nach ausdrücklicher Zustimmung.
 class PendingInvitation {
-  const PendingInvitation({required this.roomId, required this.roomName, required this.inviterId, this.requested = false});
+  const PendingInvitation({
+    required this.roomId,
+    required this.roomName,
+    required this.inviterId,
+    this.inviterName,
+    this.requested = false,
+  });
   final String roomId;
 
   /// `true`, wenn die Einladung zur eigenen wartenden Beitrittsanfrage gehört.
   final bool requested;
   final String roomName;
   final String inviterId;
+
+  /// Anzeigename des Einladenden (bereinigt), `null` wenn unbekannt.
+  final String? inviterName;
+
+  /// Name für die Anzeige: Anzeigename, sonst der lokale Teil der ID (ohne `@…:server`).
+  String get inviterLabel {
+    final n = inviterName;
+    if (n != null && n.isNotEmpty) return n;
+    final i = inviterId.indexOf(':');
+    return inviterId.startsWith('@') && i > 1 ? inviterId.substring(1, i) : inviterId;
+  }
 }

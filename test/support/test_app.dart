@@ -15,6 +15,7 @@ import 'package:family_nexus/data/platform/screen_protection.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/features/settings/settings_controller.dart';
 
+import 'fake_browser.dart';
 import 'fake_device_auth.dart';
 import 'fake_links.dart';
 import 'fake_mail.dart';
@@ -39,6 +40,8 @@ class TestApp {
     required this.links,
     required this.auth,
     required this.mail,
+    required this.browser,
+    required this.oauth,
   });
 
   final AppServices services;
@@ -53,6 +56,8 @@ class TestApp {
   final FakeLinkSource links;
   final FakeDeviceAuth auth;
   final FakeMailLauncher mail;
+  final FakeBrowser browser;
+  final FakeOAuthRedirect oauth;
 }
 
 /// Baut die App-Dienste mit Fake-Matrix. `loggedIn: true` legt zusätzlich
@@ -69,6 +74,8 @@ Future<TestApp> buildTestApp({
   final store = MemoryKeyValueStore();
   if (lang != null) store.data['language'] = lang;
   final fake = server ?? FakeMatrixServer();
+  // Standard-Anbieter ist im Test der Fake-Server (statt matrix.org).
+  store.data['serverUrl'] = 'https://${fake.host}';
   if (server == null) {
     fake.addAccount('anna', 'geheim123', displayName: 'Anna');
     fake.addAccount('ben', 'geheim456', displayName: 'Ben');
@@ -90,6 +97,8 @@ Future<TestApp> buildTestApp({
   final links = FakeLinkSource();
   final auth = FakeDeviceAuth();
   final mail = FakeMailLauncher();
+  final browser = FakeBrowser();
+  final oauth = FakeOAuthRedirect();
   final settingsController = await SettingsController.load(store);
   final services = AppServices(
     settings: settingsController,
@@ -100,6 +109,8 @@ Future<TestApp> buildTestApp({
     lock: AppLockController(settings: settingsController, auth: auth),
     scheduler: scheduler,
     mail: mail,
+    browser: browser,
+    oauthRedirect: oauth,
     shoppingBuilder: (uid) async {
       final service = ShoppingService(store: shoppingStore, myUserId: uid, clock: clock);
       return ShoppingController(
@@ -146,6 +157,8 @@ Future<TestApp> buildTestApp({
     links: links,
     auth: auth,
     mail: mail,
+    browser: browser,
+    oauth: oauth,
   );
 }
 
@@ -153,10 +166,14 @@ Future<TestApp> buildTestApp({
 class FakeFileAccess implements FileAccess {
   PickedFile? next;
   final List<String> saved = <String>[];
+  final Map<String, Uint8List> contents = <String, Uint8List>{};
 
   @override
   Future<PickedFile?> pickFile() async => next;
 
   @override
-  Future<void> saveFile({required String name, required Uint8List bytes, required String mimeType}) async => saved.add(name);
+  Future<void> saveFile({required String name, required Uint8List bytes, required String mimeType}) async {
+    saved.add(name);
+    contents[name] = bytes;
+  }
 }

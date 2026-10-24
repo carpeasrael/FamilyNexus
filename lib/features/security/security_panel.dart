@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
@@ -9,11 +13,27 @@ import '../../ui/theme/tokens.dart';
 import '../common/error_text.dart';
 import '../common/prompt_dialog.dart';
 
-/// Einrichtung bzw. Wiederherstellung der Schlüsselsicherung. Wird in der Ersteinrichtung
-/// (nach der Anmeldung) gezeigt, bis dieses Gerät verifiziert ist. Es gibt kein Überspringen:
-/// Ohne Verifizierung erhält ein Gerät keine Raumschlüssel (SA-1).
+/// Leert die Zwischenablage nach [delay], falls sie noch [secret] enthält (E-57). Bewusst nicht an ein
+/// Widget gebunden: Der Schlüssel darf nicht liegen bleiben, nur weil die Einrichtung weitergeht.
+void clearClipboardLater(String secret, {Duration delay = const Duration(seconds: 60)}) {
+  Timer(delay, () async {
+    try {
+      final current = await Clipboard.getData(Clipboard.kTextPlain);
+      if (current?.text == secret) await Clipboard.setData(const ClipboardData(text: ''));
+    } catch (_) {
+      // Ohne Zugriff auf die Zwischenablage bleibt nichts zu tun.
+    }
+  });
+}
+
+/// Einrichtung bzw. Wiederherstellung der Schlüsselsicherung („Notfall-Schlüssel“, E-57). Wird in der
+/// Ersteinrichtung (nach der Anmeldung) gezeigt, bis dieses Gerät verifiziert ist. Es gibt kein
+/// Überspringen: Ohne Verifizierung erhält ein Gerät keine Raumschlüssel (SA-1).
 class SecurityPanel extends StatefulWidget {
-  const SecurityPanel({super.key});
+  const SecurityPanel({super.key, this.onReady});
+
+  /// Wird einmal aufgerufen, sobald dieses Gerät abgesichert ist und kein Schlüssel mehr angezeigt wird.
+  final VoidCallback? onReady;
 
   @override
   State<SecurityPanel> createState() => _SecurityPanelState();
@@ -24,7 +44,39 @@ class _SecurityPanelState extends State<SecurityPanel> {
   String? _error;
   String? _recoveryKey; // wird nur im Speicher gehalten, bis der Nutzer bestätigt
   bool _keySaved = false;
+  bool _readyReported = false;
   final TextEditingController _restore = TextEditingController();
+
+  void _reportReady() {
+    if (_readyReported || widget.onReady == null) return;
+    _readyReported = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.onReady!();
+    });
+  }
+
+  Future<void> _copyKey(String key) async {
+    final l = AppLocalizations.of(context);
+    final m = ScaffoldMessenger.of(context);
+    await Clipboard.setData(ClipboardData(text: key));
+    clearClipboardLater(key);
+    m.showSnackBar(SnackBar(content: Text(l.keyCopied)));
+  }
+
+  Future<void> _saveKey(String key) async {
+    final l = AppLocalizations.of(context);
+    final s = AppScope.read(context);
+    final m = ScaffoldMessenger.of(context);
+    final now = DateTime.now();
+    final date = '${now.day.toString().padLeft(2, '0')}.${now.month.toString().padLeft(2, '0')}.${now.year}';
+    final text = l.keyFileBody(s.gateway.userId ?? '', s.gateway.server?.host ?? '', key, date);
+    try {
+      await s.files.saveFile(name: l.keyFileName, bytes: utf8.encode(text), mimeType: 'text/plain');
+      m.showSnackBar(SnackBar(content: Text(l.keySavedFile)));
+    } catch (e) {
+      m.showSnackBar(SnackBar(content: Text(l.errUnknown)));
+    }
+  }
 
   AppServices? _services;
 
@@ -98,7 +150,7 @@ class _SecurityPanelState extends State<SecurityPanel> {
       await _g.restoreSecurity(_restore.text);
       _restore.clear();
     } on GatewayException catch (e) {
-      if (mounted) setState(() => _error = e.error == GatewayError.invalidInput ? l.securityRestoreFailed : errorText(l, e));
+      if (mounted) setState(() => _error = e.error == GatewayError.invalidInput ? l.keyRestoreFailed : errorText(l, e));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -126,6 +178,7 @@ class _SecurityPanelState extends State<SecurityPanel> {
           case SecurityState.needsRestore:
             return _restoreView(l, g);
           case SecurityState.ready:
+            _reportReady();
             return Row(children: <Widget>[const Icon(Icons.verified_outlined), const SizedBox(width: 8), Text(l.securityStatusReady)]);
         }
       },
@@ -133,22 +186,32 @@ class _SecurityPanelState extends State<SecurityPanel> {
   }
 
   Widget _setupView(AppLocalizations l) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-        Semantics(header: true, child: Text(l.securityTitle, style: Theme.of(context).textTheme.titleLarge)),
+        Semantics(header: true, child: Text(l.keyTitle, style: Theme.of(context).textTheme.titleLarge)),
         const SizedBox(height: 8),
-        Text(l.securityIntro),
+        Text(l.keyIntro),
         if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error))),
         const SizedBox(height: 12),
         Align(
           alignment: Alignment.centerRight,
-          child: FilledButton(onPressed: _busy ? null : _setUp, child: Text(_busy ? l.securitySettingUp : l.securitySetupButton)),
+          child: FilledButton(onPressed: _busy ? null : _setUp, child: Text(_busy ? l.keyCreating : l.keyCreate)),
         ),
       ]);
 
+  /// Schlüssel in Vierergruppen: leichter abzuschreiben und vorzulesen.
+  static String _grouped(String key) {
+    final compact = key.replaceAll(RegExp(r'\s+'), '');
+    final parts = <String>[for (var i = 0; i < compact.length; i += 4) compact.substring(i, i + 4 > compact.length ? compact.length : i + 4)];
+    return parts.join(' ');
+  }
+
   Widget _keyView(AppLocalizations l) {
     final t = AuroraTokens.of(context);
+    final key = _recoveryKey!;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      Semantics(header: true, child: Text(l.securityKeyTitle, style: Theme.of(context).textTheme.titleLarge)),
+      Semantics(header: true, child: Text(l.keyTitle, style: Theme.of(context).textTheme.titleLarge)),
       const SizedBox(height: 8),
+      Text(l.keyShownIntro),
+      const SizedBox(height: 12),
       Container(
         width: double.infinity,
         padding: const EdgeInsets.all(14),
@@ -156,16 +219,20 @@ class _SecurityPanelState extends State<SecurityPanel> {
           border: Border.all(color: t.primary, width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
-        // Bewusst nicht kopierbar: kein Eintrag in die Zwischenablage.
-        child: Text(_recoveryKey!, style: monoStyle(context, size: 18)),
+        child: Text(_grouped(key), style: monoStyle(context, size: 18)),
       ),
+      const SizedBox(height: 12),
+      Wrap(spacing: 8, runSpacing: 8, children: <Widget>[
+        OutlinedButton.icon(icon: const Icon(Icons.copy), onPressed: () => _copyKey(key), label: Text(l.keyCopy)),
+        OutlinedButton.icon(icon: const Icon(Icons.save_alt), onPressed: () => _saveKey(key), label: Text(l.keySave)),
+      ]),
       const SizedBox(height: 8),
-      Text(l.securityKeyHint, style: Theme.of(context).textTheme.bodySmall),
+      Text(l.keyPrintHint, style: Theme.of(context).textTheme.bodySmall),
       CheckboxListTile(
         contentPadding: EdgeInsets.zero,
         value: _keySaved,
         onChanged: (v) => setState(() => _keySaved = v ?? false),
-        title: Text(l.securityKeySaved),
+        title: Text(l.keySavedCheck),
       ),
       Align(
         alignment: Alignment.centerRight,
@@ -185,19 +252,19 @@ class _SecurityPanelState extends State<SecurityPanel> {
   Widget _restoreView(AppLocalizations l, MatrixGateway g) {
     final others = g.devices.where((d) => !d.isCurrent).toList();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      Semantics(header: true, child: Text(l.securityRestoreTitle, style: Theme.of(context).textTheme.titleLarge)),
+      Semantics(header: true, child: Text(l.keyRestoreTitle, style: Theme.of(context).textTheme.titleLarge)),
       const SizedBox(height: 8),
-      Text(l.securityRestoreIntro),
+      Text(l.keyRestoreIntro),
       const SizedBox(height: 12),
       if (others.isEmpty)
-        Text(l.securityNoOtherDevice, style: Theme.of(context).textTheme.bodySmall)
+        Text(l.keyNoOtherDevice, style: Theme.of(context).textTheme.bodySmall)
       else
         for (final d in others)
           Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: OutlinedButton.icon(
               icon: const Icon(Icons.devices_other_outlined),
-              label: Text('${l.securityVerifyWithDevice}: ${d.name}'),
+              label: Text(l.keyVerifyWithDevice(d.name)),
               onPressed: _busy ? null : () => g.startVerification(userId: d.userId, deviceId: d.deviceId).catchError((Object e) {
                     if (mounted) setState(() => _error = errorText(l, e));
                   }),
@@ -212,13 +279,13 @@ class _SecurityPanelState extends State<SecurityPanel> {
         enableIMEPersonalizedLearning: false,
         minLines: 1,
         maxLines: 3,
-        decoration: InputDecoration(labelText: l.securityRestoreKeyLabel),
+        decoration: InputDecoration(labelText: l.keyRestoreLabel),
       ),
       if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error))),
       const SizedBox(height: 8),
       Align(
         alignment: Alignment.centerRight,
-        child: FilledButton(onPressed: _busy ? null : _restoreWithKey, child: Text(_busy ? l.securityRestoring : l.securityRestoreButton)),
+        child: FilledButton(onPressed: _busy ? null : _restoreWithKey, child: Text(_busy ? l.keyRestoring : l.keyRestoreButton)),
       ),
     ]);
   }

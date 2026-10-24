@@ -80,7 +80,7 @@ void main() {
     app.server.notifyAll();
     await _tab(tester, 'Familie');
     await _hold(tester); // 8 Familie
-    await tester.tap(find.text('QR-Code anzeigen'));
+    await tester.tap(find.text('Jemanden einladen'));
     await _hold(tester); // 8b Einladungs-QR
     await tester.tap(find.text('Schließen'));
     await tester.pumpAndSettle();

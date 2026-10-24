@@ -2,16 +2,27 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
-import '../../domain/app_settings.dart';
+import '../../domain/invite_link.dart';
 import '../../domain/security.dart';
 import '../../domain/server.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/widgets/glass.dart';
-import '../common/error_text.dart';
 import '../security/security_panel.dart';
+import 'account_create_step.dart';
 import 'family_step.dart';
+import 'invite_link_step.dart';
+import 'login_step.dart';
+import 'provider_controller.dart';
+import 'welcome_step.dart';
 
-/// Ersteinrichtung in vier Schritten: Sprache, Server, Konto, Familie.
+enum _Step { welcome, inviteLink, account, login, security, family }
+
+/// Ersteinrichtung (E-55, E-56): drei Wege ohne Fachbegriffe.
+///
+/// * Neue Familie gründen: Konto erstellen → Notfall-Schlüssel → Familie benennen.
+/// * Ich wurde eingeladen: (Link einfügen →) Konto erstellen beim Anbieter des Einladenden →
+///   Notfall-Schlüssel → Beitritt anfragen.
+/// * Ich habe schon ein Konto: Anmelden → Gerät freischalten → Familie wird gefunden (oder gründen/beitreten).
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -20,278 +31,226 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  static const int _steps = 4;
-  int _step = 0;
-  bool _stepChosen = false;
+  _Step _step = _Step.welcome;
+  OnboardingPath _path = OnboardingPath.create;
 
-  // Server
-  bool _customServer = false;
-  final TextEditingController _serverCtrl = TextEditingController();
-  bool _busy = false;
-  String? _error;
-  ServerInfo? _info;
+  /// Der Weg „eingeladen“ begann ohne Link (zusätzlicher Schritt „Link einfügen“).
+  bool _withLinkStep = false;
+  String? _loginUsername;
+  bool _started = false;
 
-  // Konto
-  final TextEditingController _userCtrl = TextEditingController();
-  final TextEditingController _passCtrl = TextEditingController();
+  late final AppServices _s = AppScope.read(context);
+  late final ProviderController _provider = ProviderController(gateway: _s.gateway, settings: _s.settings);
+
+  @override
+  void initState() {
+    super.initState();
+    _s.gateway.addListener(_onGateway);
+    _s.pendingInvite.addListener(_onInvite);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    _chooseInitialStep();
+    if (_step == _Step.account || _step == _Step.login) _provider.start();
+  }
 
   @override
   void dispose() {
-    _serverCtrl.dispose();
-    _userCtrl.dispose();
-    _passCtrl.dispose();
+    _s.gateway.removeListener(_onGateway);
+    _s.pendingInvite.removeListener(_onInvite);
+    _provider.dispose();
     super.dispose();
   }
 
-  /// Beim ersten Aufbau an den passenden Schritt springen (z. B. nach Abmeldung).
-  void _chooseInitialStep(AppServices s) {
-    if (_stepChosen) return;
-    _stepChosen = true;
-    final loggedIn = s.gateway.session == SessionState.ready;
+  /// Beim ersten Aufbau an den passenden Schritt springen (z. B. nach Neustart oder Abmeldung).
+  void _chooseInitialStep() {
+    final loggedIn = _s.gateway.session == SessionState.ready;
+    final invite = _s.pendingInvite.value;
+    if (invite != null) _path = OnboardingPath.invited;
     if (loggedIn) {
-      // Ohne verifiziertes Gerät zuerst die Schlüsselsicherung (Konto-Schritt).
-      _step = s.gateway.securityState == SecurityState.ready ? 3 : 2;
-    } else if (s.settings.settings.onboardingDone) {
-      _step = 2;
+      if (invite == null) _path = OnboardingPath.login;
+      // Ohne verifiziertes Gerät zuerst der Notfall-Schlüssel bzw. die Freischaltung.
+      _step = _s.gateway.securityState == SecurityState.ready ? _Step.family : _Step.security;
+    } else if (invite != null) {
+      _useInviteProvider(invite);
+      _step = _Step.account;
+    } else if (_s.settings.settings.onboardingDone) {
+      _path = OnboardingPath.login;
+      _step = _Step.login;
     }
   }
 
-  Future<void> _run(Future<void> Function() action) async {
-    setState(() {
-      _busy = true;
-      _error = null;
-    });
-    final l = AppLocalizations.of(context);
-    try {
-      await action();
-    } catch (e) {
-      if (mounted) setState(() => _error = errorText(l, e));
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
+  void _useInviteProvider(InviteLink invite) {
+    final url = ServerUrl.tryParse(invite.inviterServer);
+    if (url != null) _provider.useStandard(url);
   }
 
-  ServerUrl? _selectedServer(AppServices s) => ServerUrl.tryParse(
-        _customServer ? _serverCtrl.text : AppSettings.defaultServerUrl,
-      );
-
-  Future<void> _checkServer(AppServices s) async {
-    final l = AppLocalizations.of(context);
-    final url = _selectedServer(s);
-    if (url == null) {
-      setState(() => _error = l.serverUrlInvalid);
-      return;
-    }
-    await _run(() async {
-      final info = await s.gateway.probeServer(url);
-      if (!mounted) return;
-      setState(() => _info = info);
-      await s.settings.update((c) => c.copyWith(serverUrl: url.toString()));
-    });
-  }
-
-  Future<void> _login(AppServices s) => _run(() async {
-        final url = ServerUrl.tryParse(s.settings.settings.serverUrl);
-        if (url == null) throw const GatewayException(GatewayError.invalidInput);
-        await s.gateway.login(
-          server: url,
-          username: _userCtrl.text,
-          password: _passCtrl.text,
-        );
-        _passCtrl.clear();
-        // Es folgt die Schlüsselsicherung im selben Schritt (SecurityPanel).
-        if (mounted) setState(() {});
+  /// Angemeldet (Konto erstellt oder Anmeldung): weiter zur Absicherung; abgemeldet: zurück.
+  void _onGateway() {
+    if (!mounted) return;
+    final loggedIn = _s.gateway.session == SessionState.ready;
+    if (loggedIn && (_step == _Step.account || _step == _Step.login)) {
+      setState(() => _step = _s.gateway.securityState == SecurityState.ready ? _Step.family : _Step.security);
+    } else if (!loggedIn && (_step == _Step.security || _step == _Step.family)) {
+      setState(() {
+        _path = OnboardingPath.login;
+        _step = _Step.login;
       });
+      _provider.start();
+    }
+  }
+
+  /// Einladung kam während der Einrichtung an (Deep Link/QR): Neulinge landen direkt bei „Konto erstellen“.
+  void _onInvite() {
+    final invite = _s.pendingInvite.value;
+    if (!mounted || invite == null) return;
+    if (_step == _Step.welcome || _step == _Step.inviteLink) {
+      setState(() {
+        _path = OnboardingPath.invited;
+        _step = _Step.account;
+      });
+      _useInviteProvider(invite);
+    }
+  }
+
+  void _choose(OnboardingPath path) {
+    final invite = _s.pendingInvite.value;
+    setState(() {
+      _path = path;
+      _withLinkStep = path == OnboardingPath.invited && invite == null;
+      _step = switch (path) {
+        OnboardingPath.create => _Step.account,
+        OnboardingPath.invited => invite == null ? _Step.inviteLink : _Step.account,
+        OnboardingPath.login => _Step.login,
+      };
+    });
+    if (path == OnboardingPath.invited && invite != null) {
+      _useInviteProvider(invite);
+    } else {
+      _provider.start();
+    }
+  }
+
+  void _back() {
+    setState(() {
+      switch (_step) {
+        case _Step.account when _path == OnboardingPath.invited && _withLinkStep:
+          _step = _Step.inviteLink;
+        case _Step.inviteLink || _Step.account || _Step.login:
+          _step = _Step.welcome;
+        default:
+          break;
+      }
+    });
+  }
+
+  List<_Step> get _plan => switch (_path) {
+        OnboardingPath.create => const <_Step>[_Step.account, _Step.security, _Step.family],
+        OnboardingPath.invited => <_Step>[if (_withLinkStep) _Step.inviteLink, _Step.account, _Step.security, _Step.family],
+        OnboardingPath.login => const <_Step>[_Step.login, _Step.security, _Step.family],
+      };
+
+  /// Position im Weg; „Konto erstellen“ und „Anmelden“ teilen sich denselben Platz.
+  int get _index {
+    final plan = _plan;
+    final slot = (_step == _Step.account || _step == _Step.login)
+        ? plan.firstWhere((x) => x == _Step.account || x == _Step.login)
+        : _step;
+    final i = plan.indexOf(slot);
+    return i < 0 ? 0 : i;
+  }
+
+  String _title(AppLocalizations l) => switch (_step) {
+        _Step.welcome => l.onbTitleLanguage,
+        _Step.inviteLink => l.inviteStepTitle,
+        _Step.account => l.regTitle,
+        _Step.login => l.onbTitleAccount,
+        _Step.security => _s.gateway.securityState == SecurityState.needsRestore ? l.keyRestoreTitle : l.keyTitle,
+        _Step.family => _path == OnboardingPath.invited ? l.joinTitle : l.onbTitleFamily,
+      };
+
+  Future<void> _finish() async {
+    _s.pendingInvite.value = null;
+    await _s.settings.update((c) => c.copyWith(onboardingDone: true, pendingInvite: null));
+  }
 
   @override
   Widget build(BuildContext context) {
-    final s = AppScope.of(context);
-    _chooseInitialStep(s);
     final l = AppLocalizations.of(context);
-    final titles = <String>[l.onbTitleLanguage, l.onbTitleServer, l.onbTitleAccount, l.onbTitleFamily];
-    return Scaffold(
-      appBar: AppBar(title: Text(titles[_step])),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: <Widget>[
-            Semantics(
-              liveRegion: true,
-              child: Text(l.onbStep(_step + 1, _steps), style: Theme.of(context).textTheme.labelMedium),
-            ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(value: (_step + 1) / _steps),
-            const SizedBox(height: 16),
-            GlassCard(child: _buildStep(context, s, l)),
-            if (_error != null) ...<Widget>[
-              const SizedBox(height: 12),
-              Semantics(
-                liveRegion: true,
-                child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-              ),
+    final canGoBack = _step == _Step.inviteLink || _step == _Step.account || _step == _Step.login;
+    return ListenableBuilder(
+      listenable: _s.gateway,
+      builder: (context, _) => Scaffold(
+        appBar: AppBar(
+          title: Text(_title(l)),
+          leading: canGoBack ? BackButton(onPressed: _back) : null,
+          automaticallyImplyLeading: false,
+        ),
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: <Widget>[
+              if (_step != _Step.welcome) ...<Widget>[
+                Semantics(
+                  liveRegion: true,
+                  child: Text(l.onbStep(_index + 1, _plan.length), style: Theme.of(context).textTheme.labelMedium),
+                ),
+                const SizedBox(height: 8),
+                LinearProgressIndicator(value: (_index + 1) / _plan.length),
+                const SizedBox(height: 16),
+              ],
+              GlassCard(child: _buildStep(l)),
             ],
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildStep(BuildContext context, AppServices s, AppLocalizations l) {
+  Widget _buildStep(AppLocalizations l) {
     switch (_step) {
-      case 0:
-        return _languageStep(s, l);
-      case 1:
-        return _serverStep(s, l);
-      case 2:
-        return _accountStep(s, l);
-      default:
-        return _familyStep(s, l);
-    }
-  }
-
-  Widget _languageStep(AppServices s, AppLocalizations l) {
-    final lang = s.settings.settings.languageCode;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      Text(l.onbIntro),
-      const SizedBox(height: 12),
-      for (final p in <String>[l.onbPoint1, l.onbPoint2, l.onbPoint3])
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-            const Icon(Icons.check_circle_outline, size: 18),
-            const SizedBox(width: 8),
-            Expanded(child: Text(p)),
-          ]),
-        ),
-      const SizedBox(height: 16),
-      Text(l.settingsLanguage, style: Theme.of(context).textTheme.titleSmall),
-      const SizedBox(height: 8),
-      Wrap(spacing: 8, children: <Widget>[
-        for (final e in <String?, String>{null: l.languageSystem, 'de': l.languageGerman, 'en': l.languageEnglish}.entries)
-          ChoiceChip(
-            label: Text(e.value),
-            selected: lang == e.key,
-            onSelected: (_) => s.settings.update((c) => c.copyWith(languageCode: e.key)),
-          ),
-      ]),
-      const SizedBox(height: 16),
-      Align(
-        alignment: Alignment.centerRight,
-        child: FilledButton(onPressed: () => setState(() => _step = 1), child: Text(l.next)),
-      ),
-    ]);
-  }
-
-  Widget _serverStep(AppServices s, AppLocalizations l) {
-    final defaultHost = ServerUrl.tryParse(AppSettings.defaultServerUrl)!.host;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      RadioGroup<bool>(
-        groupValue: _customServer,
-        onChanged: (v) => setState(() {
-          _customServer = v ?? false;
-          _info = null;
-          _error = null;
-        }),
-        child: Column(children: <Widget>[
-          RadioListTile<bool>(value: false, title: Text(l.serverDefault(defaultHost))),
-          RadioListTile<bool>(value: true, title: Text(l.serverCustom)),
-        ]),
-      ),
-      if (_customServer)
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: TextField(
-            controller: _serverCtrl,
-            keyboardType: TextInputType.url,
-            autocorrect: false,
-            enableSuggestions: false,
-            decoration: InputDecoration(labelText: l.serverUrlLabel),
-            onChanged: (_) => setState(() => _info = null),
-          ),
-        ),
-      const SizedBox(height: 8),
-      Text(l.serverMetadataNote, style: Theme.of(context).textTheme.bodySmall),
-      const SizedBox(height: 12),
-      OutlinedButton(
-        onPressed: _busy ? null : () => _checkServer(s),
-        child: Text(_busy ? l.serverChecking : l.serverCheck),
-      ),
-      if (_info != null) ...<Widget>[
-        const SizedBox(height: 12),
-        Semantics(
-          liveRegion: true,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-            Text(l.serverOk(_info!.versions.last)),
-            Text(l.serverOperator(_info!.url.host)),
-            Text(_info!.contact == null ? l.serverContactUnknown : l.serverContact(_info!.contact!)),
-            if (!_info!.supportsPasswordLogin)
-              Text(l.serverNoPassword, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-          ]),
-        ),
-      ],
-      const SizedBox(height: 16),
-      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
-        TextButton(onPressed: () => setState(() => _step = 0), child: Text(l.back)),
-        FilledButton(
-          onPressed: (_info != null && _info!.supportsPasswordLogin) ? () => setState(() => _step = 2) : null,
-          child: Text(l.next),
-        ),
-      ]),
-    ]);
-  }
-
-  Widget _accountStep(AppServices s, AppLocalizations l) {
-    if (s.gateway.session == SessionState.ready) {
-      // Angemeldet: Schlüsselsicherung einrichten/wiederherstellen, dann weiter.
-      return ListenableBuilder(
-        listenable: s.gateway,
-        builder: (context, _) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-          const SecurityPanel(),
+      case _Step.welcome:
+        return WelcomeStep(onChoose: _choose);
+      case _Step.inviteLink:
+        return const InviteLinkStep();
+      case _Step.account:
+        return AccountCreateStep(
+          key: const ValueKey<String>('create'),
+          provider: _provider,
+          onLogin: (user) => setState(() {
+            _loginUsername = user;
+            _step = _Step.login;
+          }),
+        );
+      case _Step.login:
+        return LoginStep(
+          key: const ValueKey<String>('login'),
+          provider: _provider,
+          initialUsername: _loginUsername,
+          onCreate: () => setState(() => _step = _Step.account),
+        );
+      case _Step.security:
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+          SecurityPanel(onReady: () => setState(() => _step = _Step.family)),
           const SizedBox(height: 16),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
-            TextButton(onPressed: () => s.gateway.logout(), child: Text(l.onbChangeAccount)),
-            FilledButton(
-              onPressed: s.gateway.securityState == SecurityState.ready ? () => setState(() => _step = 3) : null,
-              child: Text(l.next),
-            ),
-          ]),
-        ]),
-      );
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(l.accountHint),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _userCtrl,
-          autocorrect: false,
-          enableSuggestions: false,
-          enableIMEPersonalizedLearning: false,
-          decoration: InputDecoration(labelText: l.accountUsername),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _passCtrl,
-          obscureText: true,
-          autocorrect: false,
-          enableSuggestions: false,
-          enableIMEPersonalizedLearning: false,
-          decoration: InputDecoration(labelText: l.accountPassword),
-        ),
-        const SizedBox(height: 16),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
-          TextButton(onPressed: () => setState(() => _step = 1), child: Text(l.back)),
-          FilledButton(
-            onPressed: _busy ? null : () => _login(s),
-            child: Text(_busy ? l.accountLoggingIn : l.accountLogin),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(onPressed: () => _s.gateway.logout(), child: Text(l.onbChangeAccount)),
           ),
-        ]),
-      ],
-    );
+        ]);
+      case _Step.family:
+        return FamilyStep(
+          mode: switch (_path) {
+            OnboardingPath.create => FamilyStepMode.create,
+            OnboardingPath.invited => FamilyStepMode.join,
+            OnboardingPath.login => FamilyStepMode.choice,
+          },
+          onFamilyReady: _finish,
+        );
+    }
   }
-
-  Widget _familyStep(AppServices s, AppLocalizations l) => FamilyStep(
-        onFamilyReady: () => s.settings.update((c) => c.copyWith(onboardingDone: true)),
-      );
 }

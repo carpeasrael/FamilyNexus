@@ -52,6 +52,7 @@ class ServerInfo {
     required this.supportsPasswordLogin,
     this.contact,
     this.supportPage,
+    this.usesOAuth = false,
   });
 
   final ServerUrl url;
@@ -62,6 +63,9 @@ class ServerInfo {
   /// (bereinigt), `null` = nicht angegeben.
   final String? contact;
   final String? supportPage;
+
+  /// Anmeldung und Kontoanlage laufen über die Seite des Anbieters im Browser (OAuth, E-55).
+  final bool usesOAuth;
 }
 
 /// Validierung von Matrix-IDs (`@lokal:server`). Eingaben sind nicht vertrauenswürdig.
@@ -73,4 +77,11 @@ class MatrixIds {
 
   static bool isUserId(String s) => s.length <= 255 && _user.hasMatch(s);
   static bool isRoomId(String s) => s.length <= 255 && _room.hasMatch(s);
+
+  /// `@anna:beispiel.de` → `anna`; ungültige IDs bleiben unverändert.
+  static String localpart(String userId) =>
+      isUserId(userId) ? userId.substring(1, userId.indexOf(':')) : userId;
+
+  /// `@anna:beispiel.de` → `beispiel.de`; `null` bei ungültiger ID.
+  static String? serverName(String userId) => isUserId(userId) ? userId.substring(userId.indexOf(':') + 1) : null;
 }

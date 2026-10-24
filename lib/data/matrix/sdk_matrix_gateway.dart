@@ -12,6 +12,7 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite_sqlcipher/sqflite.dart' as sql;
 
 import '../../core/app_log.dart';
+import '../../core/platform_info.dart';
 import '../../domain/attachment_policy.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
@@ -21,6 +22,8 @@ import '../../domain/invite_ticket.dart';
 import '../../domain/moderation.dart';
 import '../../domain/permissions.dart';
 import '../../domain/presence.dart';
+import '../../domain/registration.dart';
+import '../../domain/username_suggestion.dart';
 import '../../domain/security.dart';
 import '../../domain/chat.dart';
 import '../../domain/family.dart';
@@ -233,7 +236,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       'FamilyNexus',
       database: database,
       httpClient: _http,
-      supportedLoginTypes: <String>{LoginType.mLoginPassword},
+      // SSO/Token nur, damit Anbieter mit Browser-Anmeldung (OAuth, E-55) die Serverprüfung bestehen;
+      // angemeldet wird ausschließlich mit Passwort oder über OAuth.
+      supportedLoginTypes: <String>{LoginType.mLoginPassword, 'm.login.sso', LoginType.mLoginToken},
       // Nur Emoji-Vergleich (SAS); kein QR-Austausch in dieser Phase.
       verificationMethods: <KeyVerificationMethod>{KeyVerificationMethod.emoji},
       receiptsPublicByDefault: false,
@@ -302,6 +307,17 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   static final RegExp _usernameRe = RegExp(r'^[A-Za-z0-9._=\-/+@:]{1,255}$');
 
+  /// Setzt den Homeserver des SDK auf die geprüfte Adresse. Das SDK darf keine eigene
+  /// `.well-known`-Abfrage machen (ungeprüfte Ziele, Weiterleitungen, Zwischenspeicherung).
+  Future<void> _useHomeserver(Client client, ServerUrl server) async {
+    final base = _confirmedBase[server] ?? await _probe.resolveBase(server);
+    await client.checkHomeserver(base.uri, checkWellKnown: false, fetchAuthMetadata: true);
+    if (client.homeserver?.scheme != 'https') {
+      client.homeserver = null;
+      throw const GatewayException(GatewayError.serverUnsupported);
+    }
+  }
+
   @override
   Future<void> login({
     required ServerUrl server,
@@ -314,19 +330,12 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
     try {
       final client = await _ensureClient();
-      final base = _confirmedBase[server] ?? await _probe.resolveBase(server);
-      // Eigene, geprüfte Auflösung: das SDK darf keine eigene .well-known-Abfrage
-      // machen (ungeprüfte Ziele, Weiterleitungen, Zwischenspeicherung).
-      await client.checkHomeserver(base.uri, checkWellKnown: false);
-      if (client.homeserver?.scheme != 'https') {
-        client.homeserver = null;
-        throw const GatewayException(GatewayError.serverUnsupported);
-      }
+      await _useHomeserver(client, server);
       await client.login(
         LoginType.mLoginPassword,
         identifier: AuthenticationUserIdentifier(user: user),
         password: password,
-        initialDeviceDisplayName: 'FamilyNexus Android',
+        initialDeviceDisplayName: PlatformInfo.deviceName,
       );
       await _refresh();
     } on GatewayException {
@@ -334,6 +343,289 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     } catch (e) {
       AppLog.e('gateway', 'Anmeldung fehlgeschlagen', e);
       throw _map(e, forLogin: true);
+    }
+  }
+
+  // ------------------------------------------------------ Kontoanlage (E-55)
+
+  _RegistrationSession? _registration;
+  OidcLoginSession? _oauth;
+
+  /// Öffentliche Projektseite; die Rücksprungadresse auf Mobilgeräten ist deren umgekehrter
+  /// Domainname (MSC2966: eigenes Schema muss zur `client_uri` passen).
+  static final Uri oauthClientUri = Uri.parse('https://carpeasrael.github.io/FamilyNexus/');
+  static const String oauthScheme = 'io.github.carpeasrael.familynexus';
+  static final Uri oauthMobileRedirect = Uri.parse('$oauthScheme:/oauth');
+
+  static const int minPasswordLength = 8;
+
+  @override
+  Future<RegistrationOptions> registrationOptions(ServerUrl server) async {
+    try {
+      return await _probe.registrationOptions(server);
+    } on GatewayException {
+      rethrow;
+    } catch (e) {
+      AppLog.e('gateway', 'Registrierungswege nicht ermittelbar', e);
+      throw _map(e);
+    }
+  }
+
+  @override
+  Future<UsernameCheck> checkUsername(ServerUrl server, String username) async {
+    if (!UsernameSuggestion.isValid(username)) return UsernameCheck.invalid;
+    try {
+      final base = _confirmedBase[server] ?? await _probe.resolveBase(server);
+      return await _probe.checkUsername(base, username);
+    } catch (e) {
+      return UsernameCheck.unknown;
+    }
+  }
+
+  @override
+  Future<RegistrationStage?> register({
+    required ServerUrl server,
+    required String username,
+    required String password,
+    required String displayName,
+    String language = 'de',
+  }) async {
+    if (!UsernameSuggestion.isValid(username)) throw const GatewayException(GatewayError.usernameInvalid);
+    if (password.length < minPasswordLength) throw const GatewayException(GatewayError.weakPassword);
+    if (password.length > 1024) throw const GatewayException(GatewayError.invalidInput);
+    if (_client?.isLogged() ?? false) throw const GatewayException(GatewayError.notAllowed);
+    cancelRegistration();
+    try {
+      final client = await _ensureClient();
+      await _useHomeserver(client, server);
+      _registration = _RegistrationSession(
+        username: username,
+        password: password,
+        displayName: TextSanitizer.clean(displayName, max: 64),
+        language: language,
+      );
+      return await _registerAttempt(null);
+    } on GatewayException {
+      cancelRegistration();
+      rethrow;
+    } catch (e) {
+      cancelRegistration();
+      AppLog.e('gateway', 'Registrierung fehlgeschlagen', e);
+      throw _map(e);
+    }
+  }
+
+  @override
+  Future<RegistrationStage?> continueRegistration(RegistrationInput input) async {
+    final r = _registration;
+    final client = _client;
+    if (r == null || client == null) throw const GatewayException(GatewayError.notFound);
+    try {
+      switch (input) {
+        case AcceptTerms():
+          return await _registerAttempt(AuthenticationData(type: RegistrationFlows.terms, session: r.session));
+        case SubmitToken(:final token):
+          final t = token.trim();
+          if (t.isEmpty || t.length > 256) throw const GatewayException(GatewayError.invalidInput);
+          return await _registerAttempt(AuthenticationData(
+            type: RegistrationFlows.token,
+            session: r.session,
+            additionalFields: <String, Object?>{'token': t},
+          ));
+        case CaptchaDone():
+          // Nach der Bestätigung auf der Seite des Servers genügt die Sitzung (Spezifikation: Fallback).
+          return await _registerAttempt(AuthenticationData(session: r.session), attempted: RegistrationFlows.recaptcha);
+        case SubmitEmail(:final email):
+          if (!isPlausibleEmail(email)) throw const GatewayException(GatewayError.invalidInput);
+          r.clientSecret ??= _randomNonce();
+          r.sendAttempt++;
+          final res = await client.requestTokenToRegisterEmail(r.clientSecret!, email.trim(), r.sendAttempt);
+          r.sid = res.sid;
+          return const EmailStage(sent: true);
+        case EmailConfirmed():
+          final sid = r.sid;
+          if (sid == null) return const EmailStage();
+          return await _registerAttempt(AuthenticationThreePidCreds(
+            type: RegistrationFlows.email,
+            session: r.session,
+            threepidCreds: ThreepidCreds(sid: sid, clientSecret: r.clientSecret!),
+          ));
+      }
+    } on GatewayException catch (e) {
+      if (e.error != GatewayError.invalidInput && e.error != GatewayError.rateLimited) cancelRegistration();
+      rethrow;
+    } catch (e) {
+      AppLog.e('gateway', 'Registrierungsschritt fehlgeschlagen', e);
+      final mapped = _mapRegistration(e);
+      if (mapped.error != GatewayError.emailInUse &&
+          mapped.error != GatewayError.rateLimited &&
+          mapped.error != GatewayError.serverUnreachable) {
+        cancelRegistration();
+      }
+      throw mapped;
+    }
+  }
+
+  @override
+  void cancelRegistration() {
+    _registration?.password = null;
+    _registration = null;
+  }
+
+  /// Ein Durchlauf von `/register`. Verlangt der Server weitere Schritte, wird der nächste
+  /// ermittelt; Platzhalterschritte (`m.login.dummy`) erledigt die App selbst.
+  Future<RegistrationStage?> _registerAttempt(AuthenticationData? auth, {String? attempted, int depth = 0}) async {
+    final r = _registration;
+    final client = _client;
+    if (r == null || r.password == null || client == null) throw const GatewayException(GatewayError.notFound);
+    if (depth > 5) throw const GatewayException(GatewayError.unknown);
+    final tried = attempted ?? auth?.type;
+    try {
+      await client.register(
+        kind: AccountKind.user,
+        username: r.username,
+        password: r.password,
+        auth: auth,
+        initialDeviceDisplayName: PlatformInfo.deviceName,
+      );
+    } on MatrixException catch (e) {
+      final flows = e.authenticationFlows;
+      if (!e.requireAdditionalAuthentication || flows == null) throw _mapRegistration(e);
+      r.session = e.session ?? r.session;
+      r.flows = <List<String>>[for (final f in flows) f.stages];
+      r.completed = e.completedAuthenticationFlows.toSet();
+      r.params = e.authenticationParams;
+      final next = RegistrationFlows.next(r.flows, r.completed);
+      if (RegistrationFlows.choose(r.flows, r.completed) == null) {
+        throw const GatewayException(GatewayError.registrationDisabled);
+      }
+      switch (next) {
+        case RegistrationFlows.dummy:
+          if (tried == RegistrationFlows.dummy) throw const GatewayException(GatewayError.unknown);
+          return _registerAttempt(AuthenticationData(type: RegistrationFlows.dummy, session: r.session), depth: depth + 1);
+        case RegistrationFlows.terms:
+          return TermsStage(RegistrationFlows.termsFrom(r.params?[RegistrationFlows.terms], language: r.language));
+        case RegistrationFlows.token:
+          return TokenStage(wrong: tried == RegistrationFlows.token);
+        case RegistrationFlows.recaptcha:
+          final base = client.homeserver!;
+          return CaptchaStage(
+            base.replace(
+              path: '/_matrix/client/v3/auth/${RegistrationFlows.recaptcha}/fallback/web',
+              queryParameters: <String, String>{'session': r.session ?? ''},
+            ),
+            notDoneYet: tried == RegistrationFlows.recaptcha,
+          );
+        case RegistrationFlows.email:
+          return EmailStage(sent: r.sid != null, notConfirmedYet: tried == RegistrationFlows.email);
+        default:
+          throw const GatewayException(GatewayError.unknown);
+      }
+    }
+    // Konto angelegt, Sitzung läuft (das SDK hat `init` bereits ausgeführt).
+    final name = r.displayName;
+    cancelRegistration();
+    if (name.isNotEmpty) {
+      try {
+        await setDisplayName(name);
+      } catch (e) {
+        AppLog.w('gateway', 'Anzeigename nicht gesetzt');
+      }
+    }
+    await _refresh();
+    return null;
+  }
+
+  GatewayException _mapRegistration(Object e) {
+    if (e is GatewayException) return e;
+    if (e is MatrixException) {
+      final code = e.errcode;
+      if (code == 'M_USER_IN_USE') return const GatewayException(GatewayError.usernameTaken);
+      if (code == 'M_INVALID_USERNAME' || code == 'M_EXCLUSIVE') return const GatewayException(GatewayError.usernameInvalid);
+      if (code == 'M_WEAK_PASSWORD' || code.startsWith('M_PASSWORD')) return const GatewayException(GatewayError.weakPassword);
+      if (code == 'M_THREEPID_IN_USE') return const GatewayException(GatewayError.emailInUse);
+      if (code == 'M_THREEPID_DENIED' || code == 'M_SERVER_NOT_TRUSTED') return const GatewayException(GatewayError.invalidInput);
+      if (code == 'M_FORBIDDEN' || code == 'M_UNRECOGNIZED') return const GatewayException(GatewayError.registrationDisabled);
+    }
+    return _map(e);
+  }
+
+  @override
+  Future<Uri> startOAuth({required ServerUrl server, required Uri redirectUri, required bool create}) async {
+    if (_client?.isLogged() ?? false) throw const GatewayException(GatewayError.notAllowed);
+    final loopback = redirectUri.scheme == 'http' && redirectUri.host == '127.0.0.1';
+    if (!loopback && redirectUri.scheme != oauthScheme) throw const GatewayException(GatewayError.invalidInput);
+    try {
+      final client = await _ensureClient();
+      await _useHomeserver(client, server);
+      final data = await client.registerOidcClient(
+        redirectUris: <Uri>[redirectUri],
+        applicationType: OidcApplicationType.native,
+        clientInformation: OidcClientInformation(
+          clientName: 'FamilyNexus',
+          clientUri: oauthClientUri,
+          logoUri: null,
+          tosUri: null,
+          policyUri: null,
+        ),
+      );
+      final session = await client.initOidcLoginSession(
+        oidcClientData: data,
+        redirectUri: redirectUri,
+        prompt: create ? 'create' : null,
+      );
+      if (session.authenticationUri.scheme != 'https') throw const GatewayException(GatewayError.serverUnsupported);
+      _oauth = session;
+      return session.authenticationUri;
+    } on GatewayException {
+      rethrow;
+    } catch (e) {
+      AppLog.e('gateway', 'Anmeldung im Browser nicht vorbereitet', e);
+      throw _map(e);
+    }
+  }
+
+  @override
+  Future<void> completeOAuth(Uri callback) async {
+    final session = _oauth;
+    final client = _client;
+    if (session == null || client == null) throw const GatewayException(GatewayError.oauthCancelled);
+    // Rücksprung nur an die eigene, gerade verwendete Adresse.
+    if (callback.scheme != session.redirectUri.scheme || callback.path != session.redirectUri.path) {
+      throw const GatewayException(GatewayError.oauthCancelled);
+    }
+    final params = <String, String>{
+      ...callback.queryParameters,
+      if (callback.fragment.isNotEmpty) ...Uri.splitQueryString(callback.fragment),
+    };
+    final code = params['code'];
+    final state = params['state'];
+    if (params.containsKey('error') || code == null || state == null || state != session.state) {
+      // Ein fremder oder abgebrochener Rücksprung beendet den Versuch.
+      _oauth = null;
+      throw const GatewayException(GatewayError.oauthCancelled);
+    }
+    _oauth = null;
+    try {
+      await client.oidcLogin(session: session, code: code, state: state);
+      await _refresh();
+    } catch (e) {
+      AppLog.e('gateway', 'Anmeldung im Browser fehlgeschlagen', e);
+      if (e is OidcException) throw const GatewayException(GatewayError.oauthCancelled);
+      throw _map(e, forLogin: true);
+    }
+  }
+
+  @override
+  Future<void> setDisplayName(String name) async {
+    final client = _client;
+    if (client == null || !client.isLogged()) throw const GatewayException(GatewayError.notAllowed);
+    final n = TextSanitizer.clean(name, max: 64);
+    if (n.isEmpty) throw const GatewayException(GatewayError.invalidInput);
+    try {
+      await client.setProfileField(client.userID!, 'displayname', <String, Object?>{'displayname': n});
+    } catch (e) {
+      throw _map(e);
     }
   }
 
@@ -363,6 +655,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   @override
   Future<void> logout() async {
+    cancelRegistration();
+    _oauth = null;
     final client = _client;
     if (client == null) return;
     try {
@@ -850,9 +1144,19 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
             roomId: r.id,
             roomName: TextSanitizer.clean(r.getLocalizedDisplayname(), max: FamilyRoomSpec.nameMax),
             inviterId: TextSanitizer.clean(r.getState(EventTypes.RoomMember, me)?.senderId ?? '', max: 80),
+            inviterName: _inviterName(r, r.getState(EventTypes.RoomMember, me)?.senderId),
             requested: _joinRequest()?['room_id'] == r.id,
           ),
     ];
+  }
+
+  /// Anzeigename des Einladenden aus dem mitgelieferten Raumzustand (bereinigt), sonst `null`.
+  static String? _inviterName(Room r, String? inviterId) {
+    if (inviterId == null) return null;
+    final raw = r.getState(EventTypes.RoomMember, inviterId)?.content['displayname'];
+    if (raw is! String) return null;
+    final n = TextSanitizer.clean(raw);
+    return n.isEmpty ? null : n;
   }
 
   /// Kontodaten-Schlüssel der eigenen wartenden Beitrittsanfrage. Das SDK liefert den
@@ -966,6 +1270,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         validity: validity,
         nonce: nonce,
         ownHost: _ownHostOf(f.myUserId),
+        familyName: f.name,
+        inviterName: f.member(f.myUserId)?.displayName,
       );
     } on ArgumentError {
       throw const GatewayException(GatewayError.invalidInput);
@@ -1045,6 +1351,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
     try {
       // Das SDK bietet keinen Knock-Aufruf; schmaler Rohaufruf gemäß Matrix-Spezifikation.
+      // Kurzlebige Zugangsdaten (OAuth) vorher auffrischen, weil der Rohaufruf das nicht selbst tut.
+      await client.ensureNotSoftLoggedOut();
       final base = client.homeserver;
       if (base == null || base.scheme != 'https') throw const GatewayException(GatewayError.serverUnsupported);
       final uri = base.replace(
@@ -2271,4 +2579,21 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _http.close();
     super.dispose();
   }
+}
+
+/// Laufende klassische Registrierung. Das Passwort liegt nur hier und nur bis zum Ende.
+class _RegistrationSession {
+  _RegistrationSession({required this.username, required this.password, required this.displayName, required this.language});
+
+  final String username;
+  String? password;
+  final String displayName;
+  final String language;
+  String? session;
+  List<List<String>> flows = const <List<String>>[];
+  Set<String> completed = const <String>{};
+  Map<String, Object?>? params;
+  String? clientSecret;
+  int sendAttempt = 0;
+  String? sid;
 }
