@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
@@ -122,7 +123,7 @@ void main() {
       expect(find.text('Schritt 1 von 4'), findsOneWidget);
       await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), 'kein link');
       await _tap(tester, 'Weiter');
-      expect(find.text('Dieser Link ist ungültig oder abgelaufen.'), findsOneWidget);
+      expect(find.text('Das ist kein Einladungslink. Ein Einladungslink beginnt mit „familynexus://join“.'), findsOneWidget);
       await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), s.link);
       await _tap(tester, 'Weiter');
       expect(find.text('Schritt 2 von 4'), findsOneWidget);
@@ -145,6 +146,34 @@ void main() {
       expect(find.widgetWithText(FilledButton, 'Beitritt anfragen'), findsOneWidget);
     });
 
+    testWidgets('Issue #6: Familie auf Server im Heimnetz (Name ohne Punkt) – Beitritt vor der Anmeldung mit Warnung', (tester) async {
+      final server = FakeMatrixServer(host: 'nas')
+        ..addAccount('anna', 'geheim123', displayName: 'Anna');
+      final anna = await buildTestApp(server: server);
+      server.now = () => DateTime.now().toUtc();
+      final link = await anna.gateway.createInviteLink();
+      final guest = await buildTestApp(loggedIn: false, server: server);
+      guest.links.initial = link;
+      await _pump(tester, guest);
+      expect(find.text('Dein Konto liegt bei nas.'), findsOneWidget, reason: 'Link angenommen, Anbieter aus der Einladung');
+      await _createAccount(tester, name: 'Carla');
+      await _emergencyKey(tester);
+      expect(find.textContaining('Server im Heimnetz (nas)'), findsOneWidget, reason: 'deutliche Warnung');
+      expect(anna.gateway.family!.requests, isEmpty, reason: 'ohne Tipp keine Anfrage');
+      await _tap(tester, 'Beitritt anfragen');
+      expect(anna.gateway.family!.requests.single.displayName, 'Carla');
+    });
+
+    testWidgets('Issue #6: eingefügter Link aus einer HTML-Mail (&amp;, in Klammern) wird angenommen', (tester) async {
+      final s = await _annaInvites();
+      await _pump(tester, s.guest);
+      await _tap(tester, 'Ich wurde eingeladen');
+      await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), 'Hier ist er: <${s.link.replaceAll('&', '&amp;')}>.');
+      await _tap(tester, 'Weiter');
+      expect(find.text('Dein Konto liegt bei fake.test.'), findsOneWidget);
+      expect(s.guest.services.settings.settings.pendingInvite, startsWith('familynexus://join?v=2&'), reason: 'bereinigt vorgemerkt');
+    });
+
     testWidgets('TP-JOIN-03 Link geöffnet, obwohl bereits in einer Familie: Hinweis, nichts vorgemerkt', (tester) async {
       final s = await _annaInvites();
       await _pump(tester, s.anna);
@@ -160,7 +189,7 @@ void main() {
       await _pump(tester, s.guest);
       s.guest.links.controller.add('io.github.carpeasrael.familynexus:/oauth?code=x&state=y');
       await tester.pumpAndSettle();
-      expect(find.text('Dieser Link ist ungültig oder abgelaufen.'), findsNothing);
+      expect(find.textContaining('Einladungslink'), findsNothing, reason: 'keine Fehlermeldung');
     });
   });
 

@@ -49,14 +49,14 @@ void main() {
     expect(find.byType(PopupMenuButton<String>), findsWidgets, reason: 'Verifizieren bleibt für alle möglich');
   });
 
-  testWidgets('Einladungslink als QR-Code: gültiger Link, 24 Stunden', (tester) async {
+  testWidgets('Einladungslink als QR-Code: gültiger Link, Gültigkeit wählbar (Standard 3 Tage)', (tester) async {
     final app = await buildTestApp();
     await _openFamily(tester, app);
     await tester.tap(find.text('Jemanden einladen'));
     await tester.pumpAndSettle();
     expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Jemanden einladen')), findsOneWidget);
     expect(find.bySemanticsLabel('QR-Code anzeigen'), findsWidgets);
-    expect(find.textContaining('24 Stunden gültig'), findsOneWidget);
+    expect(find.textContaining('3 Tage gültig'), findsOneWidget);
     expect(find.text('Per E-Mail senden'), findsOneWidget);
     expect(find.text('Link kopieren'), findsOneWidget);
     final link = await app.gateway.createInviteLink();
@@ -81,10 +81,22 @@ void main() {
     expect(draft.subject, 'Einladung zu FamilyNexus');
     expect(draft.body, contains('„Familie Test“'));
     expect(draft.body, contains('familynexus://join?'));
-    expect(draft.body, contains('24 Stunden'));
+    expect(draft.body, contains('3 Tage gültig'));
     expect(draft.body, contains('„Ich wurde eingeladen“'), reason: 'Anleitung nennt den Weg in der App');
     expect(draft.body, isNot(contains('Matrix')), reason: 'keine Fachbegriffe');
     final link = RegExp(r'familynexus://join\?\S+').firstMatch(draft.body)!.group(0)!;
+    // Issue #6: andere Gültigkeit wählen → neuer Link, Text im Entwurf passt.
+    await tester.tap(find.text('7 Tage'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Per E-Mail senden'));
+    await tester.pumpAndSettle();
+    expect(app.mail.drafts.last.body, contains('7 Tage gültig'));
+    final link7 = RegExp(r'familynexus://join\?\S+').firstMatch(app.mail.drafts.last.body)!.group(0)!;
+    expect(link7, isNot(link), reason: 'neuer Link mit neuer Gültigkeit');
+    // Der Fake-Server erzeugt Links mit seiner festen Test-Uhr.
+    final t = app.server.now();
+    expect(InviteLink.tryParse(link7, now: t)!.expires.difference(t), const Duration(days: 7));
+    app.mail.drafts.removeLast();
     expect(InviteLink.tryParse(link, now: DateTime.now()), isNotNull, reason: 'der Link im Entwurf ist gültig');
 
     app.mail.available = false;

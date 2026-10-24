@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/app_services.dart';
 import '../../domain/invite_link.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../common/invite_link_text.dart';
 
 /// „Ich wurde eingeladen“, aber die App wurde nicht über den Link geöffnet: Link einfügen (E-56).
 /// Danach geht es mit „Konto erstellen“ beim Anbieter des Einladenden weiter.
@@ -26,14 +27,14 @@ class _InviteLinkStepState extends State<InviteLinkStep> {
   Future<void> _submit() async {
     final l = AppLocalizations.of(context);
     final s = AppScope.read(context);
-    final raw = _link.text.trim();
-    final link = InviteLink.tryParse(raw, now: DateTime.now());
-    if (link == null || !link.isValidAt(DateTime.now())) {
-      setState(() => _error = l.joinLinkInvalid);
+    final check = InviteLink.check(_link.text, now: DateTime.now());
+    final problem = check.problem;
+    if (problem != null) {
+      setState(() => _error = inviteLinkProblemText(l, problem));
       return;
     }
-    await s.settings.update((c) => c.copyWith(pendingInvite: InviteLink.normalized(raw)));
-    s.pendingInvite.value = link;
+    await s.settings.update((c) => c.copyWith(pendingInvite: check.raw));
+    s.pendingInvite.value = check.link;
   }
 
   @override
@@ -51,7 +52,7 @@ class _InviteLinkStepState extends State<InviteLinkStep> {
         minLines: 1,
         maxLines: 3,
         onSubmitted: (_) => _submit(),
-        decoration: InputDecoration(labelText: l.joinLinkLabel, errorText: _error),
+        decoration: InputDecoration(labelText: l.joinLinkLabel, errorText: _error, errorMaxLines: 4),
       ),
       const SizedBox(height: 8),
       Text(l.inviteStepNoLink, style: Theme.of(context).textTheme.bodySmall),

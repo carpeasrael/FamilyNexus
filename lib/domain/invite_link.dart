@@ -20,6 +20,7 @@ class InviteLink {
     required this.nonce,
     this.familyName,
     this.inviterName,
+    this.onLocalServer = false,
   });
 
   static const String scheme = 'familynexus';
@@ -27,7 +28,9 @@ class InviteLink {
   static const int version = 2;
   static const int maxLength = 1024;
   static const int maxNameLength = 40;
-  static const Duration defaultValidity = Duration(hours: 24);
+  /// Standard und Auswahl beim Einladen (Issue #6): Einladungen werden oft erst am nächsten Tag geöffnet.
+  static const Duration defaultValidity = Duration(days: 3);
+  static const List<Duration> validityChoices = <Duration>[Duration(days: 1), Duration(days: 3), Duration(days: 7)];
   static const Duration maxValidity = Duration(days: 7);
 
   final String roomId;
@@ -49,6 +52,11 @@ class InviteLink {
   /// Anzeigename des Einladenden laut Einladung (bereinigt, nicht vertrauenswürdig).
   final String? inviterName;
 
+  /// Die Familie liegt auf einem Server im Heimnetz (IP, `localhost`, Name ohne Punkt), der vor der
+  /// Anmeldung nicht als eigener Server bekannt ist. Nur über [check] möglich; die Oberfläche warnt
+  /// deutlich (Issue #6).
+  final bool onLocalServer;
+
   /// Servername des Einladenden (`@anna:beispiel.de` → `beispiel.de`). Neulinge legen ihr Konto
   /// standardmäßig dort an; die Adresse wird wie jede Eingabe über `.well-known` aufgelöst.
   String get inviterServer => inviter.substring(inviter.indexOf(':') + 1);
@@ -62,13 +70,22 @@ class InviteLink {
   /// [ownHost] ist der Server des eigenen Kontos; er ist von der Ortsprüfung ausgenommen
   /// (eigener Server im Heimnetz).
   static bool viaMatchesRoom(String roomId, String via, {String? ownHost}) {
-    final i = roomId.indexOf(':');
-    if (i < 0 || roomId.substring(i + 1) != via) return false;
+    if (!_viaIsRoomServer(roomId, via)) return false;
     if (ownHost != null && ownHost == via) return true;
+    return !isLocalServer(via);
+  }
+
+  static bool _viaIsRoomServer(String roomId, String via) {
+    final i = roomId.indexOf(':');
+    return i >= 0 && roomId.substring(i + 1) == via;
+  }
+
+  /// Server im Heimnetz: `localhost`, IP-Adresse oder Name ohne Punkt (z. B. `nas`).
+  static bool isLocalServer(String via) {
     final host = via.contains(':') ? via.substring(0, via.lastIndexOf(':')) : via;
-    if (host == 'localhost' || host.endsWith('.localhost')) return false;
-    if (RegExp(r'^[0-9.]+$').hasMatch(host)) return false;
-    return host.contains('.');
+    if (host == 'localhost' || host.endsWith('.localhost')) return true;
+    if (RegExp(r'^[0-9.]+$').hasMatch(host)) return true;
+    return !host.contains('.');
   }
 
   static final RegExp _viaRe = RegExp(r'^[A-Za-z0-9.\-]{1,253}(:\d{1,5})?$');
@@ -141,7 +158,10 @@ class InviteLink {
   /// Liest einen Link. Liefert `null` bei jeder Abweichung (falsches Schema,
   /// fehlende/doppelte/zusätzliche Felder, ungültige Werte). Ob der Link
   /// abgelaufen ist, prüft [isValidAt].
-  static InviteLink? tryParse(String input, {required DateTime now, String? ownHost}) {
+  static InviteLink? tryParse(String input, {required DateTime now, String? ownHost}) =>
+      _parse(input, now: now, ownHost: ownHost, allowLocal: false);
+
+  static InviteLink? _parse(String input, {required DateTime now, String? ownHost, required bool allowLocal}) {
     final text = input.trim();
     if (text.isEmpty || text.length > maxLength) return null;
     final Uri u;
@@ -174,7 +194,13 @@ class InviteLink {
     final exp = int.tryParse(q['exp'] ?? '');
     final nonce = q['n'];
     if (room == null || via == null || inv == null || exp == null || nonce == null) return null;
-    if (!isNonce(nonce) || !viaMatchesRoom(room, via, ownHost: ownHost)) return null;
+    if (!isNonce(nonce)) return null;
+    var local = false;
+    if (!viaMatchesRoom(room, via, ownHost: ownHost)) {
+      // Heimnetz-Server nur über [check] und nur, wenn er wirklich der Server des Raums ist.
+      if (!allowLocal || !_viaIsRoomServer(room, via) || !isLocalServer(via)) return null;
+      local = true;
+    }
     // Grenzen vorab prüfen: zu große Werte würden sonst beim Umrechnen werfen (K1).
     final nowSec = now.toUtc().millisecondsSinceEpoch ~/ 1000;
     if (exp <= 0 || exp > nowSec + maxValidity.inSeconds + 300) return null;
@@ -190,10 +216,62 @@ class InviteLink {
       nonce: nonce,
       familyName: _name(q['f']),
       inviterName: _name(q['by']),
+      onLocalServer: local,
     );
   }
 
   bool isValidAt(DateTime now) => now.toUtc().isBefore(expires);
+
+  /// Prüft eingefügten oder geöffneten Text und nennt bei Ablehnung den Grund (Issue #6). Anders als
+  /// [tryParse] löst sie den Link aus umgebendem Text und repariert typische Schäden beim Weitergeben;
+  /// der Inhalt selbst wird genauso streng geprüft. Links auf Server im Heimnetz werden angenommen und
+  /// mit [onLocalServer] markiert.
+  static InviteLinkCheck check(String input, {required DateTime now, String? ownHost}) {
+    final candidate = extract(input);
+    if (candidate == null) return const InviteLinkCheck._(problem: InviteLinkProblem.notALink);
+    final v = _versionOf(candidate);
+    if (v != null && v > version) return const InviteLinkCheck._(problem: InviteLinkProblem.newerVersion);
+    final link = _parse(candidate, now: now, ownHost: ownHost, allowLocal: true);
+    if (link == null) return const InviteLinkCheck._(problem: InviteLinkProblem.damaged);
+    if (!link.isValidAt(now)) return InviteLinkCheck._(link: link, problem: InviteLinkProblem.expired);
+    return InviteLinkCheck._(link: link, raw: normalized(candidate));
+  }
+
+  static int? _versionOf(String candidate) {
+    try {
+      return int.tryParse(Uri.parse(candidate).queryParameters['v'] ?? '');
+    } on FormatException {
+      return null;
+    }
+  }
+
+  static final RegExp _start = RegExp('$scheme://$host', caseSensitive: false);
+  static final RegExp _qpHex = RegExp('=([0-9A-F]{2})');
+
+  /// Löst den Einladungslink aus einem Text (Mail, Messenger, Notiz) und repariert, was beim Weitergeben
+  /// typischerweise passiert: HTML-`&amp;`, nicht dekodiertes Quoted-Printable (`=3D`, `=` am Zeilenende),
+  /// Zeilenumbrüche mitten im Link, Klammern, Anführungszeichen und Satzzeichen am Ende. `null`, wenn
+  /// kein Link enthalten ist.
+  static String? extract(String input) {
+    if (input.length > maxLength * 4) return null;
+    var t = input.replaceAll('&amp;', '&');
+    // Nur echtes Quoted-Printable (Großbuchstaben, `=3D` für jedes `=`); Link-IDs sind klein geschrieben.
+    if (t.contains('=3D')) {
+      t = t.replaceAll(RegExp(r'=\r?\n'), '').replaceAllMapped(_qpHex, (m) => String.fromCharCode(int.parse(m[1]!, radix: 16)));
+    }
+    final m = _start.firstMatch(t);
+    if (m == null) return null;
+    final parts = t.substring(m.start).split(RegExp(r'\s+'));
+    final buf = StringBuffer(parts.first);
+    // Ein Umbruch mitten im Link: weiter, solange das Stück davor mit `=`/`&` endet oder das nächste mit `&` beginnt.
+    for (final p in parts.skip(1)) {
+      final prev = buf.toString();
+      if (p.isEmpty || !(prev.endsWith('=') || prev.endsWith('&') || p.startsWith('&'))) break;
+      buf.write(p);
+    }
+    final s = buf.toString().replaceFirst(RegExp('[>"\'\u201C\u201D\u201E\u00AB\u00BB)\\].,;:!?]+\$'), '');
+    return s.isEmpty || s.length > maxLength ? null : s;
+  }
 
   /// Einheitliche Schreibweise eines (bereits geprüften) Links zum Vormerken, z. B. Schema in
   /// Kleinbuchstaben; ein Neustart liest ihn mit [tryParse] erneut.
@@ -204,4 +282,32 @@ class InviteLink {
       return raw.trim();
     }
   }
+}
+
+/// Grund, warum ein Text nicht als Einladung angenommen wird (Issue #6).
+enum InviteLinkProblem {
+  /// Kein Einladungslink im Text.
+  notALink,
+
+  /// Link unvollständig oder beschädigt (oder manipuliert).
+  damaged,
+
+  /// Gültigkeit abgelaufen.
+  expired,
+
+  /// Link aus einer neueren App-Version.
+  newerVersion,
+}
+
+/// Ergebnis von [InviteLink.check]: gültiger Link oder Grund der Ablehnung (bei `expired` mit Link).
+class InviteLinkCheck {
+  const InviteLinkCheck._({this.link, this.problem, this.raw});
+
+  final InviteLink? link;
+  final InviteLinkProblem? problem;
+
+  /// Der herausgelöste, einheitlich geschriebene Link (zum Vormerken), nur bei gültigem Ergebnis.
+  final String? raw;
+
+  bool get ok => problem == null && link != null;
 }

@@ -399,7 +399,7 @@
   "familyManage": "Verwaltung",
   "familyInvite": "Mitglied einladen",
   "familyInviteLinkTitle": "Jemanden einladen",
-  "familyInviteLinkHint": "Der Link ist 24 Stunden gültig und nur einmal verwendbar. Wer ihn öffnet, schickt dir eine Anfrage – du bestätigst sie.",
+  "familyInviteLinkHint": "Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, schickt dir eine Anfrage – du bestätigst sie.",
   "familyInviteShowQr": "QR-Code anzeigen",
   "familyInviteCopyLink": "Link kopieren",
   "familyInviteCopied": "Link kopiert.",
@@ -436,7 +436,6 @@
   "joinTitle": "Familie beitreten",
   "joinHint": "Füge den Einladungslink ein oder öffne den Link bzw. QR-Code mit der Kamera-App.",
   "joinLinkLabel": "Einladungslink",
-  "joinLinkInvalid": "Dieser Link ist ungültig oder abgelaufen.",
   "joinSend": "Beitritt anfragen",
   "joinPending": "Fast geschafft! Deine Anfrage ist unterwegs. Sobald sie bestätigt ist, bist du dabei.",
   "joinCancel": "Anfrage zurückziehen",
@@ -804,7 +803,7 @@
   "privacy11Body": "Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen.",
   "familyInviteMail": "Per E-Mail senden",
   "inviteMailSubject": "Einladung zu FamilyNexus",
-  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ich bestätige dich, dann bist du dabei.\n\nDer Link ist {hours} Stunden gültig.",
+  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ich bestätige dich, dann bist du dabei.\n\nDer Link ist {validity} gültig.",
   "@inviteMailBody": {
     "placeholders": {
       "family": {
@@ -813,7 +812,7 @@
       "link": {
         "type": "String"
       },
-      "hours": {
+      "validity": {
         "type": "String"
       }
     }
@@ -1348,5 +1347,33 @@
       }
     }
   },
-  "tasksDescriptionTooLong": "Die Erklärung ist zu lang. Bitte kürze sie etwas."
+  "tasksDescriptionTooLong": "Die Erklärung ist zu lang. Bitte kürze sie etwas.",
+  "joinLinkNotALink": "Das ist kein Einladungslink. Ein Einladungslink beginnt mit „familynexus://join“.",
+  "joinLinkDamaged": "Der Link ist unvollständig oder beschädigt – oft passiert das beim Weiterleiten. Bitte kopiere ihn noch einmal vollständig oder scanne den QR-Code.",
+  "joinLinkExpired": "Dieser Einladungslink ist abgelaufen. Bitte die Person, die dich einlädt, um einen neuen Link.",
+  "joinLinkNewerVersion": "Dieser Link stammt aus einer neueren Version von FamilyNexus. Bitte aktualisiere die App und versuche es noch einmal.",
+  "joinCardLocalServer": "Achtung: Diese Familie liegt auf einem Server im Heimnetz ({server}). Er ist nur aus diesem Netz erreichbar. Fahre nur fort, wenn du diese Einladung erwartet hast.",
+  "@joinCardLocalServer": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteValidityDays": "{days, plural, =1{1 Tag} other{{days} Tage}}",
+  "@inviteValidityDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "familyInviteValidityLabel": "Gültig für",
+  "@familyInviteLinkHint": {
+    "placeholders": {
+      "validity": {
+        "type": "String"
+      }
+    }
+  }
 }

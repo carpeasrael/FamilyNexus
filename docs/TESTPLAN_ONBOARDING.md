@@ -111,6 +111,19 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-JOIN-09 | Link, dessen Einladende bei einem anderen Anbieter als die Familie liegt | Beitrittskarte | Anbieter der Einladenden immer genannt („Konto bei …“); deutliche Warnung bei Abweichung | F (Text), Code-Review | ✅ |
 | TP-JOIN-M1 | zwei Android-Geräte | QR-Code mit der Kamera-App scannen | App öffnet sich bei „Konto erstellen“ | M | ⏳ (zwei echte Geräte nötig) |
 
+### 3.5a Einladungslinks prüfen (Issue #6, E-59)
+
+| ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
+|---|---|---|---|---|---|
+| TP-LINK-01 | – | abgelaufener Link | „Dieser Einladungslink ist abgelaufen. Bitte … um einen neuen Link.“ | U `invite_link_check_test.dart`, F `join_and_security_test.dart` | ✅ |
+| TP-LINK-02 | – | Text ohne Link, https-Link | „Das ist kein Einladungslink …“ | U, F | ✅ |
+| TP-LINK-03 | – | unvollständiger/manipulierter Link | „Der Link ist unvollständig oder beschädigt … erneut kopieren oder QR-Code scannen“ | U, F | ✅ |
+| TP-LINK-04 | – | Link mit `v=3` | „… neueren Version … bitte aktualisiere die App“ | U, F | ✅ |
+| TP-LINK-05 | – | `&amp;`, `<…>`, „…“, Text davor/danach, Satzzeichen, Umbruch im Link, Quoted-Printable | angenommen, bereinigt vorgemerkt; Text nach dem Link wird nicht angehängt | U, F `invite_onboarding_test.dart` | ✅ |
+| TP-LINK-06 | Familie auf Server im Heimnetz (IP, localhost, Name ohne Punkt) | Link vor der Anmeldung öffnen, Konto anlegen | angenommen; Beitrittskarte warnt „Server im Heimnetz“; Anfrage erst nach Tipp | U, F, S (Synapse auf `localhost`) | ✅ |
+| TP-LINK-07 | – | `via` im Heimnetz, aber nicht der Server des Raums | abgelehnt (beschädigt) | U | ✅ |
+| TP-LINK-08 | Moderatorin | „Jemanden einladen“ → 1/3/7 Tage | Standard 3 Tage; andere Wahl = neuer Link; Hinweis und E-Mail nennen die Dauer | F `family_screen_test.dart`, S | ✅ |
+
 ### 3.6 Notfall-Schlüssel
 
 | ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
