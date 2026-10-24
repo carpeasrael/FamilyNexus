@@ -1,14 +1,16 @@
 import 'server.dart';
 import 'text_sanitizer.dart';
 
-/// Einladungslink/QR-Inhalt (E-14, E-56):
-/// `familynexus://join?v=2&room=<roomId>&via=<server>&inv=<mxid>&exp=<unix-sekunden>&n=<id>[&f=<familie>][&by=<name>]`
+/// Einladungslink/QR-Inhalt (E-14, E-56, E-63):
+/// `familynexus://join?v=3&room=<roomId>&via=<server>&srv=<server>&inv=<mxid>&exp=<unix-sekunden>&n=<id>[&f=<familie>][&by=<name>]`
 ///
 /// Der Link ist nicht vertrauenswürdig: strikte Prüfung aller Felder. Die
 /// Gültigkeitsdauer wird in der App durchgesetzt; die eigentliche Sperre ist
 /// die Bestätigung durch einen Moderator.
 ///
-/// Version 1 (ohne `f`/`by`) wird weiterhin gelesen. Familien- und Einladendenname sind reine
+/// `via` ist der Server des Raums, `srv` der Server, auf dem Neulinge ihr Konto anlegen bzw. sich anmelden
+/// (standardmäßig der Heimserver des Einladenden). Version 2 (ohne `srv`; dann gilt der Server des
+/// Einladenden) und Version 1 (ohne `f`/`by`) werden weiterhin gelesen. Familien- und Einladendenname sind reine
 /// Anzeigehilfen für Neulinge, die vor der Anmeldung noch nichts vom Server abfragen können; sie
 /// werden bereinigt und nur als „laut Einladung“ gezeigt.
 class InviteLink {
@@ -21,11 +23,12 @@ class InviteLink {
     this.familyName,
     this.inviterName,
     this.onLocalServer = false,
+    this._accountServer,
   });
 
   static const String scheme = 'familynexus';
   static const String host = 'join';
-  static const int version = 2;
+  static const int version = 3;
   static const int maxLength = 1024;
   static const int maxNameLength = 40;
   /// Standard und Auswahl beim Einladen (Issue #6): Einladungen werden oft erst am nächsten Tag geöffnet.
@@ -56,6 +59,13 @@ class InviteLink {
   /// Anmeldung nicht als eigener Server bekannt ist. Nur über [check] möglich; die Oberfläche warnt
   /// deutlich (Issue #6).
   final bool onLocalServer;
+
+  final String? _accountServer;
+
+  /// Server für Konto und Anmeldung laut Einladung (Feld `srv`); bei älteren Links der Server des
+  /// Einladenden. Wird in der Einrichtung vorgewählt: `matrix.org` als Standard, jeder andere Server
+  /// im Feld „Anderer Anbieter“ (E-63).
+  String get accountServer => _accountServer ?? inviterServer;
 
   /// Servername des Einladenden (`@anna:beispiel.de` → `beispiel.de`). Neulinge legen ihr Konto
   /// standardmäßig dort an; die Adresse wird wie jede Eingabe über `.well-known` aufgelöst.
@@ -112,10 +122,14 @@ class InviteLink {
     String? ownHost,
     String? familyName,
     String? inviterName,
+    String? accountServer,
   }) {
     if (!MatrixIds.isRoomId(roomId) || !_viaRe.hasMatch(via) || !MatrixIds.isUserId(inviter) || !isNonce(nonce)) {
       throw ArgumentError('ungültige Einladungsdaten');
     }
+    final srv = accountServer ?? inviter.substring(inviter.indexOf(':') + 1);
+    if (!_viaRe.hasMatch(srv)) throw ArgumentError('ungültiger Konto-Server');
+    if (isLocalServer(srv) && srv != ownHost) throw ArgumentError('Konto-Server im Heimnetz ist nicht der eigene');
     if (validity <= Duration.zero || validity > maxValidity) throw ArgumentError('ungültige Gültigkeitsdauer');
     if (!viaMatchesRoom(roomId, via, ownHost: ownHost)) throw ArgumentError('Server passt nicht zum Raum');
     final exp = now.toUtc().add(validity).millisecondsSinceEpoch ~/ 1000;
@@ -126,6 +140,7 @@ class InviteLink {
             'v': '$version',
             'room': roomId,
             'via': via,
+            'srv': srv,
             'inv': inviter,
             'exp': '$exp',
             'n': nonce,
@@ -158,6 +173,7 @@ class InviteLink {
 
   static const Set<String> _v1Keys = <String>{'v', 'room', 'via', 'inv', 'exp', 'n'};
   static const Set<String> _v2Keys = <String>{..._v1Keys, 'f', 'by'};
+  static const Set<String> _v3Keys = <String>{..._v2Keys, 'srv'};
 
   /// Liest einen Link. Liefert `null` bei jeder Abweichung (falsches Schema,
   /// fehlende/doppelte/zusätzliche Felder, ungültige Werte). Ob der Link
@@ -189,6 +205,7 @@ class InviteLink {
     final allowed = switch (q['v']) {
       '1' => _v1Keys,
       '2' => _v2Keys,
+      '3' => _v3Keys,
       _ => null,
     };
     if (allowed == null || q.keys.toSet().difference(allowed).isNotEmpty) return null;
@@ -199,6 +216,13 @@ class InviteLink {
     final nonce = q['n'];
     if (room == null || via == null || inv == null || exp == null || nonce == null) return null;
     if (!isNonce(nonce)) return null;
+    // Version 3 nennt den Server für Konto und Anmeldung ausdrücklich (E-63); er muss gültig sein und darf
+    // nur über [check] oder als eigener Server im Heimnetz liegen.
+    final srv = q['srv'];
+    if (q['v'] == '3') {
+      if (srv == null || !_viaRe.hasMatch(srv)) return null;
+      if (isLocalServer(srv) && srv != ownHost && !allowLocal) return null;
+    }
     var local = false;
     if (!viaMatchesRoom(room, via, ownHost: ownHost)) {
       // Heimnetz-Server nur über [check] und nur, wenn er wirklich der Server des Raums ist.
@@ -221,6 +245,7 @@ class InviteLink {
       familyName: _name(q['f']),
       inviterName: _name(q['by']),
       onLocalServer: local,
+      accountServer: srv,
     );
   }
 

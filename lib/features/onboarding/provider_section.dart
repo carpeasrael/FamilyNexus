@@ -18,11 +18,34 @@ class ProviderSection extends StatefulWidget {
 
 class _ProviderSectionState extends State<ProviderSection> {
   late final TextEditingController _text = TextEditingController(text: widget.controller.customText);
+  final ExpansibleController _tile = ExpansibleController();
+  late bool _wasCustom;
+
+  @override
+  void initState() {
+    super.initState();
+    _wasCustom = widget.controller.custom;
+    widget.controller.addListener(_sync);
+  }
 
   @override
   void dispose() {
+    widget.controller.removeListener(_sync);
     _text.dispose();
     super.dispose();
+  }
+
+  /// Der Server kann auch von außen gewählt werden (Einladung, E-63): Feld nachführen und „Erweitert“
+  /// aufklappen, damit die Adresse sichtbar im Feld „Anderer Anbieter“ steht.
+  void _sync() {
+    final c = widget.controller;
+    if (_text.text != c.customText) _text.text = c.customText;
+    if (c.custom && !_wasCustom) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_tile.isExpanded) _tile.expand();
+      });
+    }
+    _wasCustom = c.custom;
   }
 
   @override
@@ -67,6 +90,7 @@ class _ProviderSectionState extends State<ProviderSection> {
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
           Semantics(liveRegion: true, child: status),
           ExpansionTile(
+            controller: _tile,
             tilePadding: EdgeInsets.zero,
             childrenPadding: const EdgeInsets.only(bottom: 8),
             expandedCrossAxisAlignment: CrossAxisAlignment.start,

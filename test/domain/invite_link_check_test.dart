@@ -53,7 +53,7 @@ void main() {
     });
 
     test('aus neuerer App-Version', () {
-      expect(check(ok.replaceFirst('v=2', 'v=3')).problem, InviteLinkProblem.newerVersion);
+      expect(check(ok.replaceFirst('v=3', 'v=4')).problem, InviteLinkProblem.newerVersion);
     });
 
     test('beschädigt oder manipuliert', () {

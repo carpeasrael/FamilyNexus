@@ -90,11 +90,12 @@ void main() {
       await E2e.until(() => mod.family != null, what: 'Familie bei der Moderatorin');
 
       final raw = await mod.createInviteLink();
-      expect(raw, contains('v=2'));
+      expect(raw, contains('v=3'));
       final link = InviteLink.tryParse(raw, now: DateTime.now(), ownHost: 'localhost')!;
       expect(link.familyName, 'Familie E2E');
       expect(link.inviterName, 'Erika');
       expect(link.inviterServer, 'localhost', reason: 'Neulinge legen das Konto beim Anbieter des Einladenden an');
+      expect(link.accountServer, 'localhost', reason: 'Der Link nennt den Server für Konto und Anmeldung ausdrücklich (E-63)');
 
       final guest = await _registered('gast', 'Gustav');
       await guest.requestToJoin(link);

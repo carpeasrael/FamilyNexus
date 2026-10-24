@@ -92,7 +92,7 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 
 | ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
 |---|---|---|---|---|---|
-| TP-INV-01 | Moderatorin | Link erzeugen | `v=2` mit Familienname und Name der Einladenden; Roundtrip | U `invite_link_test.dart`, S TP-E2E-03 | ✅ |
+| TP-INV-01 | Moderatorin | Link erzeugen | `v=3` mit Familienname und Name der Einladenden; Roundtrip | U `invite_link_test.dart`, S TP-E2E-03 | ✅ |
 | TP-INV-02 | alter Link `v=1` | einfügen | weiterhin gültig | U | ✅ |
 | TP-INV-03 | manipulierte Links | unbekannte/doppelte Felder, `v=1` mit `f`, `v=3`, fremder Server, CRLF, Überlänge | abgelehnt | U, `penetration_test.dart` | ✅ |
 | TP-INV-04 | – | Namen mit Steuer-/Bidi-Zeichen, Überlänge, leer | bereinigt, auf 40 Zeichen begrenzt, leere Namen entfallen | U | ✅ |
@@ -111,6 +111,18 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-JOIN-09 | Link, dessen Einladende bei einem anderen Anbieter als die Familie liegt | Beitrittskarte | Anbieter der Einladenden immer genannt („Konto bei …“); deutliche Warnung bei Abweichung | F (Text), Code-Review | ✅ |
 | TP-JOIN-M1 | zwei Android-Geräte | QR-Code mit der Kamera-App scannen | App öffnet sich bei „Konto erstellen“ | M | ⏳ (zwei echte Geräte nötig) |
 
+### 3.5b Server aus dem Einladungslink (E-63)
+
+| ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
+|---|---|---|---|---|---|
+| TP-INV-07 | – | Link erzeugen, Standard und anderer Konto-Server | `srv` steht im Link; Standard = Server des Einladenden; getrennt von `inv` | U `invite_link_test.dart` | ✅ |
+| TP-INV-08 | Link der Version 2 | lesen | gültig; Konto-Server = Server des Einladenden | U | ✅ |
+| TP-INV-09 | Konto-Server im Heimnetz | erzeugen, lesen | nur der eigene beim Erzeugen; ohne `check` nur als eigener Server lesbar; Oberfläche fragt vor dem Verbinden | U | ✅ |
+| TP-LINK-10 | – | `srv` fehlt (v3), ungültig, mit Pfad/Zugangsdaten, doppelt, im Heimnetz | abgelehnt | U, Pen `penetration_test.dart` | ✅ |
+| TP-JOIN-10 | Link mit Server ≠ matrix.org | Link öffnen | „Anderen Anbieter verwenden“ gewählt, Adresse im Feld, „Erweitert“ aufgeklappt; Konto liegt auf diesem Server | F `invite_onboarding_test.dart`, E2E | ✅ |
+| TP-JOIN-11 | Link mit Server matrix.org | Link öffnen | Standardanbieter gewählt, kein eigenes Feld | F | ✅ |
+| TP-JOIN-12 | Person auf der Anmeldeseite | Link trifft ein, anmelden, Notfall-Schlüssel | Anbieter wechselt auf den Server aus dem Link; Anmeldung dort; am Ende die Beitrittskarte der Familie, ein Tipp sendet die Anfrage | F | ✅ |
+
 ### 3.5a Einladungslinks prüfen (Issue #6, E-59)
 
 | ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
@@ -118,7 +130,7 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-LINK-01 | – | abgelaufener Link | „Dieser Einladungslink ist abgelaufen. Bitte … um einen neuen Link.“ | U `invite_link_check_test.dart`, F `join_and_security_test.dart` | ✅ |
 | TP-LINK-02 | – | Text ohne Link, https-Link | „Das ist kein Einladungslink …“ | U, F | ✅ |
 | TP-LINK-03 | – | unvollständiger/manipulierter Link | „Der Link ist unvollständig oder beschädigt … erneut kopieren oder QR-Code scannen“ | U, F | ✅ |
-| TP-LINK-04 | – | Link mit `v=3` | „… neueren Version … bitte aktualisiere die App“ | U, F | ✅ |
+| TP-LINK-04 | – | Link mit `v=4` | „… neueren Version … bitte aktualisiere die App“ | U, F | ✅ |
 | TP-LINK-05 | – | `&amp;`, `<…>`, „…“, Text davor/danach, Satzzeichen, Umbruch im Link, Quoted-Printable | angenommen, bereinigt vorgemerkt; Text nach dem Link wird nicht angehängt | U, F `invite_onboarding_test.dart` | ✅ |
 | TP-LINK-06 | Familie auf Server im Heimnetz (IP, localhost, Name ohne Punkt) | Link vor der Anmeldung öffnen, Konto anlegen | angenommen; Beitrittskarte warnt „Server im Heimnetz“; Anfrage erst nach Tipp | U, F, S (Synapse auf `localhost`) | ✅ |
 | TP-LINK-07 | – | `via` im Heimnetz, aber nicht der Server des Raums | abgelehnt (beschädigt) | U | ✅ |

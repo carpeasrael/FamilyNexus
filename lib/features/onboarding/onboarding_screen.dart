@@ -84,11 +84,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
+  /// Konto anlegen und Anmelden laufen beim Server aus der Einladung (E-63): `matrix.org` als Standard,
+  /// sonst eingetragen unter „Anderer Anbieter“.
   void _useInviteProvider(InviteLink invite) {
-    final url = ServerUrl.tryParse(invite.inviterServer);
+    final url = ServerUrl.tryParse(invite.accountServer);
     // Nicht lesbarer Servername: beim bisherigen Anbieter bleiben (sonst stünde „Verbinde …“ für immer).
     // Server im Heimnetz: erst nach Zustimmung verbinden (Review R2).
-    url != null ? _provider.useStandard(url, askFirst: InviteLink.isLocalServer(invite.inviterServer)) : _provider.start();
+    url != null ? _provider.useInvited(url, askFirst: InviteLink.isLocalServer(invite.accountServer)) : _provider.start();
   }
 
   /// Angemeldet (Konto erstellt oder Anmeldung): weiter zur Absicherung; abgemeldet: zurück.
@@ -117,6 +119,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         _step = _Step.account;
       });
       _useInviteProvider(invite);
+    } else if (_step == _Step.login) {
+      // Wer sich schon anmeldet, meldet sich beim Server aus der Einladung an; die Familie folgt am Ende.
+      _useInviteProvider(invite);
     }
   }
 
@@ -131,7 +136,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         OnboardingPath.login => _Step.login,
       };
     });
-    if (path == OnboardingPath.invited && invite != null) {
+    if (path != OnboardingPath.create && invite != null) {
       _useInviteProvider(invite);
     } else {
       _provider.start();

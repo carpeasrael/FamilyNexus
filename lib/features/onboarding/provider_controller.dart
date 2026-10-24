@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../data/matrix/matrix_gateway.dart';
+import '../../domain/app_settings.dart';
 import '../../domain/registration.dart';
 import '../../domain/server.dart';
 import '../settings/settings_controller.dart';
@@ -68,6 +69,33 @@ class ProviderController extends ChangeNotifier {
     if (_started && !_custom && url == _standard && _status != ProviderStatus.failed) return;
     _standard = url;
     _custom = false;
+    if (askFirst) {
+      _started = true;
+      _timer?.cancel();
+      _run++;
+      _info = null;
+      _options = null;
+      _error = null;
+      _status = ProviderStatus.needsConsent;
+      _notify();
+      return;
+    }
+    start();
+  }
+
+  /// Wählt den Server aus einer Einladung (E-63): `matrix.org` ist der Standard, jeder andere Server wird als
+  /// „Anderer Anbieter“ mit seiner Adresse eingetragen. Konto anlegen und Anmelden nutzen dann genau diesen
+  /// Server. [askFirst] wie bei [useStandard].
+  void useInvited(ServerUrl url, {bool askFirst = false}) {
+    final standard = ServerUrl.tryParse(AppSettings.defaultServerUrl)!;
+    if (url == standard) {
+      useStandard(url, askFirst: askFirst);
+      return;
+    }
+    final text = url.uri.hasPort ? '${url.host}:${url.uri.port}' : url.host;
+    if (_started && _custom && _customText == text && _status != ProviderStatus.failed) return;
+    _custom = true;
+    _customText = text;
     if (askFirst) {
       _started = true;
       _timer?.cancel();

@@ -91,7 +91,7 @@ void main() {
         'familynexus://join?v=1&room=x': 'Der Link ist unvollständig oder beschädigt – oft passiert das beim Weiterleiten. Bitte kopiere ihn noch einmal vollständig oder scanne den QR-Code.',
         'hallo': 'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „familynexus://join“.',
         s.link.replaceFirst('familynexus', 'https'): 'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „familynexus://join“.',
-        s.link.replaceFirst('v=2', 'v=9'): 'Dieser Link stammt aus einer neueren Version von FamilyNexus. Bitte aktualisiere die App und versuche es noch einmal.',
+        s.link.replaceFirst('v=3', 'v=9'): 'Dieser Link stammt aus einer neueren Version von FamilyNexus. Bitte aktualisiere die App und versuche es noch einmal.',
       };
       for (final c in cases.entries) {
         await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), c.key);

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/domain/family.dart';
+import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/registration.dart';
 import 'package:family_nexus/domain/security.dart';
 import 'package:family_nexus/domain/server.dart';
@@ -146,6 +147,65 @@ void main() {
       expect(find.widgetWithText(FilledButton, 'Beitritt anfragen'), findsOneWidget);
     });
 
+    testWidgets('TP-JOIN-10 Server aus dem Link (nicht matrix.org) steht im Feld „Anderen Anbieter verwenden“ und wird fürs Konto genutzt (E-63)', (tester) async {
+      final s = await _annaInvites();
+      s.guest.links.initial = s.link;
+      await _pump(tester, s.guest);
+
+      expect(tester.widget<RadioGroup<bool>>(find.byType(RadioGroup<bool>)).groupValue, isTrue, reason: '„Anderer Anbieter“ gewählt');
+      final field = find.widgetWithText(TextField, 'Adresse des Anbieters');
+      expect(field, findsOneWidget, reason: 'Erweitert ist aufgeklappt, die Adresse sichtbar');
+      expect(tester.widget<TextField>(field).controller!.text, 'fake.test');
+      expect(find.text('Dein Konto liegt bei fake.test.'), findsOneWidget);
+
+      await _createAccount(tester, name: 'Carla');
+      expect(s.guest.gateway.userId, '@carla:fake.test', reason: 'Konto liegt auf dem Server aus dem Link');
+      expect(s.guest.services.settings.settings.serverUrl, 'https://fake.test');
+    });
+
+    testWidgets('TP-JOIN-11 Server aus dem Link ist matrix.org: Standardanbieter bleibt gewählt, kein eigenes Feld', (tester) async {
+      final s = await _annaInvites();
+      final link = InviteLink.create(
+        roomId: '!fam:matrix.org',
+        via: 'matrix.org',
+        inviter: '@anna:matrix.org',
+        now: DateTime.now(),
+        nonce: '0123456789abcdef0123456789abcdef',
+        familyName: 'Familie Test',
+      );
+      s.guest.links.initial = link;
+      await _pump(tester, s.guest);
+
+      expect(find.byType(RadioGroup<bool>), findsNothing, reason: '„Erweitert“ bleibt zugeklappt, weil nichts Besonderes gewählt wurde');
+      await _tap(tester, 'Erweitert');
+      expect(tester.widget<RadioGroup<bool>>(find.byType(RadioGroup<bool>)).groupValue, isFalse);
+      expect(find.widgetWithText(TextField, 'Adresse des Anbieters'), findsNothing);
+      expect(find.text('matrix.org (empfohlen)'), findsOneWidget);
+    });
+
+    testWidgets('TP-JOIN-12 Anmelden mit bestehendem Konto: Link kommt erst auf der Anmeldeseite an → Server aus dem Link, am Ende die Familie', (tester) async {
+      final s = await _annaInvites();
+      await _pump(tester, s.guest);
+      await _tap(tester, 'Ich habe schon ein Konto');
+      expect(find.widgetWithText(TextField, 'Adresse des Anbieters'), findsNothing, reason: 'vorher der Standardanbieter');
+
+      s.guest.links.controller.add(s.link);
+      await tester.pumpAndSettle();
+      expect(find.text('Dein Konto liegt bei fake.test.'), findsOneWidget, reason: 'Anmeldung beim Server aus dem Link');
+      expect(tester.widget<TextField>(find.widgetWithText(TextField, 'Adresse des Anbieters')).controller!.text, 'fake.test');
+
+      await tester.enterText(find.widgetWithText(TextField, 'Benutzername'), 'ben');
+      await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'geheim456');
+      await tester.pumpAndSettle();
+      await _tap(tester, 'Anmelden');
+      expect(s.guest.gateway.userId, '@ben:fake.test');
+      await _emergencyKey(tester);
+
+      expect(find.text('Du trittst der Familie „Familie Test“ bei. Eingeladen hat dich Anna (Konto bei fake.test).'), findsOneWidget, reason: 'die Familie aus dem Link wird am Ende angeboten');
+      await _tap(tester, 'Beitritt anfragen');
+      expect(s.anna.gateway.family!.requests.single.displayName, 'Ben');
+    });
+
     testWidgets('Issue #6: Familie auf Server im Heimnetz (Name ohne Punkt) – Beitritt vor der Anmeldung mit Warnung', (tester) async {
       final server = FakeMatrixServer(host: 'nas')
         ..addAccount('anna', 'geheim123', displayName: 'Anna');
@@ -190,7 +250,7 @@ void main() {
       await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), 'Hier ist er: <${s.link.replaceAll('&', '&amp;')}>.');
       await _tap(tester, 'Weiter');
       expect(find.text('Dein Konto liegt bei fake.test.'), findsOneWidget);
-      expect(s.guest.services.settings.settings.pendingInvite, startsWith('familynexus://join?v=2&'), reason: 'bereinigt vorgemerkt');
+      expect(s.guest.services.settings.settings.pendingInvite, startsWith('familynexus://join?v=3&'), reason: 'bereinigt vorgemerkt');
     });
 
     testWidgets('TP-JOIN-03 Link geöffnet, obwohl bereits in einer Familie: Hinweis, nichts vorgemerkt', (tester) async {

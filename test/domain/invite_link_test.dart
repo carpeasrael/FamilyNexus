@@ -43,11 +43,17 @@ void main() {
     final bad = <String, String>{
       'anderes Schema': good.replaceFirst('familynexus', 'https'),
       'anderer Host': good.replaceFirst('//join', '//evil'),
-      'Version 3': good.replaceFirst('v=2', 'v=3'),
-      'Version fehlt': good.replaceFirst('v=2&', ''),
-      'Version 1 mit Familienname': '${good.replaceFirst('v=2', 'v=1')}&f=Familie',
+      'Version 4': good.replaceFirst('v=3', 'v=4'),
+      'Version fehlt': good.replaceFirst('v=3&', ''),
+      'Version 1 mit Familienname': '${good.replaceFirst('v=3', 'v=1')}&f=Familie',
+      'Version 2 mit Konto-Server': good.replaceFirst('v=3', 'v=2'),
+      'Konto-Server fehlt (Version 3)': good.replaceFirst(RegExp(r'srv=[^&]*&'), ''),
+      'Konto-Server ungültig': good.replaceFirst(RegExp(r'srv=[^&]*'), 'srv=a%20b'),
+      'Konto-Server mit Pfad': good.replaceFirst(RegExp(r'srv=[^&]*'), 'srv=evil.example%2Fx'),
+      'Konto-Server doppelt': '\$good&srv=evil.example',
+      'Konto-Server im Heimnetz': good.replaceFirst(RegExp(r'srv=[^&]*'), 'srv=192.168.0.2'),
       'doppelter Familienname': '$good&f=A&f=B',
-      'unbekanntes Feld in Version 2': '$good&hs=https%3A%2F%2Fevil.example',
+      'unbekanntes Feld in Version 3': '$good&hs=https%3A%2F%2Fevil.example',
       'Raum fehlt': good.replaceFirst('room=%21abc123%3Amatrix.org&', ''),
       'zusätzliches Feld': '$good&x=1',
       'doppelter Parameter': '$good&exp=1',
@@ -92,8 +98,8 @@ void main() {
     expect(InviteLink.tryParse('  ${make()}\n', now: now), isNotNull);
   });
 
-  group('Version 2 (E-56): Namen für Neulinge', () {
-    String v2({String? family = 'Familie Müller', String? by = 'Anna'}) => InviteLink.create(
+  group('Version 3 (E-56, E-63): Namen und Konto-Server für Neulinge', () {
+    String v3({String? family = 'Familie Müller', String? by = 'Anna'}) => InviteLink.create(
           roomId: '!abc123:matrix.org',
           via: 'matrix.org',
           inviter: '@mod:matrix.org',
@@ -104,8 +110,8 @@ void main() {
         );
 
     test('TP-INV-01 Roundtrip mit Familien- und Einladendenname', () {
-      final s = v2();
-      expect(s, contains('v=2'));
+      final s = v3();
+      expect(s, contains('v=3'));
       final l = InviteLink.tryParse(s, now: now)!;
       expect(l.familyName, 'Familie Müller');
       expect(l.inviterName, 'Anna');
@@ -121,13 +127,58 @@ void main() {
       expect(l.isValidAt(now), isTrue);
     });
 
+    test('TP-INV-07 Konto-Server (srv): Standard ist der Server des Einladenden, ein anderer wird ausdrücklich übernommen', () {
+      final same = InviteLink.tryParse(v3(), now: now)!;
+      expect(same.accountServer, 'matrix.org');
+      expect(v3(), contains('srv=matrix.org'));
+
+      final other = InviteLink.create(
+        roomId: '!abc123:matrix.org',
+        via: 'matrix.org',
+        inviter: '@mod:matrix.org',
+        now: now,
+        nonce: nonce,
+        accountServer: 'familie.example:8448',
+      );
+      final l = InviteLink.tryParse(other, now: now)!;
+      expect(l.accountServer, 'familie.example:8448');
+      expect(l.inviterServer, 'matrix.org', reason: 'Einladender und Konto-Server sind getrennte Angaben');
+    });
+
+    test('TP-INV-08 Links der Version 2 bleiben gültig; Konto-Server ist dann der des Einladenden', () {
+      final exp = now.add(const Duration(hours: 24)).millisecondsSinceEpoch ~/ 1000;
+      final v2 = 'familynexus://join?v=2&room=%21abc123%3Aclan.example&via=clan.example&inv=%40mod%3Aclan.example&exp=$exp&n=$nonce&f=Clan&by=Mo';
+      final l = InviteLink.tryParse(v2, now: now)!;
+      expect(l.accountServer, 'clan.example');
+      expect(InviteLink.check(v2, now: now).ok, isTrue);
+    });
+
+    test('TP-INV-09 Konto-Server im Heimnetz: nur der eigene beim Erzeugen, ohne Prüfung nur über check', () {
+      String make({String? own}) => InviteLink.create(
+            roomId: '!a:nas',
+            via: 'nas',
+            inviter: '@mod:nas',
+            now: now,
+            nonce: nonce,
+            ownHost: own,
+          );
+      expect(() => make(), throwsArgumentError, reason: 'fremder Heimnetz-Server darf nicht in einen Link');
+      final s = make(own: 'nas');
+      expect(InviteLink.tryParse(s, now: now), isNull, reason: 'ohne eigenen Server nicht still annehmen');
+      expect(InviteLink.tryParse(s, now: now, ownHost: 'nas')!.accountServer, 'nas');
+      final c = InviteLink.check(s, now: now);
+      expect(c.ok, isTrue);
+      expect(c.link!.accountServer, 'nas');
+      expect(InviteLink.isLocalServer(c.link!.accountServer), isTrue, reason: 'Oberfläche fragt vor dem Verbinden nach');
+    });
+
     test('TP-INV-04 Namen werden bereinigt und begrenzt; leere Namen entfallen', () {
-      final l = InviteLink.tryParse(v2(family: '\u202Egefährlich\u0000 ${'x' * 80}', by: '   '), now: now)!;
+      final l = InviteLink.tryParse(v3(family: '\u202Egefährlich\u0000 ${'x' * 80}', by: '   '), now: now)!;
       expect(l.familyName!.contains('\u202E'), isFalse);
       expect(l.familyName!.contains('\u0000'), isFalse);
       expect(l.familyName!.runes.length, lessThanOrEqualTo(InviteLink.maxNameLength));
       expect(l.inviterName, isNull);
-      expect(v2(family: null, by: null), isNot(contains('f=')));
+      expect(v3(family: null, by: null), isNot(contains('f=')));
     });
 
     test('TP-INV-06 Link mit langen Namen passt in die Längengrenze (QR lesbar)', () {
@@ -159,7 +210,7 @@ void main() {
     });
 
     test('R14 Schreibweise wird vereinheitlicht (Schema in Kleinbuchstaben) und bleibt lesbar', () {
-      final raw = v2().replaceFirst('familynexus', 'FamilyNexus');
+      final raw = v3().replaceFirst('familynexus', 'FamilyNexus');
       expect(InviteLink.tryParse(raw, now: now), isNotNull);
       final n = InviteLink.normalized(' $raw ');
       expect(n, startsWith('familynexus://join?'));
