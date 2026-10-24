@@ -256,7 +256,8 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           Padding(
             padding: const EdgeInsets.all(8),
-            child: Row(children: <Widget>[
+            // Anhängen und Senden gehören zum Eingabefeld: die Tastatur bleibt dabei offen.
+            child: TextFieldTapRegion(child: Row(children: <Widget>[
               IconButton(tooltip: l.chatAttach, icon: const Icon(Icons.attach_file), onPressed: () => _attach(services)),
               Expanded(
                 child: TextField(
@@ -276,7 +277,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 icon: const Icon(Icons.send),
                 onPressed: _sending ? null : () => _send(g),
               ),
-            ]),
+            ])),
           ),
         ]);
       },
