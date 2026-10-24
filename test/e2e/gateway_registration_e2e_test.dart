@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:family_nexus/core/platform_info.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/domain/family.dart';
@@ -67,7 +68,7 @@ void main() {
       // TP-REG-11 Anzeigename beim Anbieter, TP-DEV-01 Gerätename statt „FamilyNexus Android“.
       expect(await _profileName(g.userId!), 'Erika E2E');
       await g.refreshSecurity();
-      expect(g.devices.singleWhere((d) => d.isCurrent).name, 'FamilyNexus Linux');
+      expect(g.devices.singleWhere((d) => d.isCurrent).name, PlatformInfo.deviceName);
     });
 
     test('TP-E2E-02 lokale Prüfungen vor dem Senden: ungültiger Name, zu kurzes Passwort', () async {
