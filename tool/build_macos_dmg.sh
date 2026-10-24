@@ -19,12 +19,21 @@ team=$(sed -n '/<key>teamID<\/key>/{n;s/.*<string>\(.*\)<\/string>.*/\1/p;}' mac
 archive=build/macos/FamilyNexus-DeveloperID.xcarchive
 export_dir=build/macos/export-developer-id
 rm -rf "$archive" "$export_dir"
+# Hardened Runtime schaltet die Bibliotheksvalidierung ein: Frameworks müssen dann vom selben Team signiert sein. Beim
+# Developer-ID-Export signiert Xcode alles mit demselben Team neu. Das unsignierte Test-DMG hat nur Ad-hoc-Signaturen
+# ohne Team, dort bräche dyld beim Start mit „Library not loaded: FMDB.framework … different Team IDs“ ab (E-62).
+runtime=YES
+[ "${1:-}" = "--unsigned" ] && runtime=NO
 xcodebuild -workspace macos/Runner.xcworkspace -scheme Runner -configuration Release -archivePath "$archive" \
   CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="-" PROVISIONING_PROFILE_SPECIFIER="" DEVELOPMENT_TEAM="$team" \
-  ENABLE_HARDENED_RUNTIME=YES archive
+  ENABLE_HARDENED_RUNTIME=$runtime archive
 if [ "${1:-}" = "--unsigned" ]; then
   app="$archive/Products/Applications/FamilyNexus.app"
   dmg="build/macos/dmg/FamilyNexus-v${version}-macos-unsigned.dmg"
+  # Ohne Hardened Runtime, sonst startet die App nicht (siehe oben); Fehler früh statt beim Nutzer.
+  details=$(codesign -d -vv "$app" 2>&1)
+  ! grep -q 'flags=.*runtime' <<<"$details" \
+    || { echo "FEHLER: Das unsignierte DMG darf keine Hardened Runtime tragen (App startet sonst nicht)." >&2; exit 1; }
 else
   auth=()
   if [ -n "${ASC_KEY_PATH:-}" ]; then
