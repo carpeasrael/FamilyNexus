@@ -98,7 +98,12 @@ class TaskRule {
   }
 
   /// Schlüssel der aktuellen Periode zum Zeitpunkt [instant] in [loc].
-  String key(tz.Location loc, DateTime instant) => keyForDate(TaskPeriod.localDate(loc, instant))!;
+  /// Außerhalb des gültigen Datumsbereichs (2000–2100, z. B. falsch gestellte Geräteuhr) wird das
+  /// Datum selbst verwendet, statt abzustürzen (Review R7).
+  String key(tz.Location loc, DateTime instant) {
+    final date = TaskPeriod.localDate(loc, instant);
+    return keyForDate(date) ?? date;
+  }
 
   /// Beginn der Periode, in die der Tag [d] (UTC-Mitternacht) fällt: letzter Erneuerungstag ≤ [d].
   DateTime startOf(DateTime d) {

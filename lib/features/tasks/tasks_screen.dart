@@ -434,6 +434,12 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
       _toast(context, l.tasksInvalid);
       return;
     }
+    // Das Eingabefeld zählt Zeichen, wie man sie sieht; gespeichert wird nach Unicode-Zeichen begrenzt
+    // (Emoji mit Hautfarbe zählen doppelt). Eigene Meldung statt „Titel, Person und Punkte angeben“.
+    if (_description.text.trim().runes.length > TaskList.maxDescription) {
+      _toast(context, l.tasksDescriptionTooLong);
+      return;
+    }
     setState(() => _busy = true);
     final nav = Navigator.of(context);
     try {

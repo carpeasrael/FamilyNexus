@@ -42,6 +42,9 @@ void main() {
       expect(_list(description: 'x' * (TaskList.maxDescription + 1)).validate(), contains('description'));
       expect(_list(description: 'Text\u202Eversteckt').validate(), contains('description'));
       expect(_list(description: 'Tab\tim Text').validate(), contains('description'));
+      // Review R2: zusammengesetzte Emojis (ZWJ) und ZWNJ sind erlaubt.
+      expect(_list(description: 'Für die ganze 👨‍👩‍👧 ❤️‍🔥').validate(), isEmpty);
+      expect(_list(description: 'می\u200Cخواهم').validate(), isEmpty);
       expect(_list(description: 'Rest', deleted: true).validate(), contains('tombstone'));
     });
 
@@ -90,6 +93,16 @@ void main() {
         'v2 Erklärung kein Text': <String, Object?>{...v2, 'note': 5},
         'v2 Erklärung zu lang': <String, Object?>{...v2, 'note': 'x' * 1001},
         'Version 3': <String, Object?>{...v2, 'v': 3},
+        'v2 mit bisheriger Regel ohne Erklärung (mehrdeutig, R4)': <String, Object?>{
+          ...v2,
+          'interval': 'daily',
+          'rule': const TaskRule.everyDay().toJson(),
+          'note': '',
+        },
+        'v2 unbekanntes Feld in der Regel': <String, Object?>{
+          ...v2,
+          'rule': <String, Object?>{'kind': 'weekly', 'weekday': 3, 'every': 2},
+        },
       };
       bad.forEach((name, c) => expect(TaskCodec.decodeList(c, sender: kAnna), isNull, reason: name));
     });
@@ -158,7 +171,7 @@ void main() {
       expect(TaskProgress.doneNow(list, await store.log(), now), isEmpty);
     });
 
-    test('Ändern der Regel: Erledigungen der alten Periode zählen nicht für die neue', () async {
+    test('Ändern der Regel: andere Periode beginnt leer, der Verlauf bleibt vollständig (R5/R6)', () async {
       final now = DateTime.utc(2026, 10, 24, 10);
       final store = MemoryTaskStore();
       final s = TaskService(store: store, myUserId: kAnna, isModerator: (_) => true, clock: () => now);
@@ -175,7 +188,53 @@ void main() {
       expect(changed.rule, const TaskRule.weekly(DateTime.wednesday));
       expect(changed.description, 'Nur bei Trockenheit');
       expect(changed.items.single.id, list.items.single.id, reason: 'Punkte behalten ihre ID');
-      expect(TaskProgress.doneNow(changed, await store.log(), now), isEmpty);
+      expect(TaskProgress.doneNow(changed, await store.log(), now), isEmpty, reason: 'Samstag ≠ Periode ab Mittwoch');
+      expect(TaskProgress.history(changed, await store.log()), hasLength(1), reason: 'Verlauf zeigt auch alte Einträge');
+    });
+
+    test('Ändern der Regel bei gleichem Schlüssel: Erledigtes bleibt erledigt (täglich → Mo–Fr an einem Werktag)', () async {
+      final now = DateTime.utc(2026, 10, 22, 10); // Donnerstag
+      final store = MemoryTaskStore();
+      final s = TaskService(store: store, myUserId: kAnna, isModerator: (_) => true, clock: () => now);
+      final list = await s.createList(title: 'Garten', assignee: kAnna, timeZone: 'Europe/Berlin', items: <String>['Gießen']);
+      await s.complete(list.id, list.items.single.id);
+      final changed = await s.updateList(list.id, title: 'Garten', assignee: kAnna, rule: const TaskRule.weekdays(), items: <String>['Gießen']);
+      expect(TaskProgress.doneNow(changed, await store.log(), now), hasLength(1));
+    });
+
+    test('R1: Löschmarke einer v2-Liste wird als v1 gesendet (ältere Versionen sehen das Löschen)', () async {
+      final store = MemoryTaskStore();
+      final s = TaskService(store: store, myUserId: kAnna, isModerator: (_) => true, clock: () => DateTime.utc(2026, 10, 24));
+      final list = await s.createList(
+        title: 'Hausaufgaben',
+        assignee: kAnna,
+        rule: const TaskRule.weekdays(),
+        description: 'Vor dem Essen',
+        timeZone: 'Europe/Berlin',
+        items: <String>['Hefte'],
+      );
+      expect(TaskCodec.encodeList(list)['v'], 2);
+      await s.deleteList(list.id);
+      final tomb = (await store.getList(list.id))!;
+      expect(tomb.deleted, isTrue);
+      final c = TaskCodec.encodeList(tomb);
+      expect(c['v'], 1);
+      expect(c['interval'], 'daily');
+    });
+
+    test('R8: Ändern ohne Angabe der Erklärung behält sie', () async {
+      final store = MemoryTaskStore();
+      final s = TaskService(store: store, myUserId: kAnna, isModerator: (_) => true, clock: () => DateTime.utc(2026, 10, 24));
+      final list = await s.createList(title: 'A', assignee: kAnna, description: 'bleibt', timeZone: 'UTC', items: <String>['x']);
+      final changed = await s.updateList(list.id, title: 'B', assignee: kAnna, items: <String>['x']);
+      expect(changed.description, 'bleibt');
+    });
+
+    test('R2: einzelnes \\r beim Einfügen wird zum Zeilenumbruch', () async {
+      final store = MemoryTaskStore();
+      final s = TaskService(store: store, myUserId: kAnna, isModerator: (_) => true, clock: () => DateTime.utc(2026, 10, 24));
+      final list = await s.createList(title: 'A', assignee: kAnna, description: 'Zeile 1\rZeile 2', timeZone: 'UTC', items: <String>['x']);
+      expect(list.description, 'Zeile 1\nZeile 2');
     });
   });
 }

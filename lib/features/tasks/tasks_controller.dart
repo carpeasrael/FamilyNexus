@@ -116,7 +116,8 @@ class TasksController extends ChangeNotifier {
   DateTime? nextReset(TaskList list) {
     final loc = TimeZones.tryGet(list.timeZone);
     if (loc == null) return null;
-    final today = TaskPeriod.parseDate(TaskPeriod.localDate(loc, now))!;
+    final today = TaskPeriod.parseDate(TaskPeriod.localDate(loc, now));
+    if (today == null) return null;
     return list.rule.nextStartAfter(DateTime.utc(today.y, today.m, today.d));
   }
 
@@ -144,7 +145,7 @@ class TasksController extends ChangeNotifier {
     required String title,
     required String assignee,
     required TaskRule rule,
-    String description = '',
+    String? description,
     required List<String> items,
   }) async {
     await service.updateList(id, title: title, assignee: assignee, rule: rule, description: description, items: items);

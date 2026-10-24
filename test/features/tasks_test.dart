@@ -155,6 +155,30 @@ void main() {
     expect((await app.taskStore.lists()).single.rule, const TaskRule.monthlyByDate(31));
   });
 
+  testWidgets('Review R9: bestehende Liste (wöchentlich, v1) unverändert gespeichert bleibt v1', (tester) async {
+    _tall(tester);
+    final app = await buildTestApp(clock: () => DateTime.utc(2026, 10, 24, 8));
+    await _open(tester, app);
+    await app.services.tasks!.create(
+      title: 'Wochenputz',
+      assignee: app.gateway.userId!,
+      rule: TaskRule.fromInterval(TaskInterval.weekly),
+      items: <String>['Bad'],
+    );
+    await _openTasks(tester);
+    await tester.tap(find.text('Wochenputz'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Wöchentlich am Montag'), findsOneWidget);
+    await tester.tap(find.byTooltip('Aufgabenliste bearbeiten'));
+    await tester.pumpAndSettle();
+    expect(find.text('Montag'), findsOneWidget, reason: 'Editor zeigt die bisherige Regel');
+    await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+    await tester.pumpAndSettle();
+    final saved = (await app.taskStore.lists()).single;
+    expect(saved.version, 2);
+    expect(TaskCodec.encodeList(saved)['v'], 1);
+  });
+
   testWidgets('Mitglied ohne Moderatorenrecht: kein Anlegen; zugewiesene Liste kann abgehakt werden, fremde nicht', (tester) async {
     _tall(tester);
     final now = DateTime.utc(2026, 10, 22, 8);

@@ -31,7 +31,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 
 ## Bekannte Einschränkungen
 
-- **Aufgabenlisten mit neuen Regeln oder Erklärung (E-58)** sind für App-Versionen vor dieser Änderung unsichtbar (Format v2); umgestellte Listen bleiben dort auf der letzten v1-Fassung stehen.
+- **Aufgabenlisten mit neuen Regeln oder Erklärung (E-58)** sind für App-Versionen vor dieser Änderung unsichtbar (Format v2); umgestellte Listen bleiben dort auf der letzten v1-Fassung stehen. Bearbeitet ein Moderator mit älterer App eine umgestellte Liste, gehen Regel und Erklärung verloren.
 
 - **Einrichtung (E-55–E-57):** Zusatzschritte „Bedingungen“ und „kein Roboter“ (reCAPTCHA) sind nur gegen den Fake geprüft;
   der lokale Test-Synapse verlangt sie nicht. Die OAuth-Anmeldung (matrix.org) ist automatisch nur gegen den Fake geprüft,

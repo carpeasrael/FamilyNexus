@@ -3805,6 +3805,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Nächster Neustart: {date}'**
   String tasksNextReset(String date);
+
+  /// No description provided for @tasksDescriptionTooLong.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Erklärung ist zu lang. Bitte kürze sie etwas.'**
+  String get tasksDescriptionTooLong;
 }
 
 class _AppLocalizationsDelegate

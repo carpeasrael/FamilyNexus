@@ -1347,5 +1347,6 @@
         "type": "String"
       }
     }
-  }
+  },
+  "tasksDescriptionTooLong": "Die Erklärung ist zu lang. Bitte kürze sie etwas."
 }

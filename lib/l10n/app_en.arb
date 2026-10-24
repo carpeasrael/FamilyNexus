@@ -1341,5 +1341,6 @@
         "type": "String"
       }
     }
-  }
+  },
+  "tasksDescriptionTooLong": "The description is too long. Please shorten it a little."
 }
