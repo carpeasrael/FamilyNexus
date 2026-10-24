@@ -186,8 +186,7 @@ class _SecurityPanelState extends State<SecurityPanel> {
   }
 
   Widget _setupView(AppLocalizations l) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-        Semantics(header: true, child: Text(l.keyTitle, style: Theme.of(context).textTheme.titleLarge)),
-        const SizedBox(height: 8),
+        // Überschrift steht in der Titelleiste der Einrichtung.
         Text(l.keyIntro),
         if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error))),
         const SizedBox(height: 12),
@@ -208,8 +207,6 @@ class _SecurityPanelState extends State<SecurityPanel> {
     final t = AuroraTokens.of(context);
     final key = _recoveryKey!;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      Semantics(header: true, child: Text(l.keyTitle, style: Theme.of(context).textTheme.titleLarge)),
-      const SizedBox(height: 8),
       Text(l.keyShownIntro),
       const SizedBox(height: 12),
       Container(
@@ -252,8 +249,6 @@ class _SecurityPanelState extends State<SecurityPanel> {
   Widget _restoreView(AppLocalizations l, MatrixGateway g) {
     final others = g.devices.where((d) => !d.isCurrent).toList();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      Semantics(header: true, child: Text(l.keyRestoreTitle, style: Theme.of(context).textTheme.titleLarge)),
-      const SizedBox(height: 8),
       Text(l.keyRestoreIntro),
       const SizedBox(height: 12),
       if (others.isEmpty)

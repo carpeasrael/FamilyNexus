@@ -264,9 +264,8 @@ class _FamilyStepState extends State<FamilyStep> {
     final theme = Theme.of(context);
     final inviter = link.inviterName ?? MatrixIds.localpart(link.inviter);
     final family = link.familyName;
+    // Überschrift „Familie beitreten“ steht in der Titelleiste der Einrichtung.
     return <Widget>[
-      Semantics(header: true, child: Text(l.joinCardTitle, style: theme.textTheme.titleMedium)),
-      const SizedBox(height: 8),
       Text(family == null ? l.joinCardBodyNoName(inviter) : l.joinCardBody(family, inviter)),
       const SizedBox(height: 8),
       Text(l.joinCardNote(inviter), style: theme.textTheme.bodySmall),

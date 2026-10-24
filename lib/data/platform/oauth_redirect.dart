@@ -89,19 +89,21 @@ class LoopbackOAuthRedirect implements OAuthRedirect {
     cancel();
     final server = _server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     final done = _done = Completer<Uri?>();
-    server.listen((req) {
+    server.listen((req) async {
       if (req.method != 'GET' || req.uri.path != '/oauth' || done.isCompleted) {
         req.response.statusCode = HttpStatus.notFound;
-        req.response.close().ignore();
+        await req.response.close().catchError((Object _) {});
         return;
       }
+      final callback = Uri(scheme: 'http', host: '127.0.0.1', port: server.port, path: '/oauth', query: req.uri.query);
       req.response
         ..statusCode = HttpStatus.ok
         ..headers.contentType = ContentType.html
         ..headers.set('cache-control', 'no-store')
         ..write(_page);
-      req.response.close().ignore();
-      done.complete(Uri(scheme: 'http', host: '127.0.0.1', port: server.port, path: '/oauth', query: req.uri.query));
+      // Erst die Seite vollständig ausliefern, dann melden (sonst schließt der Empfänger zu früh).
+      await req.response.close().catchError((Object _) {});
+      if (!done.isCompleted) done.complete(callback);
     }, onError: (Object e) => AppLog.w('oauth', 'Rücksprung-Empfänger meldet einen Fehler'));
     return Uri(scheme: 'http', host: '127.0.0.1', port: server.port, path: '/oauth');
   }

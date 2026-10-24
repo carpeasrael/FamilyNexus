@@ -100,10 +100,10 @@ class _RegistrationStageViewState extends State<RegistrationStageView> with Widg
           Text(l.regEmailSent(_email.text.trim())),
           if (notConfirmedYet) ...<Widget>[const SizedBox(height: 8), Semantics(liveRegion: true, child: Text(l.regEmailNotYet, style: err))],
           const SizedBox(height: 12),
-          Wrap(alignment: WrapAlignment.end, spacing: 8, runSpacing: 8, children: <Widget>[
-            TextButton(onPressed: busy ? null : _sendEmail, child: Text(l.regEmailResend)),
-            FilledButton(onPressed: busy ? null : () => widget.onInput(const EmailConfirmed()), child: Text(l.regEmailConfirmed)),
-          ]),
+          // Hauptaktion zuerst und in voller Breite, Nebenaktion darunter.
+          FilledButton(onPressed: busy ? null : () => widget.onInput(const EmailConfirmed()), child: Text(l.regEmailConfirmed)),
+          const SizedBox(height: 8),
+          TextButton(onPressed: busy ? null : _sendEmail, child: Text(l.regEmailResend)),
         ],
       TokenStage(:final wrong) => <Widget>[
           Text(l.regTokenBody),
@@ -124,22 +124,21 @@ class _RegistrationStageViewState extends State<RegistrationStageView> with Widg
           Text(l.regCaptchaBody),
           if (notDoneYet) ...<Widget>[const SizedBox(height: 8), Semantics(liveRegion: true, child: Text(l.regCaptchaNotYet, style: err))],
           const SizedBox(height: 12),
-          Wrap(alignment: WrapAlignment.end, spacing: 8, runSpacing: 8, children: <Widget>[
-            OutlinedButton(onPressed: busy ? null : () => widget.onInput(const CaptchaDone()), child: Text(l.regCaptchaDone)),
-            FilledButton.icon(
-              icon: const Icon(Icons.open_in_new, size: 18),
-              onPressed: busy
-                  ? null
-                  : () {
-                      _captchaOpened = true;
-                      _open(page);
-                    },
-              label: Text(l.regCaptchaOpen),
-            ),
-          ]),
+          FilledButton.icon(
+            icon: const Icon(Icons.open_in_new, size: 18),
+            onPressed: busy
+                ? null
+                : () {
+                    _captchaOpened = true;
+                    _open(page);
+                  },
+            label: Text(l.regCaptchaOpen),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton(onPressed: busy ? null : () => widget.onInput(const CaptchaDone()), child: Text(l.regCaptchaDone)),
         ],
     };
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
       Semantics(header: true, child: Text(l.regExtraTitle, style: theme.textTheme.titleMedium)),
       const SizedBox(height: 8),
       ...body,
