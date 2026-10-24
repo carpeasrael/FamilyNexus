@@ -1,9 +1,5 @@
-New in 1.1.0:
-• Simple setup without technical terms: start a family, get invited or sign in.
-• Create your account in the app (matrix.org via its page).
-• Invitation links take newcomers straight to joining, with clear messages when a link does not fit. Choose how long a link is valid: 1, 3 or 7 days.
-• Making members moderators now works reliably, even several in a row.
-• Emergency key: clearly explained, copyable, savable as a file.
-• Tasks: description and repeats such as Mon–Fri, on Wednesdays, the 2nd Tuesday or the 20th.
-• iPhone: the keyboard closes when you tap outside.
+New in 1.1.1:
+• Invitation links: clear messages when a link does not fit (e.g. expired or incomplete); links pasted from emails are recognised better.
+• Choose how long an invitation link is valid: 1, 3 or 7 days.
+• Making members moderators now works reliably, even several in a row (before, "You don't have permission" could appear).
 Please update all devices in your family.

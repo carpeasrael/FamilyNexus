@@ -1,8 +1,5 @@
-Neu in 1.1.0:
-• Einfache Einrichtung: Familie gründen, eingeladen werden oder anmelden.
-• Konto direkt in der App anlegen.
-• Einladungslink mit klaren Meldungen, 1, 3 oder 7 Tage gültig.
-• Moderator ernennen klappt zuverlässig.
-• Notfall-Schlüssel kopierbar oder als Datei.
-• Aufgaben mit Erklärung und Wiederholung (z. B. Mo–Fr, am 2. Dienstag).
+Neu in 1.1.1:
+• Einladungslinks: klare Meldungen, wenn ein Link nicht passt; Links aus E-Mails werden besser erkannt.
+• Gültigkeit wählbar: 1, 3 oder 7 Tage.
+• Moderator ernennen klappt auch mehrmals hintereinander zuverlässig.
 Bitte alle Geräte der Familie aktualisieren.
