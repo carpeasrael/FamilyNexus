@@ -7,6 +7,7 @@ import '../features/lock/lock_gate.dart';
 import '../features/shell/app_root.dart';
 import '../l10n/gen/app_localizations.dart';
 import '../ui/theme/app_theme.dart';
+import '../ui/widgets/dismiss_keyboard.dart';
 import '../ui/widgets/glass.dart';
 import 'app_services.dart';
 
@@ -68,6 +69,8 @@ class _FamilyNexusAppState extends State<FamilyNexusApp> {
               AppThemeMode.dark => ThemeMode.dark,
               AppThemeMode.light => ThemeMode.light,
             },
+            // Wischen in Listen schließt die Bildschirmtastatur (iOS hat keine Taste zum Ausblenden, Issue #2).
+            scrollBehavior: const MaterialScrollBehavior().copyWith(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag),
             builder: (context, child) {
               // Systemleisten passend zum Design: helle Symbole auf dunklem, dunkle auf hellem Grund.
               final dark = Theme.of(context).brightness == Brightness.dark;
@@ -76,7 +79,9 @@ class _FamilyNexusAppState extends State<FamilyNexusApp> {
                   statusBarColor: Colors.transparent,
                   systemNavigationBarColor: Colors.transparent,
                 ),
-                child: AuroraBackground(child: LockGate(child: child ?? const SizedBox.shrink())),
+                child: DismissKeyboardOnTapOutside(
+                  child: AuroraBackground(child: LockGate(child: child ?? const SizedBox.shrink())),
+                ),
               );
             },
             home: const AppRoot(),
