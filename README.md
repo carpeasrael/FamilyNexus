@@ -12,8 +12,13 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
 
 ## Features (status: phases 1–6 implemented)
 
-- **Setup** in four steps: language → server (public default preselected, custom server possible) → sign-in with an
-  existing account + mandatory key backup → create or join a family.
+- **Setup without technical terms** (E-55–E-57): three entry points – *start a new family*, *I was invited*, *I already
+  have an account*. Accounts are created in the app (username suggested from your name, availability checked live; terms,
+  email confirmation, invitation codes and captchas are guided) or, on providers with browser sign-in such as matrix.org,
+  on the provider's page with an automatic return to the app. The provider is preselected and checked automatically;
+  changing it is under *Advanced*. An invitation link takes newcomers straight to *create account* at the inviter's
+  provider and then to a join card with names instead of IDs. The mandatory key backup is the **emergency key** (copy with
+  auto-clearing clipboard, or save as a printable file).
 - **Family chat and direct chats** (encrypted): messages, replies, reactions, attachments (validated, never opened
   automatically), offline queue. Direct chats exist for every pair of joined members ("Send message" in the family view
   or via the conversation bar in the chat); invitations from strangers are ignored.
@@ -102,7 +107,9 @@ tool/device_tests.sh             # integration tests on emulator/device (DB encr
 tool/check_permissions.sh        # checks the merged manifest permissions against the allowlist
 ```
 
-Manual walkthrough tests with screenshots and delivered reminders: `integration_test/manual/`.
+Manual walkthrough tests with screenshots and delivered reminders: `integration_test/manual/`. Screenshots of every setup
+step (rendered on the host with the app's fonts): `tool/onboarding_screens.sh` → `build/onboarding_tour/`. Test plan for
+registration, family setup, invitation and joining: `docs/TESTPLAN_ONBOARDING.md`.
 
 Coverage (lines, as of end of phase 5; phase 6 not re-measured): domain 96.6 %, UI (`features`) 86.3 %, design system
 98.3 %; `SdkMatrixGateway` is covered 69.9 % by the end-to-end tests against Synapse (skipped in `flutter test`

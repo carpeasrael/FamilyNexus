@@ -58,12 +58,30 @@ geteilt: Familienraum, privat: nur privater Raum des eigenen Kontos (Geräte-Syn
   → `ShoppingMerge`. Resync: der letzte Bearbeiter sendet seine aktiven Einträge bei neuen Mitgliedern erneut.
 - **Aufgabenlisten (E-51):** `TaskService` (Rechte, Versionen, Grenzen) → `TaskStore` (SQLCipher: Listen + anfügendes Protokoll) → `TaskSync` → Familienraum (`tasklist`, `taskdone`). Der Reset ist abgeleitet: `TaskPeriod` bildet Periodenschlüssel in der Zeitzone der Liste, `TaskProgress` wertet das Protokoll für die laufende Periode aus. Oberfläche: `TasksController`, `TasksScreen`.
 
-## Einladungen (E-49)
-- Link: `InviteLink` (Format v1) + Vermerk `InviteTicket` als verschlüsseltes Raumereignis; `SdkMatrixGateway` führt die
+## Einrichtung und Kontoanlage (E-55–E-57)
+- `features/onboarding/onboarding_screen.dart` ist der Rahmen mit drei Wegen (`OnboardingPath`) und der Schrittanzeige je Weg;
+  die Schritte sind eigene Widgets: `WelcomeStep`, `InviteLinkStep`, `AccountCreateStep` (mit `RegistrationStageView` für
+  Zusatzschritte), `LoginStep`, `SecurityPanel` (Notfall-Schlüssel, meldet `onReady`), `FamilyStep` (`FamilyStepMode`).
+- `ProviderController` (ChangeNotifier) hält den gewählten Anbieter und prüft ihn automatisch (sofort bzw. nach 800 ms
+  Pause bei eigener Eingabe): `MatrixGateway.probeServer` + `registrationOptions`. `ProviderSection` zeigt das Ergebnis und
+  „Erweitert“.
+- Domäne: `domain/registration.dart` (Modus, Zusatzschritte als `sealed`-Typen, Auswahl des Ablaufs, Bedingungen),
+  `domain/username_suggestion.dart`.
+- Daten: `ServerProbe.registrationOptions`/`oauthIssuer`/`checkUsername`; `SdkMatrixGateway.register`/`continueRegistration`
+  (eigene UIA-Schleife, Passwort nur in `_RegistrationSession`), `startOAuth`/`completeOAuth` (SDK-Erweiterungen MSC2964/2966),
+  `setDisplayName`. Plattform: `BrowserLauncher` (nur https), `OAuthRedirect` (Mobil: App-Schema über `LinkSource`, Desktop:
+  Empfänger auf `127.0.0.1`), `features/onboarding/browser_sign_in.dart` verbindet beides.
+- Einladung vor der Anmeldung: `AppRoot` merkt geprüfte Links in `AppSettings.pendingInvite` vor und stellt sie beim Start
+  wieder her; OAuth-Rücksprünge (`AppLinkOAuthRedirect.isCallback`) werden dort nicht als Einladung behandelt.
+
+## Einladungen (E-49, E-56)
+- Link: `InviteLink` (Format v2, liest v1) + Vermerk `InviteTicket` als verschlüsseltes Raumereignis; `SdkMatrixGateway` führt die
   Vermerke der Moderatoren (`_roomTickets`, `_usedTickets`) zusätzlich zu den eigenen Kontodaten und prüft damit
   Beitrittsanfragen (`RequestCheck`). Teilen: QR, Kopieren, `MailLauncher` (`data/platform/mail_launcher.dart`, `url_launcher`).
-- Einrichtung: `FamilyStep` zeigt bei vorhandener Einladung die Einladungskarte statt der Auswahl Gründen/Beitreten; eigene,
-  bestätigte Beitrittsanfragen werden automatisch angenommen.
+- Teilen über `features/family/invite_dialog.dart` (`showInviteDialog`: QR, E-Mail, Kopieren), genutzt von der
+  Familienansicht und von „Jetzt einladen“ nach der Gründung.
+- Einrichtung: `FamilyStep` zeigt bei vorhandener Einladung die Einladungskarte statt der Auswahl Gründen/Beitreten, bei einem
+  vorgemerkten Link die Beitrittskarte; eigene, bestätigte Beitrittsanfragen werden automatisch angenommen.
 
 ## Melden und Blockieren (E-48)
 - `domain/moderation.dart`: `ReportRequest` (Kategorie + bereinigter Freitext → Grundtext), `BlockedUsers` (defensives Lesen,
@@ -82,5 +100,8 @@ geteilt: Familienraum, privat: nur privater Raum des eigenen Kontos (Geräte-Syn
 
 ## Tests
 - `flutter test`: Domäne, Widgets, Sicherheits-, Manifest-, l10n- und Architekturtests (Fake-Gateway).
-- `tool/e2e.sh`: Ende-zu-Ende gegen lokalen Synapse (echtes Gateway, echte Kryptografie).
+- `tool/e2e.sh`: Ende-zu-Ende gegen lokalen Synapse (echtes Gateway, echte Kryptografie), u. a. Kontoanlage und Beitritt
+  eines Neulings (`gateway_registration_e2e_test.dart`).
+- `tool/onboarding_screens.sh`: Bildschirmfotos aller Einrichtungsschritte (`test/manual/`, nur mit `FN_SCREENSHOTS=1`).
+- Testplan für Einrichtung, Einladung und Beitritt: `docs/TESTPLAN_ONBOARDING.md`.
 - `tool/device_tests.sh`: Emulator/Gerät (DB-Verschlüsselung, Keystore, Migration, SDK-Rauchtest, Erinnerungen).

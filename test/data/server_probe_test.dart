@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/server_probe.dart';
+import 'package:family_nexus/domain/registration.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -135,5 +136,113 @@ void main() {
     final info = await probe.probe(_url);
     expect(info.contact, isNull);
     expect(info.supportsPasswordLogin, isFalse);
+  });
+
+  group('Kontoanlage (E-55)', () {
+    const meta = <String, Object>{
+      'issuer': 'https://account.example.org/',
+      'authorization_endpoint': 'https://account.example.org/authorize',
+      'registration_endpoint': 'https://account.example.org/oauth2/registration',
+      'token_endpoint': 'https://account.example.org/oauth2/token',
+    };
+
+    test('TP-OAUTH-01 Anbieter mit OAuth (wie matrix.org): Browser-Weg, Hinweis in der Serverprüfung', () async {
+      final seen = <String>[];
+      final probe = ServerProbe(client: MockClient.streaming((req, body) async {
+        seen.add('${req.method} ${req.url.path}');
+        final routes = <String, (int, Object)>{
+          '/_matrix/client/versions': (200, <String, Object>{'versions': <String>['v1.15']}),
+          '/_matrix/client/v1/auth_metadata': (200, meta),
+        };
+        final r = routes[req.url.path];
+        if (r == null) return http.StreamedResponse(Stream<List<int>>.value(<int>[]), 404);
+        return http.StreamedResponse(Stream<List<int>>.value(utf8.encode(json.encode(r.$2))), r.$1);
+      }));
+      final options = await probe.registrationOptions(_url);
+      expect(options.mode, RegistrationMode.oauth);
+      expect(options.webPage.toString(), 'https://account.example.org/');
+      expect(seen.where((s) => s.startsWith('POST')), isEmpty, reason: 'kein Registrierungsversuch bei OAuth');
+      expect((await probe.probe(_url)).usesOAuth, isTrue);
+    });
+
+    test('unsichere OAuth-Angaben (http) zählen nicht', () async {
+      final probe = ServerProbe(client: _client(<String, (int, Object)>{
+        '/_matrix/client/v1/auth_metadata': (200, <String, Object>{...meta, 'authorization_endpoint': 'http://account.example.org/authorize'}),
+        '/_matrix/client/v3/register': (401, <String, Object>{
+          'session': 's',
+          'flows': <Object>[<String, Object>{'stages': <String>['m.login.dummy']}],
+        }),
+      }));
+      expect((await probe.registrationOptions(_url)).mode, RegistrationMode.inApp);
+    });
+
+    test('Ersatzpfad msc2965 wird gelesen', () async {
+      final probe = ServerProbe(client: _client(<String, (int, Object)>{
+        '/_matrix/client/unstable/org.matrix.msc2965/auth_metadata': (200, meta),
+      }));
+      expect((await probe.registrationOptions(_url)).mode, RegistrationMode.oauth);
+    });
+
+    test('klassische Registrierung: 401 mit unterstützten Abläufen → in der App; Anfrage ohne Zugangsdaten', () async {
+      String? body;
+      final probe = ServerProbe(client: MockClient.streaming((req, stream) async {
+        if (req.url.path == '/_matrix/client/v3/register') {
+          body = await utf8.decodeStream(stream);
+          expect(req.method, 'POST');
+          expect(req.url.queryParameters['kind'], 'user');
+          return http.StreamedResponse(
+            Stream<List<int>>.value(utf8.encode(json.encode(<String, Object>{
+              'session': 'abc',
+              'flows': <Object>[
+                <String, Object>{'stages': <String>['m.login.recaptcha', 'm.login.terms']},
+              ],
+            }))),
+            401,
+          );
+        }
+        return http.StreamedResponse(Stream<List<int>>.value(<int>[]), 404);
+      }));
+      expect((await probe.registrationOptions(_url)).mode, RegistrationMode.inApp);
+      expect(body, '{}', reason: 'weder Benutzername noch Passwort werden gesendet');
+    });
+
+    test('TP-REG-09 abgeschaltet (403) oder nur Telefon → disabled, Hilfeseite des Anbieters', () async {
+      final off = ServerProbe(client: _client(<String, (int, Object)>{
+        '/_matrix/client/v3/register': (403, <String, Object>{'errcode': 'M_FORBIDDEN'}),
+        '/.well-known/matrix/support': (200, <String, Object>{'support_page': 'https://example.org/konto'}),
+      }));
+      final o = await off.registrationOptions(_url);
+      expect(o.mode, RegistrationMode.disabled);
+      expect(o.webPage.toString(), 'https://example.org/konto');
+      final phone = ServerProbe(client: _client(<String, (int, Object)>{
+        '/_matrix/client/v3/register': (401, <String, Object>{
+          'flows': <Object>[<String, Object>{'stages': <String>['m.login.msisdn']}],
+        }),
+      }));
+      expect((await phone.registrationOptions(_url)).mode, RegistrationMode.disabled);
+    });
+
+    test('Benutzername: frei, vergeben, ungültig, Fehler → unbekannt', () async {
+      ServerProbe answer(int status, Object body) => ServerProbe(client: _client(<String, (int, Object)>{
+            '/_matrix/client/v3/register/available': (status, body),
+          }));
+      expect(await answer(200, <String, Object>{'available': true}).checkUsername(_url, 'anna'), UsernameCheck.available);
+      expect(await answer(400, <String, Object>{'errcode': 'M_USER_IN_USE'}).checkUsername(_url, 'anna'), UsernameCheck.taken);
+      expect(await answer(400, <String, Object>{'errcode': 'M_INVALID_USERNAME'}).checkUsername(_url, 'anna'), UsernameCheck.invalid);
+      expect(await answer(429, <String, Object>{'errcode': 'M_LIMIT_EXCEEDED'}).checkUsername(_url, 'anna'), UsernameCheck.unknown);
+      final offline = ServerProbe(client: MockClient((_) => throw http.ClientException('offline')));
+      expect(await offline.checkUsername(_url, 'anna'), UsernameCheck.unknown);
+    });
+
+    test('Abläufe aus der Serverantwort werden begrenzt gelesen', () {
+      final flows = ServerProbe.flowsFrom(<String, Object?>{
+        'flows': <Object?>[
+          for (var i = 0; i < 50; i++) <String, Object?>{'stages': <Object?>['m.login.dummy', 7, 'x' * 100]},
+          'kein-objekt',
+        ],
+      });
+      expect(flows, hasLength(20));
+      expect(flows.first, <String>['m.login.dummy']);
+    });
   });
 }

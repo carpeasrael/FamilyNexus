@@ -787,7 +787,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errReauth => 'Please confirm your password.';
 
   @override
-  String get securityTitle => 'Key backup';
+  String get securityTitle => 'Emergency key and devices';
 
   @override
   String get securityPasswordTitle => 'Confirm password';
@@ -972,7 +972,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onbJoinTab => 'Join';
 
   @override
-  String get onbChangeAccount => 'Sign out';
+  String get onbChangeAccount => 'Use a different account';
 
   @override
   String get lockTitle => 'FamilyNexus is locked';
@@ -1044,7 +1044,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy1Body =>
-      'FamilyNexus is free software (AGPL-3.0). The app sends no data to its developers and contains no telemetry, advertising or analytics. The operator of the Matrix server you choose is responsible for processing on the server; it is shown during setup.';
+      'FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. Responsible for processing on the server is the operator of the provider you chose (Matrix server); it is shown during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that sign you in via the browser (e.g. matrix.org) you enter these details directly on their page.';
 
   @override
   String get privacy2Title => 'What data exists?';
@@ -1086,7 +1086,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy7Body =>
-      'Android backups are switched off. If you deliberately save an attachment with “Save”, the decrypted file lies outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. Messages on other members\' devices cannot technically be force-deleted. Your recovery key is the only way to rescue messages after losing all devices – keep it safe.';
+      'Android backups are disabled. If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the clipboard is cleared after one minute; if you save it as a file, it is stored unencrypted in the location you chose.';
 
   @override
   String get privacy8Title => 'Children';
@@ -1981,9 +1981,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get inviteStepNoLink =>
       'No link? Ask the person inviting you to send you one.';
-
-  @override
-  String get joinCardTitle => 'Join family';
 
   @override
   String joinCardBody(String family, String inviter) {

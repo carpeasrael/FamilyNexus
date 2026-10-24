@@ -12,6 +12,9 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 | Geräte sperren / fremde Sitzungen abmelden | Benötigt Server-Passwortbestätigung (UIA) für Geräteverwaltung; Verifizierungsstatus wird angezeigt. |
 | Konto beim Server löschen | Nur lokale Löschung („Alle lokalen Daten löschen“) und Abmelden; Kontolöschung beim Betreiber selbst. |
 | Serverwechsel mit Migration | Serverwechsel = neu anmelden; Daten migrieren nicht. |
+| Anmeldung im Browser (OAuth) in der Browser-App | Die Web-Version bietet keine OAuth-Rückkehr (Seitenwechsel verliert die Sitzung); dort gibt es Kontoanlage in der App (klassische Anbieter) oder den Weg über die Webseite des Anbieters und die Passwort-Anmeldung (E-55). |
+| Einladungslink als https-Link (App-/Universal-Links) | Mail-Programme machen `familynexus://` oft nicht anklickbar; die Anleitung nennt „Link einfügen“. Ein https-Link bräuchte eine eigene Domain mit signierter Zuordnung (E-56). |
+| Registrierung mit Telefonnummer, SSO-Registrierung | Nicht unterstützte Abläufe führen zum Hinweis „auf der Webseite des Anbieters anlegen“ (E-55). |
 | Verifizierung per QR-Code | Nur Emoji-Vergleich (SAS). |
 | Lokalisierte Emoji-Namen bei der Verifizierung | Emojis werden mit englischen Namen angezeigt (Symbole sind maßgeblich). |
 | EXIF-Entfernung bei Bildern | Anhänge werden unverändert (verschlüsselt) gesendet. |
@@ -26,6 +29,14 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 | Chat-Benachrichtigungen (auch lokal) | Keine; siehe E-16. |
 
 ## Bekannte Einschränkungen
+
+- **Einrichtung (E-55–E-57):** Zusatzschritte „Bedingungen“ und „kein Roboter“ (reCAPTCHA) sind nur gegen den Fake geprüft;
+  der lokale Test-Synapse verlangt sie nicht. Die OAuth-Anmeldung (matrix.org) ist automatisch nur gegen den Fake geprüft,
+  gegen den echten Anbieter manuell (Testplan TP-OAUTH-M1); der OAuth-Rücksprung braucht die Projektseite als `client_uri`.
+  Beendet das System die App während der Anmeldung im Browser, ist die OAuth- bzw. UIA-Sitzung verloren (der Einladungslink
+  bleibt erhalten); es genügt, erneut auf „Konto erstellen“ zu tippen. Ältere App-Versionen lehnen Einladungslinks `v=2`
+  ab. Links von Servern im Heimnetz (IP/localhost) sind vor der Anmeldung nicht lesbar.
+- **SA-8:** Notfall-Schlüssel in Zwischenablage (nach 60 s geleert) bzw. als unverschlüsselte Datei, nur auf ausdrücklichen Tipp.
 
 - **Online-Status (E-38):** Mehrere Geräte desselben Kontos werden einzeln geführt; die Person gilt als online, solange irgendein
   Gerät online meldet. Im Hintergrund oder bei beendeter App gilt man nach 5 Minuten als offline (kein Push, keine

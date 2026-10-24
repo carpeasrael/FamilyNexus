@@ -1403,7 +1403,7 @@ abstract class AppLocalizations {
   /// No description provided for @securityTitle.
   ///
   /// In de, this message translates to:
-  /// **'Schlüsselsicherung'**
+  /// **'Notfall-Schlüssel und Geräte'**
   String get securityTitle;
 
   /// No description provided for @securityPasswordTitle.
@@ -1745,7 +1745,7 @@ abstract class AppLocalizations {
   /// No description provided for @onbChangeAccount.
   ///
   /// In de, this message translates to:
-  /// **'Abmelden'**
+  /// **'Anderes Konto verwenden'**
   String get onbChangeAccount;
 
   /// No description provided for @lockTitle.
@@ -1877,7 +1877,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy1Body.
   ///
   /// In de, this message translates to:
-  /// **'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Verantwortlich für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Matrix-Servers; er wird bei der Einrichtung angezeigt.'**
+  /// **'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Verantwortlich für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server); er steht bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.'**
   String get privacy1Body;
 
   /// No description provided for @privacy2Title.
@@ -1949,7 +1949,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy7Body.
   ///
   /// In de, this message translates to:
-  /// **'Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Wiederherstellungsschlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf.'**
+  /// **'Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, wird die Zwischenablage nach einer Minute geleert; speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.'**
   String get privacy7Body;
 
   /// No description provided for @privacy8Title.
@@ -3427,12 +3427,6 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Kein Link? Bitte die Person, die dich einlädt, dir einen zu schicken.'**
   String get inviteStepNoLink;
-
-  /// No description provided for @joinCardTitle.
-  ///
-  /// In de, this message translates to:
-  /// **'Familie beitreten'**
-  String get joinCardTitle;
 
   /// No description provided for @joinCardBody.
   ///

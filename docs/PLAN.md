@@ -136,6 +136,29 @@ Abnahme 7:
 - [x] Fremdformate, gefälschte Absender, Zeit- und Periodenmanipulation werden verworfen (Pentests)
 - [x] Ende-zu-Ende verschlüsselt im Familienraum; Server sieht keinen Klartext (E2E)
 
+## Phase 8 – Erweiterung: einfache Einrichtung, Kontoanlage, Einladen und Beitreten (2026-10-24)
+
+Auftrag: nutzerfreundlicher, einfacher Ablauf für Registrierung, Einrichtung einer Familie sowie Einladung und Beitritt –
+für Menschen ohne Software-Affinität und ohne Wissen über Matrix; mit Testplänen, die nach der Umsetzung durchgeführt werden.
+Entscheidungen: E-55, E-56, E-57, SA-8. Testplan: `docs/TESTPLAN_ONBOARDING.md`.
+
+| # | Teilaufgabe |
+|---|---|
+| 8.1 | Domäne: Link v2 (`f`, `by`), Registrierungsmodell und Ablaufwahl, Benutzernamen-Vorschlag, neue Fehlerarten |
+| 8.2 | Daten: Serverprüfung (OAuth/UIA), UIA-Schleife, OAuth (MSC2964/2966), Rücksprung je Plattform, Gerätename, Anzeigename, Fake |
+| 8.3 | Oberfläche: drei Wege, Konto erstellen/Anmelden, „Erweitert“, Zusatzschritte, Notfall-Schlüssel, Beitrittskarte, „Jetzt einladen“, Einladungsdialog, Texte de/en |
+| 8.4 | Tests: Unit, Widget (Fake), E2E gegen Synapse, Bildschirmfotos, Testplan mit Ergebnissen |
+| 8.5 | Doku (README, ARCHITEKTUR, ENTSCHEIDUNGEN, OFFEN), Review durch separaten Agenten, Funde beheben |
+
+Abnahme 8:
+- [x] Auf dem normalen Weg erscheinen weder „Matrix“, „Homeserver“ noch IDs der Form `@name:server` (Test TP-L10N-01)
+- [x] Konto in der App anlegen inkl. Bedingungen, E-Mail, Einladungscode, Captcha; abgeschaltete Registrierung führt zur Webseite (Tests)
+- [x] Anbieter mit Browser-Anmeldung: `prompt=create`, nur passender `state` meldet an (Tests)
+- [x] Neuling mit Link: keine Serverfrage, Beitrittskarte mit Namen, ein Tipp zur Anfrage, Link überlebt Neustart (Tests)
+- [x] Notfall-Schlüssel bleibt Pflicht; Kopieren leert die Zwischenablage, Datei enthält Anleitung (Tests)
+- [x] Kontoanlage, Link v2, Anfrage, Bestätigung und Beitritt gegen echten Synapse (E2E)
+- [x] `flutter analyze` sauber, alle Tests grün, Testplan durchgeführt und protokolliert
+
 ## Risiken
 
 | Risiko | Gegenmaßnahme |
