@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/registration.dart';
+import '../../domain/server.dart';
 import '../../domain/username_suggestion.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../common/error_text.dart';
@@ -44,16 +45,34 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
   Timer? _checkTimer;
   int _checkRun = 0;
 
-  late final AppServices _s = AppScope.read(context);
+  late final AppServices _s;
+  ServerUrl? _checkedServer;
+
+  @override
+  void initState() {
+    super.initState();
+    _s = AppScope.read(context);
+    widget.provider.addListener(_onProvider);
+  }
 
   @override
   void dispose() {
+    widget.provider.removeListener(_onProvider);
     _checkTimer?.cancel();
     _name.dispose();
     _user.dispose();
     _pass.dispose();
-    if (_stage != null) _s.gateway.cancelRegistration();
+    // Nichts darf weiterlaufen, wenn der Schritt verlassen wird: Registrierung (samt Passwort) und
+    // Browser-Anmeldung beenden.
+    _s.gateway.cancelRegistration();
+    if (_waitingForBrowser) _s.oauthRedirect?.cancel();
     super.dispose();
+  }
+
+  /// Anderer Anbieter: „frei/vergeben“ galt für den alten und wird neu geprüft.
+  void _onProvider() {
+    final p = widget.provider;
+    if (p.ready && p.server != _checkedServer && _user.text.trim().isNotEmpty) _scheduleCheck();
   }
 
   void _onName(String v) {
@@ -88,6 +107,7 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
   Future<void> _runCheck(String name, int run) async {
     final server = widget.provider.server;
     if (server == null) return;
+    _checkedServer = server;
     final result = await _s.gateway.checkUsername(server, name);
     String? alt;
     if (result == UsernameCheck.taken) {
@@ -150,8 +170,17 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
           if (stage == null) _pass.clear();
           if (mounted) setState(() => _stage = stage);
         } on GatewayException catch (e) {
-          // Endgültig gescheitert (z. B. Name inzwischen vergeben): zurück zum Formular.
-          if (e.error != GatewayError.invalidInput && e.error != GatewayError.rateLimited && e.error != GatewayError.emailInUse) {
+          // Vorübergehend (Netz, Überlastung, Eingabe): Schritt bleibt, erneut versuchen möglich – das
+          // Gateway behält die Registrierung genau in diesen Fällen. Sonst endgültig: zurück zum Formular
+          // und Registrierung samt Passwort verwerfen.
+          const keep = <GatewayError>{
+            GatewayError.invalidInput,
+            GatewayError.rateLimited,
+            GatewayError.emailInUse,
+            GatewayError.serverUnreachable,
+          };
+          if (!keep.contains(e.error)) {
+            _s.gateway.cancelRegistration();
             if (mounted) setState(() => _stage = null);
           }
           rethrow;

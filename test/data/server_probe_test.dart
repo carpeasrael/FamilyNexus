@@ -144,6 +144,7 @@ void main() {
       'authorization_endpoint': 'https://account.example.org/authorize',
       'registration_endpoint': 'https://account.example.org/oauth2/registration',
       'token_endpoint': 'https://account.example.org/oauth2/token',
+      'revocation_endpoint': 'https://account.example.org/oauth2/revoke',
     };
 
     test('TP-OAUTH-01 Anbieter mit OAuth (wie matrix.org): Browser-Weg, Hinweis in der Serverprüfung', () async {
@@ -176,11 +177,28 @@ void main() {
       expect((await probe.registrationOptions(_url)).mode, RegistrationMode.inApp);
     });
 
-    test('Ersatzpfad msc2965 wird gelesen', () async {
-      final probe = ServerProbe(client: _client(<String, (int, Object)>{
+    test('R11 nur der stabile Pfad zählt (das SDK nutzt nur v1); Token-Endpunkt ohne https zählt nicht', () async {
+      final unstable = ServerProbe(client: _client(<String, (int, Object)>{
         '/_matrix/client/unstable/org.matrix.msc2965/auth_metadata': (200, meta),
       }));
-      expect((await probe.registrationOptions(_url)).mode, RegistrationMode.oauth);
+      expect((await unstable.registrationOptions(_url)).mode, RegistrationMode.disabled);
+      final insecureToken = ServerProbe(client: _client(<String, (int, Object)>{
+        '/_matrix/client/v1/auth_metadata': (200, <String, Object>{...meta, 'token_endpoint': 'http://account.example.org/t'}),
+      }));
+      expect(await insecureToken.oauthIssuer(_url), isNull);
+    });
+
+    test('R10 vorübergehende Fehler der Registrierungsabfrage: kein „abgeschaltet“, sondern Fehler zum erneuten Versuch', () async {
+      for (final (status, error) in <(int, GatewayError)>[(429, GatewayError.rateLimited), (502, GatewayError.serverUnreachable)]) {
+        final probe = ServerProbe(client: _client(<String, (int, Object)>{
+          '/_matrix/client/v3/register': (status, <String, Object>{'errcode': 'X'}),
+        }));
+        await expectLater(
+          probe.registrationOptions(_url),
+          throwsA(isA<GatewayException>().having((e) => e.error, 'error', error)),
+          reason: '$status',
+        );
+      }
     });
 
     test('klassische Registrierung: 401 mit unterstützten Abläufen → in der App; Anfrage ohne Zugangsdaten', () async {
@@ -203,7 +221,7 @@ void main() {
         return http.StreamedResponse(Stream<List<int>>.value(<int>[]), 404);
       }));
       expect((await probe.registrationOptions(_url)).mode, RegistrationMode.inApp);
-      expect(body, '{}', reason: 'weder Benutzername noch Passwort werden gesendet');
+      expect(json.decode(body!), <String, Object?>{'inhibit_login': true}, reason: 'weder Benutzername noch Passwort, kein Token');
     });
 
     test('TP-REG-09 abgeschaltet (403) oder nur Telefon → disabled, Hilfeseite des Anbieters', () async {

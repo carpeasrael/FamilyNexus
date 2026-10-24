@@ -36,10 +36,17 @@ class _LoginStepState extends State<LoginStep> {
   String? _error;
   Timer? _idTimer;
 
-  late final AppServices _s = AppScope.read(context);
+  late final AppServices _s;
+
+  @override
+  void initState() {
+    super.initState();
+    _s = AppScope.read(context);
+  }
 
   @override
   void dispose() {
+    if (_waitingForBrowser) _s.oauthRedirect?.cancel();
     _idTimer?.cancel();
     _user.dispose();
     _pass.dispose();
@@ -125,7 +132,16 @@ class _LoginStepState extends State<LoginStep> {
             ),
           ];
         } else {
-          final canLogin = p.ready && p.info!.supportsPasswordLogin && _user.text.trim().isNotEmpty && _pass.text.isNotEmpty;
+          // Vollständige ID eines anderen Anbieters: erst nach dem Wechsel anmelden, nie das Passwort an
+          // den bisher gewählten Anbieter senden.
+          final idServer = MatrixIds.serverName(_user.text.trim());
+          final idUrl = idServer == null ? null : ServerUrl.tryParse(idServer);
+          final providerMatches = idUrl == null || p.server == idUrl;
+          final canLogin = p.ready &&
+              providerMatches &&
+              p.info!.supportsPasswordLogin &&
+              _user.text.trim().isNotEmpty &&
+              _pass.text.isNotEmpty;
           main = <Widget>[
             TextField(
               controller: _user,

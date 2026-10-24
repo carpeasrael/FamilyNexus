@@ -114,7 +114,7 @@ class _FamilyStepState extends State<FamilyStep> {
       return;
     }
     _link.clear();
-    await _services.settings.update((c) => c.copyWith(pendingInvite: raw));
+    await _services.settings.update((c) => c.copyWith(pendingInvite: InviteLink.normalized(raw)));
     _services.pendingInvite.value = link;
   }
 
@@ -266,7 +266,18 @@ class _FamilyStepState extends State<FamilyStep> {
     final family = link.familyName;
     // Überschrift „Familie beitreten“ steht in der Titelleiste der Einrichtung.
     return <Widget>[
-      Text(family == null ? l.joinCardBodyNoName(inviter) : l.joinCardBody(family, inviter)),
+      // Diese Karte ist für die beitretende Person die eigentliche Sicherheitsabfrage (E-37): Namen
+      // stammen aus dem Link; der Anbieter der einladenden Person steht deshalb immer dabei.
+      Text(family == null
+          ? l.joinCardBodyNoName(inviter, link.inviterServer)
+          : l.joinCardBody(family, inviter, link.inviterServer)),
+      if (link.inviterServer != link.via) ...<Widget>[
+        const SizedBox(height: 8),
+        Semantics(
+          liveRegion: true,
+          child: Text(l.joinCardServerMismatch(link.via, link.inviterServer), style: TextStyle(color: theme.colorScheme.error)),
+        ),
+      ],
       const SizedBox(height: 8),
       Text(l.joinCardNote(inviter), style: theme.textTheme.bodySmall),
       ExpansionTile(

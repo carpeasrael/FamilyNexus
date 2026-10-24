@@ -12,17 +12,42 @@ import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../common/error_text.dart';
 import '../common/prompt_dialog.dart';
+import '../../data/platform/secret_clipboard.dart';
 
 /// Leert die Zwischenablage nach [delay], falls sie noch [secret] enthält (E-57). Bewusst nicht an ein
 /// Widget gebunden: Der Schlüssel darf nicht liegen bleiben, nur weil die Einrichtung weitergeht.
+///
+/// Im Hintergrund dürfen Apps die Zwischenablage oft nicht lesen (Android 10+) oder laufen gar nicht
+/// (iOS); dann wird beim nächsten Zurückkehren in die App erneut geprüft.
 void clearClipboardLater(String secret, {Duration delay = const Duration(seconds: 60)}) {
-  Timer(delay, () async {
+  AppLifecycleListener? listener;
+  Timer? giveUp;
+  var due = false;
+  var done = false;
+
+  Future<void> attempt() async {
+    if (done || !due) return;
     try {
       final current = await Clipboard.getData(Clipboard.kTextPlain);
-      if (current?.text == secret) await Clipboard.setData(const ClipboardData(text: ''));
+      if (current == null) return; // nicht lesbar (Hintergrund): beim Zurückkehren erneut
+      done = true;
+      listener?.dispose();
+      giveUp?.cancel();
+      if (current.text == secret) await Clipboard.setData(const ClipboardData(text: ''));
     } catch (_) {
       // Ohne Zugriff auf die Zwischenablage bleibt nichts zu tun.
     }
+  }
+
+  listener = AppLifecycleListener(onResume: () => attempt().ignore());
+  Timer(delay, () {
+    due = true;
+    attempt().ignore();
+  });
+  // Spätestens nach einer Stunde aufgeben (keine dauerhaft hängenden Beobachter).
+  giveUp = Timer(const Duration(hours: 1), () {
+    done = true;
+    listener?.dispose();
   });
 }
 
@@ -58,7 +83,7 @@ class _SecurityPanelState extends State<SecurityPanel> {
   Future<void> _copyKey(String key) async {
     final l = AppLocalizations.of(context);
     final m = ScaffoldMessenger.of(context);
-    await Clipboard.setData(ClipboardData(text: key));
+    await copySecret(key);
     clearClipboardLater(key);
     m.showSnackBar(SnackBar(content: Text(l.keyCopied)));
   }

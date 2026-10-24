@@ -41,7 +41,7 @@ class _AppRootState extends State<AppRoot> {
   void _restorePendingInvite(AppServices services) {
     final raw = services.settings.settings.pendingInvite;
     if (raw == null || services.pendingInvite.value != null) return;
-    final link = InviteLink.tryParse(raw, now: DateTime.now());
+    final link = InviteLink.tryParse(raw, now: DateTime.now(), ownHost: MatrixIds.serverName(services.gateway.userId ?? ''));
     if (link != null && link.isValidAt(DateTime.now()) && services.gateway.family == null) {
       services.pendingInvite.value = link;
     } else {
@@ -73,7 +73,7 @@ class _AppRootState extends State<AppRoot> {
       return;
     }
     // Vormerken (auch über einen Neustart hinweg); gehandelt wird erst nach Bestätigung.
-    services.settings.update((c) => c.copyWith(pendingInvite: raw.trim())).ignore();
+    services.settings.update((c) => c.copyWith(pendingInvite: InviteLink.normalized(raw))).ignore();
     services.pendingInvite.value = link;
   }
 

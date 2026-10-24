@@ -11,18 +11,16 @@ import 'link_source.dart';
 /// * Android/iOS: eigenes App-Schema (`io.github.carpeasrael.familynexus:/oauth`), zugestellt über
 ///   die [LinkSource].
 /// * Linux/Windows/macOS: kurzlebiger Empfänger auf `127.0.0.1` mit zufälligem Port (MSC2966,
-///   „Loopback“). Er nimmt genau einen Aufruf von `/oauth` an und schließt sich danach.
+///   „Loopback“), der bis zum Ende des Versuchs Aufrufe von `/oauth` annimmt.
 ///
-/// Der Inhalt des Rücksprungs ist nicht vertrauenswürdig; die Prüfung von `state` und Code erfolgt im
-/// Gateway.
+/// Jeder Versuch ist ein eigenes [OAuthAttempt]: ein neuer Versuch beendet den alten, ein alter kann
+/// den neuen nie beeinflussen. Rücksprünge sind nicht vertrauenswürdig; ob einer zum Versuch gehört
+/// (`state`), prüft das Gateway – unpassende werden verworfen und es wird weiter gewartet.
 abstract class OAuthRedirect {
-  /// Bereitet einen Rücksprung vor und liefert die Rücksprungadresse.
-  Future<Uri> prepare();
+  /// Beginnt einen neuen Versuch (ein laufender wird beendet).
+  Future<OAuthAttempt> prepare();
 
-  /// Wartet auf den Rücksprung (höchstens [timeout]); `null` bei Abbruch oder Zeitüberschreitung.
-  Future<Uri?> wait({Duration timeout = const Duration(minutes: 10)});
-
-  /// Beendet das Warten (z. B. „Abbrechen“).
+  /// Beendet den laufenden Versuch (z. B. „Abbrechen“, „Zurück“).
   void cancel();
 
   /// Passende Umsetzung für die Plattform; `null` im Browser (dort keine OAuth-Anmeldung, E-55).
@@ -32,51 +30,86 @@ abstract class OAuthRedirect {
   }
 }
 
+/// Ein Anmeldeversuch: Rücksprungadresse und eingehende Rücksprünge.
+abstract class OAuthAttempt {
+  Uri get redirectUri;
+
+  /// Nächster Rücksprung; `null` nach [cancel] oder wenn bis [deadline] keiner kam.
+  Future<Uri?> next({required DateTime deadline});
+
+  void cancel();
+}
+
+/// Gemeinsame Warteschlange der Versuche.
+class _Queue implements OAuthAttempt {
+  _Queue(this.redirectUri, {this.onClose});
+
+  @override
+  final Uri redirectUri;
+  final void Function()? onClose;
+  final List<Uri> _items = <Uri>[];
+  Completer<void>? _signal;
+  bool _closed = false;
+
+  bool get closed => _closed;
+
+  void add(Uri u) {
+    if (_closed) return;
+    _items.add(u);
+    final s = _signal;
+    if (s != null && !s.isCompleted) s.complete();
+  }
+
+  @override
+  Future<Uri?> next({required DateTime deadline}) async {
+    while (!_closed) {
+      if (_items.isNotEmpty) return _items.removeAt(0);
+      final left = deadline.difference(DateTime.now());
+      if (left <= Duration.zero) return null;
+      final s = _signal = Completer<void>();
+      await s.future.timeout(left, onTimeout: () {});
+    }
+    return null;
+  }
+
+  @override
+  void cancel() {
+    if (_closed) return;
+    _closed = true;
+    final s = _signal;
+    if (s != null && !s.isCompleted) s.complete();
+    onClose?.call();
+  }
+}
+
 /// Rücksprung über das App-Schema (Mobilgeräte).
 class AppLinkOAuthRedirect implements OAuthRedirect {
   AppLinkOAuthRedirect(this._links);
 
   final LinkSource _links;
-  Completer<Uri?>? _done;
-  StreamSubscription<String>? _sub;
+  _Queue? _current;
 
   static bool isCallback(String raw) => raw.startsWith('${SdkMatrixGateway.oauthScheme}:/oauth');
 
   @override
-  Future<Uri> prepare() async {
-    cancel();
-    final done = _done = Completer<Uri?>();
-    _sub = _links.links.where(isCallback).listen((raw) {
-      if (!done.isCompleted) done.complete(Uri.tryParse(raw));
+  Future<OAuthAttempt> prepare() async {
+    _current?.cancel();
+    late final StreamSubscription<String> sub;
+    final q = _current = _Queue(SdkMatrixGateway.oauthMobileRedirect, onClose: () => sub.cancel().ignore());
+    sub = _links.links.where(isCallback).listen((raw) {
+      final u = Uri.tryParse(raw);
+      if (u != null) q.add(u);
     });
-    return SdkMatrixGateway.oauthMobileRedirect;
+    return q;
   }
 
   @override
-  Future<Uri?> wait({Duration timeout = const Duration(minutes: 10)}) async {
-    final done = _done;
-    if (done == null) return null;
-    try {
-      return await done.future.timeout(timeout, onTimeout: () => null);
-    } finally {
-      await _sub?.cancel();
-      _sub = null;
-    }
-  }
-
-  @override
-  void cancel() {
-    final d = _done;
-    if (d != null && !d.isCompleted) d.complete(null);
-    _sub?.cancel().ignore();
-    _sub = null;
-  }
+  void cancel() => _current?.cancel();
 }
 
 /// Rücksprung über einen lokalen Empfänger (Desktop).
 class LoopbackOAuthRedirect implements OAuthRedirect {
-  HttpServer? _server;
-  Completer<Uri?>? _done;
+  _Queue? _current;
 
   /// Kurze Seite für den Browser nach dem Rücksprung (ohne Inhalte des Rücksprungs).
   static const String _page = '<!doctype html><meta charset="utf-8"><title>FamilyNexus</title>'
@@ -85,12 +118,15 @@ class LoopbackOAuthRedirect implements OAuthRedirect {
       '<p lang="en">Done – you can close this window and return to FamilyNexus.</p></body>';
 
   @override
-  Future<Uri> prepare() async {
-    cancel();
-    final server = _server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
-    final done = _done = Completer<Uri?>();
+  Future<OAuthAttempt> prepare() async {
+    _current?.cancel();
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    final q = _current = _Queue(
+      Uri(scheme: 'http', host: '127.0.0.1', port: server.port, path: '/oauth'),
+      onClose: () => server.close(force: true).ignore(),
+    );
     server.listen((req) async {
-      if (req.method != 'GET' || req.uri.path != '/oauth' || done.isCompleted) {
+      if (req.method != 'GET' || req.uri.path != '/oauth' || q.closed) {
         req.response.statusCode = HttpStatus.notFound;
         await req.response.close().catchError((Object _) {});
         return;
@@ -103,28 +139,11 @@ class LoopbackOAuthRedirect implements OAuthRedirect {
         ..write(_page);
       // Erst die Seite vollständig ausliefern, dann melden (sonst schließt der Empfänger zu früh).
       await req.response.close().catchError((Object _) {});
-      if (!done.isCompleted) done.complete(callback);
+      q.add(callback);
     }, onError: (Object e) => AppLog.w('oauth', 'Rücksprung-Empfänger meldet einen Fehler'));
-    return Uri(scheme: 'http', host: '127.0.0.1', port: server.port, path: '/oauth');
+    return q;
   }
 
   @override
-  Future<Uri?> wait({Duration timeout = const Duration(minutes: 10)}) async {
-    final done = _done;
-    if (done == null) return null;
-    try {
-      return await done.future.timeout(timeout, onTimeout: () => null);
-    } finally {
-      await _server?.close(force: true);
-      _server = null;
-    }
-  }
-
-  @override
-  void cancel() {
-    final d = _done;
-    if (d != null && !d.isCompleted) d.complete(null);
-    _server?.close(force: true).ignore();
-    _server = null;
-  }
+  void cancel() => _current?.cancel();
 }

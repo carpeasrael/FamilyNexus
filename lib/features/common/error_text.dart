@@ -23,7 +23,7 @@ String errorText(AppLocalizations l, Object error) {
       GatewayError.weakPassword => l.errWeakPassword,
       GatewayError.registrationDisabled => l.errRegistrationDisabled,
       GatewayError.emailInUse => l.errEmailInUse,
-      GatewayError.oauthCancelled => l.errOAuthCancelled,
+      GatewayError.oauthCancelled || GatewayError.oauthStateMismatch => l.errOAuthCancelled,
       GatewayError.unknown => l.errUnknown,
     };
   }

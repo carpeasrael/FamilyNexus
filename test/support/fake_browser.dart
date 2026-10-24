@@ -19,28 +19,51 @@ class FakeBrowser implements BrowserLauncher {
 /// Rücksprung der Browser-Anmeldung für Tests: [deliver] simuliert den Aufruf durch den Browser.
 class FakeOAuthRedirect implements OAuthRedirect {
   static final Uri redirect = Uri.parse('io.github.carpeasrael.familynexus:/oauth');
-  Completer<Uri?>? _done;
+  _FakeAttempt? _current;
 
-  bool get waiting => _done != null && !_done!.isCompleted;
+  bool get waiting => _current != null && !_current!.closed;
 
   @override
-  Future<Uri> prepare() async {
-    cancel();
-    _done = Completer<Uri?>();
-    return redirect;
+  Future<OAuthAttempt> prepare() async {
+    _current?.cancel();
+    return _current = _FakeAttempt();
+  }
+
+  void deliver(Uri callback) => _current?.add(callback);
+
+  @override
+  void cancel() => _current?.cancel();
+}
+
+class _FakeAttempt implements OAuthAttempt {
+  final List<Uri> _items = <Uri>[];
+  Completer<void>? _signal;
+  bool closed = false;
+
+  @override
+  Uri get redirectUri => FakeOAuthRedirect.redirect;
+
+  void add(Uri u) {
+    if (closed) return;
+    _items.add(u);
+    _signal?.complete();
+    _signal = null;
   }
 
   @override
-  Future<Uri?> wait({Duration timeout = const Duration(minutes: 10)}) => _done?.future ?? Future<Uri?>.value();
-
-  void deliver(Uri callback) {
-    final d = _done;
-    if (d != null && !d.isCompleted) d.complete(callback);
+  Future<Uri?> next({required DateTime deadline}) async {
+    while (!closed) {
+      if (_items.isNotEmpty) return _items.removeAt(0);
+      await (_signal = Completer<void>()).future;
+    }
+    return null;
   }
 
   @override
   void cancel() {
-    final d = _done;
-    if (d != null && !d.isCompleted) d.complete(null);
+    if (closed) return;
+    closed = true;
+    _signal?.complete();
+    _signal = null;
   }
 }

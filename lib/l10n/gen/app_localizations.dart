@@ -407,7 +407,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverNoPassword.
   ///
   /// In de, this message translates to:
-  /// **'Dieser Server erlaubt keine Anmeldung mit Passwort.'**
+  /// **'Bei diesem Anbieter ist keine Anmeldung mit Passwort möglich.'**
   String get serverNoPassword;
 
   /// No description provided for @serverMetadataNote.
@@ -533,7 +533,7 @@ abstract class AppLocalizations {
   /// No description provided for @errServerUnsupported.
   ///
   /// In de, this message translates to:
-  /// **'Dieser Server wird nicht unterstützt.'**
+  /// **'Dieser Anbieter wird von FamilyNexus nicht unterstützt. Bitte wähle unter „Erweitert“ einen anderen.'**
   String get errServerUnsupported;
 
   /// No description provided for @errNotAllowed.
@@ -2999,7 +2999,7 @@ abstract class AppLocalizations {
   /// No description provided for @regUsernameHint.
   ///
   /// In de, this message translates to:
-  /// **'Damit meldest du dich an. Nur Kleinbuchstaben, Ziffern, Punkt und Bindestrich.'**
+  /// **'Damit meldest du dich an. 3 bis 32 Zeichen: Kleinbuchstaben, Ziffern, Punkt, Unterstrich oder Bindestrich.'**
   String get regUsernameHint;
 
   /// No description provided for @regUsernameFree.
@@ -3107,7 +3107,7 @@ abstract class AppLocalizations {
   /// No description provided for @regEmailSent.
   ///
   /// In de, this message translates to:
-  /// **'Wir haben eine E-Mail an {email} geschickt. Öffne sie und tippe auf den Link. Komm danach hierher zurück.'**
+  /// **'Der Anbieter hat eine E-Mail an {email} geschickt. Öffne sie und tippe auf den Link. Komm danach hierher zurück.'**
   String regEmailSent(String email);
 
   /// No description provided for @regEmailConfirmed.
@@ -3131,13 +3131,13 @@ abstract class AppLocalizations {
   /// No description provided for @regTokenBody.
   ///
   /// In de, this message translates to:
-  /// **'Dieser Anbieter braucht einen Einladungscode. Du bekommst ihn von der Person, die den Server betreibt.'**
+  /// **'Dieser Anbieter gibt Konten nur mit einem Zugangscode frei. Du bekommst ihn vom Anbieter (nicht der Einladungslink der Familie).'**
   String get regTokenBody;
 
   /// No description provided for @regTokenLabel.
   ///
   /// In de, this message translates to:
-  /// **'Einladungscode'**
+  /// **'Zugangscode des Anbieters'**
   String get regTokenLabel;
 
   /// No description provided for @regTokenWrong.
@@ -3431,14 +3431,14 @@ abstract class AppLocalizations {
   /// No description provided for @joinCardBody.
   ///
   /// In de, this message translates to:
-  /// **'Du trittst der Familie „{family}“ bei. Eingeladen hat dich {inviter}.'**
-  String joinCardBody(String family, String inviter);
+  /// **'Du trittst der Familie „{family}“ bei. Eingeladen hat dich {inviter} (Konto bei {server}).'**
+  String joinCardBody(String family, String inviter, String server);
 
   /// No description provided for @joinCardBodyNoName.
   ///
   /// In de, this message translates to:
-  /// **'Du trittst einer Familie bei. Eingeladen hat dich {inviter}.'**
-  String joinCardBodyNoName(String inviter);
+  /// **'Du trittst einer Familie bei. Eingeladen hat dich {inviter} (Konto bei {server}).'**
+  String joinCardBodyNoName(String inviter, String server);
 
   /// No description provided for @joinCardNote.
   ///
@@ -3589,6 +3589,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal.'**
   String get errOAuthCancelled;
+
+  /// No description provided for @joinCardServerMismatch.
+  ///
+  /// In de, this message translates to:
+  /// **'Achtung: Die Familie liegt bei {family}, die einladende Person aber bei {inviter}. Tritt nur bei, wenn du diese Einladung wirklich erwartet hast.'**
+  String joinCardServerMismatch(String family, String inviter);
 }
 
 class _AppLocalizationsDelegate

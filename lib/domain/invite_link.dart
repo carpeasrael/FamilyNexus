@@ -98,22 +98,41 @@ class InviteLink {
     if (validity <= Duration.zero || validity > maxValidity) throw ArgumentError('ungültige Gültigkeitsdauer');
     if (!viaMatchesRoom(roomId, via, ownHost: ownHost)) throw ArgumentError('Server passt nicht zum Raum');
     final exp = now.toUtc().add(validity).millisecondsSinceEpoch ~/ 1000;
-    final f = _name(familyName);
-    final by = _name(inviterName);
-    return Uri(
-      scheme: scheme,
-      host: host,
-      queryParameters: <String, String>{
-        'v': '$version',
-        'room': roomId,
-        'via': via,
-        'inv': inviter,
-        'exp': '$exp',
-        'n': nonce,
-        'f': ?f,
-        'by': ?by,
-      },
-    ).toString();
+    String build(String? f, String? by) => Uri(
+          scheme: scheme,
+          host: host,
+          queryParameters: <String, String>{
+            'v': '$version',
+            'room': roomId,
+            'via': via,
+            'inv': inviter,
+            'exp': '$exp',
+            'n': nonce,
+            'f': ?f,
+            'by': ?by,
+          },
+        ).toString();
+    var f = _name(familyName);
+    var by = _name(inviterName);
+    // Namen sind nur Anzeigehilfen: lieber kürzen bzw. weglassen, als einen zu langen Link zu erzeugen
+    // (z. B. viele Emoji, die prozentkodiert je 12 Zeichen belegen).
+    var link = build(f, by);
+    while (link.length > maxLength && (f != null || by != null)) {
+      if (by != null) {
+        by = _shorten(by);
+      } else {
+        f = _shorten(f!);
+      }
+      link = build(f, by);
+    }
+    return link;
+  }
+
+  /// Halbiert einen Namen (in Zeichen); `null`, wenn nichts übrig bleibt.
+  static String? _shorten(String s) {
+    final runes = s.runes.toList();
+    if (runes.length <= 1) return null;
+    return _name(String.fromCharCodes(runes.take(runes.length ~/ 2)));
   }
 
   static const Set<String> _v1Keys = <String>{'v', 'room', 'via', 'inv', 'exp', 'n'};
@@ -175,4 +194,14 @@ class InviteLink {
   }
 
   bool isValidAt(DateTime now) => now.toUtc().isBefore(expires);
+
+  /// Einheitliche Schreibweise eines (bereits geprüften) Links zum Vormerken, z. B. Schema in
+  /// Kleinbuchstaben; ein Neustart liest ihn mit [tryParse] erneut.
+  static String normalized(String raw) {
+    try {
+      return Uri.parse(raw.trim()).toString();
+    } on FormatException {
+      return raw.trim();
+    }
+  }
 }

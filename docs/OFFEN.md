@@ -36,7 +36,8 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
   Beendet das System die App während der Anmeldung im Browser, ist die OAuth- bzw. UIA-Sitzung verloren (der Einladungslink
   bleibt erhalten); es genügt, erneut auf „Konto erstellen“ zu tippen. Ältere App-Versionen lehnen Einladungslinks `v=2`
   ab. Links von Servern im Heimnetz (IP/localhost) sind vor der Anmeldung nicht lesbar.
-- **SA-8:** Notfall-Schlüssel in Zwischenablage (nach 60 s geleert) bzw. als unverschlüsselte Datei, nur auf ausdrücklichen Tipp.
+- **SA-8:** Notfall-Schlüssel in Zwischenablage (Android: als vertraulich markiert; nach 60 s bzw. beim Zurückkehren in die App geleert – bleibt liegen, wenn die Person nicht zurückkehrt) bzw. als unverschlüsselte Datei, nur auf ausdrücklichen Tipp.
+- **OAuth-Unit-Tests** (`test/data/sdk_registration_test.dart`, Gruppe OAuth) brauchen vodozemac und laufen deshalb in `tool/e2e.sh`, in CI werden sie übersprungen.
 
 - **Online-Status (E-38):** Mehrere Geräte desselben Kontos werden einzeln geführt; die Person gilt als online, solange irgendein
   Gerät online meldet. Im Hintergrund oder bei beendeter App gilt man nach 5 Minuten als offline (kein Push, keine

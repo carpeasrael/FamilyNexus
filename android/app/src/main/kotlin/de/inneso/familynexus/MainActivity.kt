@@ -4,7 +4,13 @@ import android.view.WindowManager
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import android.content.ClipData
+import android.content.ClipDescription
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.os.PersistableBundle
 
 /**
  * Android-Adapter. Enthält nur Plattformbrücken; keine Fachlogik.
@@ -71,6 +77,25 @@ class MainActivity : FlutterFragmentActivity() {
                             window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                         }
                         result.success(null)
+                    }
+                    // Notfall-Schlüssel kopieren (E-57/SA-8): als „vertraulich“ markiert, damit Android 13+
+                    // keine Vorschau zeigt und Tastatur-Apps ihn nicht in den Verlauf übernehmen.
+                    "copySecret" -> {
+                        val text = call.arguments as? String
+                        if (text == null || text.length > 512) {
+                            result.error("invalid", null, null)
+                        } else {
+                            val clip = ClipData.newPlainText("FamilyNexus", text)
+                            val extras = PersistableBundle()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                extras.putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+                            } else {
+                                extras.putBoolean("android.content.extra.IS_SENSITIVE", true)
+                            }
+                            clip.description.extras = extras
+                            (getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).setPrimaryClip(clip)
+                            result.success(null)
+                        }
                     }
                     else -> result.notImplemented()
                 }

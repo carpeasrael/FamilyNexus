@@ -5,6 +5,7 @@ import 'package:family_nexus/domain/server.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
@@ -244,6 +245,23 @@ void main() {
     await tester.pumpAndSettle();
     await _tapText(tester, 'Anmelden');
     expect(app.gateway.userId, '@anna:fake.test');
+  });
+
+  testWidgets('R6 vollständige ID eines anderen Anbieters: Anmelden erst nach dem Wechsel, Passwort nie an den alten', (tester) async {
+    final other = FakeMatrixServer(host: 'andere.test')..addAccount('anna', 'geheim123');
+    final app = await buildTestApp(loggedIn: false, server: other);
+    await _pump(tester, app);
+    await _tapText(tester, 'Ich habe schon ein Konto');
+    // Standard ist andere.test (Voreinstellung im Test); die ID nennt fake.test.
+    await tester.enterText(find.widgetWithText(TextField, 'Benutzername'), '@anna:fake.test');
+    await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'geheim123');
+    await tester.pump();
+    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Anmelden')).onPressed, isNull,
+        reason: 'Anbieter passt noch nicht zur ID');
+    await tester.pump(const Duration(milliseconds: 700));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('fake.test ist gerade nicht erreichbar'), findsOneWidget, reason: 'Wechsel zum Anbieter aus der ID');
+    expect(app.gateway.session, SessionState.loggedOut);
   });
 
   testWidgets('Wechsel zwischen „Konto erstellen“ und „Anmelden“ behält den Benutzernamen', (tester) async {

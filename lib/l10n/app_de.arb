@@ -68,7 +68,7 @@
       }
     }
   },
-  "serverNoPassword": "Dieser Server erlaubt keine Anmeldung mit Passwort.",
+  "serverNoPassword": "Bei diesem Anbieter ist keine Anmeldung mit Passwort möglich.",
   "serverMetadataNote": "Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt. Wer das vermeiden möchte, nutzt einen eigenen Server.",
   "onbTitleAccount": "Anmelden",
   "accountUsername": "Benutzername",
@@ -89,7 +89,7 @@
   "statusRequested": "Anfrage",
   "errInvalidCredentials": "Benutzername oder Passwort stimmen nicht.",
   "errServerUnreachable": "Server nicht erreichbar. Prüfe die Verbindung.",
-  "errServerUnsupported": "Dieser Server wird nicht unterstützt.",
+  "errServerUnsupported": "Dieser Anbieter wird von FamilyNexus nicht unterstützt. Bitte wähle unter „Erweitert“ einen anderen.",
   "errNotAllowed": "Dafür fehlt die Berechtigung.",
   "errAttachmentRejected": "Dieser Anhang ist nicht erlaubt (Typ oder Größe).",
   "errInvalidInput": "Bitte Eingabe prüfen.",
@@ -976,7 +976,7 @@
   "regNameLabel": "Wie heißt du?",
   "regNameHint": "z. B. Anna Müller",
   "regUsernameLabel": "Dein Benutzername",
-  "regUsernameHint": "Damit meldest du dich an. Nur Kleinbuchstaben, Ziffern, Punkt und Bindestrich.",
+  "regUsernameHint": "Damit meldest du dich an. 3 bis 32 Zeichen: Kleinbuchstaben, Ziffern, Punkt, Unterstrich oder Bindestrich.",
   "regUsernameFree": "Der Benutzername ist frei.",
   "regUsernameTaken": "Dieser Benutzername ist schon vergeben.",
   "regUsernameTakenSuggest": "Schon vergeben – wie wäre es mit „{suggestion}“?",
@@ -1008,7 +1008,7 @@
   "regEmailLabel": "E-Mail-Adresse",
   "regEmailInvalid": "Bitte eine gültige E-Mail-Adresse eingeben.",
   "regEmailSend": "Bestätigung senden",
-  "regEmailSent": "Wir haben eine E-Mail an {email} geschickt. Öffne sie und tippe auf den Link. Komm danach hierher zurück.",
+  "regEmailSent": "Der Anbieter hat eine E-Mail an {email} geschickt. Öffne sie und tippe auf den Link. Komm danach hierher zurück.",
   "@regEmailSent": {
     "placeholders": {
       "email": {
@@ -1019,8 +1019,8 @@
   "regEmailConfirmed": "Ich habe bestätigt",
   "regEmailResend": "E-Mail erneut senden",
   "regEmailNotYet": "Noch nicht bestätigt. Bitte öffne den Link in der E-Mail (auch im Spam-Ordner nachsehen).",
-  "regTokenBody": "Dieser Anbieter braucht einen Einladungscode. Du bekommst ihn von der Person, die den Server betreibt.",
-  "regTokenLabel": "Einladungscode",
+  "regTokenBody": "Dieser Anbieter gibt Konten nur mit einem Zugangscode frei. Du bekommst ihn vom Anbieter (nicht der Einladungslink der Familie).",
+  "regTokenLabel": "Zugangscode des Anbieters",
   "regTokenWrong": "Der Code passt nicht. Bitte prüfe ihn.",
   "regCaptchaBody": "Bitte bestätige im Browser kurz, dass du kein Roboter bist. Danach geht es hier automatisch weiter.",
   "regCaptchaOpen": "Im Browser öffnen",
@@ -1162,7 +1162,7 @@
   "inviteStepTitle": "Einladung",
   "inviteStepBody": "Füge den Einladungslink ein, den du bekommen hast. Hast du einen QR-Code? Scanne ihn mit der Kamera-App – FamilyNexus öffnet sich dann von selbst.",
   "inviteStepNoLink": "Kein Link? Bitte die Person, die dich einlädt, dir einen zu schicken.",
-  "joinCardBody": "Du trittst der Familie „{family}“ bei. Eingeladen hat dich {inviter}.",
+  "joinCardBody": "Du trittst der Familie „{family}“ bei. Eingeladen hat dich {inviter} (Konto bei {server}).",
   "@joinCardBody": {
     "placeholders": {
       "family": {
@@ -1170,13 +1170,19 @@
       },
       "inviter": {
         "type": "String"
+      },
+      "server": {
+        "type": "String"
       }
     }
   },
-  "joinCardBodyNoName": "Du trittst einer Familie bei. Eingeladen hat dich {inviter}.",
+  "joinCardBodyNoName": "Du trittst einer Familie bei. Eingeladen hat dich {inviter} (Konto bei {server}).",
   "@joinCardBodyNoName": {
     "placeholders": {
       "inviter": {
+        "type": "String"
+      },
+      "server": {
         "type": "String"
       }
     }
@@ -1233,5 +1239,16 @@
   "errWeakPassword": "Das Passwort ist zu schwach. Bitte nimm ein längeres Passwort.",
   "errRegistrationDisabled": "Bei diesem Anbieter kann die App kein Konto anlegen. Erstelle es auf seiner Webseite.",
   "errEmailInUse": "Diese E-Mail-Adresse wird schon für ein anderes Konto verwendet.",
-  "errOAuthCancelled": "Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal."
+  "errOAuthCancelled": "Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal.",
+  "joinCardServerMismatch": "Achtung: Die Familie liegt bei {family}, die einladende Person aber bei {inviter}. Tritt nur bei, wenn du diese Einladung wirklich erwartet hast.",
+  "@joinCardServerMismatch": {
+    "placeholders": {
+      "family": {
+        "type": "String"
+      },
+      "inviter": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -172,7 +172,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get serverNoPassword => 'This server does not allow password sign-in.';
+  String get serverNoPassword =>
+      'This provider does not allow signing in with a password.';
 
   @override
   String get serverMetadataNote =>
@@ -240,7 +241,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Server not reachable. Check your connection.';
 
   @override
-  String get errServerUnsupported => 'This server is not supported.';
+  String get errServerUnsupported =>
+      'FamilyNexus does not support this provider. Please choose another one under “Advanced”.';
 
   @override
   String get errNotAllowed => 'You do not have permission for this.';
@@ -1720,7 +1722,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regUsernameHint =>
-      'You sign in with it. Lowercase letters, digits, dot and hyphen only.';
+      'You sign in with it. 3 to 32 characters: lowercase letters, digits, dot, underscore or hyphen.';
 
   @override
   String get regUsernameFree => 'This username is available.';
@@ -1782,7 +1784,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String regEmailSent(String email) {
-    return 'An email was sent to $email. Open it and tap the link. Then come back here.';
+    return 'The provider sent an email to $email. Open it and tap the link. Then come back here.';
   }
 
   @override
@@ -1797,10 +1799,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regTokenBody =>
-      'This provider needs an invitation code. You get it from the person who runs the server.';
+      'This provider only activates accounts with an access code. You get it from the provider (it is not the family’s invitation link).';
 
   @override
-  String get regTokenLabel => 'Invitation code';
+  String get regTokenLabel => 'Provider access code';
 
   @override
   String get regTokenWrong => 'The code does not match. Please check it.';
@@ -1983,13 +1985,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'No link? Ask the person inviting you to send you one.';
 
   @override
-  String joinCardBody(String family, String inviter) {
-    return 'You are joining the family “$family”. You were invited by $inviter.';
+  String joinCardBody(String family, String inviter, String server) {
+    return 'You are joining the family “$family”. You were invited by $inviter (account at $server).';
   }
 
   @override
-  String joinCardBodyNoName(String inviter) {
-    return 'You are joining a family. You were invited by $inviter.';
+  String joinCardBodyNoName(String inviter, String server) {
+    return 'You are joining a family. You were invited by $inviter (account at $server).';
   }
 
   @override
@@ -2082,4 +2084,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errOAuthCancelled =>
       'The sign-in in the browser was not completed. Please try again.';
+
+  @override
+  String joinCardServerMismatch(String family, String inviter) {
+    return 'Caution: the family is hosted at $family, but the inviting person at $inviter. Only join if you really expected this invitation.';
+  }
 }

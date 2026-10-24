@@ -48,7 +48,8 @@
                 <data android:scheme="familynexus" android:host="join"/>
             </intent-filter>
             <!-- Rücksprung der Anmeldung im Browser (OAuth, E-55). Nur Code und state; die App prüft
-                 den state gegen die eigene, gerade begonnene Anmeldung. -->
+                 den state gegen die eigene, gerade begonnene Anmeldung. Ohne Host wertet Android den Pfad im
+                 Filter nicht aus; die Pfadprüfung macht MainActivity.linkFrom (nur /oauth erreicht Dart). -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>

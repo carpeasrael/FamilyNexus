@@ -32,7 +32,7 @@ class _InviteLinkStepState extends State<InviteLinkStep> {
       setState(() => _error = l.joinLinkInvalid);
       return;
     }
-    await s.settings.update((c) => c.copyWith(pendingInvite: raw));
+    await s.settings.update((c) => c.copyWith(pendingInvite: InviteLink.normalized(raw)));
     s.pendingInvite.value = link;
   }
 

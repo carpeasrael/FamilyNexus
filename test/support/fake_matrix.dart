@@ -917,12 +917,13 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<void> completeOAuth(Uri callback) async {
     final expected = _oauthState;
-    _oauthState = null;
     final p = callback.queryParameters;
     final code = p['code'];
-    if (expected == null || p.containsKey('error') || code == null || p['state'] != expected) {
-      throw const GatewayException(GatewayError.oauthCancelled);
-    }
+    if (expected == null) throw const GatewayException(GatewayError.oauthCancelled);
+    // Wie das echte Gateway: fremder state wird verworfen, die Anmeldung bleibt offen.
+    if (p['state'] != expected) throw const GatewayException(GatewayError.oauthStateMismatch);
+    _oauthState = null;
+    if (p.containsKey('error') || code == null) throw const GatewayException(GatewayError.oauthCancelled);
     final id = '@$code:${fake.host}';
     if (!fake._accounts.containsKey(id)) {
       if (!_oauthCreate) throw const GatewayException(GatewayError.invalidCredentials);
