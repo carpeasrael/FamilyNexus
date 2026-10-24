@@ -122,6 +122,10 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-LINK-05 | – | `&amp;`, `<…>`, „…“, Text davor/danach, Satzzeichen, Umbruch im Link, Quoted-Printable | angenommen, bereinigt vorgemerkt; Text nach dem Link wird nicht angehängt | U, F `invite_onboarding_test.dart` | ✅ |
 | TP-LINK-06 | Familie auf Server im Heimnetz (IP, localhost, Name ohne Punkt) | Link vor der Anmeldung öffnen, Konto anlegen | angenommen; Beitrittskarte warnt „Server im Heimnetz“; Anfrage erst nach Tipp | U, F, S (Synapse auf `localhost`) | ✅ |
 | TP-LINK-07 | – | `via` im Heimnetz, aber nicht der Server des Raums | abgelehnt (beschädigt) | U | ✅ |
+| TP-LINK-09 | Name „3D-Club“, Quoted-Printable-Mail, Neustart | – | Link unverfälscht, nach Neustart lesbar (Review R1) | U | ✅ |
+| TP-LINK-10 | Server der einladenden Person im Heimnetz | Link vor der Anmeldung öffnen | erst Warnung und „Mit … verbinden“, keine Verbindung ohne Tipp (R2) | F | ✅ |
+| TP-LINK-11 | angemeldet auf anderem Server, Heimnetz-Link | Karte | Meldung „kannst du ihr nicht beitreten“, kein Anfrage-Knopf (R3) | F | ✅ |
+| TP-LINK-12 | langer Text, alter und neuer Link | einfügen | gültiger Link gefunden (R4, R5) | U | ✅ |
 | TP-LINK-08 | Moderatorin | „Jemanden einladen“ → 1/3/7 Tage | Standard 3 Tage; andere Wahl = neuer Link; Hinweis und E-Mail nennen die Dauer | F `family_screen_test.dart`, S | ✅ |
 
 ### 3.6 Notfall-Schlüssel

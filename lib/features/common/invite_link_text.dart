@@ -10,5 +10,8 @@ String inviteLinkProblemText(AppLocalizations l, InviteLinkProblem p) => switch 
       InviteLinkProblem.newerVersion => l.joinLinkNewerVersion,
     };
 
-/// „1 Tag“, „3 Tage“, „7 Tage“.
+/// „1 Tag“, „3 Tage“, „7 Tage“ (Auswahl).
 String inviteValidityText(AppLocalizations l, Duration d) => l.inviteValidityDays(d.inDays);
+
+/// „einen Tag“, „3 Tage“ (im Satz: „Der Link ist … gültig“).
+String inviteValiditySentence(AppLocalizations l, Duration d) => l.inviteValidityInSentence(d.inDays);

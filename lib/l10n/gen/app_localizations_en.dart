@@ -2232,7 +2232,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String joinCardLocalServer(String server) {
-    return 'Caution: this family is hosted on a server in a home network ($server). It can only be reached from that network. Only continue if you expected this invitation.';
+    return 'Caution: this family is hosted on a server in a home network ($server). It can only be reached when your device is on the same network (e.g. the family’s Wi-Fi). Only continue if you expected this invitation.';
   }
 
   @override
@@ -2248,4 +2248,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get familyInviteValidityLabel => 'Valid for';
+
+  @override
+  String inviteValidityInSentence(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: 'one day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String joinCardLocalOtherAccount(String family, String own) {
+    return 'This family is hosted on a server in a home network ($family). With your account at $own you cannot join it. Create an account at $family instead (sign out and choose “I was invited”).';
+  }
+
+  @override
+  String advLocalConsent(String host) {
+    return 'The invitation points to a server in a home network ($host). Only connect if you expected the invitation and are on the same network (e.g. the family’s Wi-Fi).';
+  }
+
+  @override
+  String advLocalConnect(String host) {
+    return 'Connect to $host';
+  }
 }

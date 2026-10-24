@@ -3833,7 +3833,7 @@ abstract class AppLocalizations {
   /// No description provided for @joinCardLocalServer.
   ///
   /// In de, this message translates to:
-  /// **'Achtung: Diese Familie liegt auf einem Server im Heimnetz ({server}). Er ist nur aus diesem Netz erreichbar. Fahre nur fort, wenn du diese Einladung erwartet hast.'**
+  /// **'Achtung: Diese Familie liegt auf einem Server im Heimnetz ({server}). Er ist nur erreichbar, wenn dein Gerät im selben Netz ist (z. B. im WLAN der Familie). Fahre nur fort, wenn du diese Einladung erwartet hast.'**
   String joinCardLocalServer(String server);
 
   /// No description provided for @inviteValidityDays.
@@ -3847,6 +3847,30 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Gültig für'**
   String get familyInviteValidityLabel;
+
+  /// No description provided for @inviteValidityInSentence.
+  ///
+  /// In de, this message translates to:
+  /// **'{days, plural, =1{einen Tag} other{{days} Tage}}'**
+  String inviteValidityInSentence(int days);
+
+  /// No description provided for @joinCardLocalOtherAccount.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Familie liegt auf einem Server im Heimnetz ({family}). Mit deinem Konto bei {own} kannst du ihr nicht beitreten. Lege stattdessen ein Konto bei {family} an (dazu abmelden und „Ich wurde eingeladen“ wählen).'**
+  String joinCardLocalOtherAccount(String family, String own);
+
+  /// No description provided for @advLocalConsent.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Einladung verweist auf einen Server im Heimnetz ({host}). Verbinde dich nur, wenn du die Einladung erwartet hast und im selben Netz bist (z. B. im WLAN der Familie).'**
+  String advLocalConsent(String host);
+
+  /// No description provided for @advLocalConnect.
+  ///
+  /// In de, this message translates to:
+  /// **'Mit {host} verbinden'**
+  String advLocalConnect(String host);
 }
 
 class _AppLocalizationsDelegate

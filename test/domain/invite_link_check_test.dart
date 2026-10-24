@@ -133,7 +133,68 @@ void main() {
     });
   });
 
-  test('übergroße Eingaben werden nicht verarbeitet', () {
-    expect(check('x' * 5000 + ok).problem, InviteLinkProblem.notALink);
+  test('R4: lange Texte (Mail mit Zitat und Signatur) werden durchsucht, übergroße nur bis zur Grenze', () {
+    expect(check('${'Zitat ' * 1000}\n$ok\n${'Signatur ' * 500}').ok, isTrue);
+    expect(check('${'x' * (InviteLink.maxInput + 10)}$ok').problem, InviteLinkProblem.notALink);
+  });
+
+  group('Review-Funde', () {
+    String named(String family, String by) => InviteLink.create(
+          roomId: '!AbCdEfGhIjKlMnOpQr:matrix.org',
+          via: 'matrix.org',
+          inviter: '@anna:matrix.org',
+          now: now,
+          nonce: n,
+          familyName: family,
+          inviterName: by,
+        );
+
+    test('R1: Namen wie „3D-Club“ oder „12er“ werden nicht als Quoted-Printable verfälscht', () {
+      for (final link in <String>[named('3D-Club', '3Dee'), named('12er Runde', 'Fam=3DMüller'), named('ABC', 'A=3D')]) {
+        final c = check(link);
+        expect(c.ok, isTrue, reason: link);
+        expect(c.raw, InviteLink.normalized(link), reason: 'unverändert');
+        expect(check(c.raw!).ok, isTrue, reason: 'Neustart: vorgemerkte Form erneut lesbar (idempotent)');
+      }
+      expect(check(named('3D-Club', 'x')).link!.familyName, '3D-Club');
+    });
+
+    test('R1: echtes Quoted-Printable mit „3D“ im Namen wird gelesen und bleibt nach Neustart lesbar', () {
+      final link = named('3D-Club', 'Anna');
+      final qp = link.replaceAll('=', '=3D');
+      final mail = '${qp.substring(0, 70)}=\n${qp.substring(70)}';
+      final c = check(mail);
+      expect(c.ok, isTrue);
+      expect(c.link!.familyName, '3D-Club');
+      expect(check(c.raw!).link!.familyName, '3D-Club');
+    });
+
+    test('R5: alter und neuer Link im Text – der gültige gewinnt; mitkopierte Fehlermeldung stört nicht', () {
+      final old = mk('!x:matrix.org', 'matrix.org', '@anna:matrix.org', validity: const Duration(days: 1));
+      final later = now.add(const Duration(days: 2));
+      final fresh = InviteLink.create(
+        roomId: '!y:matrix.org',
+        via: 'matrix.org',
+        inviter: '@anna:matrix.org',
+        now: later,
+        nonce: n,
+      );
+      expect(check('Alt: $old\nNeu: $fresh', at: later).link!.roomId, '!y:matrix.org');
+      expect(check('Ein Einladungslink beginnt mit „familynexus://join“. Hier: $fresh', at: later).ok, isTrue);
+      expect(check('Alt: $old', at: later).problem, InviteLinkProblem.expired, reason: 'aussagekräftigster Grund');
+    });
+
+    test('R7: lokale Endungen gelten als Heimnetz', () {
+      for (final h in <String>['fritz.box', 'nas.local', 'server.lan', 'pi.home.arpa', 'matrix.internal', 'box.localdomain', 'NAS.LOCAL']) {
+        expect(InviteLink.isLocalServer(h), isTrue, reason: h);
+      }
+      for (final h in <String>['matrix.org', 'beispiel.de', 'matrix.example.org:8448']) {
+        expect(InviteLink.isLocalServer(h), isFalse, reason: h);
+      }
+    });
+
+    test('Schema und Host komplett groß geschrieben', () {
+      expect(check(ok.replaceFirst('familynexus://join', 'FAMILYNEXUS://JOIN')).ok, isTrue);
+    });
   });
 }

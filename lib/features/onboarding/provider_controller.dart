@@ -7,8 +7,9 @@ import '../../domain/registration.dart';
 import '../../domain/server.dart';
 import '../settings/settings_controller.dart';
 
-/// `empty`: eigener Anbieter gewählt, aber noch keine Adresse eingegeben.
-enum ProviderStatus { empty, checking, ready, invalid, failed }
+/// `empty`: eigener Anbieter gewählt, aber noch keine Adresse eingegeben. `needsConsent`: Server im
+/// Heimnetz aus einer Einladung – verbunden wird erst nach ausdrücklichem Tipp (Review R2, Issue #6).
+enum ProviderStatus { empty, needsConsent, checking, ready, invalid, failed }
 
 /// Gewählter Anbieter (Homeserver) in der Einrichtung (E-55). Die Prüfung läuft automatisch: für den
 /// Standard bzw. den Anbieter aus der Einladung sofort, für eine eigene Eingabe nach kurzer Pause.
@@ -60,12 +61,29 @@ class ProviderController extends ChangeNotifier {
   }
 
   /// Wechselt auf einen fest vorgegebenen Anbieter (z. B. aus `@anna:beispiel.de` oder der Einladung).
-  void useStandard(ServerUrl url) {
+  ///
+  /// [askFirst]: nicht sofort verbinden (Server im Heimnetz aus einer Einladung), sondern erst nach
+  /// [connect].
+  void useStandard(ServerUrl url, {bool askFirst = false}) {
     if (_started && !_custom && url == _standard && _status != ProviderStatus.failed) return;
     _standard = url;
     _custom = false;
+    if (askFirst) {
+      _started = true;
+      _timer?.cancel();
+      _run++;
+      _info = null;
+      _options = null;
+      _error = null;
+      _status = ProviderStatus.needsConsent;
+      _notify();
+      return;
+    }
     start();
   }
+
+  /// Verbindung nach Zustimmung herstellen (siehe [ProviderStatus.needsConsent]).
+  void connect() => _check(immediate: true);
 
   void setCustom(bool on) {
     if (on == _custom) return;

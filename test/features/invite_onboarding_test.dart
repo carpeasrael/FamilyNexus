@@ -155,6 +155,11 @@ void main() {
       final guest = await buildTestApp(loggedIn: false, server: server);
       guest.links.initial = link;
       await _pump(tester, guest);
+      // Review R2: ohne Zustimmung keine Verbindung zum Heimnetz-Server.
+      expect(find.textContaining('Server im Heimnetz (nas)'), findsOneWidget);
+      expect(find.text('Dein Konto liegt bei nas.'), findsNothing);
+      expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Konto erstellen')).onPressed, isNull);
+      await _tap(tester, 'Mit nas verbinden');
       expect(find.text('Dein Konto liegt bei nas.'), findsOneWidget, reason: 'Link angenommen, Anbieter aus der Einladung');
       await _createAccount(tester, name: 'Carla');
       await _emergencyKey(tester);
@@ -162,6 +167,20 @@ void main() {
       expect(anna.gateway.family!.requests, isEmpty, reason: 'ohne Tipp keine Anfrage');
       await _tap(tester, 'Beitritt anfragen');
       expect(anna.gateway.family!.requests.single.displayName, 'Carla');
+    });
+
+    testWidgets('Review R3: Heimnetz-Link, aber angemeldet auf anderem Server: klare Meldung statt Anfrage', (tester) async {
+      final home = FakeMatrixServer(host: 'nas')..addAccount('anna', 'geheim123', displayName: 'Anna');
+      final anna = await buildTestApp(server: home);
+      home.now = () => DateTime.now().toUtc();
+      final link = await anna.gateway.createInviteLink();
+      final other = await buildTestApp(loggedIn: false);
+      await other.gateway.login(server: ServerUrl.tryParse('fake.test')!, username: 'ben', password: 'geheim456');
+      await other.gateway.setUpSecurity();
+      other.links.initial = link;
+      await _pump(tester, other);
+      expect(find.textContaining('Mit deinem Konto bei fake.test kannst du ihr nicht beitreten'), findsOneWidget);
+      expect(find.widgetWithText(FilledButton, 'Beitritt anfragen'), findsNothing);
     });
 
     testWidgets('Issue #6: eingefügter Link aus einer HTML-Mail (&amp;, in Klammern) wird angenommen', (tester) async {

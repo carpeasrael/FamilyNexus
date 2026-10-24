@@ -6,7 +6,7 @@ import '../../core/app_log.dart';
 
 /// Eingehende Einladungslinks (`familynexus://join?…`), z. B. nach dem Scannen eines
 /// QR-Codes mit der System-Kamera. Android-Brücke hinter Schnittstelle; Inhalte sind
-/// nicht vertrauenswürdig und werden erst in `InviteLink.tryParse` geprüft.
+/// nicht vertrauenswürdig und werden erst in `InviteLink.check` geprüft.
 abstract class LinkSource {
   /// Link, mit dem die App gestartet wurde (einmalig).
   Future<String?> initialLink();
