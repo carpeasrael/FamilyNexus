@@ -1,5 +1,4 @@
-Neu in 1.1.1:
-• Einladungslinks: klare Meldungen, wenn ein Link nicht passt (z. B. abgelaufen oder unvollständig); Links aus E-Mails werden besser erkannt.
-• Gültigkeit eines Einladungslinks wählbar: 1, 3 oder 7 Tage.
-• Mitglieder zum Moderator ernennen klappt auch mehrmals hintereinander zuverlässig (vorher kam „Dafür fehlt die Berechtigung“).
-Bitte alle Geräte der Familie aktualisieren.
+Neu in 1.1.2:
+• Einladungslinks nennen jetzt den Server für Konto und Anmeldung. Die App nutzt genau diesen Server, auch wenn du schon ein Konto hast. Ein anderer Server als matrix.org steht sichtbar im Feld „Anderen Anbieter verwenden“.
+• Nach Anmeldung und Notfall-Schlüssel erscheint die Familie aus dem Link; ein Tipp sendet die Beitrittsanfrage.
+Wichtig: Neue Einladungslinks lesen nur Geräte mit dieser Version. Bitte alle Geräte der Familie aktualisieren.

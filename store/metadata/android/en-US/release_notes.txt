@@ -1,5 +1,4 @@
-New in 1.1.1:
-• Invitation links: clear messages when a link does not fit; links pasted from emails are recognised better.
-• Choose how long a link is valid: 1, 3 or 7 days.
-• Making moderators now works reliably, even several in a row.
-Please update all devices in your family.
+New in 1.1.2:
+• Invitation links name the server for your account and sign-in; the app uses exactly that one, even with an existing account. Servers other than matrix.org appear in "Use another provider".
+• Then the family from the link appears; one tap sends the request.
+Important: new links can only be read by devices with this version. Please update all devices.
