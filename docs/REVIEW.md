@@ -216,3 +216,14 @@ Eigene Durchsicht der Änderung an `SdkMatrixGateway.promote`.
 | R2 | niedrig | Zwei Moderatoren ernennen exakt gleichzeitig: eine Ernennung kann verloren gehen | dokumentiert (E-60), wiederholbar |
 | R3 | – | Weitere Aufrufer von `setPower` | keiner in `lib/` |
 
+## Issue #9 (2026-10-24): Ersteller als Matrix-Administrator (E-61)
+
+Eigene Durchsicht der Änderung an `FamilyRoomSpec`, `PowerLevels`, Fake und Tests.
+
+| # | Schwere | Fund | Behebung |
+|---|---|---|---|
+| R1 | mittel | Stufe 100 für `tombstone`/`server_acl` wäre für den Administrator erreichbar geworden | `PowerLevels.unreachable` (101); Test |
+| R2 | niedrig | Asymmetrie: Administrator kann in fremden Clients Moderatoren herabstufen | dokumentiert (E-61); App bietet es nicht an |
+| R3 | niedrig | Bestehende Familien (Ersteller 50) nicht migrierbar | dokumentiert (E-61) |
+| R4 | – | Rechteprüfung hängt an `Role`, nicht am Level | unverändert; E2E bestätigt |
+

@@ -172,6 +172,40 @@ void main() {
       await E2e.until(() => a.family?.moderatorCount == 3, what: 'Drei Moderatoren');
     });
 
+    test('Issue #9: Ersteller ist im Raum Administrator (100), in der App Moderator; Moderator bleibt bei 50', () async {
+      final a = await _login('mod');
+      await a.createFamily('Admin');
+      await E2e.until(() => a.family != null);
+      final b = await _login('mem');
+      await _join(a, b);
+      await a.promote(b.userId!);
+      await E2e.until(() => b.family?.myRole == Role.moderator, what: 'B ist Moderator');
+
+      final roomA = a.sdkClient!.getRoomById(a.family!.roomId)!;
+      expect(roomA.getPowerLevelByUserId(a.userId!).level, 100);
+      expect(roomA.getPowerLevelByUserId(b.userId!).level, 50);
+      expect(a.family!.myRole, Role.moderator);
+      expect(a.family!.member(a.userId!)!.role, Role.moderator);
+      expect(a.family!.moderatorCount, 2);
+
+      // Der Administrator bleibt für den ernannten Moderator unantastbar (App und Server).
+      await expectLater(b.removeMember(a.userId!), _error(GatewayError.notAllowed));
+      await expectLater(
+        b.sdkClient!.setRoomStateWithKey(a.family!.roomId, 'm.room.power_levels', '', <String, Object?>{
+          ...roomA.getState('m.room.power_levels')!.content,
+          'users': <String, Object?>{a.userId!: 50, b.userId!: 50},
+        }),
+        throwsA(isA<MatrixException>().having((e) => e.errcode, 'errcode', 'M_FORBIDDEN')),
+      );
+      await expectLater(
+        b.sdkClient!.kick(a.family!.roomId, a.userId!),
+        throwsA(isA<MatrixException>().having((e) => e.errcode, 'errcode', 'M_FORBIDDEN')),
+      );
+      // Der ernannte Moderator darf weiterhin alles Übliche (Umbenennen).
+      await b.renameFamily('Von B');
+      await E2e.until(() => a.family?.name == 'Von B', what: 'Umbenennung sichtbar');
+    });
+
     test('Ablehnen einer Anfrage und abgelaufene/ungültige Links', () async {
       final a = await _login('mod');
       await a.createFamily('Ablehnen');

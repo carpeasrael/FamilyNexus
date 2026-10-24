@@ -33,7 +33,7 @@ und `android/`. Für eine zweite Plattform sind nur die Adapter in `data/platfor
 
 ## Matrix-Anbindung
 Alles geht durch `MatrixGateway`. Zusicherungen: Familienraum immer E2E-verschlüsselt (Raumversion 10, `knock`,
-Power-Levels 0/50), Senden nur bei nachweisbarer Megolm-Verschlüsselung, Rechte im Gateway **und** serverseitig,
+Power-Levels 0/50, Ersteller 100 = Administrator, in der App Moderator, E-61), Senden nur bei nachweisbarer Megolm-Verschlüsselung, Rechte im Gateway **und** serverseitig,
 Schlüsselweitergabe nur an cross-signierte Geräte (`ShareKeysWith.crossVerified`), Identitätsvermerke der Mitglieder,
 Einladungen mit Zufalls-ID. `FakeMatrixGateway` (test/support) bildet das Verhalten für Widget-/Integrationstests nach;
 `test/e2e` prüft das echte Gateway gegen Synapse.

@@ -40,7 +40,7 @@ Abnahme 1:
 | 2.3 | Serverwahl: URL-Validierung (nur https), Erreichbarkeit/Versionen, Betreiberanzeige |
 | 2.4 | Login (bestehendes Konto), Sitzungsspeicherung, Abmelden |
 | 2.5 | Ersteinrichtung in vier Schritten |
-| 2.6 | Familienraum anlegen (verschlüsselt, Power-Levels 0/50); Privatraum → Phase 3.3 (E-29) |
+| 2.6 | Familienraum anlegen (verschlüsselt, Power-Levels 0/50, Ersteller 100 – E-61); Privatraum → Phase 3.3 (E-29) |
 | 2.7 | Chat: Familienraum, Nachrichten, Antworten, Reaktionen, Anhänge (validiert), Offline-Warteschlange |
 
 Abnahme 2:

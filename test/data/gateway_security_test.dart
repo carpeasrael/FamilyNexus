@@ -9,7 +9,7 @@ import 'package:family_nexus/domain/family.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:matrix/matrix.dart';
+import 'package:matrix/matrix.dart' hide Role;
 
 void main() {
   group('HttpsOnlyClient (TLS-Pflicht für alle SDK-Verbindungen)', () {
@@ -93,8 +93,9 @@ void main() {
       expect(s['m.room.history_visibility'], <String, Object?>{'history_visibility': 'shared'});
     });
 
-    test('Ersteller ist Moderator (50), alle anderen 0', () {
-      expect(pl['users'], <String, int>{'@anna:x.org': PowerLevels.moderator});
+    test('Ersteller ist Administrator (100, in der App Moderator), alle anderen 0 (E-61)', () {
+      expect(pl['users'], <String, int>{'@anna:x.org': 100});
+      expect(PowerLevels.roleFor(PowerLevels.admin), Role.moderator);
       expect(pl['users_default'], 0);
       expect(pl['events_default'], 0);
     });
@@ -106,17 +107,18 @@ void main() {
       expect((pl['events']! as Map<String, int>)['m.room.power_levels'], 50);
     });
 
-    test('unveränderliche Zustände liegen unerreichbar auf 100', () {
+    test('unveränderliche Zustände liegen unerreichbar über dem Administrator', () {
       final ev = pl['events']! as Map<String, int>;
-      expect(ev['m.room.tombstone'], 100);
-      expect(ev['m.room.server_acl'], 100);
+      expect(ev['m.room.tombstone'], 101);
+      expect(ev['m.room.server_acl'], 101);
     });
 
-    test('jeder beim Anlegen gesetzte Zustand ist für den Ersteller (50) erlaubt', () {
+    test('jeder beim Anlegen gesetzte Zustand ist für den Ersteller (100) erlaubt', () {
       final ev = pl['events']! as Map<String, int>;
       for (final s in FamilyRoomSpec.initialState()) {
         final needed = ev[s.type] ?? (pl['state_default']! as int);
-        expect(needed, lessThanOrEqualTo(PowerLevels.moderator), reason: s.type);
+        expect(needed, lessThanOrEqualTo(PowerLevels.admin), reason: s.type);
+        expect(needed, lessThanOrEqualTo(PowerLevels.moderator), reason: '${s.type} (auch Moderatoren)');
       }
     });
 

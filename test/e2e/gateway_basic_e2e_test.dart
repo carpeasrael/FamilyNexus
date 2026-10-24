@@ -31,9 +31,9 @@ void main() {
       expect(msgs.every((e) => e.type == 'm.room.encrypted'), isTrue, reason: 'keine Klartextnachricht auf dem Server');
       expect(msgs.map((e) => e.content.toString()).join(), isNot(contains('Hallo verschlüsselt')));
 
-      // Power-Levels laut E-12
+      // Power-Levels laut E-12 und E-61 (Ersteller = Administrator)
       final pl = room.getState('m.room.power_levels')!.content;
-      expect((pl['users']! as Map)[client.userID], 50);
+      expect((pl['users']! as Map)[client.userID], 100);
       expect(pl['users_default'], 0);
       expect(room.getState('m.room.join_rules')!.content['join_rule'], 'knock');
       expect(room.getState('m.room.create')!.content['room_version'], '10');

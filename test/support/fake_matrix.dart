@@ -993,7 +993,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (_familyRoomId != null) throw const GatewayException(GatewayError.alreadyExists);
     final room = FakeRoom('${fake.nextId('!room')}:${fake.host}', trimmed)
       ..membership[_userId!] = MemberStatus.joined
-      ..power[_userId!] = PowerLevels.moderator;
+      ..power[_userId!] = PowerLevels.admin;
     fake.rooms[room.id] = room;
     _familyRoomId = room.id;
     fake.notifyAll();

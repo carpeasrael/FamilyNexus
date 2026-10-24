@@ -17,10 +17,11 @@ class FamilyRoomSpec {
         (type: 'm.room.join_rules', content: <String, Object?>{'join_rule': 'knock'}),
       ];
 
-  /// Power-Levels: Ersteller = Moderator (50), alle anderen 0. Wichtige
-  /// Zustandsereignisse, die niemand ändern soll, liegen auf 100 (unerreichbar).
+  /// Power-Levels: Ersteller = Administrator (100, in der App ein Moderator), alle anderen 0;
+  /// ernannte Moderatoren haben 50. Alle Schwellen liegen bei 50, damit Moderatoren und Ersteller
+  /// dasselbe dürfen. Zustandsereignisse, die niemand ändern soll, liegen auf 101 (unerreichbar).
   static Map<String, Object?> powerLevels(String creatorId) => <String, Object?>{
-        'users': <String, int>{creatorId: PowerLevels.moderator},
+        'users': <String, int>{creatorId: PowerLevels.admin},
         'users_default': PowerLevels.member,
         'events_default': PowerLevels.member,
         'state_default': PowerLevels.moderator,
@@ -34,8 +35,8 @@ class FamilyRoomSpec {
           'm.room.encryption': PowerLevels.moderator,
           'm.room.history_visibility': PowerLevels.moderator,
           'm.room.join_rules': PowerLevels.moderator,
-          'm.room.tombstone': 100,
-          'm.room.server_acl': 100,
+          'm.room.tombstone': PowerLevels.unreachable,
+          'm.room.server_acl': PowerLevels.unreachable,
         },
       };
 }

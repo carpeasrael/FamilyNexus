@@ -1,4 +1,5 @@
-/// Rollen laut Concept: Mitglied (Power-Level 0), Moderator (50).
+/// Rollen laut Concept: Mitglied (Power-Level 0), Moderator (50). Der Ersteller steht in Matrix auf
+/// Administrator (100); in der App ist er ein Moderator wie jeder andere (E-61).
 enum Role { member, moderator }
 
 enum MemberStatus {
@@ -14,6 +15,12 @@ class PowerLevels {
   const PowerLevels._();
   static const int member = 0;
   static const int moderator = 50;
+
+  /// Administrator im Matrix-Raum (nur der Ersteller); in der App gleichrangig mit Moderatoren.
+  static const int admin = 100;
+
+  /// Für niemanden erreichbar (über dem Administrator).
+  static const int unreachable = 101;
 
   static Role roleFor(int level) => level >= moderator ? Role.moderator : Role.member;
 }
