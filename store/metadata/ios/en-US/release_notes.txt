@@ -1,5 +1,6 @@
 New in 1.2.0:
 • Invitation links without extra confirmation: whoever opens the link and creates an account or signs in is admitted to the family automatically as soon as a moderator's app is online. Each link works once and only for a limited time.
+• Invitations can be shared as a clickable web link (mail, messenger). The page opens the app or points to the download.
 • Join without a link: moderators share the family code (Family → Invite someone), the person joining enters it under "Join". A moderator confirms explicitly.
 • Declined join requests are now shown. Open requests appear as a badge on the Family tab.
 • In the invite dialog, "Advanced" lets you choose the server for new accounts.

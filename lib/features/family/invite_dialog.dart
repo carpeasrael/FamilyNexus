@@ -105,9 +105,12 @@ class _InviteDialogState extends State<_InviteDialog> {
     await _regenerate(accountServer: host, keepServer: false);
   }
 
+  /// Zum Weitergeben: der anklickbare https-Link der Landingpage (E-68); die App liest ihn ebenso.
+  String get _shareLink => InviteLink.toWebLink(_link) ?? _link;
+
   Future<void> _copy() async {
     final l = AppLocalizations.of(context);
-    await Clipboard.setData(ClipboardData(text: _link));
+    await Clipboard.setData(ClipboardData(text: _shareLink));
     widget.messenger.showSnackBar(SnackBar(content: Text(l.familyInviteCopied)));
   }
 
@@ -117,10 +120,10 @@ class _InviteDialogState extends State<_InviteDialog> {
     final services = AppScope.read(context);
     final ok = await services.mail.compose(
       subject: l.inviteMailSubject,
-      body: l.inviteMailBody(widget.gateway.family?.name ?? '', _link, inviteValiditySentence(l, _validity)),
+      body: l.inviteMailBody(widget.gateway.family?.name ?? '', _shareLink, inviteValiditySentence(l, _validity)),
     );
     if (ok) return;
-    await Clipboard.setData(ClipboardData(text: _link));
+    await Clipboard.setData(ClipboardData(text: _shareLink));
     widget.messenger.showSnackBar(SnackBar(content: Text(l.familyInviteMailFailed)));
   }
 

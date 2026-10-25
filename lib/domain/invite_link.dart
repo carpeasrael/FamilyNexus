@@ -111,6 +111,19 @@ class InviteLink {
     return c.isEmpty ? null : c;
   }
 
+  /// Landingpage für Einladungen als https-Link (E-68): Mail-Programme machen `familynexus://` oft nicht
+  /// anklickbar. Die Angaben stehen im Fragment und gehen damit nie an den Server der Seite.
+  static const String landingPage = 'https://carpeasrael.github.io/FamilyNexus/join/';
+
+  /// Anklickbare Form eines App-Links ([create]); `null`, wenn [appLink] kein Einladungslink ist.
+  static String? toWebLink(String appLink) {
+    const prefix = '$scheme://$host?';
+    if (!appLink.startsWith(prefix)) return null;
+    return '$landingPage#${appLink.substring(prefix.length)}';
+  }
+
+  static final RegExp _webLink = RegExp('${RegExp.escape(landingPage)}?#', caseSensitive: false);
+
   /// Erzeugt den Link-Text.
   static String create({
     required String roomId,
@@ -305,7 +318,10 @@ class InviteLink {
   /// wird **nur zusätzlich** versucht – ein unveränderter Link geht immer vor, damit Namen wie „3D-Club“
   /// nie verfälscht werden (Review R1). Ein Satzzeichen am Ende eines Namens kann dabei wegfallen.
   static List<String> _candidates(String input) {
-    final text = (input.length > maxInput ? input.substring(0, maxInput) : input).replaceAll('&amp;', '&');
+    // Der https-Link der Landingpage trägt dieselben Angaben im Fragment; er wird wie der App-Link geprüft.
+    final text = (input.length > maxInput ? input.substring(0, maxInput) : input)
+        .replaceAll('&amp;', '&')
+        .replaceAll(_webLink, '$scheme://$host?');
     final variants = <String>[text];
     if (text.contains('=3D') || RegExp(r'=\r?\n').hasMatch(text)) {
       variants.add(text

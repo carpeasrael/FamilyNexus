@@ -537,6 +537,12 @@ jobs:
       - name: Build for GitHub Pages
         run: BASE_HREF=/FamilyNexus/ tool/build_web.sh
 
+      # Landingpage für Einladungslinks (E-68) muss mit ausgeliefert werden; ihre Auswertung wird mit Node geprüft.
+      - name: Check invitation landing page
+        run: |
+          test -f build/web_app/join/index.html && test -f build/web_app/join/join.js && test -f build/web_app/join/join.css
+          node test/web/join_landing_test.js
+
       - name: Attach to GitHub release
         env:
           GH_TOKEN: ${{ github.token }}

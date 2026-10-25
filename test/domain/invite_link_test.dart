@@ -217,4 +217,45 @@ void main() {
       expect(InviteLink.tryParse(n, now: now)!.familyName, 'Familie Müller');
     });
   });
+
+  group('https-Landingpage (E-68)', () {
+    final now = DateTime.utc(2026, 10, 25, 12);
+    String app() => InviteLink.create(
+          roomId: '!abc:example.org',
+          via: 'example.org',
+          inviter: '@anna:example.org',
+          now: now,
+          nonce: '0123456789abcdef0123456789abcdef',
+          familyName: 'Familie Test',
+          inviterName: 'Anna',
+        );
+
+    test('Web-Link trägt dieselben Angaben im Fragment und wird wie der App-Link gelesen', () {
+      final web = InviteLink.toWebLink(app())!;
+      expect(web, startsWith('https://carpeasrael.github.io/FamilyNexus/join/#v=3&'));
+      expect(Uri.parse(web).hasQuery, isFalse, reason: 'nichts davon geht als Anfrage an den Server');
+      final fromApp = InviteLink.check(app(), now: now).link!;
+      final fromWeb = InviteLink.check(web, now: now);
+      expect(fromWeb.ok, isTrue);
+      expect(fromWeb.link!.roomId, fromApp.roomId);
+      expect(fromWeb.link!.nonce, fromApp.nonce);
+      expect(fromWeb.link!.accountServer, fromApp.accountServer);
+      expect(fromWeb.raw, startsWith('familynexus://join?'), reason: 'vorgemerkt wird immer der App-Link');
+    });
+
+    test('auch in Text, mit Satzzeichen, Groß-/Kleinschreibung und ohne Schrägstrich', () {
+      final web = InviteLink.toWebLink(app())!;
+      expect(InviteLink.check('Hallo!\n$web.\nViele Grüße', now: now).ok, isTrue);
+      expect(InviteLink.check(web.replaceFirst('https://carpeasrael.github.io', 'HTTPS://CARPEASRAEL.GITHUB.IO'), now: now).ok, isTrue);
+      expect(InviteLink.check(web.replaceFirst('/join/#', '/join#'), now: now).ok, isTrue);
+    });
+
+    test('fremde Seiten, fehlendes Fragment und Manipulation werden abgelehnt', () {
+      final web = InviteLink.toWebLink(app())!;
+      expect(InviteLink.check(web.replaceFirst('carpeasrael.github.io', 'evil.example'), now: now).ok, isFalse);
+      expect(InviteLink.check(web.replaceFirst('#', '?'), now: now).ok, isFalse);
+      expect(InviteLink.check('$web&evil=1', now: now).ok, isFalse, reason: 'unbekanntes Feld wie beim App-Link');
+      expect(InviteLink.toWebLink('https://example.org/x'), isNull);
+    });
+  });
 }

@@ -1,5 +1,6 @@
 Neu in 1.2.0:
 • Einladungslinks ohne Rückfrage: Wer den Link öffnet und ein Konto anlegt oder sich anmeldet, wird automatisch in die Familie aufgenommen, sobald die App eines Moderators online ist. Jeder Link gilt nur einmal und nur begrenzte Zeit.
+• Einladungen lassen sich als anklickbarer Web-Link teilen (Mail, Messenger). Die Seite öffnet die App oder verweist auf den Download.
 • Beitritt ohne Link: Moderatoren nennen den Familien-Code (Familie → Jemanden einladen), die beitretende Person gibt ihn unter „Beitreten“ ein. Ein Moderator bestätigt ausdrücklich.
 • Abgelehnte Beitrittsanfragen werden jetzt angezeigt. Offene Anfragen zeigt ein Abzeichen am Tab „Familie“.
 • Im Einladungsdialog lässt sich unter „Erweitert“ der Server für neue Konten wählen.

@@ -1,6 +1,6 @@
 New in 1.2.0:
-• Invitation link: whoever opens it is admitted automatically as soon as a moderator is online.
+• Invitation link (also as a clickable web link): whoever opens it is admitted automatically as soon as a moderator is online.
 • Join without a link using a family code; a moderator confirms.
 • Declined requests are shown; open requests appear as a badge on the Family tab.
-• Choose the server for new accounts in the invite dialog; Element as a fallback if the server does not allow sign-up in the app.
+• Account server selectable in the invite dialog; Element as a fallback if sign-up is blocked.
 Important: moderators, please update – older versions do not recognise new links.

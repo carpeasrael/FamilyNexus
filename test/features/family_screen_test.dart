@@ -68,7 +68,7 @@ void main() {
     await _openFamily(tester, app);
     await tester.tap(find.text('Jemanden einladen'));
     await tester.pumpAndSettle();
-    String mailedLink() => RegExp(r'familynexus://join\?\S+').firstMatch(app.mail.drafts.last.body)!.group(0)!;
+    String mailedLink() => RegExp(r'https://carpeasrael\.github\.io/FamilyNexus/join/#\S+').firstMatch(app.mail.drafts.last.body)!.group(0)!;
     Future<void> mail() async {
       await tester.ensureVisible(find.text('Per E-Mail senden'));
       await tester.tap(find.text('Per E-Mail senden'));
@@ -76,7 +76,7 @@ void main() {
     }
 
     await mail();
-    expect(InviteLink.tryParse(mailedLink(), now: app.server.now())!.accountServer, 'fake.test', reason: 'Standard: Server des Einladenden');
+    expect(InviteLink.check(mailedLink(), now: app.server.now()).link!.accountServer, 'fake.test', reason: 'Standard: Server des Einladenden');
 
     await tester.tap(find.text('7 Tage'));
     await tester.pumpAndSettle();
@@ -91,7 +91,7 @@ void main() {
     await tester.tap(find.text('Neuen Link erzeugen'));
     await tester.pumpAndSettle();
     await mail();
-    final link = InviteLink.tryParse(mailedLink(), now: app.server.now())!;
+    final link = InviteLink.check(mailedLink(), now: app.server.now()).link!;
     expect(link.accountServer, 'matrix.org');
     expect(link.via, 'fake.test', reason: 'der Familienraum bleibt auf dem Server des Einladenden');
     expect(link.expires.difference(app.server.now()), const Duration(days: 7), reason: 'Gültigkeit bleibt');
@@ -99,7 +99,7 @@ void main() {
     await tester.tap(find.text('1 Tag'));
     await tester.pumpAndSettle();
     await mail();
-    expect(InviteLink.tryParse(mailedLink(), now: app.server.now())!.accountServer, 'matrix.org', reason: 'Server bleibt bei neuer Gültigkeit');
+    expect(InviteLink.check(mailedLink(), now: app.server.now()).link!.accountServer, 'matrix.org', reason: 'Server bleibt bei neuer Gültigkeit');
   });
 
   testWidgets('Einladungslink per E-Mail: Entwurf mit Anleitung und Link, ohne Mailprogramm wird kopiert', (tester) async {
@@ -119,24 +119,24 @@ void main() {
     final draft = app.mail.drafts.single;
     expect(draft.subject, 'Einladung zu FamilyNexus');
     expect(draft.body, contains('„Familie Test“'));
-    expect(draft.body, contains('familynexus://join?'));
+    expect(draft.body, contains('https://carpeasrael.github.io/FamilyNexus/join/#v=3'), reason: 'anklickbarer https-Link (E-68)');
     expect(draft.body, contains('3 Tage gültig'));
     expect(draft.body, contains('„Ich wurde eingeladen“'), reason: 'Anleitung nennt den Weg in der App');
     expect(draft.body, isNot(contains('Matrix')), reason: 'keine Fachbegriffe');
-    final link = RegExp(r'familynexus://join\?\S+').firstMatch(draft.body)!.group(0)!;
+    final link = RegExp(r'https://carpeasrael\.github\.io/FamilyNexus/join/#\S+').firstMatch(draft.body)!.group(0)!;
     // Issue #6: andere Gültigkeit wählen → neuer Link, Text im Entwurf passt.
     await tester.tap(find.text('7 Tage'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Per E-Mail senden'));
     await tester.pumpAndSettle();
     expect(app.mail.drafts.last.body, contains('7 Tage gültig'));
-    final link7 = RegExp(r'familynexus://join\?\S+').firstMatch(app.mail.drafts.last.body)!.group(0)!;
+    final link7 = RegExp(r'https://carpeasrael\.github\.io/FamilyNexus/join/#\S+').firstMatch(app.mail.drafts.last.body)!.group(0)!;
     expect(link7, isNot(link), reason: 'neuer Link mit neuer Gültigkeit');
     // Der Fake-Server erzeugt Links mit seiner festen Test-Uhr.
     final t = app.server.now();
-    expect(InviteLink.tryParse(link7, now: t)!.expires.difference(t), const Duration(days: 7));
+    expect(InviteLink.check(link7, now: t).link!.expires.difference(t), const Duration(days: 7));
     app.mail.drafts.removeLast();
-    expect(InviteLink.tryParse(link, now: DateTime.now()), isNotNull, reason: 'der Link im Entwurf ist gültig');
+    expect(InviteLink.check(link, now: DateTime.now()).link, isNotNull, reason: 'der Link im Entwurf ist gültig');
 
     app.mail.available = false;
     await tester.tap(find.text('Per E-Mail senden'));
@@ -144,7 +144,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
     expect(app.mail.drafts, hasLength(1));
     expect(find.text('Kein Mailprogramm gefunden. Der Link wurde stattdessen kopiert.'), findsOneWidget);
-    expect(clipboard, startsWith('familynexus://join?'), reason: 'Fallback kopiert den Link');
+    expect(clipboard, startsWith('https://carpeasrael.github.io/FamilyNexus/join/#'), reason: 'Fallback kopiert den Link');
   });
 
   testWidgets('Anfrage bestätigen und ablehnen', (tester) async {

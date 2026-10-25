@@ -1,6 +1,6 @@
 Neu in 1.2.0:
-• Einladungslink: Wer ihn öffnet, wird automatisch aufgenommen, sobald ein Moderator online ist.
+• Einladungslink (auch als anklickbarer Web-Link): Wer ihn öffnet, wird automatisch aufgenommen, sobald ein Moderator online ist.
 • Beitritt ohne Link per Familien-Code; ein Moderator bestätigt.
 • Abgelehnte Anfragen werden angezeigt; offene Anfragen zeigt ein Abzeichen am Tab „Familie“.
-• Server für neue Konten im Einladungsdialog wählbar; Element als Ausweg, wenn der Server keine Kontoanlage in der App erlaubt.
+• Konto-Server im Einladungsdialog wählbar; Element als Ausweg bei gesperrter Registrierung.
 Wichtig: Moderatoren bitte aktualisieren – ältere Versionen erkennen neue Links nicht.

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="robots" content="noindex">
+  <title>FamilyNexus – Einladung</title>
+  <link rel="icon" href="../favicon.png">
+  <link rel="stylesheet" href="join.css">
+</head>
+<body>
+  <main>
+    <img src="../icons/Icon-192.png" width="72" height="72" alt="">
+    <h1 id="title">Einladung zu FamilyNexus</h1>
+    <p id="lead">Du wurdest in eine Familie eingeladen.</p>
+    <p id="error" role="alert" hidden></p>
+    <div id="actions">
+      <a id="open" class="button" href="#">App öffnen</a>
+      <button id="copy" type="button">Link kopieren</button>
+    </div>
+    <p id="copied" role="status" hidden></p>
+    <section>
+      <h2 id="installTitle">Die App ist noch nicht installiert?</h2>
+      <p id="installText"></p>
+      <p><a id="download" href="https://github.com/carpeasrael/FamilyNexus/releases/latest" rel="noopener">App laden</a> ·
+         <a id="web" href="../" rel="noopener">Im Browser öffnen</a></p>
+    </section>
+    <p id="privacy" class="small"></p>
+  </main>
+  <script src="join.js"></script>
+</body>
+</html>
