@@ -1,4 +1,7 @@
-New in 1.1.2:
-• Invitation links now name the server for your account and sign-in. The app uses exactly that server, even if you already have an account. A server other than matrix.org appears in the field "Use another provider".
-• After sign-in and the emergency key, the family from the link appears; one tap sends the join request.
-Important: new invitation links can only be read by devices with this version. Please update all devices in your family.
+New in 1.2.0:
+• Invitation links without extra confirmation: whoever opens the link and creates an account or signs in is admitted to the family automatically as soon as a moderator's app is online. Each link works once and only for a limited time.
+• Join without a link: moderators share the family code (Family → Invite someone), the person joining enters it under "Join". A moderator confirms explicitly.
+• Declined join requests are now shown. Open requests appear as a badge on the Family tab.
+• In the invite dialog, "Advanced" lets you choose the server for new accounts.
+• If a server does not allow sign-up in the app, Element can be started.
+Important: please update all moderators. Older versions do not recognise the new invitation links and do not confirm them automatically.

@@ -1,4 +1,7 @@
-Neu in 1.1.2:
-• Einladungslinks nennen jetzt den Server für Konto und Anmeldung. Die App nutzt genau diesen Server, auch wenn du schon ein Konto hast. Ein anderer Server als matrix.org steht sichtbar im Feld „Anderen Anbieter verwenden“.
-• Nach Anmeldung und Notfall-Schlüssel erscheint die Familie aus dem Link; ein Tipp sendet die Beitrittsanfrage.
-Wichtig: Neue Einladungslinks lesen nur Geräte mit dieser Version. Bitte alle Geräte der Familie aktualisieren.
+Neu in 1.2.0:
+• Einladungslinks ohne Rückfrage: Wer den Link öffnet und ein Konto anlegt oder sich anmeldet, wird automatisch in die Familie aufgenommen, sobald die App eines Moderators online ist. Jeder Link gilt nur einmal und nur begrenzte Zeit.
+• Beitritt ohne Link: Moderatoren nennen den Familien-Code (Familie → Jemanden einladen), die beitretende Person gibt ihn unter „Beitreten“ ein. Ein Moderator bestätigt ausdrücklich.
+• Abgelehnte Beitrittsanfragen werden jetzt angezeigt. Offene Anfragen zeigt ein Abzeichen am Tab „Familie“.
+• Im Einladungsdialog lässt sich unter „Erweitert“ der Server für neue Konten wählen.
+• Erlaubt ein Server die Kontoanlage in der App nicht, kann Element gestartet werden.
+Wichtig: Bitte alle Moderatoren aktualisieren. Ältere Versionen erkennen die neuen Einladungslinks nicht und bestätigen sie nicht automatisch.

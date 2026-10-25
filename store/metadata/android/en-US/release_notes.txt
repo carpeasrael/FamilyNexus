@@ -1,4 +1,6 @@
-New in 1.1.2:
-• Invitation links name the server for your account and sign-in; the app uses exactly that one, even with an existing account. Servers other than matrix.org appear in "Use another provider".
-• Then the family from the link appears; one tap sends the request.
-Important: new links can only be read by devices with this version. Please update all devices.
+New in 1.2.0:
+• Invitation link: whoever opens it is admitted automatically as soon as a moderator is online.
+• Join without a link using a family code; a moderator confirms.
+• Declined requests are shown; open requests appear as a badge on the Family tab.
+• Choose the server for new accounts in the invite dialog; Element as a fallback if the server does not allow sign-up in the app.
+Important: moderators, please update – older versions do not recognise new links.
