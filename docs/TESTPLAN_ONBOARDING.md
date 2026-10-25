@@ -189,7 +189,7 @@ Bildschirmfotos (B), Zuordnung: 01 Start · 02–04 Konto erstellen (leer, verge
 |---|---|---|
 | D1 | Desktop-Rücksprung: Empfänger schloss, bevor der Browser die Seite „Fertig“ erhalten hatte | ✅ Seite wird erst vollständig gesendet (`oauth_redirect_test.dart`) |
 | D2 | Eigener Anbieter ohne Eingabe zeigte eine endlose Ladeanzeige | ✅ Zustand „Bitte gib die Adresse ein“ |
-| D3 | Einladung beim Kaltstart: Anbieterprüfung startete nicht (Ladeanzeige blieb) | ✅ `ProviderController.useStandard` startet immer beim ersten Aufruf |
+| D3 | Einladung beim Kaltstart: Anbieterprüfung startete nicht (Ladeanzeige blieb) | ✅ `ProviderController.useServer` startet immer beim ersten Aufruf |
 | D4 | Verworfener gespeicherter Link: Einstellung wurde während des Aufbaus geändert (Framework-Fehler) | ✅ nach dem Aufbau |
 | D5 | Titel doppelt (Titelleiste und Karte) bei Notfall-Schlüssel und Beitrittskarte; „Abmelden“ mitten in der Einrichtung missverständlich | ✅ Titel nur in der Titelleiste; „Anderes Konto verwenden“ |
 | D6 | Captcha/E-Mail: Hauptaktion stand unter der Nebenaktion | ✅ Hauptaktion zuerst, volle Breite |

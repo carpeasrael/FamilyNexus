@@ -40,7 +40,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool _started = false;
 
   late final AppServices _s = AppScope.read(context);
-  late final ProviderController _provider = ProviderController(gateway: _s.gateway, settings: _s.settings);
+  late final ProviderController _provider = ProviderController(gateway: _s.gateway, initial: _s.defaultProvider);
 
   @override
   void initState() {
@@ -90,7 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final url = ServerUrl.tryParse(invite.accountServer);
     // Nicht lesbarer Servername: beim bisherigen Anbieter bleiben (sonst stünde „Verbinde …“ für immer).
     // Server im Heimnetz: erst nach Zustimmung verbinden (Review R2).
-    url != null ? _provider.useInvited(url, askFirst: InviteLink.isLocalServer(invite.accountServer)) : _provider.start();
+    url != null ? _provider.useServer(url, askFirst: InviteLink.isLocalServer(invite.accountServer)) : _provider.start();
   }
 
   /// Angemeldet (Konto erstellt oder Anmeldung): weiter zur Absicherung; abgemeldet: zurück.

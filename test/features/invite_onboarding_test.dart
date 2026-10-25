@@ -38,12 +38,12 @@ Future<void> _tap(WidgetTester tester, String text, {bool settle = true}) async 
 }
 
 /// Anna (Moderatorin) mit Familie und einem frischen Einladungslink; dazu ein neues Gerät ohne Konto.
-Future<({TestApp anna, TestApp guest, String link})> _annaInvites() async {
+Future<({TestApp anna, TestApp guest, String link})> _annaInvites({bool matrixOrgDefault = false}) async {
   final anna = await buildTestApp();
   // Die App prüft Links gegen die echte Uhr.
   anna.server.now = () => DateTime.now().toUtc();
   final link = await anna.gateway.createInviteLink();
-  final guest = await buildTestApp(loggedIn: false, server: anna.server);
+  final guest = await buildTestApp(loggedIn: false, server: anna.server, matrixOrgDefault: matrixOrgDefault);
   return (anna: anna, guest: guest, link: link);
 }
 
@@ -148,7 +148,7 @@ void main() {
     });
 
     testWidgets('TP-JOIN-10 Server aus dem Link (nicht matrix.org) steht im Feld „Anderen Anbieter verwenden“ und wird fürs Konto genutzt (E-63)', (tester) async {
-      final s = await _annaInvites();
+      final s = await _annaInvites(matrixOrgDefault: true);
       s.guest.links.initial = s.link;
       await _pump(tester, s.guest);
 
@@ -160,11 +160,10 @@ void main() {
 
       await _createAccount(tester, name: 'Carla');
       expect(s.guest.gateway.userId, '@carla:fake.test', reason: 'Konto liegt auf dem Server aus dem Link');
-      expect(s.guest.services.settings.settings.serverUrl, 'https://fake.test');
     });
 
     testWidgets('TP-JOIN-11 Server aus dem Link ist matrix.org: Standardanbieter bleibt gewählt, kein eigenes Feld', (tester) async {
-      final s = await _annaInvites();
+      final s = await _annaInvites(matrixOrgDefault: true);
       final link = InviteLink.create(
         roomId: '!fam:matrix.org',
         via: 'matrix.org',
@@ -184,7 +183,7 @@ void main() {
     });
 
     testWidgets('TP-JOIN-12 Anmelden mit bestehendem Konto: Link kommt erst auf der Anmeldeseite an → Server aus dem Link, am Ende die Familie', (tester) async {
-      final s = await _annaInvites();
+      final s = await _annaInvites(matrixOrgDefault: true);
       await _pump(tester, s.guest);
       await _tap(tester, 'Ich habe schon ein Konto');
       expect(find.widgetWithText(TextField, 'Adresse des Anbieters'), findsNothing, reason: 'vorher der Standardanbieter');

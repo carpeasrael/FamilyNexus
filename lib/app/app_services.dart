@@ -4,6 +4,7 @@ import '../data/db/app_database.dart';
 import '../data/matrix/matrix_gateway.dart';
 import '../data/platform/browser_launcher.dart';
 import '../data/platform/element_launcher.dart';
+import '../domain/server.dart';
 import '../data/platform/file_access.dart';
 import '../data/platform/key_store.dart';
 import '../data/platform/link_source.dart';
@@ -50,6 +51,7 @@ class AppServices {
     this.browser = const SystemBrowserLauncher(),
     this.element = const SystemElementLauncher(),
     this.oauthRedirect,
+    this.defaultProvider,
   });
 
   final SettingsController settings;
@@ -67,6 +69,9 @@ class AppServices {
 
   /// Startet Element, wenn der Server die Kontoanlage in der App nicht zulässt.
   final ElementLauncher element;
+
+  /// Standard-Anbieter der Einrichtung; `null` = `matrix.org` (nur Tests setzen ihn).
+  final ServerUrl? defaultProvider;
 
   /// Rücksprung der Anmeldung im Browser; `null` = auf dieser Plattform nicht verfügbar (Browser-App).
   final OAuthRedirect? oauthRedirect;

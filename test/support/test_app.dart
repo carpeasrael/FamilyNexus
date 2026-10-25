@@ -73,12 +73,12 @@ Future<TestApp> buildTestApp({
   ScreenProtection? screenProtection,
   bool secureScreen = true,
   bool lockEnabled = false,
+  String? defaultProvider,
+  bool matrixOrgDefault = false,
 }) async {
   final store = MemoryKeyValueStore();
   if (lang != null) store.data['language'] = lang;
   final fake = server ?? FakeMatrixServer();
-  // Standard-Anbieter ist im Test der Fake-Server (statt matrix.org).
-  store.data['serverUrl'] = 'https://${fake.host}';
   if (server == null) {
     fake.addAccount('anna', 'geheim123', displayName: 'Anna');
     fake.addAccount('ben', 'geheim456', displayName: 'Ben');
@@ -117,6 +117,8 @@ Future<TestApp> buildTestApp({
     browser: browser,
     element: element,
     oauthRedirect: oauth,
+    // Standard-Anbieter ist im Test der Fake-Server (statt matrix.org), außer ein Test will den echten Standard.
+    defaultProvider: matrixOrgDefault ? null : ServerUrl.tryParse(defaultProvider ?? fake.host),
     shoppingBuilder: (uid) async {
       final service = ShoppingService(store: shoppingStore, myUserId: uid, clock: clock);
       return ShoppingController(

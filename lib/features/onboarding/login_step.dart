@@ -58,7 +58,7 @@ class _LoginStepState extends State<LoginStep> {
     _idTimer?.cancel();
     final server = MatrixIds.serverName(v.trim());
     final url = server == null ? null : ServerUrl.tryParse(server);
-    if (url != null) _idTimer = Timer(const Duration(milliseconds: 600), () => widget.provider.useStandard(url));
+    if (url != null) _idTimer = Timer(const Duration(milliseconds: 600), () => widget.provider.useServer(url));
     setState(() {});
   }
 

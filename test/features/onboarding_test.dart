@@ -230,10 +230,8 @@ void main() {
   });
 
   testWidgets('TP-LOGIN-01 vollständige ID @name:anbieter wählt den Anbieter selbst', (tester) async {
-    final app = await buildTestApp(loggedIn: false);
     // Andere Voreinstellung: Ohne die ID wäre der Anbieter unbekannt.
-    app.store.data['serverUrl'] = 'https://unbekannt.example';
-    await app.services.settings.update((c) => c.copyWith(serverUrl: 'https://unbekannt.example'));
+    final app = await buildTestApp(loggedIn: false, defaultProvider: 'unbekannt.example');
     await _pump(tester, app);
     await _tapText(tester, 'Ich habe schon ein Konto');
     expect(find.textContaining('unbekannt.example ist gerade nicht erreichbar'), findsOneWidget);

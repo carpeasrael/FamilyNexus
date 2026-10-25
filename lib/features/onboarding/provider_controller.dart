@@ -6,7 +6,6 @@ import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/app_settings.dart';
 import '../../domain/registration.dart';
 import '../../domain/server.dart';
-import '../settings/settings_controller.dart';
 
 /// `empty`: eigener Anbieter gewählt, aber noch keine Adresse eingegeben. `needsConsent`: Server im
 /// Heimnetz aus einer Einladung – verbunden wird erst nach ausdrücklichem Tipp (Review R2, Issue #6).
@@ -18,16 +17,14 @@ enum ProviderStatus { empty, needsConsent, checking, ready, invalid, failed }
 class ProviderController extends ChangeNotifier {
   ProviderController({
     required this.gateway,
-    required this.settings,
     ServerUrl? initial,
     this.debounce = const Duration(milliseconds: 800),
-  }) : _standard = initial ?? ServerUrl.tryParse(settings.settings.serverUrl)!;
+  }) : _standard = initial ?? ServerUrl.tryParse(AppSettings.defaultServerUrl)!;
 
   final MatrixGateway gateway;
-  final SettingsController settings;
   final Duration debounce;
 
-  ServerUrl _standard;
+  final ServerUrl _standard;
   bool _custom = false;
   String _customText = '';
   ProviderStatus _status = ProviderStatus.checking;
@@ -39,7 +36,7 @@ class ProviderController extends ChangeNotifier {
   bool _started = false;
   bool _disposed = false;
 
-  /// Anbieter aus der Einladung oder den Einstellungen (ohne eigene Eingabe).
+  /// Der Standard-Anbieter (`matrix.org`), unabhängig vom zuletzt benutzten Server.
   ServerUrl get standard => _standard;
   bool get custom => _custom;
   String get customText => _customText;
@@ -61,41 +58,18 @@ class ProviderController extends ChangeNotifier {
     _check(immediate: true);
   }
 
-  /// Wechselt auf einen fest vorgegebenen Anbieter (z. B. aus `@anna:beispiel.de` oder der Einladung).
+  /// Wählt einen fest vorgegebenen Anbieter (Einladung E-63, oder `@anna:beispiel.de` bei der Anmeldung):
+  /// `matrix.org` bleibt der Standard, jeder andere Server wird als „Anderer Anbieter“ mit seiner Adresse
+  /// eingetragen. Der Standard wandert nie auf den zuletzt benutzten Server.
   ///
   /// [askFirst]: nicht sofort verbinden (Server im Heimnetz aus einer Einladung), sondern erst nach
   /// [connect].
-  void useStandard(ServerUrl url, {bool askFirst = false}) {
-    if (_started && !_custom && url == _standard && _status != ProviderStatus.failed) return;
-    _standard = url;
-    _custom = false;
-    if (askFirst) {
-      _started = true;
-      _timer?.cancel();
-      _run++;
-      _info = null;
-      _options = null;
-      _error = null;
-      _status = ProviderStatus.needsConsent;
-      _notify();
-      return;
-    }
-    start();
-  }
-
-  /// Wählt den Server aus einer Einladung (E-63): `matrix.org` ist der Standard, jeder andere Server wird als
-  /// „Anderer Anbieter“ mit seiner Adresse eingetragen. Konto anlegen und Anmelden nutzen dann genau diesen
-  /// Server. [askFirst] wie bei [useStandard].
-  void useInvited(ServerUrl url, {bool askFirst = false}) {
-    final standard = ServerUrl.tryParse(AppSettings.defaultServerUrl)!;
-    if (url == standard) {
-      useStandard(url, askFirst: askFirst);
-      return;
-    }
+  void useServer(ServerUrl url, {bool askFirst = false}) {
+    final isStandard = url == _standard;
     final text = url.uri.hasPort ? '${url.host}:${url.uri.port}' : url.host;
-    if (_started && _custom && _customText == text && _status != ProviderStatus.failed) return;
-    _custom = true;
-    _customText = text;
+    if (_started && _custom == !isStandard && (isStandard || _customText == text) && _status != ProviderStatus.failed) return;
+    _custom = !isStandard;
+    if (!isStandard) _customText = text;
     if (askFirst) {
       _started = true;
       _timer?.cancel();
@@ -158,7 +132,6 @@ class ProviderController extends ChangeNotifier {
       _info = info;
       _options = options;
       _status = ProviderStatus.ready;
-      await settings.update((c) => c.copyWith(serverUrl: url.toString()));
     } on GatewayException catch (e) {
       if (run != _run || _disposed) return;
       _error = e.error;
