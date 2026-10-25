@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
@@ -50,7 +51,7 @@ class FamilyScreen extends StatelessWidget {
           ),
           if (mod) ...<Widget>[
             const SizedBox(height: 12),
-            _InvitePanel(gateway: g),
+            _InvitePanel(gateway: g, roomId: f.roomId),
             if (f.requests.isNotEmpty) ...<Widget>[
               const SizedBox(height: 16),
               Semantics(header: true, child: Text(l.familyRequests, style: Theme.of(context).textTheme.titleLarge)),
@@ -263,6 +264,7 @@ class _RequestTile extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final t = AuroraTokens.of(context);
     final valid = member.request == RequestCheck.valid;
+    final byCode = member.request == RequestCheck.code;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: GlassCard(
@@ -277,6 +279,7 @@ class _RequestTile extends StatelessWidget {
               child: Text(switch (member.request) {
                 RequestCheck.valid => l.familyRequestCheckValid,
                 RequestCheck.expired => l.familyRequestCheckExpired,
+                RequestCheck.code => l.familyRequestCheckCode(member.userId),
                 _ => l.familyRequestCheckUnknown,
               }),
             ),
@@ -286,7 +289,7 @@ class _RequestTile extends StatelessWidget {
             TextButton(onPressed: () => _act(context, () => gateway.rejectRequest(member.userId)), child: Text(l.familyRequestReject)),
             const SizedBox(width: 8),
             FilledButton(
-              onPressed: !valid
+              onPressed: !valid && !byCode
                   ? null
                   : () async {
                       if (await _confirm(context, l.familyRequestApprove, l.familyRequestApproveConfirm(member.userId), l.familyRequestApprove) && context.mounted) {
@@ -303,8 +306,11 @@ class _RequestTile extends StatelessWidget {
 }
 
 class _InvitePanel extends StatefulWidget {
-  const _InvitePanel({required this.gateway});
+  const _InvitePanel({required this.gateway, this.roomId});
   final MatrixGateway gateway;
+
+  /// Familien-Code (Raum-ID) zum Weitergeben; `null` ohne Familie.
+  final String? roomId;
 
   @override
   State<_InvitePanel> createState() => _InvitePanelState();
@@ -343,6 +349,22 @@ class _InvitePanelState extends State<_InvitePanel> {
         const SizedBox(height: 8),
         Text(l.familyInviteIntro),
         const SizedBox(height: 12),
+        if (widget.roomId != null) ...<Widget>[
+          Text(l.familyCodeTitle, style: Theme.of(context).textTheme.titleSmall),
+          Text(l.familyCodeHint, style: Theme.of(context).textTheme.bodySmall),
+          Row(children: <Widget>[
+            Expanded(child: SelectableText(widget.roomId!, style: monoStyle(context, size: 12))),
+            IconButton(
+              tooltip: l.familyCodeCopy,
+              icon: const Icon(Icons.copy_outlined),
+              onPressed: () async {
+                await Clipboard.setData(ClipboardData(text: widget.roomId!));
+                if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.familyCodeCopied)));
+              },
+            ),
+          ]),
+          const SizedBox(height: 12),
+        ],
         FilledButton.icon(
           icon: const Icon(Icons.person_add_alt_1_outlined),
           label: Text(l.familyInviteSomeone),

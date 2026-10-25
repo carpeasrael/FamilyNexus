@@ -49,6 +49,9 @@ enum RequestCheck {
 
   /// Link unbekannt (nicht von diesem Konto ausgegeben oder bereits verbraucht).
   unknown,
+
+  /// Anfrage über den Familien-Code, ohne Link: nur nach ausdrücklicher Bestätigung durch einen Moderator.
+  code,
 }
 
 class FamilyMember {

@@ -3200,6 +3200,60 @@ abstract class AppLocalizations {
   /// **'Element laden'**
   String get regElementDownload;
 
+  /// No description provided for @familyRequestCheckCode.
+  ///
+  /// In de, this message translates to:
+  /// **'Anfrage über den Familien-Code (ohne Link) – nur bestätigen, wenn du {id} kennst und erwartest'**
+  String familyRequestCheckCode(String id);
+
+  /// No description provided for @familyCodeTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Familien-Code'**
+  String get familyCodeTitle;
+
+  /// No description provided for @familyCodeHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Wer dir ohne Link beitreten will, gibt diesen Code ein. Du musst die Anfrage danach ausdrücklich bestätigen.'**
+  String get familyCodeHint;
+
+  /// No description provided for @familyCodeCopy.
+  ///
+  /// In de, this message translates to:
+  /// **'Code kopieren'**
+  String get familyCodeCopy;
+
+  /// No description provided for @familyCodeCopied.
+  ///
+  /// In de, this message translates to:
+  /// **'Code kopiert'**
+  String get familyCodeCopied;
+
+  /// No description provided for @joinCodeTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Ohne Link beitreten (Familien-Code)'**
+  String get joinCodeTitle;
+
+  /// No description provided for @joinCodeHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Frag einen Moderator nach dem Familien-Code. Er muss deine Anfrage bestätigen.'**
+  String get joinCodeHint;
+
+  /// No description provided for @joinCodeLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Familien-Code'**
+  String get joinCodeLabel;
+
+  /// No description provided for @joinCodeInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Das ist kein gültiger Familien-Code. Er beginnt mit „!“ und enthält einen Server, z. B. !abc:matrix.org.'**
+  String get joinCodeInvalid;
+
   /// No description provided for @oauthWaiting.
   ///
   /// In de, this message translates to:

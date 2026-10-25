@@ -5,6 +5,7 @@ import 'package:family_nexus/domain/attachment_policy.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/event_codec.dart';
+import 'package:family_nexus/domain/family_code.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/moderation.dart';
 import 'package:family_nexus/domain/permissions.dart';
@@ -239,6 +240,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   RequestCheck _check(FakeRoom room, String user) {
     final n = room.knockNonce[user];
+    if (n == 'code') return RequestCheck.code;
     final exp = n == null ? null : room.issued[n];
     if (exp == null) return RequestCheck.unknown;
     return fake.now().isBefore(exp) ? RequestCheck.valid : RequestCheck.expired;
@@ -582,6 +584,22 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   @override
+  Future<void> requestToJoinByCode(String code) async {
+    _requireSession();
+    _require();
+    final roomId = FamilyCode.parse(code);
+    if (roomId == null) throw const GatewayException(GatewayError.invalidInput);
+    if (_familyRoomId != null) throw const GatewayException(GatewayError.alreadyExists);
+    final room = fake.rooms[roomId];
+    if (room == null) throw const GatewayException(GatewayError.notFound);
+    if (room.membership[_userId] == MemberStatus.joined) throw const GatewayException(GatewayError.alreadyExists);
+    room.membership[_userId!] = MemberStatus.requested;
+    room.power[_userId!] = 0;
+    room.knockNonce[_userId!] = 'code';
+    fake.notifyAll();
+  }
+
+  @override
   Future<void> cancelJoinRequest() async {
     for (final r in fake.rooms.values) {
       if (r.membership[_userId] == MemberStatus.requested) {
@@ -609,7 +627,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final f = _fam();
     final m = _mem(f, userId);
     if (!Permissions.canDecideRequest(f, m)) throw const GatewayException(GatewayError.notAllowed);
-    if (m.request != RequestCheck.valid) throw const GatewayException(GatewayError.notAllowed);
+    if (m.request != RequestCheck.valid && m.request != RequestCheck.code) throw const GatewayException(GatewayError.notAllowed);
     final room = familyRoom!;
     room.issued.remove(room.knockNonce[userId]);
     room.membership[userId] = MemberStatus.invited;

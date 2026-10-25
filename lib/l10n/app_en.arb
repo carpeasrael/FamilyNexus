@@ -1057,6 +1057,20 @@
     }
   },
   "regElementDownload": "Download Element",
+  "familyRequestCheckCode": "Request via family code (no link) – only confirm if you know and expect {id}",
+  "@familyRequestCheckCode": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "familyCodeTitle": "Family code",
+  "familyCodeHint": "Anyone who wants to join without a link enters this code. You must then confirm the request explicitly.",
+  "familyCodeCopy": "Copy code",
+  "familyCodeCopied": "Code copied",
+  "joinCodeTitle": "Join without a link (family code)",
+  "joinCodeHint": "Ask a moderator for the family code. They have to confirm your request.",
+  "joinCodeLabel": "Family code",
+  "joinCodeInvalid": "That is not a valid family code. It starts with “!” and contains a server, e.g. !abc:matrix.org.",
   "oauthWaiting": "Please continue in the browser at {host} … Afterwards you continue here automatically.",
   "@oauthWaiting": {
     "placeholders": {

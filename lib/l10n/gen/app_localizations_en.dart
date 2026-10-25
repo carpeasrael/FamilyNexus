@@ -1846,6 +1846,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get regElementDownload => 'Download Element';
 
   @override
+  String familyRequestCheckCode(String id) {
+    return 'Request via family code (no link) – only confirm if you know and expect $id';
+  }
+
+  @override
+  String get familyCodeTitle => 'Family code';
+
+  @override
+  String get familyCodeHint =>
+      'Anyone who wants to join without a link enters this code. You must then confirm the request explicitly.';
+
+  @override
+  String get familyCodeCopy => 'Copy code';
+
+  @override
+  String get familyCodeCopied => 'Code copied';
+
+  @override
+  String get joinCodeTitle => 'Join without a link (family code)';
+
+  @override
+  String get joinCodeHint =>
+      'Ask a moderator for the family code. They have to confirm your request.';
+
+  @override
+  String get joinCodeLabel => 'Family code';
+
+  @override
+  String get joinCodeInvalid =>
+      'That is not a valid family code. It starts with “!” and contains a server, e.g. !abc:matrix.org.';
+
+  @override
   String oauthWaiting(String host) {
     return 'Please continue in the browser at $host … Afterwards you continue here automatically.';
   }

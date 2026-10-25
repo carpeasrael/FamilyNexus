@@ -17,6 +17,7 @@ import '../../domain/attachment_policy.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/event_codec.dart';
+import '../../domain/family_code.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/invite_ticket.dart';
 import '../../domain/moderation.dart';
@@ -1372,9 +1373,13 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Beitrittsanfragen: Der Grund enthält die Link-ID (`FamilyNexus:<id>`).
   static const String knockReasonPrefix = 'FamilyNexus:';
 
+  /// Anfrage über den Familien-Code (ohne Link): `FamilyNexus:code`.
+  static const String knockCodeMarker = 'code';
+
   RequestCheck _checkRequest(String? reason) {
     if (reason == null || !reason.startsWith(knockReasonPrefix)) return RequestCheck.unknown;
     final nonce = reason.substring(knockReasonPrefix.length);
+    if (nonce == knockCodeMarker) return RequestCheck.code;
     if (!InviteLink.isNonce(nonce)) return RequestCheck.unknown;
     if (_usedTickets.contains(nonce)) return RequestCheck.unknown;
     final exp = _issuedInvites()[nonce] ?? _roomTickets[nonce];
@@ -1387,14 +1392,29 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final client = _client;
     if (client == null || !client.isLogged()) throw const GatewayException(GatewayError.notAllowed);
     if (!link.isValidAt(DateTime.now())) throw const GatewayException(GatewayError.invalidInput);
+    if (!InviteLink.viaMatchesRoom(link.roomId, link.via, ownHost: _ownHostOf(client.userID!))) {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    await _knock(link.roomId, link.via, '$knockReasonPrefix${link.nonce}');
+  }
+
+  @override
+  Future<void> requestToJoinByCode(String code) async {
+    final client = _client;
+    if (client == null || !client.isLogged()) throw const GatewayException(GatewayError.notAllowed);
+    final roomId = FamilyCode.parse(code);
+    if (roomId == null) throw const GatewayException(GatewayError.invalidInput);
+    await _knock(roomId, FamilyCode.serverOf(roomId), '$knockReasonPrefix$knockCodeMarker');
+  }
+
+  Future<void> _knock(String roomId, String via, String reason) async {
+    final client = _client;
+    if (client == null || !client.isLogged()) throw const GatewayException(GatewayError.notAllowed);
     final existing = _familyRoomAnyState();
     if (existing != null && existing.membership != Membership.leave && existing.membership != Membership.ban) {
       throw const GatewayException(GatewayError.alreadyExists);
     }
-    if (ServerUrl.tryParse(link.via) == null) throw const GatewayException(GatewayError.invalidInput);
-    if (!InviteLink.viaMatchesRoom(link.roomId, link.via, ownHost: _ownHostOf(client.userID!))) {
-      throw const GatewayException(GatewayError.invalidInput);
-    }
+    if (ServerUrl.tryParse(via) == null) throw const GatewayException(GatewayError.invalidInput);
     try {
       // Das SDK bietet keinen Knock-Aufruf; schmaler Rohaufruf gemäß Matrix-Spezifikation.
       // Kurzlebige Zugangsdaten (OAuth) vorher auffrischen, weil der Rohaufruf das nicht selbst tut.
@@ -1402,23 +1422,23 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       final base = client.homeserver;
       if (base == null || base.scheme != 'https') throw const GatewayException(GatewayError.serverUnsupported);
       final uri = base.replace(
-        path: '/_matrix/client/v3/knock/${Uri.encodeComponent(link.roomId)}',
-        queryParameters: <String, String>{'server_name': link.via},
+        path: '/_matrix/client/v3/knock/${Uri.encodeComponent(roomId)}',
+        queryParameters: <String, String>{'server_name': via},
       );
       final req = http.Request('POST', uri)
         ..headers['authorization'] = 'Bearer ${client.accessToken}'
         ..headers['content-type'] = 'application/json'
-        ..body = json.encode(<String, Object?>{'reason': '$knockReasonPrefix${link.nonce}'});
+        ..body = json.encode(<String, Object?>{'reason': reason});
       final res = await _http.send(req).timeout(roomOpTimeout);
       await res.stream.drain<void>();
       if (res.statusCode == 429) throw const GatewayException(GatewayError.rateLimited);
       if (res.statusCode == 403) throw const GatewayException(GatewayError.notAllowed);
       if (res.statusCode == 404) throw const GatewayException(GatewayError.notFound);
       if (res.statusCode != 200) throw const GatewayException(GatewayError.unknown);
-      _joinRequestCache = link.roomId;
+      _joinRequestCache = roomId;
       _joinRequestCleared = false;
       await client.setAccountData(client.userID!, joinRequestAccountData, <String, Object?>{
-        'room_id': link.roomId,
+        'room_id': roomId,
         'ts': DateTime.now().toUtc().millisecondsSinceEpoch,
       });
       notifyListeners();
@@ -1456,8 +1476,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final f = _requireFamily();
     final m = _requireMember(f, userId);
     if (!Permissions.canDecideRequest(f, m)) throw const GatewayException(GatewayError.notAllowed);
-    // Nur Anfragen mit eigenem, gültigem Link; der Link wird dabei verbraucht (S2).
-    if (m.request != RequestCheck.valid) throw const GatewayException(GatewayError.notAllowed);
+    // Nur Anfragen mit eigenem, gültigem Link (wird dabei verbraucht, S2) oder per Familien-Code (E-65).
+    if (m.request != RequestCheck.valid && m.request != RequestCheck.code) throw const GatewayException(GatewayError.notAllowed);
     await _roomOp((room) => room.invite(userId));
     final nonce = _knockNonces[userId];
     if (nonce != null) {

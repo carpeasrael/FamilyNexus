@@ -1,3 +1,4 @@
+import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
@@ -76,6 +77,23 @@ void main() {
       await E2e.until(() => a.family?.member(d.userId!)?.status == MemberStatus.requested, what: 'A sieht die zweite Anfrage');
       await E2e.until(() => a.family!.member(d.userId!)!.request == RequestCheck.unknown, what: 'verbrauchter Link gilt nicht mehr');
       expect(d.invitations, isEmpty);
+    });
+
+    test('Familien-Code ohne Link: Moderator sieht die Anfrage als „Code“, nichts geschieht von allein, Bestätigung führt zum Beitritt', () async {
+      final a = await _login('incda');
+      await a.createFamily('Code-Familie');
+      await E2e.until(() => a.family != null, what: 'Familie bei A');
+      final c = await _login('incdc');
+      await expectLater(c.requestToJoinByCode('kein code'), throwsA(isA<GatewayException>()));
+      await c.requestToJoinByCode(a.family!.roomId);
+      await E2e.until(() => a.family?.member(c.userId!)?.status == MemberStatus.requested, what: 'A sieht die Anfrage');
+      await E2e.until(() => a.family!.member(c.userId!)!.request == RequestCheck.code, what: 'Anfrage per Code erkannt');
+      await Future<void>.delayed(const Duration(seconds: 3));
+      expect(c.invitations, isEmpty, reason: 'keine automatische Bestätigung ohne Link');
+      await a.approveRequest(c.userId!);
+      await E2e.until(() => c.invitations.isNotEmpty, what: 'C erhält die Einladung');
+      await c.acceptInvitation(c.invitations.single.roomId);
+      await E2e.until(() => c.family != null, what: 'C ist in der Familie');
     });
 
     test('Per Matrix-ID eingeladenes Konto findet die Einladung nach der Anmeldung', () async {

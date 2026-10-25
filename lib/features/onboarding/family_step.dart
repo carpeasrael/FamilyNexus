@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/family.dart';
+import '../../domain/family_code.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/server.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -44,6 +45,7 @@ class _FamilyStepState extends State<FamilyStep> {
   String? _waitingFor;
   final TextEditingController _name = TextEditingController();
   final TextEditingController _link = TextEditingController();
+  final TextEditingController _code = TextEditingController();
   late final AppServices _services;
 
   @override
@@ -58,6 +60,7 @@ class _FamilyStepState extends State<FamilyStep> {
     _services.pendingInvite.removeListener(_onPending);
     _name.dispose();
     _link.dispose();
+    _code.dispose();
     super.dispose();
   }
 
@@ -117,6 +120,21 @@ class _FamilyStepState extends State<FamilyStep> {
     _link.clear();
     await _services.settings.update((c) => c.copyWith(pendingInvite: check.raw));
     _services.pendingInvite.value = check.link;
+  }
+
+  /// Anfrage über den Familien-Code (ohne Link): Der Moderator bestätigt ausdrücklich (E-65).
+  Future<void> _sendCode() async {
+    final l = AppLocalizations.of(context);
+    final id = FamilyCode.parse(_code.text);
+    if (id == null) {
+      setState(() => _error = l.joinCodeInvalid);
+      return;
+    }
+    await _run(() async {
+      await _services.gateway.requestToJoinByCode(id);
+      _waitingFor = null;
+      _code.clear();
+    });
   }
 
   Future<void> _discard() async {
@@ -448,6 +466,28 @@ class _FamilyStepState extends State<FamilyStep> {
         Align(
           alignment: Alignment.centerRight,
           child: FilledButton(onPressed: _busy ? null : _submitLink, child: Text(l.next)),
+        ),
+        // Ohne Link: Familien-Code, den ein Moderator in der Familienansicht nennt.
+        ExpansionTile(
+          tilePadding: EdgeInsets.zero,
+          title: Text(l.joinCodeTitle),
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(l.joinCodeHint),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _code,
+              autocorrect: false,
+              enableSuggestions: false,
+              enableIMEPersonalizedLearning: false,
+              decoration: InputDecoration(labelText: l.joinCodeLabel),
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton(onPressed: _busy ? null : _sendCode, child: Text(_busy ? l.joinSending : l.joinSend)),
+            ),
+          ],
         ),
       ];
 }

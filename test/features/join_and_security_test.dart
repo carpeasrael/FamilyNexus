@@ -73,6 +73,30 @@ void main() {
       expect(find.byType(NavigationBar), findsOneWidget, reason: 'Hauptansicht');
     });
 
+    testWidgets('Familien-Code statt Link: Anfrage wartet, Moderator bestätigt ausdrücklich, Beitritt', (tester) async {
+      final s = await _benWithoutFamily();
+      await _pump(tester, s.ben);
+      await _tap(tester, 'Beitreten');
+      await _tap(tester, 'Ohne Link beitreten (Familien-Code)');
+      await tester.enterText(find.widgetWithText(TextField, 'Familien-Code'), 'kein code');
+      await _tap(tester, 'Beitritt anfragen');
+      expect(find.textContaining('kein gültiger Familien-Code'), findsOneWidget);
+      expect(s.anna.family!.requests, isEmpty);
+
+      await tester.enterText(find.widgetWithText(TextField, 'Familien-Code'), s.anna.family!.roomId);
+      await _tap(tester, 'Beitritt anfragen');
+      expect(find.textContaining('Fast geschafft!'), findsOneWidget);
+      final req = s.anna.family!.requests.single;
+      expect(req.userId, '@ben:fake.test');
+      expect(req.request, RequestCheck.code, reason: 'ohne Link nie automatisch bestätigt');
+      await tester.pumpAndSettle();
+      expect(s.anna.family!.member('@ben:fake.test')!.status, MemberStatus.requested);
+
+      await s.anna.approveRequest('@ben:fake.test');
+      await tester.pumpAndSettle();
+      expect(s.ben.gateway.family!.myRole, Role.member);
+    });
+
     testWidgets('abgelaufener oder manipulierter Link wird abgelehnt, nichts wird gesendet', (tester) async {
       final s = await _benWithoutFamily();
       await _pump(tester, s.ben);

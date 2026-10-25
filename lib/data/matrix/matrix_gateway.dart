@@ -233,6 +233,9 @@ abstract class MatrixGateway implements Listenable {
   /// Sendet eine Beitrittsanfrage für den (geprüften, nicht abgelaufenen) Link.
   Future<void> requestToJoin(InviteLink link);
 
+  /// Beitrittsanfrage über den Familien-Code (Raum-ID) ohne Einladungslink; ein Moderator muss bestätigen (E-65).
+  Future<void> requestToJoinByCode(String code);
+
   /// Moderator: lädt eine Matrix-ID direkt ein.
   Future<void> inviteUser(String userId);
 
