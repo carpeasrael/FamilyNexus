@@ -1,0 +1,4 @@
+New in 1.2.1:
+• Signing in through the provider's website (e.g. matrix.org) works again. Before, the jump to the page already failed.
+• matrix.org stays the default provider. Previously, after signing in with a full ID (@name:server) or an invitation on another server, that server was shown as the default.
+• Settings → About the app: overview of where data is stored locally, and reports of all data stored locally and online to view, copy or save.

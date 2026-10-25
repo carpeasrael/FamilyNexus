@@ -1,0 +1,31 @@
+FamilyNexus combines a family calendar, a messenger and a shared shopping list in one app – without your data ending up at a central provider.
+
+CALENDAR
+• Day, week, month and agenda views, filter by person
+• Private events stay on your own devices, shared events are visible to the whole family
+• Recurring events with exceptions, time zones, accept and decline
+• Local reminders – the notification never reveals the event title
+
+CHAT
+• Family chat and direct chats between members
+• Messages, replies, reactions and attachments
+• Share events as cards in the chat and answer them right there
+• Online status of the family (can be switched off)
+
+SHOPPING LIST
+• Shared list for the whole family, works offline
+• Check off, edit, add quantities, remove done items
+
+SECURITY AND PRIVACY
+• End-to-end encrypted over the open Matrix protocol (chat, shared events, shopping list)
+• Locally encrypted database, key kept in the device key store
+• App lock with the device credentials, screen protection
+• No ads, no trackers, no analytics
+• Bring your own server – the public server is only a default
+• Free software (AGPL-3.0), source code available
+
+FAMILY
+• Moderators invite (link or QR code), approve join requests and manage roles
+• New devices are verified by emoji comparison or recovery key
+
+You create your account during setup – on matrix.org, another provider or your own server. An existing Matrix account works as well.
