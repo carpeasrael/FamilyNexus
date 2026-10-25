@@ -3272,6 +3272,30 @@ abstract class AppLocalizations {
   /// **'Familie – {count} offene Anfragen'**
   String tabFamilyRequests(int count);
 
+  /// No description provided for @familyInviteServerLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Konto-Server für Neue'**
+  String get familyInviteServerLabel;
+
+  /// No description provided for @familyInviteServerHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Auf diesem Server legen Neulinge ihr Konto an und melden sich an. Leer lassen = dein Server. Der Familienraum bleibt, wo er ist.'**
+  String get familyInviteServerHint;
+
+  /// No description provided for @familyInviteServerApply.
+  ///
+  /// In de, this message translates to:
+  /// **'Neuen Link erzeugen'**
+  String get familyInviteServerApply;
+
+  /// No description provided for @familyInviteServerInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Das ist keine gültige Server-Adresse.'**
+  String get familyInviteServerInvalid;
+
   /// No description provided for @oauthWaiting.
   ///
   /// In de, this message translates to:

@@ -1363,7 +1363,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   @override
-  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, bool autoApprove = true}) async {
+  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, bool autoApprove = true, String? accountServer}) async {
     final f = _requireFamily();
     if (!Permissions.canInvite(f)) throw const GatewayException(GatewayError.notAllowed);
     final via = f.roomId.substring(f.roomId.indexOf(':') + 1);
@@ -1381,6 +1381,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         ownHost: _ownHostOf(f.myUserId),
         familyName: f.name,
         inviterName: f.member(f.myUserId)?.displayName,
+        accountServer: accountServer,
       );
     } on ArgumentError {
       throw const GatewayException(GatewayError.invalidInput);

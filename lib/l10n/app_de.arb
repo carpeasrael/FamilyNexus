@@ -1079,6 +1079,10 @@
       "count": {"type": "int"}
     }
   },
+  "familyInviteServerLabel": "Konto-Server für Neue",
+  "familyInviteServerHint": "Auf diesem Server legen Neulinge ihr Konto an und melden sich an. Leer lassen = dein Server. Der Familienraum bleibt, wo er ist.",
+  "familyInviteServerApply": "Neuen Link erzeugen",
+  "familyInviteServerInvalid": "Das ist keine gültige Server-Adresse.",
   "oauthWaiting": "Bitte im Browser bei {host} fortfahren … Danach geht es hier automatisch weiter.",
   "@oauthWaiting": {
     "placeholders": {

@@ -96,6 +96,17 @@ void main() {
       await E2e.until(() => c.family != null, what: 'C ist in der Familie');
     });
 
+    test('Konto-Server im Link: frei wählbar, Heimnetz-Fremdserver und Unsinn werden abgelehnt', () async {
+      final a = await _login('insrv');
+      await a.createFamily('Server-Familie');
+      await E2e.until(() => a.family != null, what: 'Familie bei A');
+      final link = InviteLink.tryParse(await a.createInviteLink(accountServer: 'matrix.org'), now: DateTime.now(), ownHost: 'localhost')!;
+      expect(link.accountServer, 'matrix.org');
+      expect(link.via, 'localhost', reason: 'Familienraum bleibt beim Einladenden');
+      await expectLater(a.createInviteLink(accountServer: '192.168.0.5'), throwsA(isA<GatewayException>()));
+      await expectLater(a.createInviteLink(accountServer: 'kein server'), throwsA(isA<GatewayException>()));
+    });
+
     test('Per Matrix-ID eingeladenes Konto findet die Einladung nach der Anmeldung', () async {
       final a = await _login('invm');
       await a.createFamily('ID-Familie');

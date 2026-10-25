@@ -1079,6 +1079,10 @@
       "count": {"type": "int"}
     }
   },
+  "familyInviteServerLabel": "Account server for newcomers",
+  "familyInviteServerHint": "Newcomers create their account and sign in on this server. Leave empty to use your own server. The family room stays where it is.",
+  "familyInviteServerApply": "Create new link",
+  "familyInviteServerInvalid": "That is not a valid server address.",
   "oauthWaiting": "Please continue in the browser at {host} … Afterwards you continue here automatically.",
   "@oauthWaiting": {
     "placeholders": {

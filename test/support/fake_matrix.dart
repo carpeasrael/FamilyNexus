@@ -555,7 +555,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   @override
-  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, bool autoApprove = true}) async {
+  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, bool autoApprove = true, String? accountServer}) async {
     final f = _fam();
     if (!Permissions.canInvite(f)) throw const GatewayException(GatewayError.notAllowed);
     final room = familyRoom!;
@@ -571,6 +571,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       ownHost: fake.host,
       familyName: f.name,
       inviterName: fake.displayNameOf(f.myUserId),
+      accountServer: accountServer,
     );
   }
 

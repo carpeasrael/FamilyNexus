@@ -63,6 +63,45 @@ void main() {
     expect(link, startsWith('familynexus://join?'));
   });
 
+  testWidgets('Einladungsdialog: Konto-Server für Neue wählbar, Gültigkeit bleibt erhalten', (tester) async {
+    final app = await buildTestApp();
+    await _openFamily(tester, app);
+    await tester.tap(find.text('Jemanden einladen'));
+    await tester.pumpAndSettle();
+    String mailedLink() => RegExp(r'familynexus://join\?\S+').firstMatch(app.mail.drafts.last.body)!.group(0)!;
+    Future<void> mail() async {
+      await tester.ensureVisible(find.text('Per E-Mail senden'));
+      await tester.tap(find.text('Per E-Mail senden'));
+      await tester.pumpAndSettle();
+    }
+
+    await mail();
+    expect(InviteLink.tryParse(mailedLink(), now: app.server.now())!.accountServer, 'fake.test', reason: 'Standard: Server des Einladenden');
+
+    await tester.tap(find.text('7 Tage'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Erweitert')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'Konto-Server für Neue'), 'not a server!');
+    await tester.tap(find.text('Neuen Link erzeugen'));
+    await tester.pumpAndSettle();
+    expect(find.text('Das ist keine gültige Server-Adresse.'), findsOneWidget);
+
+    await tester.enterText(find.widgetWithText(TextField, 'Konto-Server für Neue'), 'https://Matrix.org');
+    await tester.tap(find.text('Neuen Link erzeugen'));
+    await tester.pumpAndSettle();
+    await mail();
+    final link = InviteLink.tryParse(mailedLink(), now: app.server.now())!;
+    expect(link.accountServer, 'matrix.org');
+    expect(link.via, 'fake.test', reason: 'der Familienraum bleibt auf dem Server des Einladenden');
+    expect(link.expires.difference(app.server.now()), const Duration(days: 7), reason: 'Gültigkeit bleibt');
+
+    await tester.tap(find.text('1 Tag'));
+    await tester.pumpAndSettle();
+    await mail();
+    expect(InviteLink.tryParse(mailedLink(), now: app.server.now())!.accountServer, 'matrix.org', reason: 'Server bleibt bei neuer Gültigkeit');
+  });
+
   testWidgets('Einladungslink per E-Mail: Entwurf mit Anleitung und Link, ohne Mailprogramm wird kopiert', (tester) async {
     final app = await buildTestApp();
     String? clipboard;

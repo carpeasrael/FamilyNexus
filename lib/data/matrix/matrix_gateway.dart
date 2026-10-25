@@ -231,7 +231,7 @@ abstract class MatrixGateway implements Listenable {
   Future<void> cancelJoinRequest();
 
   /// Moderator: erzeugt einen zeitlich begrenzten, einmaligen Einladungslink/QR-Inhalt.
-  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, bool autoApprove = true});
+  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, bool autoApprove = true, String? accountServer});
 
   /// Sendet eine Beitrittsanfrage für den (geprüften, nicht abgelaufenen) Link.
   Future<void> requestToJoin(InviteLink link);

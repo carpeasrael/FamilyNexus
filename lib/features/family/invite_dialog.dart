@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/invite_link.dart';
+import '../../domain/server.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/widgets/qr_view.dart';
 import '../common/error_text.dart';
@@ -46,23 +47,62 @@ class _InviteDialogState extends State<_InviteDialog> {
   late String _link = widget.firstLink;
   bool _busy = false;
 
-  Future<void> _changeValidity(Duration d) async {
-    if (d == _validity || _busy) return;
+  /// Server für Konto und Anmeldung der Eingeladenen (Feld `srv`, E-63); `null` = Server des Einladenden.
+  String? _accountServer;
+  final TextEditingController _server = TextEditingController();
+  String? _serverError;
+
+  @override
+  void dispose() {
+    _server.dispose();
+    super.dispose();
+  }
+
+  /// Neuer Link mit geänderter Gültigkeit und/oder anderem Konto-Server; der alte bleibt gültig, wird aber nicht mehr gezeigt.
+  Future<void> _regenerate({Duration? validity, String? accountServer, bool keepServer = true}) async {
     final l = AppLocalizations.of(context);
+    final v = validity ?? _validity;
+    final srv = keepServer ? _accountServer : accountServer;
     setState(() => _busy = true);
     try {
-      final link = await widget.gateway.createInviteLink(validity: d);
+      final link = await widget.gateway.createInviteLink(validity: v, accountServer: srv);
       if (mounted) {
         setState(() {
-          _validity = d;
+          _validity = v;
+          _accountServer = srv;
           _link = link;
+          _serverError = null;
         });
       }
     } catch (e) {
+      if (mounted && srv != _accountServer) setState(() => _serverError = errorText(l, e));
       widget.messenger.showSnackBar(SnackBar(content: Text(errorText(l, e))));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  Future<void> _changeValidity(Duration d) async {
+    if (d == _validity || _busy) return;
+    await _regenerate(validity: d);
+  }
+
+  /// Übernimmt den eingetragenen Server (leer = Standard). Eingabe wird wie überall als Server-Adresse geprüft.
+  Future<void> _applyServer() async {
+    if (_busy) return;
+    final l = AppLocalizations.of(context);
+    final raw = _server.text.trim();
+    String? host;
+    if (raw.isNotEmpty) {
+      final url = ServerUrl.tryParse(raw);
+      if (url == null) {
+        setState(() => _serverError = l.familyInviteServerInvalid);
+        return;
+      }
+      host = url.uri.hasPort ? '${url.host}:${url.uri.port}' : url.host;
+    }
+    if (host == _accountServer) return;
+    await _regenerate(accountServer: host, keepServer: false);
   }
 
   Future<void> _copy() async {
@@ -107,6 +147,32 @@ class _InviteDialogState extends State<_InviteDialog> {
             onSelectionChanged: _busy ? null : (s) => _changeValidity(s.first),
           ),
           const SizedBox(height: 12),
+          ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            title: Text(l.advTitle),
+            expandedCrossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(l.familyInviteServerHint, style: Theme.of(context).textTheme.bodySmall),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _server,
+                autocorrect: false,
+                enableSuggestions: false,
+                enableIMEPersonalizedLearning: false,
+                keyboardType: TextInputType.url,
+                onSubmitted: (_) => _applyServer(),
+                decoration: InputDecoration(
+                  labelText: l.familyInviteServerLabel,
+                  hintText: MatrixIds.serverName(widget.gateway.userId ?? ''),
+                  errorText: _serverError,
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(onPressed: _busy ? null : _applyServer, child: Text(l.familyInviteServerApply)),
+              ),
+            ],
+          ),
           FilledButton.tonalIcon(icon: const Icon(Icons.mail_outline), onPressed: _busy ? null : _mail, label: Text(l.familyInviteMail)),
           const SizedBox(height: 8),
           OutlinedButton.icon(icon: const Icon(Icons.copy), onPressed: _busy ? null : _copy, label: Text(l.familyInviteCopyLink)),

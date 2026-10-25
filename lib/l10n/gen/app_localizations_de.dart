@@ -1903,6 +1903,20 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get familyInviteServerLabel => 'Konto-Server für Neue';
+
+  @override
+  String get familyInviteServerHint =>
+      'Auf diesem Server legen Neulinge ihr Konto an und melden sich an. Leer lassen = dein Server. Der Familienraum bleibt, wo er ist.';
+
+  @override
+  String get familyInviteServerApply => 'Neuen Link erzeugen';
+
+  @override
+  String get familyInviteServerInvalid =>
+      'Das ist keine gültige Server-Adresse.';
+
+  @override
   String oauthWaiting(String host) {
     return 'Bitte im Browser bei $host fortfahren … Danach geht es hier automatisch weiter.';
   }
