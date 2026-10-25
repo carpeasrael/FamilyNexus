@@ -4,7 +4,7 @@ import '../../core/app_log.dart';
 
 /// Bildschirmschutz hinter Schnittstelle. Android: FLAG_SECURE (keine Screenshots, leere Vorschau).
 /// iOS: Sichtschutz im App-Umschalter und bei Bildschirmaufnahme (Screenshots lassen sich nicht verhindern).
-/// macOS: Fenster werden von Bildschirmaufnahmen ausgenommen (`NSWindow.sharingType = .none`).
+/// macOS: kein Schutz, Screenshots (auch `screencapture`) sind erlaubt (`NSWindow.sharingType = .readOnly`).
 abstract class ScreenProtection {
   Future<void> setSecure(bool secure);
 }

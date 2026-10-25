@@ -24,14 +24,12 @@ class MainFlutterWindow: NSWindow {
     }
     AppDelegate.linkChannel = links
 
-    // Bildschirmschutz: Das Fenster wird von Screenshots und Bildschirmaufnahmen ausgenommen.
+    // Kein Bildschirmschutz unter macOS: Screenshots und Bildschirmaufnahmen (z. B. `screencapture`) sind erlaubt.
     let window = FlutterMethodChannel(name: "de.inneso.familynexus/window", binaryMessenger: messenger)
-    self.sharingType = .none // sichere Voreinstellung bis Dart etwas anderes wählt
-    window.setMethodCallHandler { [weak self] call, result in
+    self.sharingType = .readOnly
+    window.setMethodCallHandler { call, result in
       if call.method == "setSecure" {
-        let secure = (call.arguments as? Bool) ?? true
-        self?.sharingType = secure ? .none : .readOnly
-        result(nil)
+        result(nil) // bewusst ohne Wirkung: das Fenster bleibt aufnehmbar
       } else {
         result(FlutterMethodNotImplemented)
       }
