@@ -2,4 +2,4 @@ New in 1.2.1:
 • macOS: Signing in through the provider's website (e.g. matrix.org) works again.
 • matrix.org stays the default provider, even after signing in or being invited on another server.
 • Windows: invitation links open the app.
-• Settings: overview of what is stored locally.
+• About the app: storage locations and reports of all data stored locally and online.

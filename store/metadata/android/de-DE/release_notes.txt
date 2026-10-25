@@ -2,4 +2,4 @@ Neu in 1.2.1:
 • macOS: Die Anmeldung über die Webseite des Anbieters (z. B. matrix.org) funktioniert wieder.
 • matrix.org bleibt der Standard-Anbieter, auch nach einer Anmeldung oder Einladung bei einem anderen Server.
 • Windows: Einladungslinks öffnen die App.
-• Einstellungen: Übersicht, was lokal gespeichert ist.
+• Über die App: Speicherorte und Protokolle aller lokal und online gespeicherten Daten.
