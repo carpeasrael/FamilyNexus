@@ -22,7 +22,7 @@ tun muss, steht in Abschnitt 1. Rechtliche Angaben sind Hinweise, keine Rechtsbe
 
 | Bereich | Stand |
 |---|---|
-| Version | `pubspec.yaml`: `1.2.1+14` (Name+Buildnummer). Jeder Upload braucht eine **höhere Buildnummer** (`+2`, …) |
+| Version | `pubspec.yaml`: `1.2.1+15` (Name+Buildnummer). Jeder Upload braucht eine **höhere Buildnummer** (`+2`, …) |
 | Kennungen | Android `de.inneso.familynexus`; iOS/macOS `de.inneso.familynexus` (vereinheitlicht) |
 | Symbole | `tool/make_icons.py` erzeugt alle Größen (Android adaptiv + Legacy, iOS ohne Alpha, macOS) sowie `store/graphics/` (Play-Symbol 512, App-Store-Symbol 1024, Funktionsgrafik 1024×500) |
 | Android | Release: R8/Shrink, `--obfuscate`, Symbole für native Bibliotheken, unsigniert ohne `key.properties`; **App Bundle:** `tool/build_release.sh aab` (≈ 79 MB) |
@@ -74,7 +74,7 @@ Einmalig je Plattform (Team-ID: developer.apple.com → Membership):
 
 1. App-ID `de.inneso.familynexus` registrieren (Developer-Portal → Identifiers) und in App Store Connect je Plattform einen App-Eintrag anlegen (iOS und macOS können unter einem Eintrag mit derselben Bundle-ID laufen).
 2. Team-ID in `ios/ExportOptions.plist` **und** `macos/ExportOptions.plist` eintragen (`HIER_TEAM_ID_EINTRAGEN` ersetzen).
-3. Versionen kommen aus `pubspec.yaml` (`1.2.1+14` → Version 1.2.1, Build 14) und gelten für beide Plattformen; vor jedem Upload die Buildnummer erhöhen.
+3. Versionen kommen aus `pubspec.yaml` (`1.2.1+15` → Version 1.2.1, Build 14) und gelten für beide Plattformen; vor jedem Upload die Buildnummer erhöhen.
 
 Archiv bauen (die Skripte setzen Obfuskierung und Debug-Symbole, ein reines „Product → Archive“ in Xcode ohne vorherigen Flutter-Build tut das nicht):
 
@@ -108,6 +108,6 @@ FamilyNexus steht unter AGPL-3.0 (E-02), weil die Matrix-Bibliothek und `vodozem
 ## 7. Ablauf pro Release
 
 1. `flutter analyze`, `flutter test`, `tool/e2e.sh`, `tool/device_tests.sh`, `tool/check_permissions.sh`.
-2. Version in `pubspec.yaml` erhöhen (`1.2.1+14` …); Neuerungen in `store/metadata/*/*/release_notes.txt` (App Store höchstens 4000 Zeichen, Google Play höchstens 500 je Sprache) eintragen.
+2. Version in `pubspec.yaml` erhöhen (`1.2.1+15` …); Neuerungen in `store/metadata/*/*/release_notes.txt` (App Store höchstens 4000 Zeichen, Google Play höchstens 500 je Sprache) eintragen.
 3. Android: `tool/build_release.sh aab`; iOS: `tool/build_ios_release.sh`.
 4. Hochladen, interne Tests/TestFlight, danach freigeben.
