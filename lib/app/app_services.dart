@@ -12,6 +12,7 @@ import '../data/platform/oauth_redirect.dart';
 import '../data/platform/reminder_scheduler.dart';
 import '../data/platform/screen_protection.dart';
 import '../data/sync/presence_sync.dart';
+import '../domain/data_inventory.dart';
 import '../domain/invite_link.dart';
 import '../features/calendar/calendar_controller.dart';
 import '../features/lock/app_lock_controller.dart';
@@ -40,6 +41,7 @@ class AppServices {
     required this.lock,
     this.database,
     this.keyStore,
+    this.dataInventory,
     this.calendarBuilder,
     this.shoppingBuilder,
     this.tasksBuilder,
@@ -82,6 +84,9 @@ class AppServices {
   /// `null` in Widget-Tests ohne Datenbank.
   final AppDatabase? database;
   final KeyStore? keyStore;
+
+  /// Speicherorte und lokaler Datenbestand für das Datenprotokoll; `null` in Widget-Tests ohne Datenbank.
+  final LocalDataInventory? dataInventory;
   final CalendarBuilder? calendarBuilder;
   final ShoppingBuilder? shoppingBuilder;
   final TasksBuilder? tasksBuilder;

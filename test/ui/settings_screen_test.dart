@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/app/app_services.dart';
 import '../support/memory_stores.dart';
@@ -158,5 +160,60 @@ void main() {
     expect(primary(), isNot(before));
     expect(primary(), AccentPalette.of(AccentChoice.magenta).neon, reason: 'dunkles Design (Standard) nutzt die leuchtende Variante');
     expect(find.byIcon(Icons.check), findsWidgets, reason: 'Auswahl zusätzlich zur Farbe mit Häkchen');
+  });
+
+  testWidgets('Über die App: Speicherorte und Protokoll der lokal gespeicherten Daten', (tester) async {
+    tester.view.physicalSize = const Size(900, 3600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final app = await buildTestApp(lang: 'de');
+    await tester.pumpWidget(FamilyNexusApp(services: app.services));
+    await tester.pumpAndSettle();
+    await openSettings(tester);
+    await tester.ensureVisible(find.text('Speicherorte'));
+    expect(find.text('/home/test/.local/share/de.inneso.familynexus/databases'), findsOneWidget);
+    expect(find.text('/home/test/.local/share/de.inneso.familynexus/databases/familynexus_app.db'), findsOneWidget);
+    expect(find.text('Schlüsselbund des Systems (Secret Service)'), findsOneWidget);
+    expect(find.text('Online beim Matrix-Anbieter'), findsOneWidget);
+    expect(find.text('https://fake.test'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Protokoll: alle lokal gespeicherten Daten zeigen'));
+    await tester.tap(find.text('Protokoll: alle lokal gespeicherten Daten zeigen'));
+    await tester.pumpAndSettle();
+    expect(find.text('Lokal gespeicherte Daten'), findsOneWidget);
+    final report = tester.widget<SelectableText>(find.byType(SelectableText)).data!;
+    expect(report, contains('familynexus_app.db'));
+    expect(report, contains('key=language'));
+    expect(report, contains('db.app: vorhanden (Wert wird nicht angezeigt)'));
+    expect(report, contains('@anna:fake.test'), reason: 'Matrix-Zwischenspeicher des angemeldeten Kontos');
+    expect(report, contains('Familie „Familie Test“'));
+
+    await tester.tap(find.byTooltip('Als Datei speichern'));
+    await tester.pumpAndSettle();
+    final files = app.services.files as FakeFileAccess;
+    expect(files.saved.single, startsWith('familynexus-local-'));
+    expect(utf8.decode(files.contents[files.saved.single]!), report);
+  });
+
+  testWidgets('Protokoll der online gespeicherten Daten: Konto, Geräte, Räume, Hinweis zur Verschlüsselung', (tester) async {
+    tester.view.physicalSize = const Size(900, 3600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final app = await buildTestApp(lang: 'de');
+    await tester.pumpWidget(FamilyNexusApp(services: app.services));
+    await tester.pumpAndSettle();
+    await openSettings(tester);
+    await tester.ensureVisible(find.text('Protokoll: alle online gespeicherten Daten zeigen'));
+    await tester.tap(find.text('Protokoll: alle online gespeicherten Daten zeigen'));
+    await tester.pumpAndSettle();
+    expect(find.text('Online gespeicherte Daten'), findsOneWidget);
+    final report = tester.widget<SelectableText>(find.byType(SelectableText)).data!;
+    expect(report, contains('Server: https://fake.test'));
+    expect(report, contains('Anzeigename: Anna'));
+    expect(report, contains('Gerät DEV1 (DEV1)'));
+    expect(report, contains('Schlüssel-Backup (mit deinem Wiederherstellungsschlüssel verschlüsselt): eingerichtet'));
+    expect(report, contains('Ende-zu-Ende-verschlüsselt: ja'));
+    expect(report, contains('Anna (@anna:fake.test) – Moderator'));
+    expect(report, contains('nur Ende-zu-Ende-verschlüsselt'));
   });
 }

@@ -8,6 +8,7 @@ import '../core/app_log.dart';
 import '../core/platform_info.dart';
 import '../data/db/app_database.dart';
 import '../data/db/key_value_store.dart';
+import '../data/db/sql_data_inventory.dart';
 import '../data/db/sql_event_store.dart';
 import '../data/db/sql_shopping_store.dart';
 import '../data/db/sql_task_store.dart';
@@ -127,6 +128,13 @@ Future<AppServices> bootstrap({KeyStore? keyStore}) async {
     screenProtection: PlatformScreenProtection(),
     database: database,
     keyStore: keys,
+    dataInventory: SqlDataInventory(
+      db: database.db,
+      keyStore: keys,
+      appFileName: AppDatabase.fileName,
+      matrixFileName: SdkMatrixGateway.matrixDbFileName,
+      keyNames: const <String>[AppDatabase.keyName, SdkMatrixGateway.matrixDbKeyName],
+    ),
   );
 }
 

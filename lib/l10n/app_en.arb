@@ -1438,5 +1438,120 @@
         "type": "String"
       }
     }
-  }
+  },
+  "settingsStorageTitle": "Storage locations",
+  "settingsStorageDbDir": "Database folder",
+  "settingsStorageBrowser": "Browser storage (IndexedDB) of this web address",
+  "settingsStorageAppDb": "App data: events, lists, settings (encrypted)",
+  "settingsStorageMatrixDb": "Chat and sync data: Matrix (encrypted)",
+  "settingsStorageKeys": "Database keys",
+  "settingsStorageOnline": "Online at the Matrix provider",
+  "keyStoreAndroid": "Android Keystore (bound to this device)",
+  "keyStoreApple": "Device keychain (not in iCloud)",
+  "keyStoreLinux": "System keyring (Secret Service)",
+  "keyStoreWindows": "Windows Credential Manager",
+  "keyStoreBrowser": "Password-protected vault in browser storage (localStorage)",
+  "settingsReportLocal": "Report: show all locally stored data",
+  "settingsReportOnline": "Report: show all data stored online",
+  "reportLocalTitle": "Locally stored data",
+  "reportOnlineTitle": "Data stored online",
+  "reportWarning": "The report shows your data in plain text. When you copy or save it, the data leaves the app's encrypted storage.",
+  "reportCopy": "Copy",
+  "reportCopied": "Report copied.",
+  "reportSave": "Save as file",
+  "reportSaved": "Report saved.",
+  "reportGenerated": "Created: {time} · app version {version}",
+  "@reportGenerated": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "reportSectionKeys": "Key store",
+  "reportKeyPresent": "present (value not shown)",
+  "reportKeyMissing": "not present",
+  "reportSectionAppDb": "App database",
+  "reportFileSize": "File size: {size}",
+  "@reportFileSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "reportRows": "{count, plural, =0{no entries} =1{1 entry} other{{count} entries}}",
+  "@reportRows": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportSectionMatrixDb": "Matrix database (cache)",
+  "reportMatrixSecrets": "Also stored, but not shown for security reasons: the session's access token, device keys and the keys of encrypted conversations.",
+  "reportMatrixUnavailable": "Not available (not signed in or read error).",
+  "reportMemoryOnly": "Never stored, only kept in memory: family members' online status.",
+  "reportOsReminders": "Scheduled reminders are additionally held by the operating system.",
+  "reportSectionAccount": "Account",
+  "reportDisplayName": "Display name",
+  "reportAvatar": "Profile picture",
+  "reportYes": "yes",
+  "reportNo": "no",
+  "reportNotSet": "not set",
+  "reportSectionSecurity": "Encryption",
+  "reportCrossSigning": "Cross-signing keys",
+  "reportKeyBackup": "Key backup (encrypted with your recovery key)",
+  "reportSetUp": "set up",
+  "reportNotSetUp": "not set up",
+  "reportSectionAccountData": "Account data (types only, contents not shown)",
+  "reportSectionRooms": "Rooms",
+  "reportNone": "none",
+  "roomKindFamily": "Family",
+  "roomKindPrivate": "Private room (sync of private events)",
+  "roomKindDirect": "Direct chat",
+  "roomKindOther": "Other room",
+  "reportRoomEncrypted": "End-to-end encrypted",
+  "reportRoomMembership": "Own membership",
+  "reportRoomMembers": "Members: {joined} joined, {invited} invited",
+  "@reportRoomMembers": {
+    "placeholders": {
+      "joined": {
+        "type": "int"
+      },
+      "invited": {
+        "type": "int"
+      }
+    }
+  },
+  "reportRoomEvents": "Events on this device: {count}",
+  "@reportRoomEvents": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportRoomAttachments": "Attachments: {count}",
+  "@reportRoomAttachments": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportFamilyMembers": "Family members",
+  "reportOnlineNote": "Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, time and size of events and the types of account data. Event counts are based on this device's sync; the provider may hold older events as well.",
+  "eventTypeMessage": "Messages",
+  "eventTypeReaction": "Reactions",
+  "eventTypeSharedEvent": "Events (shared)",
+  "eventTypePrivateEvent": "Events (private)",
+  "eventTypeRsvp": "RSVPs",
+  "eventTypeShopping": "Shopping list",
+  "eventTypeTaskList": "Task lists",
+  "eventTypeTaskDone": "Completed tasks",
+  "eventTypeEncrypted": "Not decryptable"
 }

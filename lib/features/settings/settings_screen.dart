@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../app/app_services.dart';
 import '../../core/platform_info.dart';
 import '../../domain/app_settings.dart';
+import '../../domain/data_inventory.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../data/platform/reminder_scheduler.dart';
 import '../../domain/security.dart';
@@ -13,6 +14,8 @@ import '../common/error_text.dart';
 import '../calendar/event_editor_screen.dart' show kReminderChoices;
 import '../reminders/reminder_coordinator.dart';
 import '../moderation/blocked_users_screen.dart';
+import 'data_report.dart';
+import 'data_report_screen.dart';
 import 'privacy_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -95,6 +98,21 @@ class SettingsScreen extends StatelessWidget {
                 leading: const Icon(Icons.privacy_tip_outlined),
                 title: Text(l.settingsPrivacyPolicy),
                 onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const PrivacyScreen())),
+              ),
+              _StorageTiles(),
+              ListTile(
+                leading: const Icon(Icons.storage_outlined),
+                title: Text(l.settingsReportLocal),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => const DataReportScreen(kind: DataReportKind.local)),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.cloud_outlined),
+                title: Text(l.settingsReportOnline),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => const DataReportScreen(kind: DataReportKind.online)),
+                ),
               ),
               ListTile(
                 leading: Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
@@ -185,6 +203,52 @@ class _DropdownTile<T> extends StatelessWidget {
           ),
         ),
       );
+}
+
+/// Speicherorte der lokalen Daten (Pfade zum Markieren und Kopieren) und der Online-Anbieter.
+class _StorageTiles extends StatefulWidget {
+  @override
+  State<_StorageTiles> createState() => _StorageTilesState();
+}
+
+class _StorageTilesState extends State<_StorageTiles> {
+  Future<StorageLocations>? _locations;
+
+  @override
+  void initState() {
+    super.initState();
+    _locations = AppScope.read(context).dataInventory?.locations();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final server = AppScope.of(context).gateway.server?.toString();
+    return FutureBuilder<StorageLocations>(
+      future: _locations,
+      builder: (context, snap) {
+        final loc = snap.data;
+        Widget tile(String title, String value) => ListTile(
+              dense: true,
+              title: Text(title),
+              subtitle: SelectableText(value),
+            );
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Text(l.settingsStorageTitle, style: Theme.of(context).textTheme.titleSmall),
+          ),
+          if (loc != null) ...<Widget>[
+            tile(l.settingsStorageDbDir, loc.inBrowser ? l.settingsStorageBrowser : loc.databaseDirectory),
+            tile(l.settingsStorageAppDb, loc.appDatabase),
+            tile(l.settingsStorageMatrixDb, loc.matrixDatabase),
+            tile(l.settingsStorageKeys, DataReport.keyStoreText(l, loc.keyStore)),
+          ],
+          if (server != null) tile(l.settingsStorageOnline, server),
+        ]);
+      },
+    );
+  }
 }
 
 class _AccountSection extends StatelessWidget {

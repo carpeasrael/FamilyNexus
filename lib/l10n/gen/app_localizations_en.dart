@@ -2342,4 +2342,235 @@ class AppLocalizationsEn extends AppLocalizations {
   String advLocalConnect(String host) {
     return 'Connect to $host';
   }
+
+  @override
+  String get settingsStorageTitle => 'Storage locations';
+
+  @override
+  String get settingsStorageDbDir => 'Database folder';
+
+  @override
+  String get settingsStorageBrowser =>
+      'Browser storage (IndexedDB) of this web address';
+
+  @override
+  String get settingsStorageAppDb =>
+      'App data: events, lists, settings (encrypted)';
+
+  @override
+  String get settingsStorageMatrixDb =>
+      'Chat and sync data: Matrix (encrypted)';
+
+  @override
+  String get settingsStorageKeys => 'Database keys';
+
+  @override
+  String get settingsStorageOnline => 'Online at the Matrix provider';
+
+  @override
+  String get keyStoreAndroid => 'Android Keystore (bound to this device)';
+
+  @override
+  String get keyStoreApple => 'Device keychain (not in iCloud)';
+
+  @override
+  String get keyStoreLinux => 'System keyring (Secret Service)';
+
+  @override
+  String get keyStoreWindows => 'Windows Credential Manager';
+
+  @override
+  String get keyStoreBrowser =>
+      'Password-protected vault in browser storage (localStorage)';
+
+  @override
+  String get settingsReportLocal => 'Report: show all locally stored data';
+
+  @override
+  String get settingsReportOnline => 'Report: show all data stored online';
+
+  @override
+  String get reportLocalTitle => 'Locally stored data';
+
+  @override
+  String get reportOnlineTitle => 'Data stored online';
+
+  @override
+  String get reportWarning =>
+      'The report shows your data in plain text. When you copy or save it, the data leaves the app\'s encrypted storage.';
+
+  @override
+  String get reportCopy => 'Copy';
+
+  @override
+  String get reportCopied => 'Report copied.';
+
+  @override
+  String get reportSave => 'Save as file';
+
+  @override
+  String get reportSaved => 'Report saved.';
+
+  @override
+  String reportGenerated(String time, String version) {
+    return 'Created: $time · app version $version';
+  }
+
+  @override
+  String get reportSectionKeys => 'Key store';
+
+  @override
+  String get reportKeyPresent => 'present (value not shown)';
+
+  @override
+  String get reportKeyMissing => 'not present';
+
+  @override
+  String get reportSectionAppDb => 'App database';
+
+  @override
+  String reportFileSize(String size) {
+    return 'File size: $size';
+  }
+
+  @override
+  String reportRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+      zero: 'no entries',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportSectionMatrixDb => 'Matrix database (cache)';
+
+  @override
+  String get reportMatrixSecrets =>
+      'Also stored, but not shown for security reasons: the session\'s access token, device keys and the keys of encrypted conversations.';
+
+  @override
+  String get reportMatrixUnavailable =>
+      'Not available (not signed in or read error).';
+
+  @override
+  String get reportMemoryOnly =>
+      'Never stored, only kept in memory: family members\' online status.';
+
+  @override
+  String get reportOsReminders =>
+      'Scheduled reminders are additionally held by the operating system.';
+
+  @override
+  String get reportSectionAccount => 'Account';
+
+  @override
+  String get reportDisplayName => 'Display name';
+
+  @override
+  String get reportAvatar => 'Profile picture';
+
+  @override
+  String get reportYes => 'yes';
+
+  @override
+  String get reportNo => 'no';
+
+  @override
+  String get reportNotSet => 'not set';
+
+  @override
+  String get reportSectionSecurity => 'Encryption';
+
+  @override
+  String get reportCrossSigning => 'Cross-signing keys';
+
+  @override
+  String get reportKeyBackup => 'Key backup (encrypted with your recovery key)';
+
+  @override
+  String get reportSetUp => 'set up';
+
+  @override
+  String get reportNotSetUp => 'not set up';
+
+  @override
+  String get reportSectionAccountData =>
+      'Account data (types only, contents not shown)';
+
+  @override
+  String get reportSectionRooms => 'Rooms';
+
+  @override
+  String get reportNone => 'none';
+
+  @override
+  String get roomKindFamily => 'Family';
+
+  @override
+  String get roomKindPrivate => 'Private room (sync of private events)';
+
+  @override
+  String get roomKindDirect => 'Direct chat';
+
+  @override
+  String get roomKindOther => 'Other room';
+
+  @override
+  String get reportRoomEncrypted => 'End-to-end encrypted';
+
+  @override
+  String get reportRoomMembership => 'Own membership';
+
+  @override
+  String reportRoomMembers(int joined, int invited) {
+    return 'Members: $joined joined, $invited invited';
+  }
+
+  @override
+  String reportRoomEvents(int count) {
+    return 'Events on this device: $count';
+  }
+
+  @override
+  String reportRoomAttachments(int count) {
+    return 'Attachments: $count';
+  }
+
+  @override
+  String get reportFamilyMembers => 'Family members';
+
+  @override
+  String get reportOnlineNote =>
+      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, time and size of events and the types of account data. Event counts are based on this device\'s sync; the provider may hold older events as well.';
+
+  @override
+  String get eventTypeMessage => 'Messages';
+
+  @override
+  String get eventTypeReaction => 'Reactions';
+
+  @override
+  String get eventTypeSharedEvent => 'Events (shared)';
+
+  @override
+  String get eventTypePrivateEvent => 'Events (private)';
+
+  @override
+  String get eventTypeRsvp => 'RSVPs';
+
+  @override
+  String get eventTypeShopping => 'Shopping list';
+
+  @override
+  String get eventTypeTaskList => 'Task lists';
+
+  @override
+  String get eventTypeTaskDone => 'Completed tasks';
+
+  @override
+  String get eventTypeEncrypted => 'Not decryptable';
 }

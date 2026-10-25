@@ -12,6 +12,7 @@ import 'package:family_nexus/features/tasks/tasks_controller.dart';
 import 'package:family_nexus/data/platform/file_access.dart';
 import 'package:family_nexus/features/lock/app_lock_controller.dart';
 import 'package:family_nexus/data/platform/screen_protection.dart';
+import 'package:family_nexus/domain/data_inventory.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/features/settings/settings_controller.dart';
 
@@ -108,6 +109,7 @@ Future<TestApp> buildTestApp({
     screenProtection: screenProtection ?? protection,
     gateway: gateway,
     files: FakeFileAccess(),
+    dataInventory: FakeLocalDataInventory(),
     links: links,
     lock: AppLockController(settings: settingsController, auth: auth),
     scheduler: scheduler,
@@ -181,4 +183,30 @@ class FakeFileAccess implements FileAccess {
     saved.add(name);
     contents[name] = bytes;
   }
+}
+
+/// Fake der lokalen Bestandsaufnahme (Linux-Pfade, eine Einstellung, Schlüssel nur als vorhanden).
+class FakeLocalDataInventory implements LocalDataInventory {
+  static const StorageLocations fixed = StorageLocations(
+    databaseDirectory: '/home/test/.local/share/de.inneso.familynexus/databases',
+    appDatabase: '/home/test/.local/share/de.inneso.familynexus/databases/familynexus_app.db',
+    matrixDatabase: '/home/test/.local/share/de.inneso.familynexus/databases/familynexus_matrix.db',
+    keyStore: KeyStoreKind.linuxSecretService,
+  );
+
+  @override
+  Future<StorageLocations> locations() async => fixed;
+
+  @override
+  Future<LocalInventory> read() async => const LocalInventory(
+        locations: fixed,
+        keys: <LocalKey>[LocalKey('db.app', present: true), LocalKey('db.matrix', present: true)],
+        tables: <LocalTable>[
+          LocalTable('settings', <Map<String, Object?>>[
+            <String, Object?>{'key': 'language', 'value': 'de'},
+          ]),
+          LocalTable('events', <Map<String, Object?>>[]),
+        ],
+        appDatabaseBytes: 4096,
+      );
 }

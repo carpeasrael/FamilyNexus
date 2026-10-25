@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:family_nexus/domain/attachment_policy.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
+import 'package:family_nexus/domain/data_inventory.dart';
 import 'package:family_nexus/domain/event_codec.dart';
 import 'package:family_nexus/domain/family_code.dart';
 import 'package:family_nexus/domain/invite_link.dart';
@@ -1004,6 +1005,42 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   @override
   Future<void> close() async {}
+
+  @override
+  Future<OnlineInventory> dataInventory({bool refresh = true}) async {
+    final uid = _userId;
+    if (uid == null) throw const GatewayException(GatewayError.notAllowed);
+    final room = familyRoom;
+    return OnlineInventory(
+      server: 'https://${fake.host}',
+      userId: uid,
+      deviceId: deviceId,
+      displayName: fake.displayNameOf(uid),
+      hasAvatar: false,
+      devices: devices,
+      crossSigning: fake.recoveryKeys.containsKey(uid),
+      keyBackup: fake.recoveryKeys.containsKey(uid),
+      accountDataTypes: <String>[if (room != null) 'de.inneso.familynexus.family'],
+      rooms: <InventoryRoom>[
+        if (room != null)
+          InventoryRoom(
+            id: room.id,
+            kind: InventoryRoomKind.family,
+            name: room.name,
+            encrypted: room.encrypted,
+            membership: 'join',
+            joinedMembers: room.membership.values.where((m) => m == MemberStatus.joined).length,
+            invitedMembers: room.membership.values.where((m) => m == MemberStatus.invited).length,
+            cachedEvents: room.events.length,
+            eventTypes: <String, int>{
+              for (final e in room.events) e.type: room.events.where((x) => x.type == e.type).length,
+            },
+            attachments: 0,
+          ),
+      ],
+      family: family,
+    );
+  }
 
   @override
   Future<void> logout() async {

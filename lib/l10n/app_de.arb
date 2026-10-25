@@ -1444,5 +1444,120 @@
         "type": "String"
       }
     }
-  }
+  },
+  "settingsStorageTitle": "Speicherorte",
+  "settingsStorageDbDir": "Datenbank-Ordner",
+  "settingsStorageBrowser": "Browser-Speicher (IndexedDB) dieser Webadresse",
+  "settingsStorageAppDb": "App-Daten: Termine, Listen, Einstellungen (verschlüsselt)",
+  "settingsStorageMatrixDb": "Chat- und Abgleichsdaten: Matrix (verschlüsselt)",
+  "settingsStorageKeys": "Datenbankschlüssel",
+  "settingsStorageOnline": "Online beim Matrix-Anbieter",
+  "keyStoreAndroid": "Android Keystore (an dieses Gerät gebunden)",
+  "keyStoreApple": "Schlüsselbund des Geräts (nicht in iCloud)",
+  "keyStoreLinux": "Schlüsselbund des Systems (Secret Service)",
+  "keyStoreWindows": "Windows-Anmeldeinformationsverwaltung",
+  "keyStoreBrowser": "Passwortgeschützter Tresor im Browser-Speicher (localStorage)",
+  "settingsReportLocal": "Protokoll: alle lokal gespeicherten Daten zeigen",
+  "settingsReportOnline": "Protokoll: alle online gespeicherten Daten zeigen",
+  "reportLocalTitle": "Lokal gespeicherte Daten",
+  "reportOnlineTitle": "Online gespeicherte Daten",
+  "reportWarning": "Das Protokoll zeigt deine Daten im Klartext. Beim Kopieren oder Speichern verlassen sie den verschlüsselten Speicher der App.",
+  "reportCopy": "Kopieren",
+  "reportCopied": "Protokoll kopiert.",
+  "reportSave": "Als Datei speichern",
+  "reportSaved": "Protokoll gespeichert.",
+  "reportGenerated": "Erstellt: {time} · App-Version {version}",
+  "@reportGenerated": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "reportSectionKeys": "Schlüsselspeicher",
+  "reportKeyPresent": "vorhanden (Wert wird nicht angezeigt)",
+  "reportKeyMissing": "nicht vorhanden",
+  "reportSectionAppDb": "App-Datenbank",
+  "reportFileSize": "Dateigröße: {size}",
+  "@reportFileSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "reportRows": "{count, plural, =0{keine Einträge} =1{1 Eintrag} other{{count} Einträge}}",
+  "@reportRows": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportSectionMatrixDb": "Matrix-Datenbank (Zwischenspeicher)",
+  "reportMatrixSecrets": "Außerdem gespeichert, aber aus Sicherheitsgründen nicht angezeigt: Zugangstoken der Sitzung, Geräteschlüssel und Schlüssel der verschlüsselten Gespräche.",
+  "reportMatrixUnavailable": "Nicht verfügbar (nicht angemeldet oder Fehler beim Lesen).",
+  "reportMemoryOnly": "Nie gespeichert, nur im Arbeitsspeicher: Online-Status der Familienmitglieder.",
+  "reportOsReminders": "Geplante Erinnerungen liegen zusätzlich beim Betriebssystem.",
+  "reportSectionAccount": "Konto",
+  "reportDisplayName": "Anzeigename",
+  "reportAvatar": "Profilbild",
+  "reportYes": "ja",
+  "reportNo": "nein",
+  "reportNotSet": "nicht gesetzt",
+  "reportSectionSecurity": "Verschlüsselung",
+  "reportCrossSigning": "Cross-Signing-Schlüssel",
+  "reportKeyBackup": "Schlüssel-Backup (mit deinem Wiederherstellungsschlüssel verschlüsselt)",
+  "reportSetUp": "eingerichtet",
+  "reportNotSetUp": "nicht eingerichtet",
+  "reportSectionAccountData": "Kontodaten (nur Arten, Inhalte werden nicht angezeigt)",
+  "reportSectionRooms": "Räume",
+  "reportNone": "keine",
+  "roomKindFamily": "Familie",
+  "roomKindPrivate": "Privater Raum (Abgleich privater Termine)",
+  "roomKindDirect": "Einzelchat",
+  "roomKindOther": "Sonstiger Raum",
+  "reportRoomEncrypted": "Ende-zu-Ende-verschlüsselt",
+  "reportRoomMembership": "Eigene Mitgliedschaft",
+  "reportRoomMembers": "Mitglieder: {joined} beigetreten, {invited} eingeladen",
+  "@reportRoomMembers": {
+    "placeholders": {
+      "joined": {
+        "type": "int"
+      },
+      "invited": {
+        "type": "int"
+      }
+    }
+  },
+  "reportRoomEvents": "Ereignisse auf diesem Gerät: {count}",
+  "@reportRoomEvents": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportRoomAttachments": "Anhänge: {count}",
+  "@reportRoomAttachments": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportFamilyMembers": "Mitglieder der Familie",
+  "reportOnlineNote": "Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.",
+  "eventTypeMessage": "Nachrichten",
+  "eventTypeReaction": "Reaktionen",
+  "eventTypeSharedEvent": "Termine (geteilt)",
+  "eventTypePrivateEvent": "Termine (privat)",
+  "eventTypeRsvp": "Zu- und Absagen",
+  "eventTypeShopping": "Einkaufszettel",
+  "eventTypeTaskList": "Aufgabenlisten",
+  "eventTypeTaskDone": "Erledigte Aufgaben",
+  "eventTypeEncrypted": "Nicht entschlüsselbar"
 }

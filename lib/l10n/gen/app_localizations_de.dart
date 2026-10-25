@@ -2358,4 +2358,238 @@ class AppLocalizationsDe extends AppLocalizations {
   String advLocalConnect(String host) {
     return 'Mit $host verbinden';
   }
+
+  @override
+  String get settingsStorageTitle => 'Speicherorte';
+
+  @override
+  String get settingsStorageDbDir => 'Datenbank-Ordner';
+
+  @override
+  String get settingsStorageBrowser =>
+      'Browser-Speicher (IndexedDB) dieser Webadresse';
+
+  @override
+  String get settingsStorageAppDb =>
+      'App-Daten: Termine, Listen, Einstellungen (verschlüsselt)';
+
+  @override
+  String get settingsStorageMatrixDb =>
+      'Chat- und Abgleichsdaten: Matrix (verschlüsselt)';
+
+  @override
+  String get settingsStorageKeys => 'Datenbankschlüssel';
+
+  @override
+  String get settingsStorageOnline => 'Online beim Matrix-Anbieter';
+
+  @override
+  String get keyStoreAndroid => 'Android Keystore (an dieses Gerät gebunden)';
+
+  @override
+  String get keyStoreApple => 'Schlüsselbund des Geräts (nicht in iCloud)';
+
+  @override
+  String get keyStoreLinux => 'Schlüsselbund des Systems (Secret Service)';
+
+  @override
+  String get keyStoreWindows => 'Windows-Anmeldeinformationsverwaltung';
+
+  @override
+  String get keyStoreBrowser =>
+      'Passwortgeschützter Tresor im Browser-Speicher (localStorage)';
+
+  @override
+  String get settingsReportLocal =>
+      'Protokoll: alle lokal gespeicherten Daten zeigen';
+
+  @override
+  String get settingsReportOnline =>
+      'Protokoll: alle online gespeicherten Daten zeigen';
+
+  @override
+  String get reportLocalTitle => 'Lokal gespeicherte Daten';
+
+  @override
+  String get reportOnlineTitle => 'Online gespeicherte Daten';
+
+  @override
+  String get reportWarning =>
+      'Das Protokoll zeigt deine Daten im Klartext. Beim Kopieren oder Speichern verlassen sie den verschlüsselten Speicher der App.';
+
+  @override
+  String get reportCopy => 'Kopieren';
+
+  @override
+  String get reportCopied => 'Protokoll kopiert.';
+
+  @override
+  String get reportSave => 'Als Datei speichern';
+
+  @override
+  String get reportSaved => 'Protokoll gespeichert.';
+
+  @override
+  String reportGenerated(String time, String version) {
+    return 'Erstellt: $time · App-Version $version';
+  }
+
+  @override
+  String get reportSectionKeys => 'Schlüsselspeicher';
+
+  @override
+  String get reportKeyPresent => 'vorhanden (Wert wird nicht angezeigt)';
+
+  @override
+  String get reportKeyMissing => 'nicht vorhanden';
+
+  @override
+  String get reportSectionAppDb => 'App-Datenbank';
+
+  @override
+  String reportFileSize(String size) {
+    return 'Dateigröße: $size';
+  }
+
+  @override
+  String reportRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Einträge',
+      one: '1 Eintrag',
+      zero: 'keine Einträge',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportSectionMatrixDb => 'Matrix-Datenbank (Zwischenspeicher)';
+
+  @override
+  String get reportMatrixSecrets =>
+      'Außerdem gespeichert, aber aus Sicherheitsgründen nicht angezeigt: Zugangstoken der Sitzung, Geräteschlüssel und Schlüssel der verschlüsselten Gespräche.';
+
+  @override
+  String get reportMatrixUnavailable =>
+      'Nicht verfügbar (nicht angemeldet oder Fehler beim Lesen).';
+
+  @override
+  String get reportMemoryOnly =>
+      'Nie gespeichert, nur im Arbeitsspeicher: Online-Status der Familienmitglieder.';
+
+  @override
+  String get reportOsReminders =>
+      'Geplante Erinnerungen liegen zusätzlich beim Betriebssystem.';
+
+  @override
+  String get reportSectionAccount => 'Konto';
+
+  @override
+  String get reportDisplayName => 'Anzeigename';
+
+  @override
+  String get reportAvatar => 'Profilbild';
+
+  @override
+  String get reportYes => 'ja';
+
+  @override
+  String get reportNo => 'nein';
+
+  @override
+  String get reportNotSet => 'nicht gesetzt';
+
+  @override
+  String get reportSectionSecurity => 'Verschlüsselung';
+
+  @override
+  String get reportCrossSigning => 'Cross-Signing-Schlüssel';
+
+  @override
+  String get reportKeyBackup =>
+      'Schlüssel-Backup (mit deinem Wiederherstellungsschlüssel verschlüsselt)';
+
+  @override
+  String get reportSetUp => 'eingerichtet';
+
+  @override
+  String get reportNotSetUp => 'nicht eingerichtet';
+
+  @override
+  String get reportSectionAccountData =>
+      'Kontodaten (nur Arten, Inhalte werden nicht angezeigt)';
+
+  @override
+  String get reportSectionRooms => 'Räume';
+
+  @override
+  String get reportNone => 'keine';
+
+  @override
+  String get roomKindFamily => 'Familie';
+
+  @override
+  String get roomKindPrivate => 'Privater Raum (Abgleich privater Termine)';
+
+  @override
+  String get roomKindDirect => 'Einzelchat';
+
+  @override
+  String get roomKindOther => 'Sonstiger Raum';
+
+  @override
+  String get reportRoomEncrypted => 'Ende-zu-Ende-verschlüsselt';
+
+  @override
+  String get reportRoomMembership => 'Eigene Mitgliedschaft';
+
+  @override
+  String reportRoomMembers(int joined, int invited) {
+    return 'Mitglieder: $joined beigetreten, $invited eingeladen';
+  }
+
+  @override
+  String reportRoomEvents(int count) {
+    return 'Ereignisse auf diesem Gerät: $count';
+  }
+
+  @override
+  String reportRoomAttachments(int count) {
+    return 'Anhänge: $count';
+  }
+
+  @override
+  String get reportFamilyMembers => 'Mitglieder der Familie';
+
+  @override
+  String get reportOnlineNote =>
+      'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.';
+
+  @override
+  String get eventTypeMessage => 'Nachrichten';
+
+  @override
+  String get eventTypeReaction => 'Reaktionen';
+
+  @override
+  String get eventTypeSharedEvent => 'Termine (geteilt)';
+
+  @override
+  String get eventTypePrivateEvent => 'Termine (privat)';
+
+  @override
+  String get eventTypeRsvp => 'Zu- und Absagen';
+
+  @override
+  String get eventTypeShopping => 'Einkaufszettel';
+
+  @override
+  String get eventTypeTaskList => 'Aufgabenlisten';
+
+  @override
+  String get eventTypeTaskDone => 'Erledigte Aufgaben';
+
+  @override
+  String get eventTypeEncrypted => 'Nicht entschlüsselbar';
 }

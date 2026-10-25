@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/chat.dart';
+import '../../domain/data_inventory.dart';
 import '../../domain/family.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/moderation.dart';
@@ -309,4 +310,12 @@ abstract class MatrixGateway implements Listenable {
 
   /// Sendet einen Protokolleintrag einer Aufgabenliste verschlüsselt in den Familienraum (E-51).
   Future<void> publishTaskLog(TaskLogEntry entry);
+
+  // ------------------------------------------------------------ Datenprotokoll
+
+  /// Bestandsaufnahme der beim Anbieter gespeicherten Daten des Kontos: Profil, Geräte,
+  /// Kontodaten-Arten und Räume samt der auf diesem Gerät zwischengespeicherten Ereignisse.
+  /// Schlüssel und verschlüsselte Inhalte werden nie ausgegeben. [refresh]: Profil und Geräteliste
+  /// vorher beim Anbieter abfragen (sonst nur lokale Daten). Wirft `notAllowed`, wenn abgemeldet.
+  Future<OnlineInventory> dataInventory({bool refresh = true});
 }

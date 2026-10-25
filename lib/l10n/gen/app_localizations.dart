@@ -3985,6 +3985,408 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Mit {host} verbinden'**
   String advLocalConnect(String host);
+
+  /// No description provided for @settingsStorageTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Speicherorte'**
+  String get settingsStorageTitle;
+
+  /// No description provided for @settingsStorageDbDir.
+  ///
+  /// In de, this message translates to:
+  /// **'Datenbank-Ordner'**
+  String get settingsStorageDbDir;
+
+  /// No description provided for @settingsStorageBrowser.
+  ///
+  /// In de, this message translates to:
+  /// **'Browser-Speicher (IndexedDB) dieser Webadresse'**
+  String get settingsStorageBrowser;
+
+  /// No description provided for @settingsStorageAppDb.
+  ///
+  /// In de, this message translates to:
+  /// **'App-Daten: Termine, Listen, Einstellungen (verschlüsselt)'**
+  String get settingsStorageAppDb;
+
+  /// No description provided for @settingsStorageMatrixDb.
+  ///
+  /// In de, this message translates to:
+  /// **'Chat- und Abgleichsdaten: Matrix (verschlüsselt)'**
+  String get settingsStorageMatrixDb;
+
+  /// No description provided for @settingsStorageKeys.
+  ///
+  /// In de, this message translates to:
+  /// **'Datenbankschlüssel'**
+  String get settingsStorageKeys;
+
+  /// No description provided for @settingsStorageOnline.
+  ///
+  /// In de, this message translates to:
+  /// **'Online beim Matrix-Anbieter'**
+  String get settingsStorageOnline;
+
+  /// No description provided for @keyStoreAndroid.
+  ///
+  /// In de, this message translates to:
+  /// **'Android Keystore (an dieses Gerät gebunden)'**
+  String get keyStoreAndroid;
+
+  /// No description provided for @keyStoreApple.
+  ///
+  /// In de, this message translates to:
+  /// **'Schlüsselbund des Geräts (nicht in iCloud)'**
+  String get keyStoreApple;
+
+  /// No description provided for @keyStoreLinux.
+  ///
+  /// In de, this message translates to:
+  /// **'Schlüsselbund des Systems (Secret Service)'**
+  String get keyStoreLinux;
+
+  /// No description provided for @keyStoreWindows.
+  ///
+  /// In de, this message translates to:
+  /// **'Windows-Anmeldeinformationsverwaltung'**
+  String get keyStoreWindows;
+
+  /// No description provided for @keyStoreBrowser.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwortgeschützter Tresor im Browser-Speicher (localStorage)'**
+  String get keyStoreBrowser;
+
+  /// No description provided for @settingsReportLocal.
+  ///
+  /// In de, this message translates to:
+  /// **'Protokoll: alle lokal gespeicherten Daten zeigen'**
+  String get settingsReportLocal;
+
+  /// No description provided for @settingsReportOnline.
+  ///
+  /// In de, this message translates to:
+  /// **'Protokoll: alle online gespeicherten Daten zeigen'**
+  String get settingsReportOnline;
+
+  /// No description provided for @reportLocalTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Lokal gespeicherte Daten'**
+  String get reportLocalTitle;
+
+  /// No description provided for @reportOnlineTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Online gespeicherte Daten'**
+  String get reportOnlineTitle;
+
+  /// No description provided for @reportWarning.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Protokoll zeigt deine Daten im Klartext. Beim Kopieren oder Speichern verlassen sie den verschlüsselten Speicher der App.'**
+  String get reportWarning;
+
+  /// No description provided for @reportCopy.
+  ///
+  /// In de, this message translates to:
+  /// **'Kopieren'**
+  String get reportCopy;
+
+  /// No description provided for @reportCopied.
+  ///
+  /// In de, this message translates to:
+  /// **'Protokoll kopiert.'**
+  String get reportCopied;
+
+  /// No description provided for @reportSave.
+  ///
+  /// In de, this message translates to:
+  /// **'Als Datei speichern'**
+  String get reportSave;
+
+  /// No description provided for @reportSaved.
+  ///
+  /// In de, this message translates to:
+  /// **'Protokoll gespeichert.'**
+  String get reportSaved;
+
+  /// No description provided for @reportGenerated.
+  ///
+  /// In de, this message translates to:
+  /// **'Erstellt: {time} · App-Version {version}'**
+  String reportGenerated(String time, String version);
+
+  /// No description provided for @reportSectionKeys.
+  ///
+  /// In de, this message translates to:
+  /// **'Schlüsselspeicher'**
+  String get reportSectionKeys;
+
+  /// No description provided for @reportKeyPresent.
+  ///
+  /// In de, this message translates to:
+  /// **'vorhanden (Wert wird nicht angezeigt)'**
+  String get reportKeyPresent;
+
+  /// No description provided for @reportKeyMissing.
+  ///
+  /// In de, this message translates to:
+  /// **'nicht vorhanden'**
+  String get reportKeyMissing;
+
+  /// No description provided for @reportSectionAppDb.
+  ///
+  /// In de, this message translates to:
+  /// **'App-Datenbank'**
+  String get reportSectionAppDb;
+
+  /// No description provided for @reportFileSize.
+  ///
+  /// In de, this message translates to:
+  /// **'Dateigröße: {size}'**
+  String reportFileSize(String size);
+
+  /// No description provided for @reportRows.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{keine Einträge} =1{1 Eintrag} other{{count} Einträge}}'**
+  String reportRows(int count);
+
+  /// No description provided for @reportSectionMatrixDb.
+  ///
+  /// In de, this message translates to:
+  /// **'Matrix-Datenbank (Zwischenspeicher)'**
+  String get reportSectionMatrixDb;
+
+  /// No description provided for @reportMatrixSecrets.
+  ///
+  /// In de, this message translates to:
+  /// **'Außerdem gespeichert, aber aus Sicherheitsgründen nicht angezeigt: Zugangstoken der Sitzung, Geräteschlüssel und Schlüssel der verschlüsselten Gespräche.'**
+  String get reportMatrixSecrets;
+
+  /// No description provided for @reportMatrixUnavailable.
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht verfügbar (nicht angemeldet oder Fehler beim Lesen).'**
+  String get reportMatrixUnavailable;
+
+  /// No description provided for @reportMemoryOnly.
+  ///
+  /// In de, this message translates to:
+  /// **'Nie gespeichert, nur im Arbeitsspeicher: Online-Status der Familienmitglieder.'**
+  String get reportMemoryOnly;
+
+  /// No description provided for @reportOsReminders.
+  ///
+  /// In de, this message translates to:
+  /// **'Geplante Erinnerungen liegen zusätzlich beim Betriebssystem.'**
+  String get reportOsReminders;
+
+  /// No description provided for @reportSectionAccount.
+  ///
+  /// In de, this message translates to:
+  /// **'Konto'**
+  String get reportSectionAccount;
+
+  /// No description provided for @reportDisplayName.
+  ///
+  /// In de, this message translates to:
+  /// **'Anzeigename'**
+  String get reportDisplayName;
+
+  /// No description provided for @reportAvatar.
+  ///
+  /// In de, this message translates to:
+  /// **'Profilbild'**
+  String get reportAvatar;
+
+  /// No description provided for @reportYes.
+  ///
+  /// In de, this message translates to:
+  /// **'ja'**
+  String get reportYes;
+
+  /// No description provided for @reportNo.
+  ///
+  /// In de, this message translates to:
+  /// **'nein'**
+  String get reportNo;
+
+  /// No description provided for @reportNotSet.
+  ///
+  /// In de, this message translates to:
+  /// **'nicht gesetzt'**
+  String get reportNotSet;
+
+  /// No description provided for @reportSectionSecurity.
+  ///
+  /// In de, this message translates to:
+  /// **'Verschlüsselung'**
+  String get reportSectionSecurity;
+
+  /// No description provided for @reportCrossSigning.
+  ///
+  /// In de, this message translates to:
+  /// **'Cross-Signing-Schlüssel'**
+  String get reportCrossSigning;
+
+  /// No description provided for @reportKeyBackup.
+  ///
+  /// In de, this message translates to:
+  /// **'Schlüssel-Backup (mit deinem Wiederherstellungsschlüssel verschlüsselt)'**
+  String get reportKeyBackup;
+
+  /// No description provided for @reportSetUp.
+  ///
+  /// In de, this message translates to:
+  /// **'eingerichtet'**
+  String get reportSetUp;
+
+  /// No description provided for @reportNotSetUp.
+  ///
+  /// In de, this message translates to:
+  /// **'nicht eingerichtet'**
+  String get reportNotSetUp;
+
+  /// No description provided for @reportSectionAccountData.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontodaten (nur Arten, Inhalte werden nicht angezeigt)'**
+  String get reportSectionAccountData;
+
+  /// No description provided for @reportSectionRooms.
+  ///
+  /// In de, this message translates to:
+  /// **'Räume'**
+  String get reportSectionRooms;
+
+  /// No description provided for @reportNone.
+  ///
+  /// In de, this message translates to:
+  /// **'keine'**
+  String get reportNone;
+
+  /// No description provided for @roomKindFamily.
+  ///
+  /// In de, this message translates to:
+  /// **'Familie'**
+  String get roomKindFamily;
+
+  /// No description provided for @roomKindPrivate.
+  ///
+  /// In de, this message translates to:
+  /// **'Privater Raum (Abgleich privater Termine)'**
+  String get roomKindPrivate;
+
+  /// No description provided for @roomKindDirect.
+  ///
+  /// In de, this message translates to:
+  /// **'Einzelchat'**
+  String get roomKindDirect;
+
+  /// No description provided for @roomKindOther.
+  ///
+  /// In de, this message translates to:
+  /// **'Sonstiger Raum'**
+  String get roomKindOther;
+
+  /// No description provided for @reportRoomEncrypted.
+  ///
+  /// In de, this message translates to:
+  /// **'Ende-zu-Ende-verschlüsselt'**
+  String get reportRoomEncrypted;
+
+  /// No description provided for @reportRoomMembership.
+  ///
+  /// In de, this message translates to:
+  /// **'Eigene Mitgliedschaft'**
+  String get reportRoomMembership;
+
+  /// No description provided for @reportRoomMembers.
+  ///
+  /// In de, this message translates to:
+  /// **'Mitglieder: {joined} beigetreten, {invited} eingeladen'**
+  String reportRoomMembers(int joined, int invited);
+
+  /// No description provided for @reportRoomEvents.
+  ///
+  /// In de, this message translates to:
+  /// **'Ereignisse auf diesem Gerät: {count}'**
+  String reportRoomEvents(int count);
+
+  /// No description provided for @reportRoomAttachments.
+  ///
+  /// In de, this message translates to:
+  /// **'Anhänge: {count}'**
+  String reportRoomAttachments(int count);
+
+  /// No description provided for @reportFamilyMembers.
+  ///
+  /// In de, this message translates to:
+  /// **'Mitglieder der Familie'**
+  String get reportFamilyMembers;
+
+  /// No description provided for @reportOnlineNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.'**
+  String get reportOnlineNote;
+
+  /// No description provided for @eventTypeMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachrichten'**
+  String get eventTypeMessage;
+
+  /// No description provided for @eventTypeReaction.
+  ///
+  /// In de, this message translates to:
+  /// **'Reaktionen'**
+  String get eventTypeReaction;
+
+  /// No description provided for @eventTypeSharedEvent.
+  ///
+  /// In de, this message translates to:
+  /// **'Termine (geteilt)'**
+  String get eventTypeSharedEvent;
+
+  /// No description provided for @eventTypePrivateEvent.
+  ///
+  /// In de, this message translates to:
+  /// **'Termine (privat)'**
+  String get eventTypePrivateEvent;
+
+  /// No description provided for @eventTypeRsvp.
+  ///
+  /// In de, this message translates to:
+  /// **'Zu- und Absagen'**
+  String get eventTypeRsvp;
+
+  /// No description provided for @eventTypeShopping.
+  ///
+  /// In de, this message translates to:
+  /// **'Einkaufszettel'**
+  String get eventTypeShopping;
+
+  /// No description provided for @eventTypeTaskList.
+  ///
+  /// In de, this message translates to:
+  /// **'Aufgabenlisten'**
+  String get eventTypeTaskList;
+
+  /// No description provided for @eventTypeTaskDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Erledigte Aufgaben'**
+  String get eventTypeTaskDone;
+
+  /// No description provided for @eventTypeEncrypted.
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht entschlüsselbar'**
+  String get eventTypeEncrypted;
 }
 
 class _AppLocalizationsDelegate
