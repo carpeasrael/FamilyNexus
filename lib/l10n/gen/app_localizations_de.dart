@@ -877,7 +877,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String familyInviteLinkHint(String validity) {
-    return 'Der Link ist $validity gültig und nur einmal verwendbar. Wer ihn öffnet, schickt dir eine Anfrage – du bestätigst sie.';
+    return 'Der Link ist $validity gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist.';
   }
 
   @override
@@ -1486,7 +1486,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String inviteMailBody(String family, String link, String validity) {
-    return 'Hallo,\n\nich lade dich in unsere Familie „$family“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n$link\n\n3. Lege dein Konto an.\n4. Ich bestätige dich, dann bist du dabei.\n\nDer Link ist $validity gültig.';
+    return 'Hallo,\n\nich lade dich in unsere Familie „$family“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n$link\n\n3. Lege dein Konto an.\n4. Sobald die App eines Moderators online ist, wirst du automatisch aufgenommen.\n\nDer Link ist $validity gültig.';
   }
 
   @override
@@ -1848,6 +1848,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get regExternalLogin => 'Ich habe ein Konto – anmelden';
 
   @override
+  String get regElementOpen => 'Element starten';
+
+  @override
+  String regElementMissing(String host) {
+    return 'Element ist nicht installiert. Du kannst es hier laden und dort ein Konto beim Server $host anlegen. Danach hier „Ich habe ein Konto – anmelden“ wählen.';
+  }
+
+  @override
+  String get regElementDownload => 'Element laden';
+
+  @override
   String oauthWaiting(String host) {
     return 'Bitte im Browser bei $host fortfahren … Danach geht es hier automatisch weiter.';
   }
@@ -2003,7 +2014,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String joinCardNote(String inviter) {
-    return 'Angaben laut Einladung. $inviter bestätigt deine Anfrage, danach bist du dabei.';
+    return 'Angaben laut Einladung. Die App eines Moderators nimmt dich automatisch auf, sobald sie online ist.';
   }
 
   @override

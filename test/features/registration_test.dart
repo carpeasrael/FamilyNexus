@@ -163,6 +163,21 @@ void main() {
     expect(find.widgetWithText(TextField, 'Benutzername'), findsOneWidget);
   });
 
+  testWidgets('TP-REG-09c Registrierung abgeschaltet: Element starten, sonst Hinweis mit Download', (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    app.server.registrationMode = RegistrationMode.disabled;
+    await _pump(tester, app);
+    await _tap(tester, 'Neue Familie gründen');
+    await _tap(tester, 'Element starten');
+    expect(app.element.starts, 1);
+    expect(find.textContaining('nicht installiert'), findsNothing);
+    app.element.installed = false;
+    await _tap(tester, 'Element starten');
+    expect(find.textContaining('nicht installiert'), findsOneWidget);
+    await _tap(tester, 'Element laden');
+    expect(app.browser.opened.last.toString(), 'https://element.io/download');
+  });
+
   testWidgets('TP-REG-09b nur nicht unterstützte Schritte (Telefonnummer): wie abgeschaltet', (tester) async {
     final app = await buildTestApp(loggedIn: false);
     app.server.registrationFlows = <List<String>>[

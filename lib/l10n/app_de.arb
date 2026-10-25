@@ -399,7 +399,7 @@
   "familyManage": "Verwaltung",
   "familyInvite": "Mitglied einladen",
   "familyInviteLinkTitle": "Jemanden einladen",
-  "familyInviteLinkHint": "Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, schickt dir eine Anfrage – du bestätigst sie.",
+  "familyInviteLinkHint": "Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist.",
   "familyInviteShowQr": "QR-Code anzeigen",
   "familyInviteCopyLink": "Link kopieren",
   "familyInviteCopied": "Link kopiert.",
@@ -803,7 +803,7 @@
   "privacy11Body": "Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen.",
   "familyInviteMail": "Per E-Mail senden",
   "inviteMailSubject": "Einladung zu FamilyNexus",
-  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ich bestätige dich, dann bist du dabei.\n\nDer Link ist {validity} gültig.",
+  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Sobald die App eines Moderators online ist, wirst du automatisch aufgenommen.\n\nDer Link ist {validity} gültig.",
   "@inviteMailBody": {
     "placeholders": {
       "family": {
@@ -1049,6 +1049,14 @@
   },
   "regExternalOpen": "Webseite öffnen",
   "regExternalLogin": "Ich habe ein Konto – anmelden",
+  "regElementOpen": "Element starten",
+  "regElementMissing": "Element ist nicht installiert. Du kannst es hier laden und dort ein Konto beim Server {host} anlegen. Danach hier „Ich habe ein Konto – anmelden“ wählen.",
+  "@regElementMissing": {
+    "placeholders": {
+      "host": {"type": "String"}
+    }
+  },
+  "regElementDownload": "Element laden",
   "oauthWaiting": "Bitte im Browser bei {host} fortfahren … Danach geht es hier automatisch weiter.",
   "@oauthWaiting": {
     "placeholders": {
@@ -1184,7 +1192,7 @@
       }
     }
   },
-  "joinCardNote": "Angaben laut Einladung. {inviter} bestätigt deine Anfrage, danach bist du dabei.",
+  "joinCardNote": "Angaben laut Einladung. Die App eines Moderators nimmt dich automatisch auf, sobald sie online ist.",
   "@joinCardNote": {
     "placeholders": {
       "inviter": {

@@ -41,6 +41,7 @@ class TestApp {
     required this.auth,
     required this.mail,
     required this.browser,
+    required this.element,
     required this.oauth,
   });
 
@@ -57,6 +58,7 @@ class TestApp {
   final FakeDeviceAuth auth;
   final FakeMailLauncher mail;
   final FakeBrowser browser;
+  final FakeElement element;
   final FakeOAuthRedirect oauth;
 }
 
@@ -98,6 +100,7 @@ Future<TestApp> buildTestApp({
   final auth = FakeDeviceAuth();
   final mail = FakeMailLauncher();
   final browser = FakeBrowser();
+  final element = FakeElement();
   final oauth = FakeOAuthRedirect();
   final settingsController = await SettingsController.load(store);
   final services = AppServices(
@@ -110,6 +113,7 @@ Future<TestApp> buildTestApp({
     scheduler: scheduler,
     mail: mail,
     browser: browser,
+    element: element,
     oauthRedirect: oauth,
     shoppingBuilder: (uid) async {
       final service = ShoppingService(store: shoppingStore, myUserId: uid, clock: clock);
@@ -158,6 +162,7 @@ Future<TestApp> buildTestApp({
     auth: auth,
     mail: mail,
     browser: browser,
+    element: element,
     oauth: oauth,
   );
 }

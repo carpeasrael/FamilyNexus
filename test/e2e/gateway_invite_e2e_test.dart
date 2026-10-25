@@ -15,7 +15,7 @@ Future<SdkMatrixGateway> _login(String prefix) async {
 }
 
 Future<void> _join(SdkMatrixGateway mod, SdkMatrixGateway user) async {
-  final link = InviteLink.tryParse(await mod.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
+  final link = InviteLink.tryParse(await mod.createInviteLink(autoApprove: false), now: DateTime.now(), ownHost: 'localhost')!;
   await user.requestToJoin(link);
   await E2e.until(() => mod.family?.member(user.userId!)?.status == MemberStatus.requested, what: 'Moderator sieht Anfrage');
   await mod.approveRequest(user.userId!);
@@ -37,7 +37,7 @@ void main() {
       await E2e.until(() => b.family?.myRole == Role.moderator, what: 'B ist Moderator');
 
       // A gibt den Link aus; die Anfrage trifft ein.
-      final link = InviteLink.tryParse(await a.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
+      final link = InviteLink.tryParse(await a.createInviteLink(autoApprove: false), now: DateTime.now(), ownHost: 'localhost')!;
       final c = await _login('invc');
       await c.requestToJoin(link);
       await E2e.until(() => b.family?.member(c.userId!)?.status == MemberStatus.requested, what: 'B sieht die Anfrage');
@@ -56,6 +56,26 @@ void main() {
       await E2e.until(() => b.family?.member(d.userId!)?.status == MemberStatus.requested, what: 'B sieht die zweite Anfrage');
       await E2e.until(() => b.family!.member(d.userId!)!.request == RequestCheck.unknown, what: 'verbrauchter Link gilt nicht mehr');
       await E2e.until(() => a.family!.member(d.userId!)!.request == RequestCheck.unknown, what: 'A sieht den verbrauchten Link ebenso');
+    });
+
+    test('Link mit automatischer Bestätigung: die App des Moderators lädt ohne Klick ein, nur einmal', () async {
+      final a = await _login('inaa');
+      await a.createFamily('Auto-Familie');
+      await E2e.until(() => a.family != null, what: 'Familie bei A');
+      final link = InviteLink.tryParse(await a.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
+      final c = await _login('inac');
+      await c.requestToJoin(link);
+      await E2e.until(() => c.invitations.isNotEmpty, what: 'C erhält die Einladung ohne Zutun eines Moderators');
+      await c.acceptInvitation(c.invitations.single.roomId);
+      await E2e.until(() => c.family != null, what: 'C ist in der Familie');
+      expect(c.family!.myRole, Role.member);
+
+      // Einmalig: ein zweiter Anfrager mit demselben Link bleibt unbestätigt.
+      final d = await _login('inad');
+      await d.requestToJoin(link);
+      await E2e.until(() => a.family?.member(d.userId!)?.status == MemberStatus.requested, what: 'A sieht die zweite Anfrage');
+      await E2e.until(() => a.family!.member(d.userId!)!.request == RequestCheck.unknown, what: 'verbrauchter Link gilt nicht mehr');
+      expect(d.invitations, isEmpty);
     });
 
     test('Per Matrix-ID eingeladenes Konto findet die Einladung nach der Anmeldung', () async {

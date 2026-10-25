@@ -20,6 +20,14 @@ void main() {
     expect(InviteTicket.decode(t.encode(), nowSeconds: now)!.used, isTrue);
   });
 
+  test('automatische Bestätigung ist nur gesetzt, wenn der Vermerk es sagt', () {
+    final t = InviteTicket(nonce: nonce, expires: now + 60, auto: true);
+    expect(t.encode()['auto'], true);
+    expect(InviteTicket.decode(t.encode(), nowSeconds: now)!.auto, isTrue);
+    expect(InviteTicket.decode(InviteTicket(nonce: nonce, expires: now + 60).encode(), nowSeconds: now)!.auto, isFalse);
+    expect(InviteTicket.decode(<String, Object?>{...t.encode(), 'auto': 'ja'}, nowSeconds: now), isNull);
+  });
+
   test('ungültige Inhalte werden verworfen', () {
     Map<String, Object?> ok() => <String, Object?>{'v': 1, 'n': nonce, 'exp': now + 3600};
     expect(InviteTicket.decode(ok(), nowSeconds: now), isNotNull);

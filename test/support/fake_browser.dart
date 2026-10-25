@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:family_nexus/data/platform/browser_launcher.dart';
+import 'package:family_nexus/data/platform/element_launcher.dart';
 import 'package:family_nexus/data/platform/oauth_redirect.dart';
 
 /// Merkt sich geöffnete Seiten; `available = false` simuliert ein Gerät ohne Browser.
@@ -65,5 +66,18 @@ class _FakeAttempt implements OAuthAttempt {
     closed = true;
     _signal?.complete();
     _signal = null;
+  }
+}
+
+/// Simuliert Element; `installed = false` = nicht auf dem Gerät.
+class FakeElement implements ElementLauncher {
+  bool installed = true;
+  int starts = 0;
+
+  @override
+  Future<bool> open() async {
+    if (!installed) return false;
+    starts++;
+    return true;
   }
 }

@@ -713,6 +713,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _signalHistory.clear();
     _roomTickets.clear();
     _usedTickets.clear();
+    _autoTickets.clear();
+    _autoApproving.clear();
     _privateRoomIdCache = null;
     _privateVerified = null;
     _joinRequestCache = null;
@@ -1278,7 +1280,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   @override
-  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity}) async {
+  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, bool autoApprove = true}) async {
     final f = _requireFamily();
     if (!Permissions.canInvite(f)) throw const GatewayException(GatewayError.notAllowed);
     final via = f.roomId.substring(f.roomId.indexOf(':') + 1);
@@ -1310,7 +1312,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       throw _map(e);
     }
     _roomTickets[nonce] = invites[nonce]!;
-    await _publishTicket(InviteTicket(nonce: nonce, expires: invites[nonce]!));
+    if (autoApprove) _autoTickets.add(nonce);
+    await _publishTicket(InviteTicket(nonce: nonce, expires: invites[nonce]!, auto: autoApprove));
     return link;
   }
 
@@ -1318,6 +1321,10 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// verbrauchte IDs. Ergänzt die eigenen Kontodaten, damit jeder Moderator Anfragen prüfen kann (E-49).
   final Map<String, int> _roomTickets = <String, int>{};
   final Set<String> _usedTickets = <String>{};
+
+  /// Link-IDs, deren Anfragen ohne Rückfrage bestätigt werden, und laufende Bestätigungen (je Person).
+  final Set<String> _autoTickets = <String>{};
+  final Set<String> _autoApproving = <String>{};
 
   /// Meldet einen Link-Vermerk an die anderen Moderatoren. Scheitert das, bleibt der Link für den
   /// Aussteller selbst gültig; deshalb nur eine Warnung statt eines Fehlers.
@@ -1343,7 +1350,22 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         _usedTickets.add(t.nonce);
       } else {
         _roomTickets[t.nonce] = t.expires;
+        if (t.auto) _autoTickets.add(t.nonce);
       }
+    }
+  }
+
+  /// Bestätigt Anfragen mit gültigem Einladungslink automatisch, solange dieses Gerät eines Moderators
+  /// online ist. Prüfungen wie bei der manuellen Bestätigung ([approveRequest]); der Link ist einmalig.
+  void _autoApprove(Family f) {
+    if (!Permissions.canInvite(f)) return;
+    for (final m in f.members) {
+      if (m.status != MemberStatus.requested || m.request != RequestCheck.valid) continue;
+      final nonce = _knockNonces[m.userId];
+      if (nonce == null || !_autoTickets.contains(nonce) || !_autoApproving.add(m.userId)) continue;
+      approveRequest(m.userId).catchError((Object e) {
+        AppLog.w('gateway', 'Automatische Bestätigung fehlgeschlagen');
+      }).whenComplete(() => _autoApproving.remove(m.userId)).ignore();
     }
   }
 
@@ -1870,6 +1892,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
     _readTickets(room, _timeline!);
     _family = _buildFamily(room, client.userID!);
+    _autoApprove(_family!);
     _messages = ChatMapper.messages(_timeline!);
     if (_presenceRoomId != room.id) {
       // Andere Familie: der Status der alten gilt nicht weiter.

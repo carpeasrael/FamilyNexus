@@ -1553,7 +1553,7 @@ abstract class AppLocalizations {
   /// No description provided for @familyInviteLinkHint.
   ///
   /// In de, this message translates to:
-  /// **'Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, schickt dir eine Anfrage – du bestätigst sie.'**
+  /// **'Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist.'**
   String familyInviteLinkHint(String validity);
 
   /// No description provided for @familyInviteShowQr.
@@ -2573,7 +2573,7 @@ abstract class AppLocalizations {
   /// No description provided for @inviteMailBody.
   ///
   /// In de, this message translates to:
-  /// **'Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ich bestätige dich, dann bist du dabei.\n\nDer Link ist {validity} gültig.'**
+  /// **'Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Sobald die App eines Moderators online ist, wirst du automatisch aufgenommen.\n\nDer Link ist {validity} gültig.'**
   String inviteMailBody(String family, String link, String validity);
 
   /// No description provided for @familyInviteMailFailed.
@@ -3182,6 +3182,24 @@ abstract class AppLocalizations {
   /// **'Ich habe ein Konto – anmelden'**
   String get regExternalLogin;
 
+  /// No description provided for @regElementOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'Element starten'**
+  String get regElementOpen;
+
+  /// No description provided for @regElementMissing.
+  ///
+  /// In de, this message translates to:
+  /// **'Element ist nicht installiert. Du kannst es hier laden und dort ein Konto beim Server {host} anlegen. Danach hier „Ich habe ein Konto – anmelden“ wählen.'**
+  String regElementMissing(String host);
+
+  /// No description provided for @regElementDownload.
+  ///
+  /// In de, this message translates to:
+  /// **'Element laden'**
+  String get regElementDownload;
+
   /// No description provided for @oauthWaiting.
   ///
   /// In de, this message translates to:
@@ -3425,7 +3443,7 @@ abstract class AppLocalizations {
   /// No description provided for @joinCardNote.
   ///
   /// In de, this message translates to:
-  /// **'Angaben laut Einladung. {inviter} bestätigt deine Anfrage, danach bist du dabei.'**
+  /// **'Angaben laut Einladung. Die App eines Moderators nimmt dich automatisch auf, sobald sie online ist.'**
   String joinCardNote(String inviter);
 
   /// No description provided for @joinCardDetails.

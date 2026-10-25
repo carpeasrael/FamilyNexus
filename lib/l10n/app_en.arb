@@ -399,7 +399,7 @@
   "familyManage": "Management",
   "familyInvite": "Invite a member",
   "familyInviteLinkTitle": "Invite someone",
-  "familyInviteLinkHint": "The link is valid for {validity} and can be used once. Whoever opens it sends you a request – you confirm it.",
+  "familyInviteLinkHint": "The link is valid for {validity} and can be used once. Whoever opens it is admitted automatically as soon as a moderator's app is online.",
   "familyInviteShowQr": "Show QR code",
   "familyInviteCopyLink": "Copy link",
   "familyInviteCopied": "Link copied.",
@@ -803,7 +803,7 @@
   "privacy11Body": "The app remembers blocked members only on this device (encrypted database); the list is not transmitted. If you report a message, the operator of your server receives the message ID, the chosen reason and your optional text. They cannot read the encrypted content.",
   "familyInviteMail": "Send by email",
   "inviteMailSubject": "Invitation to FamilyNexus",
-  "inviteMailBody": "Hello,\n\nI am inviting you to our family “{family}” on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n{link}\n\n3. Create your account.\n4. I confirm you, and you are in.\n\nThe link is valid for {validity}.",
+  "inviteMailBody": "Hello,\n\nI am inviting you to our family “{family}” on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n{link}\n\n3. Create your account.\n4. As soon as a moderator's app is online, you are admitted automatically.\n\nThe link is valid for {validity}.",
   "@inviteMailBody": {
     "placeholders": {
       "family": {
@@ -1049,6 +1049,14 @@
   },
   "regExternalOpen": "Open website",
   "regExternalLogin": "I have an account – sign in",
+  "regElementOpen": "Start Element",
+  "regElementMissing": "Element is not installed. You can download it here and create an account on {host} there. Afterwards choose “I have an account – sign in” here.",
+  "@regElementMissing": {
+    "placeholders": {
+      "host": {"type": "String"}
+    }
+  },
+  "regElementDownload": "Download Element",
   "oauthWaiting": "Please continue in the browser at {host} … Afterwards you continue here automatically.",
   "@oauthWaiting": {
     "placeholders": {
@@ -1178,7 +1186,7 @@
       }
     }
   },
-  "joinCardNote": "Details according to the invitation. {inviter} confirms your request, then you are in.",
+  "joinCardNote": "Details according to the invitation. A moderator's app admits you automatically as soon as it is online.",
   "@joinCardNote": {
     "placeholders": {
       "inviter": {

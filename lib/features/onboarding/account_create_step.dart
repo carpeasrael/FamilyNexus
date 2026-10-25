@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
+import '../../data/platform/element_launcher.dart';
 import '../../domain/registration.dart';
 import '../../domain/server.dart';
 import '../../domain/username_suggestion.dart';
@@ -37,6 +38,7 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
   bool _showPassword = false;
   bool _busy = false;
   bool _waitingForBrowser = false;
+  bool _elementMissing = false;
   String? _error;
   RegistrationStage? _stage;
 
@@ -277,8 +279,20 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
                   onPressed: () => _s.browser.open(page),
                   label: Text(l.regExternalOpen),
                 ),
+              OutlinedButton(onPressed: _openElement, child: Text(l.regElementOpen)),
               FilledButton(onPressed: () => widget.onLogin(null), child: Text(l.regExternalLogin)),
             ]),
+            if (_elementMissing) ...<Widget>[
+              const SizedBox(height: 12),
+              Semantics(liveRegion: true, child: Text(l.regElementMissing(host))),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: () => _s.browser.open(ElementLauncher.downloadPage),
+                  child: Text(l.regElementDownload),
+                ),
+              ),
+            ],
           ];
         } else {
           main = <Widget>[
@@ -361,6 +375,12 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
         ]);
       },
     );
+  }
+
+  /// Ausweg ohne Kontoanlage in der App: Element starten; fehlt es, Hinweis mit Download.
+  Future<void> _openElement() async {
+    final started = await _s.element.open();
+    if (mounted) setState(() => _elementMissing = !started);
   }
 
   Widget _nameField(AppLocalizations l) => TextField(

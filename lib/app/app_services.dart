@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../data/db/app_database.dart';
 import '../data/matrix/matrix_gateway.dart';
 import '../data/platform/browser_launcher.dart';
+import '../data/platform/element_launcher.dart';
 import '../data/platform/file_access.dart';
 import '../data/platform/key_store.dart';
 import '../data/platform/link_source.dart';
@@ -45,6 +46,7 @@ class AppServices {
     this.scheduler,
     this.mail = const SystemMailLauncher(),
     this.browser = const SystemBrowserLauncher(),
+    this.element = const SystemElementLauncher(),
     this.oauthRedirect,
   });
 
@@ -60,6 +62,9 @@ class AppServices {
 
   /// Öffnet Seiten des Anbieters (Anmeldung, Bedingungen, Captcha; E-55).
   final BrowserLauncher browser;
+
+  /// Startet Element, wenn der Server die Kontoanlage in der App nicht zulässt.
+  final ElementLauncher element;
 
   /// Rücksprung der Anmeldung im Browser; `null` = auf dieser Plattform nicht verfügbar (Browser-App).
   final OAuthRedirect? oauthRedirect;
