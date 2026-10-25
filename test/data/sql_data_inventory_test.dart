@@ -54,7 +54,16 @@ void main() {
     expect(inv.locations.databaseDirectory, dir.path);
     expect(inv.locations.appDatabase, p.join(dir.path, 'app.db'));
     expect(inv.locations.matrixDatabase, p.join(dir.path, 'matrix.db'));
-    expect(inv.locations.keyStore, KeyStoreKind.linuxSecretService);
+    expect(
+      inv.locations.keyStore,
+      Platform.isMacOS || Platform.isIOS
+          ? KeyStoreKind.appleKeychain
+          : Platform.isWindows
+              ? KeyStoreKind.windowsCredentialManager
+              : Platform.isAndroid
+                  ? KeyStoreKind.androidKeystore
+                  : KeyStoreKind.linuxSecretService,
+    );
     expect(inv.appDatabaseBytes, 2048);
     expect(inv.matrixDatabaseBytes, isNull, reason: 'Datei fehlt');
     expect(inv.tables.map((t) => t.name), SqlDataInventory.tables);
