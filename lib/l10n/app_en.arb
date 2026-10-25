@@ -1553,5 +1553,16 @@
   "eventTypeShopping": "Shopping list",
   "eventTypeTaskList": "Task lists",
   "eventTypeTaskDone": "Completed tasks",
-  "eventTypeEncrypted": "Not decryptable"
+  "eventTypeEncrypted": "Not decryptable",
+  "reportFile": "File: {path}",
+  "@reportFile": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "reportMembershipJoined": "joined",
+  "reportMembershipInvited": "invited",
+  "reportMembershipRequested": "join requested",
+  "reportMembershipLeft": "left",
+  "reportMembershipBanned": "banned"
 }

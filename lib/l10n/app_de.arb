@@ -1559,5 +1559,16 @@
   "eventTypeShopping": "Einkaufszettel",
   "eventTypeTaskList": "Aufgabenlisten",
   "eventTypeTaskDone": "Erledigte Aufgaben",
-  "eventTypeEncrypted": "Nicht entschlüsselbar"
+  "eventTypeEncrypted": "Nicht entschlüsselbar",
+  "reportFile": "Datei: {path}",
+  "@reportFile": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "reportMembershipJoined": "beigetreten",
+  "reportMembershipInvited": "eingeladen",
+  "reportMembershipRequested": "Beitritt angefragt",
+  "reportMembershipLeft": "verlassen",
+  "reportMembershipBanned": "ausgeschlossen"
 }

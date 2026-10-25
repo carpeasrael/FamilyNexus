@@ -27,6 +27,22 @@ class DataReport {
         InventoryRoomKind.other => l.roomKindOther,
       };
 
+  /// Eigene Mitgliedschaft laut Matrix (`join`, `invite` …); Unbekanntes bleibt im Original.
+  static String _membership(AppLocalizations l, String membership) => switch (membership) {
+        'join' => l.reportMembershipJoined,
+        'invite' => l.reportMembershipInvited,
+        'knock' => l.reportMembershipRequested,
+        'leave' => l.reportMembershipLeft,
+        'ban' => l.reportMembershipBanned,
+        _ => membership,
+      };
+
+  static String _memberStatus(AppLocalizations l, MemberStatus s) => switch (s) {
+        MemberStatus.joined => l.reportMembershipJoined,
+        MemberStatus.invited => l.reportMembershipInvited,
+        MemberStatus.requested => l.reportMembershipRequested,
+      };
+
   static String _eventType(AppLocalizations l, String type) {
     final label = switch (type) {
       'm.room.message' => l.eventTypeMessage,
@@ -84,7 +100,7 @@ class DataReport {
       if (withMembers) {
         b
           ..writeln('  ${l.reportRoomEncrypted}: ${r.encrypted ? l.reportYes : l.reportNo}')
-          ..writeln('  ${l.reportRoomMembership}: ${r.membership}')
+          ..writeln('  ${l.reportRoomMembership}: ${_membership(l, r.membership)}')
           ..writeln('  ${l.reportRoomMembers(r.joinedMembers, r.invitedMembers)}');
       }
       b.writeln('  ${l.reportRoomEvents(r.cachedEvents)}');
@@ -124,12 +140,12 @@ class DataReport {
     _locations(b, l, inventory.locations, null);
 
     _heading(b, l.reportSectionKeys);
-    b.writeln(keyStoreText(l, inventory.locations.keyStore));
     for (final k in inventory.keys) {
       b.writeln('- ${k.name}: ${k.present ? l.reportKeyPresent : l.reportKeyMissing}');
     }
 
-    _heading(b, '${l.reportSectionAppDb} (${inventory.locations.appDatabase})');
+    _heading(b, l.reportSectionAppDb);
+    b.writeln(l.reportFile(inventory.locations.appDatabase));
     final appSize = inventory.appDatabaseBytes;
     if (appSize != null) b.writeln(l.reportFileSize(formatBytes(appSize)));
     for (final t in inventory.tables) {
@@ -141,7 +157,8 @@ class DataReport {
       }
     }
 
-    _heading(b, '${l.reportSectionMatrixDb} (${inventory.locations.matrixDatabase})');
+    _heading(b, l.reportSectionMatrixDb);
+    b.writeln(l.reportFile(inventory.locations.matrixDatabase));
     final matrixSize = inventory.matrixDatabaseBytes;
     if (matrixSize != null) b.writeln(l.reportFileSize(formatBytes(matrixSize)));
     if (matrix == null) {
@@ -204,7 +221,7 @@ class DataReport {
       _heading(b, '${l.reportFamilyMembers} „${family.name}“');
       for (final m in family.members) {
         final role = m.role == Role.moderator ? l.familyRoleModerator : l.familyRoleMember;
-        b.writeln('- ${m.displayName} (${m.userId}) – $role – ${m.status.name}');
+        b.writeln('- ${m.displayName} (${m.userId}) – $role – ${_memberStatus(l, m.status)}');
       }
     }
 

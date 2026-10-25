@@ -182,7 +182,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Lokal gespeicherte Daten'), findsOneWidget);
     final report = tester.widget<SelectableText>(find.byType(SelectableText)).data!;
-    expect(report, contains('familynexus_app.db'));
+    expect(report, contains('Datei: /home/test/.local/share/de.inneso.familynexus/databases/familynexus_app.db'));
+    expect(report, isNot(contains(') (')), reason: 'keine doppelten Klammern in Überschriften');
     expect(report, contains('key=language'));
     expect(report, contains('db.app: vorhanden (Wert wird nicht angezeigt)'));
     expect(report, contains('@anna:fake.test'), reason: 'Matrix-Zwischenspeicher des angemeldeten Kontos');
@@ -213,7 +214,8 @@ void main() {
     expect(report, contains('Gerät DEV1 (DEV1)'));
     expect(report, contains('Schlüssel-Backup (mit deinem Wiederherstellungsschlüssel verschlüsselt): eingerichtet'));
     expect(report, contains('Ende-zu-Ende-verschlüsselt: ja'));
-    expect(report, contains('Anna (@anna:fake.test) – Moderator'));
+    expect(report, contains('Anna (@anna:fake.test) – Moderator – beigetreten'));
+    expect(report, contains('Eigene Mitgliedschaft: beigetreten'));
     expect(report, contains('nur Ende-zu-Ende-verschlüsselt'));
   });
 }

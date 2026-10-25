@@ -4387,6 +4387,42 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Nicht entschlüsselbar'**
   String get eventTypeEncrypted;
+
+  /// No description provided for @reportFile.
+  ///
+  /// In de, this message translates to:
+  /// **'Datei: {path}'**
+  String reportFile(String path);
+
+  /// No description provided for @reportMembershipJoined.
+  ///
+  /// In de, this message translates to:
+  /// **'beigetreten'**
+  String get reportMembershipJoined;
+
+  /// No description provided for @reportMembershipInvited.
+  ///
+  /// In de, this message translates to:
+  /// **'eingeladen'**
+  String get reportMembershipInvited;
+
+  /// No description provided for @reportMembershipRequested.
+  ///
+  /// In de, this message translates to:
+  /// **'Beitritt angefragt'**
+  String get reportMembershipRequested;
+
+  /// No description provided for @reportMembershipLeft.
+  ///
+  /// In de, this message translates to:
+  /// **'verlassen'**
+  String get reportMembershipLeft;
+
+  /// No description provided for @reportMembershipBanned.
+  ///
+  /// In de, this message translates to:
+  /// **'ausgeschlossen'**
+  String get reportMembershipBanned;
 }
 
 class _AppLocalizationsDelegate

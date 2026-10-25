@@ -2573,4 +2573,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventTypeEncrypted => 'Not decryptable';
+
+  @override
+  String reportFile(String path) {
+    return 'File: $path';
+  }
+
+  @override
+  String get reportMembershipJoined => 'joined';
+
+  @override
+  String get reportMembershipInvited => 'invited';
+
+  @override
+  String get reportMembershipRequested => 'join requested';
+
+  @override
+  String get reportMembershipLeft => 'left';
+
+  @override
+  String get reportMembershipBanned => 'banned';
 }
