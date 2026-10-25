@@ -720,6 +720,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _privateVerified = null;
     _joinRequestCache = null;
     _joinRequestCleared = false;
+    _joinRejected = false;
+    _stopWatchingJoinRequest();
     _knownJoined = null;
     _verification = null;
     _identityChanged.clear();
@@ -1210,9 +1212,89 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   @override
-  bool get joinRequestPending => _family == null && _joinRequest() != null;
+  bool get joinRequestPending => _family == null && _joinRequest() != null && !_joinRejected;
+
+  /// Abgelehnt = ein anderes Konto hat uns aus dem Raum entfernt, nachdem wir angeklopft haben. Das SDK
+  /// liefert weder den Knock noch den späteren Austritt in seinem Zustand; deshalb fragt ein Zeitgeber
+  /// solange eine Anfrage offen ist den Server gezielt für diesen einen Raum ab ([_pollRejection]).
+  @override
+  bool get joinRequestRejected => _joinRejected && _family == null && _joinRequest() != null;
+
+  bool _joinRejected = false;
+  Timer? _rejectionTimer;
+  static const Duration rejectionPollInterval = Duration(seconds: 10);
+
+  void _watchJoinRequest() {
+    _rejectionTimer ??= Timer.periodic(rejectionPollInterval, (_) => _pollRejection().ignore());
+  }
+
+  void _stopWatchingJoinRequest() {
+    _rejectionTimer?.cancel();
+    _rejectionTimer = null;
+  }
+
+  Future<void> _pollRejection() async {
+    final c = _client;
+    final req = _joinRequest();
+    if (c == null || !c.isLogged() || req == null || _family != null) {
+      _stopWatchingJoinRequest();
+      return;
+    }
+    if (_joinRejected) return;
+    final roomId = req['room_id']! as String;
+    final me = c.userID!;
+    try {
+      final base = c.homeserver;
+      if (base == null || base.scheme != 'https') return;
+      await c.ensureNotSoftLoggedOut();
+      final filter = json.encode(<String, Object?>{
+        'presence': <String, Object?>{'types': <String>[]},
+        'account_data': <String, Object?>{'types': <String>[]},
+        'room': <String, Object?>{
+          'rooms': <String>[roomId],
+          'include_leave': true,
+          'account_data': <String, Object?>{'types': <String>[]},
+          'ephemeral': <String, Object?>{'types': <String>[]},
+          'timeline': <String, Object?>{'limit': 10},
+        },
+      });
+      final uri = base.replace(
+        path: '/_matrix/client/v3/sync',
+        queryParameters: <String, String>{'filter': filter, 'timeout': '0', 'set_presence': 'offline'},
+      );
+      final req2 = http.Request('GET', uri)..headers['authorization'] = 'Bearer ${c.accessToken}';
+      final res = await _http.send(req2).timeout(roomOpTimeout);
+      final body = await res.stream.bytesToString();
+      if (res.statusCode != 200) return;
+      final data = json.decode(body);
+      final leave = (((data as Map)['rooms'] as Map?)?['leave'] as Map?)?[roomId] as Map?;
+      if (leave == null) return;
+      final events = <Object?>[
+        ...((leave['state'] as Map?)?['events'] as List? ?? const <Object?>[]),
+        ...((leave['timeline'] as Map?)?['events'] as List? ?? const <Object?>[]),
+      ];
+      Map<Object?, Object?>? last;
+      for (final e in events) {
+        if (e is! Map || e['type'] != 'm.room.member' || e['state_key'] != me) continue;
+        if (last == null || (e['origin_server_ts'] as int? ?? 0) >= (last['origin_server_ts'] as int? ?? 0)) last = e;
+      }
+      if (last == null) return;
+      final content = last['content'];
+      final byOther = last['sender'] != me;
+      final after = (last['origin_server_ts'] as int? ?? 0) > (req['ts']! as int);
+      if (content is Map && content['membership'] == 'leave' && byOther && after) {
+        _joinRejected = true;
+        _stopWatchingJoinRequest();
+        notifyListeners();
+      }
+    } catch (e) {
+      AppLog.w('gateway', 'Ablehnung der Beitrittsanfrage konnte nicht geprüft werden');
+    }
+  }
 
   Future<void> _clearJoinRequest() async {
+    _joinRejected = false;
+    _stopWatchingJoinRequest();
     _joinRequestCache = null;
     _joinRequestCleared = true;
     final c = _client;
@@ -1437,6 +1519,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       if (res.statusCode != 200) throw const GatewayException(GatewayError.unknown);
       _joinRequestCache = roomId;
       _joinRequestCleared = false;
+      _joinRejected = false;
+      _watchJoinRequest();
       await client.setAccountData(client.userID!, joinRequestAccountData, <String, Object?>{
         'room_id': roomId,
         'ts': DateTime.now().toUtc().millisecondsSinceEpoch,
@@ -1886,6 +1970,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       _resetDirectChats();
       _presence.clear();
       _presenceRoomId = null;
+      // Offene Anfrage nach einem Neustart: weiter auf eine Ablehnung achten.
+      if (_joinRequest() != null) _watchJoinRequest();
       notifyListeners();
       return;
     }

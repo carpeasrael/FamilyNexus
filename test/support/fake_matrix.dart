@@ -50,6 +50,9 @@ class FakeRoom {
 
   /// Mitglieder, deren Identität sich geändert hat (Tests setzen das).
   final Set<String> identityChanged = <String>{};
+
+  /// Abgelehnte Anfragen (Person → Raum bleibt für sie sichtbar als „abgelehnt“).
+  final Set<String> rejected = <String>{};
   final List<FakeEvent> events = <FakeEvent>[];
 
   /// Nur Einzelchats: die zwei Beteiligten.
@@ -533,6 +536,11 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   bool get joinRequestPending =>
       fake.rooms.values.any((r) => r.membership[_userId] == MemberStatus.requested);
 
+  bool _rejectionAcknowledged = false;
+
+  @override
+  bool get joinRequestRejected => !_rejectionAcknowledged && fake.rooms.values.any((r) => r.rejected.contains(_userId));
+
   Family _fam() {
     final f = family;
     if (f == null) throw const GatewayException(GatewayError.notFound);
@@ -580,6 +588,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     room.membership[_userId!] = MemberStatus.requested;
     room.power[_userId!] = 0;
     room.knockNonce[_userId!] = link.nonce;
+    _rejectionAcknowledged = false;
+    room.rejected.remove(_userId);
     fake.notifyAll();
   }
 
@@ -596,11 +606,14 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     room.membership[_userId!] = MemberStatus.requested;
     room.power[_userId!] = 0;
     room.knockNonce[_userId!] = 'code';
+    _rejectionAcknowledged = false;
+    room.rejected.remove(_userId);
     fake.notifyAll();
   }
 
   @override
   Future<void> cancelJoinRequest() async {
+    _rejectionAcknowledged = true;
     for (final r in fake.rooms.values) {
       if (r.membership[_userId] == MemberStatus.requested) {
         r.membership.remove(_userId);
@@ -643,6 +656,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       throw const GatewayException(GatewayError.notAllowed);
     }
     final room = familyRoom!;
+    if (room.membership[userId] == MemberStatus.requested) room.rejected.add(userId);
     room.membership.remove(userId);
     room.power.remove(userId);
     fake.invites[userId]?.remove(room.id);

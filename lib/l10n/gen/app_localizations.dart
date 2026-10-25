@@ -3254,6 +3254,24 @@ abstract class AppLocalizations {
   /// **'Das ist kein gültiger Familien-Code. Er beginnt mit „!“ und enthält einen Server, z. B. !abc:matrix.org.'**
   String get joinCodeInvalid;
 
+  /// No description provided for @joinRejected.
+  ///
+  /// In de, this message translates to:
+  /// **'Deine Anfrage wurde abgelehnt. Frag bei der Familie nach, ob sie dich einladen möchte, und versuche es dann mit einem neuen Link.'**
+  String get joinRejected;
+
+  /// No description provided for @joinRejectedOk.
+  ///
+  /// In de, this message translates to:
+  /// **'Verstanden'**
+  String get joinRejectedOk;
+
+  /// No description provided for @tabFamilyRequests.
+  ///
+  /// In de, this message translates to:
+  /// **'Familie – {count} offene Anfragen'**
+  String tabFamilyRequests(int count);
+
   /// No description provided for @oauthWaiting.
   ///
   /// In de, this message translates to:

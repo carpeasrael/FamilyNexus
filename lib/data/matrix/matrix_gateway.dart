@@ -224,6 +224,9 @@ abstract class MatrixGateway implements Listenable {
   /// `true`, solange eine eigene Beitrittsanfrage (Knock) auf Bestätigung wartet.
   bool get joinRequestPending;
 
+  /// Die letzte Beitrittsanfrage wurde von einem Moderator abgelehnt (bis [cancelJoinRequest] oder eine neue Anfrage).
+  bool get joinRequestRejected;
+
   /// Zieht die eigene wartende Beitrittsanfrage zurück.
   Future<void> cancelJoinRequest();
 

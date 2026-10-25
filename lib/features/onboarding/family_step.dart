@@ -209,7 +209,9 @@ class _FamilyStepState extends State<FamilyStep> {
         if (invitations.isNotEmpty && !_showChoice) return _invitedView(l, g, invitations);
         final pending = _services.pendingInvite.value;
         final List<Widget> body;
-        if (g.joinRequestPending) {
+        if (g.joinRequestRejected) {
+          body = _rejectedView(l, g);
+        } else if (g.joinRequestPending) {
           body = _waitingView(l, g);
         } else if (pending != null) {
           body = _joinCard(l, pending);
@@ -337,6 +339,20 @@ class _FamilyStepState extends State<FamilyStep> {
       ]),
     ];
   }
+
+  /// Ein Moderator hat die Anfrage abgelehnt: erklären statt endlos „unterwegs“ zu zeigen.
+  List<Widget> _rejectedView(AppLocalizations l, MatrixGateway g) => <Widget>[
+        Row(children: <Widget>[
+          Icon(Icons.block_outlined, color: Theme.of(context).colorScheme.error),
+          const SizedBox(width: 12),
+          Expanded(child: Semantics(liveRegion: true, child: Text(l.joinRejected))),
+        ]),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: FilledButton(onPressed: _busy ? null : () => _run(g.cancelJoinRequest), child: Text(l.joinRejectedOk)),
+        ),
+      ];
 
   List<Widget> _waitingView(AppLocalizations l, MatrixGateway g) {
     final who = _waitingFor;

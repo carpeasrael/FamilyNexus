@@ -1071,6 +1071,14 @@
   "joinCodeHint": "Ask a moderator for the family code. They have to confirm your request.",
   "joinCodeLabel": "Family code",
   "joinCodeInvalid": "That is not a valid family code. It starts with “!” and contains a server, e.g. !abc:matrix.org.",
+  "joinRejected": "Your request was declined. Ask the family whether they want to invite you, then try again with a new link.",
+  "joinRejectedOk": "Got it",
+  "tabFamilyRequests": "Family – {count} open requests",
+  "@tabFamilyRequests": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "oauthWaiting": "Please continue in the browser at {host} … Afterwards you continue here automatically.",
   "@oauthWaiting": {
     "placeholders": {

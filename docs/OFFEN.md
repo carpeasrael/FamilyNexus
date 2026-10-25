@@ -61,8 +61,9 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 
 - **SA-2:** Eingeladene (noch nicht beigetretene) Personen erhalten Nachrichtenschlüssel (SDK-Verhalten); Mitigation siehe
   `docs/ENTSCHEIDUNGEN.md`.
-- Ablehnung einer Beitrittsanfrage ist für den Anfragenden nicht sichtbar (SDK liefert `knock`-Sync nicht); die
-  Anfrage läuft nach 7 Tagen ab oder wird zurückgezogen.
+- Die Ablehnung einer Beitrittsanfrage erkennt die App durch eine gezielte Abfrage des Servers für den einen Raum
+  (alle 10 s, nur solange eine Anfrage offen ist; E-66), nicht über den normalen Sync. Bis zur nächsten Abfrage (und bei
+  fehlender Verbindung) zeigt die App noch „unterwegs“; die Anfrage läuft nach 7 Tagen ab oder wird zurückgezogen.
 - Moderatoren können Chat- **und** Kalendernachrichten anderer redigieren (`redact` = 50, E-37).
 - Nachladen alter Ereignisse ist begrenzt (≈ 600 Chatereignisse, 5000 Kalendersignale); bei sehr langer Offlinezeit
   oder sehr großen Familien können Termine fehlen, bis ihr Besitzer sie erneut veröffentlicht (Resync).

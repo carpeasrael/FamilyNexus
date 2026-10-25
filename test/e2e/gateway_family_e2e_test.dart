@@ -217,10 +217,11 @@ void main() {
       await E2e.until(() => a.family?.member(d.userId!)?.status == MemberStatus.requested);
       await a.rejectRequest(d.userId!);
       await E2e.until(() => a.family?.member(d.userId!) == null, what: 'Anfrage entfernt');
-      // Der Client sieht eine Ablehnung nicht (das SDK liefert den knock-Abschnitt nicht);
-      // die Anfrage läuft ab oder wird zurückgezogen.
-      expect(d.joinRequestPending, isTrue);
+      // Die Ablehnung kommt als „verlassen“-Ereignis an (das SDK liefert den knock-Abschnitt nicht).
+      await E2e.until(() => d.joinRequestRejected, what: 'Ablehnung sichtbar');
+      expect(d.joinRequestPending, isFalse);
       await d.cancelJoinRequest();
+      expect(d.joinRequestRejected, isFalse);
       expect(d.joinRequestPending, isFalse);
       expect(d.family, isNull);
 

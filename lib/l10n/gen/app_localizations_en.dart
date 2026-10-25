@@ -1878,6 +1878,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'That is not a valid family code. It starts with “!” and contains a server, e.g. !abc:matrix.org.';
 
   @override
+  String get joinRejected =>
+      'Your request was declined. Ask the family whether they want to invite you, then try again with a new link.';
+
+  @override
+  String get joinRejectedOk => 'Got it';
+
+  @override
+  String tabFamilyRequests(int count) {
+    return 'Family – $count open requests';
+  }
+
+  @override
   String oauthWaiting(String host) {
     return 'Please continue in the browser at $host … Afterwards you continue here automatically.';
   }

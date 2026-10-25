@@ -97,6 +97,38 @@ void main() {
       expect(s.ben.gateway.family!.myRole, Role.member);
     });
 
+    testWidgets('Ablehnung wird der anfragenden Person angezeigt; danach geht es neu los', (tester) async {
+      final s = await _benWithoutFamily();
+      await _pump(tester, s.ben);
+      await _tap(tester, 'Beitreten');
+      await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), s.link);
+      await _tap(tester, 'Weiter');
+      await _tap(tester, 'Beitritt anfragen');
+      expect(find.textContaining('Fast geschafft!'), findsOneWidget);
+      await s.anna.rejectRequest('@ben:fake.test');
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Deine Anfrage wurde abgelehnt'), findsOneWidget);
+      expect(find.textContaining('Fast geschafft!'), findsNothing);
+      await _tap(tester, 'Verstanden');
+      expect(find.textContaining('Deine Anfrage wurde abgelehnt'), findsNothing);
+      expect(find.text('Einladungslink'), findsOneWidget);
+    });
+
+    testWidgets('Moderator-Abzeichen am Tab „Familie“ zählt offene Anfragen', (tester) async {
+      final annaApp = await buildTestApp();
+      annaApp.server.now = () => DateTime.now().toUtc();
+      final link = await annaApp.gateway.createInviteLink();
+      final ben = await buildTestApp(loggedIn: false, server: annaApp.server);
+      await ben.gateway.login(server: ServerUrl.tryParse(annaApp.server.host)!, username: 'ben', password: 'geheim456');
+      await ben.gateway.setUpSecurity();
+      await ben.gateway.requestToJoin(InviteLink.tryParse(link, now: DateTime.now(), ownHost: 'fake.test')!);
+      await _pump(tester, annaApp);
+      expect(find.descendant(of: find.byType(NavigationBar), matching: find.text('1')), findsOneWidget);
+      await annaApp.gateway.rejectRequest('@ben:fake.test');
+      await tester.pumpAndSettle();
+      expect(find.descendant(of: find.byType(NavigationBar), matching: find.text('1')), findsNothing);
+    });
+
     testWidgets('abgelaufener oder manipulierter Link wird abgelehnt, nichts wird gesendet', (tester) async {
       final s = await _benWithoutFamily();
       await _pump(tester, s.ben);

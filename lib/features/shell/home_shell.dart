@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
 import '../../app/app_version.dart';
+import '../../domain/permissions.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../calendar/calendar_screen.dart';
 import '../chat/chat_screen.dart';
@@ -114,7 +115,22 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
                 label: l.tabChat,
               ),
               NavigationDestination(icon: const Icon(Icons.shopping_cart_outlined), label: l.tabShopping),
-              NavigationDestination(icon: const Icon(Icons.groups_outlined), label: l.tabFamily),
+              NavigationDestination(
+                icon: ListenableBuilder(
+                  listenable: services.gateway,
+                  builder: (context, _) {
+                    // Offene Beitrittsanfragen: nur Moderatoren können sie entscheiden.
+                    final f = services.gateway.family;
+                    final open = f != null && Permissions.isModerator(f) ? f.requests.length : 0;
+                    return Badge(
+                      isLabelVisible: open > 0,
+                      label: Text('$open'),
+                      child: Semantics(label: open > 0 ? l.tabFamilyRequests(open) : null, child: const Icon(Icons.groups_outlined)),
+                    );
+                  },
+                ),
+                label: l.tabFamily,
+              ),
             ],
           ),
         );
