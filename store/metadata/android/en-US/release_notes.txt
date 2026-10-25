@@ -1,6 +1,5 @@
-New in 1.2.0:
-• Invitation link (also as a clickable web link): whoever opens it is admitted automatically as soon as a moderator is online.
-• Join without a link using a family code; a moderator confirms.
-• Declined requests are shown; open requests appear as a badge on the Family tab.
-• Account server selectable in the invite dialog; Element as a fallback if sign-up is blocked.
-Important: moderators, please update – older versions do not recognise new links.
+New in 1.2.1:
+• macOS: Signing in through the provider's website (e.g. matrix.org) works again.
+• matrix.org stays the default provider, even after signing in or being invited on another server.
+• Windows: invitation links open the app.
+• Settings: overview of what is stored locally.

@@ -1,6 +1,5 @@
-Neu in 1.2.0:
-• Einladungslink (auch als anklickbarer Web-Link): Wer ihn öffnet, wird automatisch aufgenommen, sobald ein Moderator online ist.
-• Beitritt ohne Link per Familien-Code; ein Moderator bestätigt.
-• Abgelehnte Anfragen werden angezeigt; offene Anfragen zeigt ein Abzeichen am Tab „Familie“.
-• Konto-Server im Einladungsdialog wählbar; Element als Ausweg bei gesperrter Registrierung.
-Wichtig: Moderatoren bitte aktualisieren – ältere Versionen erkennen neue Links nicht.
+Neu in 1.2.1:
+• macOS: Die Anmeldung über die Webseite des Anbieters (z. B. matrix.org) funktioniert wieder.
+• matrix.org bleibt der Standard-Anbieter, auch nach einer Anmeldung oder Einladung bei einem anderen Server.
+• Windows: Einladungslinks öffnen die App.
+• Einstellungen: Übersicht, was lokal gespeichert ist.
