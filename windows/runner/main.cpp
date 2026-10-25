@@ -3,6 +3,7 @@
 #include <windows.h>
 
 #include "flutter_window.h"
+#include "link_handler.h"
 #include "utils.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
@@ -23,11 +24,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   // weitergereicht, geprüft wird in Dart. Andere Argumente erreichen Dart nicht.
   std::string initial_link;
   for (const std::string& argument : GetCommandLineArguments()) {
-    if (argument.rfind("familynexus:", 0) == 0) {
+    if (link_handler::IsFamilyNexusLink(argument)) {
       initial_link = argument;
       break;
     }
   }
+
+  // Nur eine Instanz je Sitzung (zwei Programme dürften nicht dieselbe verschlüsselte Datenbank öffnen):
+  // Ein Klick auf einen Einladungslink übergibt ihn an die laufende App (E-69).
+  if (!link_handler::ClaimInstance() && link_handler::ForwardToRunningInstance(initial_link)) {
+    ::CoUninitialize();
+    return EXIT_SUCCESS;
+  }
+  link_handler::RegisterUrlScheme();
 
   FlutterWindow window(project, initial_link);
   Win32Window::Point origin(10, 10);

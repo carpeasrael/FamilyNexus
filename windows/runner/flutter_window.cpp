@@ -1,8 +1,10 @@
 #include "flutter_window.h"
 
+#include <cstring>
 #include <optional>
 
 #include "flutter/generated_plugin_registrant.h"
+#include "link_handler.h"
 
 FlutterWindow::FlutterWindow(const flutter::DartProject& project,
                              const std::string& initial_link)
@@ -85,6 +87,20 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
   }
 
   switch (message) {
+    case WM_COPYDATA: {
+      // Link einer zweiten Instanz (Klick auf einen Einladungslink); nur das eigene Schema, begrenzte Länge.
+      const auto* data = reinterpret_cast<const COPYDATASTRUCT*>(lparam);
+      if (data != nullptr && data->dwData == link_handler::kCopyDataId && data->lpData != nullptr &&
+          data->cbData > 0 && data->cbData <= link_handler::kMaxLinkBytes && link_channel_) {
+        const char* text = static_cast<const char*>(data->lpData);
+        const std::string link(text, strnlen(text, data->cbData));
+        if (link_handler::IsFamilyNexusLink(link)) {
+          link_channel_->InvokeMethod("onLink", std::make_unique<flutter::EncodableValue>(link));
+        }
+        return TRUE;
+      }
+      return FALSE;
+    }
     case WM_FONTCHANGE:
       flutter_controller_->engine()->ReloadSystemFonts();
       break;
