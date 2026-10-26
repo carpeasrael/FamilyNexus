@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
+import '../../app/app_version.dart';
 import '../../core/platform_info.dart';
 import '../../domain/app_settings.dart';
 import '../../domain/data_inventory.dart';
@@ -122,6 +123,8 @@ class SettingsScreen extends StatelessWidget {
                 subtitle: Text(l.settingsDeleteDataHint),
                 onTap: () => _confirmDelete(context),
               ),
+              // Version und Build wie in App Store Connect (für Testberichte und Bildschirmaufnahmen, #14).
+              ListTile(leading: const Icon(Icons.info_outline), title: Text(l.menuVersion(appVersionWithBuild))),
               ListTile(title: Text(l.settingsNoTelemetry)),
               ListTile(title: Text(l.settingsLicense)),
             ]),
