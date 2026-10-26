@@ -243,6 +243,27 @@ void main() {
       expect(find.byType(SegmentedButton<bool>), findsOneWidget, reason: 'automatisch weiter zum Familienschritt');
     });
 
+    testWidgets('Zustand ist schon „bereit“, bevor der Schlüssel zurückkommt: Schlüssel wird trotzdem gezeigt (#10)', (tester) async {
+      final app = await buildTestApp(loggedIn: false);
+      app.server.securityKeyDelay = const Duration(seconds: 2);
+      await app.gateway.login(server: ServerUrl.tryParse('fake.test')!, username: 'anna', password: 'geheim123');
+      await _pump(tester, app);
+      final create = find.widgetWithText(FilledButton, 'Notfall-Schlüssel erstellen');
+      await tester.ensureVisible(create);
+      await tester.tap(create);
+      await _pumpFrames(tester);
+      expect(app.gateway.securityState, SecurityState.ready);
+      expect(find.byType(SegmentedButton<bool>), findsNothing, reason: 'nicht weiter, solange der Schlüssel aussteht');
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Er wird nur jetzt angezeigt.'), findsOneWidget);
+      expect(find.byType(SegmentedButton<bool>), findsNothing);
+      await tester.tap(find.byType(CheckboxListTile));
+      await tester.pumpAndSettle();
+      await _tap(tester, 'Weiter');
+      expect(find.byType(SegmentedButton<bool>), findsOneWidget, reason: 'erst nach Bestätigung zum Familienschritt');
+    });
+
     testWidgets('Server verlangt Passwort: Dialog, falsches Passwort scheitert, richtiges gelingt', (tester) async {
       final app = await buildTestApp(loggedIn: false);
       app.server.requirePasswordForSecurity = true;
