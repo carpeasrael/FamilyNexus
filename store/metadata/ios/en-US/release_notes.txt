@@ -1,3 +1,6 @@
 New in 1.2.1:
 • matrix.org stays the default provider. Previously, after signing in with a full ID (@name:server) or an invitation on another server, that server was shown as the default.
 • Settings → About the app: overview of where data is stored locally, and reports of all data stored locally and online to view, copy or save.
+• Settings → Account → “Delete account”: permanently delete the account at the provider, then all data on the device.
+• Settings → Emergency key and devices: create a new emergency key. When setting up a new account, the key is now always shown.
+• The version display includes the build number.
