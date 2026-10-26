@@ -208,7 +208,7 @@ G2 zeigt nach D-06 „Willkommen“ (N2 ist abgemeldet und wird erst in F-01 wie
 | E-29 | G1 | **Einziger Moderator:** Einstellungen → „Konto löschen“ → nur Dialog ansehen → „Abbrechen“ | „Konto löschen?“ mit „Du bist der einzige Moderator der Familie. Ernenne vorher ein anderes Mitglied zum Moderator …“ (#12); „Konto endgültig löschen“ ohne Passwort inaktiv; nach „Abbrechen“ unverändert | | E-29-G1 | |
 | E-30 | G1, G2 | **Zum Moderator ernennen:** Aktionen für Test Nutzer 2 → „Zum Moderator ernennen“ → bestätigen | Rückfrage „… zum Moderator ernennen? …“; beide sehen Test Nutzer 2 als Moderator; Empfehlung zum zweiten Moderator verschwindet | | E-30-G1 | |
 | E-31 | G1 | Einstellungen → „Konto löschen“ → Dialog ansehen → „Abbrechen“ | **Kein** Hinweis „einziger Moderator“ mehr | | E-31-G1 | |
-| E-32 | G2, G1 | **Mitglied löscht sein Konto:** G2 Einstellungen → „Konto löschen“ → Passwort von I2 → „Konto endgültig löschen“; danach G1 Tab „Familie“ und Chat | G2: kein Moderator-Hinweis (N1 ist Moderator), danach „Willkommen“ (Befund B-1 aus dem Lauf vom 26.10.: es erschien „Anmelden“). G1: Test Nutzer 2 ist nicht mehr Mitglied; frühere Nachrichten bleiben sichtbar | | E-32a-G2, E-32b-G1 | |
+| E-32 | G2, G1 | **Mitglied löscht sein Konto:** G2 Einstellungen → „Konto löschen“ → Passwort von I2 → „Konto endgültig löschen“; danach G1 Tab „Familie“ und Chat | G2: kein Moderator-Hinweis (N1 ist Moderator), danach „Willkommen“ (nicht „Anmelden“; B-1 vom 26.10. behoben). G1: Test Nutzer 2 ist nicht mehr Mitglied; frühere Nachrichten bleiben sichtbar | | E-32a-G2, E-32b-G1 | |
 
 ### F. Lokale Daten, Löschen und Aufräumen
 

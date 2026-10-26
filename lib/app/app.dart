@@ -29,6 +29,18 @@ class _FamilyNexusAppState extends State<FamilyNexusApp> {
     _applyPlatformSettings();
   }
 
+  /// Neue Dienste nach „Alle lokalen Daten löschen“ oder „Konto löschen“ (`_fullReset` baut sie neu auf):
+  /// Einstellungen der neuen Dienste beobachten und anwenden.
+  @override
+  void didUpdateWidget(FamilyNexusApp oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (identical(oldWidget.services, widget.services)) return;
+    oldWidget.services.settings.removeListener(_applyPlatformSettings);
+    widget.services.settings.addListener(_applyPlatformSettings);
+    _appliedSecure = null;
+    _applyPlatformSettings();
+  }
+
   @override
   void dispose() {
     widget.services.settings.removeListener(_applyPlatformSettings);
@@ -52,6 +64,9 @@ class _FamilyNexusAppState extends State<FamilyNexusApp> {
         builder: (context, _) {
           final s = widget.services.settings.settings;
           return MaterialApp(
+            // Neue Dienste = neuer Zustand der ganzen Oberfläche: sonst blieben Navigator und Einrichtung der
+            // alten Sitzung stehen (nach „Konto löschen“ „Anmelden“ statt „Willkommen“, B-1).
+            key: ObjectKey(widget.services),
             onGenerateTitle: (c) => AppLocalizations.of(c).appName,
             debugShowCheckedModeBanner: false,
             locale: s.languageCode == null ? null : Locale(s.languageCode!),
