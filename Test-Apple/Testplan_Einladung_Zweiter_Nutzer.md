@@ -66,7 +66,7 @@ Ergebnisse: ✅ bestanden · ⚠️ bestanden mit Befund · ❌ fehlgeschlagen �
 | **TI-10** | U2: beitreten → Konto erstellen: Anbieter bereits `matrix-synapse-3ues.srv1348446.hstgr.cloud` (nicht matrix.org), Name „Test Nutzer 2“, Benutzername `fnt-MMTT-i2`, Passwort → „Konto erstellen“ | Konto angelegt ohne Zusatzschritt, weiter zum Notfall-Schlüssel | U2 | U2 |
 | **TI-11** | U2: „Notfall-Schlüssel erstellen“ (Bildschirmvideo) → Häkchen → „Weiter“ | Schlüssel wird angezeigt und bleibt stehen (#10); danach Beitrittsanfrage wird gesendet („Fast geschafft! …“) | U2 | U2 |
 | **TI-12** | Aufnahme abwarten (U1 geöffnet lassen) | Nutzer 2 wird automatisch aufgenommen (Link aus dem Einladungsdialog); U2 landet in der Hauptansicht; Dauer notieren. Falls U1 stattdessen eine Anfrage zeigt („Familie – 1 offene Anfragen“, „Gültiger Einladungslink“): „Bestätigen“ und Verhalten notieren | **P**: U1 Familie; U2 Hauptansicht | P |
-| **TI-13** | Beide: Tab „Familie“ | Mitgliederliste zeigt beide (Moderator / Mitglied); „Wer ist online“ zeigt den jeweils anderen | **P** | P |
+| **TI-13** | Beide: Tab „Familie“, danach Tab „Heute“ | „Familie“: Mitgliederliste zeigt beide (Moderator / Mitglied). „Heute“: „Wer ist online“ zeigt den jeweils anderen | **P** | P |
 | **TI-14** | U1 sendet im Familienchat „Hallo von Nutzer 1“; U2 öffnet Chat | Nachricht erscheint bei U2 (Ende-zu-Ende-verschlüsselt) | **P** vor und nach dem Senden | P |
 | **TI-15** | U2 antwortet „Hallo zurück von Nutzer 2“ | Antwort erscheint bei U1 | **P** | P |
 | **TI-16** | Einzelchat: U1 öffnet über die Mitgliederliste den Chat mit Nutzer 2 und sendet „Nur für dich“ | Einzelchat entsteht; Nachricht erscheint bei U2 im Einzelchat, nicht im Familienchat | **P** | P |
@@ -74,7 +74,7 @@ Ergebnisse: ✅ bestanden · ⚠️ bestanden mit Befund · ❌ fehlgeschlagen �
 | **TI-18** | U2 legt Einkaufseintrag „Brot“ an; U1 hakt ihn ab | Eintrag erscheint bei U1; Abhaken erscheint bei U2 | **P** nach jedem Schritt | P |
 | **TI-19** | U1: Nachricht von Nutzer 2 lange drücken → „Nachricht melden“ (Grund wählen) | Meldedialog mit Gründen; Meldung bestätigt (geht an den Betreiber des Testservers) | **P** | P |
 | **TI-20** | U1: Nachricht von Nutzer 2 lange drücken → „Test Nutzer 2 blockieren“; danach sendet U2 eine weitere Nachricht | Nachrichten von Nutzer 2 bei U1 ausgeblendet; bei U2 keine Fehlermeldung | **P** | P |
-| **TI-21** | U1: Einstellungen → „Blockierte Mitglieder“ → Aufheben | Nutzer 2 und seine Nachrichten wieder sichtbar | **P** | P |
+| **TI-21** | U1: Einstellungen → „Blockierte Mitglieder“ → „Blockierung aufheben“ | Nutzer 2 und seine Nachrichten wieder sichtbar | **P** | P |
 | **TI-22** | Negativprobe: U2 (bereits Mitglied) öffnet den verbrauchten Link aus TI-08 erneut (Mac-Terminal: `open '<Link>'`) | Hinweis „Du bist bereits in einer Familie.“; nichts ändert sich, kein Absturz | U2 | U2 |
 | **TI-23** | Versionsanzeige: beide öffnen Menü und Einstellungen → „Über die App“ | „Version 1.2.1 (16)“ auf beiden (#14) | **P** | P |
 | **TI-24** | U1: Einstellungen → Konto → „Konto löschen“ (nur Dialog prüfen) → „Abbrechen“ | Dialog „Konto löschen?“ mit Hinweis „Du bist der einzige Moderator der Familie. Ernenne vorher ein anderes Mitglied zum Moderator …“ (#12); „Konto endgültig löschen“ ohne Passwort nicht aktiv; nach „Abbrechen“ unverändert angemeldet | U1 | U1 |
@@ -105,4 +105,4 @@ xcrun simctl pbpaste booted
 
 ## Anhang B: Früheres matrix.org-Konto Nutzer 2 – nicht Teil dieses Tests
 
-Zugangsdaten stehen nicht im Repository, sondern lokal in `Test-Apple/Zugangsdaten.local.md` bzw. im Passwortmanager.
+Zugangsdaten stehen nicht im Repository, sondern lokal in `../secure/Zugangsdaten.local.md` bzw. im Passwortmanager.
