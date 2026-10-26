@@ -51,3 +51,10 @@ release/
 web/sqlite3mc.wasm
 web/pkg/
 pubspec_overrides.yaml
+
+# Testunterlagen mit echten Konto- und Zugangsdaten nicht committen
+Test-Apple/Testplan_*.md
+Test-Apple/Testreport_Einladung_Zweiter_Nutzer.pdf
+Test-Apple/Testreport_Pruefanleitung_Build15.pdf
+Test-Apple/screenshots/einladung/
+Test-Apple/screenshots/geraet/
