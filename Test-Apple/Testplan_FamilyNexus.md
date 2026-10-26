@@ -375,6 +375,6 @@ Regel: Änderungen an Schritten, erwarteten Ergebnissen oder Reihenfolge erhöhe
 | Version | Datum | Commit | Änderung |
 |---|---|---|---|
 | 1.0 | 26.10.2026 | `4abf400` | Gesamtplan, ersetzt `Testplan_Nutzeranlage.md`, `Testplan_Pruefanleitung.md`, `Testplan_Einladung_Zweiter_Nutzer.md`, `Testdaten_Stammdaten.md` (Zuordnung alter IDs: Anhang C); Erwartungen gegen den Code bestätigt |
-| 1.1 | 26.10.2026 | (nach Commit dieser Änderung) | Korrekturen P-1 bis P-11 nach dem Lauf vom 26.10.2026 (Anhang E): verbindliche Reihenfolge, Erwartungen zu B-1 bis B-4, Link-Format, Beitrittsschritte, Datumsteil für Läufe am selben Tag, Anhang D (automatisierte Bedienung) |
+| 1.1 | 26.10.2026 | `4f03868` | Korrekturen P-1 bis P-11 nach dem Lauf vom 26.10.2026 (Anhang E): verbindliche Reihenfolge, Erwartungen zu B-1 bis B-4, Link-Format, Beitrittsschritte, Datumsteil für Läufe am selben Tag, Anhang D (automatisierte Bedienung) |
 
 **Zuordnung Issues zur Planversion:** #23 bis #27 (Lauf vom 26.10.2026) beziehen sich auf v1.0 (`4abf400`); die Plantexte dazu stehen seit v1.1 im Plan.
