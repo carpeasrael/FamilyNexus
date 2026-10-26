@@ -1018,8 +1018,10 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   /// Führt den Bootstrap-Zustandsautomaten des SDK automatisch durch.
-  /// [recoveryKey] != null → Wiederherstellung; sonst Ersteinrichtung (liefert den neuen Schlüssel).
-  Future<String?> _driveBootstrap(Client client, {String? recoveryKey}) {
+  /// [recoveryKey] != null → Wiederherstellung; [keepSecrets] != null → neuer Schlüssel für ein
+  /// verifiziertes Gerät, die Geheimnisse (Typ → Wert) kommen unter den neuen Schlüssel (#11);
+  /// sonst Ersteinrichtung. Ersteinrichtung und neuer Schlüssel liefern den neuen Schlüssel.
+  Future<String?> _driveBootstrap(Client client, {String? recoveryKey, Map<String, String>? keepSecrets}) {
     final enc = client.encryption;
     if (enc == null) throw const GatewayException(GatewayError.encryptionUnavailable);
     final done = Completer<String?>();
@@ -1045,7 +1047,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
             break;
           case BootstrapState.askWipeSsss:
             // Ersteinrichtung darf bestehende Sicherungen nie überschreiben.
-            if (recoveryKey == null) {
+            if (keepSecrets != null) {
+              bs.wipeSsss(true);
+            } else if (recoveryKey == null) {
               fail(const GatewayException(GatewayError.alreadyExists));
             } else {
               bs.wipeSsss(false);
@@ -1067,16 +1071,23 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
             await bs.newSsssKey!.unlock(keyOrPassphrase: recoveryKey);
             await bs.openExistingSsss();
           case BootstrapState.askWipeCrossSigning:
+            // Neuer Schlüssel: Identität behalten, ihre Geheimnisse aber unter dem neuen Schlüssel ablegen.
+            if (keepSecrets != null) {
+              for (final e in keepSecrets.entries) {
+                await bs.newSsssKey!.store(e.key, e.value);
+              }
+            }
             await bs.wipeCrossSigning(false);
           case BootstrapState.askSetupCrossSigning:
-            // Wiederherstellung darf nie eine neue Identität anlegen (würde die alte ersetzen).
-            if (recoveryKey != null) {
+            // Wiederherstellung und neuer Schlüssel dürfen nie eine neue Identität anlegen (würde die alte ersetzen).
+            if (recoveryKey != null || keepSecrets != null) {
               fail(const GatewayException(GatewayError.notFound));
               break;
             }
             await bs.askSetupCrossSigning(setupMasterKey: true, setupSelfSigningKey: true, setupUserSigningKey: true);
           case BootstrapState.askWipeOnlineKeyBackup:
-            bs.wipeOnlineKeyBackup(false);
+            // Neuer Schlüssel ohne bekannten Backup-Schlüssel: neues Backup (Sitzungen werden neu hochgeladen).
+            bs.wipeOnlineKeyBackup(keepSecrets != null && !keepSecrets.containsKey(EventTypes.MegolmBackup));
           case BootstrapState.askSetupOnlineKeyBackup:
             await bs.askSetupOnlineKeyBackup(true);
           case BootstrapState.error:
@@ -1138,7 +1149,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (key.isEmpty || key.length > 200) throw const GatewayException(GatewayError.invalidInput);
     try {
       await _driveBootstrap(c, recoveryKey: key).timeout(const Duration(minutes: 2));
-      await c.encryption!.crossSigning.selfSign(recoveryKey: key);
+      await _selfSign(c, key);
       try {
         await c.encryption!.keyManager.loadAllKeys();
       } catch (e) {
@@ -1153,6 +1164,61 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       if (e is! MatrixException && e is! TimeoutException && e is! StateError && e is! SocketException && e is! http.ClientException) {
         throw const GatewayException(GatewayError.invalidInput);
       }
+      throw _map(e);
+    }
+  }
+
+  /// Bestätigt dieses Gerät nach dem Entsperren mit [recoveryKey]. Nach einem neuen Schlüssel (#11)
+  /// liegt der Master-Key nur noch unter dem alten (das SDK hält ihn nicht lokal vor); dann
+  /// signiert der Self-Signing-Key, der unter dem neuen liegt – wie nach einer Emoji-Verifizierung.
+  Future<void> _selfSign(Client c, String recoveryKey) async {
+    final enc = c.encryption!;
+    final masterKeyIds = enc.ssss.keyIdsFromType(EventTypes.CrossSigningMasterKey);
+    if (masterKeyIds != null && masterKeyIds.contains(enc.ssss.defaultKeyId)) {
+      await enc.crossSigning.selfSign(recoveryKey: recoveryKey);
+      return;
+    }
+    final mine = c.userDeviceKeys[c.userID];
+    final master = mine?.masterKey;
+    final device = mine?.deviceKeys[c.deviceID];
+    if (master == null || device == null || await enc.ssss.getCached(EventTypes.CrossSigningSelfSigning) == null) {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    // Das SDK lässt die Kette Gerät → Self-Signing → Master nur bei bestätigtem eigenem Master gelten.
+    // Passt der Self-Signing-Key nicht zum veröffentlichten, bricht die Kette: Bestätigung zurücknehmen.
+    await master.setVerified(true, false);
+    await enc.crossSigning.sign(<SignableKey>[master, device]);
+    await c.updateUserDeviceKeys(additionalUsers: <String>{c.userID!});
+    if (c.isUnknownSession) {
+      await c.userDeviceKeys[c.userID]?.masterKey?.setVerified(false, false);
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+  }
+
+  @override
+  Future<String> resetRecoveryKey() async {
+    final c = _client;
+    if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
+    final enc = c.encryption;
+    if (enc == null) throw const GatewayException(GatewayError.encryptionUnavailable);
+    // Nur ein verifiziertes Gerät hält die Signaturschlüssel vor, die unter den neuen Schlüssel kommen.
+    if (securityState != SecurityState.ready || !await enc.crossSigning.isCached()) {
+      throw const GatewayException(GatewayError.notAllowed);
+    }
+    final keep = <String, String>{};
+    for (final type in <String>[EventTypes.CrossSigningSelfSigning, EventTypes.CrossSigningUserSigning, EventTypes.MegolmBackup]) {
+      final secret = await enc.ssss.getCached(type);
+      if (secret != null) keep[type] = secret;
+    }
+    try {
+      final key = await _driveBootstrap(c, keepSecrets: keep).timeout(const Duration(minutes: 2));
+      if (key == null || key.isEmpty) throw const GatewayException(GatewayError.unknown);
+      await refreshSecurity();
+      return key;
+    } on GatewayException {
+      rethrow;
+    } catch (e) {
+      AppLog.e('gateway', 'Neuer Wiederherstellungsschlüssel fehlgeschlagen', e);
       throw _map(e);
     }
   }

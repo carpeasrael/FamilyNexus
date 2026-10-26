@@ -2050,6 +2050,20 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der Notfall-Schlüssel passt nicht. Bitte prüfe ihn noch einmal.';
 
   @override
+  String get keyRenewTitle => 'Neuer Notfall-Schlüssel';
+
+  @override
+  String get keyRenewIntro =>
+      'Du hast deinen Notfall-Schlüssel verloren oder willst ihn ersetzen? Dann erstelle hier einen neuen. Der alte funktioniert danach nicht mehr – bewahre nur den neuen auf. Deine Nachrichten, Termine und Geräte bleiben, wie sie sind.';
+
+  @override
+  String get keyRenew => 'Neuen Notfall-Schlüssel erstellen';
+
+  @override
+  String get securityKeyRenewHint =>
+      'Falls du ihn verloren hast. Der alte gilt danach nicht mehr.';
+
+  @override
   String get inviteStepTitle => 'Einladung';
 
   @override

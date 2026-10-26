@@ -202,6 +202,12 @@ abstract class MatrixGateway implements Listenable {
   /// Stellt mit dem Wiederherstellungsschlüssel das Backup wieder her und verifiziert dieses Gerät.
   Future<void> restoreSecurity(String recoveryKey);
 
+  /// Ersetzt den Wiederherstellungsschlüssel durch einen neuen (#11), z. B. wenn der alte verloren ist.
+  /// Nur auf einem verifizierten Gerät (sonst `notAllowed`); die Identität bleibt, andere Geräte und
+  /// die Familie merken nichts. Der alte Schlüssel schaltet danach keine Geräte mehr frei. Liefert
+  /// den neuen Schlüssel, der **einmalig** angezeigt werden muss.
+  Future<String> resetRecoveryKey();
+
   /// Startet eine Emoji-Verifizierung mit einem eigenen Gerät ([deviceId]) oder, ohne
   /// [deviceId], mit einer anderen Person.
   Future<void> startVerification({required String userId, String? deviceId});

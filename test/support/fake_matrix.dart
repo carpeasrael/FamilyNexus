@@ -427,6 +427,18 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   @override
+  Future<String> resetRecoveryKey() async {
+    _requireSession();
+    if (securityState != SecurityState.ready) throw const GatewayException(GatewayError.notAllowed);
+    final key = 'EsTx ${fake.nextId('KEY')} fake';
+    fake.recoveryKeys[_userId!] = key;
+    notifyListeners();
+    final delay = fake.securityKeyDelay;
+    if (delay != null) await Future<void>.delayed(delay);
+    return key;
+  }
+
+  @override
   Future<void> restoreSecurity(String recoveryKey) async {
     _requireSession();
     if (fake.recoveryKeys[_userId] != recoveryKey.trim()) throw const GatewayException(GatewayError.invalidInput);

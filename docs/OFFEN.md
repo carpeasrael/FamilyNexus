@@ -33,6 +33,10 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 
 - **Aufgabenlisten mit neuen Regeln oder Erklärung (E-58)** sind für App-Versionen vor dieser Änderung unsichtbar (Format v2); umgestellte Listen bleiben dort auf der letzten v1-Fassung stehen. Bearbeitet ein Moderator mit älterer App eine umgestellte Liste, gehen Regel und Erklärung verloren.
 
+- **Neuer Notfall-Schlüssel (E-72):** Der alte Schlüssel öffnet weiterhin den Master-Key (das SDK hält ihn nicht lokal vor, er
+  lässt sich nicht unter den neuen Schlüssel umziehen). Ist der alte Schlüssel in fremde Hände geraten, hilft der neue daher
+  nur bedingt; dafür bräuchte es ein Zurücksetzen der Identität, das die App nicht anbietet.
+
 - **Einrichtung (E-55–E-57):** Zusatzschritte „Bedingungen“ und „kein Roboter“ (reCAPTCHA) sind nur gegen den Fake geprüft;
   der lokale Test-Synapse verlangt sie nicht. Die OAuth-Anmeldung (matrix.org) ist automatisch nur gegen den Fake geprüft,
   gegen den echten Anbieter manuell (Testplan TP-OAUTH-M1); der OAuth-Rücksprung braucht die Projektseite als `client_uri`.

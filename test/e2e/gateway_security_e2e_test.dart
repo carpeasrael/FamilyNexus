@@ -91,6 +91,38 @@ void main() {
       await E2e.until(() => d3.messages.any((m) => m.body == 'alte Nachricht'), what: 'alte Nachricht über Backup entschlüsselt');
     });
 
+    test('neuer Schlüssel (#11): alter scheitert, neuer verifiziert und entschlüsselt alte Nachrichten', () async {
+      final a = await _fresh('renew');
+      await a.g.createFamily('Neuer Schlüssel');
+      await E2e.until(() => a.g.family != null);
+      final oldKey = await a.g.setUpSecurity();
+      await a.g.sendMessage('vor dem neuen Schlüssel');
+      await E2e.until(() => a.g.messages.any((m) => m.body == 'vor dem neuen Schlüssel'));
+      await Future<void>.delayed(const Duration(seconds: 6));
+
+      // Unverifiziertes Gerät darf keinen neuen Schlüssel erstellen.
+      final d2 = await E2e.loginAs(a.user, a.password);
+      await E2e.until(() => d2.securityState == SecurityState.needsRestore);
+      await expectLater(d2.resetRecoveryKey(), _error(GatewayError.notAllowed));
+
+      final newKey = await a.g.resetRecoveryKey();
+      expect(newKey, isNot(oldKey));
+      expect(a.g.securityState, SecurityState.ready, reason: 'Gerät 1 bleibt verifiziert');
+
+      await expectLater(d2.restoreSecurity(oldKey), throwsA(isA<GatewayException>()));
+      expect(d2.securityState, SecurityState.needsRestore);
+      await d2.restoreSecurity(newKey);
+      await E2e.until(() => d2.securityState == SecurityState.ready, what: 'Gerät 2 mit neuem Schlüssel verifiziert');
+      await E2e.until(() => d2.messages.any((m) => m.body == 'vor dem neuen Schlüssel'), what: 'alte Nachricht über Backup entschlüsselt');
+
+      // Gerät 2 kann seinerseits wieder einen neuen Schlüssel erstellen (Signaturschlüssel liegen vor).
+      final third = await d2.resetRecoveryKey();
+      final d3 = await E2e.loginAs(a.user, a.password);
+      await E2e.until(() => d3.securityState == SecurityState.needsRestore);
+      await d3.restoreSecurity(third);
+      await E2e.until(() => d3.securityState == SecurityState.ready, what: 'Gerät 3 mit drittem Schlüssel verifiziert');
+    });
+
     test('Unverifiziertes Gerät erhält keine Raumschlüssel; nach Verifizierung neue Nachrichten lesbar', () async {
       final a = await _fresh('keys');
       await a.g.createFamily('Schlüssel');

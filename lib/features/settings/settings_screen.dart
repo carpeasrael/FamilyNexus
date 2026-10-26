@@ -14,6 +14,7 @@ import '../common/error_text.dart';
 import '../calendar/event_editor_screen.dart' show kReminderChoices;
 import '../reminders/reminder_coordinator.dart';
 import '../moderation/blocked_users_screen.dart';
+import '../security/security_panel.dart' show RecoveryKeyRenewScreen;
 import 'data_report.dart';
 import 'data_report_screen.dart';
 import 'privacy_screen.dart';
@@ -358,6 +359,14 @@ class _SecuritySectionState extends State<_SecuritySection> {
             leading: Icon(ready ? Icons.verified_outlined : Icons.warning_amber_outlined),
             title: Text(ready ? l.securityStatusReady : l.securityStatusNeeds),
           ),
+          // Nur ein verifiziertes Gerät kann einen neuen Notfall-Schlüssel erstellen (#11).
+          if (ready)
+            ListTile(
+              leading: const Icon(Icons.key_outlined),
+              title: Text(l.keyRenew),
+              subtitle: Text(l.securityKeyRenewHint),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const RecoveryKeyRenewScreen())),
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
             child: Text(l.securityDevices, style: Theme.of(context).textTheme.titleSmall),
