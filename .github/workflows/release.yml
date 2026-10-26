@@ -22,12 +22,12 @@ on:
         description: Existing tag to build and attach the files to (e.g. v1.0.1)
         required: true
       build:
-        description: What to build; "aab" keeps an existing APK asset untouched, "flatpak" builds only the Linux bundle, "appimage" only the AppImage, "windows" only the Windows zip, "web" only the web app, "apple" only DMG and App Store packages
+        description: What to build; "aab" keeps an existing APK asset untouched, "apk" builds APK and AAB only (honours ref), "flatpak" builds only the Linux bundle, "appimage" only the AppImage, "windows" only the Windows zip, "web" only the web app, "apple" only DMG and App Store packages
         type: choice
-        options: [apk+aab, aab, flatpak, appimage, windows, web, apple]
+        options: [apk+aab, aab, apk, flatpak, appimage, windows, web, apple]
         default: apk+aab
       ref:
-        description: 'Only for "flatpak", "appimage", "windows", "web" and "apple" - branch or commit to build instead of the tag (the file is still attached to the tag release)'
+        description: 'Only for "apk", "flatpak", "appimage", "windows", "web" and "apple" - branch or commit to build instead of the tag (the file is still attached to the tag release)'
         required: false
 
 permissions:
@@ -46,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ env.TAG }}
+          ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'apk') && github.event.inputs.ref || env.TAG }}
 
       - name: Check signing secrets
         env:
@@ -104,14 +104,14 @@ jobs:
 
       # Separate symbol directories: each build writes its own obfuscation symbols.
       - name: Build signed release APK
-        if: env.BUILD == 'apk+aab'
+        if: env.BUILD == 'apk+aab' || env.BUILD == 'apk'
         run: |
           mkdir -p debug-info/apk
           flutter build apk --release --obfuscate --split-debug-info=debug-info/apk \
             --target-platform android-arm,android-arm64
 
       - name: Verify APK signature
-        if: env.BUILD == 'apk+aab'
+        if: env.BUILD == 'apk+aab' || env.BUILD == 'apk'
         run: |
           apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
           "$apksigner" verify --verbose build/app/outputs/flutter-apk/app-release.apk | head -5
@@ -130,7 +130,7 @@ jobs:
       - name: Prepare release files
         run: |
           mkdir -p dist
-          if [ "$BUILD" = "apk+aab" ]; then
+          if [ "$BUILD" != "aab" ]; then
             cp build/app/outputs/flutter-apk/app-release.apk "dist/FamilyNexus-${TAG}.apk"
           fi
           cp build/app/outputs/bundle/release/app-release.aab "dist/FamilyNexus-${TAG}.aab"
@@ -165,7 +165,7 @@ jobs:
     needs: apk
     if: >-
       always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
-      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'windows' && github.event.inputs.build != 'web'
+      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'apk' && github.event.inputs.build != 'windows' && github.event.inputs.build != 'web'
       && github.event.inputs.build != 'apple' && github.event.inputs.build != 'appimage'
     runs-on: ubuntu-latest
     env:
@@ -204,7 +204,7 @@ jobs:
     needs: apk
     if: >-
       always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
-      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows'
+      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'apk' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows'
       && github.event.inputs.build != 'web' && github.event.inputs.build != 'apple'
     runs-on: ubuntu-22.04
     env:
@@ -256,7 +256,7 @@ jobs:
     needs: apk
     if: >-
       always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
-      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'web'
+      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'apk' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'web'
       && github.event.inputs.build != 'apple' && github.event.inputs.build != 'appimage'
     runs-on: windows-latest
     defaults:
@@ -342,7 +342,7 @@ jobs:
     needs: apk
     if: >-
       always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
-      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows'
+      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'apk' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows'
       && github.event.inputs.build != 'web' && github.event.inputs.build != 'appimage'
     runs-on: macos-latest
     env:
@@ -473,7 +473,7 @@ jobs:
     needs: apk
     if: >-
       always() && (needs.apk.result == 'success' || needs.apk.result == 'skipped')
-      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows'
+      && github.event.inputs.build != 'aab' && github.event.inputs.build != 'apk' && github.event.inputs.build != 'flatpak' && github.event.inputs.build != 'windows'
       && github.event.inputs.build != 'apple' && github.event.inputs.build != 'appimage'
     runs-on: ubuntu-latest
     env:
