@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/app/app_services.dart';
+import 'package:family_nexus/app/app_version.dart';
 import '../support/memory_stores.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
@@ -78,6 +79,28 @@ void main() {
     expect(app.gateway.session.name, 'loggedOut');
     expect(app.scheduler.cancelled, greaterThan(0), reason: 'geplante Erinnerungen werden bei Abmeldung entfernt');
     expect(find.textContaining('Schritt 1 von 3'), findsOneWidget, reason: 'Abgemeldet: zurück zu „Anmelden“');
+  });
+
+  testWidgets('Version mit Build-Nummer im Menü, unter „Über die App“ und im Datenbericht (#14)', (tester) async {
+    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final (services, _) = await _services(lang: 'de');
+    await tester.pumpWidget(FamilyNexusApp(services: services));
+    await tester.pumpAndSettle();
+    final label = 'Version $appVersion ($appBuild)';
+    await tester.tap(find.byTooltip('Menü öffnen'));
+    await tester.pumpAndSettle();
+    expect(find.text(label), findsOneWidget, reason: 'Menü');
+    await tester.tap(find.widgetWithText(ListTile, 'Einstellungen'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text(label));
+    expect(find.widgetWithText(ListTile, label), findsOneWidget, reason: 'Einstellungen → Über die App');
+
+    await tester.ensureVisible(find.text('Protokoll: alle lokal gespeicherten Daten zeigen'));
+    await tester.tap(find.text('Protokoll: alle lokal gespeicherten Daten zeigen'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('App-Version $appVersion ($appBuild)', findRichText: true), findsOneWidget, reason: 'Datenbericht');
   });
 
   testWidgets('Datenschutzerklärung ist erreichbar (de)', (tester) async {

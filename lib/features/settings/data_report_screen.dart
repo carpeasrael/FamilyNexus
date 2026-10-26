@@ -36,7 +36,7 @@ class _DataReportScreenState extends State<DataReportScreen> {
     final gateway = services.gateway;
     switch (widget.kind) {
       case DataReportKind.online:
-        return DataReport.online(l: l, inventory: await gateway.dataInventory(), now: now, version: appVersion);
+        return DataReport.online(l: l, inventory: await gateway.dataInventory(), now: now, version: appVersionWithBuild);
       case DataReportKind.local:
         final local = services.dataInventory;
         if (local == null) throw StateError('Keine lokale Datenbank');
@@ -46,7 +46,7 @@ class _DataReportScreenState extends State<DataReportScreen> {
         } catch (_) {
           // Abgemeldet: der Abschnitt meldet „nicht verfügbar“.
         }
-        return DataReport.local(l: l, inventory: await local.read(), matrix: matrix, now: now, version: appVersion);
+        return DataReport.local(l: l, inventory: await local.read(), matrix: matrix, now: now, version: appVersionWithBuild);
     }
   }
 

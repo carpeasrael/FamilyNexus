@@ -108,6 +108,6 @@ FamilyNexus steht unter AGPL-3.0 (E-02), weil die Matrix-Bibliothek und `vodozem
 ## 7. Ablauf pro Release
 
 1. `flutter analyze`, `flutter test`, `tool/e2e.sh`, `tool/device_tests.sh`, `tool/check_permissions.sh`.
-2. Version in `pubspec.yaml` erhöhen (`1.2.1+15` …); Neuerungen in `store/metadata/*/*/release_notes.txt` (App Store höchstens 4000 Zeichen, Google Play höchstens 500 je Sprache) eintragen.
+2. Version in `pubspec.yaml` erhöhen (`1.2.1+15` …) und gleich in `lib/app/app_version.dart` (`appVersion`, `appBuild`; der Test `test/app/app_version_test.dart` schlägt sonst fehl). Die App zeigt „Version 1.2.1 (15)“ im Menü, unter Einstellungen → Über die App und in den Datenberichten; Neuerungen in `store/metadata/*/*/release_notes.txt` (App Store höchstens 4000 Zeichen, Google Play höchstens 500 je Sprache) eintragen.
 3. Android: `tool/build_release.sh aab`; iOS: `tool/build_ios_release.sh`.
 4. Hochladen, interne Tests/TestFlight, danach freigeben.

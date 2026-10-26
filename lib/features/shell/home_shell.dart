@@ -177,7 +177,7 @@ class _MenuDrawer extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              l.menuVersion(appVersion),
+              l.menuVersion(appVersionWithBuild),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
           ),
