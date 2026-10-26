@@ -3,3 +3,5 @@ New in 1.2.1:
 • matrix.org stays the default provider, even after signing in or being invited on another server.
 • Windows: invitation links open the app.
 • About the app: storage locations and reports of all data stored locally and online.
+• Delete your account in the settings.
+• Create a new emergency key; a new account now always shows it.
