@@ -2034,6 +2034,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'The emergency key does not match. Please check it again.';
 
   @override
+  String get keyRenewTitle => 'New emergency key';
+
+  @override
+  String get keyRenewIntro =>
+      'Lost your emergency key or want to replace it? Create a new one here. The old one stops working – keep only the new one. Your messages, events and devices stay as they are.';
+
+  @override
+  String get keyRenew => 'Create new emergency key';
+
+  @override
+  String get securityKeyRenewHint =>
+      'In case you lost it. The old one stops working.';
+
+  @override
   String get inviteStepTitle => 'Invitation';
 
   @override

@@ -3506,6 +3506,30 @@ abstract class AppLocalizations {
   /// **'Der Notfall-Schlüssel passt nicht. Bitte prüfe ihn noch einmal.'**
   String get keyRestoreFailed;
 
+  /// No description provided for @keyRenewTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Neuer Notfall-Schlüssel'**
+  String get keyRenewTitle;
+
+  /// No description provided for @keyRenewIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Du hast deinen Notfall-Schlüssel verloren oder willst ihn ersetzen? Dann erstelle hier einen neuen. Der alte funktioniert danach nicht mehr – bewahre nur den neuen auf. Deine Nachrichten, Termine und Geräte bleiben, wie sie sind.'**
+  String get keyRenewIntro;
+
+  /// No description provided for @keyRenew.
+  ///
+  /// In de, this message translates to:
+  /// **'Neuen Notfall-Schlüssel erstellen'**
+  String get keyRenew;
+
+  /// No description provided for @securityKeyRenewHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Falls du ihn verloren hast. Der alte gilt danach nicht mehr.'**
+  String get securityKeyRenewHint;
+
   /// No description provided for @inviteStepTitle.
   ///
   /// In de, this message translates to:

@@ -3,10 +3,13 @@ import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/security.dart';
 import 'package:family_nexus/domain/server.dart';
+import 'package:family_nexus/data/matrix/matrix_gateway.dart';
+import 'package:family_nexus/features/security/security_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_matrix.dart';
+import '../support/nav.dart';
 import '../support/test_app.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
@@ -281,6 +284,44 @@ void main() {
       await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.widgetWithText(FilledButton, 'Weiter')));
       await tester.pumpAndSettle();
       expect(find.textContaining('Er wird nur jetzt angezeigt.'), findsOneWidget);
+    });
+
+    testWidgets('Einstellungen: neuer Notfall-Schlüssel ersetzt den alten (#11)', (tester) async {
+      final first = await buildTestApp();
+      final oldKey = first.server.recoveryKeys['@anna:fake.test']!;
+      await _pump(tester, first);
+      await openSettings(tester);
+      await _tap(tester, 'Neuen Notfall-Schlüssel erstellen');
+      expect(find.byType(RecoveryKeyRenewScreen), findsOneWidget);
+      expect(find.textContaining('Der alte funktioniert danach nicht mehr'), findsOneWidget);
+      await _tap(tester, 'Neuen Notfall-Schlüssel erstellen');
+      final newKey = first.server.recoveryKeys['@anna:fake.test']!;
+      expect(newKey, isNot(oldKey));
+      expect(find.textContaining('Er wird nur jetzt angezeigt.'), findsOneWidget);
+      expect(first.protection.last, isTrue, reason: 'Bildschirmschutz, solange der Schlüssel zu sehen ist');
+      expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Weiter').first).onPressed, isNull);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Er wird nur jetzt angezeigt.'), findsOneWidget, reason: 'kein Zurück, solange der neue Schlüssel nicht bestätigt ist');
+      await tester.tap(find.byType(CheckboxListTile));
+      await tester.pumpAndSettle();
+      await _tap(tester, 'Weiter');
+      expect(find.byType(RecoveryKeyRenewScreen), findsNothing, reason: 'zurück zu den Einstellungen');
+      expect(first.gateway.securityState, SecurityState.ready);
+
+      // Zweites Gerät: nur noch der neue Schlüssel schaltet frei.
+      final second = await buildTestApp(loggedIn: false, server: first.server);
+      await second.gateway.login(server: ServerUrl.tryParse('fake.test')!, username: 'anna', password: 'geheim123');
+      await expectLater(second.gateway.restoreSecurity(oldKey), throwsA(isA<GatewayException>()));
+      await second.gateway.restoreSecurity(newKey);
+      expect(second.gateway.securityState, SecurityState.ready);
+    });
+
+    testWidgets('neuer Notfall-Schlüssel nur auf verifiziertem Gerät', (tester) async {
+      final first = await buildTestApp();
+      final second = await buildTestApp(loggedIn: false, server: first.server);
+      await second.gateway.login(server: ServerUrl.tryParse('fake.test')!, username: 'anna', password: 'geheim123');
+      await expectLater(second.gateway.resetRecoveryKey(), throwsA(isA<GatewayException>()));
     });
 
     testWidgets('zweites Gerät: Wiederherstellung mit Schlüssel (falscher, dann richtiger)', (tester) async {

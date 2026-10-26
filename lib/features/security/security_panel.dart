@@ -10,6 +10,7 @@ import '../../domain/security.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
+import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
 import '../common/prompt_dialog.dart';
 import '../../data/platform/secret_clipboard.dart';
@@ -54,11 +55,19 @@ void clearClipboardLater(String secret, {Duration delay = const Duration(seconds
 /// Einrichtung bzw. Wiederherstellung der Schlüsselsicherung („Notfall-Schlüssel“, E-57). Wird in der
 /// Ersteinrichtung (nach der Anmeldung) gezeigt, bis dieses Gerät verifiziert ist. Es gibt kein
 /// Überspringen: Ohne Verifizierung erhält ein Gerät keine Raumschlüssel (SA-1).
+///
+/// Mit [renew] ersetzt das Panel auf einem verifizierten Gerät den Schlüssel durch einen neuen (#11).
 class SecurityPanel extends StatefulWidget {
-  const SecurityPanel({super.key, this.onReady});
+  const SecurityPanel({super.key, this.onReady, this.renew = false, this.onDone});
 
   /// Wird einmal aufgerufen, sobald dieses Gerät abgesichert ist und kein Schlüssel mehr angezeigt wird.
   final VoidCallback? onReady;
+
+  /// Neuen Schlüssel erstellen statt Ersteinrichtung bzw. Wiederherstellung.
+  final bool renew;
+
+  /// Bei [renew]: aufgerufen, nachdem der neue Schlüssel bestätigt ist.
+  final VoidCallback? onDone;
 
   @override
   State<SecurityPanel> createState() => _SecurityPanelState();
@@ -137,7 +146,7 @@ class _SecurityPanelState extends State<SecurityPanel> {
       _error = null;
     });
     try {
-      final key = await _g.setUpSecurity(password: password);
+      final key = widget.renew ? await _g.resetRecoveryKey() : await _g.setUpSecurity(password: password);
       if (mounted) {
         _protectKey(true);
         setState(() => _recoveryKey = key);
@@ -193,6 +202,14 @@ class _SecurityPanelState extends State<SecurityPanel> {
   Widget build(BuildContext context) {
     final g = AppScope.of(context).gateway;
     final l = AppLocalizations.of(context);
+    // Neuer Schlüssel: Der alte gilt schon nicht mehr – kein Zurück, bis der neue bestätigt ist.
+    return PopScope(
+      canPop: !widget.renew || (!_creatingKey && _recoveryKey == null),
+      child: _content(g, l),
+    );
+  }
+
+  Widget _content(MatrixGateway g, AppLocalizations l) {
     return ListenableBuilder(
       listenable: g,
       builder: (context, _) {
@@ -201,7 +218,7 @@ class _SecurityPanelState extends State<SecurityPanel> {
         if (_recoveryKey != null) return _keyView(l);
         // Während der Einrichtung nicht als „bereit“ melden, sonst geht die Einrichtung weiter und
         // der Schlüssel kommt nie zur Anzeige (#10).
-        if (_creatingKey) return _setupView(l);
+        if (_creatingKey || widget.renew) return _setupView(l);
         switch (state) {
           case SecurityState.unknown:
             return Row(children: <Widget>[
@@ -223,12 +240,15 @@ class _SecurityPanelState extends State<SecurityPanel> {
 
   Widget _setupView(AppLocalizations l) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
         // Überschrift steht in der Titelleiste der Einrichtung.
-        Text(l.keyIntro),
+        Text(widget.renew ? l.keyRenewIntro : l.keyIntro),
         if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error))),
         const SizedBox(height: 12),
         Align(
           alignment: Alignment.centerRight,
-          child: FilledButton(onPressed: _busy ? null : _setUp, child: Text(_busy ? l.keyCreating : l.keyCreate)),
+          child: FilledButton(
+            onPressed: _busy ? null : _setUp,
+            child: Text(_busy ? l.keyCreating : (widget.renew ? l.keyRenew : l.keyCreate)),
+          ),
         ),
       ]);
 
@@ -274,6 +294,7 @@ class _SecurityPanelState extends State<SecurityPanel> {
               ? () {
                   _protectKey(false);
                   setState(() => _recoveryKey = null);
+                  if (widget.renew) widget.onDone?.call();
                 }
               : null,
           child: Text(l.next),
@@ -319,5 +340,23 @@ class _SecurityPanelState extends State<SecurityPanel> {
         child: FilledButton(onPressed: _busy ? null : _restoreWithKey, child: Text(_busy ? l.keyRestoring : l.keyRestoreButton)),
       ),
     ]);
+  }
+}
+
+/// Eigene Seite aus den Einstellungen: neuen Notfall-Schlüssel erstellen (#11).
+class RecoveryKeyRenewScreen extends StatelessWidget {
+  const RecoveryKeyRenewScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text(l.keyRenewTitle)),
+      body: SafeArea(
+        child: ListView(padding: const EdgeInsets.all(16), children: <Widget>[
+          GlassCard(child: SecurityPanel(renew: true, onDone: () => Navigator.of(context).pop())),
+        ]),
+      ),
+    );
   }
 }
