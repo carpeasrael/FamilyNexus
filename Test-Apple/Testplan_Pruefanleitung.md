@@ -93,4 +93,4 @@ Ergebnisse stehen im Report `Testreport_Pruefanleitung.md`.
 
 ## Anhang: Apple-Prüfkonto (matrix.org) – nicht Teil dieses Tests
 
-Nur für die Einreichung bei Apple und den matrix.org-Nachtest in #15. Zugangsdaten stehen nicht im Repository, sondern lokal in `Test-Apple/Zugangsdaten.local.md` bzw. im Passwortmanager.
+Nur für die Einreichung bei Apple und den matrix.org-Nachtest in #15. Zugangsdaten stehen nicht im Repository, sondern lokal in `../secure/Zugangsdaten.local.md` bzw. im Passwortmanager.
