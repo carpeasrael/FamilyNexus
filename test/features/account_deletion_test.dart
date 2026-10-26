@@ -156,6 +156,25 @@ void main() {
     expect(app.services.accountDeletionPending, isFalse);
   });
 
+  testWidgets('B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung', (tester) async {
+    _tallView(tester);
+    final before = await buildTestApp(lang: 'de');
+    await tester.pumpWidget(FamilyNexusApp(services: before.services));
+    await tester.pumpAndSettle();
+    // Konto gelöscht: Sitzung weg, die Einrichtung startet mit „Anmelden“ (Einstellungen noch vorhanden).
+    await before.gateway.logout();
+    await tester.pumpAndSettle();
+    expect(find.text('Noch kein Konto? Jetzt erstellen'), findsOneWidget);
+
+    // _fullReset baut die Dienste neu auf, ohne gespeicherte Einstellungen – wie nach einer Neuinstallation.
+    final after = await buildTestApp(loggedIn: false, secureScreen: false);
+    await tester.pumpWidget(FamilyNexusApp(services: after.services));
+    await tester.pumpAndSettle();
+    expect(find.text('Neue Familie gründen'), findsOneWidget, reason: 'Startseite statt des alten Anmeldeschritts');
+    expect(find.text('Noch kein Konto? Jetzt erstellen'), findsNothing);
+    expect(after.protection.last, isFalse, reason: 'Einstellungen der neuen Dienste gelten');
+  });
+
   group('Löschseite aus den OAuth-Metadaten', () {
     Uri? page(Map<String, Object?> m) => SdkMatrixGateway.accountDeletionPage(m);
 
