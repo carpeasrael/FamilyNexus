@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../domain/account_deletion.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/chat.dart';
@@ -115,6 +116,21 @@ abstract class MatrixGateway implements Listenable {
   });
 
   Future<void> logout();
+
+  // ------------------------------------------------- Kontolöschung (#12)
+
+  /// Wie das angemeldete Konto gelöscht wird. Anmeldung im Browser (OAuth): Löschseite des Anbieters;
+  /// kennt der Anbieter keine Kontoseite, `serverUnsupported`.
+  Future<AccountDeletion> accountDeletion();
+
+  /// Löscht das Konto beim Anbieter dauerhaft (nur [AccountDeletionInApp]; sonst `notAllowed`) und
+  /// beendet danach die Sitzung lokal. Falsches Passwort: `invalidCredentials`. Das Passwort wird
+  /// nicht gespeichert.
+  Future<void> deleteAccount({required String password});
+
+  /// Nach der Löschung im Browser: `true`, wenn der Anbieter das Konto nicht mehr annimmt (gelöscht
+  /// oder Sitzung beendet). Die Sitzung wird dann lokal beendet.
+  Future<bool> checkAccountDeleted();
 
   // ------------------------------------------------------ Kontoanlage (E-55)
 

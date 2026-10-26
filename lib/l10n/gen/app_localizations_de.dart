@@ -1040,7 +1040,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get deleteDataBody =>
-      'Alle Daten dieser App auf diesem Gerät werden unwiderruflich gelöscht und du wirst abgemeldet. Nachrichten und geteilte Termine auf Geräten anderer Familienmitglieder lassen sich technisch nicht löschen. Dein Konto beim Server bleibt bestehen; zum Löschen wende dich an dessen Betreiber.';
+      'Alle Daten dieser App auf diesem Gerät werden unwiderruflich gelöscht und du wirst abgemeldet. Nachrichten und geteilte Termine auf Geräten anderer Familienmitglieder lassen sich technisch nicht löschen. Dein Konto beim Server bleibt bestehen; löschen kannst du es unter Einstellungen → Konto → „Konto löschen“.';
 
   @override
   String get deleteDataConfirm => 'Endgültig löschen';
@@ -1095,7 +1095,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy7Body =>
-      'Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, wird die Zwischenablage nach einer Minute geleert; speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.';
+      'Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, wird die Zwischenablage nach einer Minute geleert; speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.';
 
   @override
   String get privacy8Title => 'Kinder';
@@ -1109,7 +1109,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy9Body =>
-      'Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App; Serverdaten beim Betreiber deines Servers.';
+      'Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App, dein Konto löschst du unter Einstellungen → Konto → „Konto löschen“; weitere Serverdaten beim Betreiber deines Servers.';
 
   @override
   String get familyRequestCheckValid => 'Gültiger Einladungslink';
@@ -2626,4 +2626,54 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reportMembershipBanned => 'ausgeschlossen';
+
+  @override
+  String get accountDelete => 'Konto löschen';
+
+  @override
+  String get accountDeleteHint =>
+      'Matrix-Konto beim Anbieter dauerhaft löschen';
+
+  @override
+  String get accountDeleteTitle => 'Konto löschen?';
+
+  @override
+  String accountDeleteBody(String userId, String server) {
+    return 'Dein Konto $userId wird bei $server dauerhaft gelöscht. Die Matrix-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar. Anschließend werden alle Daten auf diesem Gerät gelöscht.';
+  }
+
+  @override
+  String get accountDeleteSoleModerator =>
+      'Du bist der einzige Moderator der Familie. Ernenne vorher ein anderes Mitglied zum Moderator, sonst kann niemand mehr die Familie verwalten.';
+
+  @override
+  String get accountDeletePassword => 'Passwort zur Bestätigung';
+
+  @override
+  String get accountDeleteConfirm => 'Konto endgültig löschen';
+
+  @override
+  String get accountDeleteBrowserIntro =>
+      'Die Löschung bestätigst du auf der Kontoseite deines Anbieters im Browser.';
+
+  @override
+  String get accountDeleteBrowserWait =>
+      'Bestätige die Löschung auf der Seite des Anbieters und kehre dann hierher zurück.';
+
+  @override
+  String get accountDeleteOpen => 'Zur Löschseite';
+
+  @override
+  String get accountDeleteOpenAgain => 'Seite erneut öffnen';
+
+  @override
+  String get accountDeleteCheck => 'Löschung prüfen';
+
+  @override
+  String get accountDeleteStillActive =>
+      'Das Konto besteht noch. Schließe die Löschung auf der Seite des Anbieters ab.';
+
+  @override
+  String get accountDeleteNoBrowser =>
+      'Der Browser konnte nicht geöffnet werden.';
 }

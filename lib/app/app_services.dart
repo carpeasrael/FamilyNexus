@@ -79,6 +79,9 @@ class AppServices {
   /// Wird vom Start-Widget gesetzt: löscht alle lokalen Daten und startet neu.
   Future<void> Function()? onFullReset;
 
+  /// Läuft eine Kontolöschung (#12)? Endet die Sitzung währenddessen, löscht die App alle lokalen Daten.
+  bool accountDeletionPending = false;
+
   /// Gesprächskennung, die der Chat öffnen soll (z. B. „Nachricht schreiben“ in der Familie).
   /// Die Oberfläche wechselt zum Chat und setzt den Wert wieder auf `null`.
   final ValueNotifier<String?> chatRequest = ValueNotifier<String?>(null);

@@ -30,7 +30,7 @@ Internet (connection to the server), notifications and exact alarms (reminders),
 
 ## Backup and deletion
 
-Android backups are switched off. If you deliberately save an attachment with “Save”, the decrypted file lies outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. Messages on other members' devices cannot technically be force-deleted. Your recovery key is the only way to rescue messages after losing all devices – keep it safe.
+Android backups are switched off. If you deliberately save an attachment with “Save”, the decrypted file lies outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. “Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members' devices cannot technically be force-deleted. Your recovery key is the only way to rescue messages after losing all devices – keep it safe.
 
 ## Children
 
@@ -38,7 +38,7 @@ Children can be family members. This requires the consent of their legal guardia
 
 ## Your rights
 
-You can request access, correction and deletion at any time. You manage local data in this app; server data with your server's operator.
+You can request access, correction and deletion at any time. You manage local data in this app and delete your account under Settings → Account → “Delete account”; other server data with your server's operator.
 
 ## Online status, direct chats, shopping list
 

@@ -469,7 +469,7 @@
   "settingsDeleteData": "Alle lokalen Daten löschen",
   "settingsDeleteDataHint": "Meldet dich ab und löscht Datenbank, Schlüssel und Erinnerungen auf diesem Gerät.",
   "deleteDataTitle": "Alle lokalen Daten löschen?",
-  "deleteDataBody": "Alle Daten dieser App auf diesem Gerät werden unwiderruflich gelöscht und du wirst abgemeldet. Nachrichten und geteilte Termine auf Geräten anderer Familienmitglieder lassen sich technisch nicht löschen. Dein Konto beim Server bleibt bestehen; zum Löschen wende dich an dessen Betreiber.",
+  "deleteDataBody": "Alle Daten dieser App auf diesem Gerät werden unwiderruflich gelöscht und du wirst abgemeldet. Nachrichten und geteilte Termine auf Geräten anderer Familienmitglieder lassen sich technisch nicht löschen. Dein Konto beim Server bleibt bestehen; löschen kannst du es unter Einstellungen → Konto → „Konto löschen“.",
   "deleteDataConfirm": "Endgültig löschen",
   "privacyTitle": "Datenschutzerklärung",
   "privacy1Title": "Wer verarbeitet deine Daten?",
@@ -485,11 +485,11 @@
   "privacy6Title": "Berechtigungen",
   "privacy6Body": "Internet (Verbindung zum Server), Benachrichtigungen und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen) und Geräteanmeldung (App-Sperre). Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.",
   "privacy7Title": "Sicherung und Löschung",
-  "privacy7Body": "Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, wird die Zwischenablage nach einer Minute geleert; speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.",
+  "privacy7Body": "Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, wird die Zwischenablage nach einer Minute geleert; speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.",
   "privacy8Title": "Kinder",
   "privacy8Body": "Kinder können Familienmitglieder sein. Dafür ist die Einwilligung der Sorgeberechtigten nötig; Konten Minderjähriger laufen über die Einladung und Bestätigung eines Moderators.",
   "privacy9Title": "Deine Rechte",
-  "privacy9Body": "Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App; Serverdaten beim Betreiber deines Servers.",
+  "privacy9Body": "Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App, dein Konto löschst du unter Einstellungen → Konto → „Konto löschen“; weitere Serverdaten beim Betreiber deines Servers.",
   "familyRequestCheckValid": "Gültiger Einladungslink",
   "familyRequestCheckExpired": "Link abgelaufen",
   "familyRequestCheckUnknown": "Unbekannter Link – von keinem Moderator ausgegeben",
@@ -1574,5 +1574,25 @@
   "reportMembershipInvited": "eingeladen",
   "reportMembershipRequested": "Beitritt angefragt",
   "reportMembershipLeft": "verlassen",
-  "reportMembershipBanned": "ausgeschlossen"
+  "reportMembershipBanned": "ausgeschlossen",
+  "accountDelete": "Konto löschen",
+  "accountDeleteHint": "Matrix-Konto beim Anbieter dauerhaft löschen",
+  "accountDeleteTitle": "Konto löschen?",
+  "accountDeleteBody": "Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Matrix-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar. Anschließend werden alle Daten auf diesem Gerät gelöscht.",
+  "@accountDeleteBody": {
+    "placeholders": {
+      "userId": {"type": "String"},
+      "server": {"type": "String"}
+    }
+  },
+  "accountDeleteSoleModerator": "Du bist der einzige Moderator der Familie. Ernenne vorher ein anderes Mitglied zum Moderator, sonst kann niemand mehr die Familie verwalten.",
+  "accountDeletePassword": "Passwort zur Bestätigung",
+  "accountDeleteConfirm": "Konto endgültig löschen",
+  "accountDeleteBrowserIntro": "Die Löschung bestätigst du auf der Kontoseite deines Anbieters im Browser.",
+  "accountDeleteBrowserWait": "Bestätige die Löschung auf der Seite des Anbieters und kehre dann hierher zurück.",
+  "accountDeleteOpen": "Zur Löschseite",
+  "accountDeleteOpenAgain": "Seite erneut öffnen",
+  "accountDeleteCheck": "Löschung prüfen",
+  "accountDeleteStillActive": "Das Konto besteht noch. Schließe die Löschung auf der Seite des Anbieters ab.",
+  "accountDeleteNoBrowser": "Der Browser konnte nicht geöffnet werden."
 }

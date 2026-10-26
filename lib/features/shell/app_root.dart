@@ -99,6 +99,11 @@ class _AppRootState extends State<AppRoot> {
           final lostReady = _wasReady;
           WidgetsBinding.instance.addPostFrameCallback((_) {
             services.closeCalendar(cancelReminders: !session);
+            // Konto gelöscht: auch die lokalen Daten des Kontos entfernen (wie „Alle lokalen Daten löschen“).
+            if (!session && services.accountDeletionPending) {
+              services.accountDeletionPending = false;
+              services.onFullReset?.call().ignore();
+            }
             // Beim Verlassen der Hauptansicht geöffnete Seiten (z. B. Einstellungen) schließen, sonst
             // blieben sie über der Einrichtung stehen. Dialoge der Einrichtung bleiben unberührt.
             if (lostReady && mounted) Navigator.of(context).popUntil((r) => r.isFirst);
