@@ -10,7 +10,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 | In-App-QR-Scanner | `mobile_scanner`/ML Kit kann Daten an Google senden (E-34). Scan mit der Kamera-App öffnet den Deep Link. Alternative auf ZXing-Basis ohne Google-Dienste prüfen. |
 | ICS-/Archiv-Export | Ein Export wäre unverschlüsselt gespeichert – verstößt gegen „nie unverschlüsselt speichern“. Möglich nur als verschlüsseltes Archiv. |
 | Geräte sperren / fremde Sitzungen abmelden | Benötigt Server-Passwortbestätigung (UIA) für Geräteverwaltung; Verifizierungsstatus wird angezeigt. |
-| Konto beim Server löschen | Nur lokale Löschung („Alle lokalen Daten löschen“) und Abmelden; Kontolöschung beim Betreiber selbst. |
+| Kontolöschung bei matrix.org (OAuth) ohne Browser | Bei Anbietern mit Anmeldung im Browser bestätigt man die Löschung auf der Seite des Anbieters; die App prüft danach nur, ob das Konto noch angenommen wird (E-73). Gegen matrix.org noch nicht auf einem Gerät geprüft (#15). Kennt ein OAuth-Anbieter keine Kontoseite, ist keine Löschung aus der App möglich. |
 | Serverwechsel mit Migration | Serverwechsel = neu anmelden; Daten migrieren nicht. |
 | Anmeldung im Browser (OAuth) in der Browser-App | Die Web-Version bietet keine OAuth-Rückkehr (Seitenwechsel verliert die Sitzung); dort gibt es Kontoanlage in der App (klassische Anbieter) oder den Weg über die Webseite des Anbieters und die Passwort-Anmeldung (E-55). |
 | Einladungslink als verifizierter App-/Universal-Link (https) | Es gibt eine Landingpage (E-68), aber keine automatische Übergabe vom Browser an die App ohne Tipp: Verifizierte Links brauchen `/.well-known/assetlinks.json` bzw. `apple-app-site-association` im Wurzelverzeichnis einer eigenen Domain (GitHub Pages unter `/FamilyNexus/` kann das nicht). Mail-Programme zeigen den https-Link anklickbar; „App öffnen“ auf der Seite startet `familynexus://`. Windows trägt das Schema beim Start selbst ein und nutzt eine Einzelinstanz (E-69, noch nicht auf einem Windows-Gerät geprüft). |
@@ -24,7 +24,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 | Erinnerungen und Benachrichtigung zum Periodenwechsel bei Aufgabenlisten | Der Erinnerungs-Planer kennt nur Termine und ersetzt bei `replaceAll` alle geplanten Benachrichtigungen (E-51). |
 | Nachträgliches Abhaken früherer Perioden, Fälligkeitszeiten, Unteraufgaben | Umfang (E-51). |
 | Mehrere Wochentage je Liste (z. B. Montag und Donnerstag), „alle zwei Wochen“ | Nicht verlangt (Issue #1); Regeln sind genau eine Art je Liste (E-58). |
-| Familie selbst verlassen | Mitglieder werden nur durch Moderatoren entfernt; Austritt (`leave`) fehlt in der Oberfläche. Das Recht auf Löschung wird über die lokale Löschung und die Kontolöschung beim Betreiber wahrgenommen. |
+| Familie selbst verlassen | Mitglieder werden nur durch Moderatoren entfernt; Austritt (`leave`) fehlt in der Oberfläche. Das Recht auf Löschung wird über die lokale Löschung und „Konto löschen“ (E-73) wahrgenommen. |
 | Server durch Moderator ändern | Der Server ist in den Einstellungen nur lesbar; Wechsel = neue Familie/neue Anmeldung. |
 | Löschmarken beim „Alle lokalen Daten löschen“ | Geteilte Termine bleiben bei den anderen Geräten bestehen; vor dem Löschen sollten sie einzeln gelöscht werden. |
 | Chat-Benachrichtigungen (auch lokal) | Keine; siehe E-16. |

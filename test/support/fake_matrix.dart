@@ -1,6 +1,7 @@
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'dart:async';
 
+import 'package:family_nexus/domain/account_deletion.dart';
 import 'package:family_nexus/domain/attachment_policy.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
@@ -158,6 +159,27 @@ class FakeMatrixServer {
   String? passwordOf(String userId) => _accounts[userId]?.password;
 
   FakeMatrixGateway newDevice() => FakeMatrixGateway(this);
+
+  // ------------------------------------------------- Kontolöschung (#12)
+
+  /// Kontoseite des Anbieters für Konten mit Anmeldung im Browser; `null` = keine angeboten.
+  Uri? accountManagementPage = Uri.parse('https://fake.test/account?action=org.matrix.account_deactivate');
+
+  /// Gelöschte Konten (in der App oder beim Anbieter).
+  final List<String> deactivated = <String>[];
+
+  /// Löscht ein Konto wie der Homeserver: Es verlässt alle Räume, Anmeldung und Schlüssel sind weg.
+  /// Die Sitzungen der Geräte enden erst, wenn sie den Server das nächste Mal fragen.
+  void deactivateAccount(String userId) {
+    _accounts.remove(userId);
+    recoveryKeys.remove(userId);
+    privateRooms.remove(userId);
+    for (final r in <FakeRoom>[...rooms.values, ...dmRooms.values]) {
+      r.membership.remove(userId);
+    }
+    deactivated.add(userId);
+    notifyAll();
+  }
 
   void _register(FakeMatrixGateway g) => _gateways.add(g);
 
@@ -982,6 +1004,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       fake.addAccount(code, 'oauth-only');
     }
     _userId = id;
+    _viaOAuth = true;
     _server = ServerUrl.tryParse(fake.host);
     for (final r in fake.rooms.values) {
       if (r.membership[id] == MemberStatus.joined) {
@@ -1060,10 +1083,45 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     );
   }
 
+  /// Anmeldung im Browser (OAuth): Das Konto wird dann beim Anbieter gelöscht.
+  bool _viaOAuth = false;
+
+  @override
+  Future<AccountDeletion> accountDeletion() async {
+    _requireSession();
+    _require();
+    if (!_viaOAuth) return const AccountDeletionInApp();
+    final page = fake.accountManagementPage;
+    if (page == null) throw const GatewayException(GatewayError.serverUnsupported);
+    return AccountDeletionInBrowser(page);
+  }
+
+  @override
+  Future<void> deleteAccount({required String password}) async {
+    _requireSession();
+    _require();
+    if (_viaOAuth) throw const GatewayException(GatewayError.notAllowed);
+    if (password.isEmpty) throw const GatewayException(GatewayError.invalidInput);
+    if (fake._accounts[_userId]?.password != password) throw const GatewayException(GatewayError.invalidCredentials);
+    fake.deactivateAccount(_userId!);
+    await logout();
+  }
+
+  @override
+  Future<bool> checkAccountDeleted() async {
+    final uid = _userId;
+    if (uid == null) return true;
+    _require();
+    if (fake._accounts.containsKey(uid)) return false;
+    await logout();
+    return true;
+  }
+
   @override
   Future<void> logout() async {
     cancelRegistration();
     _oauthState = null;
+    _viaOAuth = false;
     _userId = null;
     _server = null;
     _familyRoomId = null;

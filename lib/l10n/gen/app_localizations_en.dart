@@ -1031,7 +1031,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteDataBody =>
-      'All data of this app on this device will be deleted permanently and you will be signed out. Messages and shared events on other family members\' devices cannot technically be deleted. Your account on the server remains; ask the server operator to delete it.';
+      'All data of this app on this device will be deleted permanently and you will be signed out. Messages and shared events on other family members\' devices cannot technically be deleted. Your account on the server remains; you can delete it under Settings → Account → “Delete account”.';
 
   @override
   String get deleteDataConfirm => 'Delete permanently';
@@ -1086,7 +1086,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy7Body =>
-      'Android backups are disabled. If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the clipboard is cleared after one minute; if you save it as a file, it is stored unencrypted in the location you chose.';
+      'Android backups are disabled. If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. “Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the clipboard is cleared after one minute; if you save it as a file, it is stored unencrypted in the location you chose.';
 
   @override
   String get privacy8Title => 'Children';
@@ -1100,7 +1100,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy9Body =>
-      'You can request access, correction and deletion at any time. You manage local data in this app; server data with your server\'s operator.';
+      'You can request access, correction and deletion at any time. You manage local data in this app and delete your account under Settings → Account → “Delete account”; other server data with your server\'s operator.';
 
   @override
   String get familyRequestCheckValid => 'Valid invitation link';
@@ -2607,4 +2607,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportMembershipBanned => 'banned';
+
+  @override
+  String get accountDelete => 'Delete account';
+
+  @override
+  String get accountDeleteHint =>
+      'Permanently delete your Matrix account at the provider';
+
+  @override
+  String get accountDeleteTitle => 'Delete account?';
+
+  @override
+  String accountDeleteBody(String userId, String server) {
+    return 'Your account $userId will be permanently deleted at $server. The Matrix ID cannot be used again. Messages you sent remain visible to the other family members. Afterwards all data on this device is deleted.';
+  }
+
+  @override
+  String get accountDeleteSoleModerator =>
+      'You are the family\'s only moderator. Make another member a moderator first, otherwise nobody can manage the family any more.';
+
+  @override
+  String get accountDeletePassword => 'Password to confirm';
+
+  @override
+  String get accountDeleteConfirm => 'Delete account permanently';
+
+  @override
+  String get accountDeleteBrowserIntro =>
+      'You confirm the deletion on your provider\'s account page in the browser.';
+
+  @override
+  String get accountDeleteBrowserWait =>
+      'Confirm the deletion on the provider\'s page, then come back here.';
+
+  @override
+  String get accountDeleteOpen => 'Open deletion page';
+
+  @override
+  String get accountDeleteOpenAgain => 'Open page again';
+
+  @override
+  String get accountDeleteCheck => 'Check deletion';
+
+  @override
+  String get accountDeleteStillActive =>
+      'The account still exists. Finish the deletion on the provider\'s page.';
+
+  @override
+  String get accountDeleteNoBrowser => 'The browser could not be opened.';
 }

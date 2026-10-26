@@ -1847,7 +1847,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteDataBody.
   ///
   /// In de, this message translates to:
-  /// **'Alle Daten dieser App auf diesem Gerät werden unwiderruflich gelöscht und du wirst abgemeldet. Nachrichten und geteilte Termine auf Geräten anderer Familienmitglieder lassen sich technisch nicht löschen. Dein Konto beim Server bleibt bestehen; zum Löschen wende dich an dessen Betreiber.'**
+  /// **'Alle Daten dieser App auf diesem Gerät werden unwiderruflich gelöscht und du wirst abgemeldet. Nachrichten und geteilte Termine auf Geräten anderer Familienmitglieder lassen sich technisch nicht löschen. Dein Konto beim Server bleibt bestehen; löschen kannst du es unter Einstellungen → Konto → „Konto löschen“.'**
   String get deleteDataBody;
 
   /// No description provided for @deleteDataConfirm.
@@ -1943,7 +1943,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy7Body.
   ///
   /// In de, this message translates to:
-  /// **'Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, wird die Zwischenablage nach einer Minute geleert; speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.'**
+  /// **'Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, wird die Zwischenablage nach einer Minute geleert; speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.'**
   String get privacy7Body;
 
   /// No description provided for @privacy8Title.
@@ -1967,7 +1967,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy9Body.
   ///
   /// In de, this message translates to:
-  /// **'Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App; Serverdaten beim Betreiber deines Servers.'**
+  /// **'Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App, dein Konto löschst du unter Einstellungen → Konto → „Konto löschen“; weitere Serverdaten beim Betreiber deines Servers.'**
   String get privacy9Body;
 
   /// No description provided for @familyRequestCheckValid.
@@ -4447,6 +4447,90 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'ausgeschlossen'**
   String get reportMembershipBanned;
+
+  /// No description provided for @accountDelete.
+  ///
+  /// In de, this message translates to:
+  /// **'Konto löschen'**
+  String get accountDelete;
+
+  /// No description provided for @accountDeleteHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Matrix-Konto beim Anbieter dauerhaft löschen'**
+  String get accountDeleteHint;
+
+  /// No description provided for @accountDeleteTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Konto löschen?'**
+  String get accountDeleteTitle;
+
+  /// No description provided for @accountDeleteBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Matrix-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar. Anschließend werden alle Daten auf diesem Gerät gelöscht.'**
+  String accountDeleteBody(String userId, String server);
+
+  /// No description provided for @accountDeleteSoleModerator.
+  ///
+  /// In de, this message translates to:
+  /// **'Du bist der einzige Moderator der Familie. Ernenne vorher ein anderes Mitglied zum Moderator, sonst kann niemand mehr die Familie verwalten.'**
+  String get accountDeleteSoleModerator;
+
+  /// No description provided for @accountDeletePassword.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwort zur Bestätigung'**
+  String get accountDeletePassword;
+
+  /// No description provided for @accountDeleteConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Konto endgültig löschen'**
+  String get accountDeleteConfirm;
+
+  /// No description provided for @accountDeleteBrowserIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Löschung bestätigst du auf der Kontoseite deines Anbieters im Browser.'**
+  String get accountDeleteBrowserIntro;
+
+  /// No description provided for @accountDeleteBrowserWait.
+  ///
+  /// In de, this message translates to:
+  /// **'Bestätige die Löschung auf der Seite des Anbieters und kehre dann hierher zurück.'**
+  String get accountDeleteBrowserWait;
+
+  /// No description provided for @accountDeleteOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'Zur Löschseite'**
+  String get accountDeleteOpen;
+
+  /// No description provided for @accountDeleteOpenAgain.
+  ///
+  /// In de, this message translates to:
+  /// **'Seite erneut öffnen'**
+  String get accountDeleteOpenAgain;
+
+  /// No description provided for @accountDeleteCheck.
+  ///
+  /// In de, this message translates to:
+  /// **'Löschung prüfen'**
+  String get accountDeleteCheck;
+
+  /// No description provided for @accountDeleteStillActive.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Konto besteht noch. Schließe die Löschung auf der Seite des Anbieters ab.'**
+  String get accountDeleteStillActive;
+
+  /// No description provided for @accountDeleteNoBrowser.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Browser konnte nicht geöffnet werden.'**
+  String get accountDeleteNoBrowser;
 }
 
 class _AppLocalizationsDelegate

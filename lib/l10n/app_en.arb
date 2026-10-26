@@ -469,7 +469,7 @@
   "settingsDeleteData": "Delete all local data",
   "settingsDeleteDataHint": "Signs you out and deletes the database, keys and reminders on this device.",
   "deleteDataTitle": "Delete all local data?",
-  "deleteDataBody": "All data of this app on this device will be deleted permanently and you will be signed out. Messages and shared events on other family members' devices cannot technically be deleted. Your account on the server remains; ask the server operator to delete it.",
+  "deleteDataBody": "All data of this app on this device will be deleted permanently and you will be signed out. Messages and shared events on other family members' devices cannot technically be deleted. Your account on the server remains; you can delete it under Settings → Account → “Delete account”.",
   "deleteDataConfirm": "Delete permanently",
   "privacyTitle": "Privacy policy",
   "privacy1Title": "Who processes your data?",
@@ -485,11 +485,11 @@
   "privacy6Title": "Permissions",
   "privacy6Body": "Internet (connection to the server), notifications and exact alarms (reminders), boot notification (re-schedule reminders) and device credentials (app lock). No contacts, location, camera or microphone are needed.",
   "privacy7Title": "Backup and deletion",
-  "privacy7Body": "Android backups are disabled. If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the clipboard is cleared after one minute; if you save it as a file, it is stored unencrypted in the location you chose.",
+  "privacy7Body": "Android backups are disabled. If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. “Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the clipboard is cleared after one minute; if you save it as a file, it is stored unencrypted in the location you chose.",
   "privacy8Title": "Children",
   "privacy8Body": "Children can be family members. This requires the consent of their legal guardians; accounts of minors go through invitation and confirmation by a moderator.",
   "privacy9Title": "Your rights",
-  "privacy9Body": "You can request access, correction and deletion at any time. You manage local data in this app; server data with your server's operator.",
+  "privacy9Body": "You can request access, correction and deletion at any time. You manage local data in this app and delete your account under Settings → Account → “Delete account”; other server data with your server's operator.",
   "familyRequestCheckValid": "Valid invitation link",
   "familyRequestCheckExpired": "Link expired",
   "familyRequestCheckUnknown": "Unknown link – not issued by a moderator",
@@ -1568,5 +1568,25 @@
   "reportMembershipInvited": "invited",
   "reportMembershipRequested": "join requested",
   "reportMembershipLeft": "left",
-  "reportMembershipBanned": "banned"
+  "reportMembershipBanned": "banned",
+  "accountDelete": "Delete account",
+  "accountDeleteHint": "Permanently delete your Matrix account at the provider",
+  "accountDeleteTitle": "Delete account?",
+  "accountDeleteBody": "Your account {userId} will be permanently deleted at {server}. The Matrix ID cannot be used again. Messages you sent remain visible to the other family members. Afterwards all data on this device is deleted.",
+  "@accountDeleteBody": {
+    "placeholders": {
+      "userId": {"type": "String"},
+      "server": {"type": "String"}
+    }
+  },
+  "accountDeleteSoleModerator": "You are the family's only moderator. Make another member a moderator first, otherwise nobody can manage the family any more.",
+  "accountDeletePassword": "Password to confirm",
+  "accountDeleteConfirm": "Delete account permanently",
+  "accountDeleteBrowserIntro": "You confirm the deletion on your provider's account page in the browser.",
+  "accountDeleteBrowserWait": "Confirm the deletion on the provider's page, then come back here.",
+  "accountDeleteOpen": "Open deletion page",
+  "accountDeleteOpenAgain": "Open page again",
+  "accountDeleteCheck": "Check deletion",
+  "accountDeleteStillActive": "The account still exists. Finish the deletion on the provider's page.",
+  "accountDeleteNoBrowser": "The browser could not be opened."
 }

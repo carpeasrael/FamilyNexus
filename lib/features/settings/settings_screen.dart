@@ -15,6 +15,7 @@ import '../calendar/event_editor_screen.dart' show kReminderChoices;
 import '../reminders/reminder_coordinator.dart';
 import '../moderation/blocked_users_screen.dart';
 import '../security/security_panel.dart' show RecoveryKeyRenewScreen;
+import 'account_deletion_dialog.dart';
 import 'data_report.dart';
 import 'data_report_screen.dart';
 import 'privacy_screen.dart';
@@ -279,6 +280,13 @@ class _AccountSection extends StatelessWidget {
             );
             if (ok == true) await services.logout();
           },
+        ),
+        // Apple 5.1.1(v): Wer in der App ein Konto anlegen kann, muss es hier auch löschen können (#12).
+        ListTile(
+          leading: Icon(Icons.person_remove_outlined, color: Theme.of(context).colorScheme.error),
+          title: Text(l.accountDelete, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+          subtitle: Text(l.accountDeleteHint),
+          onTap: () => deleteAccount(context),
         ),
       ]),
     );
