@@ -66,6 +66,8 @@ class SecurityPanel extends StatefulWidget {
 
 class _SecurityPanelState extends State<SecurityPanel> {
   bool _busy = false;
+  // Einrichtung läuft: Der Zustand kann schon „bereit“ sein, bevor der Schlüssel zurückkommt (#10).
+  bool _creatingKey = false;
   String? _error;
   String? _recoveryKey; // wird nur im Speicher gehalten, bis der Nutzer bestätigt
   bool _keySaved = false;
@@ -131,6 +133,7 @@ class _SecurityPanelState extends State<SecurityPanel> {
     final l = AppLocalizations.of(context);
     setState(() {
       _busy = true;
+      _creatingKey = true;
       _error = null;
     });
     try {
@@ -147,7 +150,12 @@ class _SecurityPanelState extends State<SecurityPanel> {
         setState(() => _error = errorText(l, e));
       }
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _creatingKey = false;
+        });
+      }
     }
   }
 
@@ -191,6 +199,9 @@ class _SecurityPanelState extends State<SecurityPanel> {
         final state = g.securityState;
         // Schlüsselanzeige hat Vorrang, bis bestätigt – auch wenn der Zustand schon „bereit“ ist.
         if (_recoveryKey != null) return _keyView(l);
+        // Während der Einrichtung nicht als „bereit“ melden, sonst geht die Einrichtung weiter und
+        // der Schlüssel kommt nie zur Anzeige (#10).
+        if (_creatingKey) return _setupView(l);
         switch (state) {
           case SecurityState.unknown:
             return Row(children: <Widget>[

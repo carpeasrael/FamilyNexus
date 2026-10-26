@@ -102,6 +102,10 @@ class FakeMatrixServer {
   /// Simuliert einen Server, der für die Einrichtung eine Passwortbestätigung verlangt.
   bool requirePasswordForSecurity = false;
 
+  /// Wie das echte Gateway (`await refreshSecurity()`): Der Zustand ist schon „bereit“ und gemeldet,
+  /// bevor `setUpSecurity` den Schlüssel liefert.
+  Duration? securityKeyDelay;
+
   /// Konten mit eingerichteter Schlüsselsicherung → Wiederherstellungsschlüssel.
   final Map<String, String> recoveryKeys = <String, String>{};
 
@@ -417,6 +421,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     fake.recoveryKeys[_userId!] = key;
     deviceVerified = true;
     notifyListeners();
+    final delay = fake.securityKeyDelay;
+    if (delay != null) await Future<void>.delayed(delay);
     return key;
   }
 
