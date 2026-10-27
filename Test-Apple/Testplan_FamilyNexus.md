@@ -419,6 +419,6 @@ Regel: Änderungen an Schritten, erwarteten Ergebnissen oder Reihenfolge erhöhe
 | 1.2 | 26.10.2026 | `d6cecbf` | Konfliktauflösung mit PR #22 (B-1 auf `main` behoben): Erwartungen „Willkommen“ nach Löschen, Hinweis für Build 16; Issues #23 bis #27 verlinkt |
 | 1.3 | 27.10.2026 | `dd389fe` | Korrekturen P-12 bis P-17 nach Lauf 2 (Anhang E); Issues #28 bis #30 verlinkt |
 | 1.4 | 27.10.2026 | `e31cd04` | Korrekturen P-18 bis P-30 nach Lauf 3 (Linux/Android, Anhang E); Issues #31 bis #40 verlinkt |
-| 1.5 | 27.10.2026 | (dieser Commit) | Erwartungen an die Fixes aus PR #41 (`532bc62`) angepasst (P-31 bis P-38, Anhang E); Issues #24 bis #40 behoben |
+| 1.5 | 27.10.2026 | `423a3db` | Erwartungen an die Fixes aus PR #41 (`532bc62`) angepasst (P-31 bis P-38, Anhang E); Issues #24 bis #40 behoben |
 
 **Zuordnung Issues zur Planversion:** #23 bis #27 (Lauf 1) beziehen sich auf v1.0 (`4abf400`), #28 bis #30 (Lauf 2) auf v1.2 (`d6cecbf`), #31 bis #40 (Lauf 3, Linux/Android) auf v1.0 (`4abf400`); die Plantexte dazu stehen seit v1.1, v1.3 bzw. v1.4 im Plan. Seit v1.5 beschreibt der Plan das Verhalten nach den Fixes aus PR #41 (#23 bereits durch PR #22).
