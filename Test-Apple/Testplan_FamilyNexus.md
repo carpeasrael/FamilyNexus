@@ -405,6 +405,6 @@ Regel: Änderungen an Schritten, erwarteten Ergebnissen oder Reihenfolge erhöhe
 | 1.1 | 26.10.2026 | `4f03868` | Korrekturen P-1 bis P-11 nach dem Lauf vom 26.10.2026 (Anhang E): verbindliche Reihenfolge, Erwartungen zu B-1 bis B-4, Link-Format, Beitrittsschritte, Datumsteil für Läufe am selben Tag, Anhang D (automatisierte Bedienung) |
 | 1.2 | 26.10.2026 | `d6cecbf` | Konfliktauflösung mit PR #22 (B-1 auf `main` behoben): Erwartungen „Willkommen“ nach Löschen, Hinweis für Build 16; Issues #23 bis #27 verlinkt |
 | 1.3 | 27.10.2026 | `dd389fe` | Korrekturen P-12 bis P-17 nach Lauf 2 (Anhang E); Issues #28 bis #30 verlinkt |
-| 1.4 | 27.10.2026 | (dieser Commit) | Korrekturen P-18 bis P-30 nach Lauf 3 (Linux/Android, Anhang E); Issues #31 bis #40 verlinkt |
+| 1.4 | 27.10.2026 | `e31cd04` | Korrekturen P-18 bis P-30 nach Lauf 3 (Linux/Android, Anhang E); Issues #31 bis #40 verlinkt |
 
 **Zuordnung Issues zur Planversion:** #23 bis #27 (Lauf 1) beziehen sich auf v1.0 (`4abf400`), #28 bis #30 (Lauf 2) auf v1.2 (`d6cecbf`), #31 bis #40 (Lauf 3, Linux/Android) auf v1.0 (`4abf400`); die Plantexte dazu stehen seit v1.1, v1.3 bzw. v1.4 im Plan.
