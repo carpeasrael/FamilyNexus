@@ -22,14 +22,14 @@ V-01 ✅ (main = origin/main, 1.2.1+17). V-02 ✅ (Mac /Applications: Build 16 �
 
 | Ergebnis | Anzahl Schritte (104, wie im PDF, Stand nach Nachlauf 28.10.) |
 |---|---|
-| ✅ bestanden | 94 |
+| ✅ bestanden | 95 |
 | ⚠️ bestanden mit Befund | 5 (A-07, B-03, D-02, E-21, E-25) |
 | ❌ fehlgeschlagen | 0 |
-| ⏳ nicht ausgeführt | 5 (V-07, D-07, G-06, G-07, G-08) |
+| ⏳ nicht ausgeführt | 4 (V-07, D-07, G-07, G-08) |
 
 **Nachlauf 28.10.2026 (00:00):** B-01, B-17 bis B-21, E-05, E-12, E-17 und G-04 mit neuem Konto `fnt-1027b-n1`/`-i2` nachgeholt (danach gelöscht, curl-Anmeldung 403). Nicht geprüft: Bild-Anhang in E-17, Mailprogramm in E-05, sauberer Aus/An-Vergleich in B-18.
 
-**Abnahme (Abschnitt 7): weiter nicht bestanden**, solange G-06 (Review-Notizen manuell) und V-07 offen sind; D-07, G-07 und G-08 sind optional bzw. n/a. B-17/B-18 wurden im Simulator mit Face ID geprüft, ein Lauf auf einem echten iPhone steht aus.
+**Abnahme (Abschnitt 7): weiter nicht bestanden**, solange V-07 offen ist (G-06 wurde am 28.10. gegen den Testserver durchgegangen; die matrix.org-Browserseiten gehören zu #15); D-07, G-07 und G-08 sind optional bzw. n/a. B-17/B-18 wurden im Simulator mit Face ID geprüft, ein Lauf auf einem echten iPhone steht aus.
 
 ## 4. Befundliste
 
