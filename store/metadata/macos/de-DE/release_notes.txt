@@ -7,3 +7,4 @@ Neu in 1.2.1:
 • Einstellungen → Notfall-Schlüssel und Geräte: neuen Notfall-Schlüssel erstellen. Beim Einrichten eines neuen Kontos wird der Schlüssel jetzt zuverlässig angezeigt.
 • Die Versionsanzeige nennt die Build-Nummer.
 • Nach „Alle lokalen Daten löschen“ oder „Konto löschen“ startet die App wieder mit der Startseite statt mit der Anmeldung.
+• Behoben: „Nachricht schreiben“ öffnet zuverlässig den Einzelchat; Termine: das Ende wandert mit dem Beginn; Bilder im Chat lassen sich speichern; deutsche Datumsangaben bei Aufgaben; weitere Korrekturen aus den Tests.

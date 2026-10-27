@@ -5,3 +5,4 @@ New in 1.2.1:
 • Settings → Emergency key and devices: create a new emergency key. When setting up a new account, the key is now always shown.
 • The version display includes the build number.
 • After “Delete all local data” or “Delete account” the app starts again with the welcome screen instead of sign-in.
+• Fixed: “Write a message” reliably opens the private chat; events: the end moves with the start; images in the chat can be saved; localized dates for tasks; further fixes from testing.
