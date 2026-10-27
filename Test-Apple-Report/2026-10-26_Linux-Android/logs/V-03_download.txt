@@ -1,0 +1,4 @@
+FamilyNexus-v1.2.1.apk: OK
+FamilyNexus-v1.2.1.flatpak: OK
+Installiere 4/4 …
+Änderungen abgeschlossen.

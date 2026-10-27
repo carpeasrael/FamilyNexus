@@ -1,0 +1,12 @@
+FamilyNexus – Notfall-Schlüssel
+
+Konto: @fnt-1026c-n12:matrix.chaostribunal.de
+Anbieter: matrix-synapse-3ues.srv1348446.hstgr.cloud
+Erstellt am: 26.10.2026
+
+Notfall-Schlüssel:
+<SCHLÜSSEL GESCHWÄRZT>
+
+So nutzt du ihn: Installiere FamilyNexus auf dem neuen Gerät, wähle „Ich habe schon ein Konto“, melde dich an und gib bei „Dieses Gerät freischalten“ den Notfall-Schlüssel ein.
+
+Bewahre dieses Blatt sicher auf und gib es niemandem.

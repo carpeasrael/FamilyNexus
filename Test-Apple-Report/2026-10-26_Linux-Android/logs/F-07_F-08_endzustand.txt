@@ -1,0 +1,5 @@
+2026-10-27T00:46:31 Endzustand der Testkonten (Passwörter maskiert)
+fnt-1026c-n1: Anmeldung abgelehnt: HTTP 403 M_FORBIDDEN; register/available: M_USER_IN_USE
+fnt-1026c-n12: Anmeldung abgelehnt: HTTP 403 M_FORBIDDEN; register/available: M_USER_IN_USE
+fnt-1026c-i2: Anmeldung abgelehnt: HTTP 403 M_FORBIDDEN; register/available: M_USER_IN_USE
+fnt-1026c-n9: {"available":true} (nie angelegt)

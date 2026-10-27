@@ -1,0 +1,9 @@
+vorher:
+nicht installiert
+Performing Streamed Install
+Success
+nachher:
+    versionCode=16 minSdk=26 targetSdk=36
+    versionName=1.2.1
+16
+

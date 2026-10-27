@@ -1,0 +1,2 @@
+2026-10-27T00:40:18 POST /login fnt-1026c-i2 (Passwort maskiert)
+HTTP 403 {"errcode":"M_FORBIDDEN","error":"Invalid username or password"}

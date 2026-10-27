@@ -1,0 +1,15 @@
+2026-10-26T22:21:56+01:00
+{"versions":["r0.0.1","r0.1.0","r0.2.0","r0.3.0","r0.4.0","r0.5.0","r0.6.0","r0.6.1","v1.1","v1.2","v1.3","v1.4","v1.5",
+{"session":"sbSrgCapkAiwqUpOmssVcnIR","flows":[{"stages":["m.login.dummy"]}],"params":{}}
+fnt-1026-n1: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1026-n12: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1026-i2: {"available":true}
+fnt-1026-n9: {"available":true}
+fnt-1026b-n1: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1026b-n12: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1026b-i2: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1026b-n9: {"available":true}
+fnt-1026c-n1: {"available":true}
+fnt-1026c-n12: {"available":true}
+fnt-1026c-i2: {"available":true}
+fnt-1026c-n9: {"available":true}

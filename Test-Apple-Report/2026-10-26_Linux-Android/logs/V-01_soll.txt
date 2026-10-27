@@ -1,0 +1,4 @@
+2026-10-26T22:16:44+01:00
+## main...origin/main
+85d9245 Release workflow: "apk" option builds APK and AAB from a ref
+version: 1.2.1+16

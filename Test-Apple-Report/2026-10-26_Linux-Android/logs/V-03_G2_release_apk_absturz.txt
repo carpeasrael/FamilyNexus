@@ -1,0 +1,21 @@
+Release-APK v1.2.1 (16) auf x86_64-Emulator: Absturz
+10-26 22:23:02.129  4054  4054 E AndroidRuntime: java.lang.RuntimeException: java.util.concurrent.ExecutionException: java.lang.UnsatisfiedLinkError: dlopen failed: "/data/data/de.inneso.familynexus/app_lib/libflutter.so" is for EM_AARCH64 (183) instead of EM_X86_64 (62)
+Native Bibliotheken der Release-APK:
+lib/arm64-v8a/libapp.so
+lib/arm64-v8a/libdartjni.so
+lib/arm64-v8a/libflutter.so
+lib/arm64-v8a/libsqlcipher.so
+lib/arm64-v8a/libvodozemac_bindings_dart.so
+lib/armeabi-v7a/libapp.so
+lib/armeabi-v7a/libdartjni.so
+lib/armeabi-v7a/libflutter.so
+lib/armeabi-v7a/libsqlcipher.so
+lib/armeabi-v7a/libvodozemac_bindings_dart.so
+lib/x86_64/libdartjni.so
+lib/x86_64/libsqlcipher.so
+Success
+Performing Streamed Install
+Success
+    versionCode=16 minSdk=26 targetSdk=36
+    versionName=1.2.1
+85d9245 Release workflow: "apk" option builds APK and AAB from a ref
