@@ -96,6 +96,22 @@ void main() {
       await E2e.until(() => c.family != null, what: 'C ist in der Familie');
     });
 
+    test('Familien-Code ohne Link: Ablehnung erreicht den Anfragenden (#43)', () async {
+      final a = await _login('rejca');
+      await a.createFamily('Code-Ablehnung');
+      await E2e.until(() => a.family != null, what: 'Familie bei A');
+      final c = await _login('rejcc');
+      await c.requestToJoinByCode(a.family!.roomId);
+      await E2e.until(() => a.family?.member(c.userId!)?.status == MemberStatus.requested, what: 'A sieht die Anfrage');
+      await E2e.until(() => c.joinRequestPending, what: 'C wartet');
+      await a.rejectRequest(c.userId!);
+      await E2e.until(() => a.family?.member(c.userId!) == null, what: 'Anfrage entfernt');
+      await E2e.until(() => c.joinRequestRejected, what: 'Ablehnung beim Anfragenden sichtbar');
+      expect(c.joinRequestPending, isFalse);
+      await c.cancelJoinRequest();
+      expect(c.joinRequestRejected, isFalse);
+    });
+
     test('Konto-Server im Link: frei wählbar, Heimnetz-Fremdserver und Unsinn werden abgelehnt', () async {
       final a = await _login('insrv');
       await a.createFamily('Server-Familie');
