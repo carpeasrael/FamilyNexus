@@ -78,6 +78,11 @@ void main() {
     expect(find.text('1 von 2 erledigt'), findsOneWidget);
     expect(find.textContaining('Schon am Morgen'), findsWidgets);
     expect(find.text('Müll raus erledigt'), findsOneWidget, reason: 'Verlauf');
+    // #38: Datum in der Schreibweise der App-Sprache, nicht ISO.
+    // Die Uhrzeit folgt der Zeitzone des Rechners (CI: UTC), das Datum der der Liste.
+    expect(find.textContaining('Erledigt am 22.10.2026 um '), findsOneWidget);
+    expect(find.textContaining('Du · 22.10.2026, '), findsOneWidget);
+    expect(find.textContaining('2026-10-22'), findsNothing);
 
     // Nächster Tag in Berlin (ab 22:00 UTC): die Liste ist zurückgesetzt, der Verlauf bleibt.
     now = DateTime.utc(2026, 10, 22, 22, 5);

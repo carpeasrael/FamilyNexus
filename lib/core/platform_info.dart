@@ -1,6 +1,6 @@
 import 'dart:io' show Platform;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform, kIsWeb;
 
 /// Plattformabfragen, die im Browser nicht an `dart:io` scheitern (`Platform` wirft dort).
 class PlatformInfo {
@@ -11,6 +11,13 @@ class PlatformInfo {
   static bool get isMacOS => !kIsWeb && Platform.isMacOS;
   static bool get isWindows => !kIsWeb && Platform.isWindows;
   static bool get isMobile => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+
+  /// Bedienung mit Hardware-Tastatur (Desktop, auch im Browser): Enter schickt Eingaben ab (#37).
+  /// Über `defaultTargetPlatform`, damit Tests die Plattform vorgeben können.
+  static bool get enterSubmits => switch (defaultTargetPlatform) {
+        TargetPlatform.linux || TargetPlatform.windows || TargetPlatform.macOS => true,
+        _ => false,
+      };
 
   /// Gerätename, unter dem die Sitzung beim Anbieter erscheint (z. B. in der Geräteliste).
   static String get deviceName {

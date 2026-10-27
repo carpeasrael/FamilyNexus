@@ -104,6 +104,62 @@ void main() {
       expect(await app.events.all(), isEmpty);
     });
 
+    group('#34: Ende wandert mit dem Beginn; Fehler am Zeitfeld', () {
+      /// Uhrzeit über die Tastatureingabe des Zeitwählers setzen.
+      Future<void> pickTime(WidgetTester tester, String current, int hour, int minute) async {
+        await tester.tap(find.widgetWithText(OutlinedButton, current));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.keyboard_outlined));
+        await tester.pumpAndSettle();
+        final fields = find.descendant(of: find.byType(Dialog), matching: find.byType(TextField));
+        await tester.enterText(fields.at(0), hour.toString().padLeft(2, '0'));
+        await tester.enterText(fields.at(1), minute.toString().padLeft(2, '0'));
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+      }
+
+      /// 24-Stunden-Anzeige wie auf deutsch eingestellten Geräten (sonst arbeitet der Zeitwähler mit AM/PM).
+      void use24h(WidgetTester tester) {
+        tester.platformDispatcher.alwaysUse24HourFormatTestValue = true;
+        addTearDown(tester.platformDispatcher.clearAlwaysUse24HourTestValue);
+      }
+
+      testWidgets('Beginn verschoben: Dauer bleibt, auch über Mitternacht hinweg', (tester) async {
+        use24h(tester);
+        final app = await _app();
+        await _start(tester, app, tab: 'Kalender');
+        await tester.tap(find.byTooltip('Neuer Termin'));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.widgetWithText(TextFormField, 'Titel'), 'Spieleabend');
+        // Vorschlag 12:00–13:00 (jetzt 11:00 Berlin).
+        await pickTime(tester, '12:00', 23, 0);
+        expect(find.widgetWithText(OutlinedButton, '00:00'), findsOneWidget, reason: 'Ende 00:00 am Folgetag');
+        await pickTime(tester, '23:00', 21, 0);
+        expect(find.widgetWithText(OutlinedButton, '22:00'), findsOneWidget);
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        final e = (await app.events.all()).single;
+        expect((e.start, e.end), (DateTime.utc(2026, 3, 20, 20), DateTime.utc(2026, 3, 20, 21)), reason: '21–22 Uhr, nicht bis Mitternacht');
+      });
+
+      testWidgets('Ende vor Beginn: Meldung direkt bei den Zeitfeldern', (tester) async {
+        use24h(tester);
+        final app = await _app();
+        await _start(tester, app, tab: 'Kalender');
+        await tester.tap(find.byTooltip('Neuer Termin'));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.widgetWithText(TextFormField, 'Titel'), 'Falsch herum');
+        await pickTime(tester, '13:00', 10, 0);
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        final msg = find.text('Das Ende liegt vor dem Beginn.');
+        expect(msg, findsOneWidget);
+        expect(await app.events.all(), isEmpty);
+        expect(tester.getTopLeft(msg).dy, lessThan(tester.getTopLeft(find.text('Sichtbarkeit')).dy),
+            reason: 'nicht erst am Formularende');
+      });
+    });
+
     testWidgets('Wiederholung: wöchentlich mit Anzahl', (tester) async {
       final app = await _app();
       await _start(tester, app, tab: 'Kalender');

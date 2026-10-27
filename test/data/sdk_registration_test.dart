@@ -27,6 +27,11 @@ class _Server {
   final Map<String, Object?>? meta;
   _Handler? register;
   _Handler? token;
+  _Handler? login;
+
+  /// Antwort auf alle übrigen Anfragen nach der Anmeldung (z. B. Fehler bei Folgeschritten).
+  _Handler? afterLogin;
+  bool loggedIn = false;
   final List<Map<String, Object?>> registerBodies = <Map<String, Object?>>[];
   final List<Map<String, String>> tokenBodies = <Map<String, String>>[];
   int oidcRegistrations = 0;
@@ -38,6 +43,11 @@ class _Server {
         (int, Object) r;
         if (path == '/_matrix/client/versions') {
           r = (200, <String, Object?>{'versions': <String>['v1.1', version]});
+        } else if (path == '/_matrix/client/v3/login' && req.method == 'POST' && login != null) {
+          r = login!(req, jsonBody());
+          loggedIn = r.$1 == 200;
+        } else if (afterLogin != null && loggedIn && !path.startsWith('/_matrix/client/v3/login')) {
+          r = afterLogin!(req, const <String, Object?>{});
         } else if (path == '/_matrix/client/v3/login') {
           r = (200, <String, Object?>{'flows': <Object?>[<String, Object?>{'type': 'm.login.password'}]});
         } else if (path == '/_matrix/client/v1/auth_metadata' && meta != null) {
@@ -106,6 +116,26 @@ final bool _vodAvailable = Directory(_vodLib).existsSync() &&
 
 void main() {
   setUpAll(sqfliteFfiInit);
+
+  group('#28: Anmeldung gelingt, ein Folgeschritt scheitert', () {
+    test('kein „Unbekannter Fehler.“: die Sitzung steht', () async {
+      final s = _Server();
+      s.login = (req, b) => (200, <String, Object?>{'user_id': '@n2:hs.example', 'access_token': 'tok', 'device_id': 'DEV1'});
+      s.afterLogin = (req, b) => (500, <String, Object?>{'errcode': 'M_UNKNOWN', 'error': 'kaputt'});
+      final g = await _gateway(s);
+      await g.login(server: _hs, username: 'n2', password: 'geheim123');
+      expect(g.session, SessionState.ready);
+      expect(g.userId, '@n2:hs.example');
+    });
+
+    test('falsches Passwort bleibt ein Fehler', () async {
+      final s = _Server();
+      s.login = (req, b) => (403, <String, Object?>{'errcode': 'M_FORBIDDEN', 'error': 'Invalid password'});
+      final g = await _gateway(s);
+      await expectLater(g.login(server: _hs, username: 'n2', password: 'falsch123'), _error(GatewayError.invalidCredentials));
+      expect(g.session, SessionState.loggedOut);
+    });
+  });
 
   group('UIA-Registrierung (SdkMatrixGateway)', () {
     test('Bedingungen → Captcha: Sitzung und erledigte Schritte werden weitergegeben, Captcha-Seite des Servers', () async {

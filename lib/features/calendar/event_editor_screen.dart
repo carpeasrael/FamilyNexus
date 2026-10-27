@@ -55,6 +55,10 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
   bool _saving = false;
   String? _error;
 
+  /// Fehler zu Beginn/Ende: steht direkt unter den Zeitfeldern (#34).
+  String? _timeError;
+  final GlobalKey _errorKey = GlobalKey();
+
   CalendarEvent? get _ex => widget.existing;
   tz.Location get _zone => widget.controller.zone;
 
@@ -146,13 +150,32 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
     setState(() {
       final utc = DateTime.utc(d.year, d.month, d.day);
       if (start) {
-        final shift = utc.difference(_startDate);
-        _startDate = utc;
-        _endDate = _endDate.add(shift);
+        _moveStart(utc, _startTime);
       } else {
         _endDate = utc;
       }
+      _timeError = null;
     });
+  }
+
+  /// Wanduhrzeit als UTC-Wert, nur zum Rechnen mit Differenzen.
+  static DateTime _wall(DateTime date, TimeOfDay t) => DateTime.utc(date.year, date.month, date.day, t.hour, t.minute);
+
+  /// Verschiebt den Beginn; das Ende wandert mit, die Dauer bleibt gleich (#34).
+  void _moveStart(DateTime date, TimeOfDay time) {
+    var duration = _wall(_endDate, _endTime).difference(_wall(_startDate, _startTime));
+    if (duration.isNegative) duration = const Duration(hours: 1);
+    if (_allDay) {
+      final days = _endDate.difference(_startDate).inDays;
+      _startDate = date;
+      _endDate = DateTime.utc(date.year, date.month, date.day + (days < 0 ? 0 : days));
+      return;
+    }
+    final end = _wall(date, time).add(duration);
+    _startDate = date;
+    _startTime = time;
+    _endDate = DateTime.utc(end.year, end.month, end.day);
+    _endTime = TimeOfDay(hour: end.hour, minute: end.minute);
   }
 
   Future<void> _pickTime({required bool start}) async {
@@ -160,17 +183,11 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
     if (t == null) return;
     setState(() {
       if (start) {
-        final before = _startTime.hour * 60 + _startTime.minute;
-        final after = t.hour * 60 + t.minute;
-        final endMin = (_endTime.hour * 60 + _endTime.minute) + (after - before);
-        _startTime = t;
-        if (_startDate == _endDate) {
-          final m = endMin.clamp(0, 24 * 60 - 1);
-          _endTime = TimeOfDay(hour: m ~/ 60, minute: m % 60);
-        }
+        _moveStart(_startDate, t);
       } else {
         _endTime = t;
       }
+      _timeError = null;
     });
   }
 
@@ -197,9 +214,21 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
     );
   }
 
+  /// Zeigt einen Fehler am Formularende und scrollt dorthin (#34).
+  void _showError(String text) {
+    setState(() => _error = text);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final c = _errorKey.currentContext;
+      if (c != null && c.mounted) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 250)).ignore();
+    });
+  }
+
   Future<void> _save() async {
     final l = AppLocalizations.of(context);
-    setState(() => _error = null);
+    setState(() {
+      _error = null;
+      _timeError = null;
+    });
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final DateTime start;
     final DateTime end;
@@ -211,11 +240,11 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
       end = _combine(_endDate, _endTime);
     }
     if (end.isBefore(start)) {
-      setState(() => _error = l.eventEndBeforeStart);
+      setState(() => _timeError = l.eventEndBeforeStart);
       return;
     }
     if (_end == _End.until && (_until == null || _until!.isBefore(DateTime.utc(_startDate.year, _startDate.month, _startDate.day)))) {
-      setState(() => _error = l.repeatUntilInvalid);
+      _showError(l.repeatUntilInvalid);
       return;
     }
     setState(() => _saving = true);
@@ -259,7 +288,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
       }
       if (mounted) nav.pop();
     } on CalendarException {
-      if (mounted) setState(() => _error = l.eventSaveError);
+      if (mounted) _showError(l.eventSaveError);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -299,6 +328,14 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
                 SwitchListTile(contentPadding: EdgeInsets.zero, title: Text(l.eventAllDay), value: _allDay, onChanged: (v) => setState(() => _allDay = v)),
                 _dateRow(l.eventStart, sd(_startDate), _allDay ? null : st(_startTime), () => _pickDate(start: true), () => _pickTime(start: true)),
                 _dateRow(l.eventEnd, sd(_endDate), _allDay ? null : st(_endTime), () => _pickDate(start: false), () => _pickTime(start: false)),
+                if (_timeError != null)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Semantics(liveRegion: true, child: Text(_timeError!, style: TextStyle(color: t.danger))),
+                    ),
+                  ),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(l.eventTimeZone(widget.controller.zoneName), style: Theme.of(context).textTheme.bodySmall),
@@ -399,6 +436,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
             ),
             if (_error != null)
               Padding(
+                key: _errorKey,
                 padding: const EdgeInsets.only(top: 12),
                 child: Semantics(liveRegion: true, child: Text(_error!, style: TextStyle(color: t.danger))),
               ),

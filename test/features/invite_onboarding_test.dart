@@ -124,7 +124,7 @@ void main() {
       expect(find.text('Schritt 1 von 4'), findsOneWidget);
       await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), 'kein link');
       await _tap(tester, 'Weiter');
-      expect(find.text('Das ist kein Einladungslink. Ein Einladungslink beginnt mit „familynexus://join“.'), findsOneWidget);
+      expect(find.text('Das ist kein Einladungslink. Ein Einladungslink beginnt mit „https://carpeasrael.github.io/FamilyNexus/join/“ oder „familynexus://join“.'), findsOneWidget);
       await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), s.link);
       await _tap(tester, 'Weiter');
       expect(find.text('Schritt 2 von 4'), findsOneWidget);

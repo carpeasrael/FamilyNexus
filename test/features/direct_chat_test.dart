@@ -163,5 +163,47 @@ void main() {
       expect(find.byType(ChoiceChip), findsNothing);
       expect(find.text('Ende-zu-Ende-verschlüsselt'), findsOneWidget);
     });
+    group('#31: „Nachricht schreiben“, wenn der Einzelchat erst später erscheint', () {
+      Future<TestApp> open(WidgetTester tester) async {
+        tester.view.physicalSize = const Size(900, 3000);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final app = await buildTestApp();
+        await _joinBen(app);
+        app.gateway.delayNewDirectChats = true;
+        await tester.pumpWidget(FamilyNexusApp(services: app.services));
+        await tester.pumpAndSettle();
+        await _tab(tester, 'Familie');
+        await tester.tap(find.byTooltip('Nachricht schreiben: Ben'));
+        await tester.pump();
+        await tester.pump();
+        return app;
+      }
+
+      testWidgets('wartet auf den Einzelchat statt den Familienchat zu zeigen; nichts geht an alle', (tester) async {
+        final app = await open(tester);
+        expect(find.text('Einzelchat wird geöffnet …'), findsOneWidget);
+        expect(find.text('Ende-zu-Ende-verschlüsselt'), findsNothing, reason: 'kein Rückfall auf den Familienchat');
+        expect(find.byType(TextField), findsNothing, reason: 'ohne Gespräch kein Eingabefeld');
+
+        app.gateway.hiddenThreads.clear();
+        app.server.notifyAll();
+        await tester.pumpAndSettle();
+        expect(find.text('Nur zwischen dir und Ben, Ende-zu-Ende-verschlüsselt'), findsOneWidget);
+        await tester.enterText(find.byType(TextField), 'Nur für Ben');
+        await tester.tap(find.byTooltip('Senden'));
+        await tester.pumpAndSettle();
+        expect(app.gateway.messages, isEmpty, reason: 'nicht im Familienchat');
+        expect(app.gateway.messagesIn(app.gateway.threads.last.id).single.body, 'Nur für Ben');
+      });
+
+      testWidgets('erscheint er nicht, Hinweis und zurück zum Familienchat', (tester) async {
+        await open(tester);
+        await tester.pump(const Duration(seconds: 21));
+        await tester.pumpAndSettle();
+        expect(find.text('Der Einzelchat konnte nicht geöffnet werden. Bitte versuche es erneut.'), findsOneWidget);
+        expect(find.text('Ende-zu-Ende-verschlüsselt'), findsOneWidget);
+      });
+    });
   });
 }

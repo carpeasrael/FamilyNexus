@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
+import '../../core/platform_info.dart';
 import '../../domain/shopping.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/tokens.dart';
@@ -121,6 +122,8 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
                   textCapitalization: TextCapitalization.sentences,
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(hintText: l.shoppingHintItem),
+                  // Desktop: Enter fügt hinzu; mobil springt „Weiter“ zur Menge (#37).
+                  onSubmitted: PlatformInfo.enterSubmits ? (_) => _add(c) : null,
                 ),
               ),
               const SizedBox(width: 8),

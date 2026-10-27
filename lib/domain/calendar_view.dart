@@ -46,14 +46,24 @@ class CalendarView {
   ) {
     final from = startOfDay(loc, day).toUtc();
     final to = endOfDay(loc, day).toUtc();
-    final out = all.where((o) => o.overlaps(from, to)).toList()..sort(compare);
+    final out = all.where((o) => o.overlaps(from, to)).toList()..sort(compareInDay);
     return out;
   }
 
-  static int compare(Occurrence a, Occurrence b) {
+  /// Innerhalb eines Tages: ganztägige zuerst, dann nach Beginn.
+  static int compareInDay(Occurrence a, Occurrence b) {
     if (a.event.allDay != b.event.allDay) return a.event.allDay ? -1 : 1;
     final c = a.start.compareTo(b.start);
     return c != 0 ? c : a.event.title.compareTo(b.event.title);
+  }
+
+  /// Über mehrere Tage (z. B. „Nächste Termine“): nach Beginn. Ganztägige Termine beginnen um
+  /// Mitternacht und stehen so am Anfang ihres Tages, nie vor Terminen früherer Tage (#33).
+  static int compare(Occurrence a, Occurrence b) {
+    final c = a.start.compareTo(b.start);
+    if (c != 0) return c;
+    if (a.event.allDay != b.event.allDay) return a.event.allDay ? -1 : 1;
+    return a.event.title.compareTo(b.event.title);
   }
 
   /// Gruppiert [occurrences] nach lokalem Starttag (für die Agenda). Mehrtägige

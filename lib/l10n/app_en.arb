@@ -919,7 +919,7 @@
       }
     }
   },
-  "tasksHistoryLine": "{name} · {date} {time}",
+  "tasksHistoryLine": "{name} · {date}, {time}",
   "@tasksHistoryLine": {
     "placeholders": {
       "name": {
@@ -1380,7 +1380,7 @@
     }
   },
   "tasksDescriptionTooLong": "The description is too long. Please shorten it a little.",
-  "joinLinkNotALink": "This is not an invitation link. An invitation link starts with “familynexus://join”.",
+  "joinLinkNotALink": "This is not an invitation link. An invitation link starts with “https://carpeasrael.github.io/FamilyNexus/join/” or “familynexus://join”.",
   "joinLinkDamaged": "The link is incomplete or damaged – this often happens when forwarding it. Please copy it again completely or scan the QR code.",
   "joinLinkExpired": "This invitation link has expired. Please ask the person inviting you for a new link.",
   "joinLinkNewerVersion": "This link comes from a newer version of FamilyNexus. Please update the app and try again.",
@@ -1588,5 +1588,10 @@
   "accountDeleteOpenAgain": "Open page again",
   "accountDeleteCheck": "Check deletion",
   "accountDeleteStillActive": "The account still exists. Finish the deletion on the provider's page.",
-  "accountDeleteNoBrowser": "The browser could not be opened."
+  "accountDeleteNoBrowser": "The browser could not be opened.",
+  "chatOpening": "Opening private chat …",
+  "chatOpenFailed": "The private chat could not be opened. Please try again.",
+  "chatBeforeJoin": "Older messages from before you joined cannot be read.",
+  "errWrongPassword": "The password is not correct.",
+  "syncSlow": "This is taking longer than usual. Check your internet connection or try again."
 }

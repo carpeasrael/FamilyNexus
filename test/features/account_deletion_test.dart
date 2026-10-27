@@ -58,6 +58,8 @@ void main() {
     await tester.tap(confirm);
     await tester.pumpAndSettle();
     expect(find.text('Konto löschen?'), findsOneWidget, reason: 'Dialog bleibt offen');
+    expect(find.text('Das Passwort stimmt nicht.'), findsOneWidget, reason: '#36: nur das Passwort ist gefragt');
+    expect(find.text('Benutzername oder Passwort stimmen nicht.'), findsNothing);
     expect(app.server.deactivated, isEmpty);
     expect(app.services.accountDeletionPending, isFalse);
     expect(resets, 0);

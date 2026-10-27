@@ -1611,7 +1611,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String tasksHistoryLine(String name, String date, String time) {
-    return '$name · $date $time';
+    return '$name · $date, $time';
   }
 
   @override
@@ -2314,7 +2314,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get joinLinkNotALink =>
-      'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „familynexus://join“.';
+      'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „https://carpeasrael.github.io/FamilyNexus/join/“ oder „familynexus://join“.';
 
   @override
   String get joinLinkDamaged =>
@@ -2676,4 +2676,22 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get accountDeleteNoBrowser =>
       'Der Browser konnte nicht geöffnet werden.';
+
+  @override
+  String get chatOpening => 'Einzelchat wird geöffnet …';
+
+  @override
+  String get chatOpenFailed =>
+      'Der Einzelchat konnte nicht geöffnet werden. Bitte versuche es erneut.';
+
+  @override
+  String get chatBeforeJoin =>
+      'Ältere Nachrichten aus der Zeit vor deinem Beitritt sind nicht lesbar.';
+
+  @override
+  String get errWrongPassword => 'Das Passwort stimmt nicht.';
+
+  @override
+  String get syncSlow =>
+      'Das dauert länger als üblich. Prüfe die Internetverbindung oder versuche es erneut.';
 }

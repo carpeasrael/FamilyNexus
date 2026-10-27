@@ -2777,7 +2777,7 @@ abstract class AppLocalizations {
   /// No description provided for @tasksHistoryLine.
   ///
   /// In de, this message translates to:
-  /// **'{name} · {date} {time}'**
+  /// **'{name} · {date}, {time}'**
   String tasksHistoryLine(String name, String date, String time);
 
   /// No description provided for @tasksInvalid.
@@ -3947,7 +3947,7 @@ abstract class AppLocalizations {
   /// No description provided for @joinLinkNotALink.
   ///
   /// In de, this message translates to:
-  /// **'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „familynexus://join“.'**
+  /// **'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „https://carpeasrael.github.io/FamilyNexus/join/“ oder „familynexus://join“.'**
   String get joinLinkNotALink;
 
   /// No description provided for @joinLinkDamaged.
@@ -4531,6 +4531,36 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Der Browser konnte nicht geöffnet werden.'**
   String get accountDeleteNoBrowser;
+
+  /// No description provided for @chatOpening.
+  ///
+  /// In de, this message translates to:
+  /// **'Einzelchat wird geöffnet …'**
+  String get chatOpening;
+
+  /// No description provided for @chatOpenFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Einzelchat konnte nicht geöffnet werden. Bitte versuche es erneut.'**
+  String get chatOpenFailed;
+
+  /// No description provided for @chatBeforeJoin.
+  ///
+  /// In de, this message translates to:
+  /// **'Ältere Nachrichten aus der Zeit vor deinem Beitritt sind nicht lesbar.'**
+  String get chatBeforeJoin;
+
+  /// No description provided for @errWrongPassword.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Passwort stimmt nicht.'**
+  String get errWrongPassword;
+
+  /// No description provided for @syncSlow.
+  ///
+  /// In de, this message translates to:
+  /// **'Das dauert länger als üblich. Prüfe die Internetverbindung oder versuche es erneut.'**
+  String get syncSlow;
 }
 
 class _AppLocalizationsDelegate

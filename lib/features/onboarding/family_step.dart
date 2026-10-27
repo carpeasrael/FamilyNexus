@@ -10,6 +10,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
 import '../common/error_text.dart';
 import '../common/invite_link_text.dart';
+import '../common/syncing_view.dart';
 import '../family/invite_dialog.dart';
 
 /// Was der Familienschritt zuerst zeigt: gründen (Weg „Neue Familie“), beitreten (Weg „Eingeladen“)
@@ -170,13 +171,7 @@ class _FamilyStepState extends State<FamilyStep> {
     return ListenableBuilder(
       listenable: Listenable.merge(<Listenable>[g, _services.pendingInvite]),
       builder: (context, _) {
-        if (!g.initialSyncDone) {
-          return Row(children: <Widget>[
-            const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
-            const SizedBox(width: 12),
-            Text(l.syncing),
-          ]);
-        }
+        if (!g.initialSyncDone) return SyncingView(gateway: g);
         final created = _createdName;
         if (created != null) return _createdView(l, created);
         // Das Konto gehört bereits zu einer Familie (z. B. Anmeldung an einem weiteren Gerät):
