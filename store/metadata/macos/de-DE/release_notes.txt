@@ -8,3 +8,4 @@ Neu in 1.2.1:
 • Die Versionsanzeige nennt die Build-Nummer.
 • Nach „Alle lokalen Daten löschen“ oder „Konto löschen“ startet die App wieder mit der Startseite statt mit der Anmeldung.
 • Behoben: „Nachricht schreiben“ öffnet zuverlässig den Einzelchat; Termine: das Ende wandert mit dem Beginn; Bilder im Chat lassen sich speichern; deutsche Datumsangaben bei Aufgaben; weitere Korrekturen aus den Tests.
+• Außerdem: Die Synchronisierung bietet nach 30 Sekunden „Erneut versuchen“ an; falsches Passwort beim Konto löschen wird klar gemeldet; Bestätigungs-Emojis haben deutsche Namen; „Nächste Termine“ sind nach Beginn sortiert; Mac: Enter sendet Nachrichten (Umschalt+Enter = neue Zeile).
