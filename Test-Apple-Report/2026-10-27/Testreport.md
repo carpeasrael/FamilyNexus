@@ -20,16 +20,16 @@ V-01 ✅ (main = origin/main, 1.2.1+17). V-02 ✅ (Mac /Applications: Build 16 �
 
 ## 3. Zusammenfassung
 
-| Ergebnis | Anzahl Schritte (104, wie im PDF) |
+| Ergebnis | Anzahl Schritte (104, wie im PDF, Stand nach Nachlauf 28.10.) |
 |---|---|
-| ✅ bestanden | 84 |
-| ⚠️ bestanden mit Befund / teilweise | 9 (A-07, B-01, B-03, B-19, B-21, D-02, E-05, E-21, E-25) |
+| ✅ bestanden | 94 |
+| ⚠️ bestanden mit Befund | 5 (A-07, B-03, D-02, E-21, E-25) |
 | ❌ fehlgeschlagen | 0 |
-| ⏳ nicht ausgeführt | 11 (V-07, B-17, B-18, B-20, D-07, E-12, E-17, G-04, G-06, G-07, G-08) |
+| ⏳ nicht ausgeführt | 5 (V-07, D-07, G-06, G-07, G-08) |
 
-Englischer Report mit Bildern: `Testreport_FamilyNexus_EN_AURORA.pdf` (Schritt-Übersicht, Befunde, Details je Schritt mit Screenshots).
+**Nachlauf 28.10.2026 (00:00):** B-01, B-17 bis B-21, E-05, E-12, E-17 und G-04 mit neuem Konto `fnt-1027b-n1`/`-i2` nachgeholt (danach gelöscht, curl-Anmeldung 403). Nicht geprüft: Bild-Anhang in E-17, Mailprogramm in E-05, sauberer Aus/An-Vergleich in B-18.
 
-**Abnahme (Abschnitt 7): nicht bestanden.** Es bestehen ⏳-Schritte (V-07, B-17, B-18, B-20, E-12, E-17, G-06 und Teile von B-19, B-21, E-05), die vor der Antwort an Apple nachgeholt werden müssen; B-17/B-18 gehen nur auf einem echten iPhone mit Gerätesperre. Zusätzlich fehlen die ⚠️-Befunde als angelegte Issues (nicht angelegt).
+**Abnahme (Abschnitt 7): weiter nicht bestanden**, solange G-06 (Review-Notizen manuell) und V-07 offen sind; D-07, G-07 und G-08 sind optional bzw. n/a. B-17/B-18 wurden im Simulator mit Face ID geprüft, ein Lauf auf einem echten iPhone steht aus.
 
 ## 4. Befundliste
 

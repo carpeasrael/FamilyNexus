@@ -1,0 +1,255 @@
+   Compiling proc-macro2 v1.0.94
+   Compiling unicode-ident v1.0.18
+   Compiling libc v0.2.171
+   Compiling typenum v1.18.0
+   Compiling version_check v0.9.5
+   Compiling cfg-if v1.0.0
+   Compiling serde v1.0.219
+   Compiling autocfg v1.4.0
+   Compiling subtle v2.6.1
+   Compiling object v0.36.7
+   Compiling semver v1.0.26
+   Compiling memchr v2.7.4
+   Compiling generic-array v0.14.7
+   Compiling shlex v1.3.0
+   Compiling cc v1.2.18
+   Compiling slab v0.4.9
+   Compiling gimli v0.31.1
+   Compiling adler2 v2.0.0
+   Compiling equivalent v1.0.2
+   Compiling zerocopy v0.8.24
+   Compiling hashbrown v0.15.2
+   Compiling miniz_oxide v0.8.8
+   Compiling addr2line v0.24.2
+   Compiling getrandom v0.2.15
+   Compiling rand_core v0.6.4
+   Compiling quote v1.0.40
+   Compiling indexmap v2.9.0
+   Compiling lock_api v0.4.12
+   Compiling syn v2.0.100
+   Compiling anyhow v1.0.97
+   Compiling futures-core v0.3.31
+   Compiling pin-project-lite v0.2.16
+   Compiling parking_lot_core v0.9.10
+   Compiling futures-sink v0.3.31
+   Compiling rustc-demangle v0.1.24
+   Compiling winnow v0.7.6
+   Compiling futures-channel v0.3.31
+   Compiling crypto-common v0.1.6
+   Compiling block-buffer v0.10.4
+   Compiling block-padding v0.3.3
+   Compiling proc-macro-error-attr2 v2.0.0
+   Compiling digest v0.10.7
+   Compiling inout v0.1.4
+   Compiling cpufeatures v0.2.17
+   Compiling scopeguard v1.2.0
+   Compiling futures-io v0.3.31
+   Compiling smallvec v1.15.0
+   Compiling thiserror v1.0.69
+   Compiling either v1.15.0
+   Compiling futures-task v0.3.31
+   Compiling pin-utils v0.1.0
+   Compiling itertools v0.14.0
+   Compiling proc-macro-error2 v2.0.1
+   Compiling hmac v0.12.1
+   Compiling universal-hash v0.5.1
+   Compiling syn v3.0.3
+   Compiling dart-sys v4.1.5
+   Compiling oslog v0.2.0
+   Compiling once_cell v1.21.3
+   Compiling hashbrown v0.14.5
+   Compiling signature v2.2.0
+   Compiling build-target v0.4.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling opaque-debug v0.3.1
+   Compiling portable-atomic v1.15.0
+   Compiling thiserror v2.0.19
+   Compiling serde_json v1.0.140
+   Compiling dashmap v5.5.3
+   Compiling backtrace v0.3.74
+   Compiling rand_chacha v0.3.1
+   Compiling poly1305 v0.8.0
+   Compiling flutter_rust_bridge v2.13.0
+   Compiling md-5 v0.10.6
+   Compiling sha2 v0.10.9
+   Compiling thiserror-impl v2.0.19
+   Compiling aead v0.5.2
+   Compiling num_cpus v1.16.0
+   Compiling itoa v1.0.15
+   Compiling bytes v1.12.1
+   Compiling atomic v0.5.3
+   Compiling log v0.4.27
+   Compiling ryu v1.0.20
+   Compiling hex v0.4.3
+   Compiling threadpool v1.8.1
+   Compiling rand v0.8.8
+   Compiling hkdf v0.12.4
+   Compiling tokio v1.44.2
+   Compiling lazy_static v1.5.0
+   Compiling base64 v0.22.1
+   Compiling serde_derive v1.0.219
+   Compiling zeroize_derive v1.5.0
+   Compiling futures-macro v0.3.31
+   Compiling thiserror-impl v1.0.69
+   Compiling prost-derive v0.14.4
+   Compiling allo-isolate v0.1.27
+   Compiling zeroize v1.9.0
+   Compiling flutter_rust_bridge_macros v2.13.0
+   Compiling futures-util v0.3.31
+   Compiling cipher v0.4.4
+   Compiling delegate-attr v0.3.0
+   Compiling base64ct v1.8.3
+   Compiling chacha20 v0.9.1
+   Compiling cbc v0.1.2
+   Compiling chacha20poly1305 v0.10.1
+   Compiling aes v0.8.4
+   Compiling byteorder v1.5.0
+   Compiling ctr v0.9.2
+   Compiling pbkdf2 v0.12.2
+   Compiling prost v0.14.4
+   Compiling futures-executor v0.3.31
+   Compiling futures v0.3.31
+   Compiling toml_datetime v0.6.8
+   Compiling serde_spanned v0.6.8
+   Compiling toml_edit v0.22.24
+   Compiling rustc_version v0.4.1
+   Compiling ed25519 v2.2.3
+   Compiling serde_bytes v0.11.17
+   Compiling arrayvec v0.7.6
+   Compiling curve25519-dalek v4.1.3
+   Compiling x25519-dalek v2.0.1
+   Compiling ed25519-dalek v2.1.1
+   Compiling proc-macro-crate v3.3.0
+   Compiling matrix-pickle-derive v0.2.1
+   Compiling matrix-pickle v0.2.1
+   Compiling vodozemac v0.10.0
+   Compiling vodozemac_bindings_dart v0.1.0 (/Users/carpeasrael/.pub-cache/hosted/pub.dev/flutter_vodozemac-0.9.0/rust)
+    Finished `release` profile [optimized] target(s) in 17.85s
+Synapse bereit: https://localhost:18448
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.2 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  file_picker 13.1.0 (13.3.0 available)
+  file_picker_darwin 2.3.2 (2.4.0 available)
+  flutter_local_notifications 22.3.2 (22.3.3 available)
+  hooks 2.0.2 (2.2.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.3 (1.19.0 available)
+  native_toolchain_c 0.19.2 (0.19.5 available)
+  objective_c 9.5.0 (9.6.2 available)
+  petitparser 7.0.2 (7.1.0 available)
+  posix 6.5.2 (6.5.3 available)
+  record_use 0.6.0 (1.1.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common_ffi 2.4.4 (2.4.5 available)
+  sqlite3 3.5.2 (3.8.0 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.4 available)
+  web 1.1.1 (1.1.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+22 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sdk_registration_test.dart
+00:00 +0: (setUpAll)
+00:00 +0: #28: Anmeldung gelingt, ein Folgeschritt scheitert kein „Unbekannter Fehler.“: die Sitzung steht
+00:00 +1: #28: Anmeldung gelingt, ein Folgeschritt scheitert falsches Passwort bleibt ein Fehler
+00:00 +2: UIA-Registrierung (SdkMatrixGateway) Bedingungen → Captcha: Sitzung und erledigte Schritte werden weitergegeben, Captcha-Seite des Servers
+00:00 +3: UIA-Registrierung (SdkMatrixGateway) falscher Zugangscode → „passt nicht“; Code wird im Feld token gesendet
+00:00 +4: UIA-Registrierung (SdkMatrixGateway) Platzhalterschritt (dummy) wird selbst erledigt; Endlosschleife des Servers wird abgebrochen
+00:00 +5: UIA-Registrierung (SdkMatrixGateway) nur nicht unterstützte Abläufe → registrationDisabled
+00:00 +6: UIA-Registrierung (SdkMatrixGateway) Fehlerzuordnung: vergeben, ungültig, schwaches Passwort, abgeschaltet
+00:00 +7: UIA-Registrierung (SdkMatrixGateway) Abbrechen verwirft die Registrierung samt Passwort; Anmelden ebenso (R4)
+00:00 +8: UIA-Registrierung (SdkMatrixGateway) lokale Prüfungen vor jeder Anfrage
+00:00 +9: OAuth (SdkMatrixGateway) (setUpAll)
+00:00 +9: OAuth (SdkMatrixGateway) Start: dynamische Client-Anmeldung, PKCE S256, state, prompt=create
+00:00 +10: OAuth (SdkMatrixGateway) R12 unsicherer Token-Endpunkt: Abbruch, bevor sich die App beim Anbieter anmeldet
+00:00 +11: OAuth (SdkMatrixGateway) nur eigene Rücksprungadressen; fremder state wird verworfen, Anmeldung bleibt offen (R8)
+00:00 +12: OAuth (SdkMatrixGateway) Ablehnung beim Anbieter (error=access_denied) beendet die Anmeldung
+00:00 +13: OAuth (SdkMatrixGateway) Desktop-Rücksprung über 127.0.0.1 wird angenommen, Fragment und Query werden gelesen
+00:00 +14: OAuth (SdkMatrixGateway) (tearDownAll)
+00:00 +14: (tearDownAll)
+00:00 +14: All tests passed!
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.2 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  file_picker 13.1.0 (13.3.0 available)
+  file_picker_darwin 2.3.2 (2.4.0 available)
+  flutter_local_notifications 22.3.2 (22.3.3 available)
+  hooks 2.0.2 (2.2.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.3 (1.19.0 available)
+  native_toolchain_c 0.19.2 (0.19.5 available)
+  objective_c 9.5.0 (9.6.2 available)
+  petitparser 7.0.2 (7.1.0 available)
+  posix 6.5.2 (6.5.3 available)
+  record_use 0.6.0 (1.1.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common_ffi 2.4.4 (2.4.5 available)
+  sqlite3 3.5.2 (3.8.0 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.4 available)
+  web 1.1.1 (1.1.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+22 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart
+00:00 +0: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart: Gateway gegen echten Synapse Anmeldung, Familie anlegen, verschlüsselt chatten
+00:01 +1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart: Gateway gegen echten Synapse falsche Zugangsdaten werden als invalidCredentials gemeldet
+00:01 +2: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart: Gateway gegen echten Synapse createFamily überschreibt keine bestehende Familie
+00:02 +3: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart
+00:02 +3: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Kontolöschung (#12) gegen echten Synapse Passwort-Konto: falsches Passwort scheitert, danach gelöscht, Familie verlassen, Anmeldung unmöglich
+00:05 +4: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart
+00:05 +4: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Link eines Moderators: ein zweiter Moderator prüft und bestätigt die Anfrage
+00:10 +5: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Link mit automatischer Bestätigung: die App des Moderators lädt ohne Klick ein, nur einmal
+00:12 +6: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Familien-Code ohne Link: Moderator sieht die Anfrage als „Code“, nichts geschieht von allein, Bestätigung führt zum Beitritt
+00:17 +7: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Konto-Server im Link: frei wählbar, Heimnetz-Fremdserver und Unsinn werden abgelehnt
+00:18 +8: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Per Matrix-ID eingeladenes Konto findet die Einladung nach der Anmeldung
+00:20 +9: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart
+00:20 +9: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Ersteinrichtung: Wiederherstellungsschlüssel, Cross-Signing, Gerät verifiziert
+00:21 +10: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse zweites Gerät: Emoji-Verifizierung mit dem ersten
+00:22 +11: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Abbruch: abweichende Emoji → keine Verifizierung
+00:23 +12: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Wiederherstellung mit Schlüssel: falscher Schlüssel scheitert, richtiger verifiziert und entschlüsselt alte Nachrichten
+00:31 +13: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse neuer Schlüssel (#11): alter scheitert, neuer verifiziert und entschlüsselt alte Nachrichten
+00:38 +14: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Unverifiziertes Gerät erhält keine Raumschlüssel; nach Verifizierung neue Nachrichten lesbar
+00:41 +15: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_moderation_e2e_test.dart
+00:41 +15: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_moderation_e2e_test.dart: Melden gegen echten Synapse fremde Nachricht wird gemeldet, eigene und unbekannte werden abgelehnt
+00:44 +16: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart
+00:44 +16: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart: (setUpAll)
+00:44 +16: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart: Kalender über den echten Synapse geteilte und private Termine: verschlüsselt, getrennte Räume, Signale auch für späte Zuhörer
+00:46 +17: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart: (tearDownAll)
+00:46 +17: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart
+00:46 +17: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Online-Status: verschlüsselt zugestellt, Anfrage wird beantwortet, Fremde und Klartext werden ignoriert
+00:57 +18: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einzelchat: verschlüsselt, automatische Annahme, getrennt vom Familienchat, nach Entfernen gesperrt
+01:01 +19: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einzelchat-Einladung von Fremden wird weder angenommen noch als Familieneinladung gezeigt
+01:08 +20: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einkaufszettel: verschlüsselt im Familienraum, beide Mitglieder erhalten Einträge, Server sieht keinen Klartext
+01:11 +21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Issue #1: Liste v2 (Erklärung, monatlich am letzten Freitag) wird verschlüsselt übertragen und gleich gelesen
+01:13 +22: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Aufgabenlisten: Liste und Protokolleintrag verschlüsselt im Familienraum, Server sieht keinen Klartext
+01:16 +23: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart
+01:16 +23: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-01 Registrierungsweg wird erkannt; Name frei → Konto in der App angelegt → Name vergeben
+01:18 +24: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-02 lokale Prüfungen vor dem Senden: ungültiger Name, zu kurzes Passwort
+01:18 +25: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-03 Neuling: Konto anlegen → Link v2 mit Namen → Anfrage → Moderatorin sieht den Namen → bestätigt → Mitglied
+01:19 +26: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) Issue #6: Link einer Familie auf einem Heimnetz-Server (localhost) vor der Anmeldung lesen und beitreten
+01:21 +27: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-04 direkte Einladung zeigt den Namen der einladenden Person
+01:22 +28: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-05 Abbruch: Registrierung lässt sich verwerfen, danach erneut starten
+01:23 +29: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart
+01:23 +29: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Beitritt per Link: Anfrage → Bestätigung → Annahme; Chat wird entschlüsselt
+01:26 +30: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Einladungslink: gefälschte ID nicht bestätigbar, Link nur einmal verwendbar, Identität vermerkt
+01:29 +31: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Mitglied hat keine Verwaltungsrechte – im Gateway UND auf dem Server
+01:31 +32: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Ernennen, Umbenennen, Moderatoren sind gleichrangig
+01:34 +33: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Issue #7: Mitglied zum Moderator hochstufen – auch durch einen ernannten Moderator und mehrfach hintereinander
+01:40 +34: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Issue #7: zwei Ernennungen unmittelbar hintereinander (veralteter Zwischenspeicher)
+01:43 +35: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Issue #9: Ersteller ist im Raum Administrator (100), in der App Moderator; Moderator bleibt bei 50
+01:46 +36: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Ablehnen einer Anfrage und abgelaufene/ungültige Links
+01:57 +37: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Entfernen rotiert den Raumschlüssel; Entfernte lesen neue Nachrichten nicht
+02:02 +38: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Einladung per Matrix-ID und Ablehnen einer Einladung
+02:03 +39: All tests passed!
+Test-Homeserver entfernt
+exit=0
