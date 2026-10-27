@@ -320,7 +320,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (f == null) return const <ChatThread>[];
     final dms = <ChatThread>[
       for (final r in fake.dmRooms.values)
-        if (_roomOf(r.id) != null)
+        if (_roomOf(r.id) != null && !hiddenThreads.contains(r.id))
           ChatThread(
             id: r.id,
             kind: ThreadKind.direct,
@@ -377,7 +377,16 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   @override
-  bool get initialSyncDone => true;
+  bool get initialSyncDone => syncDone;
+
+  /// Für Tests: erster Abgleich noch nicht fertig („Synchronisiere …“).
+  bool syncDone = true;
+  int syncRetries = 0;
+
+  @override
+  Future<void> retrySync() async {
+    syncRetries++;
+  }
 
   final Map<String, int> _read = <String, int>{};
 
@@ -1212,6 +1221,11 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     throw const GatewayException(GatewayError.notFound);
   }
 
+  /// Für Tests (#31): Ein neu eröffneter Einzelchat erscheint erst später in [threads] – wie beim echten
+  /// Server, wo der Raum erst mit einem späteren Abgleich vollständig geladen ist.
+  bool delayNewDirectChats = false;
+  final Set<String> hiddenThreads = <String>{};
+
   @override
   Future<String> startDirectChat(String userId) async {
     _requireSession();
@@ -1223,6 +1237,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       if (r.dmMembers.contains(_userId) && r.dmMembers.contains(userId)) return r.id;
     }
     final room = FakeRoom('${fake.nextId('!dm')}:${fake.host}', 'dm')..dmMembers.addAll(<String>[_userId!, userId]);
+    if (delayNewDirectChats) hiddenThreads.add(room.id);
     fake.dmRooms[room.id] = room;
     fake.notifyAll();
     return room.id;

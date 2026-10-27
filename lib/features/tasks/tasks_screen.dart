@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../app/app_services.dart';
 import '../../domain/family.dart';
+import '../../domain/task_period.dart';
 import '../../domain/tasks.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/tokens.dart';
@@ -67,6 +69,13 @@ String _resetLabel(AppLocalizations l, TaskRule r) {
     TaskRepeat.monthlyByWeekday => l.tasksResetMonthlyWeekday(_ordinalInText(l, r.ordinal!), days[r.weekday! - 1]),
     TaskRepeat.monthlyByDate => r.day! > 28 ? l.tasksResetMonthlyDateShort(r.day!) : l.tasksResetMonthlyDate(r.day!),
   };
+}
+
+/// Erledigt-Datum (`yyyy-MM-dd`) in der Schreibweise der App-Sprache, z. B. „26.10.2026“ (#38).
+String _date(BuildContext context, String doneOn) {
+  final p = TaskPeriod.parseDate(doneOn);
+  if (p == null) return doneOn;
+  return DateFormat.yMd(Localizations.localeOf(context).toLanguageTag()).format(DateTime(p.y, p.m, p.d));
 }
 
 String _nameOf(AppServices s, TasksController c, AppLocalizations l, String id) =>
@@ -295,7 +304,7 @@ class TaskDetailScreen extends StatelessWidget {
                           ),
                           if (done[item.id] case final e?) ...<Widget>[
                             Text(
-                              l.tasksDoneOn(e.doneOn, material.formatTimeOfDay(TimeOfDay.fromDateTime(e.at.toLocal()))),
+                              l.tasksDoneOn(_date(context, e.doneOn), material.formatTimeOfDay(TimeOfDay.fromDateTime(e.at.toLocal()))),
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary),
                             ),
                             if (e.comment.isNotEmpty) Text(e.comment, style: Theme.of(context).textTheme.bodySmall),
@@ -318,7 +327,7 @@ class TaskDetailScreen extends StatelessWidget {
                   subtitle: Text([
                     l.tasksHistoryLine(
                       _nameOf(services, c, l, e.by),
-                      e.doneOn,
+                      _date(context, e.doneOn),
                       material.formatTimeOfDay(TimeOfDay.fromDateTime(e.at.toLocal())),
                     ),
                     if (e.comment.isNotEmpty) e.comment,

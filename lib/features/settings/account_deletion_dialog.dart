@@ -67,7 +67,9 @@ class _AccountDeletionDialogState extends State<AccountDeletionDialog> {
     try {
       await action(s, l);
     } on GatewayException catch (e) {
-      if (mounted) setState(() => _error = errorText(l, e));
+      // Hier wird nur das Passwort abgefragt: kein Hinweis auf den Benutzernamen (#36).
+      final text = e.error == GatewayError.invalidCredentials ? l.errWrongPassword : errorText(l, e);
+      if (mounted) setState(() => _error = text);
     } finally {
       if (mounted) setState(() => _busy = false);
     }

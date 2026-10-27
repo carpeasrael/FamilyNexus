@@ -87,6 +87,9 @@ abstract class MatrixGateway implements Listenable {
   /// nicht aussagekräftig.
   bool get initialSyncDone;
 
+  /// Startet den Abgleich neu, z. B. wenn „Synchronisiere …“ ungewöhnlich lange steht (#24).
+  Future<void> retrySync();
+
   /// Anzahl ungelesener Chatnachrichten aller Gespräche (ohne eigene).
   int get unreadCount;
 

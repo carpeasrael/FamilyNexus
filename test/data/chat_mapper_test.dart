@@ -172,4 +172,67 @@ void main() {
       expect(map(events).single.reactions.length, ChatMapper.maxReactionKeys);
     });
   });
+
+  test('#29: Verifizierungsanfrage als Raumnachricht erscheint nicht als Chat-Text', () {
+    final m = map(<Event>[
+      ev(r'$a', text('Hallo'), ts: 1),
+      ev(r'$v', <String, Object?>{
+        'msgtype': 'm.key.verification.request',
+        'body': 'Attempting verification request. (m.key.verification.request) Apparently your client doesn\'t support this',
+        'from_device': 'DEV',
+        'methods': <String>['m.sas.v1'],
+        'to': '@anna:fake.test',
+      }, ts: 2),
+    ]);
+    expect(m.map((e) => e.body), <String>['Hallo']);
+  });
+
+  group('#35: nicht lesbare Ereignisse vor dem eigenen Beitritt', () {
+    const me = '@ida:fake.test';
+    Event member(String id, String membership, {String? prev, int ts = 0}) => Event.fromJson(<String, Object?>{
+          'type': 'm.room.member',
+          'event_id': id,
+          'sender': me,
+          'state_key': me,
+          'origin_server_ts': ts,
+          'content': <String, Object?>{'membership': membership, 'displayname': 'Ida'},
+          if (prev != null) 'unsigned': <String, Object?>{'prev_content': <String, Object?>{'membership': prev}},
+        }, room);
+    Event encrypted(String id, int ts) => ev(id, <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2', 'ciphertext': 'x'},
+        type: 'm.room.encrypted', ts: ts);
+
+    List<ChatMessage> mapAs(List<Event> chronological) =>
+        ChatMapper.messages(timeline(chronological.reversed.toList()), myUserId: me);
+
+    test('werden zu einem Hinweis zusammengefasst, spätere bleiben einzeln sichtbar', () {
+      final m = mapAs(<Event>[
+        encrypted(r'$e1', 10),
+        encrypted(r'$e2', 20),
+        encrypted(r'$e3', 30),
+        member(r'$j', 'join', prev: 'invite', ts: 40),
+        ev(r'$t', text('Willkommen!'), ts: 50),
+        encrypted(r'$e4', 60),
+      ]);
+      expect(m.first.beforeJoin, isTrue);
+      expect(m.where((e) => e.beforeJoin), hasLength(1));
+      expect(m.where((e) => e.undecryptable && !e.beforeJoin).map((e) => e.id), <String>[r'$e4']);
+      expect(m.map((e) => e.id), <String>[ChatMapper.beforeJoinId, r'$t', r'$e4']);
+    });
+
+    test('Namensänderung nach dem Beitritt zählt nicht als Beitritt', () {
+      final m = mapAs(<Event>[
+        encrypted(r'$e1', 10),
+        member(r'$j', 'join', prev: 'invite', ts: 20),
+        encrypted(r'$e2', 30),
+        member(r'$n', 'join', prev: 'join', ts: 40),
+      ]);
+      expect(m.map((e) => e.id), <String>[ChatMapper.beforeJoinId, r'$e2']);
+    });
+
+    test('Beitritt nicht in der geladenen Zeitleiste: nichts wird ausgeblendet', () {
+      final m = mapAs(<Event>[encrypted(r'$e1', 10), encrypted(r'$e2', 20)]);
+      expect(m.map((e) => e.id), <String>[r'$e1', r'$e2']);
+      expect(m.any((e) => e.beforeJoin), isFalse);
+    });
+  });
 }

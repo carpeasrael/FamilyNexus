@@ -23,6 +23,7 @@ class ChatMessage {
     this.sharedEventId,
     this.blockedAttachment = false,
     this.undecryptable = false,
+    this.beforeJoin = false,
   });
 
   final String id;
@@ -47,6 +48,9 @@ class ChatMessage {
   /// Gerät dem Raum später beigetreten ist.
   final bool undecryptable;
 
+  /// Sammelhinweis statt einzelner, nicht lesbarer Ereignisse aus der Zeit vor dem eigenen Beitritt.
+  final bool beforeJoin;
+
   ChatMessage copyWith({
     Map<String, Set<String>>? reactions,
     MessageStatus? status,
@@ -64,6 +68,7 @@ class ChatMessage {
         sharedEventId: sharedEventId,
         blockedAttachment: blockedAttachment,
         undecryptable: undecryptable,
+        beforeJoin: beforeJoin,
       );
 }
 

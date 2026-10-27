@@ -56,6 +56,17 @@ void main() {
     expect(CalendarView.forDay(occ, berlin, DateTime.utc(2026, 3, 20)).map((o) => o.event.title), <String>['Ganztags', 'Früh', 'Spät']);
   });
 
+  test('#33 „Nächste Termine“: nach Beginn, ganztägige späterer Tage nicht vorn', () {
+    final heute = ev(d: 20, h: 18, title: 'Heute Abend');
+    final morgen = ev(d: 21, allDay: true, title: 'Morgen ganztags');
+    final morgenFrueh = ev(d: 21, h: 8, title: 'Morgen früh');
+    final occ = <Occurrence>[
+      for (final e in [morgen, morgenFrueh, heute])
+        ...OccurrenceExpander.expand(e, from: DateTime.utc(2026, 3, 20), to: DateTime.utc(2026, 3, 23), viewer: berlin),
+    ]..sort(CalendarView.compare);
+    expect(occ.map((o) => o.event.title), <String>['Heute Abend', 'Morgen ganztags', 'Morgen früh']);
+  });
+
   test('mehrtägiger Termin erscheint an jedem berührten Tag der Agenda', () {
     final e = ev(d: 20, h: 22, length: const Duration(hours: 30)); // bis 22.03. 04:00
     final occ = OccurrenceExpander.expand(e, from: DateTime.utc(2026, 3, 1), to: DateTime.utc(2026, 4, 1));

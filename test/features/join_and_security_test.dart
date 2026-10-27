@@ -148,8 +148,8 @@ void main() {
       final cases = <String, String>{
         expired: 'Dieser Einladungslink ist abgelaufen. Bitte die Person, die dich einlädt, um einen neuen Link.',
         'familynexus://join?v=1&room=x': 'Der Link ist unvollständig oder beschädigt – oft passiert das beim Weiterleiten. Bitte kopiere ihn noch einmal vollständig oder scanne den QR-Code.',
-        'hallo': 'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „familynexus://join“.',
-        s.link.replaceFirst('familynexus', 'https'): 'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „familynexus://join“.',
+        'hallo': 'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „https://carpeasrael.github.io/FamilyNexus/join/“ oder „familynexus://join“.',
+        s.link.replaceFirst('familynexus', 'https'): 'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „https://carpeasrael.github.io/FamilyNexus/join/“ oder „familynexus://join“.',
         s.link.replaceFirst('v=3', 'v=9'): 'Dieser Link stammt aus einer neueren Version von FamilyNexus. Bitte aktualisiere die App und versuche es noch einmal.',
       };
       for (final c in cases.entries) {

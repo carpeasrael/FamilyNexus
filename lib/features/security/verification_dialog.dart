@@ -5,6 +5,7 @@ import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/security.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../common/error_text.dart';
+import 'sas_emoji_names.dart';
 
 /// Öffnet den Verifizierungsdialog automatisch, sobald eine Verifizierung läuft oder
 /// angefragt wird (an beliebiger Stelle der App).
@@ -103,7 +104,8 @@ class VerificationDialog extends StatelessWidget {
               Wrap(spacing: 10, runSpacing: 10, alignment: WrapAlignment.center, children: <Widget>[
                 for (final e in v.emojis)
                   Semantics(
-                    label: e.name,
+                    label: SasEmojiNames.of(e.name, Localizations.localeOf(context).languageCode),
+                    excludeSemantics: true,
                     child: Text(e.emoji, style: const TextStyle(fontSize: 34)),
                   ),
               ]),

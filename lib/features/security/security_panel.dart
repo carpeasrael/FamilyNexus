@@ -13,6 +13,7 @@ import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
 import '../common/prompt_dialog.dart';
+import '../common/syncing_view.dart';
 import '../../data/platform/secret_clipboard.dart';
 
 /// Leert die Zwischenablage nach [delay], falls sie noch [secret] enthält (E-57). Bewusst nicht an ein
@@ -221,11 +222,7 @@ class _SecurityPanelState extends State<SecurityPanel> {
         if (_creatingKey || widget.renew) return _setupView(l);
         switch (state) {
           case SecurityState.unknown:
-            return Row(children: <Widget>[
-              const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
-              const SizedBox(width: 12),
-              Text(l.syncing),
-            ]);
+            return SyncingView(gateway: g);
           case SecurityState.needsSetup:
             return _setupView(l);
           case SecurityState.needsRestore:

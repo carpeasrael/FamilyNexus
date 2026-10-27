@@ -1,8 +1,10 @@
-import 'dart:typed_data';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../app/app_services.dart';
+import '../../core/platform_info.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../data/platform/file_access.dart';
 import '../../domain/chat.dart';
@@ -38,11 +40,26 @@ class _ChatScreenState extends State<ChatScreen> {
   String _threadId = ChatThread.familyId;
   late final AppServices _services;
 
+  /// Angefordertes Gespräch, das noch nicht in der Liste steht (z. B. gerade eröffneter
+  /// Einzelchat). Bis es erscheint, wird gewartet statt auf den Familienchat zurückzufallen,
+  /// sonst ginge eine private Nachricht an alle (#31).
+  String? _waitingFor;
+  Timer? _waitTimer;
+
+  /// So lange wird höchstens auf ein angefordertes Gespräch gewartet.
+  static const Duration openTimeout = Duration(seconds: 20);
+
   @override
   void initState() {
     super.initState();
     _services = AppScope.read(context);
     _services.chatRequest.addListener(_openRequested);
+    // Die Anforderung kann gestellt worden sein, bevor dieser Bildschirm entstand.
+    final pending = _services.chatRequest.value;
+    if (pending != null) {
+      _services.chatRequest.value = null;
+      _select(pending);
+    }
     _scroll.addListener(() {
       // Liste ist umgekehrt: Ende = älteste geladene Nachricht.
       if (_scroll.hasClients && _scroll.position.extentAfter < 200) {
@@ -56,16 +73,29 @@ class _ChatScreenState extends State<ChatScreen> {
     final id = _services.chatRequest.value;
     if (id == null) return;
     _services.chatRequest.value = null;
-    if (mounted && id != _threadId) {
+    if (mounted && id != _threadId) setState(() => _select(id));
+  }
+
+  void _select(String id) {
+    _threadId = id;
+    _replyTo = null;
+    _waitTimer?.cancel();
+    _waitingFor = null;
+    if (id == ChatThread.familyId) return;
+    _waitingFor = id;
+    _waitTimer = Timer(openTimeout, () {
+      if (!mounted || _waitingFor != id) return;
       setState(() {
-        _threadId = id;
-        _replyTo = null;
+        _waitingFor = null;
+        _threadId = ChatThread.familyId;
       });
-    }
+      _toast(AppLocalizations.of(context).chatOpenFailed);
+    });
   }
 
   @override
   void dispose() {
+    _waitTimer?.cancel();
     _services.chatRequest.removeListener(_openRequested);
     _scroll.dispose();
     _ctrl.dispose();
@@ -178,11 +208,29 @@ class _ChatScreenState extends State<ChatScreen> {
         final blocked = services.settings.settings.blockedUsers;
         final threads = visibleThreads(g.threads, blocked);
         // Verschwindet ein Gespräch (z. B. Mitglied entfernt), geht es zurück zum Familienchat.
+        // Ein angefordertes Gespräch, das noch nicht erschienen ist, wird dagegen abgewartet.
         final current = threads.where((t) => t.id == _threadId).firstOrNull;
-        if (current == null && _threadId != ChatThread.familyId) {
+        final waiting = current == null && _waitingFor == _threadId;
+        if (current != null && _waitingFor == current.id) {
+          _waitingFor = null;
+          _waitTimer?.cancel();
+        }
+        if (current == null && !waiting && _threadId != ChatThread.familyId) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) setState(() => _threadId = ChatThread.familyId);
           });
+        }
+        if (waiting) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                const CircularProgressIndicator(),
+                const SizedBox(height: 12),
+                Text(l.chatOpening, textAlign: TextAlign.center),
+              ]),
+            ),
+          );
         }
         final threadId = current?.id ?? ChatThread.familyId;
         final msgs = visibleMessages(g.messagesIn(threadId), blocked, myUserId: g.userId);
@@ -195,10 +243,7 @@ class _ChatScreenState extends State<ChatScreen> {
             _ThreadBar(
               threads: threads,
               selected: threadId,
-              onSelect: (id) => setState(() {
-                _threadId = id;
-                _replyTo = null;
-              }),
+              onSelect: (id) => setState(() => _select(id)),
             ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
@@ -227,6 +272,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     itemCount: msgs.length,
                     itemBuilder: (context, i) {
                       final m = msgs[msgs.length - 1 - i];
+                      if (m.beforeJoin) return const _BeforeJoinNote();
                       return _Bubble(
                         message: m,
                         mine: m.senderId == g.userId,
@@ -260,7 +306,13 @@ class _ChatScreenState extends State<ChatScreen> {
             child: TextFieldTapRegion(child: Row(children: <Widget>[
               IconButton(tooltip: l.chatAttach, icon: const Icon(Icons.attach_file), onPressed: () => _attach(services)),
               Expanded(
-                child: TextField(
+                // Desktop: Enter sendet, Umschalt+Enter macht einen Zeilenumbruch (#37).
+                child: CallbackShortcuts(
+                  bindings: <ShortcutActivator, VoidCallback>{
+                    if (PlatformInfo.enterSubmits) const SingleActivator(LogicalKeyboardKey.enter): () => _send(g),
+                    if (PlatformInfo.enterSubmits) const SingleActivator(LogicalKeyboardKey.numpadEnter): () => _send(g),
+                  },
+                  child: TextField(
                   controller: _ctrl,
                   minLines: 1,
                   maxLines: 5,
@@ -270,6 +322,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(hintText: l.chatHint),
                   onSubmitted: (_) => _send(g),
+                ),
                 ),
               ),
               IconButton.filled(
@@ -400,6 +453,24 @@ class _Bubble extends StatelessWidget {
   }
 }
 
+/// Ein Hinweis statt vieler „nicht entschlüsselbar“-Einträge aus der Zeit vor dem Beitritt (#35).
+class _BeforeJoinNote extends StatelessWidget {
+  const _BeforeJoinNote();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+        const Icon(Icons.lock_clock_outlined, size: 16),
+        const SizedBox(width: 6),
+        Flexible(child: Text(l.chatBeforeJoin, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall)),
+      ]),
+    );
+  }
+}
+
 /// Anhänge werden nie automatisch geladen oder geöffnet.
 class _AttachmentView extends StatefulWidget {
   const _AttachmentView({required this.message, required this.services, required this.threadId});
@@ -461,17 +532,21 @@ class _AttachmentViewState extends State<_AttachmentView> {
     if (a.isImage && _bytes != null) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.memory(
-            _bytes!,
-            height: 200,
-            cacheHeight: 400, // begrenzt den Speicher (Bild-Bomben)
-            fit: BoxFit.cover,
-            semanticLabel: a.name,
-            errorBuilder: (_, _, _) => const Icon(Icons.broken_image),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: <Widget>[
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.memory(
+              _bytes!,
+              height: 200,
+              cacheHeight: 400, // begrenzt den Speicher (Bild-Bomben)
+              fit: BoxFit.cover,
+              semanticLabel: a.name,
+              errorBuilder: (_, _, _) => const Icon(Icons.broken_image),
+            ),
           ),
-        ),
+          // Bilder lassen sich wie andere Anhänge speichern (#40).
+          TextButton.icon(onPressed: _save, icon: const Icon(Icons.download_outlined), label: Text(l.chatSaveAttachment)),
+        ]),
       );
     }
     return Padding(
@@ -483,9 +558,10 @@ class _AttachmentViewState extends State<_AttachmentView> {
         const SizedBox(width: 6),
         if (_loading)
           const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-        else if (a.isImage)
-          TextButton(onPressed: _load, child: Text(l.chatLoadAttachment))
-        else
+        else if (a.isImage) ...<Widget>[
+          TextButton(onPressed: _load, child: Text(l.chatLoadAttachment)),
+          TextButton(onPressed: _save, child: Text(l.chatSaveAttachment)),
+        ] else
           TextButton(onPressed: _save, child: Text(l.chatSaveAttachment)),
       ]),
     );

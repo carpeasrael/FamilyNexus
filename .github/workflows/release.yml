@@ -108,7 +108,12 @@ jobs:
         run: |
           mkdir -p debug-info/apk
           flutter build apk --release --obfuscate --split-debug-info=debug-info/apk \
-            --target-platform android-arm,android-arm64
+            --target-platform android-arm,android-arm64,android-x64
+
+      # Plugins bringen x86_64-Bibliotheken mit; ohne Flutter für x86_64 stürzte die App dort ab (#32).
+      - name: Verify APK native libraries
+        if: env.BUILD == 'apk+aab' || env.BUILD == 'apk'
+        run: tool/check_apk_abis.sh build/app/outputs/flutter-apk/app-release.apk
 
       - name: Verify APK signature
         if: env.BUILD == 'apk+aab' || env.BUILD == 'apk'

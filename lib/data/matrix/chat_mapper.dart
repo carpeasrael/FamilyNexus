@@ -21,19 +21,53 @@ class ChatMapper {
     MessageTypes.Video,
   };
 
+  /// Kennung des Sammelhinweises für nicht lesbare Ereignisse vor dem eigenen Beitritt.
+  static const String beforeJoinId = 'before-join';
+
   /// Nachrichten der Zeitleiste, älteste zuerst. Ein einzelnes fehlerhaftes
   /// Ereignis wird übersprungen und darf die übrigen nie blockieren.
-  static List<ChatMessage> messages(Timeline timeline) {
+  ///
+  /// Nicht entschlüsselbare Ereignisse aus der Zeit vor dem eigenen Beitritt (dafür gibt es keine
+  /// Schlüssel; es können auch Kalender-, Einkaufs- oder Aufgabenänderungen sein) werden zu einem
+  /// einzigen Hinweis zusammengefasst (#35).
+  static List<ChatMessage> messages(Timeline timeline, {String? myUserId}) {
+    final me = myUserId ?? timeline.room.client.userID;
+    final joinedAt = me == null ? null : _joinedAt(timeline, me);
     final out = <ChatMessage>[];
+    var hidden = 0;
+    DateTime? firstHidden;
     for (final e in timeline.events.reversed) {
       try {
         final m = _map(timeline, e);
-        if (m != null) out.add(m);
+        if (m == null) continue;
+        if (m.undecryptable && joinedAt != null && m.time.isBefore(joinedAt)) {
+          hidden++;
+          firstHidden ??= m.time;
+          continue;
+        }
+        out.add(m);
       } catch (err) {
         AppLog.e('chat', 'Ereignis konnte nicht dargestellt werden', err);
       }
     }
+    if (hidden > 0) {
+      out.insert(
+        0,
+        ChatMessage(id: beforeJoinId, senderId: '', senderName: '', time: firstHidden!, undecryptable: true, beforeJoin: true),
+      );
+    }
     return out;
+  }
+
+  /// Zeitpunkt des letzten eigenen Beitritts, sofern er in der geladenen Zeitleiste liegt.
+  static DateTime? _joinedAt(Timeline timeline, String me) {
+    for (final e in timeline.events) {
+      if (e.type != EventTypes.RoomMember || e.stateKey != me) continue;
+      if (e.content.tryGet<String>('membership') != 'join') continue;
+      if (e.prevContent?.tryGet<String>('membership') == 'join') continue; // nur Namens-/Bildänderung
+      return e.originServerTs;
+    }
+    return null;
   }
 
   static ChatMessage? _map(Timeline timeline, Event e) {
@@ -56,6 +90,9 @@ class ChatMapper {
     if (e.type != EventTypes.Message || e.relationshipType == RelationshipTypes.edit || e.redacted) {
       return null;
     }
+
+    // Geräte-Verifizierung (`m.key.verification.request` als Raumnachricht) ist kein Chat-Inhalt (#29).
+    if (e.messageType.startsWith('m.key.verification.')) return null;
 
     final d = e.getDisplayEvent(timeline);
     final isFile = _fileTypes.contains(d.messageType);

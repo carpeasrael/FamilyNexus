@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:family_nexus/app/app.dart';
@@ -127,5 +128,30 @@ void main() {
   test('der Fake kennt keinen unverschlüsselten Raum', () async {
     final app = await buildTestApp();
     expect(app.gateway.familyRoom!.encrypted, isTrue);
+  });
+
+  testWidgets('#40: Bild-Anhänge lassen sich speichern – vor und nach dem Laden, mit Warnung', (tester) async {
+    tester.view.physicalSize = const Size(900, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final app = await buildTestApp();
+    final ben = await _joinBen(app);
+    final png = base64.decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
+    await ben.sendAttachment(fileName: 'testbild.png', bytes: Uint8List.fromList(png));
+    await _openChat(tester, app);
+    expect(find.text('testbild.png'), findsWidgets);
+    expect(find.widgetWithText(TextButton, 'Anhang laden'), findsOneWidget);
+    await tester.tap(find.widgetWithText(TextButton, 'Speichern'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('unverschlüsselt im gewählten Ordner'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+    await tester.pumpAndSettle();
+    final files = app.services.files as FakeFileAccess;
+    expect(files.saved, <String>['testbild.png']);
+    expect(files.contents['testbild.png'], png);
+
+    // Zum Speichern geladen: das Bild wird gezeigt, Speichern bleibt möglich.
+    expect(find.byType(Image), findsOneWidget);
+    expect(find.text('Speichern'), findsOneWidget);
   });
 }

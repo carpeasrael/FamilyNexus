@@ -258,4 +258,40 @@ void main() {
       expect(InviteLink.toWebLink('https://example.org/x'), isNull);
     });
   });
+
+  group('#26: abgeschnittene Links', () {
+    final now = DateTime.utc(2026, 10, 25, 12);
+    final link = InviteLink.create(
+      roomId: '!abc:example.org',
+      via: 'example.org',
+      inviter: '@anna:example.org',
+      now: now,
+      nonce: '0123456789abcdef0123456789abcdef',
+      familyName: 'Familie Test',
+      inviterName: 'Test Nutzer 1',
+    );
+
+    test('die Zufalls-ID steht am Ende', () {
+      expect(link, endsWith('&n=0123456789abcdef0123456789abcdef'));
+      expect(InviteLink.toWebLink(link), endsWith('&n=0123456789abcdef0123456789abcdef'));
+    });
+
+    test('um die letzten Zeichen gekürzt: beschädigt, nicht mit gekürztem Namen angenommen', () {
+      for (final cut in <int>[1, 10, 31]) {
+        final short = link.substring(0, link.length - cut);
+        expect(InviteLink.check(short, now: now).problem, InviteLinkProblem.damaged, reason: 'um $cut Zeichen gekürzt');
+        final web = InviteLink.toWebLink(link)!;
+        expect(InviteLink.check(web.substring(0, web.length - cut), now: now).problem, InviteLinkProblem.damaged);
+      }
+    });
+
+    test('ältere Links mit anderer Reihenfolge werden weiterhin gelesen', () {
+      final old = 'familynexus://join?v=3&room=%21abc%3Aexample.org&via=example.org&srv=example.org'
+          '&inv=%40anna%3Aexample.org&exp=${now.add(const Duration(days: 1)).millisecondsSinceEpoch ~/ 1000}'
+          '&n=0123456789abcdef0123456789abcdef&f=Familie+Test&by=Anna';
+      final c = InviteLink.check(old, now: now);
+      expect(c.ok, isTrue);
+      expect(c.link!.inviterName, 'Anna');
+    });
+  });
 }

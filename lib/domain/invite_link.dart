@@ -2,7 +2,8 @@ import 'server.dart';
 import 'text_sanitizer.dart';
 
 /// Einladungslink/QR-Inhalt (E-14, E-56, E-63):
-/// `familynexus://join?v=3&room=<roomId>&via=<server>&srv=<server>&inv=<mxid>&exp=<unix-sekunden>&n=<id>[&f=<familie>][&by=<name>]`
+/// `familynexus://join?v=3&room=<roomId>&via=<server>&srv=<server>&inv=<mxid>&exp=<unix-sekunden>[&f=<familie>][&by=<name>]&n=<id>`
+/// (die Reihenfolge der Felder ist beim Lesen beliebig; `n` steht beim Erzeugen am Ende)
 ///
 /// Der Link ist nicht vertrauenswürdig: strikte Prüfung aller Felder. Die
 /// Gültigkeitsdauer wird in der App durchgesetzt; die eigentliche Sperre ist
@@ -156,9 +157,11 @@ class InviteLink {
             'srv': srv,
             'inv': inviter,
             'exp': '$exp',
-            'n': nonce,
             'f': ?f,
             'by': ?by,
+            // Zuletzt: Wird der Link beim Weitergeben abgeschnitten, trifft es die Zufalls-ID fester
+            // Länge, und der Link gilt als beschädigt statt mit gekürztem Namen angenommen zu werden (#26).
+            'n': nonce,
           },
         ).toString();
     var f = _name(familyName);

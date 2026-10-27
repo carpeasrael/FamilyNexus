@@ -257,13 +257,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       if (!_syncedOnce) {
         // „Abgeglichen“ gilt erst, wenn Familie und Sicherheitsstatus aus den ersten Daten berechnet
         // sind; sonst sähe ein bestehendes Mitglied kurz „keine Familie“ und könnte eine zweite gründen.
-        _refresh().catchError((Object e) {
-          AppLog.e('gateway', 'Erster Abgleich fehlgeschlagen', e);
-        }).whenComplete(() {
-          _syncedOnce = true;
-          notifyListeners();
-          _scheduleRefresh();
-        });
+        _firstRefresh();
       }
       _retryFailedSends();
       _scheduleRefresh();
@@ -272,6 +266,37 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _verificationSub = client.onKeyVerificationRequest.stream.listen(_onIncomingVerification);
     _toDeviceSub = client.onToDeviceEvent.stream.listen(_onToDevice);
     return client;
+  }
+
+  /// Erster Abgleich nach dem ersten Sync. Bleibt er hängen (z. B. ein nie antwortender Request),
+  /// begrenzt die Zeitschranke das „Synchronisiere …“ (#24); der laufende Abgleich meldet sich später.
+  void _firstRefresh() {
+    if (_firstRefreshRunning) return;
+    _firstRefreshRunning = true;
+    _refresh().timeout(firstRefreshTimeout).catchError((Object e) {
+      AppLog.e('gateway', 'Erster Abgleich fehlgeschlagen', e);
+    }).whenComplete(() {
+      _firstRefreshRunning = false;
+      _syncedOnce = true;
+      notifyListeners();
+      _scheduleRefresh();
+    });
+  }
+
+  bool _firstRefreshRunning = false;
+
+  /// Höchstdauer des ersten Abgleichs, bevor die Oberfläche weitermacht.
+  static const Duration firstRefreshTimeout = Duration(seconds: 45);
+
+  @override
+  Future<void> retrySync() async {
+    final c = _client;
+    if (c == null || !c.isLogged()) return;
+    AppLog.w('gateway', 'Abgleich wird neu gestartet');
+    // Ein hängender Long-Poll wird verworfen und ein neuer gestartet.
+    await c.abortSync();
+    c.backgroundSync = true;
+    _scheduleRefresh();
   }
 
   @override
@@ -347,6 +372,14 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     } on GatewayException {
       rethrow;
     } catch (e) {
+      // Angemeldet ist angemeldet: scheitert nur ein Folgeschritt (z. B. Schlüssel hochladen,
+      // erster Abgleich), keine Fehlermeldung zeigen – der Abgleich holt ihn nach (#28).
+      if (_client?.isLogged() ?? false) {
+        AppLog.e('gateway', 'Nach der Anmeldung fehlgeschlagen (Anmeldung gilt)', e);
+        _scheduleRefresh();
+        notifyListeners();
+        return;
+      }
       AppLog.e('gateway', 'Anmeldung fehlgeschlagen', e);
       throw _map(e, forLogin: true);
     }
@@ -1273,7 +1306,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       await _driveBootstrap(c, recoveryKey: key).timeout(const Duration(minutes: 2));
       await _selfSign(c, key);
       try {
-        await c.encryption!.keyManager.loadAllKeys();
+        // Ältere Nachrichtenschlüssel kommen notfalls später; die Freischaltung wartet nicht ewig (#24).
+        await c.encryption!.keyManager.loadAllKeys().timeout(const Duration(seconds: 30));
       } catch (e) {
         AppLog.w('gateway', 'Schlüsselsicherung konnte nicht geladen werden');
       }
@@ -1422,6 +1456,26 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _rejectionTimer = null;
   }
 
+  /// Abweichung zwischen Geräte- und Serveruhr, die beim Zeitvergleich hingenommen wird (#30).
+  static const Duration rejectionClockSkew = Duration(minutes: 10);
+
+  /// Ob [member] (letztes eigenes `m.room.member`-Ereignis des angefragten Raums) die Ablehnung der
+  /// Anfrage ist: „leave“ durch jemand anderen. Stammt der Vorzustand „knock“ aus dem Ereignis selbst,
+  /// ist es eindeutig die Antwort auf eine Anfrage; dann genügt ein grober Zeitvergleich, denn der
+  /// Zeitpunkt der Anfrage stammt von der Uhr des Geräts, der des Ereignisses vom Server. Eine
+  /// vorgehende Geräteuhr verhinderte sonst die Meldung ganz (#30).
+  @visibleForTesting
+  static bool isKnockRejection(Map<Object?, Object?> member, {required String me, required int requestedAt}) {
+    final content = member['content'];
+    if (content is! Map || content['membership'] != 'leave' || member['sender'] == me) return false;
+    final ts = member['origin_server_ts'] as int? ?? 0;
+    final unsigned = member['unsigned'];
+    final prevContent = unsigned is Map ? unsigned['prev_content'] : null;
+    final prev = prevContent is Map ? prevContent['membership'] : null;
+    final tolerance = prev == 'knock' ? rejectionClockSkew.inMilliseconds : 0;
+    return ts > requestedAt - tolerance;
+  }
+
   Future<void> _pollRejection() async {
     final c = _client;
     final req = _joinRequest();
@@ -1468,10 +1522,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         if (last == null || (e['origin_server_ts'] as int? ?? 0) >= (last['origin_server_ts'] as int? ?? 0)) last = e;
       }
       if (last == null) return;
-      final content = last['content'];
-      final byOther = last['sender'] != me;
-      final after = (last['origin_server_ts'] as int? ?? 0) > (req['ts']! as int);
-      if (content is Map && content['membership'] == 'leave' && byOther && after) {
+      if (isKnockRejection(last, me: me, requestedAt: req['ts']! as int)) {
         _joinRejected = true;
         _stopWatchingJoinRequest();
         notifyListeners();
@@ -1679,6 +1730,33 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     await _knock(roomId, FamilyCode.serverOf(roomId), '$knockReasonPrefix$knockCodeMarker');
   }
 
+  static String? _errcodeOf(String body) {
+    try {
+      final data = json.decode(body);
+      final code = data is Map ? data['errcode'] : null;
+      return code is String && RegExp(r'^[A-Z0-9_.]{1,64}$').hasMatch(code) ? code : null;
+    } on FormatException {
+      return null;
+    }
+  }
+
+  /// Fehler einer abgelehnten Beitrittsanfrage nach Status und Matrix-Fehlercode (#25): Statt pauschal
+  /// „Unbekannter Fehler.“ zu melden, werden Serverprobleme (z. B. Server der Familie nicht erreichbar,
+  /// 5xx), fehlende Unterstützung und Sperren unterschieden.
+  @visibleForTesting
+  static GatewayException knockError(int status, String body) {
+    final code = _errcodeOf(body);
+    if (status == 429 || code == 'M_LIMIT_EXCEEDED') return const GatewayException(GatewayError.rateLimited);
+    if (code == 'M_UNRECOGNIZED' || code == 'M_UNSUPPORTED_ROOM_VERSION' || code == 'M_INCOMPATIBLE_ROOM_VERSION') {
+      return const GatewayException(GatewayError.serverUnsupported);
+    }
+    if (status == 403 || code == 'M_FORBIDDEN') return const GatewayException(GatewayError.notAllowed);
+    if (status == 404 || code == 'M_NOT_FOUND') return const GatewayException(GatewayError.notFound);
+    if (status == 400 && code == 'M_INVALID_PARAM') return const GatewayException(GatewayError.invalidInput);
+    if (status >= 500) return const GatewayException(GatewayError.serverUnreachable);
+    return const GatewayException(GatewayError.unknown);
+  }
+
   Future<void> _knock(String roomId, String via, String reason) async {
     final client = _client;
     if (client == null || !client.isLogged()) throw const GatewayException(GatewayError.notAllowed);
@@ -1702,11 +1780,14 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         ..headers['content-type'] = 'application/json'
         ..body = json.encode(<String, Object?>{'reason': reason});
       final res = await _http.send(req).timeout(roomOpTimeout);
-      await res.stream.drain<void>();
-      if (res.statusCode == 429) throw const GatewayException(GatewayError.rateLimited);
-      if (res.statusCode == 403) throw const GatewayException(GatewayError.notAllowed);
-      if (res.statusCode == 404) throw const GatewayException(GatewayError.notFound);
-      if (res.statusCode != 200) throw const GatewayException(GatewayError.unknown);
+      final body = await res.stream.bytesToString();
+      if (res.statusCode != 200) {
+        final error = knockError(res.statusCode, body);
+        // Nur Status und Fehlercode protokollieren (keine Raum- oder Personendaten), damit sich ein
+        // „Unbekannter Fehler.“ beim nächsten Mal zuordnen lässt (#25).
+        AppLog.w('gateway', 'Beitrittsanfrage abgelehnt: HTTP ${res.statusCode} ${_errcodeOf(body) ?? '-'} → ${error.error.name}');
+        throw error;
+      }
       _joinRequestCache = roomId;
       _joinRequestCleared = false;
       _joinRejected = false;

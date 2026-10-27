@@ -36,6 +36,20 @@ Future<void> _fillAndSubmit(WidgetTester tester, {String name = 'Emil', String p
 }
 
 void main() {
+  testWidgets('#27: Kontoanlage direkt nach „Alle lokalen Daten löschen“ (neue Dienste) geht zu Schritt 2', (tester) async {
+    final before = await buildTestApp();
+    await _pump(tester, before);
+    await before.gateway.logout();
+    await tester.pumpAndSettle();
+    // _fullReset baut die Dienste neu auf; die Einrichtung muss die neuen verwenden.
+    final after = await buildTestApp(loggedIn: false);
+    await _pump(tester, after);
+    await _fillAndSubmit(tester);
+    expect(after.gateway.userId, '@emil:fake.test');
+    expect(find.text('Notfall-Schlüssel erstellen'), findsOneWidget, reason: 'nicht auf „Schritt 1 von 3“ stehen bleiben');
+    expect(find.text('Dafür fehlt die Berechtigung.'), findsNothing);
+  });
+
   testWidgets('TP-REG-05 Bedingungen: lesen im Browser, ohne Zustimmung kein Weiter', (tester) async {
     final app = await buildTestApp(loggedIn: false);
     app.server.registrationFlows = <List<String>>[
