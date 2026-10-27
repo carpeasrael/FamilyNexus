@@ -306,6 +306,10 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
               onChanged: _onUser,
               decoration: InputDecoration(
                 labelText: l.regUsernameLabel,
+                // Die Hinweise sind lang (Zeichenregeln, Vorschlag bei vergebenem Namen): mehrzeilig, sonst
+                // bricht Flutter nach einer Zeile mit „…“ ab (Issue #44).
+                helperMaxLines: 3,
+                errorMaxLines: 3,
                 helperText: switch (_check) {
                   UsernameCheck.available => l.regUsernameFree,
                   null || UsernameCheck.unknown => l.regUsernameHint,

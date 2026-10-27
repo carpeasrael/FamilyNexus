@@ -1508,7 +1508,11 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       final req2 = http.Request('GET', uri)..headers['authorization'] = 'Bearer ${c.accessToken}';
       final res = await _http.send(req2).timeout(roomOpTimeout);
       final body = await res.stream.bytesToString();
-      if (res.statusCode != 200) return;
+      if (res.statusCode != 200) {
+        // Nur der Status (keine Raum- oder Personendaten): So lässt sich eine nie eintreffende Ablehnung (#43) zuordnen.
+        AppLog.w('gateway', 'Ablehnung der Beitrittsanfrage: Abfrage lieferte HTTP ${res.statusCode}');
+        return;
+      }
       final data = json.decode(body);
       final leave = (((data as Map)['rooms'] as Map?)?['leave'] as Map?)?[roomId] as Map?;
       if (leave == null) return;

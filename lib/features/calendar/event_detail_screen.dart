@@ -70,6 +70,17 @@ class EventDetailScreen extends StatefulWidget {
 class _EventDetailScreenState extends State<EventDetailScreen> {
   CalendarController get c => widget.controller;
 
+  /// ID des angezeigten Termins. Sie wechselt, wenn der Termin von „Geteilt“ auf „Privat“
+  /// gestellt wird (dabei entsteht eine Kopie mit neuer ID, der alte Termin gilt als gelöscht).
+  late String _eventId = widget.occurrence.event.id;
+
+  Future<void> _edit(CalendarEvent e) async {
+    final saved = await Navigator.of(context).push<CalendarEvent>(MaterialPageRoute<CalendarEvent>(
+      builder: (_) => EventEditorScreen(controller: c, existing: e),
+    ));
+    if (saved != null && mounted && saved.id != _eventId) setState(() => _eventId = saved.id);
+  }
+
   Future<void> _delete(CalendarEvent e) async {
     final l = AppLocalizations.of(context);
     final nav = Navigator.of(context);
@@ -107,7 +118,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     return ListenableBuilder(
       listenable: c,
       builder: (context, _) {
-        final e = c.eventById(widget.occurrence.event.id);
+        final e = c.eventById(_eventId);
         if (e == null || e.deleted) {
           return Scaffold(appBar: AppBar(), body: Center(child: Text(l.eventCancelled)));
         }
@@ -126,9 +137,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 IconButton(
                   tooltip: l.eventEdit,
                   icon: const Icon(Icons.edit_outlined),
-                  onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                    builder: (_) => EventEditorScreen(controller: c, existing: e),
-                  )),
+                  onPressed: () => _edit(e),
                 ),
               if (mine)
                 IconButton(tooltip: l.eventDelete, icon: const Icon(Icons.delete_outline), onPressed: () => _delete(e)),

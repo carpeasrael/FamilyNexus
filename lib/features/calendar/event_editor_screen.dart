@@ -253,8 +253,9 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
     try {
       final reminders = _reminders.toList()..sort((a, b) => b.compareTo(a));
       final ex = _ex;
+      final CalendarEvent saved;
       if (ex == null) {
-        await c.create(
+        saved = await c.create(
           title: _title.text,
           start: start,
           end: end,
@@ -268,7 +269,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
           reminders: reminders,
         );
       } else {
-        await c.update(
+        saved = await c.update(
           ex.copyWith(
             title: _title.text.trim(),
             start: start,
@@ -286,7 +287,9 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
           visibility: _visibility,
         );
       }
-      if (mounted) nav.pop();
+      // Der gespeicherte Termin geht an den Aufrufer zurück: Beim Wechsel von „Geteilt“ zu „Privat“
+      // entsteht eine Kopie mit neuer ID, der Aufrufer muss ihr folgen.
+      if (mounted) nav.pop(saved);
     } on CalendarException {
       if (mounted) _showError(l.eventSaveError);
     } finally {

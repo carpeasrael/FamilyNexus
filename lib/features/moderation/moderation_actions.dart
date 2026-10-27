@@ -66,6 +66,9 @@ class ModerationActions {
     messenger.showSnackBar(SnackBar(
       content: Text(l.reportDone),
       duration: const Duration(seconds: 8),
+      // Ohne `persist: false` bleibt ein SnackBar mit Aktion bis zum Antippen stehen (Flutter-Standard)
+      // und verdeckt die untere Bedienung (Issue #45).
+      persist: false,
       action: canBlock
           ? SnackBarAction(
               label: l.reportBlockOffer,
