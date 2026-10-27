@@ -62,3 +62,6 @@ Einzelergebnisse mit Beobachtung und Screenshot: siehe `Ergebnisse.md` (Tabellen
 
 ## 7. Zustand am Ende (F-08)
 Konten `fnt-1027-n1`, `-n12`, `-i2` gelöscht (curl-Anmeldung `403`), `-n9` nie angelegt; Registrierung offen; G1/G2 zeigen „Willkommen“.
+
+
+**Nachtrag nach dem Lauf:** #44 bis #46 sind in PR #52 behoben, aber noch nicht in einem Build geprüft. #43 ließ sich lokal und per API nicht reproduzieren (Server liefert die Ablehnung, neuer E2E-Test besteht) und bleibt offen; es wurde nur die Protokollierung ergänzt.
