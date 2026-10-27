@@ -16,20 +16,20 @@ Lauf vom 27.10.2026 (20:40 bis 23:25), Apple-Lauf: G1 = iPhone (iOS-Simulator), 
 | Tester / Beginn | Claude (automatisiert) / 27.10.2026 20:40 | dto. |
 
 ## 2. Vorbereitung V-01 bis V-07
-V-01 ✅ (main = origin/main, 1.2.1+17). V-02 ✅ (Mac /Applications: Build 16 → V-03). V-03 ✅ (Mac-Build 17 gebaut). V-04 ✅ (beide „Willkommen“). V-05 ✅ (Server erreichbar, `m.login.dummy`). V-06 ✅ (Datumsteil `1027`, alle Namen frei). V-07 ⏳ (Systemeinstellungen/Bildschirmsperre nicht geprüft).
+V-01 ✅ (main = origin/main, 1.2.1+17). V-02 ✅ (Mac /Applications: Build 16 → V-03). V-03 ✅ (Mac-Build 17 gebaut). V-04 ✅ (beide „Willkommen“). V-05 ✅ (Server erreichbar, `m.login.dummy`). V-06 ✅ (Datumsteil `1027`, alle Namen frei). V-07 ✅ (nachgeholt 28.10.: Sprache de-DE auf beiden, Simulator ohne Gerätecode, Mac Bildschirmsperre nach 300 s, Benachrichtigungen vorab nicht erlaubt).
 
 ## 3. Zusammenfassung
 
 | Ergebnis | Anzahl Schritte (104, wie im PDF, Stand nach Nachlauf 28.10.) |
 |---|---|
-| ✅ bestanden | 95 |
+| ✅ bestanden | 96 |
 | ⚠️ bestanden mit Befund | 5 (A-07, B-03, D-02, E-21, E-25) |
 | ❌ fehlgeschlagen | 0 |
-| ⏳ nicht ausgeführt | 4 (V-07, D-07, G-07, G-08) |
+| ⏳ nicht ausgeführt | 3 (D-07, G-07, G-08; alle optional bzw. n/a) |
 
 **Nachlauf 28.10.2026 (00:00):** B-01, B-17 bis B-21, E-05, E-12, E-17 und G-04 mit neuem Konto `fnt-1027b-n1`/`-i2` nachgeholt (danach gelöscht, curl-Anmeldung 403). Nicht geprüft: Bild-Anhang in E-17, Mailprogramm in E-05, sauberer Aus/An-Vergleich in B-18.
 
-**Abnahme (Abschnitt 7): weiter nicht bestanden**, solange V-07 offen ist (G-06 wurde am 28.10. gegen den Testserver durchgegangen; die matrix.org-Browserseiten gehören zu #15); D-07, G-07 und G-08 sind optional bzw. n/a. B-17/B-18 wurden im Simulator mit Face ID geprüft, ein Lauf auf einem echten iPhone steht aus.
+**Abnahme (Abschnitt 7):** keine ❌-Schritte, V-01 bis V-07 erfüllt, A bis F und G-01 bis G-06 ausgeführt. Offen bleiben G-07 (Durchlauf mit einer Person ohne Vorwissen), der optionale Schritt D-07 und G-08 (nur Web). Die fünf ⚠️-Schritte haben Befunde; für A-07, D-02, E-21 und E-25 sind Issues #43 bis #46 angelegt, B-03 ist unbestätigt (Eingabeartefakt). G-06 deckt die matrix.org-Browserseiten nicht ab (gehört zu #15); B-17/B-18 liefen im Simulator, ein Lauf auf einem echten iPhone steht aus. Damit ist die Abnahme formal noch nicht erreicht.
 
 ## 4. Befundliste
 
