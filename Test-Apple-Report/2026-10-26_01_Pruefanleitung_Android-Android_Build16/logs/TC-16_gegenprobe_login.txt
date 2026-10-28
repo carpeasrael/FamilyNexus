@@ -1,0 +1,2 @@
+2026-10-26T20:19:47 POST /login als fnt-1026-del (richtiges Passwort, maskiert)
+HTTP 403 {"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
