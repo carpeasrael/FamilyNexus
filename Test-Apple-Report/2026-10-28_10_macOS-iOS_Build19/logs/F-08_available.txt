@@ -1,0 +1,4 @@
+n1: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+n12: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+i2: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+n9: {"available":true}
