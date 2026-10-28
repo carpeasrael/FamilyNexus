@@ -5,6 +5,7 @@ import '../../domain/chat.dart';
 import '../../domain/moderation.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../common/error_text.dart';
+import '../chat/sender_name.dart';
 
 /// Blockieren und Melden aus Chat und Familie (E-48).
 class ModerationActions {
@@ -72,7 +73,7 @@ class ModerationActions {
       action: canBlock
           ? SnackBarAction(
               label: l.reportBlockOffer,
-              onPressed: () => block(context, services, userId: message.senderId, name: message.senderName),
+              onPressed: () => block(context, services, userId: message.senderId, name: message.senderLabel(l)),
             )
           : null,
     ));

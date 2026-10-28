@@ -196,5 +196,16 @@ void main() {
     test('Schema und Host komplett groß geschrieben', () {
       expect(check(ok.replaceFirst('familynexus://join', 'FAMILYNEXUS://JOIN')).ok, isTrue);
     });
+
+    test('#59: App-Link mit „#“ statt „?“ (wie hinter der Landingpage) wird angenommen', () {
+      final hash = ok.replaceFirst('familynexus://join?', 'familynexus://join#');
+      final slashHash = ok.replaceFirst('familynexus://join?', 'familynexus://join/#');
+      for (final l in <String>[hash, slashHash, 'Einladung: $hash.']) {
+        final r = check(l);
+        expect(r.ok, isTrue, reason: l);
+        expect(r.link!.roomId, check(ok).link!.roomId);
+        expect(r.link!.familyName, 'Familie Müller');
+      }
+    });
   });
 }

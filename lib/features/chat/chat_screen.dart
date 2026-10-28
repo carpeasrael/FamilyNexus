@@ -19,6 +19,7 @@ import '../calendar/formatting.dart';
 import '../common/error_text.dart';
 import '../moderation/moderation_actions.dart';
 import '../presence/presence_view.dart';
+import 'sender_name.dart';
 
 const List<String> _quickReactions = <String>['👍', '❤️', '😂', '🎉', '😮', '🙏'];
 
@@ -185,10 +186,10 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.block),
-              title: Text(l.chatBlockSender(m.senderName)),
+              title: Text(l.chatBlockSender(m.senderLabel(l))),
               onTap: () {
                 Navigator.pop(c);
-                ModerationActions.block(context, _services, userId: m.senderId, name: m.senderName).ignore();
+                ModerationActions.block(context, _services, userId: m.senderId, name: m.senderLabel(l)).ignore();
               },
             ),
           ],
@@ -291,7 +292,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: GlassCard(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 child: Row(children: <Widget>[
-                  Expanded(child: Text(l.chatReplyingTo(_replyTo!.senderName), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                  Expanded(child: Text(l.chatReplyingTo(_replyTo!.senderLabel(l)), maxLines: 1, overflow: TextOverflow.ellipsis)),
                   IconButton(
                     tooltip: l.chatCancelReply,
                     icon: const Icon(Icons.close),
@@ -375,7 +376,7 @@ class _Bubble extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Semantics(
             container: true,
-            label: l.chatMessageFrom(mine ? l.chatYou : m.senderName),
+            label: l.chatMessageFrom(mine ? l.chatYou : m.senderLabel(l)),
             child: GestureDetector(
               onLongPress: onLongPress,
               child: GlassCard(
@@ -383,7 +384,7 @@ class _Bubble extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
                   if (!mine)
-                    Text(m.senderName, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: t.primary)),
+                    Text(m.senderLabel(l), style: Theme.of(context).textTheme.labelMedium?.copyWith(color: t.primary)),
                   if (replied != null)
                     Container(
                       margin: const EdgeInsets.only(bottom: 4),

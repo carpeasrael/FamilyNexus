@@ -137,6 +137,10 @@ ThemeData buildTheme(Brightness brightness, {bool reduceEffects = false, AccentC
     snackBarTheme: SnackBarThemeData(
       backgroundColor: t.bgSurface,
       contentTextStyle: body(14),
+      // Ohne eigene Farbe nimmt SnackBarAction `inversePrimary` (= onPrimary): dunkel auf dunkler
+      // Fläche, „Absender blockieren“ war kaum lesbar (Issue #62).
+      actionTextColor: t.primary,
+      disabledActionTextColor: t.textMuted,
       behavior: SnackBarBehavior.floating,
     ),
     focusColor: t.primary.withValues(alpha: 0.25),

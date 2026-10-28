@@ -27,16 +27,15 @@ Future<void> showInviteDialog(BuildContext context, MatrixGateway gateway) async
   if (!context.mounted) return;
   await showDialog<void>(
     context: context,
-    builder: (c) => _InviteDialog(gateway: gateway, firstLink: first, messenger: messenger),
+    builder: (c) => _InviteDialog(gateway: gateway, firstLink: first),
   );
 }
 
 class _InviteDialog extends StatefulWidget {
-  const _InviteDialog({required this.gateway, required this.firstLink, required this.messenger});
+  const _InviteDialog({required this.gateway, required this.firstLink});
 
   final MatrixGateway gateway;
   final String firstLink;
-  final ScaffoldMessengerState messenger;
 
   @override
   State<_InviteDialog> createState() => _InviteDialogState();
@@ -51,6 +50,10 @@ class _InviteDialogState extends State<_InviteDialog> {
   String? _accountServer;
   final TextEditingController _server = TextEditingController();
   String? _serverError;
+
+  /// Rückmeldung im Dialog („Link kopiert.“ usw.). Ein SnackBar läge auf dem Handy hinter dem Dialog (#66).
+  String? _notice;
+  bool _copied = false;
 
   @override
   void dispose() {
@@ -72,11 +75,18 @@ class _InviteDialogState extends State<_InviteDialog> {
           _accountServer = srv;
           _link = link;
           _serverError = null;
+          _notice = null;
+          _copied = false;
         });
       }
     } catch (e) {
-      if (mounted && srv != _accountServer) setState(() => _serverError = errorText(l, e));
-      widget.messenger.showSnackBar(SnackBar(content: Text(errorText(l, e))));
+      if (mounted) {
+        setState(() {
+          if (srv != _accountServer) _serverError = errorText(l, e);
+          _notice = errorText(l, e);
+          _copied = false;
+        });
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -111,7 +121,12 @@ class _InviteDialogState extends State<_InviteDialog> {
   Future<void> _copy() async {
     final l = AppLocalizations.of(context);
     await Clipboard.setData(ClipboardData(text: _shareLink));
-    widget.messenger.showSnackBar(SnackBar(content: Text(l.familyInviteCopied)));
+    if (mounted) {
+      setState(() {
+        _notice = l.familyInviteCopied;
+        _copied = true;
+      });
+    }
   }
 
   /// Öffnet einen Mailentwurf mit Anleitung und Link; ohne Mailprogramm wird der Link kopiert.
@@ -124,7 +139,12 @@ class _InviteDialogState extends State<_InviteDialog> {
     );
     if (ok) return;
     await Clipboard.setData(ClipboardData(text: _shareLink));
-    widget.messenger.showSnackBar(SnackBar(content: Text(l.familyInviteMailFailed)));
+    if (mounted) {
+      setState(() {
+        _notice = l.familyInviteMailFailed;
+        _copied = true;
+      });
+    }
   }
 
   @override
@@ -178,7 +198,16 @@ class _InviteDialogState extends State<_InviteDialog> {
           ),
           FilledButton.tonalIcon(icon: const Icon(Icons.mail_outline), onPressed: _busy ? null : _mail, label: Text(l.familyInviteMail)),
           const SizedBox(height: 8),
-          OutlinedButton.icon(icon: const Icon(Icons.copy), onPressed: _busy ? null : _copy, label: Text(l.familyInviteCopyLink)),
+          OutlinedButton.icon(
+            icon: Icon(_copied ? Icons.check : Icons.copy),
+            onPressed: _busy ? null : _copy,
+            label: Text(l.familyInviteCopyLink),
+          ),
+          if (_notice != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Semantics(liveRegion: true, child: Text(_notice!, textAlign: TextAlign.center)),
+            ),
           const SizedBox(height: 12),
           Text(l.familyInviteLinkHint(inviteValiditySentence(l, _validity)), style: Theme.of(context).textTheme.bodySmall),
         ]),

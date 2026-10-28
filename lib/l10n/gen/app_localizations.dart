@@ -662,6 +662,12 @@ abstract class AppLocalizations {
   /// **'Du'**
   String get chatYou;
 
+  /// No description provided for @chatFormerMember.
+  ///
+  /// In de, this message translates to:
+  /// **'Ehemaliges Mitglied'**
+  String get chatFormerMember;
+
   /// No description provided for @logout.
   ///
   /// In de, this message translates to:
@@ -805,6 +811,18 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Erlauben'**
   String get remindersAllow;
+
+  /// No description provided for @remindersPermissionSystem.
+  ///
+  /// In de, this message translates to:
+  /// **'Benachrichtigungen sind in den Systemeinstellungen ausgeschaltet. Erlaube sie dort für FamilyNexus, sonst erscheinen keine Erinnerungen.'**
+  String get remindersPermissionSystem;
+
+  /// No description provided for @remindersOpenSettings.
+  ///
+  /// In de, this message translates to:
+  /// **'Einstellungen öffnen'**
+  String get remindersOpenSettings;
 
   /// No description provided for @remindersPlanned.
   ///
@@ -1007,7 +1025,7 @@ abstract class AppLocalizations {
   /// No description provided for @eventEndBeforeStart.
   ///
   /// In de, this message translates to:
-  /// **'Das Ende liegt vor dem Beginn.'**
+  /// **'Das Ende muss nach dem Beginn liegen.'**
   String get eventEndBeforeStart;
 
   /// No description provided for @eventLocation.

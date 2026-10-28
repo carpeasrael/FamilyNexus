@@ -125,6 +125,7 @@
     }
   },
   "chatYou": "Du",
+  "chatFormerMember": "Ehemaliges Mitglied",
   "logout": "Abmelden",
   "settingsAccount": "Konto",
   "settingsServer": "Server",
@@ -191,6 +192,8 @@
   "remindersPermissionNotifications": "Benachrichtigungen sind blockiert. Ohne sie erscheinen keine Erinnerungen.",
   "remindersPermissionExact": "Genaue Alarme sind nicht erlaubt. Erinnerungen können sich verspäten.",
   "remindersAllow": "Erlauben",
+  "remindersPermissionSystem": "Benachrichtigungen sind in den Systemeinstellungen ausgeschaltet. Erlaube sie dort für FamilyNexus, sonst erscheinen keine Erinnerungen.",
+  "remindersOpenSettings": "Einstellungen öffnen",
   "remindersPlanned": "{count, plural, =0{Keine Erinnerung geplant} =1{1 Erinnerung geplant} other{{count} Erinnerungen geplant}}",
   "@remindersPlanned": {
     "placeholders": {
@@ -245,7 +248,7 @@
   "eventAllDay": "Ganztägig",
   "eventStart": "Beginn",
   "eventEnd": "Ende",
-  "eventEndBeforeStart": "Das Ende liegt vor dem Beginn.",
+  "eventEndBeforeStart": "Das Ende muss nach dem Beginn liegen.",
   "eventLocation": "Ort",
   "eventNote": "Notiz",
   "eventColor": "Farbe",

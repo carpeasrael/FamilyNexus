@@ -20,6 +20,7 @@ import 'account_deletion_dialog.dart';
 import 'data_report.dart';
 import 'data_report_screen.dart';
 import 'privacy_screen.dart';
+import '../reminders/permission_hint.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -72,7 +73,8 @@ class SettingsScreen extends StatelessWidget {
             _RemindersSection(),
             const SizedBox(height: 16),
             _Section(title: l.settingsSectionPrivacy, children: <Widget>[
-              _LockTiles(),
+              // Ohne Geräteanmeldung (Linux, Browser) lässt sich die App-Sperre nicht einschalten: Schalter ausgeblendet (#67).
+              if (AppScope.of(context).lock.auth.supported) _LockTiles(),
               SwitchListTile(
                 title: Text(l.settingsShareOnlineStatus),
                 subtitle: Text(l.settingsShareOnlineStatusHint),
@@ -333,11 +335,14 @@ class _RemindersSection extends StatelessWidget {
             ]),
           ),
           if (perm != ReminderPermission.granted)
-            ListTile(
-              leading: const Icon(Icons.notifications_off_outlined),
-              title: Text(perm == ReminderPermission.notificationsDenied ? l.remindersPermissionNotifications : l.remindersPermissionExact),
-              trailing: TextButton(onPressed: () => coordinator?.requestPermission().ignore(), child: Text(l.remindersAllow)),
-            ),
+            Builder(builder: (context) {
+              final hint = reminderPermissionHint(l, coordinator, perm);
+              return ListTile(
+                leading: const Icon(Icons.notifications_off_outlined),
+                title: Text(hint.text),
+                trailing: TextButton(onPressed: hint.onPressed, child: Text(hint.action)),
+              );
+            }),
         ]);
       },
     );

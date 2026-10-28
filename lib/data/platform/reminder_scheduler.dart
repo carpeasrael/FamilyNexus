@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_log.dart';
 import '../../core/platform_info.dart';
@@ -27,6 +28,13 @@ abstract class ReminderScheduler {
 
   /// Fragt die Berechtigungen beim Nutzer an.
   Future<ReminderPermission> request();
+
+  /// Öffnet die Benachrichtigungs-Einstellungen des Systems für die App. `false`, wenn die Plattform das
+  /// nicht bietet. Nötig, wenn das System nach einer Ablehnung keinen Dialog mehr zeigt (#57).
+  Future<bool> openSettings();
+
+  /// Ob [openSettings] auf dieser Plattform etwas öffnen kann.
+  bool get canOpenSettings;
 
   /// Ersetzt alle geplanten Erinnerungen durch [planned].
   Future<void> replaceAll(
@@ -137,6 +145,28 @@ class LocalReminderScheduler implements ReminderScheduler {
       await android.requestExactAlarmsPermission();
     }
     return permission();
+  }
+
+  @override
+  bool get canOpenSettings => _isApple;
+
+  /// iOS: Einstellungen der App; macOS 13+: Mitteilungen der App in den Systemeinstellungen.
+  @override
+  Future<bool> openSettings() async {
+    final Uri uri;
+    if (_ios != null) {
+      uri = Uri.parse('app-settings:');
+    } else if (_mac != null) {
+      uri = Uri.parse('x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=de.inneso.familynexus');
+    } else {
+      return false;
+    }
+    try {
+      return await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      AppLog.e('reminders', 'Systemeinstellungen nicht geöffnet', e);
+      return false;
+    }
   }
 
   @override

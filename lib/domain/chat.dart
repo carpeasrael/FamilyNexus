@@ -28,6 +28,7 @@ class ChatMessage {
 
   final String id;
   final String senderId;
+  /// Leer, wenn das Konto gelöscht und kein früherer Name bekannt ist (Anzeige „Ehemaliges Mitglied“, #60).
   final String senderName;
   final DateTime time;
   final String body;

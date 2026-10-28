@@ -2,6 +2,8 @@ import 'package:family_nexus/data/platform/device_auth.dart';
 
 class FakeDeviceAuth implements DeviceAuth {
   bool available = true;
+  @override
+  bool supported = true;
   bool succeed = true;
   final List<String> reasons = <String>[];
 

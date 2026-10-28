@@ -142,6 +142,85 @@ void main() {
         expect((e.start, e.end), (DateTime.utc(2026, 3, 20, 20), DateTime.utc(2026, 3, 20, 21)), reason: '21–22 Uhr, nicht bis Mitternacht');
       });
 
+      testWidgets('#64: 12-Stunden-Gerät, App deutsch: Texteingabe nimmt 21 an', (tester) async {
+        tester.platformDispatcher.alwaysUse24HourFormatTestValue = false;
+        addTearDown(tester.platformDispatcher.clearAlwaysUse24HourTestValue);
+        final app = await _app();
+        await _start(tester, app, tab: 'Kalender');
+        await tester.tap(find.byTooltip('Neuer Termin'));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.widgetWithText(TextFormField, 'Titel'), 'Abends');
+        await pickTime(tester, '12:00', 21, 0);
+        expect(find.text('Geben Sie eine gültige Uhrzeit ein'), findsNothing);
+        expect(find.widgetWithText(OutlinedButton, '21:00'), findsOneWidget);
+        expect(find.widgetWithText(OutlinedButton, '22:00'), findsOneWidget);
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        final e = (await app.events.all()).single;
+        expect(e.start, DateTime.utc(2026, 3, 20, 20), reason: '21:00 Berlin');
+      });
+
+      testWidgets('#56: Ende = Beginn wird nicht gespeichert; danach wandert das Ende mit einer Stunde', (tester) async {
+        use24h(tester);
+        final app = await _app();
+        await _start(tester, app, tab: 'Kalender');
+        await tester.tap(find.byTooltip('Neuer Termin'));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.widgetWithText(TextFormField, 'Titel'), 'Ohne Dauer');
+        await pickTime(tester, '13:00', 12, 0); // Ende = Beginn 12:00
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        expect(find.text('Das Ende muss nach dem Beginn liegen.'), findsOneWidget);
+        expect(await app.events.all(), isEmpty);
+        // Beginn und Ende zeigen jetzt beide 12:00; das erste Feld ist der Beginn.
+        await tester.tap(find.widgetWithText(OutlinedButton, '12:00').first);
+        await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.keyboard_outlined));
+        await tester.pumpAndSettle();
+        final fields = find.descendant(of: find.byType(Dialog), matching: find.byType(TextField));
+        await tester.enterText(fields.at(0), '15');
+        await tester.enterText(fields.at(1), '00');
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+        expect(find.widgetWithText(OutlinedButton, '16:00'), findsOneWidget, reason: 'Ende wandert mit, eine Stunde');
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        final e = (await app.events.all()).single;
+        expect(e.end.difference(e.start), const Duration(hours: 1));
+      });
+
+      testWidgets('#63: Detailseite zeigt nach dem Bearbeiten die neue Uhrzeit', (tester) async {
+        use24h(tester);
+        final app = await _app();
+        await _start(tester, app, tab: 'Kalender');
+        await app.services.calendar!.create(
+          title: 'Sport',
+          start: DateTime.utc(2026, 3, 20, 17), // 18:00 Berlin
+          end: DateTime.utc(2026, 3, 20, 18),
+          visibility: EventVisibility.private,
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Sport'));
+        await tester.pumpAndSettle();
+        expect(find.text('18:00 – 19:00'), findsOneWidget);
+        await tester.tap(find.byTooltip('Termin bearbeiten'));
+        await tester.pumpAndSettle();
+        await pickTime(tester, '18:00', 20, 0);
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        expect(find.text('20:00 – 21:00'), findsOneWidget);
+        expect(find.text('18:00 – 19:00'), findsNothing);
+        // Ganztägig: Detail zeigt „Ganztägig“ statt der Uhrzeit.
+        await tester.tap(find.byTooltip('Termin bearbeiten'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Ganztägig'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        expect(find.text('20:00 – 21:00'), findsNothing);
+        expect(find.text('Ganztägig'), findsWidgets);
+      });
+
       testWidgets('Ende vor Beginn: Meldung direkt bei den Zeitfeldern', (tester) async {
         use24h(tester);
         final app = await _app();
@@ -152,7 +231,7 @@ void main() {
         await pickTime(tester, '13:00', 10, 0);
         await tester.tap(find.text('Speichern'));
         await tester.pumpAndSettle();
-        final msg = find.text('Das Ende liegt vor dem Beginn.');
+        final msg = find.text('Das Ende muss nach dem Beginn liegen.');
         expect(msg, findsOneWidget);
         expect(await app.events.all(), isEmpty);
         expect(tester.getTopLeft(msg).dy, lessThan(tester.getTopLeft(find.text('Sichtbarkeit')).dy),
@@ -404,6 +483,45 @@ void main() {
       await tester.tap(find.text('Erlauben'));
       await tester.pumpAndSettle();
       expect(app.scheduler.requested, 1);
+    });
+
+    testWidgets('#57: „Erlauben“ ohne Wirkung → „Einstellungen öffnen“; nach der Rückkehr verschwindet der Hinweis', (tester) async {
+      final app = await _app();
+      app.scheduler
+        ..current = ReminderPermission.notificationsDenied
+        ..grantOnRequest = false; // System zeigt keinen Dialog
+      await _start(tester, app);
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Erlauben'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('in den Systemeinstellungen ausgeschaltet'), findsOneWidget);
+      await tester.tap(find.text('Einstellungen öffnen'));
+      await tester.pumpAndSettle();
+      expect(app.scheduler.settingsOpened, 1);
+
+      app.scheduler.current = ReminderPermission.granted; // dort erlaubt
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      expect(find.text('Einstellungen öffnen'), findsNothing);
+      expect(find.text('Erlauben'), findsNothing);
+    });
+
+    testWidgets('#57: ohne Weg in die Einstellungen (z. B. Android) bleibt „Erlauben“', (tester) async {
+      final app = await _app();
+      app.scheduler
+        ..current = ReminderPermission.notificationsDenied
+        ..grantOnRequest = false
+        ..settingsAvailable = false;
+      await _start(tester, app);
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Erlauben'));
+      await tester.pumpAndSettle();
+      expect(find.text('Erlauben'), findsOneWidget);
+      expect(find.text('Einstellungen öffnen'), findsNothing);
     });
   });
 }

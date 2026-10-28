@@ -33,12 +33,13 @@ class ChatMapper {
   static List<ChatMessage> messages(Timeline timeline, {String? myUserId}) {
     final me = myUserId ?? timeline.room.client.userID;
     final joinedAt = me == null ? null : _joinedAt(timeline, me);
+    final pastNames = _pastNames(timeline);
     final out = <ChatMessage>[];
     var hidden = 0;
     DateTime? firstHidden;
     for (final e in timeline.events.reversed) {
       try {
-        final m = _map(timeline, e);
+        final m = _map(timeline, e, pastNames);
         if (m == null) continue;
         if (m.undecryptable && joinedAt != null && m.time.isBefore(joinedAt)) {
           hidden++;
@@ -59,6 +60,34 @@ class ChatMapper {
     return out;
   }
 
+  /// Ungelesene **lesbare** Nachrichten anderer, höchstens [serverCount] (#65).
+  ///
+  /// Der Zähler des Servers (`notificationCount`) zählt auch verschlüsselte Ereignisse, die der Chat nicht
+  /// als Nachricht zeigt: nicht entschlüsselbare (Sammelhinweis #35) sowie Kalender-, Einkaufs- und
+  /// Aufgabenänderungen. Gezählt wird deshalb in der geladenen Zeitleiste, neueste zuerst, bis zur eigenen
+  /// Lesemarke, eigenen Nachricht oder zum eigenen Beitritt. Der Server bleibt die Obergrenze; meldet er 0,
+  /// ist alles gelesen.
+  static int unreadReadable(Timeline timeline, {required int serverCount, String? myUserId}) {
+    if (serverCount <= 0) return 0;
+    final room = timeline.room;
+    final me = myUserId ?? room.client.userID;
+    final marker = room.fullyRead;
+    final readAt = room.receiptState.global.latestOwnReceipt?.ts ?? 0;
+    var n = 0;
+    for (final e in timeline.events) {
+      if (marker.isNotEmpty && e.eventId == marker) break;
+      if (e.originServerTs.millisecondsSinceEpoch <= readAt) break;
+      if (e.senderId == me) {
+        if (e.type == EventTypes.Message || e.type == EventTypes.RoomMember) break;
+        continue;
+      }
+      if (e.type != EventTypes.Message || e.relationshipType == RelationshipTypes.edit || e.redacted) continue;
+      if (e.messageType.startsWith('m.key.verification.')) continue;
+      if (++n >= serverCount) break;
+    }
+    return n;
+  }
+
   /// Zeitpunkt des letzten eigenen Beitritts, sofern er in der geladenen Zeitleiste liegt.
   static DateTime? _joinedAt(Timeline timeline, String me) {
     for (final e in timeline.events) {
@@ -70,8 +99,35 @@ class ChatMapper {
     return null;
   }
 
-  static ChatMessage? _map(Timeline timeline, Event e) {
-    final name = TextSanitizer.displayName(e.senderFromMemoryOrFallback.displayName, e.senderId);
+  /// Letzter bekannter Anzeigename je Person aus den Mitglieds-Ereignissen der Zeitleiste (neueste zuerst).
+  static Map<String, String> _pastNames(Timeline timeline) {
+    final out = <String, String>{};
+    for (final e in timeline.events) {
+      final id = e.stateKey;
+      if (e.type != EventTypes.RoomMember || id == null || out.containsKey(id)) continue;
+      final n = TextSanitizer.clean(
+        e.content.tryGet<String>('displayname') ?? e.prevContent?.tryGet<String>('displayname') ?? '',
+      );
+      if (n.isNotEmpty) out[id] = n;
+    }
+    return out;
+  }
+
+  /// Anzeigename des Absenders. Wer sein Konto gelöscht hat, hat keinen Namen mehr (der Server leert ihn vor
+  /// dem Austritt). Dann gilt der letzte Name aus der Zeitleiste; ist keiner geladen, bleibt der Name leer
+  /// und die Oberfläche zeigt „Ehemaliges Mitglied“ statt der Matrix-ID (#60).
+  static String _senderName(Event e, Map<String, String> pastNames) {
+    final u = e.senderFromMemoryOrFallback;
+    final current = TextSanitizer.clean(u.displayName ?? '');
+    if (current.isNotEmpty) return current;
+    final past = pastNames[e.senderId];
+    if (past != null) return past;
+    final gone = u.membership == Membership.leave || u.membership == Membership.ban;
+    return gone ? '' : TextSanitizer.displayName(null, e.senderId);
+  }
+
+  static ChatMessage? _map(Timeline timeline, Event e, Map<String, String> pastNames) {
+    final name = _senderName(e, pastNames);
     final status = e.status.isError
         ? MessageStatus.failed
         : (e.status.isSent ? MessageStatus.sent : MessageStatus.sending);

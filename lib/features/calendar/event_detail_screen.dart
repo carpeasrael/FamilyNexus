@@ -74,6 +74,20 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   /// gestellt wird (dabei entsteht eine Kopie mit neuer ID, der alte Termin gilt als gelöscht).
   late String _eventId = widget.occurrence.event.id;
 
+  /// Vorkommen des aktuellen Stands von [e]. Das beim Öffnen übergebene Vorkommen veraltet, sobald der
+  /// Termin bearbeitet wird (Uhrzeit, Datum, ganztägig; #63): bei Serien gilt derselbe Tag, sonst das
+  /// erste Vorkommen ab dem neuen Beginn.
+  Occurrence _occurrenceOf(CalendarEvent e) {
+    final o = widget.occurrence;
+    if (identical(e, o.event)) return o;
+    const day = Duration(days: 1);
+    for (final x in OccurrenceExpander.expand(e, from: o.start.subtract(day), to: o.end.add(day), viewer: c.zone)) {
+      if (x.dateKey == o.dateKey) return x;
+    }
+    final first = OccurrenceExpander.expand(e, from: e.start.subtract(day), to: e.end.add(day * 2), viewer: c.zone);
+    return first.isEmpty ? o : first.first;
+  }
+
   Future<void> _edit(CalendarEvent e) async {
     final saved = await Navigator.of(context).push<CalendarEvent>(MaterialPageRoute<CalendarEvent>(
       builder: (_) => EventEditorScreen(controller: c, existing: e),
@@ -100,7 +114,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     if (choice == null) return;
     try {
       if (choice == 'one') {
-        await c.excludeOccurrence(e, widget.occurrence.dateKey);
+        await c.excludeOccurrence(e, _occurrenceOf(e).dateKey);
       } else {
         await c.delete(e.id);
       }
@@ -123,6 +137,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           return Scaffold(appBar: AppBar(), body: Center(child: Text(l.eventCancelled)));
         }
         final fmt = Fmt(context, c.zone);
+        final occurrence = _occurrenceOf(e);
         final mine = c.service.canEdit(e);
         final family = services.gateway.family;
         String nameOf(String id) => id == c.me ? l.chatYou : (family?.member(id)?.displayName ?? id);
@@ -150,8 +165,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
                   Semantics(header: true, child: Text(e.title, style: Theme.of(context).textTheme.headlineSmall)),
                   const SizedBox(height: 6),
-                  Text(fmt.range(widget.occurrence, l), style: monoStyle(context, size: 15)),
-                  Text(fmt.dateLong(DateTime.parse(widget.occurrence.dateKey)), style: Theme.of(context).textTheme.bodyMedium),
+                  Text(fmt.range(occurrence, l), style: monoStyle(context, size: 15)),
+                  Text(fmt.dateLong(DateTime.parse(occurrence.dateKey)), style: Theme.of(context).textTheme.bodyMedium),
                   const SizedBox(height: 8),
                   Wrap(spacing: 8, runSpacing: 4, children: <Widget>[
                     StatusBadge(

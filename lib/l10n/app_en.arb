@@ -125,6 +125,7 @@
     }
   },
   "chatYou": "You",
+  "chatFormerMember": "Former member",
   "logout": "Sign out",
   "settingsAccount": "Account",
   "settingsServer": "Server",
@@ -191,6 +192,8 @@
   "remindersPermissionNotifications": "Notifications are blocked. Without them no reminders appear.",
   "remindersPermissionExact": "Exact alarms are not allowed. Reminders may be late.",
   "remindersAllow": "Allow",
+  "remindersPermissionSystem": "Notifications are switched off in the system settings. Allow them there for FamilyNexus, otherwise no reminders appear.",
+  "remindersOpenSettings": "Open settings",
   "remindersPlanned": "{count, plural, =0{No reminders scheduled} =1{1 reminder scheduled} other{{count} reminders scheduled}}",
   "@remindersPlanned": {
     "placeholders": {
@@ -245,7 +248,7 @@
   "eventAllDay": "All day",
   "eventStart": "Start",
   "eventEnd": "End",
-  "eventEndBeforeStart": "The end is before the start.",
+  "eventEndBeforeStart": "The end must be after the start.",
   "eventLocation": "Location",
   "eventNote": "Note",
   "eventColor": "Color",
