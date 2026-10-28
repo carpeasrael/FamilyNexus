@@ -138,6 +138,6 @@ Umgebungshinweis: V-04 war zunächst durch Schlüsselbund-Altlast (#61) blockier
 | G-03 | ✅ | review_notes_test: All tests passed |
 | G-04 | n/a | optional, nicht ausgeführt (lokaler Synapse nötig) |
 | G-05 | ✅ | durch G-02 abgedeckt |
-| G-06 | ⏳ | Review-Notizen manuell: nicht ausgeführt |
-| G-07 | ⏳ | Durchlauf durch Person ohne Vorwissen: nicht automatisierbar |
+| G-06 | ⏳ | Review-Notizen teilweise nachvollzogen: Kontoanlage, Kontolöschung, Benachrichtigungen, Melden, Blockieren/Aufheben und Entfernen von Mitgliedern auf dem Testserver belegt (A-03 bis A-11, F-01, F-06, B-02, E-25 bis E-27, E-04). Offen: Teil über matrix.org (Anmeldung im Browser, Prüfkonto, Notfall-Schlüssel des Prüfkontos) – Zugangsdaten nicht verfügbar, gehört zu #15 |
+| G-07 | ⏳ | Durchlauf durch Person ohne Vorwissen: braucht eine echte Testperson, nicht automatisierbar. Material liegt in Test-Apple/G-07_Testperson/ (Vorbereitung nennt noch Build 17, Soll ist 1.2.1 (19)) |
 | G-08 | n/a | nur Plattform Web |
