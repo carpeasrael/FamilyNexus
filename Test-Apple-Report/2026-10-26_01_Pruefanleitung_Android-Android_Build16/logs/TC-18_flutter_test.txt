@@ -1,0 +1,1099 @@
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.2 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  file_picker 13.1.0 (13.2.0 available)
+  file_picker_darwin 2.3.2 (2.4.0 available)
+  flutter_local_notifications 22.3.2 (22.3.3 available)
+  hooks 2.0.2 (2.2.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.3 (1.19.0 available)
+  native_toolchain_c 0.19.2 (0.19.5 available)
+  objective_c 9.5.0 (9.6.2 available)
+  petitparser 7.0.2 (7.1.0 available)
+  record_use 0.6.0 (1.1.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common_ffi 2.4.4 (2.4.5 available)
+  sqlite3 3.5.2 (3.8.0 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.3 available)
+  web 1.1.1 (1.1.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+20 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/carpeasrael/Project_dev/FamilyNexus/test/architecture_test.dart
+00:00 +0: /home/carpeasrael/Project_dev/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:00 +1: /home/carpeasrael/Project_dev/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:00 +2: /home/carpeasrael/Project_dev/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:00 +3: /home/carpeasrael/Project_dev/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:00 +4: /home/carpeasrael/Project_dev/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:00 +5: /home/carpeasrael/Project_dev/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:00 +6: /home/carpeasrael/Project_dev/FamilyNexus/test/architecture_test.dart: Präsentation greift nicht direkt auf Datenbank, Schlüsselspeicher oder SDKs zu
+00:00 +7: /home/carpeasrael/Project_dev/FamilyNexus/test/architecture_test.dart: keine print/debugPrint-Aufrufe in lib/
+00:00 +8: /home/carpeasrael/Project_dev/FamilyNexus/test/architecture_test.dart: Android-spezifische Dart-Brücken liegen nur in data/platform
+00:00 +9: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Kontrastberechnung: Schwarz/Weiß = 21
+00:00 +10: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: WCAG AA (dunkel) Text auf allen Glasflächen ≥ 4.5
+00:00 +11: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: WCAG AA (dunkel) Primärbutton: onPrimary auf primary ≥ 4.5
+00:00 +12: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: WCAG AA (dunkel) Akzent-/Statusfarben als Text auf Oberfläche ≥ 4.5
+00:00 +13: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: WCAG AA (dunkel) Rahmen/UI-Komponenten ≥ 3 (Eingabefeld-Rand)
+00:00 +14: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: WCAG AA (hell) Text auf allen Glasflächen ≥ 4.5
+00:00 +15: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: WCAG AA (hell) Primärbutton: onPrimary auf primary ≥ 4.5
+00:00 +16: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: WCAG AA (hell) Akzent-/Statusfarben als Text auf Oberfläche ≥ 4.5
+00:00 +17: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: WCAG AA (hell) Rahmen/UI-Komponenten ≥ 3 (Eingabefeld-Rand)
+00:00 +18: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: ColorScheme-Paare erreichen AA (dark)
+00:00 +19: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: ColorScheme-Paare erreichen AA (light)
+00:00 +20: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Rahmen und Fokus gegen Oberfläche ≥ 3 (sichtbare Bedienelemente)
+00:00 +21: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent teal (dunkel): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +22: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent magenta (dunkel): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +23: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent violet (dunkel): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +24: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent sky (dunkel): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +25: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent lime (dunkel): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +26: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent orange (dunkel): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +27: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent rose (dunkel): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +28: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent green (dunkel): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +29: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent teal (hell): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +30: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent magenta (hell): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +31: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent violet (hell): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +32: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent sky (hell): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +33: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent lime (hell): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +34: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent orange (hell): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +35: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent rose (hell): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +36: /home/carpeasrael/Project_dev/FamilyNexus/test/core/contrast_test.dart: Akzent green (hell): Kontrast von Schaltflächen, Text und Verlauf ≥ 4.5
+00:00 +37: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: (setUpAll)
+00:00 +37: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: geteilte Termine werden verschlüsselt in den Familienraum gesendet und von Ben übernommen
+00:00 +38: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: geteilte Termine Änderung und Löschung erreichen Ben; ältere Fassung bleibt im Verlauf
+00:00 +39: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: private Termine (Sicherheit) verlassen nie den privaten Raum: nicht im Familienraum, nicht bei Ben
+00:00 +40: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: private Termine (Sicherheit) erscheinen auf einem zweiten Gerät derselben Person
+00:00 +41: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: private Termine (Sicherheit) Mischbestand: nach beliebig vielen Aktionen nie ein privater Titel im Familienraum
+00:00 +42: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: private Termine (Sicherheit) Geteilt → privat nach Veröffentlichung: danach geht nur eine Löschmarke ohne Inhalt in den Familienraum
+00:00 +43: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: private Termine (Sicherheit) Fremder Absender im privaten Raum wird verworfen
+00:00 +44: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Fälschung und Müll Ben kann einen Termin von Anna nicht überschreiben (owner ≠ Absender)
+00:00 +45: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Fälschung und Müll Ben kann Annas Termin nicht unter eigenem Namen mit derselben ID übernehmen
+00:01 +46: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Fälschung und Müll Ungültige Inhalte werden verworfen, nichts bricht
+00:01 +47: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Warteschlange (offline) Termine bleiben erhalten und werden nachgereicht, in Änderungsreihenfolge
+00:01 +48: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Warteschlange (offline) Server nicht erreichbar → nichts geht verloren
+00:01 +49: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Zusagen Ben sagt zu; Anna sieht es; Offline-Antwort wird nachgereicht
+00:01 +50: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Zusagen verspätetes Echo einer älteren Antwort überschreibt die neuere nicht
+00:01 +51: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Zusagen die neuere Zusage gewinnt, auch bei umgekehrter Zustellung
+00:01 +52: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Resync für neue Mitglieder Anna sendet beim Beitritt von Cara ihre aktuellen geteilten Termine erneut
+00:01 +53: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Resync für neue Mitglieder Resync ist idempotent für bestehende Mitglieder
+00:01 +54: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: ohne Sitzung wird nichts gesendet
+00:01 +55: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Review-Funde Phase 3 K4: gleichzeitig eintreffende Fassungen enden immer bei der neuesten (beide Reihenfolgen)
+00:01 +56: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Review-Funde Phase 3 K3: privat → geteilt konvergiert auf dem zweiten eigenen Gerät
+00:01 +57: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Review-Funde Phase 3 K5: Resync übersteht einen Ausfall (Vormerken statt einmaligem Senden)
+00:01 +58: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Review-Funde Phase 3 K6: Serverfehler lassen den Termin in der Warteschlange; lokale Codec-Fehler nicht
+00:01 +59: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Review-Funde Phase 3 S2: Antworten auf unbekannte oder private Termine werden verworfen
+00:01 +60: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: Review-Funde Phase 3 S3: Titel mit Steuer-/Bidi-Zeichen werden verworfen
+00:01 +61: /home/carpeasrael/Project_dev/FamilyNexus/test/data/calendar_sync_test.dart: (tearDownAll)
+00:04 +61: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: (setUpAll)
+00:04 +61: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: einfache Nachricht, Reihenfolge älteste zuerst
+00:04 +62: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: einfache Nachricht, Reihenfolge älteste zuerst
+00:04 +63: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Lebenszeichen im Vordergrund ohne erneute Bitte um Antwort
+00:04 +63: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: einfache Nachricht, Reihenfolge älteste zuerst
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:04 +64: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Lebenszeichen im Vordergrund ohne erneute Bitte um Antwort
+00:04 +64: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Antwort: Zitat-Fallback wird aus dem Text entfernt, Bezug bleibt
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:04 +65: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Lebenszeichen im Vordergrund ohne erneute Bitte um Antwort
+00:04 +65: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge passender Bildanhang wird übernommen
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:04 +65: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge Größe als Kommazahl/Text/fehlend blockiert den Anhang, bricht aber nichts ab
+[Matrix] [33mExpected optional "int" in event content for the Key "size" but got "double" at ChatMapper._map (package:family_nexus/data/matrix/chat_mapper.dart:66:26)[0m
+[Matrix] [33mExpected optional "int" in event content for the Key "size" but got "String" at ChatMapper._map (package:family_nexus/data/matrix/chat_mapper.dart:66:26)[0m
+00:04 +66: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Lebenszeichen im Vordergrund ohne erneute Bitte um Antwort
+00:04 +66: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge Größe als Kommazahl/Text/fehlend blockiert den Anhang, bricht aber nichts ab
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:05 +67: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Lebenszeichen im Vordergrund ohne erneute Bitte um Antwort
+00:05 +67: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge Typ/Endung passen nicht zusammen oder nicht erlaubt → blockiert
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:05 +68: /home/carpeasrael/Project_dev/FamilyNexus/test/data/shopping_sync_test.dart: ein neuer Eintrag erreicht Ben, nur als Ereignis im Familienraum
+00:05 +68: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge Typ/Endung passen nicht zusammen oder nicht erlaubt → blockiert
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:05 +69: /home/carpeasrael/Project_dev/FamilyNexus/test/data/shopping_sync_test.dart: ein neuer Eintrag erreicht Ben, nur als Ereignis im Familienraum
+00:05 +69: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge zu große Datei wird blockiert
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:05 +70: /home/carpeasrael/Project_dev/FamilyNexus/test/data/shopping_sync_test.dart: ein neuer Eintrag erreicht Ben, nur als Ereignis im Familienraum
+00:05 +70: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge Dateiname aus fremder Quelle wird bereinigt
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:05 +71: /home/carpeasrael/Project_dev/FamilyNexus/test/data/shopping_sync_test.dart: ein neuer Eintrag erreicht Ben, nur als Ereignis im Familienraum
+00:05 +71: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: nicht entschlüsselbare Nachricht wird sichtbar markiert
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:05 +72: /home/carpeasrael/Project_dev/FamilyNexus/test/data/shopping_sync_test.dart: ein neuer Eintrag erreicht Ben, nur als Ereignis im Familienraum
+00:05 +72: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Bearbeitungen, Entfernte und fremde Ereignistypen werden nicht als Nachricht gezeigt
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:05 +73: /home/carpeasrael/Project_dev/FamilyNexus/test/data/shopping_sync_test.dart: ein neuer Eintrag erreicht Ben, nur als Ereignis im Familienraum
+00:05 +73: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Status: Fehler → failed, sonst sent
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:05 +74: /home/carpeasrael/Project_dev/FamilyNexus/test/data/shopping_sync_test.dart: ein neuer Eintrag erreicht Ben, nur als Ereignis im Familienraum
+00:05 +74: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Reaktionen Emojis werden gezählt, Text als „Reaktion“ verworfen
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the user @cara:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:05 +75: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Hintergrund: „offline“ einmalig, danach Ruhe; zurück: wieder „online“
+00:05 +75: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Reaktionen Emojis werden gezählt, Text als „Reaktion“ verworfen
+[Matrix] [33mUnable to request the profile @cara:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:05 +76: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Hintergrund: „offline“ einmalig, danach Ruhe; zurück: wieder „online“
+00:05 +76: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Reaktionen Anzahl verschiedener Reaktionen ist begrenzt
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:05 +77: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Hintergrund: „offline“ einmalig, danach Ruhe; zurück: wieder „online“
+00:05 +77: /home/carpeasrael/Project_dev/FamilyNexus/test/data/chat_mapper_test.dart: Reaktionen Anzahl verschiedener Reaktionen ist begrenzt
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:05 +77: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Hintergrund: „offline“ einmalig, danach Ruhe; zurück: wieder „online“
+00:05 +78: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Hintergrund: „offline“ einmalig, danach Ruhe; zurück: wieder „online“
+00:05 +79: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Hintergrund: „offline“ einmalig, danach Ruhe; zurück: wieder „online“
+00:05 +80: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Hintergrund: „offline“ einmalig, danach Ruhe; zurück: wieder „online“
+00:05 +81: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Hintergrund: „offline“ einmalig, danach Ruhe; zurück: wieder „online“
+00:05 +82: /home/carpeasrael/Project_dev/FamilyNexus/test/data/shopping_sync_test.dart: neues Mitglied erhält den Bestand: nur aktive Einträge, die man zuletzt selbst bearbeitet hat
+00:05 +83: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Teilen ausgeschaltet: nie „online“, einmalig „offline“, keine Antworten auf Anfragen
+00:05 +84: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_task_store_test.dart: (setUpAll)
+00:05 +84: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: war das Teilen von Anfang an aus, wird gar nichts gesendet
+00:05 +85: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: war das Teilen von Anfang an aus, wird gar nichts gesendet
+00:05 +86: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: war das Teilen von Anfang an aus, wird gar nichts gesendet
+00:05 +87: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: war das Teilen von Anfang an aus, wird gar nichts gesendet
+00:05 +88: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_task_store_test.dart: Liste: speichern, lesen, Version überschreibt, ausstehend/veröffentlicht
+00:05 +89: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_task_store_test.dart: Liste: speichern, lesen, Version überschreibt, ausstehend/veröffentlicht
+00:05 +90: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_task_store_test.dart: Liste: speichern, lesen, Version überschreibt, ausstehend/veröffentlicht
+00:05 +91: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_task_store_test.dart: Liste: speichern, lesen, Version überschreibt, ausstehend/veröffentlicht
+00:05 +92: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_task_store_test.dart: Liste: speichern, lesen, Version überschreibt, ausstehend/veröffentlicht
+00:05 +93: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_task_store_test.dart: Liste: speichern, lesen, Version überschreibt, ausstehend/veröffentlicht
+00:05 +94: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_task_store_test.dart: Liste: speichern, lesen, Version überschreibt, ausstehend/veröffentlicht
+00:05 +95: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: ohne Familie wird nichts gesendet; erst mit Familie nachgeholt
+00:05 +96: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: ohne Familie wird nichts gesendet; erst mit Familie nachgeholt
+00:05 +97: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: ohne Familie wird nichts gesendet; erst mit Familie nachgeholt
+00:05 +98: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: ohne Familie wird nichts gesendet; erst mit Familie nachgeholt
+00:05 +99: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: ohne Familie wird nichts gesendet; erst mit Familie nachgeholt
+00:05 +100: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Entfernte Mitglieder erscheinen nicht mehr im Status
+00:05 +101: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: Schließen meldet „offline“
+00:05 +102: /home/carpeasrael/Project_dev/FamilyNexus/test/data/presence_sync_test.dart: goOffline meldet vor dem Abmelden „offline“ (nur, wenn zuvor online gemeldet)
+00:05 +103: /home/carpeasrael/Project_dev/FamilyNexus/test/data/oauth_redirect_test.dart: TP-OAUTH-06 Desktop: Rücksprung über 127.0.0.1 mit zufälligem Port, nur GET /oauth, danach geschlossen
+00:05 +104: /home/carpeasrael/Project_dev/FamilyNexus/test/data/oauth_redirect_test.dart: Abbrechen beendet das Warten ohne Ergebnis
+00:05 +105: /home/carpeasrael/Project_dev/FamilyNexus/test/data/oauth_redirect_test.dart: Mobil: nur Links im App-Schema mit Pfad /oauth zählen
+00:05 +106: /home/carpeasrael/Project_dev/FamilyNexus/test/data/oauth_redirect_test.dart: R2: ein neuer Versuch beendet den alten, der alte stört den neuen nicht
+00:05 +107: /home/carpeasrael/Project_dev/FamilyNexus/test/data/oauth_redirect_test.dart: Zeitüberschreitung liefert null
+00:06 +108: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: (setUpAll)
+00:06 +108: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Bedingungen → Captcha: Sitzung und erledigte Schritte werden weitergegeben, Captcha-Seite des Servers
+00:06 +109: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: liefert Versionen, Passwort-Login und Betreiber
+00:06 +110: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: liefert Versionen, Passwort-Login und Betreiber
+00:06 +111: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Platzhalterschritt (dummy) wird selbst erledigt; Endlosschleife des Servers wird abgebrochen
+00:06 +112: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Platzhalterschritt (dummy) wird selbst erledigt; Endlosschleife des Servers wird abgebrochen
+00:06 +113: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: übernimmt gültiges https-well-known
+00:06 +114: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) nur nicht unterstützte Abläufe → registrationDisabled
+00:06 +115: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) nur nicht unterstützte Abläufe → registrationDisabled
+00:06 +116: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Liste erreicht alle Mitglieder, nur als Ereignis im Familienraum
+00:06 +117: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Liste erreicht alle Mitglieder, nur als Ereignis im Familienraum
+00:06 +118: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Liste erreicht alle Mitglieder, nur als Ereignis im Familienraum
+00:06 +119: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Liste erreicht alle Mitglieder, nur als Ereignis im Familienraum
+00:06 +120: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Liste erreicht alle Mitglieder, nur als Ereignis im Familienraum
+00:06 +121: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Liste erreicht alle Mitglieder, nur als Ereignis im Familienraum
+00:06 +122: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Liste erreicht alle Mitglieder, nur als Ereignis im Familienraum
+00:06 +123: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Liste erreicht alle Mitglieder, nur als Ereignis im Familienraum
+00:06 +124: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Liste erreicht alle Mitglieder, nur als Ereignis im Familienraum
+00:06 +125: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Fehlerzuordnung: vergeben, ungültig, schwaches Passwort, abgeschaltet
+00:06 +126: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Fehlerzuordnung: vergeben, ungültig, schwaches Passwort, abgeschaltet
+00:06 +127: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Fehlerzuordnung: vergeben, ungültig, schwaches Passwort, abgeschaltet
+00:06 +128: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Fehlerzuordnung: vergeben, ungültig, schwaches Passwort, abgeschaltet
+00:06 +129: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Fehlerzuordnung: vergeben, ungültig, schwaches Passwort, abgeschaltet
+00:06 +130: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Fehlerzuordnung: vergeben, ungültig, schwaches Passwort, abgeschaltet
+00:06 +131: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Nicht-Moderator kann keine Liste einschleusen
+00:06 +132: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Nicht-Moderator kann keine Liste einschleusen
+00:06 +133: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Abbrechen verwirft die Registrierung samt Passwort; Anmelden ebenso (R4)
+00:06 +134: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Abbrechen verwirft die Registrierung samt Passwort; Anmelden ebenso (R4)
+00:06 +135: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Abbrechen verwirft die Registrierung samt Passwort; Anmelden ebenso (R4)
+00:06 +136: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Abbrechen verwirft die Registrierung samt Passwort; Anmelden ebenso (R4)
+00:06 +137: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Abbrechen verwirft die Registrierung samt Passwort; Anmelden ebenso (R4)
+00:06 +138: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Abbrechen verwirft die Registrierung samt Passwort; Anmelden ebenso (R4)
+00:06 +139: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Offline-Warteschlange: nichts geht verloren, später wird gesendet
+00:06 +140: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) lokale Prüfungen vor jeder Anfrage
+00:06 +141: /home/carpeasrael/Project_dev/FamilyNexus/test/data/task_sync_test.dart: Änderung durch die Moderatorin (Neuzuweisung) konvergiert
+00:06 +142: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) (setUpAll)
+00:06 +142: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: HttpsOnlyClient (TLS-Pflicht für alle SDK-Verbindungen) lehnt http ab, ohne die Anfrage abzusetzen
+00:06 +143: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) Start: dynamische Client-Anmeldung, PKCE S256, state, prompt=create
+00:06 +144: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) Start: dynamische Client-Anmeldung, PKCE S256, state, prompt=create
+00:06 +145: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) Start: dynamische Client-Anmeldung, PKCE S256, state, prompt=create
+00:07 +146: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: SDK-Logs schwerer SDK-Fehler: nur der Typ landet im Log, Text/Titel nie
+00:07 +147: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) R12 unsicherer Token-Endpunkt: Abbruch, bevor sich die App beim Anbieter anmeldet
+00:07 +148: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) R12 unsicherer Token-Endpunkt: Abbruch, bevor sich die App beim Anbieter anmeldet
+00:07 +149: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) R12 unsicherer Token-Endpunkt: Abbruch, bevor sich die App beim Anbieter anmeldet
+00:07 +150: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) R12 unsicherer Token-Endpunkt: Abbruch, bevor sich die App beim Anbieter anmeldet
+00:07 +151: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) R12 unsicherer Token-Endpunkt: Abbruch, bevor sich die App beim Anbieter anmeldet
+00:07 +152: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_data_inventory_test.dart: erfasst jede Tabelle der App-Datenbank (auch künftige Migrationen)
+00:07 +153: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_data_inventory_test.dart: erfasst jede Tabelle der App-Datenbank (auch künftige Migrationen)
+00:07 +154: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_data_inventory_test.dart: erfasst jede Tabelle der App-Datenbank (auch künftige Migrationen)
+00:07 +155: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_data_inventory_test.dart: erfasst jede Tabelle der App-Datenbank (auch künftige Migrationen)
+00:07 +156: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_data_inventory_test.dart: erfasst jede Tabelle der App-Datenbank (auch künftige Migrationen)
+00:07 +157: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_data_inventory_test.dart: erfasst jede Tabelle der App-Datenbank (auch künftige Migrationen)
+00:07 +158: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_data_inventory_test.dart: erfasst jede Tabelle der App-Datenbank (auch künftige Migrationen)
+00:07 +159: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) Desktop-Rücksprung über 127.0.0.1 wird angenommen, Fragment und Query werden gelesen
+00:07 +160: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_data_inventory_test.dart: liefert Pfade, Zeilen, Dateigrößen und nur das Vorhandensein der Schlüssel
+00:07 +161: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sql_data_inventory_test.dart: (tearDownAll)
+00:07 +161: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/app_settings_test.dart: Standardwerte: Dunkel, Bildschirmschutz an, https-Standardserver
+00:07 +162: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/app_settings_test.dart: Roundtrip toMap/fromMap
+00:07 +163: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/app_settings_test.dart: ungültige Werte fallen auf Standard zurück
+00:07 +164: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/app_settings_test.dart: unsichere/ungültige Server-URL aus dem Speicher wird verworfen
+00:07 +165: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/app_settings_test.dart: copyWith validiert Server und klemmt Sperrzeit
+00:07 +166: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/app_settings_test.dart: copyWith kann Sprache auf Gerätesprache zurücksetzen
+00:07 +167: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/app_settings_test.dart: Online-Status teilen: Standard an, Rundreise, Unsinn fällt auf „an“ zurück
+00:07 +168: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/app_settings_test.dart: Akzentfarbe: Standard Türkis, Rundreise, Unsinn fällt zurück
+00:07 +169: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/attachment_policy_test.dart: erlaubt passende Bilddatei
+00:07 +170: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/attachment_policy_test.dart: lehnt ausführbare/unbekannte Typen ab
+00:07 +171: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/attachment_policy_test.dart: lehnt leere und zu große Dateien ab
+00:07 +172: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/attachment_policy_test.dart: lehnt Endung/Inhalt-Widerspruch ab (z. B. ausführbar als .png getarnt)
+00:07 +173: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/attachment_policy_test.dart: Dateinamen werden bereinigt
+00:07 +174: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/attachment_policy_test.dart: eingehende Metadaten
+00:07 +175: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: (setUpAll)
+00:07 +175: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: anlegen trimmt Titel, setzt Besitzer, Version 1, noch unveröffentlicht
+00:07 +176: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: anlegen ungültige Eingaben werden abgelehnt
+00:07 +177: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: anlegen persönliche Erinnerungen werden gespeichert
+00:07 +178: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: ändern und löschen Änderung erhöht Version, setzt updatedAt, behält Sichtbarkeit, bewahrt Verlauf
+00:07 +179: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: ändern und löschen fremde Termine sind nicht änderbar oder löschbar (auch nicht für Moderatoren)
+00:07 +180: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: ändern und löschen Löschen erzeugt Tombstone mit höherer Version und entfernt Erinnerungen
+00:07 +181: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: ändern und löschen Unbekannte ID
+00:07 +182: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: Sichtbarkeit wechseln privat → geteilt: gleiche ID, neue Version, zur Veröffentlichung vorgemerkt
+00:07 +183: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: Sichtbarkeit wechseln geteilt → privat: Tombstone für alle, private Kopie mit neuer ID, Erinnerungen wandern mit
+00:07 +184: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: Sichtbarkeit wechseln gleiche Sichtbarkeit ist ein No-Op
+00:07 +185: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine neu → eingefügt und als veröffentlicht markiert
+00:07 +186: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine neuere Fassung ersetzt, ältere Fassung bleibt im Verlauf
+00:07 +187: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine veraltete Fassung ändert nichts, landet aber im Verlauf
+00:07 +188: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine Fälschung durch anderen Absender wird verworfen
+00:07 +189: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine privat → geteilt vom eigenen anderen Gerät mit höherer Version wird übernommen
+00:07 +190: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine anderer Wechsel der Sichtbarkeit wird abgelehnt (geteilt → privat, gleiche/niedrigere Version, fremder Absender)
+00:07 +191: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine Grenze: höchstens 2000 Termine je fremdem Absender
+00:07 +192: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_view_test.dart: (setUpAll)
+00:07 +193: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_view_test.dart: (setUpAll)
+00:07 +194: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_view_test.dart: (setUpAll)
+00:07 +194: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_service_test.dart: Rechte: nur eigene, nicht gelöschte Termine sind editierbar
+00:08 +195: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_view_test.dart: Woche beginnt am Montag
+00:08 +196: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_view_test.dart: Monatsraster: 42 Tage, Montag zuerst, enthält alle Monatstage
+00:08 +197: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_view_test.dart: Monate addieren mit Klemmung auf Monatsende
+00:08 +198: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/calendar_view_test.dart: Tagesgrenzen folgen der lokalen Zeitzone (Sommerzeittag hat 23 Stunden)
+00:08 +199: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: (setUpAll)
+00:08 +200: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: (setUpAll)
+00:08 +201: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: (setUpAll)
+00:08 +202: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: (setUpAll)
+00:08 +203: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: (setUpAll)
+00:08 +204: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: (setUpAll)
+00:08 +204: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: neuer Termin wird eingefügt
+00:08 +205: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: höhere Version gewinnt, niedrigere ist veraltet
+00:08 +206: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: gleiche Version, später aktualisiert gewinnt
+00:08 +207: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: völliger Gleichstand: deterministisch über kanonische Darstellung
+00:08 +208: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: identische Fassung (Resync) ist ein Duplikat
+00:08 +209: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: fremder Absender kann einen Termin nicht übernehmen oder ändern
+00:08 +210: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: Konvergenz: beliebige Reihenfolge ergibt dasselbe Endergebnis
+00:08 +211: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: Löschmarke (höhere Version) ersetzt, ältere Fassung kann sie nicht „wiederbeleben“
+00:08 +212: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/conflict_test.dart: (tearDownAll)
+00:08 +212: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/domain_models_test.dart: ChatMessage copyWith ändert nur Reaktionen und Status
+00:08 +213: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/domain_models_test.dart: ChatMessage Anhang, der kein Bild ist
+00:08 +214: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/domain_models_test.dart: FamilyMember / Family copyWith, Gleichheit, Hashcode
+00:08 +215: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/domain_models_test.dart: FamilyMember / Family Familie: joined/requests/Moderatorzahl/Empfehlung
+00:08 +216: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/domain_models_test.dart: FamilyMember / Family Einladung (Wert)
+00:08 +217: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/domain_models_test.dart: Server IP-Adressen und IPv6 werden akzeptiert/abgelehnt
+00:08 +218: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/domain_models_test.dart: Server Gleichheit und Info
+00:08 +219: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/domain_models_test.dart: Anhang-Signaturen gif/webp/pdf/jpeg
+00:08 +220: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/domain_models_test.dart: Anhang-Signaturen Dateiname nur mit Punkt am Ende hat keinen Typ
+00:08 +221: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/domain_models_test.dart: Sicherheitsmodelle
+00:08 +222: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: (setUpAll)
+00:08 +222: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: Roundtrip erhält alle Felder inkl. Wiederholung und Teilnehmer
+00:08 +223: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: ganztägiger Termin und Tombstone laufen durch
+00:08 +224: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: Löschmarke enthält weder Zeitpunkt noch Farbe des Termins
+00:08 +225: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/family_test.dart: Power-Levels → Rollen
+00:08 +226: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/family_test.dart: Power-Levels → Rollen
+00:08 +227: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/family_test.dart: Power-Levels → Rollen
+00:08 +228: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/family_test.dart: Power-Levels → Rollen
+00:08 +229: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/family_test.dart: Power-Levels → Rollen
+00:08 +230: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung falsche Schemaversion, Typen und fehlende Felder werden abgelehnt
+00:08 +231: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung falsche Schemaversion, Typen und fehlende Felder werden abgelehnt
+00:08 +232: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/family_test.dart: unbekannter Nutzer ist Mitglied (geringste Rechte)
+00:08 +233: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung Größenlimits
+00:08 +234: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung unsinnige Zeiten und Wiederholungen
+00:08 +235: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung Termine über 366 Tage Dauer werden abgelehnt
+00:08 +236: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung Zufallsmüll stürzt nie ab
+00:08 +237: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung ungültiger Absender wird abgelehnt
+00:08 +238: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: RSVP Roundtrip inkl. Zeitstempel des Absenders
+00:08 +239: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: RSVP ungültige Inhalte → null
+00:08 +240: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: Review: Text und Wiederholungsende Steuer-/Bidi-/Nullbreiten-Zeichen in Titel und Ort werden abgelehnt, Zeilenumbruch in der Notiz nicht
+00:08 +241: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: Review: Text und Wiederholungsende Wiederholungsende vor dem ersten Termin ist ungültig
+00:08 +242: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/event_codec_test.dart: (tearDownAll)
+00:08 +242: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/moderation_test.dart: ReportRequest Grund ohne Freitext ist nur die Kategorie
+00:08 +243: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/moderation_test.dart: ReportRequest Freitext wird bereinigt und gekürzt
+00:08 +244: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/moderation_test.dart: BlockedUsers parse verwirft ungültige IDs, Dubletten und Überlängen
+00:08 +245: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/moderation_test.dart: BlockedUsers add und remove sind idempotent und prüfen die ID
+00:08 +246: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/moderation_test.dart: BlockedUsers Obergrenze: weitere Einträge werden nicht aufgenommen
+00:08 +247: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/moderation_test.dart: BlockedUsers Einstellungen speichern und lesen die Liste (ungültige Werte fallen weg)
+00:08 +248: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/moderation_test.dart: Filter blockierte Absender werden ausgeblendet, eigene Nachrichten nie
+00:08 +249: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/moderation_test.dart: Filter ohne Blockierungen bleibt die Liste unverändert
+00:08 +250: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/moderation_test.dart: Filter Einzelchats mit Blockierten verschwinden, der Familienchat nie
+00:08 +251: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: (setUpAll)
+00:08 +251: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: einmalige Termine im Fenster / außerhalb / Randfälle (Ende ist exklusiv)
+00:08 +252: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: einmalige Termine mehrtägiger Termin, der vor dem Fenster begann, wird gefunden
+00:08 +253: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: einmalige Termine gelöschte und Termine mit unbekannter Zeitzone liefern nichts
+00:08 +254: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: täglich Intervall und count
+00:08 +255: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: täglich Uhrzeit bleibt über die Sommerzeitumstellung gleich (09:00 Berlin)
+00:08 +256: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: täglich Herbst: Rückstellung am 25.10.2026
+00:08 +257: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: täglich Termin in der Sommerzeit-Lücke (02:30 am 29.03.) rutscht, stürzt nicht ab
+00:08 +258: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: wöchentlich Wochentag des Beginns
+00:08 +259: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: wöchentlich mehrere Wochentage, Intervall 2
+00:09 +260: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: wöchentlich Wochentage vor dem Beginn in der ersten Woche entfallen
+00:09 +261: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: monatlich / jährlich 31. springt auf Monatsende, kehrt zurück
+00:09 +262: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: monatlich / jährlich Schaltjahr: 29.02. jährlich
+00:09 +263: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: monatlich / jährlich monatlich über den Jahreswechsel, Intervall 3
+00:09 +264: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: Ende und Ausnahmen until ist inklusive
+00:09 +265: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/permissions_test.dart: Mitglied hat keine Verwaltungsrechte (Tabelle im Concept)
+00:09 +266: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/permissions_test.dart: Mitglied hat keine Verwaltungsrechte (Tabelle im Concept)
+00:09 +267: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/permissions_test.dart: Mitglied hat keine Verwaltungsrechte (Tabelle im Concept)
+00:09 +268: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/permissions_test.dart: Mitglied hat keine Verwaltungsrechte (Tabelle im Concept)
+00:09 +269: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: Ende und Ausnahmen Skip-Ahead liefert dasselbe wie volle Aufzählung (monatlich/jährlich)
+00:09 +270: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: Ende und Ausnahmen Skip-Ahead liefert dasselbe wie volle Aufzählung (monatlich/jährlich)
+00:09 +271: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: ganztägig mehrtägig, wiederholt, Betrachter-Zeitzone bestimmt die Grenzen
+00:09 +272: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/permissions_test.dart: Moderator darf Mitglieder ernennen, aber keine Moderatoren, Eingeladene oder sich selbst
+00:09 +273: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: ganztägig Ausnahme für ganztägigen Termin
+00:09 +274: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/permissions_test.dart: Moderator darf Mitglieder entfernen, aber keine Moderatoren und nicht sich selbst
+00:09 +275: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/permissions_test.dart: Moderator darf Mitglieder entfernen, aber keine Moderatoren und nicht sich selbst
+00:09 +276: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/occurrence_test.dart: (tearDownAll)
+00:09 +276: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/permissions_test.dart: Moderator entscheidet nur über Beitrittsanfragen
+00:09 +277: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/permissions_test.dart: geteilte Termine: nur der Besitzer, auch nicht der Moderator (E-10)
+00:09 +278: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/permissions_test.dart: unbekannter Nutzer gilt als Mitglied (keine Rechte)
+00:09 +279: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/presence_test.dart: PresenceCodec kodiert und dekodiert online mit Bitte um Antwort
+00:09 +280: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/presence_test.dart: PresenceCodec „offline“ trägt nie eine Bitte um Antwort
+00:09 +281: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/presence_test.dart: PresenceCodec verwirft ungültige Inhalte
+00:09 +282: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/presence_test.dart: PresenceCodec verwirft zu alte und zu weit vorausgehende Meldungen
+00:09 +283: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/presence_test.dart: PresenceBoard nur neuere Meldungen ersetzen ältere
+00:09 +284: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/presence_test.dart: PresenceBoard ungültige Kennungen und zu viele Einträge werden abgelehnt
+00:09 +285: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/presence_test.dart: PresenceBoard retainOnly entfernt Nicht-Mitglieder
+00:09 +286: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/presence_test.dart: PresenceBoard Auswertung: online nur innerhalb der Gültigkeit, danach offline mit „zuletzt“
+00:09 +287: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/presence_test.dart: PresenceBoard leicht vorausgehende Absenderuhr gilt als online
+00:09 +288: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/presence_test.dart: PresenceBoard mit mehreren Geräten online, solange irgendein Gerät aktuell online meldet
+00:09 +289: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/presence_test.dart: PresenceBoard mit mehreren Geräten alle Geräte offline → offline mit jüngster Meldung; Gerätezahl ist begrenzt
+00:09 +290: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/reminder_planner_test.dart: (setUpAll)
+00:09 +290: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/reminder_planner_test.dart: plant Standard-Erinnerung vor dem Termin
+00:09 +291: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/reminder_planner_test.dart: eigene Erinnerungen überschreiben den Standard; leere Liste = keine
+00:09 +292: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/reminder_planner_test.dart: vergangene Erinnerungen und gelöschte Termine werden übersprungen
+00:09 +293: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/reminder_planner_test.dart: Serien: jedes Vorkommen im Horizont, begrenzt auf das Limit
+00:09 +294: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/reminder_planner_test.dart: Horizont: nichts weiter als 60 Tage voraus
+00:09 +295: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/server_test.dart: ServerUrl ergänzt https und normalisiert
+00:09 +296: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/server_test.dart: ServerUrl ergänzt https und normalisiert
+00:09 +297: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/server_test.dart: ServerUrl ergänzt https und normalisiert
+00:09 +298: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/reminder_planner_test.dart: Datenschutz: PlannedReminder enthält weder Titel noch Ort noch Notiz
+00:09 +299: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/server_test.dart: ServerUrl lehnt unsichere und fremde Schemata ab
+00:09 +300: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/reminder_planner_test.dart: ungültige Minutenwerte werden ignoriert
+00:09 +301: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/reminder_planner_test.dart: ungültige Minutenwerte werden ignoriert
+00:09 +302: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/server_test.dart: ServerUrl lehnt überlange Eingaben ab
+00:09 +303: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/reminder_planner_test.dart: K7: Erinnerungen ganztägiger Termine beziehen sich auf 09:00 Ortszeit des Tages
+00:09 +304: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/server_test.dart: MatrixIds gültige und ungültige Benutzer-IDs
+00:09 +305: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/reminder_planner_test.dart: abgesagte Termine (skip) erhalten keine Erinnerung
+00:09 +306: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/server_test.dart: MatrixIds Raum-IDs
+00:09 +307: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/reminder_planner_test.dart: (tearDownAll)
+00:09 +307: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingItem.validate gültiger Eintrag
+00:09 +308: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingItem.validate lehnt ungültige Felder ab
+00:09 +309: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingItem.validate Löschmarken tragen keinen Inhalt
+00:09 +310: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingCodec Hin- und Rückweg
+00:09 +311: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingCodec „by“ muss dem Absender entsprechen
+00:09 +312: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingCodec verwirft Fremdformate und Grenzfälle
+00:09 +313: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingMerge höhere Version gewinnt, dann Zeit, dann Absender
+00:09 +314: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingMerge identische Fassung ersetzt nichts, völliger Gleichstand ist symmetrisch
+00:09 +315: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingMerge Reihenfolge der Zustellung ist egal (Konvergenz)
+00:09 +316: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingService Anlegen normalisiert Leerraum und merkt den Eintrag zum Senden vor
+00:09 +317: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingService ungültige Eingaben werden abgelehnt
+00:09 +318: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingService Abhaken, Bearbeiten, Löschen erhöhen die Version und setzen den Bearbeiter
+00:09 +319: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingService „Erledigte entfernen“ löscht nur abgehakte Einträge
+00:09 +320: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/text_sanitizer_test.dart: entfernt Steuer-, Bidi- und Nullbreiten-Zeichen und normalisiert Leerraum
+00:09 +321: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/text_sanitizer_test.dart: entfernt Steuer-, Bidi- und Nullbreiten-Zeichen und normalisiert Leerraum
+00:09 +322: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/text_sanitizer_test.dart: entfernt Steuer-, Bidi- und Nullbreiten-Zeichen und normalisiert Leerraum
+00:09 +323: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingService Löschmarken werden auch dann übernommen, wenn die aktive Grenze erreicht ist
+00:09 +324: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/text_sanitizer_test.dart: kürzt nach Zeichen, nicht nach UTF-16-Einheiten
+00:09 +325: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingService Löschmarken verstopfen die Liste nicht: bei voller Ablage werden alte veröffentlichte aufgeräumt
+00:09 +326: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingService Löschmarken verstopfen die Liste nicht: bei voller Ablage werden alte veröffentlichte aufgeräumt
+00:09 +327: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingService Löschmarken verstopfen die Liste nicht: bei voller Ablage werden alte veröffentlichte aufgeräumt
+00:09 +328: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingService unveröffentlichte Löschmarken werden nie aufgeräumt; eine volle Ablage lehnt dann neue ab
+00:09 +329: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/shopping_test.dart: ShoppingService übertriebene Versionssprünge werden verworfen (kein „unveränderbar“ machen)
+00:10 +330: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_period_test.dart: (setUpAll)
+00:10 +330: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_period_test.dart: täglich: lokales Datum, nicht UTC-Datum
+00:10 +331: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_period_test.dart: Tageswechsel genau um lokale Mitternacht (auch über die Sommerzeitumstellung)
+00:10 +332: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_period_test.dart: wöchentlich: ISO-Woche, Montag bis Sonntag
+00:10 +333: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_period_test.dart: wöchentlich: Jahresgrenzen folgen dem Donnerstag der Woche
+00:10 +334: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_period_test.dart: monatlich: Monatswechsel inkl. Schaltjahr
+00:10 +335: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_period_test.dart: ungültige Daten werden abgelehnt
+00:10 +336: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_period_test.dart: isKey akzeptiert nur bekannte Formate
+00:10 +337: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_period_test.dart: Rückfallzone UTC (Gerätezeitzone unbekannt) ist gültig
+00:10 +338: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_period_test.dart: (tearDownAll)
+00:10 +338: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: (setUpAll)
+00:10 +338: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskList.validate gültige Liste
+00:10 +339: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskList.validate lehnt ungültige Felder ab
+00:10 +340: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskList.validate Löschmarke trägt keinen Inhalt
+00:10 +341: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskCodec Roundtrip Liste
+00:10 +342: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskCodec Roundtrip Protokoll inkl. Kommentar
+00:10 +343: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskCodec by muss dem Absender entsprechen
+00:10 +344: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskCodec Zeitraum und Typen werden streng geprüft
+00:10 +345: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskCodec encode wirft bei ungültigen Daten
+00:10 +346: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskMerge höhere Version gewinnt, dann Zeit, dann Absender
+00:10 +347: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskMerge Gleichstand ist symmetrisch (genau einer gewinnt)
+00:10 +348: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskProgress (Reset als abgeleiteter Zustand) erledigter Punkt gilt in derselben Periode, nicht in der nächsten
+00:10 +349: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/registration_flows_test.dart: wählt den einfachsten vollständig unterstützten Ablauf
+00:10 +350: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/registration_flows_test.dart: wählt den einfachsten vollständig unterstützten Ablauf
+00:10 +351: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/registration_flows_test.dart: wählt den einfachsten vollständig unterstützten Ablauf
+00:10 +352: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskProgress (Reset als abgeleiteter Zustand) Zurücknehmen: jüngster Eintrag entscheidet
+00:10 +353: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/registration_flows_test.dart: Abläufe mit nicht unterstützten Schritten (Telefon, SSO) fallen weg
+00:10 +354: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskProgress (Reset als abgeleiteter Zustand) Einträge anderer Personen oder inkonsistente Einträge zählen nicht
+00:10 +355: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/registration_flows_test.dart: Aufwand: Code (2) ist günstiger als Bedingungen + Captcha (4)
+00:10 +356: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskProgress (Reset als abgeleiteter Zustand) Verlauf: neueste zuerst, nur gültige Einträge
+00:10 +357: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/registration_flows_test.dart: TP-REG-05 Bedingungen: bevorzugte Sprache, nur https, Namen bereinigt
+00:10 +358: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskService nur Moderatoren legen an, ändern und löschen
+00:10 +359: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskService nur Moderatoren legen an, ändern und löschen
+00:10 +360: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskService Bearbeiten behält die IDs unveränderter Punkte und erhöht die Version
+00:10 +361: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskService nur die zugewiesene Person hakt ab; Datum, Periode und Kommentar werden protokolliert
+00:10 +362: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskService Mitternacht in der Listen-Zeitzone setzt zurück, der Verlauf bleibt
+00:10 +363: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskService unbekannter Punkt, gelöschte Liste, Zurücknehmen
+00:10 +364: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/tasks_test.dart: TaskService Grenzen: Anzahl Listen
+00:10 +365: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/username_suggestion_test.dart: TP-REG-02 Vorschlag aus dem Namen: Umlaute, Akzente, Leerzeichen
+00:10 +366: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/username_suggestion_test.dart: TP-REG-02 Vorschlag aus dem Namen: Umlaute, Akzente, Leerzeichen
+00:10 +367: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/username_suggestion_test.dart: TP-REG-02 Vorschlag aus dem Namen: Umlaute, Akzente, Leerzeichen
+00:10 +368: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/username_suggestion_test.dart: kurze, leere und überlange Namen
+00:10 +369: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/username_suggestion_test.dart: Vorschläge sind immer gültige Benutzernamen
+00:10 +370: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/username_suggestion_test.dart: Prüfung: nur a-z 0-9 . _ - und 3 bis 32 Zeichen, kein Punkt am Rand
+00:10 +371: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/username_suggestion_test.dart: TP-REG-03 Ausweichvorschläge: stabil, gültig, ohne Doppelte
+00:10 +372: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: (setUpAll)
+00:10 +372: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Issue #1: Erklärung und Regel in der Liste Erklärung ist optional, mehrzeilig, begrenzt und ohne Steuer-/Bidi-Zeichen
+00:10 +373: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Issue #1: Erklärung und Regel in der Liste ungültige Regel wird abgelehnt
+00:10 +374: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Ereignisformat: v1 für bisherige Listen, v2 nur für neue Regeln/Erklärung bisherige Regel ohne Erklärung bleibt v1 (ältere App-Versionen lesen sie weiter)
+00:10 +375: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Ereignisformat: v1 für bisherige Listen, v2 nur für neue Regeln/Erklärung neue Regel oder Erklärung → v2 mit Roundtrip
+00:10 +376: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Ereignisformat: v1 für bisherige Listen, v2 nur für neue Regeln/Erklärung manipulierte Ereignisse werden verworfen
+00:10 +377: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln Schlüssel neuer Regeln: Startdatum ≤ Erledigungsdatum, höchstens 35 Tage davor
+00:10 +378: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln ein Eintrag zählt nur mit dem Schlüssel der Regel der Liste
+00:10 +379: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln Montag bis Freitag: am Samstag Erledigtes bleibt bis Sonntag erledigt, Montag beginnt neu
+00:10 +380: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln monatlich am 31.: im November gilt der 30. als Neustart
+00:10 +381: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln Ändern der Regel: andere Periode beginnt leer, der Verlauf bleibt vollständig (R5/R6)
+00:10 +382: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln Ändern der Regel bei gleichem Schlüssel: Erledigtes bleibt erledigt (täglich → Mo–Fr an einem Werktag)
+00:10 +383: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln R1: Löschmarke einer v2-Liste wird als v1 gesendet (ältere Versionen sehen das Löschen)
+00:10 +384: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln R8: Ändern ohne Angabe der Erklärung behält sie
+00:10 +385: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln R2: einzelnes \r beim Einfügen wird zum Zeilenumbruch
+00:10 +386: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_list_rules_test.dart: (tearDownAll)
+00:10 +386: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: (setUpAll)
+00:11 +386: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) täglich, alle Wochentage: wie bisher (gleicher Schlüssel, Format v1)
+00:11 +387: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Montag bis Freitag: am Wochenende keine Erneuerung, Samstag/Sonntag gehören zum Freitag
+00:11 +388: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) wöchentlich am Mittwoch: Periode Mittwoch bis Dienstag
+00:11 +389: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) wöchentlich am Montag entspricht dem bisherigen Intervall (ISO-Woche)
+00:11 +390: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) monatlich am zweiten Dienstag und am letzten Freitag
+00:11 +391: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) monatlich am 20.
+00:11 +392: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Klärungspunkt: am 31. – in kürzeren Monaten am letzten Kalendertag (auch Februar, Schaltjahr)
+00:11 +393: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) monatlich am 1. entspricht dem bisherigen Intervall (Monatsschlüssel)
+00:11 +394: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) nächster Neustart
+00:11 +395: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Zeitumstellung: Schlüssel folgt dem lokalen Datum der Liste (Frühjahr und Herbst)
+00:11 +396: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) R7: Geräteuhr außerhalb 2000–2100 führt nicht zum Absturz
+00:11 +397: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +398: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +399: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +400: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +401: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +402: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +403: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +404: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +405: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +406: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +407: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +408: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +409: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +410: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +411: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +412: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +413: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +414: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +415: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +416: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +417: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +418: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +419: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +420: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +421: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +422: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +423: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +424: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +425: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +426: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +427: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +428: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +429: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +430: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +431: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +432: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +433: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +434: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +435: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +436: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +437: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +438: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +439: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +440: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +441: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +442: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +443: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +444: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +445: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +446: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +447: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +448: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +449: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +450: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +451: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +452: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +453: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +454: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +455: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +456: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +457: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +458: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +459: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +460: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +461: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +462: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +463: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +464: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +465: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +466: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +467: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +468: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +469: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +470: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +471: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +472: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +473: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +474: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +475: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +476: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +477: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +478: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +479: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +480: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +481: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +482: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +483: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +484: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +485: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +486: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:11 +487: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Regel im Ereignis (nicht vertrauenswürdig) Roundtrip aller Arten
+00:11 +488: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: Regel im Ereignis (nicht vertrauenswürdig) ungültige Regeln werden verworfen
+00:11 +489: /home/carpeasrael/Project_dev/FamilyNexus/test/domain/task_rule_test.dart: (tearDownAll)
+00:11 +489: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart: (setUpAll)
+00:11 +489: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart: Kalender über den echten Synapse geteilte und private Termine: verschlüsselt, getrennte Räume, Signale auch für späte Zuhörer
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:11 +489 ~1: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart: (tearDownAll)
+00:12 +489 ~1: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart: Gateway gegen echten Synapse Anmeldung, Familie anlegen, verschlüsselt chatten
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~2: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart: Gateway gegen echten Synapse falsche Zugangsdaten werden als invalidCredentials gemeldet
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~3: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart: Gateway gegen echten Synapse createFamily überschreibt keine bestehende Familie
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~4: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Beitritt per Link: Anfrage → Bestätigung → Annahme; Chat wird entschlüsselt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~5: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Einladungslink: gefälschte ID nicht bestätigbar, Link nur einmal verwendbar, Identität vermerkt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~6: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Mitglied hat keine Verwaltungsrechte – im Gateway UND auf dem Server
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~7: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Ernennen, Umbenennen, Moderatoren sind gleichrangig
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~8: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Issue #7: Mitglied zum Moderator hochstufen – auch durch einen ernannten Moderator und mehrfach hintereinander
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~9: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Issue #7: zwei Ernennungen unmittelbar hintereinander (veralteter Zwischenspeicher)
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~10: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Issue #9: Ersteller ist im Raum Administrator (100), in der App Moderator; Moderator bleibt bei 50
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~11: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Ablehnen einer Anfrage und abgelaufene/ungültige Links
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~12: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Entfernen rotiert den Raumschlüssel; Entfernte lesen neue Nachrichten nicht
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~13: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Einladung per Matrix-ID und Ablehnen einer Einladung
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~14: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Link eines Moderators: ein zweiter Moderator prüft und bestätigt die Anfrage
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~15: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Link mit automatischer Bestätigung: die App des Moderators lädt ohne Klick ein, nur einmal
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~16: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Familien-Code ohne Link: Moderator sieht die Anfrage als „Code“, nichts geschieht von allein, Bestätigung führt zum Beitritt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~17: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Konto-Server im Link: frei wählbar, Heimnetz-Fremdserver und Unsinn werden abgelehnt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~18: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Per Matrix-ID eingeladenes Konto findet die Einladung nach der Anmeldung
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:12 +489 ~19: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_moderation_e2e_test.dart: Melden gegen echten Synapse fremde Nachricht wird gemeldet, eigene und unbekannte werden abgelehnt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~20: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Online-Status: verschlüsselt zugestellt, Anfrage wird beantwortet, Fremde und Klartext werden ignoriert
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~21: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einzelchat: verschlüsselt, automatische Annahme, getrennt vom Familienchat, nach Entfernen gesperrt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~22: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einzelchat-Einladung von Fremden wird weder angenommen noch als Familieneinladung gezeigt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~23: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einkaufszettel: verschlüsselt im Familienraum, beide Mitglieder erhalten Einträge, Server sieht keinen Klartext
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~24: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Issue #1: Liste v2 (Erklärung, monatlich am letzten Freitag) wird verschlüsselt übertragen und gleich gelesen
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~25: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Aufgabenlisten: Liste und Protokolleintrag verschlüsselt im Familienraum, Server sieht keinen Klartext
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~26: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-01 Registrierungsweg wird erkannt; Name frei → Konto in der App angelegt → Name vergeben
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~27: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-02 lokale Prüfungen vor dem Senden: ungültiger Name, zu kurzes Passwort
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~28: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-03 Neuling: Konto anlegen → Link v2 mit Namen → Anfrage → Moderatorin sieht den Namen → bestätigt → Mitglied
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~29: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) Issue #6: Link einer Familie auf einem Heimnetz-Server (localhost) vor der Anmeldung lesen und beitreten
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~30: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-04 direkte Einladung zeigt den Namen der einladenden Person
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~31: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-05 Abbruch: Registrierung lässt sich verwerfen, danach erneut starten
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~32: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Ersteinrichtung: Wiederherstellungsschlüssel, Cross-Signing, Gerät verifiziert
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~33: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse zweites Gerät: Emoji-Verifizierung mit dem ersten
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~34: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Abbruch: abweichende Emoji → keine Verifizierung
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~35: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Wiederherstellung mit Schlüssel: falscher Schlüssel scheitert, richtiger verifiziert und entschlüsselt alte Nachrichten
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~36: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse neuer Schlüssel (#11): alter scheitert, neuer verifiziert und entschlüsselt alte Nachrichten
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~37: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Unverifiziertes Gerät erhält keine Raumschlüssel; nach Verifizierung neue Nachrichten lesbar
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:13 +489 ~38: /home/carpeasrael/Project_dev/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Kontolöschung (#12) gegen echten Synapse Passwort-Konto: falsches Passwort scheitert, danach gelöscht, Familie verlassen, Anmeldung unmöglich
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:16 +489 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: AppLockController ist beim Kaltstart gesperrt, wenn aktiviert; sonst nie
+00:16 +490 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: AppLockController Entsperren nur mit erfolgreicher Geräteanmeldung
+00:16 +491 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: AppLockController sperrt nach Inaktivität im Hintergrund, nicht davor
+00:16 +492 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: AppLockController Auszeit „sofort“ sperrt bei jeder Rückkehr
+00:16 +493 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: AppLockController Zustandswechsel während der Geräteabfrage zählen nicht als Inaktivität
+00:16 +494 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: AppLockController Aktivieren verlangt verfügbares Gerät und erfolgreiche Bestätigung
+00:16 +495 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: AppLockController Deaktivieren verlangt ebenfalls die Bestätigung
+00:16 +496 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:18 +497 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:18 +498 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:18 +499 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:18 +500 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:18 +501 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:19 +502 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:19 +503 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:19 +504 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:19 +505 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:19 +506 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:19 +507 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:19 +508 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:19 +509 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:19 +510 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:19 +511 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:19 +512 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:19 +513 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:20 +514 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/calendar_flow_test.dart: Schließen der Oberfläche entfernt geplante Erinnerungen NICHT (nur Abmeldung)
+00:21 +515 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/chat_test.dart: Nachricht senden erscheint im Verlauf, Eingabe wird geleert
+00:21 +516 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie
+00:22 +517 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/moderation_test.dart: Fremde Nachricht melden: Dialog, Server-Meldung, Hinweis mit Blockieren-Angebot
+00:22 +518 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/moderation_test.dart: Fremde Nachricht melden: Dialog, Server-Meldung, Hinweis mit Blockieren-Angebot
+00:23 +519 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/moderation_test.dart: Fremde Nachricht melden: Dialog, Server-Meldung, Hinweis mit Blockieren-Angebot
+00:23 +520 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:23 +521 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:23 +522 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:24 +523 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:24 +524 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:24 +525 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:24 +526 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:24 +527 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:25 +528 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:25 +529 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:25 +530 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:25 +531 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:25 +532 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:25 +533 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:25 +534 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:25 +535 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:25 +536 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:26 +537 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:26 +538 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:26 +539 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:26 +540 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/moderation_test.dart: Blockieren blendet Nachrichten aus, Aufheben in den Einstellungen bringt sie zurück
+00:27 +541 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/moderation_test.dart: Blockieren blendet Nachrichten aus, Aufheben in den Einstellungen bringt sie zurück
+00:27 +542 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/moderation_test.dart: Blockieren blendet Nachrichten aus, Aufheben in den Einstellungen bringt sie zurück
+00:27 +543 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/calendar_flow_test.dart: Termin anlegen über das Formular Wiederholung: wöchentlich mit Anzahl
+00:27 +544 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/calendar_flow_test.dart: Termin anlegen über das Formular Wiederholung: wöchentlich mit Anzahl
+00:27 +545 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/registration_test.dart: TP-REG-05 Bedingungen: lesen im Browser, ohne Zustimmung kein Weiter
+00:27 +546 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/registration_test.dart: TP-REG-05 Bedingungen: lesen im Browser, ohne Zustimmung kein Weiter
+00:28 +547 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/registration_test.dart: TP-REG-05 Bedingungen: lesen im Browser, ohne Zustimmung kein Weiter
+00:28 +548 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/registration_test.dart: TP-REG-05 Bedingungen: lesen im Browser, ohne Zustimmung kein Weiter
+00:28 +549 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/registration_test.dart: TP-REG-05 Bedingungen: lesen im Browser, ohne Zustimmung kein Weiter
+00:28 +550 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern
+00:28 +551 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern
+00:28 +552 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern
+00:28 +553 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern
+00:29 +554 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern
+00:29 +555 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/tasks_test.dart: Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern
+00:29 +556 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:29 +557 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:29 +558 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:29 +559 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:30 +560 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:30 +561 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:30 +562 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:30 +563 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:30 +564 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:30 +565 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:30 +566 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:30 +567 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:30 +568 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:31 +569 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:31 +570 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:31 +571 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:31 +572 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:31 +573 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:31 +574 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:31 +575 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:31 +576 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:31 +577 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:32 +578 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:32 +579 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:32 +580 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:32 +581 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/calendar_flow_test.dart: Detail, Zusage, Löschen Zusage wird lokal gespeichert und an die Familie gesendet
+00:32 +582 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:32 +583 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:32 +584 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:32 +585 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:32 +586 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:32 +587 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:32 +588 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +589 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +590 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +591 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +592 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +593 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +594 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +595 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +596 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +597 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +598 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +599 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +600 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +601 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +602 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +603 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +604 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +605 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:33 +606 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:34 +607 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:34 +608 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:34 +609 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:34 +610 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:34 +611 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:34 +612 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:34 +613 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:34 +614 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:34 +615 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:34 +616 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:35 +617 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:35 +618 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:35 +619 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:35 +620 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:35 +621 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:35 +622 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:35 +623 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:35 +624 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:35 +625 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:35 +626 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:36 +627 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:36 +628 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:36 +629 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Tippen außerhalb des Textfelds schließt die Tastatur (variant: TargetPlatform.iOS)
+00:36 +630 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Tippen außerhalb des Textfelds schließt die Tastatur (variant: TargetPlatform.iOS)
+00:36 +631 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:36 +632 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:36 +633 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:36 +634 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:36 +635 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:36 +636 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:36 +637 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:36 +638 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:36 +639 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:36 +640 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:36 +641 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:36 +642 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:36 +643 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:36 +644 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:37 +645 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:37 +646 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +647 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +648 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +649 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +650 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +651 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +652 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +653 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +654 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +655 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +656 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +657 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +658 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +659 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +660 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +661 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +662 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +663 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +663 ~39: /home/carpeasrael/Project_dev/FamilyNexus/test/manual/onboarding_screens_test.dart: Bildschirmfotos der Einrichtung Weg A: Neue Familie gründen (mit Zusatzschritten des Anbieters)
+  Skip: Nur mit FN_SCREENSHOTS=1 (tool/onboarding_screens.sh)
+00:37 +663 ~40: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +663 ~40: /home/carpeasrael/Project_dev/FamilyNexus/test/manual/onboarding_screens_test.dart: Bildschirmfotos der Einrichtung Weg B: Ich wurde eingeladen (Link geöffnet)
+  Skip: Nur mit FN_SCREENSHOTS=1 (tool/onboarding_screens.sh)
+00:37 +663 ~41: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +663 ~41: /home/carpeasrael/Project_dev/FamilyNexus/test/manual/onboarding_screens_test.dart: Bildschirmfotos der Einrichtung Weg B ohne Link und Weg C (Anmelden, Gerät freischalten)
+  Skip: Nur mit FN_SCREENSHOTS=1 (tool/onboarding_screens.sh)
+00:37 +663 ~42: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +663 ~42: /home/carpeasrael/Project_dev/FamilyNexus/test/manual/onboarding_screens_test.dart: Bildschirmfotos der Einrichtung Anbieter mit Browser-Anmeldung (wie matrix.org) und englische Startseite
+  Skip: Nur mit FN_SCREENSHOTS=1 (tool/onboarding_screens.sh)
+00:37 +663 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +664 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +665 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +666 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +667 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +668 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +669 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +670 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +671 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +672 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +673 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +674 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +675 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +676 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:37 +677 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Sprachumschaltung wirkt sofort
+00:37 +678 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Sprachumschaltung wirkt sofort
+00:38 +679 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Sprachumschaltung wirkt sofort
+00:38 +680 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Sprachumschaltung wirkt sofort
+00:38 +681 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Sprachumschaltung wirkt sofort
+00:38 +682 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Sprachumschaltung wirkt sofort
+00:38 +683 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Sprachumschaltung wirkt sofort
+00:38 +684 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Sprachumschaltung wirkt sofort
+00:38 +685 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Sprachumschaltung wirkt sofort
+00:38 +686 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.android)
+00:38 +687 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:38 +688 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Per Matrix-ID eingeladenes Konto: Einladungskarte statt „Gründen oder Beitreten“, ein Tipp genügt
+00:38 +689 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:38 +690 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:38 +691 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:39 +692 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:39 +693 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:39 +694 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Schlüsselsicherung Zustand ist schon „bereit“, bevor der Schlüssel zurückkommt: Schlüssel wird trotzdem gezeigt (#10)
+00:39 +695 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Bildschirmschutz ist standardmäßig aktiv und schaltbar
+00:39 +696 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Browser öffnet nicht: Hinweis, nichts vorgemerkt
+00:39 +697 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/features/account_deletion_test.dart: Browser öffnet nicht: Hinweis, nichts vorgemerkt
+00:39 +698 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Konto: zeigt Server und Benutzer, Abmelden führt zur Einrichtung
+00:39 +699 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Konto: zeigt Server und Benutzer, Abmelden führt zur Einrichtung
+00:39 +700 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Konto: zeigt Server und Benutzer, Abmelden führt zur Einrichtung
+00:39 +701 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Konto: zeigt Server und Benutzer, Abmelden führt zur Einrichtung
+00:40 +702 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Schlüsselsicherung Einstellungen: neuer Notfall-Schlüssel ersetzt den alten (#11)
+00:40 +703 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Version mit Build-Nummer im Menü, unter „Über die App“ und im Datenbericht (#14)
+00:40 +704 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Version mit Build-Nummer im Menü, unter „Über die App“ und im Datenbericht (#14)
+00:40 +705 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Version mit Build-Nummer im Menü, unter „Über die App“ und im Datenbericht (#14)
+00:40 +706 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Schlüsselsicherung zweites Gerät: Emoji-Verifizierung über beide Geräte
+00:41 +707 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Schlüsselsicherung zweites Gerät: Emoji-Verifizierung über beide Geräte
+00:41 +708 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Alle lokalen Daten löschen: nur nach Bestätigung
+00:41 +709 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Alle lokalen Daten löschen: nur nach Bestätigung
+00:41 +710 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/features/join_and_security_test.dart: Schlüsselsicherung abweichende Emoji: Verifizierung wird abgebrochen, Gerät bleibt unverifiziert
+00:41 +711 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Burger-Menü: Einstellungen und Datenschutz öffnen als eigene Seiten mit Zurück
+00:41 +712 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Burger-Menü: Einstellungen und Datenschutz öffnen als eigene Seiten mit Zurück
+00:41 +713 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Akzentfarbe wählbar: Standard Türkis, Wechsel färbt die Oberfläche und bleibt gespeichert
+00:42 +714 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Über die App: Speicherorte und Protokoll der lokal gespeicherten Daten
+00:42 +715 ~43: /home/carpeasrael/Project_dev/FamilyNexus/test/ui/settings_screen_test.dart: Protokoll der online gespeicherten Daten: Konto, Geräte, Räume, Hinweis zur Verschlüsselung
+00:43 +716 ~43: All tests passed!
