@@ -158,6 +158,21 @@ void main() {
       expect(app.services.settings.settings.lockEnabled, isTrue);
       expect(find.text('Sperren nach'), findsOneWidget);
     });
+
+    testWidgets('#67: Plattform ohne Geräteanmeldung (Linux) zeigt keinen Schalter „App-Sperre“', (tester) async {
+      tester.view.physicalSize = const Size(900, 3000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final app = await buildTestApp();
+      app.auth.supported = false;
+      app.auth.available = false;
+      await tester.pumpWidget(FamilyNexusApp(services: app.services));
+      await tester.pumpAndSettle();
+      await openSettings(tester);
+      expect(find.text('Online-Status teilen'), findsOneWidget, reason: 'Abschnitt Datenschutz ist sichtbar');
+      expect(find.text('App-Sperre'), findsNothing);
+      expect(find.text('Auf diesem Gerät ist keine gesicherte Bildschirmsperre eingerichtet.'), findsNothing);
+    });
   });
 }
 

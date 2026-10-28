@@ -185,10 +185,17 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       });
 
   @override
-  int get unreadCount => (_familyRoom()?.notificationCount ?? 0) + _dmRooms().fold<int>(0, (a, r) => a + r.notificationCount);
+  int get unreadCount => unreadIn(ChatThread.familyId) + _dmTimelines.keys.fold<int>(0, (a, id) => a + unreadIn(id));
 
+  /// Nur lesbare Nachrichten anderer; der Serverzähler zählt auch nicht entschlüsselbare Ereignisse und
+  /// App-Daten mit (#65). Ohne geladene Zeitleiste gilt der Serverzähler.
   @override
-  int unreadIn(String threadId) => _roomForThread(threadId)?.notificationCount ?? 0;
+  int unreadIn(String threadId) {
+    final room = _roomForThread(threadId);
+    if (room == null) return 0;
+    final t = _timelineFor(threadId);
+    return t == null ? room.notificationCount : ChatMapper.unreadReadable(t, serverCount: room.notificationCount);
+  }
 
   @override
   Future<void> markChatRead({String threadId = ChatThread.familyId}) async {
@@ -1476,6 +1483,31 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return ts > requestedAt - tolerance;
   }
 
+  /// Zähler der Abfragen; macht jeden Filter einmalig (siehe [rejectionPollFilter]). Startwert aus der Uhr,
+  /// damit auch nach einem Neustart keine Antwort aus der vorigen Sitzung wiederkommt.
+  int _rejectionPolls = DateTime.now().millisecondsSinceEpoch;
+
+  /// Filter der Ablehnungs-Abfrage für genau einen Raum. Synapse beantwortet gleiche `/sync`-Anfragen bis zu
+  /// zwei Minuten aus seinem Antwort-Zwischenspeicher (`sync_response_cache_duration`); mit immer gleichem
+  /// Filter kam die Ablehnung deshalb erst nach ~2 Minuten an (#43, am Testserver gemessen: 122 s statt
+  /// sofort). Ein Ereignistyp, den es nie gibt, in `not_types` macht jede Abfrage verschieden, ohne das
+  /// Ergebnis zu ändern.
+  @visibleForTesting
+  static String rejectionPollFilter(String roomId, int poll) => json.encode(<String, Object?>{
+        'presence': <String, Object?>{'types': <String>[]},
+        'account_data': <String, Object?>{'types': <String>[]},
+        'room': <String, Object?>{
+          'rooms': <String>[roomId],
+          'include_leave': true,
+          'account_data': <String, Object?>{'types': <String>[]},
+          'ephemeral': <String, Object?>{'types': <String>[]},
+          'timeline': <String, Object?>{
+            'limit': 10,
+            'not_types': <String>['de.inneso.familynexus.poll.$poll'],
+          },
+        },
+      });
+
   Future<void> _pollRejection() async {
     final c = _client;
     final req = _joinRequest();
@@ -1490,17 +1522,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       final base = c.homeserver;
       if (base == null || base.scheme != 'https') return;
       await c.ensureNotSoftLoggedOut();
-      final filter = json.encode(<String, Object?>{
-        'presence': <String, Object?>{'types': <String>[]},
-        'account_data': <String, Object?>{'types': <String>[]},
-        'room': <String, Object?>{
-          'rooms': <String>[roomId],
-          'include_leave': true,
-          'account_data': <String, Object?>{'types': <String>[]},
-          'ephemeral': <String, Object?>{'types': <String>[]},
-          'timeline': <String, Object?>{'limit': 10},
-        },
-      });
+      final filter = rejectionPollFilter(roomId, ++_rejectionPolls);
       final uri = base.replace(
         path: '/_matrix/client/v3/sync',
         queryParameters: <String, String>{'filter': filter, 'timeout': '0', 'set_presence': 'offline'},
@@ -2522,7 +2544,6 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   // ------------------------------------------------------ Einzelchats (E-39)
 
-  Iterable<Room> _dmRooms() => _dmTimelines.keys.map(_roomForThread).whereType<Room>();
 
   void _resetDirectChats() {
     for (final t in _dmTimelines.values) {
@@ -2629,11 +2650,11 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
             kind: ThreadKind.direct,
             title: f.member(e.value)?.displayName ?? e.value,
             peerId: e.value,
-            unread: client.getRoomById(e.key)?.notificationCount ?? 0,
+            unread: unreadIn(e.key),
           ),
     ]..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     _threads = <ChatThread>[
-      ChatThread(id: ChatThread.familyId, kind: ThreadKind.family, title: f.name, unread: familyRoom.notificationCount),
+      ChatThread(id: ChatThread.familyId, kind: ThreadKind.family, title: f.name, unread: unreadIn(ChatThread.familyId)),
       ...dms,
     ];
   }

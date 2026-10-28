@@ -9,6 +9,11 @@ class FakeReminderScheduler implements ReminderScheduler {
   int cancelled = 0;
   int requested = 0;
 
+  /// `false`: „Erlauben“ bringt keine Berechtigung (System zeigt keinen Dialog, #57).
+  bool grantOnRequest = true;
+  bool settingsAvailable = true;
+  int settingsOpened = 0;
+
   List<PlannedReminder> get last => plans.isEmpty ? const <PlannedReminder>[] : plans.last;
 
   @override
@@ -20,8 +25,18 @@ class FakeReminderScheduler implements ReminderScheduler {
   @override
   Future<ReminderPermission> request() async {
     requested++;
-    current = ReminderPermission.granted;
+    if (grantOnRequest) current = ReminderPermission.granted;
     return current;
+  }
+
+  @override
+  bool get canOpenSettings => settingsAvailable;
+
+  @override
+  Future<bool> openSettings() async {
+    if (!settingsAvailable) return false;
+    settingsOpened++;
+    return true;
   }
 
   @override

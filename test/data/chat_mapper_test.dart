@@ -219,6 +219,51 @@ void main() {
       expect(m.map((e) => e.id), <String>[ChatMapper.beforeJoinId, r'$t', r'$e4']);
     });
 
+    group('#65: Zähler ungelesener Nachrichten', () {
+      int unread(List<Event> chronological, int server) =>
+          ChatMapper.unreadReadable(timeline(chronological.reversed.toList()), serverCount: server, myUserId: me);
+
+      test('nicht lesbare Ereignisse und App-Daten zählen nicht, nur die lesbare Nachricht', () {
+        final events = <Event>[
+          encrypted(r'$e1', 10),
+          encrypted(r'$e2', 20),
+          member(r'$j', 'join', prev: 'invite', ts: 40),
+          encrypted(r'$e3', 45), // z. B. noch nicht entschlüsselte Kalenderänderung
+          ev(r'$cal', <String, Object?>{'id': 'x'}, type: 'de.inneso.familynexus.event', ts: 50),
+          ev(r'$t', text('Hallo von Nutzer 1'), ts: 60),
+        ];
+        expect(unread(events, 8), 1, reason: 'Server meldet 8, lesbar ist eine');
+      });
+
+      test('Server meldet 0: nichts ungelesen; mehr Nachrichten als der Server: Server ist Obergrenze', () {
+        final events = <Event>[ev(r'$a', text('eins'), ts: 1), ev(r'$b', text('zwei'), ts: 2)];
+        expect(unread(events, 0), 0);
+        expect(unread(events, 1), 1);
+        expect(unread(events, 5), 2);
+      });
+
+      test('zählt nur nach der eigenen Lesemarke bzw. eigenen Nachricht', () {
+        room.roomAccountData['m.fully_read'] =
+            BasicEvent(type: 'm.fully_read', content: <String, Object?>{'event_id': r'$b'});
+        final events = <Event>[
+          ev(r'$a', text('alt'), ts: 1),
+          ev(r'$b', text('gelesen'), ts: 2),
+          ev(r'$c', text('neu'), ts: 3),
+        ];
+        expect(unread(events, 3), 1);
+        room.roomAccountData.remove('m.fully_read');
+        final withOwn = <Event>[
+          ev(r'$a', text('alt'), ts: 1),
+          ev(r'$own', text('meine Antwort'), sender: me, ts: 2),
+          ev(r'$c', text('neu'), ts: 3),
+          ev(r'$edit', text('* neu', extra: <String, Object?>{
+            'm.relates_to': <String, Object?>{'rel_type': 'm.replace', 'event_id': r'$c'},
+          }), ts: 4),
+        ];
+        expect(unread(withOwn, 3), 1, reason: 'Bearbeitung zählt nicht extra');
+      });
+    });
+
     test('Namensänderung nach dem Beitritt zählt nicht als Beitritt', () {
       final m = mapAs(<Event>[
         encrypted(r'$e1', 10),
@@ -233,6 +278,47 @@ void main() {
       final m = mapAs(<Event>[encrypted(r'$e1', 10), encrypted(r'$e2', 20)]);
       expect(m.map((e) => e.id), <String>[r'$e1', r'$e2']);
       expect(m.any((e) => e.beforeJoin), isFalse);
+    });
+  });
+
+  group('#60: Absender mit gelöschtem Konto', () {
+    const gone = '@ida:fake.test';
+    Event member(String id, String membership, {String? name, String? prevName, int ts = 0}) =>
+        Event.fromJson(<String, Object?>{
+          'type': 'm.room.member',
+          'event_id': id,
+          'sender': gone,
+          'state_key': gone,
+          'origin_server_ts': ts,
+          'content': <String, Object?>{'membership': membership, 'displayname': ?name},
+          if (prevName != null)
+            'unsigned': <String, Object?>{
+              'prev_content': <String, Object?>{'membership': 'join', 'displayname': prevName},
+            },
+        }, room);
+
+    test('Name aus früheren Mitglieds-Ereignissen statt Matrix-ID', () {
+      // Löschen mit Datenlöschung: erst Name geleert (Profiländerung), dann Austritt ohne Namen.
+      final leave = member(r'$leave', 'leave', ts: 40);
+      room.setState(leave);
+      final m = map(<Event>[
+        member(r'$join', 'join', name: 'Ida', ts: 10),
+        ev(r'$t', text('Tschüss'), sender: gone, ts: 20),
+        member(r'$clear', 'join', prevName: 'Ida', ts: 30),
+        leave,
+      ]);
+      expect(m.single.senderName, 'Ida');
+    });
+
+    test('kein früherer Name geladen (z. B. nach Wiederherstellung): leer = „Ehemaliges Mitglied“', () {
+      room.setState(member(r'$leave', 'leave', ts: 40));
+      final m = map(<Event>[ev(r'$t', text('Tschüss'), sender: gone, ts: 20)]);
+      expect(m.single.senderName, isEmpty);
+    });
+
+    test('noch Mitglied ohne Namen: Matrix-ID wie bisher', () {
+      final m = map(<Event>[ev(r'$t', text('Hallo'), sender: '@neu:fake.test', ts: 20)]);
+      expect(m.single.senderName, '@neu:fake.test');
     });
   });
 }

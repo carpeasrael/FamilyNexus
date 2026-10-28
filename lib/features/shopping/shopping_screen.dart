@@ -260,6 +260,8 @@ class _EditDialogState extends State<_EditDialog> {
     super.dispose();
   }
 
+  void _save() => Navigator.pop(context, (title: _title.text, quantity: _qty.text));
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -272,17 +274,22 @@ class _EditDialogState extends State<_EditDialog> {
           maxLength: ShoppingItem.maxTitle,
           enableIMEPersonalizedLearning: false,
           decoration: InputDecoration(labelText: l.shoppingHintItem),
+          // Desktop: Enter speichert (#68); mobil springt „Weiter“ zur Menge.
+          textInputAction: TextInputAction.next,
+          onSubmitted: PlatformInfo.enterSubmits ? (_) => _save() : null,
         ),
         TextField(
           controller: _qty,
           maxLength: ShoppingItem.maxQuantity,
           enableIMEPersonalizedLearning: false,
           decoration: InputDecoration(labelText: l.shoppingHintQuantity),
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => _save(),
         ),
       ]),
       actions: <Widget>[
         TextButton(onPressed: () => Navigator.pop(context), child: Text(l.cancel)),
-        FilledButton(onPressed: () => Navigator.pop(context, (title: _title.text, quantity: _qty.text)), child: Text(l.save)),
+        FilledButton(onPressed: _save, child: Text(l.save)),
       ],
     );
   }

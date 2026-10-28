@@ -53,6 +53,37 @@ void main() {
     expect(app.shoppingStore.items.values.single.title, 'Milch');
   }, variant: desktop);
 
+  testWidgets('#68 Desktop: Enter speichert im Dialog „Familienname ändern“', (tester) async {
+    final app = await _open(tester, 'Familie');
+    await tester.tap(find.byTooltip('Familienname ändern'));
+    await tester.pumpAndSettle();
+    await _type(tester, find.widgetWithText(TextField, 'Name der Familie'), 'Neue Familie');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(app.gateway.family!.name, 'Neue Familie');
+  }, variant: desktop);
+
+  testWidgets('#68 Desktop: Enter speichert im Einkauf „Bearbeiten“ (Name und Menge)', (tester) async {
+    final app = await _open(tester, 'Einkauf');
+    await _type(tester, find.widgetWithText(TextField, 'Was wird gebraucht?'), 'Brot');
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pumpAndSettle();
+    for (final (field, value) in <(int, String)>[(0, 'Vollkornbrot'), (1, '2 Stück')]) {
+      await tester.tap(find.byTooltip(field == 0 ? 'Brot' : 'Vollkornbrot'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Bearbeiten'));
+      await tester.pumpAndSettle();
+      final f = find.descendant(of: find.byType(AlertDialog), matching: find.byType(TextField)).at(field);
+      await _type(tester, f, value);
+      await tester.testTextInput.receiveAction(field == 0 ? TextInputAction.next : TextInputAction.done);
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsNothing, reason: 'Feld $field: Enter schließt und speichert');
+    }
+    final item = app.shoppingStore.items.values.single;
+    expect((item.title, item.quantity), ('Vollkornbrot', '2 Stück'));
+  }, variant: desktop);
+
   testWidgets('Mobil: „Weiter“ im Einkaufsfeld springt nur zur Menge, Enter sendet im Chat nicht', (tester) async {
     final app = await _open(tester, 'Einkauf');
     await _type(tester, find.widgetWithText(TextField, 'Was wird gebraucht?'), 'Milch');

@@ -164,7 +164,8 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
   /// Verschiebt den Beginn; das Ende wandert mit, die Dauer bleibt gleich (#34).
   void _moveStart(DateTime date, TimeOfDay time) {
     var duration = _wall(_endDate, _endTime).difference(_wall(_startDate, _startTime));
-    if (duration.isNegative) duration = const Duration(hours: 1);
+    // Auch Ende = Beginn ergibt eine Stunde, sonst wanderte ein Termin ohne Dauer mit (#56).
+    if (duration <= Duration.zero) duration = const Duration(hours: 1);
     if (_allDay) {
       final days = _endDate.difference(_startDate).inDays;
       _startDate = date;
@@ -179,7 +180,18 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
   }
 
   Future<void> _pickTime({required bool start}) async {
-    final t = await showTimePicker(context: context, initialTime: start ? _startTime : _endTime);
+    // Flutter zeigt das Ziffernblatt im Format der App-Sprache (Deutsch: 24 h), prüft die Texteingabe
+    // aber nach der Geräteeinstellung. Auf einem 12-h-Gerät lehnte sie deshalb 13–23 ab (#64).
+    final use24h = MediaQuery.alwaysUse24HourFormatOf(context) ||
+        hourFormat(of: MaterialLocalizations.of(context).timeOfDayFormat()) != HourFormat.h;
+    final t = await showTimePicker(
+      context: context,
+      initialTime: start ? _startTime : _endTime,
+      builder: (ctx, child) => MediaQuery(
+        data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: use24h),
+        child: child!,
+      ),
+    );
     if (t == null) return;
     setState(() {
       if (start) {
@@ -239,7 +251,8 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
       start = _combine(_startDate, _startTime);
       end = _combine(_endDate, _endTime);
     }
-    if (end.isBefore(start)) {
+    // Ganztägig: gleicher Tag ist erlaubt; mit Uhrzeit muss das Ende nach dem Beginn liegen (#56).
+    if (_allDay ? end.isBefore(start) : !end.isAfter(start)) {
       setState(() => _timeError = l.eventEndBeforeStart);
       return;
     }

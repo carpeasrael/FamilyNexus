@@ -5,6 +5,10 @@ import '../../core/app_log.dart';
 /// Authentifizierung mit den Geräteanmeldedaten des Betriebssystems (PIN, Muster,
 /// Passwort oder Biometrie). Die App speichert selbst keine PIN (E-17).
 abstract class DeviceAuth {
+  /// `false`, wenn die Plattform gar keine Geräteanmeldung für Apps bietet (Linux, Browser). Dann
+  /// blendet die App den Schalter „App-Sperre“ aus, statt eine fehlende Bildschirmsperre zu melden (#67).
+  bool get supported;
+
   /// `true`, wenn das Gerät eine gesicherte Sperre eingerichtet hat.
   Future<bool> isAvailable();
 
@@ -15,6 +19,9 @@ abstract class DeviceAuth {
 class LocalDeviceAuth implements DeviceAuth {
   LocalDeviceAuth([LocalAuthentication? auth]) : _auth = auth ?? LocalAuthentication();
   final LocalAuthentication _auth;
+
+  @override
+  bool get supported => true;
 
   @override
   Future<bool> isAvailable() async {
@@ -43,6 +50,9 @@ class LocalDeviceAuth implements DeviceAuth {
 /// Plattform ohne Geräteanmeldung für Apps (Linux, SA-6): Die App-Sperre lässt sich nicht einschalten.
 class UnavailableDeviceAuth implements DeviceAuth {
   const UnavailableDeviceAuth();
+
+  @override
+  bool get supported => false;
 
   @override
   Future<bool> isAvailable() async => false;

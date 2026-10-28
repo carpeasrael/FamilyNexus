@@ -40,6 +40,8 @@ class _TextPromptDialogState extends State<TextPromptDialog> {
     super.dispose();
   }
 
+  void _confirm() => Navigator.pop(context, _ctrl.text);
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -56,11 +58,14 @@ class _TextPromptDialogState extends State<TextPromptDialog> {
           enableSuggestions: !widget.obscure,
           enableIMEPersonalizedLearning: false,
           decoration: InputDecoration(labelText: widget.label),
+          // Enter (Desktop) bzw. „Fertig“ (Tastatur) bestätigt wie die Schaltfläche (#68).
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => _confirm(),
         ),
       ]),
       actions: <Widget>[
         TextButton(onPressed: () => Navigator.pop(context), child: Text(l.cancel)),
-        FilledButton(onPressed: () => Navigator.pop(context, _ctrl.text), child: Text(widget.confirmLabel)),
+        FilledButton(onPressed: _confirm, child: Text(widget.confirmLabel)),
       ],
     );
   }

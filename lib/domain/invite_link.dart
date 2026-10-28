@@ -125,6 +125,10 @@ class InviteLink {
 
   static final RegExp _webLink = RegExp('${RegExp.escape(landingPage)}?#', caseSensitive: false);
 
+  /// App-Link mit `#` statt `?` (so steht er hinter der Landingpage; beim Kopieren aus der Adresszeile
+  /// entsteht `familynexus://join#…`). Die Angaben sind dieselben (#59).
+  static final RegExp _appLinkFragment = RegExp('$scheme://$host/?#', caseSensitive: false);
+
   /// Erzeugt den Link-Text.
   static String create({
     required String roomId,
@@ -324,7 +328,8 @@ class InviteLink {
     // Der https-Link der Landingpage trägt dieselben Angaben im Fragment; er wird wie der App-Link geprüft.
     final text = (input.length > maxInput ? input.substring(0, maxInput) : input)
         .replaceAll('&amp;', '&')
-        .replaceAll(_webLink, '$scheme://$host?');
+        .replaceAll(_webLink, '$scheme://$host?')
+        .replaceAll(_appLinkFragment, '$scheme://$host?');
     final variants = <String>[text];
     if (text.contains('=3D') || RegExp(r'=\r?\n').hasMatch(text)) {
       variants.add(text

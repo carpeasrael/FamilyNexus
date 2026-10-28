@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -51,6 +53,20 @@ void main() {
       expect(rejected(leave(ts: requestedAt - const Duration(hours: 2).inMilliseconds)), isFalse);
       expect(rejected(leave(sender: me)), isFalse);
       expect(rejected(leave(prev: null, ts: requestedAt - 1000)), isFalse, reason: 'ohne Vorzustand gilt der strenge Vergleich');
+    });
+  });
+
+  group('#43: Abfrage der Ablehnung umgeht den Sync-Zwischenspeicher des Servers', () {
+    test('jede Abfrage hat einen anderen Filter, Inhalt bleibt auf den einen Raum beschränkt', () {
+      final a = SdkMatrixGateway.rejectionPollFilter('!fam:fake.test', 1);
+      final b = SdkMatrixGateway.rejectionPollFilter('!fam:fake.test', 2);
+      expect(a, isNot(b), reason: 'gleiche Anfragen beantwortet Synapse bis zu 2 Minuten aus dem Zwischenspeicher');
+      final room = (jsonDecode(a) as Map<String, Object?>)['room']! as Map<String, Object?>;
+      expect(room['rooms'], <String>['!fam:fake.test']);
+      expect(room['include_leave'], isTrue);
+      final timeline = room['timeline']! as Map<String, Object?>;
+      expect(timeline['limit'], 10);
+      expect(timeline['not_types'], <String>['de.inneso.familynexus.poll.1'], reason: 'nur ein nie vorkommender Typ wird ausgeschlossen');
     });
   });
 }

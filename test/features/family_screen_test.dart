@@ -59,6 +59,13 @@ void main() {
     expect(find.textContaining('3 Tage gültig'), findsOneWidget);
     expect(find.text('Per E-Mail senden'), findsOneWidget);
     expect(find.text('Link kopieren'), findsOneWidget);
+    // #66: Die Bestätigung steht im Dialog, nicht in einem SnackBar dahinter.
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async => null);
+    addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+    await tester.tap(find.text('Link kopieren'));
+    await tester.pumpAndSettle();
+    expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Link kopiert.')), findsOneWidget);
+    expect(find.descendant(of: find.byType(SnackBar), matching: find.text('Link kopiert.')), findsNothing);
     final link = await app.gateway.createInviteLink();
     expect(link, startsWith('familynexus://join?'));
   });

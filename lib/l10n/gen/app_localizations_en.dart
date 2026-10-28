@@ -314,6 +314,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatYou => 'You';
 
   @override
+  String get chatFormerMember => 'Former member';
+
+  @override
   String get logout => 'Sign out';
 
   @override
@@ -418,6 +421,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remindersAllow => 'Allow';
+
+  @override
+  String get remindersPermissionSystem =>
+      'Notifications are switched off in the system settings. Allow them there for FamilyNexus, otherwise no reminders appear.';
+
+  @override
+  String get remindersOpenSettings => 'Open settings';
 
   @override
   String remindersPlanned(int count) {
@@ -549,7 +559,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventEnd => 'End';
 
   @override
-  String get eventEndBeforeStart => 'The end is before the start.';
+  String get eventEndBeforeStart => 'The end must be after the start.';
 
   @override
   String get eventLocation => 'Location';

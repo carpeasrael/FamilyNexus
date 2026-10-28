@@ -11,6 +11,7 @@ import '../presence/presence_view.dart';
 import '../tasks/tasks_screen.dart';
 import '../../domain/family.dart';
 import '../../domain/presence.dart';
+import '../reminders/permission_hint.dart';
 
 /// „Heute“: nächste Termine, Erinnerungen, ungelesene Nachrichten.
 class TodayScreen extends StatelessWidget {
@@ -40,11 +41,14 @@ class TodayScreen extends StatelessWidget {
           final perm = reminders?.permission ?? ReminderPermission.granted;
           return ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, 96), children: <Widget>[
             if (perm != ReminderPermission.granted)
-              SectionCard(
-                title: l.remindersTitle,
-                trailing: TextButton(onPressed: () => reminders?.requestPermission().ignore(), child: Text(l.remindersAllow)),
-                child: Text(perm == ReminderPermission.notificationsDenied ? l.remindersPermissionNotifications : l.remindersPermissionExact),
-              ),
+              Builder(builder: (context) {
+                final hint = reminderPermissionHint(l, reminders, perm);
+                return SectionCard(
+                  title: l.remindersTitle,
+                  trailing: TextButton(onPressed: hint.onPressed, child: Text(hint.action)),
+                  child: Text(hint.text),
+                );
+              }),
             SectionCard(
               title: l.todayNext,
               child: upcoming.isEmpty

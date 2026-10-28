@@ -33,6 +33,13 @@ class ReminderCoordinator extends ChangeNotifier {
   int _plannedCount = 0;
 
   ReminderPermission get permission => _permission;
+
+  /// `true`, wenn „Erlauben“ die Berechtigung nicht gebracht hat: Das System zeigt nach einer Ablehnung
+  /// (oder bei manchen macOS-Builds) keinen Dialog mehr; dann führt nur der Weg über die Einstellungen
+  /// weiter (#57). Nach der Rückkehr in die App liest [reschedule] die Berechtigung neu (HomeShell).
+  bool get needsSystemSettings =>
+      _askedWithoutSuccess && _permission == ReminderPermission.notificationsDenied && scheduler.canOpenSettings;
+  bool _askedWithoutSuccess = false;
   int get plannedCount => _plannedCount;
 
   void start() {
@@ -61,10 +68,14 @@ class ReminderCoordinator extends ChangeNotifier {
 
   Future<ReminderPermission> requestPermission() async {
     _permission = await scheduler.request();
+    _askedWithoutSuccess = _permission == ReminderPermission.notificationsDenied;
     notifyListeners();
     await reschedule();
     return _permission;
   }
+
+  /// Öffnet die Benachrichtigungs-Einstellungen des Systems; `false`, wenn das nicht geht.
+  Future<bool> openSystemSettings() => scheduler.openSettings();
 
   bool _running = false;
   bool _again = false;

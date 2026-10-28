@@ -64,6 +64,16 @@ void main() {
     });
   }
 
+  for (final b in Brightness.values) {
+    for (final accent in AccentChoice.values) {
+      test('SnackBar-Aktion lesbar (${b.name}, ${accent.name}) – Issue #62', () {
+        final s = buildTheme(b, accent: accent).snackBarTheme;
+        expect(contrastRatio(s.actionTextColor!, s.backgroundColor!), greaterThanOrEqualTo(4.5));
+        expect(contrastRatio(s.contentTextStyle!.color!, s.backgroundColor!), greaterThanOrEqualTo(4.5));
+      });
+    }
+  }
+
   test('Rahmen und Fokus gegen Oberfläche ≥ 3 (sichtbare Bedienelemente)', () {
     for (final t in <AuroraTokens>[AuroraTokens.dark, AuroraTokens.light]) {
       final border = composite(t.glassBorder, composite(t.glassFill, t.bgBody));
