@@ -1,0 +1,2 @@
+n1: {"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
+i2: {"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
