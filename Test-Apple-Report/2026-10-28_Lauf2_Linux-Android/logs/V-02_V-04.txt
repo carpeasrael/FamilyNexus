@@ -1,0 +1,10 @@
+## V-02 G1 Linux
+2026-10-28T08:34:20+01:00
+         Version: 1.2.1
+          Commit: c9c6345929a621e27f463524edb2dbb3be549c1730487ae53eacb5d28c941…
+           Datum: 2026-10-28 05:38:42 +0000
+{"app_name":"family_nexus","version":"1.2.1","build_number":"18","package_name":"family_nexus"}
+## V-02 G2 Android
+16
+    versionCode=18 minSdk=26 targetSdk=36
+    versionName=1.2.1

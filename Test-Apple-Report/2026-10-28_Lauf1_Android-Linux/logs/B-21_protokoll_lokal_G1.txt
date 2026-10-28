@@ -1,0 +1,512 @@
+FamilyNexus – Lokal gespeicherte Daten
+Erstellt: 2026-10-28 07:29 · App-Version 1.2.1 (18)
+
+== Speicherorte ==
+Datenbank-Ordner: /data/user/0/de.inneso.familynexus/databases
+App-Daten: Termine, Listen, Einstellungen (verschlüsselt): /data/user/0/de.inneso.familynexus/databases/familynexus_app.db
+Chat- und Abgleichsdaten: Matrix (verschlüsselt): /data/user/0/de.inneso.familynexus/databases/familynexus_matrix.db
+Datenbankschlüssel: Android Keystore (an dieses Gerät gebunden)
+
+== Schlüsselspeicher ==
+- db.app: vorhanden (Wert wird nicht angezeigt)
+- db.matrix: vorhanden (Wert wird nicht angezeigt)
+
+== App-Datenbank ==
+Datei: /data/user/0/de.inneso.familynexus/databases/familynexus_app.db
+Dateigröße: 80.0 KB
+
+-- settings: 11 Einträge --
+* key=onboardingDone
+    value=true
+* key=language
+    value=de
+* key=calendarOwner
+    value=@fnt-1028b-n1:matrix.chaostribunal.de|!oQFImVlqvHSFHGkJCb:matrix.chaostribunal.de
+* key=accent
+    value=teal
+* key=reduceEffects
+    value=false
+* key=theme
+    value=dark
+* key=defaultReminders
+    value=30
+* key=lockTimeout
+    value=0
+* key=lockEnabled
+    value=false
+* key=secureScreen
+    value=false
+* key=shareOnlineStatus
+    value=false
+
+-- events: 4 Einträge --
+* id=18dae7cd-c705-4977-83bd-aabe873d807b
+    owner=@fnt-1028b-n1:matrix.chaostribunal.de
+    visibility=shared
+    version=6
+    published=6
+    deleted=0
+    data={
+        "v": 1,
+        "id": "18dae7cd-c705-4977-83bd-aabe873d807b",
+        "owner": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 6,
+        "deleted": false,
+        "title": "Test geteilt 2",
+        "start": "2026-10-29T09:00:00.000Z",
+        "end": "2026-10-29T10:00:00.000Z",
+        "tz": "Europe/Berlin",
+        "all_day": false,
+        "location": "Kueche",
+        "note": "Testnotiz",
+        "color": 3,
+        "rec": {
+          "freq": "none",
+          "interval": 1,
+          "weekdays": [],
+          "count": null,
+          "until": null,
+          "ex": []
+        },
+        "attendees": [],
+        "updated_at": "2026-10-28T06:10:26.515895Z"
+      }
+* id=76fb3abd-88a4-4348-a779-0bc63d347dd7
+    owner=@fnt-1028b-n1:matrix.chaostribunal.de
+    visibility=private
+    version=1
+    published=1
+    deleted=0
+    data={
+        "v": 1,
+        "id": "76fb3abd-88a4-4348-a779-0bc63d347dd7",
+        "owner": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 1,
+        "deleted": false,
+        "title": "Test privat",
+        "start": "2026-10-29T20:00:00.000Z",
+        "end": "2026-10-29T21:00:00.000Z",
+        "tz": "Europe/Berlin",
+        "all_day": false,
+        "location": "",
+        "note": "",
+        "color": 4,
+        "rec": {
+          "freq": "none",
+          "interval": 1,
+          "weekdays": [],
+          "count": null,
+          "until": null,
+          "ex": []
+        },
+        "attendees": [],
+        "updated_at": "2026-10-28T06:04:05.127152Z"
+      }
+* id=f46280e4-54e4-47a4-8459-d8ca0e425881
+    owner=@fnt-1028b-n1:matrix.chaostribunal.de
+    visibility=private
+    version=2
+    published=2
+    deleted=0
+    data={
+        "v": 1,
+        "id": "f46280e4-54e4-47a4-8459-d8ca0e425881",
+        "owner": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 2,
+        "deleted": false,
+        "title": "Test Serie",
+        "start": "2026-10-30T00:00:00.000Z",
+        "end": "2026-10-30T00:00:00.000Z",
+        "tz": "Europe/Berlin",
+        "all_day": true,
+        "location": "",
+        "note": "",
+        "color": 4,
+        "rec": {
+          "freq": "weekly",
+          "interval": 1,
+          "weekdays": [],
+          "count": 3,
+          "until": null,
+          "ex": [
+            "2026-11-06"
+          ]
+        },
+        "attendees": [],
+        "updated_at": "2026-10-28T06:13:42.714050Z"
+      }
+* id=53ff57ae-9943-45f5-9a35-427f842e3845
+    owner=@fnt-1028b-n1:matrix.chaostribunal.de
+    visibility=private
+    version=2
+    published=2
+    deleted=1
+    data={
+        "v": 1,
+        "id": "53ff57ae-9943-45f5-9a35-427f842e3845",
+        "owner": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 2,
+        "deleted": true,
+        "title": "–",
+        "start": "2000-01-01T00:00:00.000Z",
+        "end": "2000-01-01T00:00:00.000Z",
+        "tz": "Etc/UTC",
+        "all_day": false,
+        "location": "",
+        "note": "",
+        "color": 0,
+        "rec": {
+          "freq": "none",
+          "interval": 1,
+          "weekdays": [],
+          "count": null,
+          "until": null,
+          "ex": []
+        },
+        "attendees": [],
+        "updated_at": "2026-10-28T06:13:57.779210Z"
+      }
+
+-- event_history: 7 Einträge --
+* id=18dae7cd-c705-4977-83bd-aabe873d807b
+    version=1
+    updated_ms=1793167236120
+    owner=@fnt-1028b-n1:matrix.chaostribunal.de
+    visibility=shared
+    data={
+        "v": 1,
+        "id": "18dae7cd-c705-4977-83bd-aabe873d807b",
+        "owner": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 1,
+        "deleted": false,
+        "title": "Test geteilt",
+        "start": "2026-10-29T09:00:00.000Z",
+        "end": "2026-10-29T10:00:00.000Z",
+        "tz": "Europe/Berlin",
+        "all_day": false,
+        "location": "Kueche",
+        "note": "Testnotiz",
+        "color": 3,
+        "rec": {
+          "freq": "none",
+          "interval": 1,
+          "weekdays": [],
+          "count": null,
+          "until": null,
+          "ex": []
+        },
+        "attendees": [],
+        "updated_at": "2026-10-28T06:00:36.120607Z"
+      }
+* id=18dae7cd-c705-4977-83bd-aabe873d807b
+    version=2
+    updated_ms=1793167628016
+    owner=@fnt-1028b-n1:matrix.chaostribunal.de
+    visibility=shared
+    data={
+        "v": 1,
+        "id": "18dae7cd-c705-4977-83bd-aabe873d807b",
+        "owner": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 2,
+        "deleted": false,
+        "title": "Test geteilt",
+        "start": "2026-10-29T00:00:00.000Z",
+        "end": "2026-10-29T00:00:00.000Z",
+        "tz": "Europe/Berlin",
+        "all_day": true,
+        "location": "Kueche",
+        "note": "Testnotiz",
+        "color": 3,
+        "rec": {
+          "freq": "none",
+          "interval": 1,
+          "weekdays": [],
+          "count": null,
+          "until": null,
+          "ex": []
+        },
+        "attendees": [],
+        "updated_at": "2026-10-28T06:07:08.016176Z"
+      }
+* id=18dae7cd-c705-4977-83bd-aabe873d807b
+    version=3
+    updated_ms=1793167648917
+    owner=@fnt-1028b-n1:matrix.chaostribunal.de
+    visibility=shared
+    data={
+        "v": 1,
+        "id": "18dae7cd-c705-4977-83bd-aabe873d807b",
+        "owner": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 3,
+        "deleted": false,
+        "title": "Test geteilt 2",
+        "start": "2026-10-29T00:00:00.000Z",
+        "end": "2026-10-29T00:00:00.000Z",
+        "tz": "Europe/Berlin",
+        "all_day": true,
+        "location": "Kueche",
+        "note": "Testnotiz",
+        "color": 3,
+        "rec": {
+          "freq": "none",
+          "interval": 1,
+          "weekdays": [],
+          "count": null,
+          "until": null,
+          "ex": []
+        },
+        "attendees": [],
+        "updated_at": "2026-10-28T06:07:28.917258Z"
+      }
+* id=18dae7cd-c705-4977-83bd-aabe873d807b
+    version=4
+    updated_ms=1793167757450
+    owner=@fnt-1028b-n1:matrix.chaostribunal.de
+    visibility=shared
+    data={
+        "v": 1,
+        "id": "18dae7cd-c705-4977-83bd-aabe873d807b",
+        "owner": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 4,
+        "deleted": false,
+        "title": "Test geteilt 2",
+        "start": "2026-10-29T09:00:00.000Z",
+        "end": "2026-10-29T10:00:00.000Z",
+        "tz": "Europe/Berlin",
+        "all_day": false,
+        "location": "Kueche",
+        "note": "Testnotiz",
+        "color": 3,
+        "rec": {
+          "freq": "none",
+          "interval": 1,
+          "weekdays": [],
+          "count": null,
+          "until": null,
+          "ex": []
+        },
+        "attendees": [],
+        "updated_at": "2026-10-28T06:09:17.450885Z"
+      }
+* id=18dae7cd-c705-4977-83bd-aabe873d807b
+    version=5
+    updated_ms=1793167795967
+    owner=@fnt-1028b-n1:matrix.chaostribunal.de
+    visibility=shared
+    data={
+        "v": 1,
+        "id": "18dae7cd-c705-4977-83bd-aabe873d807b",
+        "owner": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 5,
+        "deleted": false,
+        "title": "Test geteilt 2",
+        "start": "2026-10-29T11:00:00.000Z",
+        "end": "2026-10-29T12:00:00.000Z",
+        "tz": "Europe/Berlin",
+        "all_day": false,
+        "location": "Kueche",
+        "note": "Testnotiz",
+        "color": 3,
+        "rec": {
+          "freq": "none",
+          "interval": 1,
+          "weekdays": [],
+          "count": null,
+          "until": null,
+          "ex": []
+        },
+        "attendees": [],
+        "updated_at": "2026-10-28T06:09:55.967336Z"
+      }
+* id=f46280e4-54e4-47a4-8459-d8ca0e425881
+    version=1
+    updated_ms=1793167521205
+    owner=@fnt-1028b-n1:matrix.chaostribunal.de
+    visibility=private
+    data={
+        "v": 1,
+        "id": "f46280e4-54e4-47a4-8459-d8ca0e425881",
+        "owner": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 1,
+        "deleted": false,
+        "title": "Test Serie",
+        "start": "2026-10-30T00:00:00.000Z",
+        "end": "2026-10-30T00:00:00.000Z",
+        "tz": "Europe/Berlin",
+        "all_day": true,
+        "location": "",
+        "note": "",
+        "color": 4,
+        "rec": {
+          "freq": "weekly",
+          "interval": 1,
+          "weekdays": [],
+          "count": 3,
+          "until": null,
+          "ex": []
+        },
+        "attendees": [],
+        "updated_at": "2026-10-28T06:05:21.205386Z"
+      }
+* id=53ff57ae-9943-45f5-9a35-427f842e3845
+    version=1
+    updated_ms=1793167929180
+    owner=@fnt-1028b-n1:matrix.chaostribunal.de
+    visibility=private
+    data={
+        "v": 1,
+        "id": "53ff57ae-9943-45f5-9a35-427f842e3845",
+        "owner": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 1,
+        "deleted": false,
+        "title": "Test Erinnerung",
+        "start": "2026-10-28T06:23:00.000Z",
+        "end": "2026-10-28T07:23:00.000Z",
+        "tz": "Europe/Berlin",
+        "all_day": false,
+        "location": "",
+        "note": "",
+        "color": 4,
+        "rec": {
+          "freq": "none",
+          "interval": 1,
+          "weekdays": [],
+          "count": null,
+          "until": null,
+          "ex": []
+        },
+        "attendees": [],
+        "updated_at": "2026-10-28T06:12:09.180254Z"
+      }
+
+-- rsvps: keine Einträge --
+
+-- event_reminders: 2 Einträge --
+* event_id=76fb3abd-88a4-4348-a779-0bc63d347dd7
+    minutes=10
+* event_id=f46280e4-54e4-47a4-8459-d8ca0e425881
+    minutes=10
+
+-- person_colors: keine Einträge --
+
+-- shopping_items: 2 Einträge --
+* id=38b4c27f-c271-4c14-9025-7efa3d5c040b
+    version=2
+    published=2
+    deleted=0
+    author=@fnt-1028b-n1:matrix.chaostribunal.de
+    data={
+        "v": 1,
+        "id": "38b4c27f-c271-4c14-9025-7efa3d5c040b",
+        "by": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 2,
+        "deleted": false,
+        "title": "Milch",
+        "qty": "2 l",
+        "checked": true,
+        "ts": 1793168197715
+      }
+* id=e450e43d-202e-43a3-a988-fc6b762a5540
+    version=2
+    published=2
+    deleted=0
+    author=@fnt-1028b-n1:matrix.chaostribunal.de
+    data={
+        "v": 1,
+        "id": "e450e43d-202e-43a3-a988-fc6b762a5540",
+        "by": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 2,
+        "deleted": false,
+        "title": "Vollkornbrot",
+        "qty": "",
+        "checked": false,
+        "ts": 1793168223266
+      }
+
+-- task_lists: 1 Eintrag --
+* id=eaf17d32-319e-4cc6-8f43-31984c6706f9
+    version=1
+    published=1
+    deleted=0
+    author=@fnt-1028b-n1:matrix.chaostribunal.de
+    data={
+        "v": 1,
+        "id": "eaf17d32-319e-4cc6-8f43-31984c6706f9",
+        "by": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "version": 1,
+        "deleted": false,
+        "title": "Bad putzen",
+        "assignee": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "interval": "weekly",
+        "tz": "Europe/Berlin",
+        "items": [
+          {
+            "id": "f5cdff20-370f-49f9-8ad3-6710f4c7363e",
+            "title": "Waschbecken"
+          },
+          {
+            "id": "ce675432-87de-4333-ac9d-b99dff07f4ec",
+            "title": "Spiegel"
+          }
+        ],
+        "ts": 1793168320097
+      }
+
+-- task_log: 1 Eintrag --
+* id=1bfc7f71-c847-418c-b412-8ad82198f875
+    list_id=eaf17d32-319e-4cc6-8f43-31984c6706f9
+    at_ms=1793168373932
+    published=1
+    author=@fnt-1028b-n1:matrix.chaostribunal.de
+    data={
+        "v": 1,
+        "id": "1bfc7f71-c847-418c-b412-8ad82198f875",
+        "list": "eaf17d32-319e-4cc6-8f43-31984c6706f9",
+        "item": "f5cdff20-370f-49f9-8ad3-6710f4c7363e",
+        "by": "@fnt-1028b-n1:matrix.chaostribunal.de",
+        "period": "2026-W44",
+        "on": "2026-10-28",
+        "ts": 1793168373932,
+        "kind": "done",
+        "comment": "erledigt"
+      }
+
+== Matrix-Datenbank (Zwischenspeicher) ==
+Datei: /data/user/0/de.inneso.familynexus/databases/familynexus_matrix.db
+Dateigröße: 300.0 KB
+Benutzername: @fnt-1028b-n1:matrix.chaostribunal.de (TCFDHZAAES)
+Kontodaten (nur Arten, Inhalte werden nicht angezeigt): de.inneso.familynexus.family, de.inneso.familynexus.private_room, m.cross_signing.master, m.cross_signing.self_signing, m.cross_signing.user_signing, m.megolm_backup.v1, m.push_rules, m.secret_storage.default_key, m.secret_storage.key.PI8V3wL09w6OImoc42UsbmoyvEng5SLO
+
+- Familie „Testfamilie 1028b“ (!oQFImVlqvHSFHGkJCb:matrix.chaostribunal.de)
+  Ereignisse auf diesem Gerät: 22
+    Termine (geteilt) (de.inneso.familynexus.event): 6
+    Einkaufszettel (de.inneso.familynexus.shopping): 4
+    Nachrichten (m.room.message): 2
+    Erledigte Aufgaben (de.inneso.familynexus.taskdone): 1
+    Aufgabenlisten (de.inneso.familynexus.tasklist): 1
+    m.room.name: 1
+    m.room.join_rules: 1
+    m.room.history_visibility: 1
+    m.room.encryption: 1
+    m.room.guest_access: 1
+    m.room.power_levels: 1
+    m.room.member: 1
+    m.room.create: 1
+
+- Privater Raum (Abgleich privater Termine) „FamilyNexus“ (!FPyuMNymuIrqBozdVo:matrix.chaostribunal.de)
+  Ereignisse auf diesem Gerät: 13
+    Termine (privat) (de.inneso.familynexus.private_event): 5
+    m.room.name: 1
+    m.room.history_visibility: 1
+    m.room.encryption: 1
+    m.room.guest_access: 1
+    m.room.join_rules: 1
+    m.room.power_levels: 1
+    m.room.member: 1
+    m.room.create: 1
+
+Außerdem gespeichert, aber aus Sicherheitsgründen nicht angezeigt: Zugangstoken der Sitzung, Geräteschlüssel und Schlüssel der verschlüsselten Gespräche.
+
+Nie gespeichert, nur im Arbeitsspeicher: Online-Status der Familienmitglieder.
+Geplante Erinnerungen liegen zusätzlich beim Betriebssystem.
+

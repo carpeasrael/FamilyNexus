@@ -1,0 +1,960 @@
+{
+ "V-01": {
+  "erg": "✅",
+  "obs": "main = origin/main @ bb7f347; Soll 1.2.1+18",
+  "shots": [],
+  "zeit": "06:51"
+ },
+ "V-02": {
+  "erg": "✅",
+  "obs": "G1 Android vorher versionCode 17 (alte App), nach Neuinstallation versionCode 18 / 1.2.1. G2 Flatpak bereits 1.2.1, build_number 18 (Release-Bundle vom 28.10. 05:38 UTC, Commit c9c6345…)",
+  "shots": [],
+  "zeit": "06:51"
+ },
+ "V-03": {
+  "erg": "✅",
+  "obs": "G1: Release-APK v1.2.1 Build 18 (Lauf 40638701954, aus bb7f347) heruntergeladen, sha256 OK, alte App deinstalliert, adb install; x86_64-Emulator startet die Release-APK (Issue #32 behoben). G2: Flatpak-Bundle v1.2.1 Build 18 (sha256 OK) bereits installiert, nicht erneut installiert",
+  "shots": [],
+  "zeit": "06:51"
+ },
+ "V-04": {
+  "erg": "✅",
+  "obs": "G1: durch Deinstallation leer → Willkommen (Gerätesprache en-US, daher Englisch). G2: Daten einer fremden Sitzung (heute 06:47) nach ~/.var/app/de.inneso.familynexus.bak-20261028 umbenannt, Start → Willkommen",
+  "shots": [
+   "V-04-G1",
+   "V-04-G2"
+  ],
+  "zeit": "06:51"
+ },
+ "V-05": {
+  "erg": "✅",
+  "obs": "versions-JSON vorhanden; register liefert flows m.login.dummy (offen)",
+  "shots": [],
+  "zeit": "06:51"
+ },
+ "V-06": {
+  "erg": "✅",
+  "obs": "fnt-1028-n1/-n12/-i2 belegt (fremde Konten, nicht benutzt); fnt-1028b-n1/-n12/-i2/-n9 frei → Datumsteil Lauf 1: 1028b (1028c für Lauf 2 reserviert)",
+  "shots": [],
+  "zeit": "06:51"
+ },
+ "V-07": {
+  "erg": "✅",
+  "obs": "G1 Android: Sprache en-US, PIN per locksettings gesetzt, Benachrichtigungen nicht erlaubt (frisch installiert). G2 Linux: de_DE.UTF-8, keine App-Sperre auf Linux. Bildschirmschutz auf G1 bleibt an: adb emu screenrecord screenshot liefert trotzdem Bilder",
+  "shots": [],
+  "zeit": "06:51"
+ },
+ "A-01": {
+  "erg": "✅",
+  "obs": "Willkommen (Gerätesprache Englisch: „Welcome to FamilyNexus“) mit drei Wegen, drei Hinweisen, Sprache Gerätesprache/Deutsch/English; kein Sprach- oder Server-Schritt",
+  "shots": [
+   "A-01-G1"
+  ],
+  "zeit": "06:51"
+ },
+ "A-02": {
+  "erg": "✅",
+  "obs": "English → Texte sofort englisch; Deutsch → „Willkommen bei FamilyNexus“, ohne Neustart",
+  "shots": [
+   "A-02a-G1",
+   "A-02b-G1"
+  ],
+  "zeit": "06:51"
+ },
+ "A-03": {
+  "erg": "✅",
+  "obs": "„Konto erstellen“, „Schritt 1 von 3“, matrix.org-Hinweis, Feld „Wie heißt du?“, „Konto bei matrix.org erstellen“ (nicht angetippt), „Dein Konto liegt bei matrix.org.“",
+  "shots": [
+   "A-03-G1"
+  ],
+  "zeit": "06:51"
+ },
+ "A-04": {
+  "erg": "✅",
+  "obs": "„nicht-vorhanden.invalid ist gerade nicht erreichbar. Prüfe deine Internetverbindung.“ mit „Erneut versuchen“; „Konto erstellen“ ausgegraut",
+  "shots": [
+   "A-04-G1"
+  ],
+  "zeit": "06:52"
+ },
+ "A-05": {
+  "erg": "✅",
+  "obs": "„Dein Konto liegt bei matrix-synapse-3ues.srv1348446.hstgr.cloud.“, „Betreiber: matrix-synapse-3ues…“, „Kontakt: nicht angegeben“, Metadaten-Hinweis; Felder Name/Benutzername/Passwort mit Hinweisen; „Konto erstellen“ ausgegraut",
+  "shots": [
+   "A-05-G1",
+   "A-05b-G1"
+  ],
+  "zeit": "06:52"
+ },
+ "A-06": {
+  "erg": "⚠️",
+  "obs": "„Joerg Muessig“ → Benutzername „joerg.muessig“, „Der Benutzername ist frei.“ mit Häkchen. Umlaut-Eingabe „Jörg Müßig“ per adb nicht möglich (adb input text ohne Umlaute, Anhang D) → nicht geprüft; wird in Lauf 2 auf Linux (G1) geprüft",
+  "shots": [
+   "A-06-G1"
+  ],
+  "zeit": "06:53"
+ },
+ "A-07": {
+  "erg": "✅",
+  "obs": "Alle sechs Eingaben (ab, Anna, anna mueller [ü per adb nicht tippbar], .anna, anna., 33×a): „Bitte 3 bis 32 Zeichen: …“ vollständig in zwei Zeilen, ohne „…“; „Konto erstellen“ ausgegraut. „Anna“ wird nicht still zu „anna“ (Issue #44 behoben)",
+  "shots": [
+   "A-07a-G1",
+   "A-07b-G1",
+   "A-07c-G1",
+   "A-07d-G1",
+   "A-07e-G1",
+   "A-07f-G1"
+  ],
+  "zeit": "06:54"
+ },
+ "A-08": {
+  "erg": "✅",
+  "obs": "Benutzername bleibt fnt-1028b-n1 nach Namensänderung; „Der Benutzername ist frei.“; 7 Zeichen: ausgegraut, 17 Zeichen: aktiv; „Passwort anzeigen“ ↔ „Passwort verbergen“; leerer Name: ausgegraut",
+  "shots": [
+   "A-08-G1"
+  ],
+  "zeit": "06:55"
+ },
+ "A-09": {
+  "erg": "✅",
+  "obs": "Konto in <1 s angelegt („Erstelle Konto …“ zu kurz für das Bild); kein Zusatzschritt; „Dein Notfall-Schlüssel“, „Schritt 2 von 3“",
+  "shots": [
+   "A-09a-G1",
+   "A-09b-G1"
+  ],
+  "zeit": "06:55"
+ },
+ "A-10": {
+  "erg": "✅",
+  "obs": "Schlüssel erscheint und bleibt unverändert stehen (Bild nach 20 s pixelgleich, #10); „Kopiert. … nach einer Minute geleert.“; „Als Datei speichern“ → Android-Dateiauswahl, gespeichert als /sdcard/Download/FamilyNexus-Notfall-Schluessel.txt mit Konto, Anbieter, Datum, Schlüssel („Gespeichert. …“); „Weiter“ erst nach dem Häkchen aktiv. Abgelegt als KN1 (secure/). Bildschirmvideo per adb screenrecord ist wegen Bildschirmschutz (FLAG_SECURE) leer (16 kB)",
+  "shots": [
+   "A-10a-G1",
+   "A-10b-G1",
+   "A-10c-G1",
+   "A-10d-G1",
+   "A-10e-G1"
+  ],
+  "zeit": "06:57"
+ },
+ "A-11": {
+  "erg": "✅",
+  "obs": "Hinweise zu Moderator und Einwilligung bei Kindern; „Fertig! „Testfamilie 1028b“ ist eingerichtet.“ mit „Später“ und „Jetzt einladen“",
+  "shots": [
+   "A-11-G1"
+  ],
+  "zeit": "06:57"
+ },
+ "A-12": {
+  "erg": "✅",
+  "obs": "Hauptansicht „Heute“",
+  "shots": [
+   "A-12-G1"
+  ],
+  "zeit": "06:57"
+ },
+ "B-02": {
+  "erg": "✅",
+  "obs": "„Benachrichtigungen sind blockiert. …“ → „Erlauben“ → Android-Systemdialog „Allow FamilyNexus to send you notifications?“ → Allow; Hinweis weg",
+  "shots": [
+   "B-02a-G1",
+   "B-02b-G1",
+   "B-02c-G1"
+  ],
+  "zeit": "06:58"
+ },
+ "B-03": {
+  "erg": "✅",
+  "obs": "Sichtbarkeit zuerst „Privat“; bei „Geteilt“ „Verschlüsselt an die Familie gesendet. …“; Termin 29.10. 10:00–11:00 mit „Geteilt“, Ort „Kueche“ (Ersatzschreibung, adb), Notiz, Farbe 4",
+  "shots": [
+   "B-03a-G1",
+   "B-03b-G1"
+  ],
+  "zeit": "07:00"
+ },
+ "B-04": {
+  "erg": "✅",
+  "obs": "Ohne Titel: „Bitte einen Titel eingeben.“; Ende 05:00 vor Beginn 06:00: „Das Ende liegt vor dem Beginn.“ direkt unter Beginn/Ende ohne Scrollen (#34); Zurück ohne Speichern: nichts gespeichert (weiter 1 Termin am 29.10.)",
+  "shots": [
+   "B-04-G1"
+  ],
+  "zeit": "07:02"
+ },
+ "B-05": {
+  "erg": "⚠️",
+  "obs": "Nur Beginn auf 21:00 gesetzt → Ende wandert auf 22:00 (#34 behoben); „Test privat“ 21:00–22:00 „Privat“, Hinweis „Nur auf deinen eigenen Geräten. …“. BEFUND L1-1: Zeitwahl im Texteingabemodus lehnt Stunden > 12 ab („Geben Sie eine gültige Uhrzeit ein“), obwohl Anzeige und Ziffernblatt 24 h zeigen (Gerät en-US/12 h, App Deutsch); über das Ziffernblatt geht 21:00",
+  "shots": [
+   "B-05x-G1",
+   "B-05-G1"
+  ],
+  "zeit": "07:04"
+ },
+ "B-06": {
+  "erg": "✅",
+  "obs": "Drei Vorkommen 30.10., 6.11., 13.11. (Abstand eine Woche), „Ganztägig, Privat, Wiederholt“ (Wiederholung „Wöchentlich“ im Editor gewählt, Ende nach 3)",
+  "shots": [
+   "B-06a-G1",
+   "B-06-G1"
+  ],
+  "zeit": "07:05"
+ },
+ "B-07": {
+  "erg": "✅",
+  "obs": "Tag (Donnerstag, 29. Oktober 2026), Woche (26. Okt. – 1. Nov. 2026), Monat, Agenda zeigen die Termine; Weiter → November/Dezember, Zurück → November, Heute → Oktober 2026",
+  "shots": [
+   "B-07a-G1",
+   "B-07b-G1",
+   "B-07c-G1",
+   "B-07d-G1"
+  ],
+  "zeit": "07:06"
+ },
+ "B-08": {
+  "erg": "⚠️",
+  "obs": "Detail mit „Von dir“, Geteilt, Ort, Notiz; Titel → „Test geteilt 2“ gespeichert. Verlauf zeigt nur frühere Fassungen (nach zwei Speichervorgängen „Verlauf (2)“: „Test geteilt – Version 2“, „Version 1“; der erste Speichervorgang war ein Bedienfehler, bei dem „Ganztägig“ mit angetippt wurde). BEFUND L1-2: Nach „Speichern“ im Editor zeigt die Detailseite weiter die alte Zeitangabe (z. B. „10:00 – 11:00“ statt „12:00 – 13:00“ bzw. statt „Ganztägig“), die Liste zeigt die neue; erst erneutes Öffnen zeigt den richtigen Stand (Titel wird dagegen aktualisiert)",
+  "shots": [
+   "B-08a-G1",
+   "B-08b-G1",
+   "L1-2a-G1",
+   "L1-2b-G1"
+  ],
+  "zeit": "07:10"
+ },
+ "B-09": {
+  "erg": "✅",
+  "obs": "„1 Stunde vorher“ ausgewählt (Häkchen), „Standard verwenden“ setzt zurück auf die Vorgabe",
+  "shots": [
+   "B-09a-G1",
+   "B-09b-G1"
+  ],
+  "zeit": "07:11"
+ },
+ "B-10": {
+  "erg": "✅",
+  "obs": "Termin 07:23, Standard-Erinnerung 10 Min., App im Hintergrund; nach ~50 s (07:13:03) Systembenachrichtigung „Erinnerung“ / „Termin in 10 Minuten“ ohne Titel oder Ort",
+  "shots": [
+   "B-10-G1"
+  ],
+  "zeit": "07:13"
+ },
+ "B-11": {
+  "erg": "✅",
+  "obs": "„Alle Vorkommen oder nur dieses löschen?“ → „Nur dieses“: nur 6.11. verschwindet (30.10. und 13.11. bleiben); „Diesen Termin wirklich löschen?“ → „Löschen“: „Test Erinnerung“ weg",
+  "shots": [
+   "B-11a-G1",
+   "B-11b-G1",
+   "B-11-G1"
+  ],
+  "zeit": "07:14"
+ },
+ "B-01": {
+  "erg": "✅",
+  "obs": "Kacheln Nächste Termine, Erinnerungen, Wer ist online, Einkaufszettel, Aufgaben, Ungelesene Nachrichten; Tabs Heute/Kalender/Chat/Einkauf/Familie; „Menü öffnen“; „Neuer Termin“. Nach B-06/B-11: Nächste Termine chronologisch 29.10. 10:00, 29.10. 21:00, 30.10. ganztägig, 13.11. ganztägig – ganztägige nur an ihrem Tag (#33 behoben)",
+  "shots": [
+   "B-01a-G1",
+   "B-01b-G1"
+  ],
+  "zeit": "07:14"
+ },
+ "B-12": {
+  "erg": "✅",
+  "obs": "„Ende-zu-Ende-verschlüsselt“; mobil „Senden“; „Hallo Testfamilie“ mit Uhrzeit 07:14 (Enter-Verhalten Desktop: in Lauf 1 auf G2 Linux nicht Teil des Schritts, wird in Lauf 2 auf G1 Linux geprüft)",
+  "shots": [
+   "B-12-G1"
+  ],
+  "zeit": "07:14"
+ },
+ "B-13": {
+  "erg": "✅",
+  "obs": "„Im Chat geteilt“; im Chat Karte mit „Test geteilt 2, Donnerstag, 29. Oktober 2026, 10:00 – 11:00“",
+  "shots": [
+   "B-13a-G1",
+   "B-13-G1"
+  ],
+  "zeit": "07:16"
+ },
+ "B-14": {
+  "erg": "✅",
+  "obs": "„Milch“ 2 l und „Brot“ hinzugefügt → „Zu besorgen (2)“; Milch abgehakt → „Erledigt (1)“; Menü „Bearbeiten“ → „Vollkornbrot“; leerer Eintrag (leer bzw. nur Leerzeichen): kein Eintrag entsteht. Enter auf dem Desktop: in Lauf 2 auf G1 Linux",
+  "shots": [
+   "B-14a-G1",
+   "B-14b-G1"
+  ],
+  "zeit": "07:17"
+ },
+ "B-15": {
+  "erg": "✅",
+  "obs": "„Nur Moderatoren legen Listen an. …“; leeres Speichern: „Bitte Titel, Person und mindestens einen Punkt angeben.“; Liste „Bad putzen“ (Du, Wöchentlich am Montag) unter „Mir zugewiesen“, „Nächster Neustart: Montag, 2. November 2026“; Waschbecken mit Kommentar „erledigt“ → „1 von 2 erledigt“, „Erledigt am 28.10.2026 um 07:19“, Verlauf „Du · 28.10.2026, 07:19“ (#38 behoben); Heute: „Aufgaben für dich: 1 offen“",
+  "shots": [
+   "B-15a-G1",
+   "B-15b-G1"
+  ],
+  "zeit": "07:20"
+ },
+ "B-16": {
+  "erg": "✅",
+  "obs": "Sprache English → sofort „Settings“, zurück Deutsch; Design Hell, Akzent Magenta, „Effekte reduzieren“ an – wirken sofort; nach App-Neustart (force-stop, zusätzlich Neustart des Emulators wegen Emulator-Absturz) Hell/Magenta/Effekte an erhalten; danach zurück auf Dunkel/Türkis/aus",
+  "shots": [
+   "B-16a-G1",
+   "B-16b-G1",
+   "B-16c-G1",
+   "B-16d-G1"
+  ],
+  "zeit": "07:23"
+ },
+ "B-17": {
+  "erg": "✅",
+  "obs": "Einschalten verlangt die Geräte-PIN; „Sperren nach“: „Sofort“; App in den Hintergrund und zurück → Systemdialog „FamilyNexus entsperren“ bzw. nach Abbrechen „FamilyNexus ist gesperrt … Entsperren“; Entsperren mit PIN öffnet die App; danach aus (PIN verlangt). Hinweis: Bei sehr kurzer Pause (≤ 2 s) wird nicht gesperrt, da die App erst nach dem Android-Zustand „paused“ zählt",
+  "shots": [
+   "B-17a-G1",
+   "B-17b-G1",
+   "B-17c-G1",
+   "B-17d-G1"
+  ],
+  "zeit": "07:26"
+ },
+ "B-18": {
+  "erg": "✅",
+  "obs": "An: adb screencap liefert schwarzes Bild, App-Übersicht zeigt die Karte schwarz; aus: Bildschirmfoto und Übersicht zeigen den Inhalt. (Die Emulator-Konsole „adb emu screenrecord screenshot“ umgeht FLAG_SECURE und zeigt auch bei „an“ die Live-Vorschau in der Übersicht – nur Messmethode, daher hier adb screencap.) Bildschirmschutz bleibt für den Rest des Laufs aus",
+  "shots": [
+   "B-18a-G1",
+   "B-18b-G1",
+   "B-18c-G1",
+   "B-18d-G1"
+  ],
+  "zeit": "07:29"
+ },
+ "B-21": {
+  "erg": "✅",
+  "obs": "„Speicherorte“: Datenbank-Ordner /data/user/0/de.inneso.familynexus/databases, „Android Keystore (an dieses Gerät gebunden)“, Online beim Anbieter; lokales Protokoll mit Warnhinweis zum Klartext, „App-Version 1.2.1 (18)“, Termine, Einkauf, Aufgaben, Familie, privater Raum; „Kopieren“ → „Protokoll kopiert.“; Online-Protokoll mit „Anzeigename: Test N1“, Gerät „FamilyNexus Android – Verifiziert – Dieses Gerät“, Kontodaten-Arten, Mitglieder, Räume. Beide Protokolle unter logs/B-21_*",
+  "shots": [
+   "B-21a-G1",
+   "B-21b-G1",
+   "B-21c-G1",
+   "B-21d-G1"
+  ],
+  "zeit": "07:30"
+ },
+ "B-22": {
+  "erg": "✅",
+  "obs": "Menü unten „Version 1.2.1 (18)“; Einstellungen → Über die App „Version 1.2.1 (18)“ (#14); Konto: Server matrix-synapse-3ues.srv1348446.hstgr.cloud, Benutzername @fnt-1028b-n1:matrix.chaostribunal.de",
+  "shots": [
+   "B-22a-G1",
+   "B-22b-G1",
+   "B-22c-G1"
+  ],
+  "zeit": "07:30"
+ },
+ "B-19": {
+  "erg": "✅",
+  "obs": "„Online-Status teilen“ aus/an schaltbar (Wirkung in E-15); „Blockierte Mitglieder“: „Du hast niemanden blockiert.“; Datenschutzerklärung vollständig mit Abschnitten (Wer verarbeitet …, Welche Daten …, Was sieht der Server?, Private Termine, Online-Status …, Melden und Blockieren, Aufgabenlisten …)",
+  "shots": [
+   "B-19a-G1",
+   "B-19b-G1",
+   "B-19c-G1"
+  ],
+  "zeit": "07:31"
+ },
+ "B-20": {
+  "erg": "✅",
+  "obs": "Standard-Erinnerung von „10 Minuten vorher“ auf „30 Minuten vorher“ (Mehrfachauswahl, 10 abgewählt); Hinweis „Erinnerungen sind lokale Benachrichtigungen …“; neuer Termin übernimmt 30 Minuten",
+  "shots": [
+   "B-20-G1",
+   "B-20b-G1"
+  ],
+  "zeit": "07:32"
+ },
+ "C-01": {
+  "erg": "✅",
+  "obs": "Anbieter-Adresse eingetragen („Dein Konto liegt bei matrix-synapse-3ues…“); fnt-1028b-n1 + falsches Passwort → „Benutzername oder Passwort stimmen nicht.“, keine Anmeldung",
+  "shots": [
+   "C-01a-G2",
+   "C-01-G2"
+  ],
+  "zeit": "07:33"
+ },
+ "C-02": {
+  "erg": "✅",
+  "obs": "G2: „Mit „FamilyNexus Android“ bestätigen“ → „Warte auf die Gegenseite …“; G1: „@fnt-1028b-n1… (RBAZZILRMF) möchte die Verifizierung starten.“ → Annehmen; beide zeigen dieselben 7 Symbole in gleicher Reihenfolge (Oktopus, Brille, Elefant, Weihnachtsmann, Kuchen, Hammer, Trompete – Namen auf G1 per Bedienungshilfen-Baum auf Deutsch, #39); beide „Sie stimmen überein“ → „Verifiziert.“; G2 Hauptansicht mit F1, geteilten und privaten Terminen (inkl. Serie ohne gelöschtes Vorkommen), Chat, Einkauf (1 offen), Aufgaben (1 offen)",
+  "shots": [
+   "C-02a-G2",
+   "C-02b-G1",
+   "C-02c-G1",
+   "C-02d-G2",
+   "C-02e-G1",
+   "C-02e-G2",
+   "C-02f-G2",
+   "C-02g-G2",
+   "C-02h-G2"
+  ],
+  "zeit": "07:35"
+ },
+ "C-03": {
+  "erg": "✅",
+  "obs": "„Dieses Gerät ist verifiziert.“; „Geräte deines Kontos“: „FamilyNexus Linux (Dieses Gerät) – Verifiziert“, „FamilyNexus Android – Verifiziert“; „Neuen Notfall-Schlüssel erstellen“ vorhanden",
+  "shots": [
+   "C-03-G2"
+  ],
+  "zeit": "07:35"
+ },
+ "C-04": {
+  "erg": "✅",
+  "obs": "Abmelden → Dialog „Abmelden“ (Abbrechen/Abmelden) → App zeigt direkt „Anmelden“ (nicht „Willkommen“)",
+  "shots": [
+   "C-04a-G2",
+   "C-04-G2"
+  ],
+  "zeit": "07:36"
+ },
+ "C-05": {
+  "erg": "✅",
+  "obs": "Seite „Neuer Notfall-Schlüssel“ („Der alte funktioniert danach nicht mehr …“); neuer Schlüssel angezeigt (anders als KN1); Zurück-Pfeil, System-Zurück und Wischgeste vom Rand wirkungslos; Häkchen → „Weiter“ → zurück in den Einstellungen. Als Datei gespeichert, abgelegt als KN1b",
+  "shots": [
+   "C-05a-G1",
+   "C-05b-G1",
+   "C-05c-G1",
+   "C-05d-G1"
+  ],
+  "zeit": "07:37"
+ },
+ "C-06": {
+  "erg": "✅",
+  "obs": "Anmeldung N1 auf G2 → „Dieses Gerät freischalten“ → KN1 → „Freischalten“ → „Der Notfall-Schlüssel passt nicht. Bitte prüfe ihn noch einmal.“; Gerät bleibt gesperrt („Schalte frei …“ zu kurz für das Bild)",
+  "shots": [
+   "C-06a-G2",
+   "C-06-G2"
+  ],
+  "zeit": "07:40"
+ },
+ "C-07": {
+  "erg": "✅",
+  "obs": "KN1b → „Freischalten“ → Gerät freigeschaltet, Hauptansicht „Heute“ mit F1 und den Daten aus B (Termine, Erinnerungen, Einkauf, Aufgaben)",
+  "shots": [
+   "C-07a-G2",
+   "C-07-G2"
+  ],
+  "zeit": "07:41"
+ },
+ "C-08": {
+  "erg": "✅",
+  "obs": "Abmelden wie C-04 → „Anmelden“",
+  "shots": [
+   "C-08-G2"
+  ],
+  "zeit": "07:41"
+ },
+ "D-01": {
+  "erg": "✅",
+  "obs": "Anbieter-Adresse, Name „Test N2“, Benutzername fnt-1028b-n1 → „Schon vergeben – wie wäre es mit „fnt-1028b-n12“?“ mit Chip, „Konto erstellen“ ausgegraut; Chip → „Der Benutzername ist frei.“; Konto angelegt, Schlüssel erstellt und nach 15 s unverändert, „Kopiert. …“, abgelegt als KN2 (über die Zwischenablage); „Weiter“ → Familienschritt „Gründen | Beitreten“",
+  "shots": [
+   "D-01a-G2",
+   "D-01b-G2",
+   "D-01c-G2",
+   "D-01d-G2",
+   "D-01e-G2"
+  ],
+  "zeit": "07:44"
+ },
+ "D-02": {
+  "erg": "⚠️",
+  "obs": "G1: „Code kopiert“ (Code !oQFImVlqvHSFHGkJCb:matrix.chaostribunal.de, auf G2 eingetippt). G2: „abc“ → „Das ist kein gültiger Familien-Code. Er beginnt mit „!“ …“; Code → „Fast geschafft! …“ (07:44:55). G1: Tab „Familie – 1 offene Anfragen“, „Test N2 möchte beitreten – Anfrage über den Familien-Code (ohne Link) – nur bestätigen, wenn du @fnt-1028b-n12… kennst“ → „Ablehnen“ (07:45:22), Anfrage verschwindet. G2: „Deine Anfrage wurde abgelehnt. …“ erst nach ca. 2 Min. (erkannt 07:47:19); Uhren von Rechner, Emulator und Server gleich (logs/D-02_zeiten.txt). Im Rahmen des Plans (≤ 3 Min.), aber deutlich über der Erwartung des Nachtests Build 18 (10–20 s) → Beobachtung zu #43",
+  "shots": [
+   "D-02a-G1",
+   "D-02b-G2",
+   "D-02c-G2",
+   "D-02d-G1",
+   "D-02e-G1",
+   "D-02f-G2"
+  ],
+  "zeit": "07:47"
+ },
+ "D-03": {
+  "erg": "✅",
+  "obs": "„Verstanden“ → Umschalter „Gründen“ → „Löschtest 1028b“ (mit ö) → „Familie gründen“ → direkt Hauptansicht „Heute“ (ohne „Fertig!“)",
+  "shots": [
+   "D-03-G2"
+  ],
+  "zeit": "07:48"
+ },
+ "D-04": {
+  "erg": "✅",
+  "obs": "Abmelden → „Noch kein Konto?“ → Anbieter → Name „Test“, Benutzername fnt-1028b-n12 (App meldet „Schon vergeben …“ mit Vorschlag n122) → unten „Ich habe schon ein Konto“ → „Anmelden“ mit vorausgefülltem fnt-1028b-n12 und Anbieter",
+  "shots": [
+   "D-04a-G2",
+   "D-04-G2"
+  ],
+  "zeit": "07:49"
+ },
+ "D-05": {
+  "erg": "✅",
+  "obs": "N2 angemeldet → „Kein anderes Gerät gefunden. Nutze deinen Notfall-Schlüssel.“ (kein „Mit … bestätigen“); KN2 → freigeschaltet nach ca. 4 s, kein Hänger bei „Synchronisiere …“; F2 „Löschtest 1028b“ erkannt",
+  "shots": [
+   "D-05a-G2",
+   "D-05b-G2",
+   "D-05-G2",
+   "D-05c-G2"
+  ],
+  "zeit": "07:50"
+ },
+ "D-06": {
+  "erg": "✅",
+  "obs": "Abgemeldet → Kontoanlage mit Anbieter, Name, fnt-1028b-n9 („frei“), Passwort → Zurück-Pfeil ohne „Konto erstellen“ → „Willkommen“; Gegenprobe register/available: {\"available\":true}",
+  "shots": [
+   "D-06a-G2",
+   "D-06-G2"
+  ],
+  "zeit": "07:51"
+ },
+ "D-07": {
+  "erg": "n/a",
+  "obs": "Optional, ohne Serverzugang nicht ausgeführt (Registrierung bleibt offen)",
+  "shots": [],
+  "zeit": "07:51"
+ },
+ "E-01": {
+  "erg": "✅",
+  "obs": "„Testfamilie 1028b“, „Empfehlung: Ernenne einen zweiten Moderator.“, Mitglieder: nur Test N1 (Moderator, „Du bist online“); „Mitglied einladen“, „Familien-Code“",
+  "shots": [
+   "E-01-G1",
+   "E-01b-G1"
+  ],
+  "zeit": "07:51"
+ },
+ "E-02": {
+  "erg": "✅",
+  "obs": "„Testfamilie 1028b neu“ gespeichert, „Name geändert.“; neuer Name im Tab Familie. Hinweis Plan: Der Chat zeigt im Kopf nur „Chat“ (kein Familienname), solange es nur den Familienchat gibt – der Name erscheint erst bei mehreren Gesprächen (prüfen in E-18)",
+  "shots": [
+   "E-02-G1",
+   "E-02b-G1"
+  ],
+  "zeit": "07:52"
+ },
+ "E-03": {
+  "erg": "✅",
+  "obs": "„abc“ → „Bitte eine gültige Benutzer-ID eingeben, z. B. @anna:beispiel.de.“; @fnt-1028b-n12:… → Rückfrage „… einladen? Eingeladene erhalten bereits vor der Annahme die Nachrichtenschlüssel …“ → „Einladung gesendet.“; Test N2 mit „Eingeladen“ in der Liste",
+  "shots": [
+   "E-03a-G1",
+   "E-03b-G1",
+   "E-03c-G1",
+   "E-03d-G1"
+  ],
+  "zeit": "07:53"
+ },
+ "E-04": {
+  "erg": "✅",
+  "obs": "Aktionen für Test N2 → „Entfernen“ → „Test N2 wirklich aus der Familie entfernen? Die Raumschlüssel werden erneuert …“ → Entfernen; N2 verschwindet aus der Liste",
+  "shots": [
+   "E-04a-G1",
+   "E-04b-G1"
+  ],
+  "zeit": "07:54"
+ },
+ "E-05": {
+  "erg": "⚠️",
+  "obs": "„Jemanden einladen“: QR-Code direkt, „Gültig für“ 1/3/7 Tage (3 Tage), „Der Link ist 3 Tage gültig und nur einmal verwendbar …“; Erweitert → „Konto-Server für Neue“ = Anbieter-Adresse → „Neuen Link erzeugen“. Link: https://carpeasrael.github.io/FamilyNexus/join/#v=3&room=…&via=…&srv=matrix-synapse-3ues…&inv=…&exp=…&f=Testfamilie+1028b+neu&by=Test+N1&n=… (n am Ende, #26). „Per E-Mail senden“ → Gmail ohne Konto (Einrichtungsseite), Entwurf nicht prüfbar. BEFUND L1-3: „Link kopieren“ → „Link kopiert.“ erscheint hinter dem Einladungsdialog und ist erst nach „Schließen“ sichtbar (Android-Handy)",
+  "shots": [
+   "E-05a-G1",
+   "E-05b-G1",
+   "E-05c-G1",
+   "E-05d-G1",
+   "E-05e-G1"
+  ],
+  "zeit": "07:57"
+ },
+ "E-06": {
+  "erg": "✅",
+  "obs": "„abc“ → „Das ist kein Einladungslink. Ein Einladungslink beginnt mit „https://carpeasrael.github.io/FamilyNexus/join/“ oder „familynexus://join“.“ (#26); Link um die letzten 10 Zeichen gekürzt → „Der Link ist unvollständig oder beschädigt – oft passiert das beim Weiterleiten. …“ (#26/P-37)",
+  "shots": [
+   "E-06a-G2",
+   "E-06b-G2"
+  ],
+  "zeit": "07:59"
+ },
+ "E-07": {
+  "erg": "✅",
+  "obs": "Vollständiger Link eingefügt (eingetippt) → da G2 kein Konto hat, folgt zuerst die Kontoanlage (Schritt 2 von 4); Beitrittskarte wird nach E-10 bewertet. Hinweis Tester: Der erste Versuch mit einem aus der Bedienungshilfe abgelesenen Link scheiterte zu Recht („beschädigt“), weil beim Ablesen ein Zeichen des Einmal-Codes fehlte (31 statt 32); verwendet wurde dann ein neu erzeugter Link (QR-Code dekodiert, https-Form)",
+  "shots": [
+   "E-07a-G2"
+  ],
+  "zeit": "08:01"
+ },
+ "E-08": {
+  "erg": "✅",
+  "obs": "Anbieter ist bereits „matrix-synapse-3ues.srv1348446.hstgr.cloud“ (aus srv im Link), nicht matrix.org",
+  "shots": [
+   "E-08-G2"
+  ],
+  "zeit": "08:01"
+ },
+ "E-09": {
+  "erg": "✅",
+  "obs": "Test Nutzer 2 / fnt-1028b-i2 („frei“) → „Konto erstellen“ → ohne Zusatzschritt zum Notfall-Schlüssel (Schritt 3 von 4)",
+  "shots": [
+   "E-09a-G2",
+   "E-09-G2"
+  ],
+  "zeit": "08:02"
+ },
+ "E-10": {
+  "erg": "✅",
+  "obs": "„Notfall-Schlüssel erstellen“ → Schlüssel bleibt stehen, „Kopieren“, abgelegt als KI2; Häkchen → „Weiter“ → Beitrittskarte „Familie beitreten“ (Schritt 4 von 4): „Du trittst der Familie „Testfamilie 1028b neu“ bei. Eingeladen hat dich Test N1 (Konto bei matrix.chaostribunal.de).“, Details mit @fnt-1028b-n1:… und Server der Familie, „Verwerfen“ / „Beitritt anfragen“ → angetippt (Zwischenbild „Fast geschafft!“ nicht erfasst, Aufnahme zu schnell)",
+  "shots": [
+   "E-10a-G2",
+   "E-10b-G2",
+   "E-07b-G2",
+   "E-10c-G2"
+  ],
+  "zeit": "08:03"
+ },
+ "E-11": {
+  "erg": "✅",
+  "obs": "I2 nach ca. 5 s automatisch aufgenommen (G1 online), G2 zeigt die Hauptansicht; auf G1 keine offene Anfrage",
+  "shots": [
+   "E-11-G1",
+   "E-11-G2"
+  ],
+  "zeit": "08:03"
+ },
+ "E-12": {
+  "erg": "✅",
+  "obs": "Verbrauchter Link (familynexus://join?… aus dem QR-Code) über das System geöffnet: „flatpak run de.inneso.familynexus '<Link>'“ übergibt per D-Bus an die laufende Instanz → kurze Meldung „Du bist bereits in einer Familie.“; nichts ändert sich, kein Absturz. Die https-Form wurde nicht geöffnet (würde den Browser des echten Desktops starten)",
+  "shots": [
+   "E-12a-G2",
+   "E-12-G2"
+  ],
+  "zeit": "08:03"
+ },
+ "E-13": {
+  "erg": "✅",
+  "obs": "Beide: Test N1 (Moderator), Test Nutzer 2 (Mitglied, „Nicht persönlich geprüft“ aus Sicht von N1; auf G2 entsprechend bei N1); Familienname „Testfamilie 1028b neu“ auch bei I2",
+  "shots": [
+   "E-13-G1",
+   "E-13-G2"
+  ],
+  "zeit": "08:03"
+ },
+ "E-14": {
+  "erg": "✅",
+  "obs": "I2: unter dem Familiennamen „Nur Moderatoren verwalten die Familie.“; kein „Familienname ändern“, „Mitglied einladen“, „Familien-Code“; Menü bei Test N1 nur „Verifizieren“ und „Test N1 blockieren“; Aufgaben: Liste „Bad putzen“ unter „Weitere Listen“, keine Schaltfläche „Neue Aufgabenliste“",
+  "shots": [
+   "E-14a-G2",
+   "E-14b-G2"
+  ],
+  "zeit": "08:04"
+ },
+ "E-15": {
+  "erg": "✅",
+  "obs": "An: G1 „Wer ist online: Test Nutzer 2 – Online“, G2 „Test N1 – Online“, eigener Eintrag „Du bist online“. G1 aus (08:04:52): G1 eigener Eintrag „Dein Status wird nicht geteilt“; G2 „Gerade ist sonst niemand online.“ und bei Test N1 „Zuletzt online gerade eben“. Wieder an: G2 zeigt N1 nach wenigen Sekunden wieder „Online“",
+  "shots": [
+   "E-15a-G1",
+   "E-15a-G2",
+   "E-15b-G1",
+   "E-15b-G2",
+   "E-15c-G2",
+   "E-15d-G2"
+  ],
+  "zeit": "08:06"
+ },
+ "E-16": {
+  "erg": "⚠️",
+  "obs": "G1 sendet „Hallo von Nutzer 1“; G2 „Heute“ vor dem Öffnen: Kachel „Ungelesene Nachrichten“; im Chat ein einziger Hinweis „Ältere Nachrichten aus der Zeit vor deinem Beitritt sind nicht lesbar.“ (#35 behoben), keine einzelnen „kann nicht entschlüsselt werden“; G2 „Antworten“ → „Antwort an Test N1“ → „Hallo zurück von Nutzer 2“ mit Enter gesendet (Desktop, #37), bei G1 mit Bezug; G1 lange drücken → 👍 → „👍 1“ auf beiden. BEFUND L1-4: Die Kachel zeigte bei I2 „7 ungelesene Nachrichten“, obwohl nur eine lesbare neue Nachricht vorlag (die nicht lesbaren Ereignisse vor dem Beitritt werden mitgezählt)",
+  "shots": [
+   "E-16a-G2",
+   "E-16b-G2",
+   "E-16c-G2",
+   "E-16d-G1",
+   "E-16e-G2"
+  ],
+  "zeit": "08:08"
+ },
+ "E-17": {
+  "erg": "✅",
+  "obs": "G1 (Android) „Datei anhängen“ → testbild.png und testdatei.txt aus Downloads gesendet; G2 (Linux): beide Anhänge sichtbar, Bild nach „Anhang laden“ angezeigt, „Speichern“ unter dem Bild (#40); „Speichern“ bei der Textdatei → Warnung „Die Datei wird entschlüsselt und unverschlüsselt im gewählten Ordner gespeichert. …“ → auf G2 „Abbrechen“ (Dateiauswahl des Flatpak öffnet sich auf dem echten Desktop, Anhang D). Speichern bis in den Ordner auf G1 geprüft: Warnung → Speichern → Android-Dateiauswahl → /sdcard/Download/testdatei (1).txt mit korrektem Inhalt. Empfänger-Speichern auf Android folgt in Lauf 2",
+  "shots": [
+   "E-17a-G1",
+   "E-17b-G1",
+   "E-17c-G2",
+   "E-17d-G2",
+   "E-17e-G2",
+   "E-17f-G1"
+  ],
+  "zeit": "08:10"
+ },
+ "E-18": {
+  "erg": "✅",
+  "obs": "G1 Familie → bei Test Nutzer 2 „Nachricht schreiben“ → öffnet sofort den Einzelchat „Nur zwischen dir und Test Nutzer 2, Ende-zu-Ende-verschlüsselt“ (Reiter „Gespräche“: Familienchat / Einzelchat mit Test Nutzer 2), kein Familienchat (#31 behoben) → „Nur fuer dich“ gesendet (Ersatzschreibung adb). G2: Chat zeigt Reiter „Testfamilie 1028b neu“ | „Test N1“; im Einzelchat „Nur zwischen dir und Test N1“ mit der Nachricht; im Familienchat nicht vorhanden. Kein Rohtext „Attempting verification request“ ; nach E-24 erneut geprüft: auch dann kein Rohtext in beiden Einzelchats (#29 behoben)",
+  "shots": [
+   "E-18a-G1",
+   "E-18b-G1",
+   "E-18c-G2",
+   "E-18d-G2",
+   "E-18e-G1",
+   "E-18f-G2"
+  ],
+  "zeit": "08:11"
+ },
+ "E-19": {
+  "erg": "✅",
+  "obs": "G2 Kalender (Agenda) und „Heute“: nur „Test geteilt 2“ (Von Test N1); „Test privat“ und „Test Serie“ nicht sichtbar; Filter (Mehrfachauswahl-Chips Alle / Test N1 / Test Nutzer 2): nur Test Nutzer 2 → „Keine Termine“; „Alle“ → wieder sichtbar",
+  "shots": [
+   "E-19a-G2",
+   "E-19b-G2",
+   "E-19c-G2",
+   "E-19d-G2"
+  ],
+  "zeit": "08:12"
+ },
+ "E-20": {
+  "erg": "✅",
+  "obs": "G2: „Nur der Ersteller kann diesen Termin ändern.“ (kein Bearbeiten), unter „Antwort“ Zusagen/Vielleicht/Absagen, vorher „Keine Antwort“ → „Zusagen“ → „Du – Zugesagt“; G1: „Antwort – Test Nutzer 2 – Zugesagt“; „Im Chat teilen“ nur bei G1 (Ersteller)",
+  "shots": [
+   "E-20a-G2",
+   "E-20b-G2",
+   "E-20c-G1"
+  ],
+  "zeit": "08:13"
+ },
+ "E-21": {
+  "erg": "✅",
+  "obs": "G2 legt „Termin I2“ (28.10. 09:00–10:00) „Geteilt“ an; G1 sieht „Termin I2, Geteilt, Von Test Nutzer 2“; G2 „Termin bearbeiten“ → „Privat“ → Hinweis „Bereits an die Familie gesendete Inhalte bleiben auf deren Geräten …“ → Speichern: Detailseite zeigt den Termin mit „Privat“, nicht „Gelöscht“; Liste: ein privater Termin, kein Duplikat (#46 behoben). G1: Termin verschwindet aus der Ansicht",
+  "shots": [
+   "E-21a-G2",
+   "E-21b-G1",
+   "E-21c-G2",
+   "E-21d-G2",
+   "E-21e-G2",
+   "E-21f-G1"
+  ],
+  "zeit": "08:15"
+ },
+ "E-22": {
+  "erg": "✅",
+  "obs": "G2 sieht Vollkornbrot (zuletzt von Test N1) und Milch erledigt; G2 legt „Käse“ per Enter an (#37); G1 sieht „Käse – zuletzt von Test Nutzer 2“, hakt ab; „Erledigte entfernen“ → „2 erledigte Einträge für die ganze Familie entfernen?“ → „2 Einträge entfernt“; G2 Menü → „Löschen“ bei Vollkornbrot → beide „Der Einkaufszettel ist leer.“",
+  "shots": [
+   "E-22a-G2",
+   "E-22b-G2",
+   "E-22c-G1",
+   "E-22d-G1",
+   "E-22e-G2",
+   "E-22f-G1"
+  ],
+  "zeit": "08:16"
+ },
+ "E-23": {
+  "erg": "✅",
+  "obs": "G1 legt „Muell rausbringen“ (Ersatzschreibung) an: Zugewiesen an Test Nutzer 2, Täglich → „Montag bis Freitag (ohne Wochenende)“, Punkt „Tonne an die Strasse“ → Liste „Mo–Fr“; G1 kann den Punkt nicht abhaken (Kästchen deaktiviert); G2: „Aufgaben für dich: 1 offen“ auf „Heute“, Liste unter „Mir zugewiesen“, abgehakt mit Kommentar „draußen“ → „Erledigt am 28.10.2026 um 08:18“; G1 Verlauf „Tonne an die Strasse erledigt – Test Nutzer 2 · 28.10.2026, 08:18“ (#38); G1 „Liste löschen“ → „Liste „Bad putzen“ löschen?“ → weg",
+  "shots": [
+   "E-23a-G1",
+   "E-23b-G1",
+   "E-23c-G2",
+   "E-23d-G2",
+   "E-23e-G1",
+   "E-23f-G1",
+   "E-23g-G1"
+  ],
+  "zeit": "08:19"
+ },
+ "E-24": {
+  "erg": "✅",
+  "obs": "G1 Aktionen für Test Nutzer 2 → „Verifizieren“ → „Warte auf die Gegenseite …“; G2 „… möchte die Verifizierung starten.“ → Annehmen; gleiche 7 Symbole in gleicher Reihenfolge (Pinguin, Büroklammer, Schmetterling, Herz, Erdbeere, Wolke, Pizza); beide „Sie stimmen überein“ → „Verifiziert.“; Mitgliederliste G1: Test Nutzer 2 „Verifiziert“",
+  "shots": [
+   "E-24a-G2",
+   "E-24b-G1",
+   "E-24c-G2",
+   "E-24d-G1",
+   "E-24e-G2",
+   "E-24f-G1"
+  ],
+  "zeit": "08:20"
+ },
+ "E-25": {
+  "erg": "✅",
+  "obs": "Nachricht von Test Nutzer 2 lange drücken → „Nachricht melden“ → Dialog mit Hinweis auf den Betreiber (matrix-synapse-3ues…) und vier Gründen → „Spam oder Werbung“, Text → „Melden“ → „Meldung gesendet.“ mit „Absender blockieren“; Hinweis verschwindet von selbst nach ca. 9–10 s (gemessen inkl. Abfrageverzug), Navigation danach ohne Neustart bedienbar (#45 behoben)",
+  "shots": [
+   "E-25a-G1",
+   "E-25b-G1"
+  ],
+  "zeit": "08:21"
+ },
+ "E-26": {
+  "erg": "✅",
+  "obs": "G1: lange drücken → „Test Nutzer 2 blockieren“ → „Test Nutzer 2 blockieren?“ mit Erklärung (Nachrichten und Einzelchat ausgeblendet, erfährt nichts, bleibt Mitglied) → „Blockieren“ → „Test Nutzer 2 ist blockiert.“; Nachrichten von I2 im Familienchat ausgeblendet; Mitglied mit „Blockiert“; G2 sendet „Noch da?“ ohne Fehlermeldung, bei G1 nicht sichtbar",
+  "shots": [
+   "E-26a-G1",
+   "E-26b-G2",
+   "E-26c-G1",
+   "E-26d-G1"
+  ],
+  "zeit": "08:23"
+ },
+ "E-27": {
+  "erg": "✅",
+  "obs": "Einstellungen → „Blockierte Mitglieder“ → Test Nutzer 2 → „Blockierung aufheben“ → „Blockierung von Test Nutzer 2 aufgehoben.“, Liste „Du hast niemanden blockiert.“; Nachrichten von I2 wieder sichtbar, auch „Noch da?“ (08:22)",
+  "shots": [
+   "E-27a-G1",
+   "E-27b-G1"
+  ],
+  "zeit": "08:23"
+ },
+ "E-28": {
+  "erg": "✅",
+  "obs": "G1 Menü und Über die App „Version 1.2.1 (18)“ (siehe B-22); G2 Menü unten und Einstellungen „Version 1.2.1 (18)“ (#14)",
+  "shots": [
+   "E-28-G1",
+   "E-28a-G2",
+   "E-28b-G2"
+  ],
+  "zeit": "08:24"
+ },
+ "E-29": {
+  "erg": "✅",
+  "obs": "„Konto löschen?“ mit Konto/Anbieter und „Du bist der einzige Moderator der Familie. Ernenne vorher ein anderes Mitglied zum Moderator …“ (#12); „Konto endgültig löschen“ ohne Passwort inaktiv; „Abbrechen“ → unverändert in den Einstellungen",
+  "shots": [
+   "E-29-G1"
+  ],
+  "zeit": "08:25"
+ },
+ "E-30": {
+  "erg": "✅",
+  "obs": "G1 Aktionen → „Zum Moderator ernennen“ → „Test Nutzer 2 zum Moderator ernennen? Moderatoren können einladen, ernennen und entfernen.“ → bestätigt; G1 und G2 zeigen Test Nutzer 2 als Moderator (G2 sieht jetzt „Mitglied einladen“, „Familien-Code“); „Empfehlung: Ernenne einen zweiten Moderator.“ verschwunden",
+  "shots": [
+   "E-30a-G1",
+   "E-30b-G1",
+   "E-30c-G2",
+   "E-30d-G1"
+  ],
+  "zeit": "08:25"
+ },
+ "E-31": {
+  "erg": "✅",
+  "obs": "„Konto löschen?“ ohne Hinweis „einziger Moderator“; Abbrechen",
+  "shots": [
+   "E-31-G1"
+  ],
+  "zeit": "08:26"
+ },
+ "E-32": {
+  "erg": "✅",
+  "obs": "G2 Einstellungen → „Konto löschen“: Dialog nennt @fnt-1028b-i2:… und Server, kein Moderator-Hinweis (N1 ist Moderator) → Passwort → „Konto endgültig löschen“ → „Willkommen“. G1: Test Nutzer 2 nicht mehr in der Mitgliederliste; frühere Nachrichten von I2 bleiben sichtbar (Absender jetzt als @fnt-1028b-i2:… statt Anzeigename). Gegenprobe Anmeldung I2: M_FORBIDDEN (logs/E-32_gegenprobe_i2.txt)",
+  "shots": [
+   "E-32a-G2",
+   "E-32b-G2",
+   "E-32c-G2",
+   "E-32d-G1",
+   "E-32e-G1"
+  ],
+  "zeit": "08:27"
+ },
+ "F-01": {
+  "erg": "✅",
+  "obs": "G2: „Ich habe schon ein Konto“ → N2 angemeldet (kein „Unbekannter Fehler.“, #28) → „Kein anderes Gerät gefunden“ → KN2 → Hauptansicht; „Konto löschen?“ nennt @fnt-1028b-n12:… und Server, „dauerhaft gelöscht“, Nachrichten bleiben sichtbar, kein Moderator-Hinweis; falsches Passwort → „Das Passwort stimmt nicht.“ (#36), Dialog bleibt; Feld geleert, richtiges Passwort → „Willkommen“",
+  "shots": [
+   "F-01a-G2",
+   "F-01b-G2",
+   "F-01c-G2"
+  ],
+  "zeit": "08:29"
+ },
+ "F-02": {
+  "erg": "✅",
+  "obs": "curl-Anmeldung fnt-1028b-n12 mit richtigem Passwort → {\"errcode\":\"M_FORBIDDEN\",…} (logs/F-02_gegenprobe_n2.txt)",
+  "shots": [],
+  "zeit": "08:29"
+ },
+ "F-03": {
+  "erg": "✅",
+  "obs": "„Alle lokalen Daten löschen?“ → „Endgültig löschen“ → „Willkommen“ (Gerätesprache Englisch: „Welcome to FamilyNexus“); Konto besteht weiter",
+  "shots": [
+   "F-03a-G1",
+   "F-03b-G1"
+  ],
+  "zeit": "08:30"
+ },
+ "F-04": {
+  "erg": "✅",
+  "obs": "App beendet (force-stop) und neu gestartet → „Willkommen“, nicht „Anmelden“; Einstellungen (Sprache Deutsch) zurückgesetzt",
+  "shots": [
+   "F-04-G1"
+  ],
+  "zeit": "08:30"
+ },
+ "F-05": {
+  "erg": "✅",
+  "obs": "„Ich habe schon ein Konto“ → N1 → „Dieses Gerät freischalten“ mit KN1b → nach ca. 6 s „Heute“; wiederhergestellt: geteilter und private Termine (Test privat, Test Serie über den privaten Raum), Chat (6 Nachrichten), Einkauf (leer, wie zuvor), Aufgabenliste „Muell rausbringen“",
+  "shots": [
+   "F-05a-G1",
+   "F-05b-G1",
+   "F-05c-G1",
+   "F-05d-G1"
+  ],
+  "zeit": "08:32"
+ },
+ "F-06": {
+  "erg": "✅",
+  "obs": "„Konto löschen?“ ohne Moderator-Hinweis (allein, I2 gelöscht) → Passwort → „Konto endgültig löschen“ → „Willkommen“ (Gerätesprache Englisch)",
+  "shots": [
+   "F-06a-G1",
+   "F-06b-G1"
+  ],
+  "zeit": "08:33"
+ },
+ "F-07": {
+  "erg": "✅",
+  "obs": "Anmeldung fnt-1028b-n1 und fnt-1028b-i2 (auch n12) per curl → M_FORBIDDEN (logs/F-07_F-08_endzustand.txt)",
+  "shots": [],
+  "zeit": "08:33"
+ },
+ "F-08": {
+  "erg": "✅",
+  "obs": "Alle Konten des Laufs (fnt-1028b-n1, -n12, -i2) gelöscht (Anmeldung M_FORBIDDEN, register/available weiterhin M_USER_IN_USE); fnt-1028b-n9 nie angelegt (available:true); Registrierung offen gelassen (für Lauf 2)",
+  "shots": [],
+  "zeit": "08:33"
+ },
+ "G-04": {
+  "erg": "⏳",
+  "obs": "Optional, nicht ausgeführt (lokaler Synapse/E2E)",
+  "shots": [],
+  "zeit": "08:33"
+ },
+ "G-05": {
+  "erg": "✅",
+  "obs": "In G-02 enthalten (siehe G-02)",
+  "shots": [],
+  "zeit": "08:33"
+ },
+ "G-06": {
+  "erg": "⚠️",
+  "obs": "Stellen aus store/metadata/ios/review_notes.txt im Lauf gefunden: Willkommen → „Ich habe schon ein Konto“ / „Neue Familie gründen“ → Kontoanlage → „Notfall-Schlüssel erstellen“ → Häkchen → „Weiter“ → Name der Familie → „Familie gründen“ (A-03…A-11), „Dieses Gerät freischalten“ → Notfall-Schlüssel → „Freischalten“ (C-07, F-05), Menü „Menü öffnen“ → Einstellungen → Konto → „Konto löschen“ (E-29, F-06), „Erlauben“ (B-02), Melden/Blockieren per langem Drücken, Aufheben unter „Blockierte Mitglieder“ (E-25 bis E-27). Abweichung erwartet: Anmeldung/Kontoanlage bei matrix.org im Browser hier nicht geprüft (Testserver, #15)",
+  "shots": [],
+  "zeit": "08:33"
+ },
+ "G-07": {
+  "erg": "⏳",
+  "obs": "Nicht ausführbar: keine Testperson ohne Vorwissen verfügbar",
+  "shots": [],
+  "zeit": "08:33"
+ },
+ "G-08": {
+  "erg": "n/a",
+  "obs": "Plattform Web nicht Teil dieses Laufs (G1 Android-Emulator, G2 Linux-Flatpak)",
+  "shots": [],
+  "zeit": "08:33"
+ },
+ "G-01": {
+  "erg": "✅",
+  "obs": "flutter analyze @ bb7f347: „No issues found!“",
+  "shots": [],
+  "zeit": "08:34"
+ },
+ "G-02": {
+  "erg": "✅",
+  "obs": "flutter test (LD_LIBRARY_PATH auf libsqlcipher) @ bb7f347: 749 bestanden, 44 übersprungen, „All tests passed!“ (logs/G-02_flutter_test.txt)",
+  "shots": [],
+  "zeit": "08:34"
+ },
+ "G-03": {
+  "erg": "✅",
+  "obs": "flutter test test/store/review_notes_test.dart: 4 bestanden, „All tests passed!“",
+  "shots": [],
+  "zeit": "08:34"
+ }
+}
