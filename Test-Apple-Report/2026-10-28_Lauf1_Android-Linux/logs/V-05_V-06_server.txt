@@ -1,0 +1,19 @@
+2026-10-28T06:49:01+01:00
+{"versions":["r0.0.1","r0.1.0","r0.2.0","r0.3.0","r0.4.0","r0.5.0","r0.6.0","r0.6.1","v1.1","v1.2","v1.3","v1.4","v1.5","v1.6","v1.7","v1.8","v1.9","v1.10","v1.11","v1.12","v1.13","v1.14","v1.15"],"unstable_features":{"org.matrix.label_based_filtering":true,"org.matrix.e2e_cross_signing":true,"org.m
+{"session":"olWaVfPgxkdIyKhdYUhZTXqy","flows":[{"stages":["m.login.dummy"]}],"params":{}}
+fnt-1028-n1: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1028-n12: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1028-i2: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1028-n9: {"available":true}
+fnt-1028b-n1: {"available":true}
+fnt-1028b-n12: {"available":true}
+fnt-1028b-i2: {"available":true}
+fnt-1028b-n9: {"available":true}
+fnt-1028c-n1: {"available":true}
+fnt-1028c-n12: {"available":true}
+fnt-1028c-i2: {"available":true}
+fnt-1028c-n9: {"available":true}
+fnt-1028d-n1: {"available":true}
+fnt-1028d-n12: {"available":true}
+fnt-1028d-i2: {"available":true}
+fnt-1028d-n9: {"available":true}

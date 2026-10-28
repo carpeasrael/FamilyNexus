@@ -1,0 +1,12 @@
+2026-10-28T09:58:00+01:00
+fnt-1028d-n1 login: {"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
+fnt-1028d-i2 login: {"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
+fnt-1028d-n12 login: {"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
+fnt-1028d-n1 available: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1028d-n12 available: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1028d-i2 available: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1028d-n9 available: {"available":true}
+fnt-1028b-n1 (Lauf 1) login: {"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
+fnt-1028b-n12 (Lauf 1) login: {"errcode":"M_LIMIT_EXCEEDED","error":"Too Many Requests","retry_after_ms":324891}
+fnt-1028b-i2 (Lauf 1) login: {"errcode":"M_LIMIT_EXCEEDED","error":"Too Many Requests","retry_after_ms":324296}
+Registrierung: {"session":"KDUxCQJgEhvjaiNqONlpuEPQ","flows":[{"stages":["m.login.dummy"]}],"params":{}}

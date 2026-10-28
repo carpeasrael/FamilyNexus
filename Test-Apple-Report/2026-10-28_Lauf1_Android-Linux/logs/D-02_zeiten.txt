@@ -1,0 +1,6 @@
+Anfrage G2 (Linux): 07:44:55 lokal
+Ablehnung G1 (Android): 07:45:22 lokal
+Meldung abgelehnt auf G2 erkannt: 07:47:19 lokal (Abfrage per OCR alle ~6 s)
+Rechner: 06:47:28 UTC
+Server: date: Wed, 28 Oct 2026 06:47:28 GMT
+Emulator: 06:47:29 UTC

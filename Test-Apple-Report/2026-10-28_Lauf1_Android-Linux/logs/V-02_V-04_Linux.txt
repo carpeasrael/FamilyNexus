@@ -1,0 +1,27 @@
+## V-02 Linux
+2026-10-28T06:49:50+01:00
+
+FamilyNexus - Privater Familienkalender und Messenger,
+Ende-zu-Ende-verschlüsselt
+
+         Kennung: de.inneso.familynexus
+             Ref: app/de.inneso.familynexus/x86_64/master
+     Architektur: x86_64
+           Zweig: master
+         Version: 1.2.1
+          Lizenz: AGPL-3.0-or-later
+        Ursprung: familynexus-origin
+        Sammlung: 
+    Installation: user
+  Installed Size: 34,1 MB
+Laufzeitumgebung: org.gnome.Platform/x86_64/51
+             Sdk: org.gnome.Sdk/x86_64/51
+
+          Commit: c9c6345929a621e27f463524edb2dbb3be549c1730487ae53eacb5d28c941…
+         Betreff: Export de.inneso.familynexus
+           Datum: 2026-10-28 05:38:42 +0000
+{"app_name":"family_nexus","version":"1.2.1","build_number":"18","package_name":"family_nexus"}
+## V-04 Vorbereitung: fremde Daten beiseite
+umbenannt nach ~/.var/app/de.inneso.familynexus.bak-20261028
+6.18.49-1-MANJARO
+de_DE.UTF-8
