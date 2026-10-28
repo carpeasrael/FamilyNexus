@@ -59,3 +59,6 @@ Test-Apple/Testreport_Einladung_Zweiter_Nutzer.pdf
 Test-Apple/Testreport_Pruefanleitung_Build15.pdf
 Test-Apple/screenshots/einladung/
 Test-Apple/screenshots/geraet/
+
+# Review-Videos (groß, nur Prüfsumme im Report)
+Test-Apple/verification_1.2.1/*.mov
