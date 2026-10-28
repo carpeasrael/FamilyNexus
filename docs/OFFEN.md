@@ -28,6 +28,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 | Server durch Moderator ändern | Der Server ist in den Einstellungen nur lesbar; Wechsel = neue Familie/neue Anmeldung. |
 | Löschmarken beim „Alle lokalen Daten löschen“ | Geteilte Termine bleiben bei den anderen Geräten bestehen; vor dem Löschen sollten sie einzeln gelöscht werden. |
 | Chat-Benachrichtigungen (auch lokal) | Keine; siehe E-16. |
+| Familienspeicher auf Nextcloud (E-74) | Abgestimmt und beschrieben (`docs/NEXTCLOUD_FAMILIENSPEICHER.md`), Umsetzung in den Phasen S1–S5 offen. Bekannte Grenzen nach Umsetzung: gemeinsames Konto (SA-9), Web-Version nur mit CORS-Freigabe am Nextcloud-Server, früher geöffnete Dateien bleiben bei entfernten Mitgliedern lesbar. |
 
 ## Bekannte Einschränkungen
 
