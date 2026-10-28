@@ -1,0 +1,25 @@
+[English]
+FamilyNexus connects to a Matrix server (default: matrix.org, checked automatically; other servers under "Advanced"). Accounts can be created in the app. At matrix.org, sign-in and account creation take place on the provider's page (account.matrix.org) in the browser; the app then returns automatically.
+
+Review account (user name and password: see "Sign-in information"):
+1. Welcome screen → "I already have an account".
+2. "Sign in at matrix.org" → the browser opens → enter user name and password → "Continue". If the browser suggests a different matrix.org account, sign out there first.
+3. Back in the app: "Unlock this device" → enter the emergency key below → "Unlock".
+4. Main view with the tabs Today, Calendar, Chat, Shopping, Family. The review account is moderator of a sample family with a second member and sample data.
+Emergency key of the review account: <EMERGENCY KEY OF THE REVIEW ACCOUNT>
+
+Account creation: Welcome screen → "Start a new family" → "What is your name?" → "Create account at matrix.org" → browser → back in the app "Create emergency key" → "I have stored the emergency key safely." → "Next" → family name → "Create family".
+Account deletion: menu (top right, "Open menu") → Settings → Account → "Delete account". At matrix.org the deletion is confirmed on the provider's page; afterwards all data on the device is deleted.
+Notifications: if "Today" shows "Notifications are blocked", tap "Allow".
+
+Encryption: end-to-end encryption (Matrix: Olm/Megolm, vodozemac) for messages, shared events and the shopping list; local database encrypted with SQLCipher (AES-256). Standard algorithms, no proprietary cryptography.
+No advertising, no analytics, no tracking. Source code: AGPL-3.0.
+User-generated content: messages only go to invited family members. Report: long-press a message → "Report message" (choose a reason; the report goes to the operator of the Matrix server). Block: long-press a message → "Block <name>" or Family → member menu; undo under Settings → Blocked members. Moderators can remove members from the family.
+
+[Answer to App Review – short version; full reply sent in Resolution Center]
+1. Screen recording: attached to the reply (physical iPhone, build 1.2.1 (<BUILD>) from TestFlight). No paid content, no in-app purchases, no subscriptions.
+2. Purpose: private family organizer (shared calendar, family/direct chat, shopping list, task lists), end-to-end encrypted on the open Matrix protocol; no ads, tracking or analytics. Audience: families; accounts are created by adults, children join only by moderator invitation.
+3. Access: steps below. Member account (role "member"): user <R2 USER NAME>, password <R2 PASSWORD>, emergency key <R2 KEY>. No sample files needed; any photo works for chat attachments.
+4. External services: Matrix homeserver chosen by the user (default matrix.org, incl. account.matrix.org in the browser); GitHub Pages (carpeasrael.github.io: invitation page, privacy policy); element.io/download (link only); Apple system services (local notifications, Keychain, Face ID/Touch ID, Mail). No push, analytics, advertising, payment or AI services; no server of our own.
+5. Regions: identical in all regions; UI in English and German (English otherwise). <IF APPLICABLE: not offered in <COUNTRIES>.>
+6. Not a regulated industry; no protected third-party content. Standard encryption only (export documentation in App Store Connect). AGPL-3.0.

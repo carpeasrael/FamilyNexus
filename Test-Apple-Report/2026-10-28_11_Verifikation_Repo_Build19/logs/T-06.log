@@ -1,0 +1,43 @@
+## T-06 dependencies
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: 0.20.3
+  matrix: 14.2.0
+  flutter_vodozemac: 0.9.0
+  sqflite_sqlcipher: 3.4.1
+  # Linux: SQLCipher über FFI (E-50); Bibliothek siehe `hooks` unten.
+  sqflite_common_ffi: 2.4.4
+  sqflite_common: 2.5.14
+  sqflite_common_ffi_web: 1.2.0
+  # Browser: SQLite3MultipleCiphers über package:sqlite3 (WebAssembly), siehe E-53.
+  sqlite3: 3.5.2
+  flutter_secure_storage: 11.2.0
+  path: 1.9.1
+  http: 1.6.0
+  uuid: 4.6.0
+  file_picker: 13.1.0
+  timezone: 0.11.2
+  flutter_timezone: 5.1.1
+  flutter_local_notifications: 22.3.2
+  qr: 4.0.0
+  local_auth: 3.0.2
+  url_launcher: 6.3.3
+  web: 1.1.1
+
+dev_dependencies:
+## URLs
+https://carpeasrael.github.io/FamilyNexus/
+https://carpeasrael.github.io/FamilyNexus/join/
+https://element.io/download
+https://matrix.org
+## Suche
+lib/l10n/app_en.arb:29:  "settingsNoTelemetry": "No telemetry, no ads, no analytics.",
+lib/l10n/app_en.arb:59:  "onbPoint1": "No telemetry, no ads, no analytics.",
+lib/l10n/app_en.arb:479:  "privacy1Body": "FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. Responsible for processing on the server is the operator of the provider you chose (Matrix server); it is shown during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that sign you in via the browser (e.g. matrix.org) you enter these details directly on their page.",
+lib/l10n/gen/app_localizations_en.dart:93:  String get settingsNoTelemetry => 'No telemetry, no ads, no analytics.';
+lib/l10n/gen/app_localizations_en.dart:158:  String get onbPoint1 => 'No telemetry, no ads, no analytics.';
+lib/l10n/gen/app_localizations_en.dart:1057:      'FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. Responsible for processing on the server is the operator of the provider you chose (Matrix server); it is shown during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that sign you in via the browser (e.g. matrix.org) you enter these details directly on their page.';
+Treffer:        6

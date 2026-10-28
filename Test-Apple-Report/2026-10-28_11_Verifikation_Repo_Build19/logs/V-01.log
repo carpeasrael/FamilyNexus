@@ -1,0 +1,6 @@
+## V-01
+6275b3e
+version: 1.2.1+19
+3:const String appVersion = '1.2.1';
+4:const String appBuild = '19';
+7:const String appVersionWithBuild = '$appVersion ($appBuild)';

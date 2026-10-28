@@ -197,6 +197,7 @@ No sample files are needed. Any photo can be used to try attachments in the chat
 4. External services
 - Matrix homeserver chosen by the user (default: matrix.org, operated by The Matrix.org Foundation): accounts, sign-in and account deletion (account.matrix.org in the browser), end-to-end encrypted messaging and synchronisation. Users can choose any other Matrix server.
 - GitHub Pages (carpeasrael.github.io): web page that opens invitation links in the app; privacy policy.
+- element.io/download: link only (download page of a Matrix client, shown as a hint).
 - Apple system services on the device: local notifications for reminders, Keychain, Face ID/Touch ID for the optional app lock, Mail for sending invitations.
 We do not use push, analytics, advertising, payment or AI services, and we operate no server of our own.
 
