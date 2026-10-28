@@ -1,0 +1,34 @@
+diff --git a/lib/data/platform/reminder_scheduler.dart b/lib/data/platform/reminder_scheduler.dart
+index 1e755ca..0b783a0 100644
+--- a/lib/data/platform/reminder_scheduler.dart
++++ b/lib/data/platform/reminder_scheduler.dart
+@@ -105,6 +105,12 @@ class LocalReminderScheduler implements ReminderScheduler {
+           requestSoundPermission: false,
+         ),
+         linux: LinuxInitializationSettings(defaultActionName: 'FamilyNexus'),
++        // TEMP-WORKAROUND Testlauf 10: ohne diese Angabe wirft das Plugin unter Windows beim Start.
++        windows: WindowsInitializationSettings(
++          appName: 'FamilyNexus',
++          appUserModelId: 'de.inneso.FamilyNexus',
++          guid: '6f1c2a9e-3b7d-4c58-9a41-5d2e8b0c7f13',
++        ),
+       ),
+     );
+     _ready = true;
+diff --git a/lib/main.dart b/lib/main.dart
+index bb0be6c..d6b26da 100644
+--- a/lib/main.dart
++++ b/lib/main.dart
+@@ -1,3 +1,4 @@
++import 'dart:io' as io; // TEMP-DIAG
+ import 'package:flutter/material.dart';
+ 
+ import 'app/app.dart';
+@@ -88,6 +89,7 @@ class _BootstrapperState extends State<_Bootstrapper> {
+         builder: (context, snap) {
+           if (snap.hasError) {
+             AppLog.e('startup', 'Start fehlgeschlagen', snap.error);
++            io.File('C:/fn-test/startup-error.txt').writeAsStringSync('${snap.error}\n${snap.stackTrace}'); // TEMP-DIAG
+             return StartupFailureApp(onRetry: _retry, onReset: _reset);
+           }
+           final services = snap.data;
