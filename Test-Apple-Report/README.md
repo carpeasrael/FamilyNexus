@@ -22,6 +22,7 @@ Im Ordner: `Testreport.md` (Kurzfassung), PDFs als `Testreport_<Ordner>_DE.pdf` 
 | 07 | `2026-10-28_07_iOS-macOS_Build18` | 28.10.2026, 00:50–ca. 08:35 (zwei Läufe) | TP-FN-001 v1.5 | 1.2.1 (18) | iPhone-15-Simulator / macOS, dann getauscht |
 | 08 | `2026-10-28_08_Android-Linux_Build18` | 28.10.2026, 06:49–08:34 | TP-FN-001 v1.5 @ `423a3db` | 1.2.1 (18) | Android-Emulator / Linux-Flatpak |
 | 09 | `2026-10-28_09_Linux-Android_Build18` | 28.10.2026, 08:34–09:58 | TP-FN-001 v1.5 @ `423a3db` | 1.2.1 (18) | Linux-Flatpak / Android-Emulator |
+| 11 | `2026-10-28_11_Verifikation_Repo_Build19` | 28.10.2026, Teillauf ohne Gerät | TP-FN-VR-121 v1.0 @ `6275b3e` | 1.2.1 (19) | nur Repository/Code, Geräteschritte offen |
 
 Die Läufe 04 und 05 liefen parallel; die Nummer folgt dem Beginn. Die Bezeichnungen „Lauf 1/2/3“ im Testplan (Anhang E, Issue-Zuordnung) entsprechen den Nummern 03, 05 und 04.
 
