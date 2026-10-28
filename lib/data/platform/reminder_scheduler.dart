@@ -105,6 +105,12 @@ class LocalReminderScheduler implements ReminderScheduler {
           requestSoundPermission: false,
         ),
         linux: LinuxInitializationSettings(defaultActionName: 'FamilyNexus'),
+        // Windows: ohne diese Angabe wirft das Plugin beim Start und die App zeigt „Lokale Daten nicht lesbar“.
+        windows: WindowsInitializationSettings(
+          appName: 'FamilyNexus',
+          appUserModelId: 'de.inneso.FamilyNexus',
+          guid: '6f1c2a9e-3b7d-4c58-9a41-5d2e8b0c7f13',
+        ),
       ),
     );
     _ready = true;
