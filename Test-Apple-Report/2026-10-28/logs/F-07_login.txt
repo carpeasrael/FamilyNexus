@@ -1,0 +1,9 @@
+== fnt-1028-n1
+{"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
+HTTP 403
+== fnt-1028-i2
+{"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
+HTTP 403
+== fnt-1028-n12
+{"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
+HTTP 403

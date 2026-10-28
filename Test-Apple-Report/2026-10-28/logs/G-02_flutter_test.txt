@@ -1,0 +1,1272 @@
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.2 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  file_picker 13.1.0 (13.3.0 available)
+  file_picker_darwin 2.3.2 (2.4.0 available)
+  flutter_local_notifications 22.3.2 (22.3.3 available)
+  hooks 2.0.2 (2.2.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.3 (1.19.0 available)
+  native_toolchain_c 0.19.2 (0.19.5 available)
+  objective_c 9.5.0 (9.6.2 available)
+  petitparser 7.0.2 (7.1.0 available)
+  posix 6.5.2 (6.5.3 available)
+  record_use 0.6.0 (1.1.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common_ffi 2.4.4 (2.4.5 available)
+  sqlite3 3.5.2 (3.8.0 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.4 available)
+  web 1.1.1 (1.1.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+22 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/keyboard_dismiss_test.dart
+00:00 +0: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/l10n/l10n_test.dart: de und en haben identische Schlüssel
+00:00 +1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/l10n/l10n_test.dart: keine festen UI-Texte im Code (mehrzeilig, alle üblichen Parameter)
+00:00 +2: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +3: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +4: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +5: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +6: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +7: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +8: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +9: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +10: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +11: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +12: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +13: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +14: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +15: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +16: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +17: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +18: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +19: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +20: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +22: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +23: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +24: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +25: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +26: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +27: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +28: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +29: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +30: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +31: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +32: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +33: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +34: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +35: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:00 +36: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:01 +37: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:01 +38: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:01 +39: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:01 +40: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:01 +41: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:01 +42: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:01 +43: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:01 +44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: fünf Tabs und Burger-Menü auf Deutsch
+00:01 +45: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +46: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +47: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +48: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +49: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +50: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +51: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +52: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +53: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +54: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +55: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +56: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +57: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +58: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +59: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +60: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +61: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +62: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +63: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +64: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +65: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +66: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +67: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +68: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +69: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +70: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +71: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +72: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +73: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +74: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +75: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +76: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/enter_submits_test.dart: Desktop: Enter sendet im Chat, Umschalt+Enter nicht (variant: TargetPlatform.linux)
+00:01 +77: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: Sprachumschaltung wirkt sofort
+00:01 +78: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: Sprachumschaltung wirkt sofort
+00:02 +79: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: Sprachumschaltung wirkt sofort
+00:02 +80: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:02 +81: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/keyboard_dismiss_test.dart: Chat: Senden lässt die Tastatur offen, Wischen im Verlauf schließt sie (variant: TargetPlatform.iOS)
+00:02 +82: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:02 +83: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:02 +84: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:02 +85: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:02 +86: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:02 +87: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:02 +88: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:02 +89: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:02 +90: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/ui/settings_screen_test.dart: „Effekte reduzieren“ wird übernommen
+00:02 +91: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/second_device_test.dart: Anmeldung eines bestehenden Familienmitglieds an einem weiteren Gerät: Schlüssel eingeben, dann Hauptansicht
+00:02 +92: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/second_device_test.dart: Anmeldung eines bestehenden Familienmitglieds an einem weiteren Gerät: Schlüssel eingeben, dann Hauptansicht
+00:02 +93: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/second_device_test.dart: Anmeldung eines bestehenden Familienmitglieds an einem weiteren Gerät: Schlüssel eingeben, dann Hauptansicht
+00:02 +94: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/second_device_test.dart: Anmeldung eines bestehenden Familienmitglieds an einem weiteren Gerät: Schlüssel eingeben, dann Hauptansicht
+00:03 +95: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/second_device_test.dart: Anmeldung eines bestehenden Familienmitglieds an einem weiteren Gerät: Schlüssel eingeben, dann Hauptansicht
+00:03 +96: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/second_device_test.dart: Anmeldung eines bestehenden Familienmitglieds an einem weiteren Gerät: Schlüssel eingeben, dann Hauptansicht
+00:03 +97: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/second_device_test.dart: Anmeldung eines bestehenden Familienmitglieds an einem weiteren Gerät: Schlüssel eingeben, dann Hauptansicht
+00:03 +98: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/second_device_test.dart: Anmeldung eines bestehenden Familienmitglieds an einem weiteren Gerät: Schlüssel eingeben, dann Hauptansicht
+00:03 +99: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/second_device_test.dart: Anmeldung eines bestehenden Familienmitglieds an einem weiteren Gerät: Schlüssel eingeben, dann Hauptansicht
+00:03 +100: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:03 +101: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:03 +102: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:04 +103: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:04 +104: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:04 +105: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:04 +106: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:05 +107: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/invite_onboarding_test.dart: Neulinge mit Einladungslink (E-56) TP-JOIN-01 Link geöffnet → ohne Serverfrage „Konto erstellen“ → Notfall-Schlüssel → Beitrittskarte mit Namen → Anfrage → bestätigt → Hauptansicht
+00:05 +108: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/registration_test.dart: #27: Kontoanlage direkt nach „Alle lokalen Daten löschen“ (neue Dienste) geht zu Schritt 2
+00:05 +109: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/registration_test.dart: #27: Kontoanlage direkt nach „Alle lokalen Daten löschen“ (neue Dienste) geht zu Schritt 2
+00:05 +110: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/registration_test.dart: #27: Kontoanlage direkt nach „Alle lokalen Daten löschen“ (neue Dienste) geht zu Schritt 2
+00:05 +111: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/registration_test.dart: #27: Kontoanlage direkt nach „Alle lokalen Daten löschen“ (neue Dienste) geht zu Schritt 2
+00:05 +112: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/registration_test.dart: #27: Kontoanlage direkt nach „Alle lokalen Daten löschen“ (neue Dienste) geht zu Schritt 2
+00:05 +113: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/registration_test.dart: #27: Kontoanlage direkt nach „Alle lokalen Daten löschen“ (neue Dienste) geht zu Schritt 2
+00:05 +114: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/registration_test.dart: #27: Kontoanlage direkt nach „Alle lokalen Daten löschen“ (neue Dienste) geht zu Schritt 2
+00:05 +115: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/registration_test.dart: #27: Kontoanlage direkt nach „Alle lokalen Daten löschen“ (neue Dienste) geht zu Schritt 2
+00:05 +116: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/registration_test.dart: #27: Kontoanlage direkt nach „Alle lokalen Daten löschen“ (neue Dienste) geht zu Schritt 2
+00:06 +117: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Schließen der Oberfläche entfernt geplante Erinnerungen NICHT (nur Abmeldung)
+00:06 +118: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Schließen der Oberfläche entfernt geplante Erinnerungen NICHT (nur Abmeldung)
+00:06 +119: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Schließen der Oberfläche entfernt geplante Erinnerungen NICHT (nur Abmeldung)
+00:06 +120: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:06 +121: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:06 +122: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:06 +123: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:06 +124: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:06 +125: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:06 +126: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:06 +127: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +128: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +129: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +130: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +131: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +132: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +133: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +134: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +135: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +136: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +137: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +138: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +139: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +140: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +141: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Moderatorin legt Liste an, weist sie sich selbst zu, hakt mit Kommentar ab; Reset am nächsten Tag, Verlauf bleibt
+00:07 +142: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/chat_test.dart: Nachricht senden erscheint im Verlauf, Eingabe wird geleert
+00:07 +143: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Termin anlegen über das Formular privater Termin wird nur in den privaten Raum gesendet
+00:07 +144: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Termin anlegen über das Formular privater Termin wird nur in den privaten Raum gesendet
+00:07 +145: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Termin anlegen über das Formular privater Termin wird nur in den privaten Raum gesendet
+00:07 +146: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern
+00:07 +147: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern
+00:08 +148: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern
+00:08 +149: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern
+00:08 +150: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern
+00:08 +151: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/tasks_test.dart: Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern
+00:08 +152: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Termin anlegen über das Formular #34: Ende wandert mit dem Beginn; Fehler am Zeitfeld Beginn verschoben: Dauer bleibt, auch über Mitternacht hinweg
+00:09 +153: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Termin anlegen über das Formular #34: Ende wandert mit dem Beginn; Fehler am Zeitfeld Beginn verschoben: Dauer bleibt, auch über Mitternacht hinweg
+00:09 +154: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Termin anlegen über das Formular #34: Ende wandert mit dem Beginn; Fehler am Zeitfeld Beginn verschoben: Dauer bleibt, auch über Mitternacht hinweg
+00:09 +155: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Termin anlegen über das Formular #34: Ende wandert mit dem Beginn; Fehler am Zeitfeld Beginn verschoben: Dauer bleibt, auch über Mitternacht hinweg
+00:09 +156: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Termin anlegen über das Formular #34: Ende wandert mit dem Beginn; Fehler am Zeitfeld Beginn verschoben: Dauer bleibt, auch über Mitternacht hinweg
+00:09 +157: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Termin anlegen über das Formular #34: Ende wandert mit dem Beginn; Fehler am Zeitfeld Beginn verschoben: Dauer bleibt, auch über Mitternacht hinweg
+00:09 +158: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:09 +159: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:09 +160: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:09 +161: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:10 +162: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:10 +163: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:10 +164: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:10 +165: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:10 +166: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:10 +167: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Link einfügen → Beitrittskarte → Anfrage wartet → Moderator bestätigt → Einladung annehmen
+00:10 +168: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/moderation_test.dart: Fremde Nachricht melden: Dialog, Server-Meldung, Hinweis mit Blockieren-Angebot
+00:10 +169: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/moderation_test.dart: Fremde Nachricht melden: Dialog, Server-Meldung, Hinweis mit Blockieren-Angebot
+00:10 +170: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie
+00:10 +171: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie
+00:10 +172: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie
+00:10 +173: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie
+00:10 +174: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie
+00:10 +175: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie
+00:11 +176: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie
+00:11 +177: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie
+00:11 +178: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie
+00:11 +179: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie
+00:11 +180: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie
+00:11 +181: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Moderator sieht Mitglieder mit Rolle als Text, Anfragen getrennt und die Moderator-Empfehlung
+00:11 +182: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Moderator sieht Mitglieder mit Rolle als Text, Anfragen getrennt und die Moderator-Empfehlung
+00:11 +183: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Moderator sieht Mitglieder mit Rolle als Text, Anfragen getrennt und die Moderator-Empfehlung
+00:11 +184: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Moderator sieht Mitglieder mit Rolle als Text, Anfragen getrennt und die Moderator-Empfehlung
+00:11 +185: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/moderation_test.dart: Blockieren blendet Nachrichten aus, Aufheben in den Einstellungen bringt sie zurück
+00:11 +186: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/moderation_test.dart: Blockieren blendet Nachrichten aus, Aufheben in den Einstellungen bringt sie zurück
+00:12 +187: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/moderation_test.dart: Blockieren blendet Nachrichten aus, Aufheben in den Einstellungen bringt sie zurück
+00:12 +188: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/moderation_test.dart: Blockieren blendet Nachrichten aus, Aufheben in den Einstellungen bringt sie zurück
+00:12 +189: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Mitglied sieht keine Verwaltung
+00:12 +190: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Beitreten per Link Per Matrix-ID eingeladenes Konto: Einladungskarte statt „Gründen oder Beitreten“, ein Tipp genügt
+00:12 +191: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Detail, Zusage, Löschen Fremde Termine sind schreibgeschützt
+00:12 +192: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Detail, Zusage, Löschen Fremde Termine sind schreibgeschützt
+00:12 +193: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/calendar_flow_test.dart: Detail, Zusage, Löschen Fremde Termine sind schreibgeschützt
+00:12 +194: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche Ungelesene Nachrichten werden in der Leiste gezeigt und beim Öffnen gelesen
+00:12 +195: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche Ungelesene Nachrichten werden in der Leiste gezeigt und beim Öffnen gelesen
+00:12 +196: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/moderation_test.dart: Familie: Blockieren aus dem Mitgliedermenü, Einzelchat ist dann ausgeblendet
+00:12 +197: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/moderation_test.dart: Familie: Blockieren aus dem Mitgliedermenü, Einzelchat ist dann ausgeblendet
+00:12 +198: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/moderation_test.dart: Familie: Blockieren aus dem Mitgliedermenü, Einzelchat ist dann ausgeblendet
+00:12 +199: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/moderation_test.dart: Familie: Blockieren aus dem Mitgliedermenü, Einzelchat ist dann ausgeblendet
+00:12 +200: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/moderation_test.dart: Familie: Blockieren aus dem Mitgliedermenü, Einzelchat ist dann ausgeblendet
+00:12 +201: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/moderation_test.dart: Familie: Blockieren aus dem Mitgliedermenü, Einzelchat ist dann ausgeblendet
+00:13 +202: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Einladungsdialog: Konto-Server für Neue wählbar, Gültigkeit bleibt erhalten
+00:13 +203: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Einladungsdialog: Konto-Server für Neue wählbar, Gültigkeit bleibt erhalten
+00:13 +204: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Einladungsdialog: Konto-Server für Neue wählbar, Gültigkeit bleibt erhalten
+00:13 +205: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Schlüsselsicherung Einstellungen: neuer Notfall-Schlüssel ersetzt den alten (#11)
+00:13 +206: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Schlüsselsicherung Einstellungen: neuer Notfall-Schlüssel ersetzt den alten (#11)
+00:13 +207: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche #31: „Nachricht schreiben“, wenn der Einzelchat erst später erscheint wartet auf den Einzelchat statt den Familienchat zu zeigen; nichts geht an alle
+00:13 +208: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche #31: „Nachricht schreiben“, wenn der Einzelchat erst später erscheint wartet auf den Einzelchat statt den Familienchat zu zeigen; nichts geht an alle
+00:13 +209: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/direct_chat_test.dart: Oberfläche #31: „Nachricht schreiben“, wenn der Einzelchat erst später erscheint wartet auf den Einzelchat statt den Familienchat zu zeigen; nichts geht an alle
+00:13 +210: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Einladungslink per E-Mail: Entwurf mit Anleitung und Link, ohne Mailprogramm wird kopiert
+00:13 +211: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Einladungslink per E-Mail: Entwurf mit Anleitung und Link, ohne Mailprogramm wird kopiert
+00:13 +212: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-START-01 Startseite: drei Wege, keine Fachbegriffe, keine Schrittanzeige
+00:13 +213: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-START-01 Startseite: drei Wege, keine Fachbegriffe, keine Schrittanzeige
+00:14 +214: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-START-01 Startseite: drei Wege, keine Fachbegriffe, keine Schrittanzeige
+00:14 +215: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-START-01 Startseite: drei Wege, keine Fachbegriffe, keine Schrittanzeige
+00:14 +216: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-START-01 Startseite: drei Wege, keine Fachbegriffe, keine Schrittanzeige
+00:14 +217: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-START-01 Startseite: drei Wege, keine Fachbegriffe, keine Schrittanzeige
+00:14 +218: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Schlüsselsicherung eingehende Verifizierungsanfrage erscheint als Dialog (Gerät 1) und lässt sich ablehnen
+00:14 +219: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/join_and_security_test.dart: Schlüsselsicherung eingehende Verifizierungsanfrage erscheint als Dialog (Gerät 1) und lässt sich ablehnen
+00:14 +220: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Ernennen und Entfernen verlangen Bestätigung
+00:14 +221: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Ernennen und Entfernen verlangen Bestätigung
+00:14 +222: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/family_screen_test.dart: Ernennen und Entfernen verlangen Bestätigung
+00:14 +223: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:14 +224: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:14 +225: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:15 +226: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:15 +227: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:15 +228: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:15 +229: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:15 +230: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:15 +231: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:15 +232: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:15 +233: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:15 +234: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:15 +235: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:15 +236: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/onboarding_test.dart: TP-REG-01 Weg „Neue Familie“: Konto erstellen → Notfall-Schlüssel → Familie benennen → Jetzt einladen → Hauptansicht
+00:15 +237: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:15 +238: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:15 +239: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:15 +240: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:15 +241: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:15 +242: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:16 +243: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:16 +244: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:16 +244: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/manual/onboarding_screens_test.dart: Bildschirmfotos der Einrichtung Weg A: Neue Familie gründen (mit Zusatzschritten des Anbieters)
+  Skip: Nur mit FN_SCREENSHOTS=1 (tool/onboarding_screens.sh)
+00:16 +244 ~1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:16 +244 ~1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/manual/onboarding_screens_test.dart: Bildschirmfotos der Einrichtung Weg B: Ich wurde eingeladen (Link geöffnet)
+  Skip: Nur mit FN_SCREENSHOTS=1 (tool/onboarding_screens.sh)
+00:16 +244 ~2: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:16 +244 ~2: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/manual/onboarding_screens_test.dart: Bildschirmfotos der Einrichtung Weg B ohne Link und Weg C (Anmelden, Gerät freischalten)
+  Skip: Nur mit FN_SCREENSHOTS=1 (tool/onboarding_screens.sh)
+00:16 +244 ~3: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:16 +244 ~3: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/manual/onboarding_screens_test.dart: Bildschirmfotos der Einrichtung Anbieter mit Browser-Anmeldung (wie matrix.org) und englische Startseite
+  Skip: Nur mit FN_SCREENSHOTS=1 (tool/onboarding_screens.sh)
+00:16 +244 ~4: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:16 +244 ~4: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart: Gateway gegen echten Synapse Anmeldung, Familie anlegen, verschlüsselt chatten
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:16 +244 ~5: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:16 +244 ~5: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart: Gateway gegen echten Synapse falsche Zugangsdaten werden als invalidCredentials gemeldet
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:16 +244 ~6: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:16 +244 ~6: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart: Gateway gegen echten Synapse createFamily überschreibt keine bestehende Familie
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:16 +244 ~7: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:16 +245 ~7: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:16 +246 ~7: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Einkaufszettel Eintrag anlegen, abhaken, bearbeiten, löschen und Erledigte entfernen
+00:16 +247 ~7: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:16 +248 ~7: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:16 +248 ~7: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Kontolöschung (#12) gegen echten Synapse Passwort-Konto: falsches Passwort scheitert, danach gelöscht, Familie verlassen, Anmeldung unmöglich
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:16 +248 ~8: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:16 +248 ~8: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Link eines Moderators: ein zweiter Moderator prüft und bestätigt die Anfrage
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:16 +248 ~9: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:16 +248 ~9: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Link mit automatischer Bestätigung: die App des Moderators lädt ohne Klick ein, nur einmal
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:16 +248 ~10: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:16 +248 ~10: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Familien-Code ohne Link: Moderator sieht die Anfrage als „Code“, nichts geschieht von allein, Bestätigung führt zum Beitritt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:16 +248 ~11: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:16 +248 ~11: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Familien-Code ohne Link: Ablehnung erreicht den Anfragenden (#43)
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:16 +248 ~12: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:16 +248 ~12: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Konto-Server im Link: frei wählbar, Heimnetz-Fremdserver und Unsinn werden abgelehnt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:16 +248 ~13: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:16 +248 ~13: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Per Matrix-ID eingeladenes Konto findet die Einladung nach der Anmeldung
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:16 +248 ~14: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:16 +249 ~14: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:16 +250 ~14: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +251 ~14: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +252 ~14: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +253 ~14: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +253 ~14: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_moderation_e2e_test.dart: Melden gegen echten Synapse fremde Nachricht wird gemeldet, eigene und unbekannte werden abgelehnt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +253 ~15: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +253 ~15: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Ersteinrichtung: Wiederherstellungsschlüssel, Cross-Signing, Gerät verifiziert
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +253 ~16: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +253 ~16: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse zweites Gerät: Emoji-Verifizierung mit dem ersten
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +253 ~17: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +253 ~17: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Abbruch: abweichende Emoji → keine Verifizierung
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +253 ~18: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +253 ~18: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Wiederherstellung mit Schlüssel: falscher Schlüssel scheitert, richtiger verifiziert und entschlüsselt alte Nachrichten
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +253 ~19: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +253 ~19: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse neuer Schlüssel (#11): alter scheitert, neuer verifiziert und entschlüsselt alte Nachrichten
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +253 ~20: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +253 ~20: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Unverifiziertes Gerät erhält keine Raumschlüssel; nach Verifizierung neue Nachrichten lesbar
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +253 ~21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +254 ~21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +255 ~21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +256 ~21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +257 ~21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +258 ~21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +259 ~21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt
+00:17 +260 ~21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Mitgliederliste zeigt Text und Punkt: online, offline, zuletzt
+00:17 +261 ~21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:17 +261 ~21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-01 Registrierungsweg wird erkannt; Name frei → Konto in der App angelegt → Name vergeben
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +261 ~22: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:17 +261 ~22: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-02 lokale Prüfungen vor dem Senden: ungültiger Name, zu kurzes Passwort
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +261 ~23: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:17 +261 ~23: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-03 Neuling: Konto anlegen → Link v2 mit Namen → Anfrage → Moderatorin sieht den Namen → bestätigt → Mitglied
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +261 ~24: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:17 +261 ~24: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) Issue #6: Link einer Familie auf einem Heimnetz-Server (localhost) vor der Anmeldung lesen und beitreten
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +261 ~25: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:17 +261 ~25: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-04 direkte Einladung zeigt den Namen der einladenden Person
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +261 ~26: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:17 +261 ~26: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-05 Abbruch: Registrierung lässt sich verwerfen, danach erneut starten
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:17 +261 ~27: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:18 +261 ~27: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart: Kalender über den echten Synapse geteilte und private Termine: verschlüsselt, getrennte Räume, Signale auch für späte Zuhörer
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +261 ~28: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:18 +262 ~28: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:18 +262 ~28: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Online-Status: verschlüsselt zugestellt, Anfrage wird beantwortet, Fremde und Klartext werden ignoriert
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +262 ~29: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:18 +262 ~29: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einzelchat: verschlüsselt, automatische Annahme, getrennt vom Familienchat, nach Entfernen gesperrt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +262 ~30: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:18 +262 ~30: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einzelchat-Einladung von Fremden wird weder angenommen noch als Familieneinladung gezeigt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +262 ~31: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:18 +262 ~31: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einkaufszettel: verschlüsselt im Familienraum, beide Mitglieder erhalten Einträge, Server sieht keinen Klartext
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +262 ~32: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:18 +262 ~32: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Issue #1: Liste v2 (Erklärung, monatlich am letzten Freitag) wird verschlüsselt übertragen und gleich gelesen
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +262 ~33: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:18 +262 ~33: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Aufgabenlisten: Liste und Protokolleintrag verschlüsselt im Familienraum, Server sieht keinen Klartext
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +262 ~34: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Konto löschen: Abbrechen löscht nichts
+00:18 +263 ~34: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +264 ~34: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +264 ~34: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Beitritt per Link: Anfrage → Bestätigung → Annahme; Chat wird entschlüsselt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +264 ~35: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +264 ~35: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Einladungslink: gefälschte ID nicht bestätigbar, Link nur einmal verwendbar, Identität vermerkt
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +264 ~36: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +264 ~36: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Mitglied hat keine Verwaltungsrechte – im Gateway UND auf dem Server
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +264 ~37: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +264 ~37: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Ernennen, Umbenennen, Moderatoren sind gleichrangig
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +264 ~38: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +264 ~38: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Issue #7: Mitglied zum Moderator hochstufen – auch durch einen ernannten Moderator und mehrfach hintereinander
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +264 ~39: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +264 ~39: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Issue #7: zwei Ernennungen unmittelbar hintereinander (veralteter Zwischenspeicher)
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +264 ~40: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +264 ~40: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Issue #9: Ersteller ist im Raum Administrator (100), in der App Moderator; Moderator bleibt bei 50
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +264 ~41: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +264 ~41: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Ablehnen einer Anfrage und abgelaufene/ungültige Links
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +264 ~42: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +264 ~42: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Entfernen rotiert den Raumschlüssel; Entfernte lesen neue Nachrichten nicht
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +264 ~43: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +264 ~43: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Einladung per Matrix-ID und Ablehnen einer Einladung
+  Skip: Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)
+00:18 +264 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +265 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +266 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/shopping_presence_ui_test.dart: Online-Status Einstellung „Online-Status teilen“ steuert die Meldungen
+00:18 +267 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sdk_registration_test.dart: #28: Anmeldung gelingt, ein Folgeschritt scheitert kein „Unbekannter Fehler.“: die Sitzung steht
+00:18 +268 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:18 +269 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:18 +270 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:18 +271 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:18 +272 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:18 +273 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:18 +274 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:18 +275 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +276 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +277 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +278 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +279 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +280 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +281 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +282 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +283 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +284 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +285 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +286 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +287 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser: Löschseite des Anbieters, danach Prüfung und lokale Löschung
+00:19 +288 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/presence_sync_test.dart: im Hintergrund wird nicht auf Anfragen geantwortet
+00:19 +289 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/gateway_security_test.dart: HttpsOnlyClient (TLS-Pflicht für alle SDK-Verbindungen) erlaubt https und deaktiviert Weiterleitungen
+00:19 +290 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +291 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +292 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +293 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +294 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +295 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +296 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +297 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +298 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +299 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +300 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +301 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +302 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +303 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +304 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Anmeldung im Browser ohne Kontoseite: Fehlermeldung statt Dialog
+00:19 +305 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Browser öffnet nicht: Hinweis, nichts vorgemerkt
+00:19 +306 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: einfache Nachricht, Reihenfolge älteste zuerst
+00:19 +307 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: einfache Nachricht, Reihenfolge älteste zuerst
+00:19 +308 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/shopping_sync_test.dart: ein neuer Eintrag erreicht Ben, nur als Ereignis im Familienraum
+00:19 +308 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: einfache Nachricht, Reihenfolge älteste zuerst
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +309 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +310 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +310 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: Antwort: Zitat-Fallback wird aus dem Text entfernt, Bezug bleibt
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +311 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +312 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +313 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +313 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge passender Bildanhang wird übernommen
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +314 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +315 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +315 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge Größe als Kommazahl/Text/fehlend blockiert den Anhang, bricht aber nichts ab
+[Matrix] [33mExpected optional "int" in event content for the Key "size" but got "double" at ChatMapper._map (package:family_nexus/data/matrix/chat_mapper.dart:103:26)[0m
+[Matrix] [33mExpected optional "int" in event content for the Key "size" but got "String" at ChatMapper._map (package:family_nexus/data/matrix/chat_mapper.dart:103:26)[0m
+00:19 +316 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +316 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge Größe als Kommazahl/Text/fehlend blockiert den Anhang, bricht aber nichts ab
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +317 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +317 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge Größe als Kommazahl/Text/fehlend blockiert den Anhang, bricht aber nichts ab
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +318 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +319 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +319 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge Typ/Endung passen nicht zusammen oder nicht erlaubt → blockiert
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +320 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +320 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge zu große Datei wird blockiert
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +321 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +321 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: Anhänge Dateiname aus fremder Quelle wird bereinigt
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +322 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +323 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +323 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: nicht entschlüsselbare Nachricht wird sichtbar markiert
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +324 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +324 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: Bearbeitungen, Entfernte und fremde Ereignistypen werden nicht als Nachricht gezeigt
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +325 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +325 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: Status: Fehler → failed, sonst sent
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +326 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +326 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: Reaktionen Emojis werden gezählt, Text als „Reaktion“ verworfen
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the user @cara:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @cara:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +327 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +328 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +328 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: Reaktionen Anzahl verschiedener Reaktionen ist begrenzt
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +329 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +330 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +330 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: #29: Verifizierungsanfrage als Raumnachricht erscheint nicht als Chat-Text
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +331 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +332 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +332 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: #35: nicht lesbare Ereignisse vor dem eigenen Beitritt werden zu einem Hinweis zusammengefasst, spätere bleiben einzeln sichtbar
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the user @ida:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ida:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +333 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +334 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +334 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: #35: nicht lesbare Ereignisse vor dem eigenen Beitritt Namensänderung nach dem Beitritt zählt nicht als Beitritt
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the user @ida:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ida:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +335 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +335 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/chat_mapper_test.dart: #35: nicht lesbare Ereignisse vor dem eigenen Beitritt Beitritt nicht in der geladenen Zeitleiste: nichts wird ausgeblendet
+[Matrix] [33mUnable to request the user @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getRoomStateWithKey (package:matrix/matrix_api_lite/generated/api.dart:5056:43)
+#1      Room._requestSingleParticipantViaState (package:matrix/src/room.dart:2054:33)
+#2      Room._requestUser (package:matrix/src/room.dart:2112:25)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+[Matrix] [33mUnable to request the profile @ben:fake.test from the server - Null check operator used on a null value
+#0      Api.getUserProfile (package:matrix/matrix_api_lite/generated/api.dart:3080:43)
+#1      Client.getUserProfile (package:matrix/src/client.dart:1167:12)
+<asynchronous suspension>
+#2      Room._requestUser (package:matrix/src/room.dart:2127:27)
+<asynchronous suspension>
+#3      Room.requestUser (package:matrix/src/room.dart:2206:20)
+<asynchronous suspension>
+[0m
+00:19 +336 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +337 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +338 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +339 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +340 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +341 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +342 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +343 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +344 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +345 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +346 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +347 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +348 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +349 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: B-1: nach dem Zurücksetzen (neue Dienste) „Willkommen“ statt „Anmelden“ der alten Sitzung
+00:19 +350 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Löschseite aus den OAuth-Metadaten mit Aktion „Konto löschen“
+00:19 +351 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Löschseite aus den OAuth-Metadaten ohne die Aktion: Kontoseite selbst
+00:19 +352 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/features/account_deletion_test.dart: Löschseite aus den OAuth-Metadaten nur https ohne Zugangsdaten
+00:20 +353 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: (setUpAll)
+00:20 +354 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: (setUpAll)
+00:20 +354 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/join_request_errors_test.dart: #25: Antwort des Servers auf die Anfrage (knock) Server der Familie nicht erreichbar (5xx) → Verbindungsfehler
+00:20 +355 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: geteilte Termine werden verschlüsselt in den Familienraum gesendet und von Ben übernommen
+00:20 +356 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: geteilte Termine werden verschlüsselt in den Familienraum gesendet und von Ben übernommen
+00:20 +357 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: geteilte Termine werden verschlüsselt in den Familienraum gesendet und von Ben übernommen
+00:20 +358 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: geteilte Termine werden verschlüsselt in den Familienraum gesendet und von Ben übernommen
+00:20 +359 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: geteilte Termine werden verschlüsselt in den Familienraum gesendet und von Ben übernommen
+00:20 +360 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: geteilte Termine Änderung und Löschung erreichen Ben; ältere Fassung bleibt im Verlauf
+00:20 +361 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: private Termine (Sicherheit) verlassen nie den privaten Raum: nicht im Familienraum, nicht bei Ben
+00:20 +362 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: private Termine (Sicherheit) erscheinen auf einem zweiten Gerät derselben Person
+00:20 +363 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: private Termine (Sicherheit) Mischbestand: nach beliebig vielen Aktionen nie ein privater Titel im Familienraum
+00:20 +364 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: private Termine (Sicherheit) Geteilt → privat nach Veröffentlichung: danach geht nur eine Löschmarke ohne Inhalt in den Familienraum
+00:20 +365 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: private Termine (Sicherheit) Fremder Absender im privaten Raum wird verworfen
+00:20 +366 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Fälschung und Müll Ben kann einen Termin von Anna nicht überschreiben (owner ≠ Absender)
+00:20 +367 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Fälschung und Müll Ben kann Annas Termin nicht unter eigenem Namen mit derselben ID übernehmen
+00:20 +368 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Fälschung und Müll Ungültige Inhalte werden verworfen, nichts bricht
+00:20 +369 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Warteschlange (offline) Termine bleiben erhalten und werden nachgereicht, in Änderungsreihenfolge
+00:20 +370 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Warteschlange (offline) Server nicht erreichbar → nichts geht verloren
+00:20 +371 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Zusagen Ben sagt zu; Anna sieht es; Offline-Antwort wird nachgereicht
+00:20 +372 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Zusagen verspätetes Echo einer älteren Antwort überschreibt die neuere nicht
+00:20 +373 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Zusagen die neuere Zusage gewinnt, auch bei umgekehrter Zustellung
+00:20 +374 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Resync für neue Mitglieder Anna sendet beim Beitritt von Cara ihre aktuellen geteilten Termine erneut
+00:20 +375 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Resync für neue Mitglieder Resync ist idempotent für bestehende Mitglieder
+00:20 +376 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: ohne Sitzung wird nichts gesendet
+00:20 +377 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Review-Funde Phase 3 K4: gleichzeitig eintreffende Fassungen enden immer bei der neuesten (beide Reihenfolgen)
+00:20 +378 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Review-Funde Phase 3 K3: privat → geteilt konvergiert auf dem zweiten eigenen Gerät
+00:20 +379 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Review-Funde Phase 3 K5: Resync übersteht einen Ausfall (Vormerken statt einmaligem Senden)
+00:20 +380 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Review-Funde Phase 3 K6: Serverfehler lassen den Termin in der Warteschlange; lokale Codec-Fehler nicht
+00:20 +381 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Review-Funde Phase 3 S2: Antworten auf unbekannte oder private Termine werden verworfen
+00:20 +382 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: Review-Funde Phase 3 S3: Titel mit Steuer-/Bidi-Zeichen werden verworfen
+00:20 +383 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/calendar_sync_test.dart: (tearDownAll)
+00:20 +383 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sql_task_store_test.dart: (setUpAll)
+00:20 +383 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sql_task_store_test.dart: Migration v4 legt die Tabellen an; schemaVersion ist 4
+00:20 +384 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/task_sync_test.dart: Liste erreicht alle Mitglieder, nur als Ereignis im Familienraum
+00:20 +385 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/task_sync_test.dart: Liste erreicht alle Mitglieder, nur als Ereignis im Familienraum
+00:20 +386 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/oauth_redirect_test.dart: TP-OAUTH-06 Desktop: Rücksprung über 127.0.0.1 mit zufälligem Port, nur GET /oauth, danach geschlossen
+00:20 +387 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/oauth_redirect_test.dart: TP-OAUTH-06 Desktop: Rücksprung über 127.0.0.1 mit zufälligem Port, nur GET /oauth, danach geschlossen
+00:20 +388 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/oauth_redirect_test.dart: TP-OAUTH-06 Desktop: Rücksprung über 127.0.0.1 mit zufälligem Port, nur GET /oauth, danach geschlossen
+00:20 +389 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sql_task_store_test.dart: Protokoll: nur anfügen (Duplikat ändert nichts), Reihenfolge, ausstehend
+00:20 +390 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sql_task_store_test.dart: Protokoll: nur anfügen (Duplikat ändert nichts), Reihenfolge, ausstehend
+00:20 +391 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sql_task_store_test.dart: Protokoll: nur anfügen (Duplikat ändert nichts), Reihenfolge, ausstehend
+00:20 +392 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sql_task_store_test.dart: Protokoll: nur anfügen (Duplikat ändert nichts), Reihenfolge, ausstehend
+00:20 +393 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/task_sync_test.dart: Nicht-Moderator kann keine Liste einschleusen
+00:20 +394 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/oauth_redirect_test.dart: R2: ein neuer Versuch beendet den alten, der alte stört den neuen nicht
+00:20 +395 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sql_task_store_test.dart: pruneLog entfernt nur veröffentlichte alte Einträge; requeue markiert Eigenes neu
+00:20 +396 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sql_task_store_test.dart: pruneLog entfernt nur veröffentlichte alte Einträge; requeue markiert Eigenes neu
+00:20 +397 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sql_task_store_test.dart: pruneLog entfernt nur veröffentlichte alte Einträge; requeue markiert Eigenes neu
+00:20 +398 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/oauth_redirect_test.dart: Zeitüberschreitung liefert null
+00:20 +399 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/oauth_redirect_test.dart: Zeitüberschreitung liefert null
+00:20 +400 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/oauth_redirect_test.dart: Zeitüberschreitung liefert null
+00:20 +401 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/oauth_redirect_test.dart: Zeitüberschreitung liefert null
+00:20 +402 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/oauth_redirect_test.dart: Zeitüberschreitung liefert null
+00:20 +403 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/vault_key_store_test.dart: Schlüssel werden einmal zufällig erzeugt und bleiben nach erneutem Entsperren gleich
+00:20 +404 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/vault_key_store_test.dart: Parallele Aufrufe liefern denselben Schlüssel und verlieren keine Einträge
+00:20 +405 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/vault_key_store_test.dart: Fehlgeschlagenes Speichern erzeugt keinen Schlüssel im Speicher und blockiert nichts
+00:20 +406 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/vault_key_store_test.dart: deleteKey und deleteAll entfernen Schlüssel; deleteAll zerstört den Tresor
+00:20 +407 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/vault_key_store_test.dart: Falsches Passwort entsperrt nicht
+00:20 +408 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/vault_key_store_test.dart: Außerhalb des Browsers gibt es keinen Web-Tresor
+00:20 +409 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_ticket_test.dart: Vermerk wird geschrieben und wieder gelesen
+00:20 +410 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_ticket_test.dart: verbrauchter Vermerk trägt die Markierung
+00:20 +411 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_ticket_test.dart: automatische Bestätigung ist nur gesetzt, wenn der Vermerk es sagt
+00:20 +412 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_ticket_test.dart: ungültige Inhalte werden verworfen
+00:21 +413 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/username_suggestion_test.dart: TP-REG-02 Vorschlag aus dem Namen: Umlaute, Akzente, Leerzeichen
+00:21 +414 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: (setUpAll)
+00:21 +415 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: (setUpAll)
+00:21 +416 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: (setUpAll)
+00:21 +417 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: (setUpAll)
+00:21 +418 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: (setUpAll)
+00:21 +418 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Roundtrip erhält alle Felder inkl. Wiederholung und Teilnehmer
+00:21 +419 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: ganztägiger Termin und Tombstone laufen durch
+00:21 +420 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Löschmarke enthält weder Zeitpunkt noch Farbe des Termins
+00:21 +421 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Sichtbarkeit private Termine können nicht für den Familienraum kodiert werden
+00:21 +422 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Sichtbarkeit geteilte Termine gehören nicht in den privaten Raum
+00:21 +423 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Sichtbarkeit Sichtbarkeit steht nie im Inhalt; sie ergibt sich aus dem Raum
+00:21 +424 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung Absender muss mit owner übereinstimmen
+00:21 +425 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung falsche Schemaversion, Typen und fehlende Felder werden abgelehnt
+00:21 +426 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung Größenlimits
+00:21 +427 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung unsinnige Zeiten und Wiederholungen
+00:21 +428 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung Termine über 366 Tage Dauer werden abgelehnt
+00:21 +429 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung Zufallsmüll stürzt nie ab
+00:21 +430 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Fälschungsschutz und Validierung ungültiger Absender wird abgelehnt
+00:21 +431 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: RSVP Roundtrip inkl. Zeitstempel des Absenders
+00:21 +432 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: RSVP ungültige Inhalte → null
+00:21 +433 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Review: Text und Wiederholungsende Steuer-/Bidi-/Nullbreiten-Zeichen in Titel und Ort werden abgelehnt, Zeilenumbruch in der Notiz nicht
+00:21 +434 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: Review: Text und Wiederholungsende Wiederholungsende vor dem ersten Termin ist ungültig
+00:21 +435 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/event_codec_test.dart: (tearDownAll)
+00:21 +435 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingItem.validate gültiger Eintrag
+00:21 +436 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingItem.validate lehnt ungültige Felder ab
+00:21 +437 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingItem.validate Löschmarken tragen keinen Inhalt
+00:21 +438 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingCodec Hin- und Rückweg
+00:21 +439 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingCodec „by“ muss dem Absender entsprechen
+00:21 +440 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingCodec verwirft Fremdformate und Grenzfälle
+00:21 +441 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingMerge höhere Version gewinnt, dann Zeit, dann Absender
+00:21 +442 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingMerge identische Fassung ersetzt nichts, völliger Gleichstand ist symmetrisch
+00:21 +443 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingMerge Reihenfolge der Zustellung ist egal (Konvergenz)
+00:21 +444 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingService Anlegen normalisiert Leerraum und merkt den Eintrag zum Senden vor
+00:21 +445 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingService ungültige Eingaben werden abgelehnt
+00:21 +446 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingService Abhaken, Bearbeiten, Löschen erhöhen die Version und setzen den Bearbeiter
+00:21 +447 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingService „Erledigte entfernen“ löscht nur abgehakte Einträge
+00:21 +448 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingService Obergrenzen: aktive Einträge und Gesamtzahl
+00:21 +449 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingService Eingehendes: neuer Eintrag, Aktualisierung, veraltet, Duplikat
+00:21 +450 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingService Löschmarken werden auch dann übernommen, wenn die aktive Grenze erreicht ist
+00:21 +451 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingService Löschmarken verstopfen die Liste nicht: bei voller Ablage werden alte veröffentlichte aufgeräumt
+00:21 +452 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/shopping_test.dart: ShoppingService unveröffentlichte Löschmarken werden nie aufgeräumt; eine volle Ablage lehnt dann neue ab
+00:21 +453 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/registration_flows_test.dart: wählt den einfachsten vollständig unterstützten Ablauf
+00:21 +454 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/registration_flows_test.dart: wählt den einfachsten vollständig unterstützten Ablauf
+00:21 +455 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/attachment_policy_test.dart: erlaubt passende Bilddatei
+00:21 +456 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/attachment_policy_test.dart: erlaubt passende Bilddatei
+00:21 +457 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/registration_flows_test.dart: Aufwand: Code (2) ist günstiger als Bedingungen + Captcha (4)
+00:21 +458 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/family_code_test.dart: Familien-Code ist eine Raum-ID mit Server
+00:21 +459 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/family_code_test.dart: Familien-Code ist eine Raum-ID mit Server
+00:21 +460 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/family_code_test.dart: Familien-Code ist eine Raum-ID mit Server
+00:21 +461 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/family_code_test.dart: Familien-Code ist eine Raum-ID mit Server
+00:21 +462 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/family_code_test.dart: Familien-Code ist eine Raum-ID mit Server
+00:21 +463 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/family_code_test.dart: Familien-Code ist eine Raum-ID mit Server
+00:21 +464 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/attachment_policy_test.dart: Dateinamen werden bereinigt
+00:21 +465 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/attachment_policy_test.dart: Dateinamen werden bereinigt
+00:21 +466 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/attachment_policy_test.dart: eingehende Metadaten
+00:22 +467 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/app_settings_test.dart: Standardwerte: Dunkel, Bildschirmschutz an, https-Standardserver
+00:22 +468 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/app_settings_test.dart: Roundtrip toMap/fromMap
+00:22 +469 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/app_settings_test.dart: ungültige Werte fallen auf Standard zurück
+00:22 +470 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/app_settings_test.dart: unsichere/ungültige Server-URL aus dem Speicher wird verworfen
+00:22 +471 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/app_settings_test.dart: copyWith validiert Server und klemmt Sperrzeit
+00:22 +472 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/app_settings_test.dart: copyWith kann Sprache auf Gerätesprache zurücksetzen
+00:22 +473 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/app_settings_test.dart: Online-Status teilen: Standard an, Rundreise, Unsinn fällt auf „an“ zurück
+00:22 +474 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/app_settings_test.dart: Akzentfarbe: Standard Türkis, Rundreise, Unsinn fällt zurück
+00:22 +475 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/family_test.dart: Power-Levels → Rollen
+00:22 +476 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: (setUpAll)
+00:22 +477 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: (setUpAll)
+00:22 +478 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: (setUpAll)
+00:22 +479 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: (setUpAll)
+00:22 +480 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: (setUpAll)
+00:22 +480 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_period_test.dart: wöchentlich: ISO-Woche, Montag bis Sonntag
+00:22 +481 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskList.validate gültige Liste
+00:22 +482 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskList.validate gültige Liste
+00:22 +483 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskList.validate gültige Liste
+00:22 +484 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskList.validate gültige Liste
+00:22 +485 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskList.validate gültige Liste
+00:22 +486 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskList.validate gültige Liste
+00:22 +487 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_period_test.dart: (tearDownAll)
+00:22 +487 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskList.validate lehnt ungültige Felder ab
+00:22 +488 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskList.validate Löschmarke trägt keinen Inhalt
+00:22 +489 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskCodec Roundtrip Liste
+00:22 +490 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskCodec Roundtrip Protokoll inkl. Kommentar
+00:22 +491 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskCodec by muss dem Absender entsprechen
+00:22 +492 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskCodec Zeitraum und Typen werden streng geprüft
+00:22 +493 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskCodec encode wirft bei ungültigen Daten
+00:22 +494 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskMerge höhere Version gewinnt, dann Zeit, dann Absender
+00:22 +495 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskMerge Gleichstand ist symmetrisch (genau einer gewinnt)
+00:22 +496 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskProgress (Reset als abgeleiteter Zustand) erledigter Punkt gilt in derselben Periode, nicht in der nächsten
+00:22 +497 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskProgress (Reset als abgeleiteter Zustand) wöchentlich: erledigt bis Sonntag, am Montag zurückgesetzt
+00:22 +498 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskProgress (Reset als abgeleiteter Zustand) monatlich: erledigt bis Monatsende, danach zurückgesetzt
+00:22 +499 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskProgress (Reset als abgeleiteter Zustand) Zurücknehmen: jüngster Eintrag entscheidet
+00:22 +500 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskProgress (Reset als abgeleiteter Zustand) Einträge anderer Personen oder inkonsistente Einträge zählen nicht
+00:22 +501 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskProgress (Reset als abgeleiteter Zustand) Verlauf: neueste zuerst, nur gültige Einträge
+00:22 +502 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskService nur Moderatoren legen an, ändern und löschen
+00:22 +503 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskService Bearbeiten behält die IDs unveränderter Punkte und erhöht die Version
+00:22 +504 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskService nur die zugewiesene Person hakt ab; Datum, Periode und Kommentar werden protokolliert
+00:22 +505 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskService Mitternacht in der Listen-Zeitzone setzt zurück, der Verlauf bleibt
+00:22 +506 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskService unbekannter Punkt, gelöschte Liste, Zurücknehmen
+00:22 +507 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskService Grenzen: Anzahl Listen
+00:22 +508 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskService Empfang: Liste eines Nicht-Moderators wird verworfen
+00:22 +509 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: TaskService Empfang: Protokoll-Duplikat, Zeitabweichung
+00:22 +510 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/tasks_test.dart: (tearDownAll)
+00:23 +510 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: (setUpAll)
+00:23 +510 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: einmalige Termine im Fenster / außerhalb / Randfälle (Ende ist exklusiv)
+00:23 +511 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: einmalige Termine mehrtägiger Termin, der vor dem Fenster begann, wird gefunden
+00:23 +512 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: einmalige Termine gelöschte und Termine mit unbekannter Zeitzone liefern nichts
+00:23 +513 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: täglich Intervall und count
+00:23 +514 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: täglich Uhrzeit bleibt über die Sommerzeitumstellung gleich (09:00 Berlin)
+00:23 +515 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: täglich Herbst: Rückstellung am 25.10.2026
+00:23 +516 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: täglich Termin in der Sommerzeit-Lücke (02:30 am 29.03.) rutscht, stürzt nicht ab
+00:23 +517 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: wöchentlich Wochentag des Beginns
+00:23 +518 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: wöchentlich mehrere Wochentage, Intervall 2
+00:23 +519 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: wöchentlich Wochentage vor dem Beginn in der ersten Woche entfallen
+00:23 +520 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: monatlich / jährlich 31. springt auf Monatsende, kehrt zurück
+00:23 +521 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: monatlich / jährlich Schaltjahr: 29.02. jährlich
+00:23 +522 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: monatlich / jährlich monatlich über den Jahreswechsel, Intervall 3
+00:23 +523 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: Ende und Ausnahmen until ist inklusive
+00:23 +524 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: Ende und Ausnahmen Ausnahmen entfernen Vorkommen, zählen aber für count mit
+00:23 +525 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: Ende und Ausnahmen Fenster schneidet Serie zu
+00:23 +526 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: Ende und Ausnahmen endlose Serie, die Jahrzehnte zurückliegt, wird korrekt gefunden (Skip-Ahead)
+00:23 +527 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: Ende und Ausnahmen Skip-Ahead liefert dasselbe wie volle Aufzählung (monatlich/jährlich)
+00:23 +528 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: ganztägig mehrtägig, wiederholt, Betrachter-Zeitzone bestimmt die Grenzen
+00:23 +529 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: ganztägig Ausnahme für ganztägigen Termin
+00:23 +530 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: Zeitzonen Termin in New York wird in UTC korrekt abgebildet (Sommerzeit-Versatz)
+00:23 +531 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/occurrence_test.dart: (tearDownAll)
+00:23 +531 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: (setUpAll)
+00:23 +531 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) täglich, alle Wochentage: wie bisher (gleicher Schlüssel, Format v1)
+00:23 +532 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Montag bis Freitag: am Wochenende keine Erneuerung, Samstag/Sonntag gehören zum Freitag
+00:23 +533 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) wöchentlich am Mittwoch: Periode Mittwoch bis Dienstag
+00:23 +534 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) wöchentlich am Montag entspricht dem bisherigen Intervall (ISO-Woche)
+00:23 +535 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) monatlich am zweiten Dienstag und am letzten Freitag
+00:23 +536 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) monatlich am 20.
+00:23 +537 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Klärungspunkt: am 31. – in kürzeren Monaten am letzten Kalendertag (auch Februar, Schaltjahr)
+00:23 +538 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) monatlich am 1. entspricht dem bisherigen Intervall (Monatsschlüssel)
+00:23 +539 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) nächster Neustart
+00:23 +540 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Zeitumstellung: Schlüssel folgt dem lokalen Datum der Liste (Frühjahr und Herbst)
+00:23 +541 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) R7: Geräteuhr außerhalb 2000–2100 führt nicht zum Absturz
+00:23 +542 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:23 +543 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:23 +544 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:23 +545 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:23 +546 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:23 +547 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:23 +548 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:23 +549 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:23 +550 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Issue #1: Perioden je Wiederholungsregel (Schlüssel = Startdatum) Startdatum liegt nie nach dem Tag und höchstens 35 Tage davor (alle Regeln, 2026–2030)
+00:23 +551 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Regel im Ereignis (nicht vertrauenswürdig) Roundtrip aller Arten
+00:23 +552 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: Regel im Ereignis (nicht vertrauenswürdig) ungültige Regeln werden verworfen
+00:23 +553 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_rule_test.dart: (tearDownAll)
+00:23 +553 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_view_test.dart: (setUpAll)
+00:23 +553 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_view_test.dart: Woche beginnt am Montag
+00:23 +554 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_view_test.dart: Monatsraster: 42 Tage, Montag zuerst, enthält alle Monatstage
+00:23 +555 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_view_test.dart: Monate addieren mit Klemmung auf Monatsende
+00:23 +556 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_view_test.dart: Tagesgrenzen folgen der lokalen Zeitzone (Sommerzeittag hat 23 Stunden)
+00:23 +557 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_view_test.dart: Termin kurz nach Mitternacht lokal gehört zum lokalen, nicht zum UTC-Tag
+00:23 +558 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_view_test.dart: Sortierung: ganztägig zuerst, dann nach Beginn
+00:23 +559 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_view_test.dart: #33 „Nächste Termine“: nach Beginn, ganztägige späterer Tage nicht vorn
+00:23 +560 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_view_test.dart: mehrtägiger Termin erscheint an jedem berührten Tag der Agenda
+00:23 +561 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_view_test.dart: Personenfilter: Besitzer oder Teilnehmer
+00:23 +562 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_view_test.dart: Serie über die Sommerzeit bleibt im Wochenraster stabil
+00:23 +563 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_view_test.dart: (tearDownAll)
+00:25 +563 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/moderation_test.dart: ReportRequest Grund ohne Freitext ist nur die Kategorie
+00:25 +564 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/moderation_test.dart: ReportRequest Freitext wird bereinigt und gekürzt
+00:25 +565 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/moderation_test.dart: BlockedUsers parse verwirft ungültige IDs, Dubletten und Überlängen
+00:25 +566 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/moderation_test.dart: BlockedUsers add und remove sind idempotent und prüfen die ID
+00:25 +567 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/moderation_test.dart: BlockedUsers Obergrenze: weitere Einträge werden nicht aufgenommen
+00:25 +568 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/moderation_test.dart: BlockedUsers Einstellungen speichern und lesen die Liste (ungültige Werte fallen weg)
+00:25 +569 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/moderation_test.dart: Filter blockierte Absender werden ausgeblendet, eigene Nachrichten nie
+00:25 +570 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/moderation_test.dart: Filter ohne Blockierungen bleibt die Liste unverändert
+00:25 +571 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/moderation_test.dart: Filter Einzelchats mit Blockierten verschwinden, der Familienchat nie
+00:25 +572 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: gültige Links normal, auch wenn man auf einem anderen Server angemeldet ist
+00:25 +573 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: gültige Links Standardgültigkeit 3 Tage, wählbar 1/3/7 Tage
+00:25 +574 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: eigene Ursache je Ablehnung (statt „ungültig oder abgelaufen“) abgelaufen
+00:25 +575 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: eigene Ursache je Ablehnung (statt „ungültig oder abgelaufen“) kein Einladungslink
+00:25 +576 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: eigene Ursache je Ablehnung (statt „ungültig oder abgelaufen“) aus neuerer App-Version
+00:25 +577 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: eigene Ursache je Ablehnung (statt „ungültig oder abgelaufen“) beschädigt oder manipuliert
+00:25 +578 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: eigene Ursache je Ablehnung (statt „ungültig oder abgelaufen“) Uhr der eingeladenen Person stark nachgehend → beschädigt (unplausible Gültigkeit)
+00:25 +579 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert HTML-Mail: &amp; statt &
+00:25 +580 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert in spitzen Klammern
+00:25 +581 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert in deutschen Anführungszeichen
+00:25 +582 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert in englischen Anführungszeichen
+00:25 +583 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert Text davor und danach
+00:25 +584 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert Punkt am Satzende
+00:25 +585 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert in Klammern mit Satzzeichen
+00:25 +586 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert Zeilenumbruch nach =
+00:25 +587 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert Zeilenumbruch vor &
+00:25 +588 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert Schema in Großbuchstaben
+00:25 +589 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert nicht dekodiertes Quoted-Printable
+00:25 +590 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert Mail mit Anleitung: der Link wird aus dem ganzen Text gelöst
+00:25 +591 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: beim Weitergeben beschädigte Links werden repariert der Text nach dem Link wird nicht angehängt
+00:25 +592 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: Server im Heimnetz (vor der Anmeldung unbekannt) IP-Adresse: angenommen und als Heimnetz markiert
+00:25 +593 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: Server im Heimnetz (vor der Anmeldung unbekannt) localhost: angenommen und als Heimnetz markiert
+00:25 +594 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: Server im Heimnetz (vor der Anmeldung unbekannt) Name ohne Punkt: angenommen und als Heimnetz markiert
+00:25 +595 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: Server im Heimnetz (vor der Anmeldung unbekannt) IP mit Port: angenommen und als Heimnetz markiert
+00:25 +596 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: Server im Heimnetz (vor der Anmeldung unbekannt) Heimnetz-Server muss der Server des Raums sein
+00:25 +597 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: R4: lange Texte (Mail mit Zitat und Signatur) werden durchsucht, übergroße nur bis zur Grenze
+00:25 +598 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: Review-Funde R1: Namen wie „3D-Club“ oder „12er“ werden nicht als Quoted-Printable verfälscht
+00:25 +599 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: Review-Funde R1: echtes Quoted-Printable mit „3D“ im Namen wird gelesen und bleibt nach Neustart lesbar
+00:25 +600 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: Review-Funde R5: alter und neuer Link im Text – der gültige gewinnt; mitkopierte Fehlermeldung stört nicht
+00:25 +601 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: Review-Funde R7: lokale Endungen gelten als Heimnetz
+00:25 +602 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_check_test.dart: Review-Funde Schema und Host komplett groß geschrieben
+00:25 +603 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/permissions_test.dart: Mitglied hat keine Verwaltungsrechte (Tabelle im Concept)
+00:25 +604 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/permissions_test.dart: Moderator darf einladen und konfigurieren
+00:25 +605 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/permissions_test.dart: Moderator darf Mitglieder ernennen, aber keine Moderatoren, Eingeladene oder sich selbst
+00:25 +606 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/permissions_test.dart: Moderator darf Mitglieder entfernen, aber keine Moderatoren und nicht sich selbst
+00:25 +607 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/permissions_test.dart: Moderator entscheidet nur über Beitrittsanfragen
+00:25 +608 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/permissions_test.dart: geteilte Termine: nur der Besitzer, auch nicht der Moderator (E-10)
+00:25 +609 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/permissions_test.dart: unbekannter Nutzer gilt als Mitglied (keine Rechte)
+00:25 +610 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/domain_models_test.dart: ChatMessage copyWith ändert nur Reaktionen und Status
+00:25 +611 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/domain_models_test.dart: ChatMessage Anhang, der kein Bild ist
+00:25 +612 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/domain_models_test.dart: FamilyMember / Family copyWith, Gleichheit, Hashcode
+00:25 +613 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/domain_models_test.dart: FamilyMember / Family Familie: joined/requests/Moderatorzahl/Empfehlung
+00:25 +614 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/domain_models_test.dart: FamilyMember / Family Einladung (Wert)
+00:25 +615 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/domain_models_test.dart: Server IP-Adressen und IPv6 werden akzeptiert/abgelehnt
+00:25 +616 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/domain_models_test.dart: Server Gleichheit und Info
+00:25 +617 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/domain_models_test.dart: Anhang-Signaturen gif/webp/pdf/jpeg
+00:25 +618 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/domain_models_test.dart: Anhang-Signaturen Dateiname nur mit Punkt am Ende hat keinen Typ
+00:25 +619 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/domain_models_test.dart: Sicherheitsmodelle
+00:25 +620 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: (setUpAll)
+00:25 +620 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Issue #1: Erklärung und Regel in der Liste Erklärung ist optional, mehrzeilig, begrenzt und ohne Steuer-/Bidi-Zeichen
+00:25 +621 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Issue #1: Erklärung und Regel in der Liste ungültige Regel wird abgelehnt
+00:25 +622 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Ereignisformat: v1 für bisherige Listen, v2 nur für neue Regeln/Erklärung bisherige Regel ohne Erklärung bleibt v1 (ältere App-Versionen lesen sie weiter)
+00:25 +623 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Ereignisformat: v1 für bisherige Listen, v2 nur für neue Regeln/Erklärung neue Regel oder Erklärung → v2 mit Roundtrip
+00:25 +624 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Ereignisformat: v1 für bisherige Listen, v2 nur für neue Regeln/Erklärung manipulierte Ereignisse werden verworfen
+00:25 +625 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln Schlüssel neuer Regeln: Startdatum ≤ Erledigungsdatum, höchstens 35 Tage davor
+00:25 +626 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln ein Eintrag zählt nur mit dem Schlüssel der Regel der Liste
+00:25 +627 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln Montag bis Freitag: am Samstag Erledigtes bleibt bis Sonntag erledigt, Montag beginnt neu
+00:25 +628 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln monatlich am 31.: im November gilt der 30. als Neustart
+00:25 +629 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln Ändern der Regel: andere Periode beginnt leer, der Verlauf bleibt vollständig (R5/R6)
+00:25 +630 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln Ändern der Regel bei gleichem Schlüssel: Erledigtes bleibt erledigt (täglich → Mo–Fr an einem Werktag)
+00:25 +631 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln R1: Löschmarke einer v2-Liste wird als v1 gesendet (ältere Versionen sehen das Löschen)
+00:25 +632 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln R8: Ändern ohne Angabe der Erklärung behält sie
+00:25 +633 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: Verlauf und aktueller Stand mit neuen Regeln R2: einzelnes \r beim Einfügen wird zum Zeilenumbruch
+00:25 +634 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/task_list_rules_test.dart: (tearDownAll)
+00:26 +634 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: (setUpAll)
+00:26 +634 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: anlegen trimmt Titel, setzt Besitzer, Version 1, noch unveröffentlicht
+00:26 +635 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: anlegen ungültige Eingaben werden abgelehnt
+00:26 +636 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: anlegen persönliche Erinnerungen werden gespeichert
+00:26 +637 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: ändern und löschen Änderung erhöht Version, setzt updatedAt, behält Sichtbarkeit, bewahrt Verlauf
+00:26 +638 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: ändern und löschen fremde Termine sind nicht änderbar oder löschbar (auch nicht für Moderatoren)
+00:26 +639 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: ändern und löschen Löschen erzeugt Tombstone mit höherer Version und entfernt Erinnerungen
+00:26 +640 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: ändern und löschen Unbekannte ID
+00:26 +641 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: Sichtbarkeit wechseln privat → geteilt: gleiche ID, neue Version, zur Veröffentlichung vorgemerkt
+00:26 +642 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: Sichtbarkeit wechseln geteilt → privat: Tombstone für alle, private Kopie mit neuer ID, Erinnerungen wandern mit
+00:26 +643 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: Sichtbarkeit wechseln gleiche Sichtbarkeit ist ein No-Op
+00:26 +644 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine neu → eingefügt und als veröffentlicht markiert
+00:26 +645 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine neuere Fassung ersetzt, ältere Fassung bleibt im Verlauf
+00:26 +646 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine veraltete Fassung ändert nichts, landet aber im Verlauf
+00:26 +647 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine Fälschung durch anderen Absender wird verworfen
+00:26 +648 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine privat → geteilt vom eigenen anderen Gerät mit höherer Version wird übernommen
+00:26 +649 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine anderer Wechsel der Sichtbarkeit wird abgelehnt (geteilt → privat, gleiche/niedrigere Version, fremder Absender)
+00:26 +650 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine Grenze: höchstens 2000 Termine je fremdem Absender
+00:26 +651 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine Verlauf ist je Termin begrenzt
+00:26 +652 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: eingehende Termine Wiederholung: gleiche Fassung zweimal → Duplikat
+00:26 +653 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: Rechte: nur eigene, nicht gelöschte Termine sind editierbar
+00:26 +654 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/calendar_service_test.dart: (tearDownAll)
+00:27 +654 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: (setUpAll)
+00:27 +654 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: plant Standard-Erinnerung vor dem Termin
+00:28 +655 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Roundtrip
+00:28 +656 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Roundtrip
+00:28 +657 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Roundtrip
+00:28 +658 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: Serien: jedes Vorkommen im Horizont, begrenzt auf das Limit
+00:28 +659 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: Serien: jedes Vorkommen im Horizont, begrenzt auf das Limit
+00:28 +660 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: Serien: jedes Vorkommen im Horizont, begrenzt auf das Limit
+00:28 +661 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links anderes Schema
+00:28 +662 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: Horizont: nichts weiter als 60 Tage voraus
+00:28 +663 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links anderer Host
+00:28 +664 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: Ausnahmen werden respektiert
+00:28 +665 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links Version 4
+00:28 +666 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: IDs sind stabil, positiv (31 Bit) und unterscheiden Vorkommen/Minuten
+00:28 +667 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: IDs sind stabil, positiv (31 Bit) und unterscheiden Vorkommen/Minuten
+00:28 +668 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links Version 1 mit Familienname
+00:28 +669 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: Datenschutz: PlannedReminder enthält weder Titel noch Ort noch Notiz
+00:28 +670 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links Version 2 mit Konto-Server
+00:28 +671 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: ungültige Minutenwerte werden ignoriert
+00:28 +672 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links Konto-Server fehlt (Version 3)
+00:28 +673 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: K7: Erinnerungen ganztägiger Termine beziehen sich auf 09:00 Ortszeit des Tages
+00:28 +674 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: K7: Erinnerungen ganztägiger Termine beziehen sich auf 09:00 Ortszeit des Tages
+00:28 +675 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links Konto-Server mit Pfad
+00:28 +676 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/reminder_planner_test.dart: abgesagte Termine (skip) erhalten keine Erinnerung
+00:28 +677 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links Konto-Server doppelt
+00:28 +678 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links Konto-Server im Heimnetz
+00:28 +679 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links doppelter Familienname
+00:28 +680 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links unbekanntes Feld in Version 3
+00:28 +681 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links Raum fehlt
+00:28 +682 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links zusätzliches Feld
+00:28 +683 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links doppelter Parameter
+00:28 +684 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: entfernt Steuer-, Bidi- und Nullbreiten-Zeichen und normalisiert Leerraum
+00:28 +685 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: entfernt Steuer-, Bidi- und Nullbreiten-Zeichen und normalisiert Leerraum
+00:28 +686 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: entfernt Steuer-, Bidi- und Nullbreiten-Zeichen und normalisiert Leerraum
+00:28 +687 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: entfernt Steuer-, Bidi- und Nullbreiten-Zeichen und normalisiert Leerraum
+00:28 +688 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: entfernt Steuer-, Bidi- und Nullbreiten-Zeichen und normalisiert Leerraum
+00:28 +689 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: entfernt Steuer-, Bidi- und Nullbreiten-Zeichen und normalisiert Leerraum
+00:28 +690 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: entfernt Steuer-, Bidi- und Nullbreiten-Zeichen und normalisiert Leerraum
+00:28 +691 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: entfernt Steuer-, Bidi- und Nullbreiten-Zeichen und normalisiert Leerraum
+00:28 +692 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: entfernt Steuer-, Bidi- und Nullbreiten-Zeichen und normalisiert Leerraum
+00:28 +693 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links exp kein Zahl
+00:28 +694 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: kürzt nach Zeichen, nicht nach UTF-16-Einheiten
+00:28 +695 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links exp negativ
+00:28 +696 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: Anzeigename fällt auf die ID zurück, wenn nach der Bereinigung leer
+00:28 +697 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: Anzeigename fällt auf die ID zurück, wenn nach der Bereinigung leer
+00:28 +698 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links Nonce fehlt
+00:28 +699 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/text_sanitizer_test.dart: Reaktionsschlüssel: Emojis ja, Text/Steuerzeichen/zu lang nein
+00:28 +700 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links Nonce ungültig
+00:28 +701 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links exp riesig (Überlauf)
+00:28 +702 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links via passt nicht zum Raum
+00:28 +703 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links leer
+00:28 +704 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links Müll
+00:28 +705 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Ablehnung manipulierter/falscher Links zu lang
+00:28 +706 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: via muss zur Raum-ID passen und darf nicht lokal/IP sein (außer eigener Server)
+00:28 +707 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: abgelaufener Link wird gelesen, aber als ungültig erkannt
+00:28 +708 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Leerraum um den Link wird toleriert
+00:28 +709 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Version 3 (E-56, E-63): Namen und Konto-Server für Neulinge TP-INV-01 Roundtrip mit Familien- und Einladendenname
+00:28 +710 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Version 3 (E-56, E-63): Namen und Konto-Server für Neulinge TP-INV-02 Links der Version 1 bleiben gültig
+00:28 +711 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Version 3 (E-56, E-63): Namen und Konto-Server für Neulinge TP-INV-07 Konto-Server (srv): Standard ist der Server des Einladenden, ein anderer wird ausdrücklich übernommen
+00:28 +712 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Version 3 (E-56, E-63): Namen und Konto-Server für Neulinge TP-INV-08 Links der Version 2 bleiben gültig; Konto-Server ist dann der des Einladenden
+00:28 +713 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Version 3 (E-56, E-63): Namen und Konto-Server für Neulinge TP-INV-09 Konto-Server im Heimnetz: nur der eigene beim Erzeugen, ohne Prüfung nur über check
+00:28 +714 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Version 3 (E-56, E-63): Namen und Konto-Server für Neulinge TP-INV-04 Namen werden bereinigt und begrenzt; leere Namen entfallen
+00:28 +715 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Version 3 (E-56, E-63): Namen und Konto-Server für Neulinge TP-INV-06 Link mit langen Namen passt in die Längengrenze (QR lesbar)
+00:28 +716 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Version 3 (E-56, E-63): Namen und Konto-Server für Neulinge R13 viele Emoji in den Namen: Link wird gekürzt statt zu lang, bleibt lesbar
+00:28 +717 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: Version 3 (E-56, E-63): Namen und Konto-Server für Neulinge R14 Schreibweise wird vereinheitlicht (Schema in Kleinbuchstaben) und bleibt lesbar
+00:28 +718 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: https-Landingpage (E-68) Web-Link trägt dieselben Angaben im Fragment und wird wie der App-Link gelesen
+00:28 +719 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: https-Landingpage (E-68) auch in Text, mit Satzzeichen, Groß-/Kleinschreibung und ohne Schrägstrich
+00:28 +720 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: https-Landingpage (E-68) fremde Seiten, fehlendes Fragment und Manipulation werden abgelehnt
+00:28 +721 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: #26: abgeschnittene Links die Zufalls-ID steht am Ende
+00:28 +722 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: #26: abgeschnittene Links um die letzten Zeichen gekürzt: beschädigt, nicht mit gekürztem Namen angenommen
+00:28 +723 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/invite_link_test.dart: #26: abgeschnittene Links ältere Links mit anderer Reihenfolge werden weiterhin gelesen
+00:28 +724 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:28 +725 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:28 +726 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:28 +727 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:28 +728 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:28 +729 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:28 +730 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Domäne ist reines Dart: kein Flutter, keine Daten-/UI-Schicht
+00:28 +731 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Präsentation greift nicht direkt auf Datenbank, Schlüsselspeicher oder SDKs zu
+00:28 +732 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Präsentation greift nicht direkt auf Datenbank, Schlüsselspeicher oder SDKs zu
+00:28 +733 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Präsentation greift nicht direkt auf Datenbank, Schlüsselspeicher oder SDKs zu
+00:28 +734 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Präsentation greift nicht direkt auf Datenbank, Schlüsselspeicher oder SDKs zu
+00:28 +735 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Präsentation greift nicht direkt auf Datenbank, Schlüsselspeicher oder SDKs zu
+00:28 +736 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Präsentation greift nicht direkt auf Datenbank, Schlüsselspeicher oder SDKs zu
+00:28 +737 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Präsentation greift nicht direkt auf Datenbank, Schlüsselspeicher oder SDKs zu
+00:28 +738 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/domain/presence_test.dart: PresenceBoard retainOnly entfernt Nicht-Mitglieder
+00:28 +739 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: keine print/debugPrint-Aufrufe in lib/
+00:28 +740 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: keine print/debugPrint-Aufrufe in lib/
+00:28 +741 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: keine print/debugPrint-Aufrufe in lib/
+00:28 +742 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: keine print/debugPrint-Aufrufe in lib/
+00:28 +743 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: keine print/debugPrint-Aufrufe in lib/
+00:28 +744 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: keine print/debugPrint-Aufrufe in lib/
+00:28 +745 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: keine print/debugPrint-Aufrufe in lib/
+00:28 +746 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: keine print/debugPrint-Aufrufe in lib/
+00:28 +747 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: keine print/debugPrint-Aufrufe in lib/
+00:28 +748 ~44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Android-spezifische Dart-Brücken liegen nur in data/platform
+00:28 +749 ~44: All tests passed!
