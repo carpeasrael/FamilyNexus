@@ -23,9 +23,9 @@ Konten dieses Laufs: Datumsteil **`1028f`** (`1028` bis `1028e` waren durch frü
 
 | Ergebnis | Anzahl |
 |---|---|
-| ✅ bestanden | 41 |
+| ✅ bestanden | 42 |
 | ⚠️ bestanden mit Befund | 7 (V-03, V-06, V-07, B-01, B-19, C-03, E-05) |
-| ❌ fehlgeschlagen | 2 (V-04 ohne Korrektur, B-10) |
+| ❌ fehlgeschlagen | 1 (V-04 ohne Korrektur) |
 | ⏳ ausgeführt, aber offen | 3 (B-17, E-03, E-29) |
 | ⏳ nicht ausgeführt | siehe Liste „Nicht ausgeführt“ |
 | n/a | 2 (B-02, B-18) |
@@ -37,7 +37,7 @@ Konten dieses Laufs: Datumsteil **`1028f`** (`1028` bis `1028e` waren durch frü
 | Nr. | Schwere | Schritt | Beschreibung |
 |---|---|---|---|
 | 1 | **hoch** | V-04 | **Windows-Build startet nicht.** In `LocalReminderScheduler.initialize` (`lib/data/platform/reminder_scheduler.dart`, ca. Zeile 93) fehlt in `InitializationSettings` die Angabe `windows: WindowsInitializationSettings(...)`. Das Plugin wirft beim Start `Invalid argument(s): Windows settings must be set when targeting Windows platform.` (aufgerufen aus `bootstrap.dart:79`). Die App zeigt dazu die irreführende Seite „Lokale Daten nicht lesbar“; „Lokale Daten zurücksetzen“ hilft nicht. Belegt für den lokalen Build 1.2.1 (19) aus `f4c358c`. Der frühere Lauf (Release Build 16) zeigte dasselbe Bild; ob dort dieselbe Ursache vorliegt, wurde nicht geprüft. Mit `windows: WindowsInitializationSettings(appName: 'FamilyNexus', appUserModelId: 'de.inneso.FamilyNexus', guid: '<feste GUID>')` startet die App (Diff in `logs/windows-startfix.diff`). Die Meldung „Lokale Daten nicht lesbar“ sollte außerdem zwischen Datenbankfehler und anderen Startfehlern unterscheiden. Es besteht kein Zusammenhang mit VM/Datenbank, entgegen der Vermutung im Lauf vom Vormittag. |
-| 2 | mittel | B-10 | **Erinnerung kam nicht an.** Termin „Test Erinnerung“ 23:21, Standard-Erinnerung 10 Min., App minimiert, Bildschirm von 23:10:57 bis 23:13:49 alle 20 s aufgenommen: keine Benachrichtigung zu sehen (erwartet ab ca. 23:11). Ursache offen. Naheliegend: `appUserModelId` ist ohne Installation/Verknüpfung nicht registriert (der Code beschreibt das selbst: „Planung braucht eine registrierte App-Kennung“), oder Fokus-Assistent unterdrückt Toasts; beides nicht geprüft |
+| 2 | Hinweis (korrigiert) | B-10 | **Korrektur vom 29.10.2026: Die Erinnerung kam an.** Im ersten Durchlauf wurde keine Benachrichtigung beobachtet, weil der Bildschirm nur alle 20 s aufgenommen wurde und der Toast nur wenige Sekunden steht. Nachprüfung: In der Benachrichtigungsdatenbank von Windows (`wpndatabase.db-wal`) steht der Toast „Erinnerung“ / „Termin in 10 Minuten“ (ohne Titel und Ort), als hinzugefügt vermerkt um 23:11:03 (`LastNotificationAddedTime` unter `HKCU\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\de.inneso.FamilyNexus`); fällig war 23:11:00 (30-s-Takt der App). Das Plugin trägt die App-Kennung `de.inneso.FamilyNexus` selbst in `HKCU\Software\Classes\AppUserModelId` ein. Nicht belegt: ob der Toast als Banner erschien oder nur im Info-Center. Offen: Erinnerungen kommen unter Windows nur, solange die App läuft (In-App-Timer, wie unter Linux); der Code-Kommentar nennt dafür eine fehlende App-Kennung, die aber vorhanden ist. Fehler beim Anzeigen werden nur still geloggt |
 | 3 | niedrig | E-05 | „Per E-Mail senden“ öffnet auf diesem Rechner nichts und zeigt keine Meldung („Kein Mailprogramm gefunden. Der Link wurde stattdessen kopiert.“ erwartet). Es ist unklar, ob kein Mailprogramm eingerichtet ist (dann fehlt die Meldung) oder ob die Aktion nicht auslöst |
 | 4 | niedrig | B-01 | Schaltfläche „Neuer Termin“ ist nur ein „+“-Symbol (kein Text); der Plan nennt „Neuer Termin“ |
 | 5 | Hinweis | V-03 | Lokaler Windows-Build braucht Entwicklermodus (Symlinks) und die Visual-Studio-Komponente „C++ ATL“ (`atlstr.h`); beides musste nachgerüstet werden. `sqlcipher.dll` und `libcrypto-3-x64.dll` fehlen im lokalen Build und wurden aus dem Release kopiert (ohne sie startet die App nicht) |
@@ -85,7 +85,7 @@ Konten dieses Laufs: Datumsteil **`1028f`** (`1028` bis `1028e` waren durch frü
 | B-07 | Tag, Woche, Monat, Agenda zeigen die Termine; Navigation und „Heute“ wirken. In der Monatsansicht lag der sichtbare Ausschnitt oberhalb der Termine (nur bis 25.10. sichtbar) | B-07a … B-07e-G1 | ✅ |
 | B-08 | Detail mit „Von dir“, Sichtbarkeit, Ort, Notiz; nach dem Speichern sofort „Test geteilt 2“ **und** „10:30 – 11:30“ (#63 behoben); „Verlauf (1)“ zeigt „Test geteilt“ | B-08pre-G1, B-08a-G1, B-08b-G1 | ✅ |
 | B-09 | Zusätzlich „30 Minuten vorher“ neben „10 Minuten“ gewählt, „Standard verwenden“ setzt zurück | B-09a-G1, B-09-G1 | ✅ |
-| B-10 | Keine Systembenachrichtigung beobachtet (Befund 2) | B-10pre-G1, B-10-G1 | ❌ |
+| B-10 | Systembenachrichtigung „Erinnerung“ / „Termin in 10 Minuten“ ohne Titel und Ort von Windows zugestellt (23:11:03, fällig 23:11:00). Banner im Lauf nicht gesehen (Aufnahme alle 20 s), Zustellung aber in der Windows-Benachrichtigungsdatenbank nachgewiesen (Befund 2, korrigiert) | B-10pre-G1, B-10-G1 | ✅ |
 | B-11 | Serie: „Alle Vorkommen oder nur dieses löschen?“ → „Nur dieses“: nur ein Vorkommen weg (Erinnerungen 5 → 4); „Test Erinnerung“: „Diesen Termin wirklich löschen?“ → „Löschen“ | B-11a … B-11c, B-11-G1 | ✅ |
 | B-12 | „Ende-zu-Ende-verschlüsselt“; Umschalt+Enter = Zeilenumbruch, Enter sendet; Nachricht „Hallo Testfamilie“ mit Uhrzeit 23:15 | B-12a-G1, B-12-G1 | ✅ |
 | B-13 | „Im Chat geteilt“; Karte „Test geteilt 2“ mit Datum und Zusagen/Vielleicht/Absagen im Chat | B-13a-G1, B-13-G1 | ✅ |
@@ -130,7 +130,7 @@ Konten dieses Laufs: Datumsteil **`1028f`** (`1028` bis `1028e` waren durch frü
 
 ## Nicht ausgeführt (⏳, Grund: G2 bzw. zweites Konto fehlt)
 
-C-01, C-02, C-04, C-07, C-08 · D-01 bis D-07 · E-04, E-06 bis E-28, E-30 bis E-32 · F-01, F-02 · B-17 (Entsperren), B-10 (Windows-Toast nicht beobachtet, siehe oben) · G-01 bis G-08 (keine automatischen Tests, Review-Notizen, Person ohne Vorwissen, Web).
+C-01, C-02, C-04, C-07, C-08 · D-01 bis D-07 · E-04, E-06 bis E-28, E-30 bis E-32 · F-01, F-02 · B-17 (Entsperren), G-01 bis G-08 (keine automatischen Tests, Review-Notizen, Person ohne Vorwissen, Web).
 
 ## Zustand am Ende
 
