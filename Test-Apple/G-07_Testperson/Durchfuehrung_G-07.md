@@ -50,7 +50,7 @@ Rückfragen und Stolperstellen werden als Issues erfasst (Titel „G-07: … (Sc
 1. Konto löschen: Testperson oder Beobachtung in der App → Einstellungen → „Konto löschen“ (Passwort der Testperson); Kontrolle per `curl` auf dem Server (`403 M_FORBIDDEN`).
 2. Lokale Daten auf dem Gerät löschen (Zustand „Willkommen“).
 3. Zettel mit dem Passwort und dem Notfall-Schlüssel vernichten, nichts davon in Git.
-4. Ergebnis in `Test-Apple-Report/<Datum>/` ablegen (Bogen als `G-07_Beobachtungsbogen.md`, Bilder in `screenshots/`), Report und PDF ergänzen, Issue #15 (TC-14) aktualisieren.
+4. Ergebnis in `Test-Apple-Report/<Lauf-Ordner>/` ablegen (Bogen als `G-07_Beobachtungsbogen.md`, Bilder in `screenshots/`), Report und PDF ergänzen, Issue #15 (TC-14) aktualisieren.
 
 ## Datenschutz
 
