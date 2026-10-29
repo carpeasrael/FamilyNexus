@@ -19,6 +19,10 @@ build=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$plist")
 soll=$(sed -n 's/^version: \([0-9.]*\)+\(.*\)/\1 \2/p' pubspec.yaml)
 [ "$soll" = "$version $build" ] || echo "Warnung: App $version ($build), pubspec.yaml $soll" >&2
 
+if pgrep -x "QuickTime Player" >/dev/null; then
+  echo "QuickTime Player läuft (Öffnen-Dialog zeigt Ordnernamen im Video). Bitte beenden." >&2
+  exit 1
+fi
 if pgrep -x FamilyNexus >/dev/null; then
   echo "FamilyNexus läuft noch. Bitte beenden (⌘Q), die Aufnahme muss mit dem Kaltstart beginnen." >&2
   exit 1
@@ -35,6 +39,7 @@ hidden=$(osascript -e 'tell application "System Events"
 end tell' 2>/dev/null) || { hidden=""; echo "Warnung: Programme konnten nicht ausgeblendet werden, Schreibtisch von Hand aufräumen." >&2; }
 dock_before=$(osascript -e 'tell application "System Events" to get autohide of dock preferences' 2>/dev/null || echo "")
 [ "$dock_before" = "false" ] && osascript -e 'tell application "System Events" to set autohide of dock preferences to true' >/dev/null 2>&1
+sleep 2   # Dock-Animation abwarten, damit der erste Frame keinen Dock zeigt
 restore() {
   [ "$dock_before" = "false" ] && osascript -e 'tell application "System Events" to set autohide of dock preferences to false' >/dev/null 2>&1
   [ -n "$hidden" ] || return 0
