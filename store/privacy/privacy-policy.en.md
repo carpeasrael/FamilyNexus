@@ -10,7 +10,7 @@ FamilyNexus is free software (AGPL-3.0). The app sends no data to its developers
 
 ## What data exists?
 
-Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted (SQLCipher) on your device. The key is held in the Android keystore and never in a file.
+Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted (SQLCipher) on your device. The key is held in your device's secure key store (Android Keystore or Apple Keychain) and never in a file.
 
 ## What does the server see?
 

@@ -1901,7 +1901,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy2Body.
   ///
   /// In de, this message translates to:
-  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt im Android-Schlüsselspeicher und nie in einer Datei.'**
+  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt im sicheren Schlüsselspeicher deines Geräts (Android-Keystore bzw. Apple-Schlüsselbund) und nie in einer Datei.'**
   String get privacy2Body;
 
   /// No description provided for @privacy3Title.
