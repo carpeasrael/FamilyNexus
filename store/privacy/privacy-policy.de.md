@@ -10,7 +10,7 @@ FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Ent
 
 ## Welche Daten gibt es?
 
-Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt im Android-Schlüsselspeicher und nie in einer Datei.
+Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt im sicheren Schlüsselspeicher deines Geräts (Android-Keystore bzw. Apple-Schlüsselbund) und nie in einer Datei.
 
 ## Was sieht der Server?
 

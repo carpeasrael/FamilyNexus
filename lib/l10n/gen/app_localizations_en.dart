@@ -1061,7 +1061,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy2Body =>
-      'Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted (SQLCipher) on your device. The key is held in the Android keystore and never in a file.';
+      'Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted (SQLCipher) on your device. The key is held in your device\'s secure key store (Android Keystore or Apple Keychain) and never in a file.';
 
   @override
   String get privacy3Title => 'What does the server see?';
