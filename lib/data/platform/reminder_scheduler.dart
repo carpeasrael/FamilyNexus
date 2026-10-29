@@ -57,10 +57,11 @@ class LocalReminderScheduler implements ReminderScheduler {
   String _channelDescription = '';
   bool _ready = false;
 
-  /// Linux (E-50) und Windows (E-52): Das Plugin kann dort nicht verlässlich im Voraus planen
-  /// (Linux: `zonedSchedule` fehlt; Windows: Planung braucht eine registrierte App-Kennung). Die App hält die
-  /// Erinnerungen selbst und zeigt fällige an, solange sie läuft. Geprüft wird gegen die Uhrzeit (nicht mit
-  /// einem langen Timer), damit Erinnerungen auch nach einem Standby noch erscheinen.
+  /// Linux (E-50) und Windows (E-52): Das Plugin kann dort nicht verlässlich im Voraus planen (Linux: `zonedSchedule`
+  /// fehlt; Windows: geplante Toasts werden bei der Zustellung mit „Element nicht gefunden“ verworfen, auch bei
+  /// laufender App, geprüft mit Plugin 22.3.2; vermutlich fehlt eine Startmenü-Verknüpfung mit der App-Kennung). Die
+  /// App hält die Erinnerungen selbst und zeigt fällige an, solange sie läuft. Geprüft wird gegen die Uhrzeit (nicht
+  /// mit einem langen Timer), damit Erinnerungen auch nach einem Standby noch erscheinen.
   final bool _inAppTimers;
   List<_InAppReminder> _inApp = const <_InAppReminder>[];
   Timer? _tick;
