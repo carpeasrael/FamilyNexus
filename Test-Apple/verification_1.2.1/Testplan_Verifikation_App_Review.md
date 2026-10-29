@@ -124,7 +124,7 @@ Ablage: `Test-Apple-Report/<Lauf-Ordner>/video/FamilyNexus_1.2.1_<Build>_iPhone.
 
 | ID | Gerät | Schritt | Erwartetes Ergebnis | Beobachtet | Nachweis | Erg. |
 |---|---|---|---|---|---|---|
-| F-01 | G1 (+ G3) | **Gesamtplan TP-FN-001 v1.6** mit dem Soll-Build: G1 = physisches iPhone (TestFlight), G2 = Mac (falls eingereicht, sonst zweites Gerät) | Report mit Ergebnis „bestanden“ liegt vor (Ordner nennen); offene ⚠️ als Issues; kein ❌, kein ⏳ | | Report-Ordner | |
+| F-01 | G1 (+ G3) | **Gesamtplan TP-FN-001 v1.7** mit dem Soll-Build: G1 = physisches iPhone (TestFlight), G2 = Mac (falls eingereicht, sonst zweites Gerät) | Report mit Ergebnis „bestanden“ liegt vor (Ordner nennen); offene ⚠️ als Issues; kein ❌, kein ⏳ | | Report-Ordner | |
 | F-02 | G1 | **Review-Notizen am Gerät** (= TP-FN-001 G-06) mit dem Text aus App Store Connect, nicht aus dem Repository | Jeder Schritt der Notizen ist auffindbar und funktioniert mit R1 | | F-02-G1 | |
 | F-03 | – | `flutter test test/store/review_notes_test.dart` | Grün | | Log | |
 | F-04 | – | TestFlight → Soll-Build → „Abstürze“ bzw. Xcode Organizer → Crashes | Keine Absturzberichte aus den Läufen F-01, F-02 und Abschnitt 4 | | Screenshot | |
