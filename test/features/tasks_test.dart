@@ -93,6 +93,27 @@ void main() {
     expect(tester.widget<Checkbox>(find.byType(Checkbox).first).value, isFalse);
   });
 
+  testWidgets('#76: „Montag bis Freitag“ wird beim Anlegen als Regel gespeichert', (tester) async {
+    _tall(tester);
+    final app = await buildTestApp(clock: () => DateTime.utc(2026, 10, 24, 8));
+    await _open(tester, app);
+    await _openTasks(tester);
+    await tester.tap(find.byTooltip('Neue Aufgabenliste'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'Titel'), 'Müll rausbringen');
+    await tester.enterText(find.widgetWithText(TextField, 'Punkte (einer pro Zeile)'), 'Tonne raus');
+    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Du').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Montag bis Freitag (ohne Wochenende)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+    await tester.pumpAndSettle();
+
+    expect((await app.taskStore.lists()).single.rule, const TaskRule.weekdays());
+  });
+
   testWidgets('Issue #1: Erklärung und Wiederholung „monatlich am zweiten Dienstag“ anlegen, anzeigen und ändern', (tester) async {
     _tall(tester);
     final now = DateTime.utc(2026, 10, 24, 8); // Samstag
