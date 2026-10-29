@@ -1508,6 +1508,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         },
       });
 
+  bool _rejectionPollRunning = false;
+
   Future<void> _pollRejection() async {
     final c = _client;
     final req = _joinRequest();
@@ -1516,6 +1518,17 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       return;
     }
     if (_joinRejected) return;
+    // Eine hängende Abfrage nicht mit weiteren überholen: Antworten kämen sonst durcheinander an.
+    if (_rejectionPollRunning) return;
+    _rejectionPollRunning = true;
+    try {
+      await _pollRejectionOnce(c, req);
+    } finally {
+      _rejectionPollRunning = false;
+    }
+  }
+
+  Future<void> _pollRejectionOnce(Client c, Map<String, Object?> req) async {
     final roomId = req['room_id']! as String;
     final me = c.userID!;
     try {
@@ -1547,8 +1560,23 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         if (e is! Map || e['type'] != 'm.room.member' || e['state_key'] != me) continue;
         if (last == null || (e['origin_server_ts'] as int? ?? 0) >= (last['origin_server_ts'] as int? ?? 0)) last = e;
       }
-      if (last == null) return;
-      if (isKnockRejection(last, me: me, requestedAt: req['ts']! as int)) {
+      if (last == null) {
+        AppLog.w('gateway', 'Ablehnung der Beitrittsanfrage: Raum unter „verlassen“, aber ohne eigenes Mitgliedsereignis');
+        return;
+      }
+      final rejected = isKnockRejection(last, me: me, requestedAt: req['ts']! as int);
+      if (!rejected) {
+        final content = last['content'];
+        final unsigned = last['unsigned'];
+        AppLog.w(
+          'gateway',
+          'Ablehnung der Beitrittsanfrage: Ereignis nicht als Ablehnung gewertet '
+          '(membership=${content is Map ? content['membership'] : '?'}, eigenes=${last['sender'] == me}, '
+          'vorher=${unsigned is Map && unsigned['prev_content'] is Map ? (unsigned['prev_content'] as Map)['membership'] : '-'}, '
+          'Versatz=${((last['origin_server_ts'] as int? ?? 0) - (req['ts']! as int)) ~/ 1000}s)',
+        );
+      }
+      if (rejected) {
         _joinRejected = true;
         _stopWatchingJoinRequest();
         notifyListeners();
