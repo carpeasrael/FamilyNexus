@@ -2239,6 +2239,11 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         } while (_refreshAgain);
         done.complete();
       } catch (e) {
+        // Der Abgleich hat Zeitleisten und Nachrichtenlisten womöglich schon aktualisiert, bevor ein
+        // späterer Schritt scheiterte. Ohne Meldung blieben neue Nachrichten unsichtbar, bis ein
+        // anderer Anlass die Oberfläche neu aufbaut (#77).
+        AppLog.e('gateway', 'Abgleich fehlgeschlagen', e);
+        notifyListeners();
         done.completeError(e);
       } finally {
         _refreshRun = null;
