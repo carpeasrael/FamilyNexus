@@ -24,27 +24,49 @@ if pgrep -x FamilyNexus >/dev/null; then
   exit 1
 fi
 
+# Leerer Schreibtisch: alle anderen sichtbaren Programme ausblenden (braucht einmalig „Automation“ für System Events,
+# schlägt es fehl, nur Warnung) und nach der Aufnahme wieder einblenden.
+hidden=$(osascript -e 'tell application "System Events"
+  set names to name of every application process whose visible is true and background only is false
+  repeat with n in names
+    set visible of application process n to false
+  end repeat
+  return names
+end tell' 2>/dev/null) || { hidden=""; echo "Warnung: Programme konnten nicht ausgeblendet werden, Schreibtisch von Hand aufräumen." >&2; }
+dock_before=$(osascript -e 'tell application "System Events" to get autohide of dock preferences' 2>/dev/null || echo "")
+[ "$dock_before" = "false" ] && osascript -e 'tell application "System Events" to set autohide of dock preferences to true' >/dev/null 2>&1
+restore() {
+  [ "$dock_before" = "false" ] && osascript -e 'tell application "System Events" to set autohide of dock preferences to false' >/dev/null 2>&1
+  [ -n "$hidden" ] || return 0
+  osascript -e "tell application \"System Events\"
+    repeat with n in {$(printf '%s' "$hidden" | sed 's/, /","/g; s/^/"/; s/$/"/')}
+      try
+        set visible of application process n to true
+      end try
+    end repeat
+  end tell" >/dev/null 2>&1 || true
+}
+
 dir="Test-Apple/verification_1.2.1"
 mkdir -p "$dir"
 out="$dir/FamilyNexus_${version}_${build}_Mac.mov"
+[ ! -e "$out" ] || out="${out%.mov}_$(date +%H%M%S).mov"   # vorhandene Aufnahme nie überschreiben
 echo "macOS $(sw_vers -productVersion) ($(sw_vers -buildVersion)), $(sysctl -n hw.model), App $version ($build)"
 
 # -v Video, -C Mauszeiger mitaufnehmen; ohne Ton.
 screencapture -v -C "$out" &
 rec=$!
-trap 'kill -INT "$rec" 2>/dev/null || true; wait "$rec" 2>/dev/null || true' EXIT INT
+trap 'kill -INT "$rec" 2>/dev/null || true; wait "$rec" 2>/dev/null || true; restore' EXIT INT
 
 sleep 3
 open "$app"   # S-01: Start der App im Video sichtbar
 echo "Aufnahme läuft. Drehbuch durchspielen; zum Beenden hier im Terminal die Eingabetaste drücken (S-15)."
 read -r _
 
-# S-16: Terminal nach vorn, nur die Systemversion zeigen (kein Rechnername, keine Seriennummer), dann beenden.
-open -a Terminal
-sleep 2
-clear
-printf '\n  macOS %s (%s)\n  %s\n\n' "$(sw_vers -productVersion)" "$(sw_vers -buildVersion)" "$(sw_vers -productName)"
-sleep 8
+# S-16: Systemdialog nur mit der Systemversion (kein Rechnername, kein Benutzername, keine Seriennummer).
+osascript >/dev/null 2>&1 <<OSA || echo "Warnung: Versionsdialog konnte nicht geöffnet werden." >&2
+tell application "System Events" to display dialog "$(sw_vers -productName) $(sw_vers -productVersion) ($(sw_vers -buildVersion))" with title "macOS-Version" buttons {"OK"} default button "OK" giving up after 8
+OSA
 kill -INT "$rec" 2>/dev/null || true
 wait "$rec" 2>/dev/null || true
 
