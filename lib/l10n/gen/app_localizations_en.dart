@@ -883,8 +883,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String familyInviteLinkHint(String validity) {
-    return 'The link is valid for $validity and can be used once. Whoever opens it is admitted automatically as soon as a moderator\'s app is online.';
+    return 'The link is valid for $validity and can be used once. Whoever opens it is admitted automatically as soon as a moderator\'s app is online. Only give it to the person you want to invite.';
   }
+
+  @override
+  String familyInviteLinkHintManual(String validity) {
+    return 'The link is valid for $validity and can be used once. A moderator confirms the request before the person is admitted.';
+  }
+
+  @override
+  String get familyInviteManual => 'Confirm requests yourself';
+
+  @override
+  String get familyInviteManualHint =>
+      'Without this setting, the app admits anyone with the link automatically. Changing it creates a new link.';
 
   @override
   String get familyInviteShowQr => 'Show QR code';
@@ -1006,7 +1018,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLockHint =>
-      'Locks the app after inactivity. Confirmation uses your device lock; the app stores no PIN of its own.';
+      'Locks the app after inactivity. Confirmation uses your device lock; the app stores no PIN of its own. The lock is a privacy screen: it hides the app, while your data is protected by encryption and your device lock.';
 
   @override
   String get settingsLockUnavailable =>

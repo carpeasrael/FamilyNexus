@@ -130,7 +130,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 ## Windows (E-52)
 
 - Gebaut mit dem Release-Workflow (Job `windows`) und der Datenbank-Bibliothek geladen/geprüft; **nicht auf einem Windows-Gerät bedient** (Anmeldung gegen echten Server, Anmeldeinformationsverwaltung, Erinnerungen, App-Sperre mit Windows Hello).
-- **SA-6:** kein Bildschirmschutz. Keine Code-Signatur: Windows SmartScreen warnt beim ersten Start („Weitere Informationen → Trotzdem ausführen“).
+- Bildschirmschutz (`SetWindowDisplayAffinity`, Pen-Test I-04) ist umgesetzt, aber **weder gebaut noch auf einem Windows-Gerät geprüft** (Screenshot, Teams/Zoom-Freigabe, Abschalten in den Einstellungen). Keine Code-Signatur: Windows SmartScreen warnt beim ersten Start („Weitere Informationen → Trotzdem ausführen“).
 - Einladungslinks aus dem Browser funktionieren nicht automatisch (Schema nicht registriert, keine Einzelinstanz); Start mit `familynexus.exe familynexus://join?…` oder Link in der App einfügen. Zwei gleichzeitig gestartete Instanzen sind nicht abgesichert.
 - Nur **x64**. Erinnerungen erscheinen nur, solange die App läuft. Kein Installer (Zip zum Entpacken).
 - Die Plugin-Vorlagen brauchen unter neueren Visual-Studio-Versionen `_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS` (`windows/CMakeLists.txt`); entfällt, sobald `local_auth_windows` auf C++20-Coroutinen umgestellt ist.

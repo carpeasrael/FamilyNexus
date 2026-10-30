@@ -50,7 +50,19 @@ class EncryptedDb {
     }
     final dir = Directory(p.join(base, _linuxAppId, 'databases'));
     await dir.create(recursive: true);
+    if (Platform.isLinux) await _restrictToOwner(dir.parent.path);
     return dir.path;
+  }
+
+  /// Nur der eigene Benutzer darf das Datenverzeichnis lesen (Pen-Test I-02). Die Dateien sind ohnehin
+  /// verschlüsselt; so verraten sie anderen Konten auf dem Rechner auch Größe und Zeitpunkte nicht.
+  static Future<void> _restrictToOwner(String path) async {
+    try {
+      final r = await Process.run('chmod', <String>['-R', 'go-rwx', path]);
+      if (r.exitCode != 0) AppLog.w('db', 'Rechte des Datenverzeichnisses nicht eingeschränkt (${r.exitCode})');
+    } on ProcessException {
+      AppLog.w('db', 'chmod nicht verfügbar');
+    }
   }
 
   /// Gibt es die Datenbank schon?

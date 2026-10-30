@@ -403,7 +403,10 @@
   "familyManage": "Verwaltung",
   "familyInvite": "Mitglied einladen",
   "familyInviteLinkTitle": "Jemanden einladen",
-  "familyInviteLinkHint": "Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist.",
+  "familyInviteLinkHint": "Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist. Gib ihn nur der Person, die du einladen willst.",
+  "familyInviteLinkHintManual": "Der Link ist {validity} gültig und nur einmal verwendbar. Ein Moderator bestätigt die Anfrage, bevor die Person aufgenommen wird.",
+  "familyInviteManual": "Anfragen selbst bestätigen",
+  "familyInviteManualHint": "Ohne diese Einstellung nimmt die App jede Person mit dem Link automatisch auf. Ändern erzeugt einen neuen Link.",
   "familyInviteShowQr": "QR-Code anzeigen",
   "familyInviteCopyLink": "Link kopieren",
   "familyInviteCopied": "Link kopiert.",
@@ -1414,6 +1417,13 @@
   },
   "familyInviteValidityLabel": "Gültig für",
   "@familyInviteLinkHint": {
+    "placeholders": {
+      "validity": {
+        "type": "String"
+      }
+    }
+  },
+  "@familyInviteLinkHintManual": {
     "placeholders": {
       "validity": {
         "type": "String"

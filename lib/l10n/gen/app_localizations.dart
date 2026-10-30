@@ -1577,8 +1577,26 @@ abstract class AppLocalizations {
   /// No description provided for @familyInviteLinkHint.
   ///
   /// In de, this message translates to:
-  /// **'Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist.'**
+  /// **'Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist. Gib ihn nur der Person, die du einladen willst.'**
   String familyInviteLinkHint(String validity);
+
+  /// No description provided for @familyInviteLinkHintManual.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Link ist {validity} gültig und nur einmal verwendbar. Ein Moderator bestätigt die Anfrage, bevor die Person aufgenommen wird.'**
+  String familyInviteLinkHintManual(String validity);
+
+  /// No description provided for @familyInviteManual.
+  ///
+  /// In de, this message translates to:
+  /// **'Anfragen selbst bestätigen'**
+  String get familyInviteManual;
+
+  /// No description provided for @familyInviteManualHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Ohne diese Einstellung nimmt die App jede Person mit dem Link automatisch auf. Ändern erzeugt einen neuen Link.'**
+  String get familyInviteManualHint;
 
   /// No description provided for @familyInviteShowQr.
   ///
@@ -1799,7 +1817,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsLockHint.
   ///
   /// In de, this message translates to:
-  /// **'Sperrt die App nach Inaktivität. Die Bestätigung erfolgt mit der Sperre deines Geräts; die App speichert keine eigene PIN.'**
+  /// **'Sperrt die App nach Inaktivität. Die Bestätigung erfolgt mit der Sperre deines Geräts; die App speichert keine eigene PIN. Die Sperre ist ein Sichtschutz: Sie verdeckt die App, die Daten selbst schützt die Verschlüsselung und die Sperre deines Geräts.'**
   String get settingsLockHint;
 
   /// No description provided for @settingsLockUnavailable.

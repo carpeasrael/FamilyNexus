@@ -35,6 +35,9 @@ class FlutterWindow : public Win32Window {
   std::string initial_link_;
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> link_channel_;
 
+  // Bildschirmschutz (`setSecure`): Fenster von Aufnahmen ausnehmen.
+  std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> window_channel_;
+
   // The Flutter instance hosted by this window.
   std::unique_ptr<flutter::FlutterViewController> flutter_controller_;
 };

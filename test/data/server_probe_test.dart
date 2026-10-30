@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/server_probe.dart';
@@ -90,6 +91,17 @@ void main() {
     expect(info.contact!.length, lessThanOrEqualTo(80));
     expect(info.contact, isNot(contains('\n')));
     expect(info.supportPage, isNull);
+  });
+
+  test('Pen-Test I-03: TLS- und Netzfehler kommen als „nicht erreichbar“, nicht roh', () async {
+    for (final error in <Exception>[const HandshakeException('CERTIFICATE_VERIFY_FAILED'), const SocketException('refused')]) {
+      final probe = ServerProbe(client: MockClient((_) async => throw error));
+      await expectLater(
+        probe.probe(_url),
+        throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.serverUnreachable)),
+        reason: '${error.runtimeType}',
+      );
+    }
   });
 
   test('Pen-Test F-08: Bidi- und unsichtbare Zeichen im Betreiber-Kontakt werden entfernt', () async {

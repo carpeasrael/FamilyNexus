@@ -10,16 +10,24 @@ class AppLockController extends ChangeNotifier {
     required this.settings,
     required this.auth,
     DateTime Function()? clock,
+    Duration Function()? monotonic,
   })  : _clock = clock ?? DateTime.now,
+        _monotonic = monotonic ?? _stopwatchElapsed,
         _locked = settings.settings.lockEnabled;
 
   final SettingsController settings;
   final DeviceAuth auth;
   final DateTime Function() _clock;
 
+  /// Monotone Uhr: lässt sich nicht verstellen, steht aber je nach System still, solange das Gerät schläft.
+  final Duration Function() _monotonic;
+  static final Stopwatch _stopwatch = Stopwatch()..start();
+  static Duration _stopwatchElapsed() => _stopwatch.elapsed;
+
   bool _locked;
   bool _authenticating = false;
   DateTime? _backgroundedAt;
+  Duration? _backgroundedMono;
 
   bool get locked => _locked;
   bool get authenticating => _authenticating;
@@ -29,6 +37,7 @@ class AppLockController extends ChangeNotifier {
     // Der System-Dialog selbst löst Zustandswechsel aus; sie zählen nicht als Inaktivität.
     if (_authenticating) return;
     _backgroundedAt = _clock();
+    _backgroundedMono = _monotonic();
   }
 
   /// Die App kommt zurück: sperren, wenn die Auszeit überschritten ist.
@@ -36,9 +45,15 @@ class AppLockController extends ChangeNotifier {
     if (_authenticating) return;
     final s = settings.settings;
     final since = _backgroundedAt;
+    final sinceMono = _backgroundedMono;
     _backgroundedAt = null;
-    if (!s.lockEnabled || _locked || since == null) return;
-    if (_clock().difference(since) >= Duration(seconds: s.lockTimeoutSeconds)) {
+    _backgroundedMono = null;
+    if (!s.lockEnabled || _locked || since == null || sinceMono == null) return;
+    // Beide Uhren zählen (Pen-Test I-05): Die Wanduhr erfasst den Geräteschlaf, die monotone Uhr ein Zurückstellen
+    // der Uhrzeit. Läuft die Wanduhr rückwärts, wird ebenfalls gesperrt.
+    final timeout = Duration(seconds: s.lockTimeoutSeconds);
+    final wall = _clock().difference(since);
+    if (wall >= timeout || wall.isNegative || _monotonic() - sinceMono >= timeout) {
       _locked = true;
       notifyListeners();
     }

@@ -403,7 +403,10 @@
   "familyManage": "Management",
   "familyInvite": "Invite a member",
   "familyInviteLinkTitle": "Invite someone",
-  "familyInviteLinkHint": "The link is valid for {validity} and can be used once. Whoever opens it is admitted automatically as soon as a moderator's app is online.",
+  "familyInviteLinkHint": "The link is valid for {validity} and can be used once. Whoever opens it is admitted automatically as soon as a moderator's app is online. Only give it to the person you want to invite.",
+  "familyInviteLinkHintManual": "The link is valid for {validity} and can be used once. A moderator confirms the request before the person is admitted.",
+  "familyInviteManual": "Confirm requests yourself",
+  "familyInviteManualHint": "Without this setting, the app admits anyone with the link automatically. Changing it creates a new link.",
   "familyInviteShowQr": "Show QR code",
   "familyInviteCopyLink": "Copy link",
   "familyInviteCopied": "Link copied.",
@@ -1408,6 +1411,13 @@
   },
   "familyInviteValidityLabel": "Valid for",
   "@familyInviteLinkHint": {
+    "placeholders": {
+      "validity": {
+        "type": "String"
+      }
+    }
+  },
+  "@familyInviteLinkHintManual": {
     "placeholders": {
       "validity": {
         "type": "String"

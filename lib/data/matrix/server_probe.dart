@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io' show IOException;
 
 import 'package:http/http.dart' as http;
 
@@ -52,6 +53,10 @@ class ServerProbe {
     } on TimeoutException {
       throw const GatewayException(GatewayError.serverUnreachable);
     } on http.ClientException {
+      throw const GatewayException(GatewayError.serverUnreachable);
+    } on IOException catch (e) {
+      // TLS-Fehler (z. B. untergeschobenes Zertifikat) und Netzfehler nicht roh weiterreichen (Pen-Test I-03).
+      AppLog.w('probe', 'Server nicht erreichbar (${e.runtimeType})');
       throw const GatewayException(GatewayError.serverUnreachable);
     }
   }
