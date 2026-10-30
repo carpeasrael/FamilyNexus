@@ -24,7 +24,7 @@ Im Ordner: `Testreport.md` (Kurzfassung), PDFs als `Testreport_<Ordner>_DE.pdf` 
 | 09 | `2026-10-28_09_Linux-Android_Build18` | 28.10.2026, 08:34–09:58 | TP-FN-001 v1.5 @ `423a3db` | 1.2.1 (18) | Linux-Flatpak / Android-Emulator |
 | 11 | `2026-10-28_11_Verifikation_Repo_Build19` | 28.10.2026, Teillauf ohne Gerät | TP-FN-VR-121 v1.0 @ `6275b3e` | 1.2.1 (19) | nur Repository/Code, Geräteschritte offen |
 | 12 | `2026-10-28_12_Windows-nur-G1_Build19` | 28.10.2026, ca. 22:10–00:10 (nur G1-Schritte) | TP-FN-001 v1.6 @ `f4c358c` | 1.2.1 (19), lokaler Build mit Startkorrektur | Windows 11 / – (G2 nicht verfügbar) |
-| 13 | `2026-10-29_13_macOS-iOS_Build20` | 29.10.2026, Nachtest (Teilplan: B-02, B-10, D-02, E-07, E-12, E-18, E-23), vorbereitet | TP-FN-001 v1.7 @ `5469f8d` | 1.2.1 (20) | macOS / iOS (offen) |
+| 13 | `2026-10-29_13_macOS-iOS_Build20` | 29./30.10.2026, vollständiger Plan (V, A–G) | TP-FN-001 v1.7 | 1.2.1 (20) | macOS / iPhone-17-Simulator (iOS 27.0) |
 
 Die Läufe 04 und 05 liefen parallel; die Nummer folgt dem Beginn. Die Bezeichnungen „Lauf 1/2/3“ im Testplan (Anhang E, Issue-Zuordnung) entsprechen den Nummern 03, 05 und 04.
 
