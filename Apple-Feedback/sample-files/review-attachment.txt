@@ -1,0 +1,9 @@
+FamilyNexus App Review - optional attachment
+
+This file contains fictional test data only.
+Family appointment: Weekend picnic.
+Shopping item: Milk, quantity 1.
+Household task: Water the plants.
+
+Send this file as a chat attachment and load it from the second review account.
+No import or configuration is required.
