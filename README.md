@@ -124,7 +124,8 @@ Preparation for Google Play and the App Store (versions, icons, store texts, pri
 ## Own server, privacy
 
 - Run your own homeserver: [`docs/EIGENER_SERVER.md`](docs/EIGENER_SERVER.md).
-- Privacy text: in the app under *Settings → Privacy*; "Delete all local data" is also there.
+- [Privacy policy / Datenschutzerklärung (Deutsch)](store/privacy/privacy-policy.de.md) for iOS, macOS, Windows,
+  Linux and Android. Privacy information and "Delete all local data" are also available in the app under *Settings → Privacy*.
 - Dependencies, licenses, SBOM: [`docs/ABHAENGIGKEITEN.md`](docs/ABHAENGIGKEITEN.md) (`python3 tool/sbom.py`).
 - Architecture: [`docs/ARCHITEKTUR.md`](docs/ARCHITEKTUR.md); planning and acceptance: [`docs/PLAN.md`](docs/PLAN.md);
   reviews: [`docs/REVIEW.md`](docs/REVIEW.md).
