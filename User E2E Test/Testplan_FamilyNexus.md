@@ -59,7 +59,7 @@ Vor dem Lauf wird für **beide Geräte** festgelegt und im Report eingetragen, a
 | Linux | Bildschirmfoto-Werkzeug des Systems (z. B. `spectacle -b -n -a -o <Datei>.png`); bei Bedienung per Skript auf eigenem X-Server siehe Anhang D |
 | Windows / Web | Bildschirmfoto-Werkzeug des Systems bzw. des Browsers |
 
-**Dateinamen:** `<Schritt-ID>-<Gerät>.png` (z. B. `E-14-G2.png`); bei mehreren Bildern ein Buchstabe (`E-14a-G1.png`). Ablage: `Test-Apple-Report/<Lauf-Ordner>/screenshots/` (Lauf-Ordner siehe `Test-Apple-Report/README.md`). Notfall-Schlüssel und Passwörter werden vor der Weitergabe geschwärzt.
+**Dateinamen:** `<Schritt-ID>-<Gerät>.png` (z. B. `E-14-G2.png`); bei mehreren Bildern ein Buchstabe (`E-14a-G1.png`). Ablage: `User E2E Test Report/<Lauf-Ordner>/screenshots/` (Lauf-Ordner siehe `User E2E Test Report/README.md`). Notfall-Schlüssel und Passwörter werden vor der Weitergabe geschwärzt.
 
 ## 3. Testserver, Konten und Stammdaten
 
@@ -342,7 +342,7 @@ Jede Funktion der App ist mindestens einem Schritt zugeordnet. Wird eine Funktio
 
 **Bestanden**, wenn Abschnitt 2 vollständig ist, V-01 bis V-07 erfüllt sind und alle Schritte aus A bis H ✅ oder begründet „n/a“ sind. Optional: D-07, G-04, H-19. ⚠️ ist zulässig, wenn der Befund im Report steht und als Issue angelegt ist. ⏳ muss vor der Antwort an Apple nachgeholt werden.
 
-**Report:** eine Kopie dieses Plans mit ausgefüllten Spalten „Beobachtet“, „Screenshot“, „Erg.“, abgelegt als `Test-Apple-Report/<Lauf-Ordner>/Testreport.md` und als PDF `Testreport_<Lauf-Ordner>_<DE|EN>.pdf`. Erste Seite: Abschnitt 2 (Plattform und System), Ergebnis von V-01 bis V-07, Zusammenfassung (Anzahl je Ergebnis) und Befundliste (Nr., Schwere, Schritt, Beschreibung). Screenshots stehen neben dem jeweiligen Schritt (im PDF als Bild in der Zeile oder direkt darunter); bei Schritten mit zwei Geräten nebeneinander. Passwörter und Notfall-Schlüssel sind geschwärzt.
+**Report:** eine Kopie dieses Plans mit ausgefüllten Spalten „Beobachtet“, „Screenshot“, „Erg.“, abgelegt als `User E2E Test Report/<Lauf-Ordner>/Testreport.md` und als PDF `Testreport_<Lauf-Ordner>_<DE|EN>.pdf`. Erste Seite: Abschnitt 2 (Plattform und System), Ergebnis von V-01 bis V-07, Zusammenfassung (Anzahl je Ergebnis) und Befundliste (Nr., Schwere, Schritt, Beschreibung). Screenshots stehen neben dem jeweiligen Schritt (im PDF als Bild in der Zeile oder direkt darunter); bei Schritten mit zwei Geräten nebeneinander. Passwörter und Notfall-Schlüssel sind geschwärzt.
 
 ## Anhang A: Vorbereitung iOS-Simulator
 
@@ -406,7 +406,7 @@ Nur für die Einreichung bei Apple und den matrix.org-Nachtest in #15. Zugangsda
 
 ## Anhang E: Änderungen nach den Läufen vom 26./27.10.2026
 
-Quelle (Planversion 1.0 → 1.1): Report `Test-Apple-Report/2026-10-26_03_iOS-macOS_Build16/Testreport_2026-10-26_03_iOS-macOS_Build16_EN.pdf`. Korrigierte Planfehler:
+Quelle (Planversion 1.0 → 1.1): Report `User E2E Test Report/2026-10-26_03_iOS-macOS_Build16/Testreport_2026-10-26_03_iOS-macOS_Build16_EN.pdf`. Korrigierte Planfehler:
 
 | Nr. | Betrifft | Fehler im Plan | Korrektur |
 |---|---|---|---|
@@ -428,7 +428,7 @@ Quelle (Planversion 1.0 → 1.1): Report `Test-Apple-Report/2026-10-26_03_iOS-ma
 | P-16 | V-06 | Fremde Altkonten (`fnt-1026c-n1`) | Suffix-Regel, nie fremde Konten benutzen |
 | P-17 | Anhang D | Bedienung des Simulators unter „Device Hub“ und Dauer fehlten | ergänzt |
 
-Quelle (Planversion 1.3 → 1.4): Lauf 3 auf Linux-Flatpak (G1) und Android-Emulator (G2) nach v1.0 @ `4abf400`, Report `Test-Apple-Report/2026-10-26_04_Linux-Android_Build16/Testreport_2026-10-26_04_Linux-Android_Build16_EN.pdf`; App-Befunde als Issues #31 bis #40, Ergänzungen in #23, #26, #30.
+Quelle (Planversion 1.3 → 1.4): Lauf 3 auf Linux-Flatpak (G1) und Android-Emulator (G2) nach v1.0 @ `4abf400`, Report `User E2E Test Report/2026-10-26_04_Linux-Android_Build16/Testreport_2026-10-26_04_Linux-Android_Build16_EN.pdf`; App-Befunde als Issues #31 bis #40, Ergänzungen in #23, #26, #30.
 
 | Nr. | Betrifft | Fehler im Plan | Korrektur |
 |---|---|---|---|
@@ -459,7 +459,7 @@ Quelle (Planversion 1.4 → 1.5): Fixes aus PR #41 (Issues #24 bis #40). Erwartu
 | P-37 | E-06 | Kürzen des Linkendes wurde angenommen, daher `&n=…` entfernen; Meldung nannte nur `familynexus://join` (#26) | Ende um 10 Zeichen kürzen → „beschädigt“; Meldung nennt beide Formen |
 | P-38 | E-16, E-17, E-18, F-01 | Nicht lesbare Einträge (#35), fehlendes Speichern von Bildern (#40), Rohtext und Familienchat im Einzelchat (#29, #31), Passwortmeldung (#36) als Befund erwartet | Sammelhinweis; Bild speichern; Wartehinweis statt Familienchat; „Das Passwort stimmt nicht.“ |
 
-Quelle (Planversion 1.5 → 1.6): Läufe vom 28.10.2026 mit Build 1.2.1 (18): Apple (iOS-Simulator und Mac, `Test-Apple-Report/2026-10-28_07_iOS-macOS_Build18/`, Hinweise in #61) und Android/Linux (`Test-Apple-Report/2026-10-28_08_Android-Linux_Build18/`, `2026-10-28_09_Linux-Android_Build18/`, Hinweise P-39 bis P-47 in #69); App-Befunde #56 bis #60 und #62 bis #68, Beobachtung zu #43. Die App-Fixes dazu sind in den Erwartungen berücksichtigt (ältere Builds → ⚠️ mit Issue-Nummer).
+Quelle (Planversion 1.5 → 1.6): Läufe vom 28.10.2026 mit Build 1.2.1 (18): Apple (iOS-Simulator und Mac, `User E2E Test Report/2026-10-28_07_iOS-macOS_Build18/`, Hinweise in #61) und Android/Linux (`User E2E Test Report/2026-10-28_08_Android-Linux_Build18/`, `2026-10-28_09_Linux-Android_Build18/`, Hinweise P-39 bis P-47 in #69); App-Befunde #56 bis #60 und #62 bis #68, Beobachtung zu #43. Die App-Fixes dazu sind in den Erwartungen berücksichtigt (ältere Builds → ⚠️ mit Issue-Nummer).
 
 | Nr. | Betrifft | Bisher im Plan | Neu |
 |---|---|---|---|
@@ -479,7 +479,7 @@ Quelle (Planversion 1.5 → 1.6): Läufe vom 28.10.2026 mit Build 1.2.1 (18): Ap
 | P-52 | Anhang D | Großbuchstaben im iOS-Simulator (#61) | Zwischenablage, A-07 auf Mac/iPhone |
 | P-53 | B-02, B-04, B-05, B-08, B-14, E-02, E-05, E-07, E-16, E-25, E-32, F-05 | Erwartungen ohne die Fixes vom 28.10.2026 | „Einstellungen öffnen“ (#57), Ende = Beginn abgelehnt (#56), Texteingabe 13–23 Uhr (#64), Detail mit neuer Uhrzeit (#63), Enter in Dialogen (#68), „Link kopiert.“ im Dialog (#66), `familynexus://join#` (#59), Zähler nur lesbare Nachrichten (#65), lesbare Aktion „Absender blockieren“ (#62), Namen gelöschter Mitglieder (#60) |
 
-Quelle (Planversion 1.6 → 1.7): Lauf vom 28.10.2026 mit Build 1.2.1 (19) (macOS und iOS-Simulator, `Test-Apple-Report/2026-10-28_10_macOS-iOS_Build19/`); App-Befunde #75 bis #78. Der Plan nennt jetzt Build 20 als Soll (`ba36fed`).
+Quelle (Planversion 1.6 → 1.7): Lauf vom 28.10.2026 mit Build 1.2.1 (19) (macOS und iOS-Simulator, `User E2E Test Report/2026-10-28_10_macOS-iOS_Build19/`); App-Befunde #75 bis #78. Der Plan nennt jetzt Build 20 als Soll (`ba36fed`).
 
 | Nr. | Betrifft | Bisher im Plan | Neu |
 |---|---|---|---|
