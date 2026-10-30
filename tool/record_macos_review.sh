@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Nimmt das Review-Video der macOS-App auf (Apple-Punkt 1, Testplan TP-FN-VR-121, Abschnitt 4, K-09).
 # Die Aufnahme beginnt vor dem Start der App und läuft bis zur Eingabetaste; der Ablauf (Drehbuch S-01 bis S-14) wird
-# von Hand durchgespielt; am Ende (Eingabetaste) zeigt das Video die macOS-Version. Ausgabe: Test-Apple/verification_1.2.1/FamilyNexus_<Version>_<Build>_Mac.mov
+# von Hand durchgespielt; am Ende (Eingabetaste) zeigt das Video die macOS-Version. Ausgabe: User E2E Test/verification_1.2.1/FamilyNexus_<Version>_<Build>_Mac.mov
 #
 # Vorab: Terminal braucht „Bildschirmaufnahme“ (Systemeinstellungen → Datenschutz & Sicherheit). Lokale Daten
 # leeren (Einstellungen → „Alle lokalen Daten löschen“), Fokus „Nicht stören“ an, Schreibtisch ohne persönliche
@@ -52,7 +52,7 @@ restore() {
   end tell" >/dev/null 2>&1 || true
 }
 
-dir="Test-Apple/verification_1.2.1"
+dir="User E2E Test/verification_1.2.1"
 mkdir -p "$dir"
 out="$dir/FamilyNexus_${version}_${build}_Mac.mov"
 [ ! -e "$out" ] || out="${out%.mov}_$(date +%H%M%S).mov"   # vorhandene Aufnahme nie überschreiben

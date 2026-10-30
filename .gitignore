@@ -54,11 +54,11 @@ pubspec_overrides.yaml
 
 # Testunterlagen mit echten Konto- und Zugangsdaten nicht committen
 secure/
-Test-Apple/*.local.md
-Test-Apple/Testreport_Einladung_Zweiter_Nutzer.pdf
-Test-Apple/Testreport_Pruefanleitung_Build15.pdf
-Test-Apple/screenshots/einladung/
-Test-Apple/screenshots/geraet/
+User E2E Test/*.local.md
+User E2E Test/Testreport_Einladung_Zweiter_Nutzer.pdf
+User E2E Test/Testreport_Pruefanleitung_Build15.pdf
+User E2E Test/screenshots/einladung/
+User E2E Test/screenshots/geraet/
 
 # Review-Videos (groß, nur Prüfsumme im Report)
-Test-Apple/verification_1.2.1/*.mov
+User E2E Test/verification_1.2.1/*.mov
