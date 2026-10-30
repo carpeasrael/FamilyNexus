@@ -1,0 +1,2 @@
+00:26 +785 ~49: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/architecture_test.dart: Android-spezifische Dart-Brücken liegen nur in data/platform
+00:26 +786 ~49: All tests passed!

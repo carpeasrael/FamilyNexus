@@ -1,0 +1,3 @@
+Web-Link: Basis https://carpeasrael.github.io/FamilyNexus/join/ | Länge 310 | Parameter: ['by', 'exp', 'f', 'inv', 'n', 'room', 'srv', 'v', 'via']
+exp in Tagen: 2.97 | n: 32 Hexzeichen: True
+Passwort/Schlüssel/Token/Gerät im Link: False

@@ -1,0 +1,7 @@
+Passwort N1: 0
+KN1: 0
+KN1b: 0
+Token-Muster: 0
+280:Außerdem gespeichert, aber aus Sicherheitsgründen nicht angezeigt: Zugangstoken der Sitzung, Geräteschlüssel und Schlüssel der verschlüsselten Gespräche.
+282:Nie gespeichert, nur im Arbeitsspeicher: Online-Status der Familienmitglieder.
+283:Geplante Erinnerungen liegen zusätzlich beim Betriebssystem.
