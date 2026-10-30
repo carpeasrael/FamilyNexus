@@ -1,0 +1,16 @@
+Documents nach Löschen (F-01) und Beenden:
+128 .
+224 ..
+81920 familynexus_app.db
+217088 familynexus_matrix.db
+Treffer FN-ANHANG im App-Datenordner (tmp/):
+tmp/FN-ANHANG.txt
+tmp/a_b_c_d.txt
+Suchbegriffe sonst:
+Testfamilie 1030: 0
+Hallo von Nutzer 1: 0
+Test N1: 0
+00000000: 1ab6 8340 500e 51c7 c3cf cb0a 90dc fb4e  ...@P.Q........N
+Error: in prepare, file is not a database (26)
+00000000: dff8 2e94 83bf 577d 6e78 1179 0e1a 2d6c  ......W}nx.y..-l
+Error: in prepare, file is not a database (26)

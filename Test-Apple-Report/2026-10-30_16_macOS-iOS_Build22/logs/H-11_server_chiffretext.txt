@@ -1,0 +1,14 @@
+Raum 1 | Mitglieder beigetreten: 2 | Ereignisse: {'m.room.power_levels': 1, 'm.room.encrypted': 38, 'm.reaction': 1, 'm.room.member': 7, 'm.room.name': 2, 'm.room.join_rules': 1} | algorithm: {'m.megolm.v1.aes-sha2'} | m.room.message im Klartext: 0 | m.room.encryption: ['m.megolm.v1.aes-sha2'] | join_rule: ['knock'] | m.room.name vorhanden: True
+Raum 2 | Mitglieder beigetreten: 1 | Ereignisse: {'m.room.encrypted': 7, 'm.room.name': 1, 'm.room.history_visibility': 1, 'm.room.encryption': 1, 'm.room.guest_access': 1, 'm.room.join_rules': 1, 'm.room.power_levels': 1, 'm.room.member': 1, 'm.room.create': 1} | algorithm: {'m.megolm.v1.aes-sha2'} | m.room.message im Klartext: 0 | m.room.encryption: ['m.megolm.v1.aes-sha2'] | join_rule: ['invite'] | m.room.name vorhanden: True
+Raum 3 | Mitglieder beigetreten: 2 | Ereignisse: {'m.room.encrypted': 11, 'm.room.member': 3, 'm.room.encryption': 1, 'm.room.history_visibility': 1, 'm.room.guest_access': 1, 'm.room.join_rules': 1, 'm.room.power_levels': 1, 'm.room.create': 1} | algorithm: {'m.megolm.v1.aes-sha2'} | m.room.message im Klartext: 0 | m.room.encryption: ['m.megolm.v1.aes-sha2'] | join_rule: ['invite'] | m.room.name vorhanden: False
+Treffer Suchbegriffe in allen Verläufen und Zuständen:
+  Hallo von Nutzer 1: 0
+  Nur für dich: 0
+  FN-ANHANG-358768: 0
+  Test geteilt 2: 0
+  Noch da: 0
+  Hallo Testfamilie: 0
+  Milch: 0
+  Bad putzen: 0
+  Test privat: 0
+Geräte des Kontos: ['Testwerkzeug', 'FamilyNexus macOS', 'Testwerkzeug']

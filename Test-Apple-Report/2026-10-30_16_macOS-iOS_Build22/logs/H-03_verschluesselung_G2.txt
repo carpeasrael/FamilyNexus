@@ -1,0 +1,8 @@
+== familynexus_app.db
+00000000: 4c26 58f6 2f7f d61e dbdd 6457 c83f 46d6  L&X./.....dW.?F.
+familynexus_app.db: data
+Error: in prepare, file is not a database (26)
+== familynexus_matrix.db
+00000000: 6c7d 048c a93f b0a9 3413 053a c17c 7cc2  l}...?..4..:.||.
+familynexus_matrix.db: data
+Error: in prepare, file is not a database (26)

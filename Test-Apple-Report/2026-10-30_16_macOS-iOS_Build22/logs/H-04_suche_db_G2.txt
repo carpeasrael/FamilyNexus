@@ -1,0 +1,12 @@
+familynexus_app.db | Testfamilie 1030: 0
+familynexus_app.db | Test geteilt 2: 0
+familynexus_app.db | Hallo von Nutzer 1: 0
+familynexus_app.db | Nur für dich: 0
+familynexus_app.db | Test N1: 0
+familynexus_app.db | FN-ANHANG-358768: 0
+familynexus_matrix.db | Testfamilie 1030: 0
+familynexus_matrix.db | Test geteilt 2: 0
+familynexus_matrix.db | Hallo von Nutzer 1: 0
+familynexus_matrix.db | Nur für dich: 0
+familynexus_matrix.db | Test N1: 0
+familynexus_matrix.db | FN-ANHANG-358768: 0
