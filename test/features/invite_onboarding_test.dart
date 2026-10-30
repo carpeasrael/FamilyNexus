@@ -108,6 +108,32 @@ void main() {
       expect(s.guest.services.pendingInvite.value?.inviterName, 'Anna');
     });
 
+    testWidgets('#103 Zurück zur Startseite verwirft den vorgemerkten Link; „Neue Familie gründen“ nutzt wieder matrix.org', (tester) async {
+      final s = await _annaInvites();
+      await s.guest.services.settings.update((c) => c.copyWith(pendingInvite: s.link));
+      await _pump(tester, s.guest);
+      expect(find.text('Dein Konto liegt bei fake.test.'), findsOneWidget, reason: 'gespeicherter Link wirkt nach dem Neustart');
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Neue Familie gründen'), findsOneWidget);
+      expect(s.guest.services.pendingInvite.value, isNull);
+      expect(s.guest.services.settings.settings.pendingInvite, isNull, reason: 'dauerhaft verworfen');
+    });
+
+    testWidgets('#103 „Neue Familie gründen“ verwirft einen vorgemerkten Link', (tester) async {
+      final s = await _annaInvites();
+      await s.guest.services.settings.update((c) => c.copyWith(pendingInvite: s.link));
+      await _pump(tester, s.guest);
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      s.guest.links.initial = null;
+      await s.guest.services.settings.update((c) => c.copyWith(pendingInvite: s.link));
+      s.guest.services.pendingInvite.value = null;
+      await _tap(tester, 'Neue Familie gründen');
+      expect(s.guest.services.settings.settings.pendingInvite, isNull);
+    });
+
     testWidgets('TP-JOIN-02b abgelaufener gespeicherter Link wird beim Start verworfen', (tester) async {
       final s = await _annaInvites();
       await s.guest.services.settings.update((c) => c.copyWith(pendingInvite: 'familynexus://join?v=2&room=x'));
