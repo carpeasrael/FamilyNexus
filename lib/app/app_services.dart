@@ -1,6 +1,11 @@
 import 'package:flutter/widgets.dart';
+import 'package:sqflite_sqlcipher/sqflite.dart' show Database;
 
 import '../data/db/app_database.dart';
+import '../data/db/key_value_store.dart';
+import '../data/db/sql_event_store.dart';
+import '../data/db/sql_shopping_store.dart';
+import '../data/db/sql_task_store.dart';
 import '../data/matrix/matrix_gateway.dart';
 import '../data/platform/browser_launcher.dart';
 import '../data/platform/element_launcher.dart';
@@ -136,6 +141,28 @@ class AppServices {
     await presence?.goOffline();
     await gateway.logout();
   }
+
+  /// Entfernt die Familiendaten des abgemeldeten Kontos (Termine samt privater, Einkaufszettel, Aufgaben) von
+  /// diesem Gerät; App-Einstellungen bleiben. Ohne vorherige Anmeldung (`calendarOwner` fehlt) geschieht nichts.
+  /// Abmelden hieß bisher nur „Sitzung beenden“; die Daten blieben bis zur Anmeldung eines anderen Kontos liegen
+  /// (Pen-Test F-02).
+  Future<void> wipeAccountData() async {
+    final db = database?.db;
+    if (db != null) await wipeAccountDataIn(db);
+  }
+
+  /// [wipeAccountData] für die App-Datenbank [db].
+  static Future<void> wipeAccountDataIn(Database db) async {
+    final kv = SqlKeyValueStore(db);
+    if ((await kv.readAll())[calendarOwnerKey] == null) return;
+    await SqlEventStore(db).wipe();
+    await SqlShoppingStore(db).wipe();
+    await SqlTaskStore(db).wipe();
+    await kv.delete(calendarOwnerKey);
+  }
+
+  /// Einstellungsschlüssel: Konto und Familie, denen die lokalen Familiendaten gehören.
+  static const String calendarOwnerKey = 'calendarOwner';
 
   /// Beendet Synchronisation und Planung. [cancelReminders]: nur bei Abmeldung/Löschung –
   /// beim bloßen Schließen der Oberfläche müssen geplante Erinnerungen bestehen bleiben.

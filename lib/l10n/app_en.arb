@@ -127,6 +127,7 @@
   "chatYou": "You",
   "chatFormerMember": "Former member",
   "logout": "Sign out",
+  "logoutBody": "Events, the shopping list and tasks are removed from this device. Everything already sent stays encrypted in your family and comes back after you sign in again; changes not yet sent are lost.",
   "settingsAccount": "Account",
   "settingsServer": "Server",
   "serverContactUnknown": "Contact: not specified",

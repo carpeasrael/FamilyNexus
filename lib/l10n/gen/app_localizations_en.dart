@@ -320,6 +320,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logout => 'Sign out';
 
   @override
+  String get logoutBody =>
+      'Events, the shopping list and tasks are removed from this device. Everything already sent stays encrypted in your family and comes back after you sign in again; changes not yet sent are lost.';
+
+  @override
   String get settingsAccount => 'Account';
 
   @override

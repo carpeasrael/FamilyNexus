@@ -277,6 +277,7 @@ class _AccountSection extends StatelessWidget {
               context: context,
               builder: (c) => AlertDialog(
                 title: Text(l.logout),
+                content: Text(l.logoutBody),
                 actions: <Widget>[
                   TextButton(onPressed: () => Navigator.pop(c, false), child: Text(l.cancel)),
                   TextButton(onPressed: () => Navigator.pop(c, true), child: Text(l.logout)),

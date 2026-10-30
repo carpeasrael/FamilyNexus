@@ -325,6 +325,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get logout => 'Abmelden';
 
   @override
+  String get logoutBody =>
+      'Termine, Einkaufszettel und Aufgaben werden von diesem Gerät entfernt. Was schon gesendet ist, bleibt verschlüsselt in deiner Familie und kommt nach der nächsten Anmeldung zurück; noch nicht gesendete Änderungen gehen verloren.';
+
+  @override
   String get settingsAccount => 'Konto';
 
   @override

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
+import '../../core/app_log.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../data/platform/oauth_redirect.dart';
 import '../../domain/invite_link.dart';
@@ -99,6 +100,10 @@ class _AppRootState extends State<AppRoot> {
           final lostReady = _wasReady;
           WidgetsBinding.instance.addPostFrameCallback((_) {
             services.closeCalendar(cancelReminders: !session);
+            // Sitzung beendet (Abmelden, Konto wechseln, auf einem anderen Gerät entfernt): Familiendaten vom Gerät.
+            if (!session && !services.accountDeletionPending) {
+              services.wipeAccountData().catchError((Object e) => AppLog.e('app', 'Lokale Familiendaten nicht gelöscht', e)).ignore();
+            }
             // Konto gelöscht: auch die lokalen Daten des Kontos entfernen (wie „Alle lokalen Daten löschen“).
             if (!session && services.accountDeletionPending) {
               services.accountDeletionPending = false;

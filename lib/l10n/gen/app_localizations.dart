@@ -674,6 +674,12 @@ abstract class AppLocalizations {
   /// **'Abmelden'**
   String get logout;
 
+  /// No description provided for @logoutBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Termine, Einkaufszettel und Aufgaben werden von diesem Gerät entfernt. Was schon gesendet ist, bleibt verschlüsselt in deiner Familie und kommt nach der nächsten Anmeldung zurück; noch nicht gesendete Änderungen gehen verloren.'**
+  String get logoutBody;
+
   /// No description provided for @settingsAccount.
   ///
   /// In de, this message translates to:

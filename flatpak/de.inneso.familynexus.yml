@@ -12,7 +12,8 @@ finish-args:
   - --device=dri
   - --share=network
   - --talk-name=org.freedesktop.Notifications
-  - --talk-name=org.freedesktop.secrets
+  # Kein --talk-name=org.freedesktop.secrets: libsecret legt die Schlüssel in der Sandbox über das
+  # Secret-Portal ab (data/keyrings); die Freigabe gäbe Zugriff auf den ganzen Schlüsselbund des Nutzers (F-03).
 cleanup:
   - /include
   - /lib/pkgconfig
