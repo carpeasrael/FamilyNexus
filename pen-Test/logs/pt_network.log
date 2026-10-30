@@ -1,0 +1,13 @@
+00:00 +0: loading /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart
+00:00 +0: Transportverschlüsselung PT-N1: HttpsOnlyClient lehnt http:// ab (auch bei manipuliertem Ziel)
+00:00 +1: Transportverschlüsselung PT-N2: MITM mit selbstsigniertem Zertifikat – Serverprüfung bricht ab (Standard-Client der App)
+00:00 +2: Transportverschlüsselung PT-N3: MITM gegen den lokalen Synapse (Caddy, selbstsigniert) – App-Client verweigert
+00:00 +3: Bösartiger Homeserver PT-N4: Weiterleitung https → http wird nicht verfolgt (Downgrade)
+00:00 +4: Bösartiger Homeserver PT-N5: .well-known mit http-/Fremd-Basis wird ignoriert
+00:00 +5: Bösartiger Homeserver PT-N6: Übergroße / endlose Antwort wird begrenzt (Speicher-DoS)
+PT-N6: Abbruch nach 105 ms
+00:00 +6: Bösartiger Homeserver PT-N7: Hängender Server (Slowloris) – Zeitschranke greift
+00:02 +7: Bösartiger Homeserver PT-N8: OAuth-Metadaten mit http-Endpunkt / Zugangsdaten in URL → kein OAuth
+PT-N8: Kontakt nach Bereinigung: "@admin‮:evil <script>"
+00:02 +8: OAuth-Loopback-Empfänger (Desktop) PT-N9: nur 127.0.0.1, nur GET /oauth, nach Abbruch geschlossen
+00:02 +9: All tests passed!

@@ -1,0 +1,51 @@
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.2 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  dev_build 1.1.15 (1.1.16 available)
+  file_picker 13.1.0 (13.3.0 available)
+  file_picker_darwin 2.3.2 (2.4.0 available)
+  flutter_local_notifications 22.3.2 (22.3.3 available)
+  hooks 2.0.2 (2.2.0 available)
+  jni 1.1.0 (1.1.1 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.3 (1.19.0 available)
+  native_toolchain_c 0.19.2 (0.19.5 available)
+  objective_c 9.5.0 (9.6.2 available)
+  petitparser 7.0.2 (7.1.0 available)
+  posix 6.5.2 (6.5.4 available)
+  record_use 0.6.0 (1.1.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common_ffi 2.4.4 (2.4.5 available)
+  sqlite3 3.5.2 (3.8.0 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.4 available)
+  web 1.1.1 (1.1.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+24 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_storage_test.dart
+00:00 +0: PT-L1: Datenbankdatei ist verschlüsselt, Klartext nirgends auf der Platte (auch nicht in Nebendateien)
+PT-L1: Dateien=[familynexus_app.db] Kopf=[221, 159, 39, 99, 233, 183, 213, 99]
+00:00 +1: PT-L2: Falscher Schlüssel wird abgewiesen, kein stilles Neuanlegen
+Shell: 2026-10-30 11:15:29.811: ERROR CORE sqlcipher_page_cipher: hmac check failed for pgno=1
+Shell: 2026-10-30 11:15:29.811: ERROR CORE sqlite3Codec: error decrypting page 1 data: 1
+Shell: 2026-10-30 11:15:29.811: ERROR CORE sqlcipher_codec_ctx_set_error: 1 lock=0
+error SqfliteFfiException(sqlite_error: 26, , SqliteException(26): while preparing statement, file is not a database, file is not a database (code 26)
+  Causing statement: SELECT count(*) FROM sqlite_master}) DatabaseException(SqliteException(26): while preparing statement, file is not a database, file is not a database (code 26)
+  Causing statement: SELECT count(*) FROM sqlite_master) sql 'SELECT count(*) FROM sqlite_master' {details: {database: {path: /tmp/fn_pt_storageXHLBHI/familynexus_app.db, id: 3, readOnly: false, singleInstance: true}}} during open, closing...
+00:00 +2: PT-L3: Unverschlüsselte (untergeschobene) Klartext-Datenbank wird nicht geöffnet
+Shell: 2026-10-30 11:15:29.924: ERROR CORE sqlcipher_page_cipher: hmac check failed for pgno=1
+Shell: 2026-10-30 11:15:29.924: ERROR CORE sqlite3Codec: error decrypting page 1 data: 1
+Shell: 2026-10-30 11:15:29.924: ERROR CORE sqlcipher_codec_ctx_set_error: 1 lock=0
+error SqfliteFfiException(sqlite_error: 26, , SqliteException(26): while preparing statement, file is not a database, file is not a database (code 26)
+  Causing statement: SELECT count(*) FROM sqlite_master}) DatabaseException(SqliteException(26): while preparing statement, file is not a database, file is not a database (code 26)
+  Causing statement: SELECT count(*) FROM sqlite_master) sql 'SELECT count(*) FROM sqlite_master' {details: {database: {path: /tmp/fn_pt_storageFONELR/familynexus_app.db, id: 5, readOnly: false, singleInstance: true}}} during open, closing...
+00:00 +3: PT-L4: Brute-Force-Parameter von SQLCipher (KDF, Cipher) entsprechen v4-Standard
+PT-L4: version=[{cipher_version: 4.19.0 community}] kdf_iter=[{kdf_iter: 256000}] hmac=[{cipher_hmac_algorithm: HMAC_SHA512}] kdf=[{cipher_kdf_algorithm: PBKDF2_HMAC_SHA512}] page=[{cipher_page_size: 4096}] provider=[{cipher_provider: openssl}]
+00:00 +4: PT-L5: Löschen entfernt die Datei vollständig; Dateirechte dokumentieren
+PT-L5: Dateirechte der DB (Test-Umask): rw-r--r--
+00:00 +5: All tests passed!
