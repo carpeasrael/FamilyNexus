@@ -125,7 +125,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
+  /// Vorgemerkten Einladungslink verwerfen: Wer zur Startseite zurückgeht oder „Neue Familie gründen“ wählt,
+  /// will ihn nicht mehr; sonst überschreibt er nach einem Neustart den Anbieter und den Familienschritt (#103).
+  void _discardInvite() {
+    if (_s.pendingInvite.value == null && _s.settings.settings.pendingInvite == null) return;
+    _s.pendingInvite.value = null;
+    _s.settings.update((c) => c.copyWith(pendingInvite: null)).ignore();
+  }
+
   void _choose(OnboardingPath path) {
+    if (path == OnboardingPath.create) _discardInvite();
     final invite = _s.pendingInvite.value;
     setState(() {
       _path = path;
@@ -153,6 +162,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _step = _Step.inviteLink;
         case _Step.inviteLink || _Step.account || _Step.login:
           _step = _Step.welcome;
+          _discardInvite();
         default:
           break;
       }
