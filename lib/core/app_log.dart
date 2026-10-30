@@ -11,15 +11,18 @@ class AppLog {
 
   static final RegExp _mxid = RegExp(r'@[A-Za-z0-9._=\-/+]+:[A-Za-z0-9.\-]+');
   static final RegExp _room = RegExp(r'![A-Za-z0-9._~\-]+:[A-Za-z0-9.\-]+');
-  // Schlüsselwort + beliebiger Trenner (: = Leerzeichen) + Wert.
+  // Schlüsselwort + beliebiger Trenner (: = Leerzeichen, auch JSON `"key":`) + Wert.
   static final RegExp _secret = RegExp(
-    r'''\b(access[_-]?token|refresh[_-]?token|token|password|passwort|passphrase|secret|authorization|bearer|recovery[_-]?key|key)\b[\s:=]*(?:bearer\s+)?(?:"[^"]*"|'[^']*'|[^\s,;&}"']+)''',
+    r'''\b(access[_-]?token|refresh[_-]?token|token|password|passwort|passphrase|secret|authorization|bearer|recovery[_-]?key|key)\b["']?[\s:=]*(?:bearer\s+)?(?:"[^"]*"|'[^']*'|[^\s,;&}"']+)''',
     caseSensitive: false,
   );
+  // Notfall-Schlüssel im Matrix-Format: 12 Vierergruppen Base58, durch Leerzeichen getrennt.
+  static final RegExp _recovery = RegExp(r'\b(?:[1-9A-HJ-NP-Za-km-z]{4}\s+){11}[1-9A-HJ-NP-Za-km-z]{4}\b');
   // Lange Base64-/Hex-artige Zeichenketten (Schlüssel, Token).
   static final RegExp _blob = RegExp(r'[A-Za-z0-9_\-+/=]{32,}');
 
   static String redact(String s) => s
+      .replaceAll(_recovery, '***')
       .replaceAll(_mxid, '@***:***')
       .replaceAll(_room, '!***:***')
       .replaceAllMapped(_secret, (m) => '${m.group(1)}=***')

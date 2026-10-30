@@ -1685,6 +1685,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'The app is already running in another tab or window of this browser. Two tabs at the same time would corrupt the local data. Close the other tab and try again.';
 
   @override
+  String get webEmbeddedTitle => 'Opened inside another page';
+
+  @override
+  String get webEmbeddedBody =>
+      'For security reasons, FamilyNexus cannot be used embedded in another website. Open the app directly in its own tab.';
+
+  @override
   String get privacy13Title => 'Browser version';
 
   @override

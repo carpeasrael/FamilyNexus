@@ -87,8 +87,10 @@ class WebVaultBackend implements VaultBackend {
     } catch (_) {
       throw const WrongVaultPasswordException();
     }
-    // Obergrenze: ein manipulierter Eintrag darf den Browser nicht mit einer riesigen Rundenzahl blockieren.
-    if (_iterations < 1 || _iterations > 5000000) throw const WrongVaultPasswordException();
+    // Untergrenze (Pen-Test F-06): ein untergeschobener Tresor mit wenigen Runden würde das Passwort leicht
+    // knackbar machen; jeder echte Tresor hat mindestens [iterations]. Obergrenze: ein manipulierter Eintrag
+    // darf den Browser nicht mit einer riesigen Rundenzahl blockieren.
+    if (_iterations < iterations || _iterations > 5000000) throw const WrongVaultPasswordException();
     _key = await _derive(password, _salt!, _iterations);
     try {
       await load();

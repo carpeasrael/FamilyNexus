@@ -48,6 +48,17 @@ import UserNotifications
         self?.secure = (call.arguments as? Bool) ?? true
         if self?.secure == false { self?.hideCover() }
         result(nil)
+      } else if call.method == "copySecret" {
+        // Notfall-Schlüssel: nur auf diesem Gerät (kein Universal Clipboard) und nach 60 s verfallen.
+        guard let text = call.arguments as? String, text.count <= 512 else {
+          result(FlutterError(code: "invalid", message: nil, details: nil))
+          return
+        }
+        UIPasteboard.general.setItems(
+          [["public.utf8-plain-text": text]],
+          options: [.localOnly: true, .expirationDate: Date().addingTimeInterval(60)]
+        )
+        result(nil)
       } else {
         result(FlutterMethodNotImplemented)
       }

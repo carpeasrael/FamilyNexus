@@ -25,3 +25,11 @@ Future<bool> acquireWebTabLock() async {
   (locks as JSObject).callMethod<JSAny?>('request'.toJS, 'familynexus-app'.toJS, options, callback.toJS);
   return result.future;
 }
+
+/// `true`, wenn die App in einem Rahmen einer anderen Seite läuft (Pen-Test F-06). Eine fremde Seite könnte
+/// die Tresor-Entsperrung überlagern (Clickjacking); `frame-ancestors` lässt sich per `<meta>` nicht setzen,
+/// und GitHub Pages erlaubt keine eigenen Header.
+bool isWebEmbedded() {
+  final top = web.window.top;
+  return top == null || !top.strictEquals(web.window).toDart;
+}

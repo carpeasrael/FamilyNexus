@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../../core/app_log.dart';
 import '../../domain/registration.dart';
 import '../../domain/server.dart';
+import '../../domain/text_sanitizer.dart';
 import 'matrix_gateway.dart';
 
 /// Prüft einen Homeserver: Erreichbarkeit, Protokollversionen, Passwort-Login
@@ -57,9 +58,9 @@ class ServerProbe {
 
   static String? _cleanText(Object? v, {int max = 80}) {
     if (v is! String) return null;
-    final s = v.replaceAll(RegExp(r'[\x00-\x1F\x7F]'), ' ').trim();
-    if (s.isEmpty) return null;
-    return s.length > max ? s.substring(0, max) : s;
+    // Wie Anzeigenamen: auch Bidi- und unsichtbare Zeichen entfernen (Pen-Test F-08, Spoofing).
+    final s = TextSanitizer.clean(v, max: max);
+    return s.isEmpty ? null : s;
   }
 
   static final RegExp _verRe = RegExp(r'^v(\d{1,3})\.(\d{1,3})$');

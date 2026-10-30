@@ -42,6 +42,7 @@ class _WebUnlockAppState extends State<WebUnlockApp> {
   }
 
   Future<void> _submit(AppLocalizations l) async {
+    if (isEmbedded()) return;
     final pw = _password.text;
     if (_create) {
       if (pw.length < kMinVaultPasswordLength) return setState(() => _error = l.webPasswordTooShort);
@@ -122,6 +123,13 @@ class _WebUnlockAppState extends State<WebUnlockApp> {
                 future: _tab,
                 builder: (context, snap) {
                   if (!snap.hasData) return const SizedBox.shrink();
+                  if (isEmbedded()) {
+                    return _card(context, <Widget>[
+                      Semantics(header: true, child: Text(l.webEmbeddedTitle, style: title)),
+                      const SizedBox(height: 12),
+                      Text(l.webEmbeddedBody),
+                    ]);
+                  }
                   if (snap.data == false) {
                     return _card(context, <Widget>[
                       Semantics(header: true, child: Text(l.webTabBusyTitle, style: title)),

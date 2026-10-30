@@ -2924,6 +2924,18 @@ abstract class AppLocalizations {
   /// **'Die App läuft bereits in einem anderen Tab oder Fenster dieses Browsers. Zwei Tabs gleichzeitig würden die lokalen Daten beschädigen. Schließe den anderen Tab und versuche es erneut.'**
   String get webTabBusyBody;
 
+  /// No description provided for @webEmbeddedTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'In fremder Seite geöffnet'**
+  String get webEmbeddedTitle;
+
+  /// No description provided for @webEmbeddedBody.
+  ///
+  /// In de, this message translates to:
+  /// **'FamilyNexus lässt sich aus Sicherheitsgründen nicht eingebettet in einer anderen Website verwenden. Öffne die App direkt in einem eigenen Tab.'**
+  String get webEmbeddedBody;
+
   /// No description provided for @privacy13Title.
   ///
   /// In de, this message translates to:

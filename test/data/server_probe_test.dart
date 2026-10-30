@@ -92,6 +92,18 @@ void main() {
     expect(info.supportPage, isNull);
   });
 
+  test('Pen-Test F-08: Bidi- und unsichtbare Zeichen im Betreiber-Kontakt werden entfernt', () async {
+    final probe = ServerProbe(client: _client(<String, (int, Object)>{
+      '/_matrix/client/versions': (200, <String, Object>{'versions': <String>['v1.1']}),
+      '/.well-known/matrix/support': (200, <String, Object>{
+        'contacts': <Object>[<String, Object>{'matrix_id': '@admin\u202E:evil\u200B.org\u2066'}],
+      }),
+    }));
+    final contact = (await probe.probe(_url)).contact!;
+    expect(contact, isNot(matches(RegExp('[\u200B-\u200F\u202A-\u202E\u2066-\u2069]'))));
+    expect(contact, '@admin :evil .org');
+  });
+
   test('Mindestversion v1.1 wird verlangt; höchste Version wird zuletzt geführt', () async {
     final old = ServerProbe(client: _client(<String, (int, Object)>{
       '/_matrix/client/versions': (200, <String, Object>{'versions': <String>['r0.6.1']}),
