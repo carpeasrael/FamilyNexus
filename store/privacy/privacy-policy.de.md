@@ -284,6 +284,14 @@ Aufgabenverläufe. Unter **Einstellungen → Datenschutz → Alle lokalen Daten
 löschen** werden die App- und Matrix-Datenbanken, die zugehörigen lokal abgelegten
 Schlüssel und die durch die App verwalteten Erinnerungen entfernt.
 
+**Abmelden:** Beim Abmelden unter **Einstellungen → Konto → Abmelden** entfernt die
+App die Termine (auch private), Einkaufslisten und Aufgaben dieses Kontos vom Gerät
+und bricht geplante Erinnerungen ab. Das gilt auch, wenn die Sitzung auf andere
+Weise endet, etwa weil das Gerät von einem anderen Gerät aus abgemeldet wurde.
+App-Einstellungen wie Sprache und Darstellung bleiben erhalten. Bereits gesendete
+Inhalte werden nach der nächsten Anmeldung wieder synchronisiert; noch nicht
+gesendete Änderungen gehen verloren.
+
 **Auf dem Server:** Lokale Löschung ist keine Kontolöschung. Nach erneuter Anmeldung
 können noch vorhandene Serverdaten wieder synchronisiert werden. Speicherfristen
 für Konto-, Inhalts-, Verbindungs- und Meldedaten sowie Backups bestimmt der
