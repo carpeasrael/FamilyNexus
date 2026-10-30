@@ -22,7 +22,7 @@ tun muss, steht in Abschnitt 1. Rechtliche Angaben sind Hinweise, keine Rechtsbe
 
 | Bereich | Stand |
 |---|---|
-| Version | `pubspec.yaml`: `1.2.1+20` (Name+Buildnummer). Jeder Upload braucht eine **höhere Buildnummer** (`+2`, …) |
+| Version | `pubspec.yaml`: `1.2.1+21` (Name+Buildnummer). Jeder Upload braucht eine **höhere Buildnummer** (`+2`, …) |
 | Kennungen | Android `de.inneso.familynexus`; iOS/macOS `de.inneso.familynexus` (vereinheitlicht) |
 | Symbole | `tool/make_icons.py` erzeugt alle Größen (Android adaptiv + Legacy, iOS ohne Alpha, macOS) sowie `store/graphics/` (Play-Symbol 512, App-Store-Symbol 1024, Funktionsgrafik 1024×500) |
 | Android | Release: R8/Shrink, `--obfuscate`, Symbole für native Bibliotheken, unsigniert ohne `key.properties`; **App Bundle:** `tool/build_release.sh aab` (≈ 79 MB) |
@@ -74,7 +74,7 @@ Einmalig je Plattform (Team-ID: developer.apple.com → Membership):
 
 1. App-ID `de.inneso.familynexus` registrieren (Developer-Portal → Identifiers) und in App Store Connect je Plattform einen App-Eintrag anlegen (iOS und macOS können unter einem Eintrag mit derselben Bundle-ID laufen).
 2. Team-ID in `ios/ExportOptions.plist` **und** `macos/ExportOptions.plist` eintragen (`HIER_TEAM_ID_EINTRAGEN` ersetzen).
-3. Versionen kommen aus `pubspec.yaml` (`1.2.1+20` → Version 1.2.1, Build 20) und gelten für beide Plattformen; vor jedem Upload die Buildnummer erhöhen.
+3. Versionen kommen aus `pubspec.yaml` (`1.2.1+21` → Version 1.2.1, Build 21) und gelten für beide Plattformen; vor jedem Upload die Buildnummer erhöhen.
 
 Archiv bauen (die Skripte setzen Obfuskierung und Debug-Symbole, ein reines „Product → Archive“ in Xcode ohne vorherigen Flutter-Build tut das nicht):
 
