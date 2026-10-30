@@ -30,4 +30,4 @@ Im Ordner: `Testreport.md` (Kurzfassung), PDFs als `Testreport_<Ordner>_DE.pdf` 
 
 Die Läufe 04 und 05 liefen parallel; die Nummer folgt dem Beginn. Die Bezeichnungen „Lauf 1/2/3“ im Testplan (Anhang E, Issue-Zuordnung) entsprechen den Nummern 03, 05 und 04.
 
-Testpläne: `../Test-Apple/README.md`.
+Testpläne: `../User E2E Test/README.md`.

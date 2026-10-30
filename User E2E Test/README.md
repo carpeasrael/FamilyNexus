@@ -11,4 +11,4 @@
 
 Abgelöst durch den Gesamtplan (nur noch in der Git-Historie): `Testplan_Nutzeranlage.md`, `Testplan_Pruefanleitung.md`, `Testplan_Einladung_Zweiter_Nutzer.md`, `Testdaten_Stammdaten.md`.
 
-Reports: `../Test-Apple-Report/README.md` (chronologisch, ein Ordner je Lauf).
+Reports: `../User E2E Test Report/README.md` (chronologisch, ein Ordner je Lauf).

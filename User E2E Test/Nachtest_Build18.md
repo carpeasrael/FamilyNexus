@@ -1,6 +1,6 @@
 # Nachtest Build 1.2.1 (18)
 
-**Ziel:** Prüfen, ob die Fixes aus PR #52 im Build wirken (#44, #45, #46) und ob #43 auftritt. Bezug: Testplan TP-FN-001 v1.5 (Schritte A-07, E-21, E-25, D-02), Testreport `Test-Apple-Report/2026-10-27_06_iOS-macOS_Build17/`, Issue #15.
+**Ziel:** Prüfen, ob die Fixes aus PR #52 im Build wirken (#44, #45, #46) und ob #43 auftritt. Bezug: Testplan TP-FN-001 v1.5 (Schritte A-07, E-21, E-25, D-02), Testreport `User E2E Test Report/2026-10-27_06_iOS-macOS_Build17/`, Issue #15.
 
 **Dauer:** etwa 45 Minuten. **Konten:** zwei, `fnt-1028-n1` (N1) und `fnt-1028-i2` (I2); Namen am 28.10.2026 frei, sonst Datumsteil/Suffix ändern (fremde Konten nie benutzen). Registrierung am 28.10.2026 offen. Passwörter erzeugt die Testperson und hält sie nur im Passwortmanager.
 
@@ -56,4 +56,4 @@ Eingabe auf einem **echten iPhone mit Bildschirmtastatur**. Im Simulator gingen 
 | #46 | ☐ behoben ☐ nicht behoben | bei ✅ schließen |
 | #43 | ☐ aufgetreten (Zeiten, HTTP-Status) ☐ nicht aufgetreten | bei „nicht aufgetreten“ als „nicht reproduzierbar“ begründen, sonst Debug-Protokoll anhängen |
 
-Ergebnisse als `Test-Apple-Report/<Lauf-Ordner>/Nachtest_Build18.md` ablegen, Bilder in `screenshots/`, Issue #15 aktualisieren.
+Ergebnisse als `User E2E Test Report/<Lauf-Ordner>/Nachtest_Build18.md` ablegen, Bilder in `screenshots/`, Issue #15 aktualisieren.

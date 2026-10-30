@@ -118,7 +118,7 @@ Eine **zusammenhängende** Aufnahme auf G1, ohne Schnitt. Sie beginnt auf dem Ho
 | K-08 | Nachher | W1 gelöscht: Anmeldung mit W1 bei account.matrix.org scheitert. R1 und R2 weiter nutzbar (V-07, V-09 kurz wiederholen); R2 nicht blockiert | | |
 | K-09 | macOS (nur falls eingereicht) | Gleiche Prüfungen für die Aufnahme auf G3; „click and hold“ statt lange drücken | | |
 
-Ablage: `Test-Apple-Report/<Lauf-Ordner>/video/FamilyNexus_1.2.1_<Build>_iPhone.mov` (nicht in Git, falls größer als 50 MB: nur Prüfsumme und Ablageort im Report).
+Ablage: `User E2E Test Report/<Lauf-Ordner>/video/FamilyNexus_1.2.1_<Build>_iPhone.mov` (nicht in Git, falls größer als 50 MB: nur Prüfsumme und Ablageort im Report).
 
 ## 5. Funktionsprüfung des Builds auf physischen Geräten (Guideline 2.1)
 
@@ -173,7 +173,7 @@ Der Entwurf steht in Anhang A. Jede Aussage wird gegen App, Code oder Unterlagen
 
 **Bestanden**, wenn Abschnitt 2 vollständig ist, V-01 bis V-14, alle Szenen S-01 bis S-14, K-01 bis K-08, F-01 bis F-06, T-01 bis T-10, P-01 bis P-05 und H-01 bis H-06 ✅ oder begründet „n/a“ sind. ⚠️ nur mit Issue und nur, wenn der Befund weder im Video noch beim Weg aus den Review-Notizen auftritt. Erst danach wird die Antwort abgeschickt (H-02).
 
-**Report:** Kopie dieses Plans mit ausgefüllten Spalten als `Test-Apple-Report/<JJJJ-MM-TT>_<NN>_Verifikation_iPhone_Build<NN>/Testreport.md` (Benennung nach `Test-Apple-Report/README.md`), dazu `screenshots/`, `logs/`, Videoablage (K-07) und die tatsächlich abgeschickte Antwort als `Antwort_App_Review.md` (ohne Passwörter und Schlüssel). Eintrag in der Tabelle von `Test-Apple-Report/README.md`.
+**Report:** Kopie dieses Plans mit ausgefüllten Spalten als `User E2E Test Report/<JJJJ-MM-TT>_<NN>_Verifikation_iPhone_Build<NN>/Testreport.md` (Benennung nach `User E2E Test Report/README.md`), dazu `screenshots/`, `logs/`, Videoablage (K-07) und die tatsächlich abgeschickte Antwort als `Antwort_App_Review.md` (ohne Passwörter und Schlüssel). Eintrag in der Tabelle von `User E2E Test Report/README.md`.
 
 ## Anhang A: Entwurf der Antwort an App Review (Englisch)
 
