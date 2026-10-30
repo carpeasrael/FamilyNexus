@@ -62,3 +62,6 @@ User E2E Test/screenshots/geraet/
 
 # Review-Videos (groß, nur Prüfsumme im Report)
 User E2E Test/verification_1.2.1/*.mov
+
+# Wegwerf-Zertifikat der Pen-Test-Server (wird lokal erzeugt, siehe pen-Test/Pentest-Report_*.md)
+pen-Test/tests/*.pem

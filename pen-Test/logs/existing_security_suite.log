@@ -1,0 +1,128 @@
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.2 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  dev_build 1.1.15 (1.1.16 available)
+  file_picker 13.1.0 (13.3.0 available)
+  file_picker_darwin 2.3.2 (2.4.0 available)
+  flutter_local_notifications 22.3.2 (22.3.3 available)
+  hooks 2.0.2 (2.2.0 available)
+  jni 1.1.0 (1.1.1 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.3 (1.19.0 available)
+  native_toolchain_c 0.19.2 (0.19.5 available)
+  objective_c 9.5.0 (9.6.2 available)
+  petitparser 7.0.2 (7.1.0 available)
+  posix 6.5.2 (6.5.4 available)
+  record_use 0.6.0 (1.1.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common_ffi 2.4.4 (2.4.5 available)
+  sqlite3 3.5.2 (3.8.0 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.4 available)
+  web 1.1.1 (1.1.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+24 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart
+00:00 +0: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: (setUpAll)
+00:00 +0: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks Ausgangslink ist gültig (Kontrolle für die Angriffe)
+00:00 +1: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks 2000 zufällig mutierte Links: nie eine Ausnahme; angenommene Links sind in sich stimmig
+00:00 +2: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks 2000 zufällig mutierte Links: nie eine Ausnahme; angenommene Links sind in sich stimmig
+00:00 +3: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks 2000 zufällig mutierte Links: nie eine Ausnahme; angenommene Links sind in sich stimmig
+00:00 +4: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks 2000 zufällig mutierte Links: nie eine Ausnahme; angenommene Links sind in sich stimmig
+00:00 +5: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks 2000 zufällig mutierte Links: nie eine Ausnahme; angenommene Links sind in sich stimmig
+00:00 +6: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks 2000 zufällig mutierte Links: nie eine Ausnahme; angenommene Links sind in sich stimmig
+00:00 +7: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks 2000 zufällig mutierte Links: nie eine Ausnahme; angenommene Links sind in sich stimmig
+00:00 +8: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks 2000 zufällig mutierte Links: nie eine Ausnahme; angenommene Links sind in sich stimmig
+00:00 +9: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks 2000 zufällig mutierte Links: nie eine Ausnahme; angenommene Links sind in sich stimmig
+00:00 +10: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks 2000 zufällig mutierte Links: nie eine Ausnahme; angenommene Links sind in sich stimmig
+00:00 +11: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks 2000 zufällig mutierte Links: nie eine Ausnahme; angenommene Links sind in sich stimmig
+00:00 +12: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks Regression: ungültige Prozentkodierung wirft nicht (präparierter Deep Link/QR)
+00:00 +13: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks Angriffsmuster werden abgelehnt
+00:00 +14: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Einladungslinks abgelaufene und zu weit in der Zukunft liegende Links
+00:00 +15: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Server-Eingabe (SSRF / Downgrade) nur https, keine Zugangsdaten, kein Pfad/Query/Fragment
+00:00 +16: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Server-Eingabe (SSRF / Downgrade) Eingaben werden zu https normalisiert; Host-Großschreibung egal
+00:00 +17: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Server-Eingabe (SSRF / Downgrade) Zufallsfuzz: nie eine Ausnahme, Ergebnis ist immer https ohne Zusätze
+00:00 +18: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Matrix-IDs (Injektion) lehnt Steuerzeichen, Leerraum, Bidi und Überlänge ab
+00:00 +19: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Fremde Kalender-Ereignisse (nicht vertrauenswürdig) Fälschung in fremdem Namen wird verworfen
+00:00 +20: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Fremde Kalender-Ereignisse (nicht vertrauenswürdig) 3000 Mutationen (falsche Typen, Riesenwerte, NaN, verschachtelt): nie eine Ausnahme
+00:00 +21: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Fremde Kalender-Ereignisse (nicht vertrauenswürdig) Textfelder mit Bidi-/Steuerzeichen oder Überlänge werden nicht ungeprüft übernommen
+00:00 +22: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Fremde Kalender-Ereignisse (nicht vertrauenswürdig) Regression: RSVP mit Zeitstempel außerhalb des DateTime-Bereichs wirft nicht
+00:00 +23: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Fremde Kalender-Ereignisse (nicht vertrauenswürdig) RSVP-Dekodierung: Müll liefert null statt Ausnahme
+00:00 +24: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Aufgabenlisten (fremde Ereignisse) Listen: 3000 Mutationen, nie eine Ausnahme; Angenommenes ist gültig und vom Absender
+00:00 +25: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Aufgabenlisten (fremde Ereignisse) Protokoll: 3000 Mutationen, nie eine Ausnahme; Angenommenes ist gültig und vom Absender
+00:00 +26: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Aufgabenlisten (fremde Ereignisse) Fälschung in fremdem Namen, Zeit- und Periodenmanipulation
+00:00 +27: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Aufgabenlisten (fremde Ereignisse) Vorab- oder Rückdatierung zählt nicht: Datum muss zum Zeitpunkt in der Listenzone passen
+00:00 +28: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Aufgabenlisten (fremde Ereignisse) Nicht zugewiesene Person oder fremde Liste: Eintrag zählt nie
+00:00 +29: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Aufgabenlisten (fremde Ereignisse) Speicherschutz: zu viele Punkte, überlange Titel, doppelte IDs
+00:00 +30: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Anhänge Pfad-Traversal, Bidi-Tarnung und Steuerzeichen in Dateinamen
+00:00 +31: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Anhänge ausführbare Dateien und Skripte werden nie angenommen, auch nicht doppelt getarnt
+00:00 +32: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Anhänge Größenlimit und eingehende Metadaten
+00:00 +33: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Anzeigenamen / Spoofing unsichtbare Zeichen, Bidi-Umkehr und Zeilenumbrüche werden entfernt
+00:00 +34: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Anzeigenamen / Spoofing Reaktionsschlüssel: kein Text-/HTML-/Steuerzeichen-Einschleusen
+00:00 +35: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: Anzeigenamen / Spoofing Zufallsfuzz: clean() wirft nie und überschreitet das Limit nicht
+00:00 +36: /home/carpeasrael/Project_dev/FamilyNexus/test/security/penetration_test.dart: (tearDownAll)
+00:02 +36: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: HttpsOnlyClient (TLS-Pflicht für alle SDK-Verbindungen) lehnt http ab, ohne die Anfrage abzusetzen
+00:02 +37: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: HttpsOnlyClient (TLS-Pflicht für alle SDK-Verbindungen) erlaubt https und deaktiviert Weiterleitungen
+00:02 +38: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: HttpsOnlyClient (TLS-Pflicht für alle SDK-Verbindungen) lehnt weitere Schemata ab
+00:02 +39: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: SDK-Logs schwerer SDK-Fehler: nur der Typ landet im Log, Text/Titel nie
+00:02 +40: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: SDK-Logs Debug-/Info-Ereignisse mit Inhalt werden gar nicht weitergegeben
+00:02 +41: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: SDK-Logs Ruhige Zone verschluckt print vollständig
+00:02 +42: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: Familienraum-Spezifikation (E-12) Anfangszustand: Megolm, Verlauf für Mitglieder, anklopfbar
+00:02 +43: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: Familienraum-Spezifikation (E-12) Ersteller ist Administrator (100, in der App Moderator), alle anderen 0 (E-61)
+00:02 +44: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: Familienraum-Spezifikation (E-12) Moderationsrechte liegen auf 50, Rollenänderung ebenfalls
+00:02 +45: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: Familienraum-Spezifikation (E-12) unveränderliche Zustände liegen unerreichbar über dem Administrator
+00:02 +46: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: Familienraum-Spezifikation (E-12) jeder beim Anlegen gesetzte Zustand ist für den Ersteller (100) erlaubt
+00:02 +47: /home/carpeasrael/Project_dev/FamilyNexus/test/data/gateway_security_test.dart: Familienraum-Spezifikation (E-12) Raumversion 10 (Ersteller ohne unendliche Macht)
+00:02 +48: /home/carpeasrael/Project_dev/FamilyNexus/test/data/oauth_redirect_test.dart: TP-OAUTH-06 Desktop: Rücksprung über 127.0.0.1 mit zufälligem Port, nur GET /oauth, danach geschlossen
+00:02 +49: /home/carpeasrael/Project_dev/FamilyNexus/test/data/vault_key_store_test.dart: Schlüssel werden einmal zufällig erzeugt und bleiben nach erneutem Entsperren gleich
+00:02 +50: /home/carpeasrael/Project_dev/FamilyNexus/test/data/vault_key_store_test.dart: Schlüssel werden einmal zufällig erzeugt und bleiben nach erneutem Entsperren gleich
+00:02 +51: /home/carpeasrael/Project_dev/FamilyNexus/test/data/oauth_redirect_test.dart: Mobil: nur Links im App-Schema mit Pfad /oauth zählen
+00:02 +52: /home/carpeasrael/Project_dev/FamilyNexus/test/data/vault_key_store_test.dart: Parallele Aufrufe liefern denselben Schlüssel und verlieren keine Einträge
+00:02 +53: /home/carpeasrael/Project_dev/FamilyNexus/test/data/oauth_redirect_test.dart: R2: ein neuer Versuch beendet den alten, der alte stört den neuen nicht
+00:02 +54: /home/carpeasrael/Project_dev/FamilyNexus/test/data/vault_key_store_test.dart: Fehlgeschlagenes Speichern erzeugt keinen Schlüssel im Speicher und blockiert nichts
+00:02 +55: /home/carpeasrael/Project_dev/FamilyNexus/test/data/oauth_redirect_test.dart: Zeitüberschreitung liefert null
+00:02 +56: /home/carpeasrael/Project_dev/FamilyNexus/test/data/oauth_redirect_test.dart: Zeitüberschreitung liefert null
+00:02 +57: /home/carpeasrael/Project_dev/FamilyNexus/test/data/oauth_redirect_test.dart: Zeitüberschreitung liefert null
+00:02 +58: /home/carpeasrael/Project_dev/FamilyNexus/test/data/oauth_redirect_test.dart: Zeitüberschreitung liefert null
+00:03 +59: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: liefert Versionen, Passwort-Login und Betreiber
+00:03 +60: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: folgt well-known nur zu https-Zielen
+00:03 +61: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: übernimmt gültiges https-well-known
+00:03 +62: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Server ohne Versionen → nicht unterstützt
+00:03 +63: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Müll-/Übergrößen-Antworten werden ignoriert
+00:03 +64: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Betreiberangaben werden bereinigt und gekürzt
+00:03 +65: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Mindestversion v1.1 wird verlangt; höchste Version wird zuletzt geführt
+00:03 +66: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Nicht-Map in well-known/m.homeserver wirft nicht, sondern wird ignoriert
+00:03 +67: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Admin-Kontakt wird bevorzugt
+00:03 +68: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Nicht-200-Antworten werden wie „nicht vorhanden“ behandelt
+00:03 +69: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Kontoanlage (E-55) TP-OAUTH-01 Anbieter mit OAuth (wie matrix.org): Browser-Weg, Hinweis in der Serverprüfung
+00:03 +70: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Kontoanlage (E-55) unsichere OAuth-Angaben (http) zählen nicht
+00:03 +71: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Kontoanlage (E-55) R11 nur der stabile Pfad zählt (das SDK nutzt nur v1); Token-Endpunkt ohne https zählt nicht
+00:03 +72: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Kontoanlage (E-55) R10 vorübergehende Fehler der Registrierungsabfrage: kein „abgeschaltet“, sondern Fehler zum erneuten Versuch
+00:03 +73: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Kontoanlage (E-55) klassische Registrierung: 401 mit unterstützten Abläufen → in der App; Anfrage ohne Zugangsdaten
+00:03 +74: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Kontoanlage (E-55) TP-REG-09 abgeschaltet (403) oder nur Telefon → disabled, Hilfeseite des Anbieters
+00:03 +75: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Kontoanlage (E-55) Benutzername: frei, vergeben, ungültig, Fehler → unbekannt
+00:03 +76: /home/carpeasrael/Project_dev/FamilyNexus/test/data/server_probe_test.dart: Kontoanlage (E-55) Abläufe aus der Serverantwort werden begrenzt gelesen
+00:03 +77: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: (setUpAll)
+00:03 +77: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: #28: Anmeldung gelingt, ein Folgeschritt scheitert kein „Unbekannter Fehler.“: die Sitzung steht
+00:03 +78: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: #28: Anmeldung gelingt, ein Folgeschritt scheitert falsches Passwort bleibt ein Fehler
+00:03 +79: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Bedingungen → Captcha: Sitzung und erledigte Schritte werden weitergegeben, Captcha-Seite des Servers
+00:03 +80: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) falscher Zugangscode → „passt nicht“; Code wird im Feld token gesendet
+00:03 +81: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Platzhalterschritt (dummy) wird selbst erledigt; Endlosschleife des Servers wird abgebrochen
+00:03 +82: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) nur nicht unterstützte Abläufe → registrationDisabled
+00:03 +83: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Fehlerzuordnung: vergeben, ungültig, schwaches Passwort, abgeschaltet
+00:03 +84: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) Abbrechen verwirft die Registrierung samt Passwort; Anmelden ebenso (R4)
+00:03 +85: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: UIA-Registrierung (SdkMatrixGateway) lokale Prüfungen vor jeder Anfrage
+00:03 +86: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) (setUpAll)
+00:03 +86: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) Start: dynamische Client-Anmeldung, PKCE S256, state, prompt=create
+00:03 +87: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) R12 unsicherer Token-Endpunkt: Abbruch, bevor sich die App beim Anbieter anmeldet
+00:03 +88: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) nur eigene Rücksprungadressen; fremder state wird verworfen, Anmeldung bleibt offen (R8)
+00:03 +89: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) Ablehnung beim Anbieter (error=access_denied) beendet die Anmeldung
+00:03 +90: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) Desktop-Rücksprung über 127.0.0.1 wird angenommen, Fragment und Query werden gelesen
+00:03 +91: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: OAuth (SdkMatrixGateway) (tearDownAll)
+00:03 +91: /home/carpeasrael/Project_dev/FamilyNexus/test/data/sdk_registration_test.dart: (tearDownAll)
+00:03 +91: All tests passed!

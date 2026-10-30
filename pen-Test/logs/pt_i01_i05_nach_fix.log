@@ -1,0 +1,61 @@
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.2 available)
+  code_assets 1.2.1 (2.1.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  dev_build 1.1.15 (1.1.16 available)
+  file_picker 13.1.0 (13.3.0 available)
+  file_picker_darwin 2.3.2 (2.4.0 available)
+  flutter_local_notifications 22.3.2 (22.3.3 available)
+  hooks 2.0.2 (2.2.0 available)
+  jni 1.1.0 (1.1.1 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.3 (1.19.0 available)
+  native_toolchain_c 0.19.2 (0.19.5 available)
+  objective_c 9.5.0 (9.6.2 available)
+  petitparser 7.0.2 (7.1.0 available)
+  posix 6.5.2 (6.5.4 available)
+  record_use 0.6.0 (1.1.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common_ffi 2.4.4 (2.4.5 available)
+  sqlite3 3.5.2 (3.8.0 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.4 available)
+  web 1.1.1 (1.1.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+24 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart
+00:00 +0: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: Transportverschlüsselung PT-N1: HttpsOnlyClient lehnt http:// ab (auch bei manipuliertem Ziel)
+00:00 +0: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_logging_test.dart: PT-G1: typische Geheimnisse werden geschwärzt
+PT-G1 Zugangs-Token: request failed access_token=***
+PT-G1 Bearer-Header: Authorization=***
+PT-G1 Matrix-ID: user @***:*** failed
+PT-G1 Raum-ID: room !***:***
+PT-G1 DB-Schlüssel: key=***
+00:00 +1: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: Transportverschlüsselung PT-N1: HttpsOnlyClient lehnt http:// ab (auch bei manipuliertem Ziel)
+00:00 +1: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_logging_test.dart: PT-G1b: Passwort in JSON-Schreibweise ("password":"…") wird geschwärzt (F-07 behoben)
+PT-G1b: {"password=***}
+00:00 +2: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_logging_test.dart: PT-G1b: Passwort in JSON-Schreibweise ("password":"…") wird geschwärzt (F-07 behoben)
+00:00 +3: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: Transportverschlüsselung PT-N2: MITM mit selbstsigniertem Zertifikat – Serverprüfung bricht ab (Standard-Client der App)
+00:00 +3: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_logging_test.dart: PT-G2: Notfall-Schlüssel im Matrix-Format (Vierergruppen mit Leerzeichen) ohne Stichwort
+PT-G2: Wiederherstellung fehlgeschlagen für ***
+00:00 +4: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: Transportverschlüsselung PT-N2: MITM mit selbstsigniertem Zertifikat – Serverprüfung bricht ab (Standard-Client der App)
+00:00 +5: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: Transportverschlüsselung PT-N2: MITM mit selbstsigniertem Zertifikat – Serverprüfung bricht ab (Standard-Client der App)
+00:00 +6: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: Transportverschlüsselung PT-N3: MITM gegen den lokalen Synapse (Caddy, selbstsigniert) – App-Client verweigert
+  Skip: nur mit laufendem tool/synapse/up.sh
+00:00 +6 ~1: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: Bösartiger Homeserver PT-N4: Weiterleitung https → http wird nicht verfolgt (Downgrade)
+00:00 +7 ~1: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: Bösartiger Homeserver PT-N5: .well-known mit http-/Fremd-Basis wird ignoriert
+00:00 +8 ~1: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: Bösartiger Homeserver PT-N6: Übergroße / endlose Antwort wird begrenzt (Speicher-DoS)
+00:00 +8 ~1: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_permissions_test.dart: PT-L1: Datenverzeichnis und vorhandene Dateien nur für den eigenen Benutzer
+PT-L1: app=700 databases=700 alt.db=600
+00:00 +8 ~1: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: Bösartiger Homeserver PT-N6: Übergroße / endlose Antwort wird begrenzt (Speicher-DoS)
+PT-N6: Abbruch nach 127 ms
+00:00 +9 ~1: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_permissions_test.dart: PT-L1: Datenverzeichnis und vorhandene Dateien nur für den eigenen Benutzer
+00:00 +10 ~1: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: Bösartiger Homeserver PT-N7: Hängender Server (Slowloris) – Zeitschranke greift
+00:02 +11 ~1: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: Bösartiger Homeserver PT-N8: OAuth-Metadaten mit http-Endpunkt / Zugangsdaten in URL → kein OAuth
+PT-N8: Kontakt nach Bereinigung: "@admin :evil <script>"
+00:02 +12 ~1: /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_network_test.dart: OAuth-Loopback-Empfänger (Desktop) PT-N9: nur 127.0.0.1, nur GET /oauth, nach Abbruch geschlossen
+00:02 +13 ~1: All tests passed!

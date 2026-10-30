@@ -1,0 +1,27 @@
+Resolving dependencies...
+Downloading packages...
+  cross_file 0.3.5+5 (0.4.0 available)
+Got dependencies!
+24 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_invite_race_e2e_test.dart
+00:00 +0: (setUpAll)
+00:00 +0: PT-A1: Race – derselbe Auto-Link, zwei gleichzeitige Anfragen
+PT-A1: C eingeladen=true, D eingeladen=true; Status bei A: C=invited, D=invited
+00:16 +0 -1: PT-A1: Race – derselbe Auto-Link, zwei gleichzeitige Anfragen [E]
+  Expected: false
+    Actual: <true>
+  Einmal-Link darf nur EINE Person einladen
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  pen-Test/tests/pt_invite_race_e2e_test.dart 57:5    main.<fn>
+  
+00:16 +0 -1: PT-A2: erfundene Link-ID → keine automatische Einladung
+00:23 +1 -1: PT-A3: Mitglied fälscht Link-Vermerk (auto=true) → ignoriert
+PT-A3: Prüfergebnis bei A: unknown, X eingeladen=false
+00:34 +2 -1: (tearDownAll)
+00:35 +2 -1: Some tests failed.
+
+Failing tests:
+  /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_invite_race_e2e_test.dart: PT-A1: Race – derselbe Auto-Link, zwei gleichzeitige Anfragen

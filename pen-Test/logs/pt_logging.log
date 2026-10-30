@@ -1,0 +1,13 @@
+00:00 +0: loading /home/carpeasrael/Project_dev/FamilyNexus/pen-Test/tests/pt_logging_test.dart
+00:00 +0: PT-G1: typische Geheimnisse werden geschwärzt
+PT-G1 Zugangs-Token: request failed access_token=***
+PT-G1 Bearer-Header: Authorization=***
+PT-G1 Matrix-ID: user @***:*** failed
+PT-G1 Raum-ID: room !***:***
+PT-G1 DB-Schlüssel: key=***
+00:00 +1: PT-G1b: Passwort in JSON-Schreibweise ("password":"…") wird NICHT geschwärzt
+PT-G1b: {"password=***Sommer2026!"}
+00:00 +2: PT-G2: Notfall-Schlüssel im Matrix-Format (Vierergruppen mit Leerzeichen) ohne Stichwort
+PT-G2: Wiederherstellung fehlgeschlagen für EsTc 5rr1 4Jhp Uc18 hwCn 2b9T tSvj 5h4T TXBk 1VZD f3Zw 4Kmz
+00:00 +3: PT-G3: AppLog.e gibt nie den Fehlertext aus
+00:00 +4: All tests passed!
