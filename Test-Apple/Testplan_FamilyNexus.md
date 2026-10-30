@@ -1,10 +1,10 @@
 # Testplan FamilyNexus (Gesamtplan)
 
-**Planversion: 1.7** (29.10.2026) · Dokument-ID `TP-FN-001` · Änderungen siehe „Versionshistorie“ am Ende und Anhang E. Reports und Issues nennen Planversion und Git-Commit (z. B. „TP-FN-001 v1.0 @ 4abf400“).
+**Planversion: 1.8** (30.10.2026) · Dokument-ID `TP-FN-001` · Änderungen siehe „Versionshistorie“ am Ende und Anhang E. Reports und Issues nennen Planversion und Git-Commit (z. B. „TP-FN-001 v1.0 @ 4abf400“).
 
 Ersetzt: `Testplan_Nutzeranlage.md`, `Testplan_Pruefanleitung.md`, `Testplan_Einladung_Zweiter_Nutzer.md`, `Testdaten_Stammdaten.md` (Zuordnung der alten IDs: Anhang C)
 Bezug: `Massnahmenplan_App_Store_Review.md` (Maßnahme 6), Issues #10–#14, Nachtest #15
-Soll-Version der App: `version:` in `pubspec.yaml` auf aktuellem `main` (beim Schreiben **1.2.1+20** = „1.2.1 (20)“) · Stand: 29.10.2026 (überarbeitet nach den Läufen vom 26. bis 28.10.2026, siehe Anhang E). **Achtung:** Die Build-Nummer 16 gibt es mit und ohne den Fix aus PR #22 (`88dc3ca` setzte 1.2.1+16 vor dem Merge `d20f0e0`); im Report daher immer auch den Commit des installierten Builds nennen. **Ab Plan v1.5** gelten die Erwartungen für Builds mit den Fixes aus PR #41 (Issues #24 bis #40, Merge-Commit `532bc62`); ältere Builds zeigen die in Anhang E genannten Befunde, sie werden dann als ⚠️/❌ mit Issue-Nummer eingetragen. **Ab Plan v1.6** gelten zusätzlich die Erwartungen für Builds mit den Fixes vom 28.10.2026 (Issues #43, #56, #57, #59, #60, #62 bis #68); Builds bis 1.2.1 (18) zeigen dort noch die alten Befunde (→ ⚠️ mit Issue-Nummer); **ab Plan v1.7** gelten zusätzlich die Erwartungen für Builds ab 1.2.1 (20) (Fixes und Maßnahmen zu #75 bis #78); in 1.2.1 (19) zeigen B-19 (#78) und E-18 (#77) noch den alten Befund (→ ⚠️), D-02 (#75), E-23 (#76), B-02 und B-10 (#57) sowie E-07 und E-12 (#59) sind nachzutesten
+Soll-Version der App: `version:` in `pubspec.yaml` auf aktuellem `main` (beim Schreiben **1.2.1+20** = „1.2.1 (20)“) · Stand: 29.10.2026 (überarbeitet nach den Läufen vom 26. bis 28.10.2026, siehe Anhang E). **Achtung:** Die Build-Nummer 16 gibt es mit und ohne den Fix aus PR #22 (`88dc3ca` setzte 1.2.1+16 vor dem Merge `d20f0e0`); im Report daher immer auch den Commit des installierten Builds nennen. **Ab Plan v1.5** gelten die Erwartungen für Builds mit den Fixes aus PR #41 (Issues #24 bis #40, Merge-Commit `532bc62`); ältere Builds zeigen die in Anhang E genannten Befunde, sie werden dann als ⚠️/❌ mit Issue-Nummer eingetragen. **Ab Plan v1.6** gelten zusätzlich die Erwartungen für Builds mit den Fixes vom 28.10.2026 (Issues #43, #56, #57, #59, #60, #62 bis #68); Builds bis 1.2.1 (18) zeigen dort noch die alten Befunde (→ ⚠️ mit Issue-Nummer); **ab Plan v1.7** gelten zusätzlich die Erwartungen für Builds ab 1.2.1 (20) (Fixes und Maßnahmen zu #75 bis #78); in 1.2.1 (19) zeigen B-19 (#78) und E-18 (#77) noch den alten Befund (→ ⚠️), D-02 (#75), E-23 (#76), B-02 und B-10 (#57) sowie E-07 und E-12 (#59) sind nachzutesten; **ab Plan v1.8** gilt zusätzlich Abschnitt H (Verschlüsselung auf dem Gerät und Datenaustausch, H-01 bis H-19; keine Änderung an A bis G)
 
 ## 1. Ziel und Aufbau
 
@@ -91,7 +91,7 @@ Vor dem Lauf wird für **beide Geräte** festgelegt und im Report eingetragen, a
 
 Passwörter erzeugt der Tester beim Anlegen (mind. 8 Zeichen, Passwortmanager). Passwörter und Schlüssel stehen weder im Plan noch im Report, sondern nur im Passwortmanager oder in `../secure/` (von Git ignoriert).
 
-**Reihenfolge ist verbindlich:** A → B → C → D → E → F. Konten werden **erst in F** (und in E-32) gelöscht. Vor F-01 müssen alle Schritte E-01 bis E-31 (insbesondere die Mehrnutzer-Schritte E-14 bis E-27) abgeschlossen oder begründet als ⏳ eingetragen sein; wer F früher beginnt, verliert die Konten für diese Schritte (so im Lauf vom 26.10. geschehen: E-14 bis E-27 fehlten). Vor dem Beginn von F die Abnahme von E im Report abhaken.
+**Reihenfolge ist verbindlich:** A → B → C → D → E → H (H-01 bis H-17) → F (mit H-18 nach F-04 und H-19 nach F-05). Konten werden **erst in F** (und in E-32) gelöscht. Vor F-01 müssen alle Schritte E-01 bis E-31 sowie H-01 bis H-17 (insbesondere die Mehrnutzer-Schritte E-14 bis E-27) abgeschlossen oder begründet als ⏳ eingetragen sein; wer F früher beginnt, verliert die Konten für diese Schritte (so im Lauf vom 26.10. geschehen: E-14 bis E-27 fehlten). Vor dem Beginn von F die Abnahme von E im Report abhaken.
 
 **Namen aus früheren Läufen:** Gelöschte Konten bleiben auf dem Server als „vergeben“ (`M_USER_IN_USE`). Am selben Tag erhält jeder Lauf einen eigenen Datumsteil (`1026`, `1026b`, `1026c` …). Altkonten eines abgebrochenen Laufs sind im Report als Zustand am Ende (F-08) zu führen.
 
@@ -245,6 +245,48 @@ G2 zeigt nach D-06 „Willkommen“ (N2 ist abgemeldet und wird erst in F-01 wie
 | G-07 | G1 | **Durchlauf mit einer Person ohne Vorwissen:** A-01 bis A-12 und B-01 bis B-03 nach Anleitung | Ohne Rückfrage ausführbar; Rückfragen notieren | | – | |
 | G-08 | Web | **Nur Plattform Web:** erster Aufruf → „Browser-Tresor einrichten“ (Passwort < 10 Zeichen, nicht übereinstimmend, dann gültig); Seite neu laden → „FamilyNexus entsperren“ (falsches, dann richtiges Passwort); zweiten Tab öffnen; „Passwort vergessen? Alle lokalen Daten löschen“ | „Mindestens 10 Zeichen.“, „Die Passwörter stimmen nicht überein.“, „Falsches Passwort.“; Entsperren klappt; zweiter Tab: „FamilyNexus ist schon geöffnet“; Löschen führt zu „Willkommen“ | | G-08a … | |
 
+### H. Verschlüsselung auf dem Gerät und Datenaustausch
+
+**Zweck:** Nachweis, dass (1) die Daten auf dem Gerät nur verschlüsselt liegen und der Schlüssel nicht neben den Daten steht, (2) der Server und Dritte nur Chiffretext und Metadaten sehen und (3) Dateien, die die App bewusst verlassen (Anhang speichern, Notfall-Schlüssel, Protokoll), das tun, was die App vorher ankündigt. Befehle und Auswertung: Anhang F.
+
+**Reihenfolge:** H-01 bis H-17 laufen **nach E und vor F** mit den Daten aus B und E (G1 = N1, G2 = I2; Konten und Familie F1 bestehen noch). H-18 folgt auf F-04, H-19 auf F-05 und vor F-06. Die Schritte brauchen die Beispieldaten aus B und E; fehlen sie, den Schritt als ⏳ eintragen.
+
+**Regeln für den Lauf:** Datenbankdateien nur als **Kopie bei beendeter App** untersuchen, nie das Original öffnen. Passwörter, Zugangstoken, Notfall-Schlüssel und Schlüsselbund-Werte stehen weder in der Konsolenausgabe des Reports noch in Screenshots; Treffer werden gezählt, nicht ausgegeben. Das Schlüsselbund-Passwort des Geräts gibt nur der Besitzer selbst ein (automatisierte Läufe tragen dann ⏳ ein). Vor dem Lauf eigene Suchbegriffe festlegen, die in den Beispieldaten **eindeutig** vorkommen, z. B. `Testfamilie MMTT`, `Test geteilt 2`, `Hallo von Nutzer 1`, `Nur für dich`, `Test N1` und den Inhalt der Textdatei aus E-17 (z. B. eine Zufallszeichenfolge `FN-ANHANG-<6 Ziffern>`).
+
+#### H.1 Daten und Schlüssel auf dem Gerät (G1)
+
+| ID | Gerät | Schritt | Erwartetes Ergebnis | Beobachtetes Ergebnis | Screenshot | Erg. |
+|---|---|---|---|---|---|---|
+| H-01 | G1 | Einstellungen → „Über die App“ → „Speicherorte“ lesen; **„Datenbank-Ordner“** als `D` notieren (Pfad in den Report, kein Benutzername nötig) | Zeilen „Datenbank-Ordner“, „App-Daten: Termine, Listen, Einstellungen (verschlüsselt)“, „Chat- und Abgleichsdaten: Matrix (verschlüsselt)“, „Datenbankschlüssel“ mit dem Schlüsselspeicher der Plattform (Apple: „Schlüsselbund des Geräts (nicht in iCloud)“; Android: „Android Keystore (an dieses Gerät gebunden)“; Linux: „Schlüsselbund des Systems (Secret Service)“; Windows: „Windows-Anmeldeinformationsverwaltung“; Web: „Passwortgeschützter Tresor im Browser-Speicher (localStorage)“); „Online beim Matrix-Anbieter“ | | H-01-G1 | |
+| H-02 | G1 | App beenden. In `D` die Dateien auflisten und **Kopien** in einen eigenen Ordner legen (Anhang F, F.1). Plattform-Zugang: macOS und Linux direkt; iOS-Simulator über `xcrun simctl get_app_container booted de.inneso.familynexus data`; Android nur mit Debug-Build über `run-as`, sonst n/a; iPhone und Web n/a | Es gibt genau die zwei Datenbanken `familynexus_app.db` (App-Daten) und `familynexus_matrix.db` (Chat/Matrix), Größe > 0, ggf. mit `-wal`, `-shm` oder `-journal`. Es gibt keine weitere Datei mit Termin-, Chat- oder Einkaufsdaten (z. B. `.json`, `.txt`, `.csv`, Bilder) | | – (Auflistung, Namen und Größen) | |
+| H-03 | G1 | Kopien prüfen: ersten 16 Byte lesen (`head -c 16 … \| xxd`), `file …`, `sqlite3 <Kopie> "select count(*) from sqlite_master;"` (Anhang F, F.1) | Der Kopf lautet **nicht** `SQLite format 3` (bei SQLCipher sind alle 16 Byte Zufallsdaten); `file` meldet `data`; `sqlite3` ohne Schlüssel meldet „file is not a database“ bzw. „file is encrypted or is not a database“. Gilt für beide Datenbanken | | – (Konsolenausgabe) | |
+| H-04 | G1 | **Keine Klartextreste:** alle Suchbegriffe (siehe Regeln) in beiden Datenbanken **und** den `-wal`/`-journal`-Dateien suchen: `strings -n 6 <Datei> \| grep -c -F -e "<Begriff>"`; danach rekursiv über den gesamten App-Datenordner (`grep -rIlaF`), also auch Zwischenspeicher (Cache), Einstellungen und Protokolle. **Gegenprobe:** dieselbe Suche im lokalen Protokoll aus B-21 (gespeichert als Datei) | 0 Treffer in beiden Datenbanken, den Zusatzdateien und im übrigen App-Datenordner (Ausnahme: bewusst gespeicherte Dateien aus H-08 liegen außerhalb des Ordners); die Gegenprobe findet die Begriffe (Treffer > 0), die Suche ist also wirksam. Treffer im Cache/Verzeichnis außerhalb der Datenbank → ❌ mit Dateiname | | – (Zählung je Begriff und Datei) | |
+| H-05 | G1 | **Schlüssel im Schlüsselspeicher:** macOS: Schlüsselbundverwaltung → Suche „fn.key“ (nur ansehen, **Wert nicht anzeigen**); Linux: `secret-tool search --all service fn` bzw. Seahorse; Windows: Anmeldeinformationsverwaltung; iOS, iPadOS, Android, Web: Inhalt nicht einsehbar → n/a. | Es gibt Einträge `fn.key.db.app` und `fn.key.db.matrix` (zwei getrennte Schlüssel); macOS: im Bund „Anmeldung“/„login“, **nicht** im iCloud-Schlüsselbund; Name und Art stimmen mit „Datenbankschlüssel“ aus H-01 überein | | H-05-G1 | |
+| H-06 | G1 | **Keine Sicherung der Daten:** Android: `adb shell dumpsys package de.inneso.familynexus \| grep -i -E "flags=\|allowBackup"` und Prüfung, dass `adb backup` nichts Brauchbares liefert; iOS/macOS: Schlüssel ist nur „nach dem ersten Entsperren, nur dieses Gerät“ lesbar (kein iCloud-Eintrag, siehe H-05); Linux, Windows, Web n/a | Android: `ALLOW_BACKUP` steht **nicht** in den Flags (Datenschutzerklärung: „Android-Backups sind ausgeschaltet“). Apple: kein Schlüsselbund-Eintrag im iCloud-Bund | | – | |
+| H-07 | G1 | **Zwischenablage:** C-05 (oder A-10-Ablauf) → „Notfall-Schlüssel erstellen“ → „Kopieren“; sofort `pbpaste \| wc -c` (iOS-Simulator `xcrun simctl pbpaste booted \| wc -c`; Linux `xclip -o -selection clipboard \| wc -c`); nach 65 s wiederholen. **Zweiter Lauf:** wieder kopieren, dann **etwas anderes** kopieren (z. B. Text `abc`) und nach 65 s prüfen. Inhalt nie ausgeben | Sofort: Zeichenzahl > 0 (der Schlüssel); nach einer Minute **0** („Die Zwischenablage wird nach einer Minute geleert.“). Zweiter Lauf: `abc` bleibt stehen (die App löscht nur den eigenen Schlüssel, nicht fremde Inhalte) | | – (Zeichenzahlen im Report) | |
+| H-08 | G1 | **Dateien, die die App bewusst im Klartext ablegt:** (a) Notfall-Schlüssel „Als Datei speichern“ (A-10/C-05): Inhalt ansehen; (b) Protokoll „Als Datei speichern“ (B-21); (c) Anhang „Speichern“ (E-17). Danach die Dateien (a) und (b) sicher löschen (Papierkorb leeren) | (a) Datei `FamilyNexus-Notfall-Schluessel.txt` mit Konto, Anbieter, Datum, Schlüssel; Hinweis in der Datenschutzerklärung, dass sie „unverschlüsselt an dem von dir gewählten Ort“ liegt. (b) Vor dem Speichern Warnung „Das Protokoll zeigt deine Daten im Klartext. Beim Kopieren oder Speichern verlassen sie den verschlüsselten Speicher der App.“; „Protokoll gespeichert.“. (c) Warnung „Die Datei wird entschlüsselt und unverschlüsselt im gewählten Ordner gespeichert. … Sie bleibt dort auch nach dem Abmelden oder Löschen der App-Daten erhalten.“ | | H-08a-G1 … H-08c-G1 | |
+| H-09 | G1 | **Protokoll ohne Geheimnisse:** die in H-08b gespeicherte Datei auf Passwort, Notfall-Schlüssel und Zugangstoken prüfen: `grep -c -F -f <Datei mit Passwort/Schlüssel> <Protokoll>` für N1 (Passwort, KN1, KN1b), und `grep -c -E "syt_\|access_token\|Bearer "` (Anhang F, F.2) | 0 Treffer. Das Protokoll nennt „Außerdem gespeichert, aber aus Sicherheitsgründen nicht angezeigt: Zugangstoken der Sitzung, Geräteschlüssel und Schlüssel der verschlüsselten Gespräche.“, „Nie gespeichert, nur im Arbeitsspeicher: Online-Status der Familienmitglieder.“ und „Geplante Erinnerungen liegen zusätzlich beim Betriebssystem.“ (Titel und Zeit der Erinnerungen liegen also im Klartext beim Betriebssystem, sichtbar z. B. auf dem Sperrbildschirm → als Hinweis im Report vermerken, kein Fehler) | | – (Zählung) | |
+
+#### H.2 Datenaustausch mit dem Server und zwischen den Geräten (G1, G2)
+
+| ID | Gerät | Schritt | Erwartetes Ergebnis | Beobachtetes Ergebnis | Screenshot | Erg. |
+|---|---|---|---|---|---|---|
+| H-10 | G1, G2 | Einstellungen → „Über die App“ → „Protokoll: alle online gespeicherten Daten zeigen“, Abschnitte „Verschlüsselung“ und „Räume“ lesen | Jeder Raum (Familie, „Privater Raum (Abgleich privater Termine)“, „Einzelchat“ mit Test Nutzer 2) zeigt „Ende-zu-Ende-verschlüsselt“; kein Raum „Sonstiger Raum“ ohne Verschlüsselung; „Cross-Signing-Schlüssel“ und „Schlüssel-Backup (mit deinem Wiederherstellungsschlüssel verschlüsselt)“ „eingerichtet“; privater Raum: „Mitglieder: 1 beigetreten, 0 eingeladen“; Familienraum: beigetretene Mitglieder = N1 und I2. Auf G2 dasselbe für I2 (kein privater Raum von N1 sichtbar) | | H-10-G1, H-10-G2 | |
+| H-11 | – | **Server sieht nur Chiffretext (N1):** mit `curl` an N1 anmelden (Passwort per `read -s`, **neues Testgerät**), die beigetretenen Räume und die letzten 50 Ereignisse jedes Raums lesen, danach Gerät **abmelden** (Anhang F, F.3). Vorher in der App sichtbar gesendet: Chat (E-16), Anhänge (E-17), Einzelchat (E-18), Einkauf (E-22), Aufgaben (B-15/E-23), geteilter Termin | In allen drei Raumarten sind Ereignisse vom Typ `m.room.encrypted` mit `algorithm` = `m.megolm.v1.aes-sha2`, `ciphertext`, `session_id`; **kein** Ereignis `m.room.message` im Klartext (Anzahl 0); 0 Treffer für alle Suchbegriffe, auch für den Inhalt des Anhangs und für `Nur für dich`. Die Antworten enthalten keine Klartext-`body`-Felder von Nachrichten. Nach der Abmeldung steht „Testwerkzeug“ nicht mehr unter „Geräte deines Kontos“ (C-03), das Konto zeigt keine unbekannte Verifizierungsanfrage mehr | | – (Zählung nach Ereignistyp; Token nie im Report) | |
+| H-12 | – | **Metadaten (aus H-11):** notieren, was im Klartext lesbar ist: Raumnamen (`m.room.name`), Mitgliedslisten, Einladungen, Zeitstempel, Ereignisgröße, Geräteliste des Kontos (`/devices`), Raumeinstellungen (`m.room.encryption`, `join_rules`, `history_visibility`) | Es ist nur sichtbar, was die Datenschutzerklärung (B-19) und `serverMetadataNote` nennen: „Metadaten wie wer wann mit wem schreibt“, Konto-ID, Zeitpunkte, Raumgröße, Geräte. Ist der Familienname als Raumname lesbar und nicht in der Datenschutzerklärung genannt → ⚠️ (Hinweis, kein Verschlüsselungsfehler); Inhalte von Nachrichten, Terminen, Listen, Anhängen, Online-Status dürfen nicht lesbar sein (sonst ❌) | | – (Tabelle im Report) | |
+| H-13 | – | **Privater Raum:** aus H-11 den Raum mit einem Mitglied suchen und `joined_members` sowie `m.room.join_rules` lesen; G2 (I2) im Familienraum: Test privat (B-05) nicht sichtbar (E-19) | Nur N1 ist Mitglied des privaten Raums; Beitritt für andere nicht ohne Einladung möglich; Ereignisse darin `m.room.encrypted`. Der private Termin erscheint bei I2 weder im Kalender noch im Chat | | – | |
+| H-14 | G1 | **Einladungslink enthält keine Geheimnisse:** den Link aus E-05 (bzw. `link.txt`) lesen: App-Link `familynexus://join?…` und Web-Link `https://carpeasrael.github.io/FamilyNexus/join/#…` | Parameter nur `v`, `room`, `via`, `srv`, `inv`, `exp` (Ablauf, höchstens 7 Tage), `f` (Familienname), `by` (Name der einladenden Person), `n` (Zufalls-ID, 32 Hexzeichen); **kein** Passwort, Notfall-Schlüssel, Zugangstoken oder Gerätekennung; Länge ≤ 1024. Der Web-Link trägt die Angaben hinter `#`, sie werden nicht an den Webserver der Landeseite gesendet (Netzwerkprotokoll des Browsers: Anfrage ohne Fragment). Familien- und Einladername stehen im Klartext im Link (beim Weitergeben per Mail oder Nachricht beachten → als Hinweis vermerken) | | – (Parameterliste ohne Namen) | |
+| H-15 | G1, G2 | **Anhang unverändert und sicher benannt:** vor E-17 Dateien anlegen: `FN-ANHANG.txt` (Zufallsinhalt, `shasum -a 256` notieren) und eine Datei mit Sonderzeichen im Namen (z. B. `a<b>c"d.txt` bzw. `..` und Schrägstriche, soweit das Dateisystem es erlaubt). G1 sendet beide; G2 lädt, „Speichern“, Zielordner wählen; `shasum -a 256` der gespeicherten Datei | Prüfsumme der gespeicherten Datei = Original (kein Verlust, keine Änderung); Dateiname ohne Pfadanteile und ohne `< > : " \| ? *` und Steuerzeichen (Sonderzeichen werden zu `_`), höchstens 100 Zeichen; die Datei wird nie automatisch geöffnet oder ausgeführt | | H-15-G2 | |
+| H-16 | G1 | **Unzulässige Anhänge:** „Datei anhängen“ mit (a) `test.zip`, (b) `test.sh`, (c) `test.exe`, (d) einer `.txt` mit 26 MB (`mkfile -n 26m` bzw. `dd if=/dev/zero of=gross.txt bs=1m count=26`), (e) einer `.txt` mit 25 MB minus 1 Byte | (a) bis (d): „Dieser Anhang ist nicht erlaubt (Typ oder Größe).“, es wird nichts gesendet, G2 sieht nichts; (e): wird gesendet. Erlaubt sind nur Bilder (jpg, png, gif, webp), pdf, txt, csv, ics und Office-Dateien (doc, docx, xls, xlsx, ppt, pptx), höchstens 25 MB. Blockierte **eingehende** Anhänge („Anhang blockiert (Typ oder Größe nicht erlaubt)“) lassen sich nur mit einem fremden Matrix-Client auslösen → durch `test/domain/attachment_policy_test.dart` (G-02) abgedeckt | | H-16a-G1 … | |
+| H-17 | – | **Transport:** (a) `openssl s_client -connect <Anbieter>:443 -servername <Anbieter> </dev/null` (b) Verbindungen der laufenden App auf G1 während Chat und Abgleich: macOS/Linux `lsof -nP -i -a -p $(pgrep -f FamilyNexus \| head -1)`, alternativ `nettop -p <PID>`; Android `adb shell cat /proc/net/tcp6` bzw. Paketmitschnitt | (a) TLS 1.2 oder 1.3, Zertifikatskette gültig (`Verify return code: 0 (ok)`), Name passt zum Anbieter. (b) Verbindungen nur zum Anbieter (Adresse per `dig`/`host` auflösen) und zu Diensten des Betriebssystems (Netzwerk-Dienste von Apple/Google dürfen vorkommen, dann vermerken); **keine** Verbindung zu Werbe-, Analyse- oder Crash-Diensten („keine Telemetrie“, A-01). Abruf der Landeseite des Einladungslinks (H-14) ist die einzige Webanfrage außer dem Anbieter | | – (Ausgabe, Adressen gekürzt) | |
+
+#### H.3 Schlüssel beim Löschen und bei Verlust (G1)
+
+| ID | Gerät | Schritt | Erwartetes Ergebnis | Beobachtetes Ergebnis | Screenshot | Erg. |
+|---|---|---|---|---|---|---|
+| H-18 | G1 | **Nach F-04** (App nach „Alle lokalen Daten löschen“ neu gestartet, „Willkommen“): in `D` auflisten (H-02), Schlüsselspeicher (H-05) ansehen; die in H-08 gespeicherten Dateien suchen | Beide Datenbanken (und `-wal`/`-shm`/`-journal`) sind **gelöscht**; die Schlüssel `fn.key.db.app` und `fn.key.db.matrix` gibt es nicht mehr; keine Datei mit den Suchbegriffen im App-Datenordner (H-04 wiederholen: 0 Treffer). Außerhalb der App bleibt, was bewusst gespeichert wurde (H-08c, Anhang aus H-15 auf G2): das ist im Dialog angekündigt und kein Fehler | | – (Auflistung) | |
+| H-19 | G1 | **Nach F-05 und vor F-06, optional, nur durch den Besitzer des Geräts (macOS/Linux; sonst n/a):** App beenden, die Datenbankkopie-Prüfsumme (`shasum -a 256 familynexus_app.db`) notieren, in der Schlüsselbundverwaltung **nur** den Eintrag `fn.key.db.app` löschen (nicht `fn.key.db.matrix`, nicht fremde Einträge), App starten und die Prüfsumme der Datei erneut bilden (vor dem Zurücksetzen); „Lokale Daten zurücksetzen“ → Rückfrage → bestätigen; danach wie F-05 anmelden und mit KN1b freischalten | Start zeigt **„Lokale Daten nicht lesbar“**: „Die verschlüsselte Datenbank konnte nicht geöffnet werden, zum Beispiel weil der Schlüssel des Geräts nicht mehr verfügbar ist. Aus Sicherheitsgründen wurde nichts verändert. …“; Prüfsumme gegenüber der Notiz unverändert (die App legt **keinen neuen Schlüssel** an und überschreibt die Datenbank nicht); „Lokale Daten wirklich löschen?“ → danach „Willkommen“; nach Anmeldung und Freischalten sind Termine, Chat, Einkauf und Aufgaben wieder da (Wiederherstellung vom Server, wie F-05). Das Schlüsselbund-Passwort tippt nur der Besitzer | | H-19a-G1 … H-19c-G1 | |
+
 ## 6. Abdeckungsmatrix
 
 Jede Funktion der App ist mindestens einem Schritt zugeordnet. Wird eine Funktion ergänzt, kommt sie hier mit Schritt hinzu.
@@ -289,11 +331,16 @@ Jede Funktion der App ist mindestens einem Schritt zugeordnet. Wird eine Funktio
 | Konto | Server und Benutzername, Konto löschen (falsch/richtig, einziger Moderator, Mitglied mit Austragen) (#12) | B-22, E-29, E-31, E-32, F-01, F-06 |
 | Review | Review-Notizen automatisch und manuell (#13), Person ohne Vorwissen | G-03, G-06, G-07 |
 | Web | Browser-Tresor, Entsperren, zweiter Tab, Passwort vergessen | G-08 |
+| Verschlüsselung Gerät | Datenbanken verschlüsselt, keine Klartextreste, Schlüssel im Schlüsselspeicher, keine Sicherung | H-01 bis H-06 |
+| Verschlüsselung Gerät | Zwischenablage, bewusst im Klartext gespeicherte Dateien, Protokoll ohne Geheimnisse | H-07 bis H-09 |
+| Datenaustausch | Räume Ende-zu-Ende-verschlüsselt, Server sieht nur Chiffretext und Metadaten, privater Raum | H-10 bis H-13 |
+| Datenaustausch | Einladungslink ohne Geheimnisse, Anhänge (unverändert, Dateiname, Typ und Größe), Transport und Verbindungen | H-14 bis H-17 |
+| Schlüssel | Löschen entfernt Dateien und Schlüssel, Schlüssel verloren (Startfehler, Wiederherstellung) | H-18, H-19 |
 | Nicht manuell | Zusatzschritte, OAuth, abgelaufener Link, geänderte Identität, Startfehler | G-05 |
 
 ## 7. Abnahme und Report
 
-**Bestanden**, wenn Abschnitt 2 vollständig ist, V-01 bis V-07 erfüllt sind und alle Schritte aus A bis G ✅ oder begründet „n/a“ sind. Optional: D-07, G-04. ⚠️ ist zulässig, wenn der Befund im Report steht und als Issue angelegt ist. ⏳ muss vor der Antwort an Apple nachgeholt werden.
+**Bestanden**, wenn Abschnitt 2 vollständig ist, V-01 bis V-07 erfüllt sind und alle Schritte aus A bis H ✅ oder begründet „n/a“ sind. Optional: D-07, G-04, H-19. ⚠️ ist zulässig, wenn der Befund im Report steht und als Issue angelegt ist. ⏳ muss vor der Antwort an Apple nachgeholt werden.
 
 **Report:** eine Kopie dieses Plans mit ausgefüllten Spalten „Beobachtet“, „Screenshot“, „Erg.“, abgelegt als `Test-Apple-Report/<Lauf-Ordner>/Testreport.md` und als PDF `Testreport_<Lauf-Ordner>_<DE|EN>.pdf`. Erste Seite: Abschnitt 2 (Plattform und System), Ergebnis von V-01 bis V-07, Zusammenfassung (Anzahl je Ergebnis) und Befundliste (Nr., Schwere, Schritt, Beschreibung). Screenshots stehen neben dem jeweiligen Schritt (im PDF als Bild in der Zeile oder direkt darunter); bei Schritten mit zwei Geräten nebeneinander. Passwörter und Notfall-Schlüssel sind geschwärzt.
 
@@ -443,6 +490,61 @@ Quelle (Planversion 1.6 → 1.7): Lauf vom 28.10.2026 mit Build 1.2.1 (19) (macO
 | P-58 | E-23 | Erwartung ohne Prüfung der gespeicherten Wiederholung (#76) | Kürzel „Mo–Fr“ und Regel „Montag bis Freitag“ prüfen, Auswahl vor dem Speichern aufnehmen |
 | P-59 | B-02 | Dialog oder „Einstellungen öffnen“ gleichwertig | Maßgeblich ist ein mit Distribution-Zertifikat signierter Build; Signatur im Report nennen (#57) |
 
+## Anhang F: Hilfsbefehle für Abschnitt H
+
+Alle Befehle laufen in einem eigenen Arbeitsordner (`W`), nie im App-Datenordner. Passwörter, Token und Schlüssel werden nicht ausgegeben, nicht in die Shell-History geschrieben und nicht in den Report übernommen; ausgegeben werden nur Zählungen.
+
+**F.1 Datenbanken kopieren und prüfen (H-02 bis H-04)**
+```sh
+W=$(mktemp -d); D="<Datenbank-Ordner aus H-01>"            # App vorher beenden
+cp "$D"/familynexus_*.db* "$W"/ && ls -l "$W"
+for f in "$W"/familynexus_*.db; do
+  head -c 16 "$f" | xxd; file "$f"
+  sqlite3 "$f" "select count(*) from sqlite_master;" 2>&1 | head -1   # erwartet: file is not a database
+done
+# Suchbegriffe (nur Zählung, kein Inhalt):
+for f in "$W"/*; do for t in "Testfamilie MMTT" "Test geteilt 2" "Hallo von Nutzer 1" "Nur für dich" "Test N1" "FN-ANHANG-"; do
+  printf '%s | %s: ' "$(basename "$f")" "$t"; strings -n 6 "$f" | grep -c -F -e "$t"; done; done
+grep -rIlaF -e "Testfamilie MMTT" -e "Hallo von Nutzer 1" "$D/.." 2>/dev/null | wc -l    # gesamter App-Datenordner
+```
+iOS-Simulator: `D` = `$(xcrun simctl get_app_container booted de.inneso.familynexus data)/Library/…` (Ordner aus H-01); Android (Debug-Build): `adb exec-out run-as de.inneso.familynexus cat databases/familynexus_app.db > "$W/familynexus_app.db"`.
+
+**F.2 Protokoll auf Geheimnisse prüfen (H-09)**
+```sh
+P="<gespeichertes Protokoll>"
+grep -c -F -f ../secure/pw_n1.txt "$P"; grep -c -F -f ../secure/kn1.txt "$P"; grep -c -F -f ../secure/kn1b.txt "$P"   # je 0
+grep -c -E 'syt_|access_token|Bearer ' "$P"                                                                              # 0
+```
+
+**F.3 Server sieht nur Chiffretext (H-11, H-12, H-13)**
+```sh
+S=https://matrix-synapse-3ues.srv1348446.hstgr.cloud
+read -s PW                                                   # Passwort von N1 einfügen, wird nicht angezeigt
+T=$(curl -s -X POST "$S/_matrix/client/v3/login" -H 'Content-Type: application/json' \
+  -d "$(python3 -c 'import json,sys;print(json.dumps({"type":"m.login.password","identifier":{"type":"m.id.user","user":"fnt-MMTT-n1"},"password":sys.argv[1],"initial_device_display_name":"Testwerkzeug"}))' "$PW")" \
+  | python3 -c 'import sys,json;print(json.load(sys.stdin)["access_token"])'); unset PW
+H="Authorization: Bearer $T"
+curl -s -H "$H" "$S/_matrix/client/v3/joined_rooms"          # Raum-IDs
+for R in <Raum-IDs>; do                                      # '!' und ':' kodieren
+  Q=$(python3 -c 'import sys,urllib.parse;print(urllib.parse.quote(sys.argv[1],safe=""))' "$R")
+  curl -s -H "$H" "$S/_matrix/client/v3/rooms/$Q/messages?dir=b&limit=50" > "$W/msgs-$RANDOM.json"
+  curl -s -H "$H" "$S/_matrix/client/v3/rooms/$Q/joined_members" | python3 -c 'import sys,json;print(len(json.load(sys.stdin)["joined"]))'
+done
+# Auswertung: Zählung nach Ereignistyp, Klartext-Nachrichten und Suchbegriffe
+cat "$W"/msgs-*.json | python3 -c 'import sys,json,collections;c=collections.Counter()
+for l in sys.stdin.read().replace("}{","}\n{").splitlines():
+  for e in json.loads(l).get("chunk",[]): c[e["type"]]+=1
+print(dict(c))'                                              # erwartet: m.room.encrypted > 0, m.room.message fehlt
+grep -c -F -e "Hallo von Nutzer 1" -e "Nur für dich" -e "FN-ANHANG-" "$W"/msgs-*.json      # je 0
+curl -s -H "$H" -X POST "$S/_matrix/client/v3/logout" -d '{}'; unset T                      # Testgerät abmelden (H-11)
+```
+Hinweis: Ein neues Gerät des Kontos kann auf G1 eine Verifizierungsanfrage auslösen; sie wird abgelehnt oder ignoriert. Ereignisse vor der Anmeldung des Testgeräts sind ohnehin nicht entschlüsselbar (kein Schlüssel); das Ergebnis „nur `m.room.encrypted`“ ist deshalb gewollt. Token und `msgs-*.json` nach der Auswertung löschen.
+
+**F.4 Zwischenablage (H-07)**
+```sh
+pbpaste | wc -c; sleep 65; pbpaste | wc -c        # nur Zeichenzahl, nie den Inhalt ausgeben
+```
+
 ## Versionshistorie
 
 Regel: Änderungen an Schritten, erwarteten Ergebnissen oder Reihenfolge erhöhen die Nebenversion (1.1 → 1.2); Umbau der Struktur oder des Umfangs die Hauptversion (1.x → 2.0); reine Tippfehler bleiben ohne neue Version. Jeder Report trägt auf der ersten Seite „TP-FN-001 v<Version> @ <Commit>“, jedes Issue aus einem Lauf verweist auf Planversion, Commit und Schritt-ID.
@@ -457,5 +559,6 @@ Regel: Änderungen an Schritten, erwarteten Ergebnissen oder Reihenfolge erhöhe
 | 1.5 | 27.10.2026 | `423a3db` | Erwartungen an die Fixes aus PR #41 (`532bc62`) angepasst (P-31 bis P-38, Anhang E); Issues #24 bis #40 behoben |
 | 1.6 | 28.10.2026 | `0a1b2f4` | Hinweise aus den Läufen vom 28.10.2026 (P-39 bis P-53, Anhang E; #61, #69, #58) und Erwartungen an die Fixes zu #43, #56, #57, #59, #60, #62 bis #68 |
 | 1.7 | 29.10.2026 | Basis `ba36fed` | Soll-Version Build 20; Erwartungen und Hinweise zu B-02, B-19, D-02, E-18, E-23 nach dem Lauf mit Build 19 (P-54 bis P-59, Anhang E; #75 bis #78) |
+| 1.8 | 30.10.2026 | Basis `802eba1` | Neuer Abschnitt H „Verschlüsselung auf dem Gerät und Datenaustausch“ (H-01 bis H-19), Anhang F (Hilfsbefehle), Abdeckungsmatrix, Reihenfolge und Abnahme erweitert; A bis G unverändert |
 
 **Zuordnung Issues zur Planversion:** #23 bis #27 (Lauf 1) beziehen sich auf v1.0 (`4abf400`), #28 bis #30 (Lauf 2) auf v1.2 (`d6cecbf`), #31 bis #40 (Lauf 3, Linux/Android) auf v1.0 (`4abf400`); die Plantexte dazu stehen seit v1.1, v1.3 bzw. v1.4 im Plan. Seit v1.5 beschreibt der Plan das Verhalten nach den Fixes aus PR #41 (#23 bereits durch PR #22). #75 bis #78 (Lauf mit Build 19) beziehen sich auf v1.6 (`f4c358c`); #43 bis #46 und #56 bis #69 beziehen sich auf v1.5 (`bb7f347` bzw. `423a3db`); seit v1.6 beschreibt der Plan das Verhalten nach den Fixes vom 28.10.2026.
