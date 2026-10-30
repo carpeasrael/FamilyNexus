@@ -1,0 +1,31 @@
+FamilyNexus - Guideline 2.1
+Build/platform: [VERSION/BUILD], [PLATFORM].
+
+1. Physical-device recording and testing
+Video: [VIDEO_URL]
+Device/OS/date: [DEVICE]; [OS]; [DATE].
+Recording: launch, registration, login, deletion, calendar, chat, shopping, tasks, reporting/blocking; latest public OS on the recording date.
+Device QA: [QA_RESULT_AND_REPORT].
+No paid in-app features, subscriptions or in-app purchases.
+
+2. Purpose and audience
+FamilyNexus combines appointments, household tasks, shopping and encrypted family/direct chat to reduce scattered messages and missed arrangements. Adults organize families; minors participate with guardian consent and moderator invitation. It is a consumer app, not limited to specific businesses/employees.
+
+3. Setup and access
+Setup/sync require internet and a Matrix account. Both review accounts use matrix.org and the same sample family:
+R1 moderator: username/password in Sign-in information; emergency key [R1_KEY].
+R2 member: username [R2_USER]; password [R2_PASSWORD]; emergency key [R2_KEY].
+Launch > "I already have an account" > "Sign in at matrix.org" > browser login > return > "Unlock this device" > account's emergency key > "Unlock". Sign out of other browser accounts first.
+Today: upcoming items. Calendar > "New event": title/date, shared/private, save. Chat: send a message; Family > member > "Send message" opens direct chat. Shopping: add/check off items. Top-right menu > Tasks: moderators create/assign lists; assignees complete items. Family: moderator invitations/member management. Sample events, chats, shopping items and tasks are provided. No sample files required; chat attachments are optional. Reminders need notification permission; chat has no push notifications.
+Register: "Start a new family" > name > "Create account at matrix.org" > provider steps > return > "Create emergency key" > store/confirm > "Next" > family name > "Create family".
+Delete: menu > Settings > Account > "Delete account" > "Open deletion page" > confirm with provider > return > "Check deletion" if needed. Local data is cleared; messages received by others may remain. Use a disposable account.
+Report: long-press a chat message > "Report message" > reason > "Report". Server receives identifiers/reason/optional text, not decrypted content. "Block sender" hides messages/direct chat on this device. Undo: Settings > "Blocked members". Moderators can remove members.
+
+4. Services and tools
+Matrix homeserver (default matrix.org): accounts, encrypted sync/media, reports; account.matrix.org: browser registration/login/deletion, possibly email/CAPTCHA. Alternative HTTPS providers: Advanced. GitHub Pages: invitation page/OAuth client website. Element: optional registration fallback. Local tools: Flutter, Matrix Dart SDK, vodozemac, SQLCipher; Apple Keychain, device authentication, local notifications. No ad, analytics, AI, payment, external content-data or remote push service integrated.
+
+5. Regions
+Same features across regions; German/English, locale/time-zone formatting. Provider availability/rules may vary. Storefronts: [STOREFRONTS].
+
+6. Regulated services and third-party material
+No regulated professional services or entertainment catalog. Open-source software/fonts included (app: AGPL-3.0-or-later; fonts: OFL). Rights review/encryption export documentation: [RIGHTS_AND_EXPORT_STATUS].
