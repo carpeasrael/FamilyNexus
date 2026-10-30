@@ -88,7 +88,7 @@ class SettingsScreen extends StatelessWidget {
                 trailing: s.blockedUsers.isEmpty ? null : Text('${s.blockedUsers.length}'),
                 onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const BlockedUsersScreen())),
               ),
-              // Linux, Windows und Browser bieten keinen Schutz vor Bildschirmaufnahmen (SA-6): Schalter ausgeblendet.
+              // Linux und Browser bieten keinen Schutz vor Bildschirmaufnahmen (SA-6, SA-7), macOS erlaubt sie bewusst: Schalter ausgeblendet.
               if (!PlatformInfo.hasNoScreenProtection)
                 SwitchListTile(
                   title: Text(l.settingsSecureScreen),
@@ -277,6 +277,7 @@ class _AccountSection extends StatelessWidget {
               context: context,
               builder: (c) => AlertDialog(
                 title: Text(l.logout),
+                content: Text(l.logoutBody),
                 actions: <Widget>[
                   TextButton(onPressed: () => Navigator.pop(c, false), child: Text(l.cancel)),
                   TextButton(onPressed: () => Navigator.pop(c, true), child: Text(l.logout)),

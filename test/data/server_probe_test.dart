@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/server_probe.dart';
@@ -90,6 +91,29 @@ void main() {
     expect(info.contact!.length, lessThanOrEqualTo(80));
     expect(info.contact, isNot(contains('\n')));
     expect(info.supportPage, isNull);
+  });
+
+  test('Pen-Test I-03: TLS- und Netzfehler kommen als „nicht erreichbar“, nicht roh', () async {
+    for (final error in <Exception>[const HandshakeException('CERTIFICATE_VERIFY_FAILED'), const SocketException('refused')]) {
+      final probe = ServerProbe(client: MockClient((_) async => throw error));
+      await expectLater(
+        probe.probe(_url),
+        throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.serverUnreachable)),
+        reason: '${error.runtimeType}',
+      );
+    }
+  });
+
+  test('Pen-Test F-08: Bidi- und unsichtbare Zeichen im Betreiber-Kontakt werden entfernt', () async {
+    final probe = ServerProbe(client: _client(<String, (int, Object)>{
+      '/_matrix/client/versions': (200, <String, Object>{'versions': <String>['v1.1']}),
+      '/.well-known/matrix/support': (200, <String, Object>{
+        'contacts': <Object>[<String, Object>{'matrix_id': '@admin\u202E:evil\u200B.org\u2066'}],
+      }),
+    }));
+    final contact = (await probe.probe(_url)).contact!;
+    expect(contact, isNot(matches(RegExp('[\u200B-\u200F\u202A-\u202E\u2066-\u2069]'))));
+    expect(contact, '@admin :evil .org');
   });
 
   test('Mindestversion v1.1 wird verlangt; höchste Version wird zuletzt geführt', () async {

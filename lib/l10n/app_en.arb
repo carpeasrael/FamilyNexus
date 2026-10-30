@@ -127,6 +127,7 @@
   "chatYou": "You",
   "chatFormerMember": "Former member",
   "logout": "Sign out",
+  "logoutBody": "Events, the shopping list and tasks are removed from this device. Everything already sent stays encrypted in your family and comes back after you sign in again; changes not yet sent are lost.",
   "settingsAccount": "Account",
   "settingsServer": "Server",
   "serverContactUnknown": "Contact: not specified",
@@ -402,7 +403,10 @@
   "familyManage": "Management",
   "familyInvite": "Invite a member",
   "familyInviteLinkTitle": "Invite someone",
-  "familyInviteLinkHint": "The link is valid for {validity} and can be used once. Whoever opens it is admitted automatically as soon as a moderator's app is online.",
+  "familyInviteLinkHint": "The link is valid for {validity} and can be used once. Whoever opens it is admitted automatically as soon as a moderator's app is online. Only give it to the person you want to invite.",
+  "familyInviteLinkHintManual": "The link is valid for {validity} and can be used once. A moderator confirms the request before the person is admitted.",
+  "familyInviteManual": "Confirm requests yourself",
+  "familyInviteManualHint": "Without this setting, the app admits anyone with the link automatically. Changing it creates a new link.",
   "familyInviteShowQr": "Show QR code",
   "familyInviteCopyLink": "Copy link",
   "familyInviteCopied": "Link copied.",
@@ -460,7 +464,7 @@
   "lockUnlock": "Unlock",
   "lockReason": "Unlock FamilyNexus",
   "settingsLock": "App lock",
-  "settingsLockHint": "Locks the app after inactivity. Confirmation uses your device lock; the app stores no PIN of its own.",
+  "settingsLockHint": "Locks the app after inactivity. Confirmation uses your device lock; the app stores no PIN of its own. The lock is a privacy screen: it hides the app, while your data is protected by encryption and your device lock.",
   "settingsLockUnavailable": "No secure screen lock is set up on this device.",
   "settingsLockFailed": "The confirmation was not successful.",
   "settingsLockTimeout": "Lock after",
@@ -963,6 +967,8 @@
   "webForgotPassword": "Forgot the password? Delete all local data",
   "webTabBusyTitle": "FamilyNexus is already open",
   "webTabBusyBody": "The app is already running in another tab or window of this browser. Two tabs at the same time would corrupt the local data. Close the other tab and try again.",
+  "webEmbeddedTitle": "Opened inside another page",
+  "webEmbeddedBody": "For security reasons, FamilyNexus cannot be used embedded in another website. Open the app directly in its own tab.",
   "privacy13Title": "Browser version",
   "privacy13Body": "In the web version your data is stored encrypted in this browser (IndexedDB, SQLite3MultipleCiphers). The key is protected by your browser password, which is stored nowhere. There is no screen protection and no reminders while the page is closed. Do not use the web version on a foreign or shared computer. The page loads nothing from third parties.",
   "startCreateTitle": "Start a new family",
@@ -1405,6 +1411,13 @@
   },
   "familyInviteValidityLabel": "Valid for",
   "@familyInviteLinkHint": {
+    "placeholders": {
+      "validity": {
+        "type": "String"
+      }
+    }
+  },
+  "@familyInviteLinkHintManual": {
     "placeholders": {
       "validity": {
         "type": "String"

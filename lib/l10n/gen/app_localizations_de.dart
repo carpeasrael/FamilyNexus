@@ -325,6 +325,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get logout => 'Abmelden';
 
   @override
+  String get logoutBody =>
+      'Termine, Einkaufszettel und Aufgaben werden von diesem Gerät entfernt. Was schon gesendet ist, bleibt verschlüsselt in deiner Familie und kommt nach der nächsten Anmeldung zurück; noch nicht gesendete Änderungen gehen verloren.';
+
+  @override
   String get settingsAccount => 'Konto';
 
   @override
@@ -887,8 +891,20 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String familyInviteLinkHint(String validity) {
-    return 'Der Link ist $validity gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist.';
+    return 'Der Link ist $validity gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist. Gib ihn nur der Person, die du einladen willst.';
   }
+
+  @override
+  String familyInviteLinkHintManual(String validity) {
+    return 'Der Link ist $validity gültig und nur einmal verwendbar. Ein Moderator bestätigt die Anfrage, bevor die Person aufgenommen wird.';
+  }
+
+  @override
+  String get familyInviteManual => 'Anfragen selbst bestätigen';
+
+  @override
+  String get familyInviteManualHint =>
+      'Ohne diese Einstellung nimmt die App jede Person mit dem Link automatisch auf. Ändern erzeugt einen neuen Link.';
 
   @override
   String get familyInviteShowQr => 'QR-Code anzeigen';
@@ -1011,7 +1027,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsLockHint =>
-      'Sperrt die App nach Inaktivität. Die Bestätigung erfolgt mit der Sperre deines Geräts; die App speichert keine eigene PIN.';
+      'Sperrt die App nach Inaktivität. Die Bestätigung erfolgt mit der Sperre deines Geräts; die App speichert keine eigene PIN. Die Sperre ist ein Sichtschutz: Sie verdeckt die App, die Daten selbst schützt die Verschlüsselung und die Sperre deines Geräts.';
 
   @override
   String get settingsLockUnavailable =>
@@ -1691,6 +1707,13 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get webTabBusyBody =>
       'Die App läuft bereits in einem anderen Tab oder Fenster dieses Browsers. Zwei Tabs gleichzeitig würden die lokalen Daten beschädigen. Schließe den anderen Tab und versuche es erneut.';
+
+  @override
+  String get webEmbeddedTitle => 'In fremder Seite geöffnet';
+
+  @override
+  String get webEmbeddedBody =>
+      'FamilyNexus lässt sich aus Sicherheitsgründen nicht eingebettet in einer anderen Website verwenden. Öffne die App direkt in einem eigenen Tab.';
 
   @override
   String get privacy13Title => 'Browser-Version';

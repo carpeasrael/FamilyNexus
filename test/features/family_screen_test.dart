@@ -109,6 +109,26 @@ void main() {
     expect(InviteLink.check(mailedLink(), now: app.server.now()).link!.accountServer, 'matrix.org', reason: 'Server bleibt bei neuer Gültigkeit');
   });
 
+  testWidgets('Pen-Test I-01: „Anfragen selbst bestätigen“ erzeugt einen Link ohne automatische Bestätigung', (tester) async {
+    final app = await buildTestApp();
+    await _openFamily(tester, app);
+    await tester.tap(find.text('Jemanden einladen'));
+    await tester.pumpAndSettle();
+    expect(app.gateway.lastInviteAutoApprove, isTrue, reason: 'Standard bleibt die automatische Bestätigung (E-64)');
+    expect(find.textContaining('automatisch aufgenommen'), findsOneWidget);
+
+    await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Erweitert')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Anfragen selbst bestätigen'));
+    await tester.pumpAndSettle();
+    expect(app.gateway.lastInviteAutoApprove, isFalse);
+    expect(find.textContaining('Ein Moderator bestätigt die Anfrage'), findsOneWidget);
+
+    await tester.tap(find.text('7 Tage'));
+    await tester.pumpAndSettle();
+    expect(app.gateway.lastInviteAutoApprove, isFalse, reason: 'bleibt bei neuer Gültigkeit');
+  });
+
   testWidgets('Einladungslink per E-Mail: Entwurf mit Anleitung und Link, ohne Mailprogramm wird kopiert', (tester) async {
     final app = await buildTestApp();
     String? clipboard;

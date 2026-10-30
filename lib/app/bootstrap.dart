@@ -84,14 +84,14 @@ Future<AppServices> bootstrap({KeyStore? keyStore}) async {
       // damit sich Daten verschiedener Familien nie vermischen (S7).
       final store = SqlEventStore(database.db);
       final owner = '$userId|${gateway.family?.roomId ?? ''}';
-      final previous = (await kv.readAll())['calendarOwner'];
+      final previous = (await kv.readAll())[AppServices.calendarOwnerKey];
       if (previous != null && previous != owner) {
         await store.wipe();
         await SqlShoppingStore(database.db).wipe();
         await SqlTaskStore(database.db).wipe();
         await scheduler?.cancelAll();
       }
-      await kv.write('calendarOwner', owner);
+      await kv.write(AppServices.calendarOwnerKey, owner);
       final zone = await SystemDeviceTimeZone().current();
       return buildCalendarController(store: store, gateway: gateway, userId: userId, zoneName: zone);
     },

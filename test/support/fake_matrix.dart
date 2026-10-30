@@ -610,6 +610,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (!Permissions.canInvite(f)) throw const GatewayException(GatewayError.notAllowed);
     final room = familyRoom!;
     final nonce = (_nonceCounter++).toRadixString(16).padLeft(32, '0');
+    lastInviteAutoApprove = autoApprove;
     room.issued[nonce] = fake.now().add(validity);
     return InviteLink.create(
       roomId: f.roomId,
@@ -626,6 +627,9 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   static int _nonceCounter = 1;
+
+  /// Ob der zuletzt erzeugte Link automatisch bestätigt wird (Pen-Test I-01).
+  bool? lastInviteAutoApprove;
 
   @override
   Future<void> requestToJoin(InviteLink link) async {

@@ -56,7 +56,7 @@ Not included / known limitations: see [`docs/OFFEN.md`](docs/OFFEN.md).
 | JDK 17, Android SDK (platform 35/36, build tools, NDK via Gradle) | Android build |
 | Rust (`rustup`, Android targets) | `vodozemac` (cryptography) is built from source during the Android build |
 | Linux: clang, CMake, Ninja, GTK 3, libsecret, SQLCipher (`libsqlcipher.so`) | Linux build, and `flutter test` on Linux hosts |
-| `flatpak`, `flatpak-builder` (optional) | Linux Flatpak bundle (`tool/build_flatpak.sh`) |
+| `flatpak`, `flatpak-builder` (optional; otherwise the script uses the Flatpak `org.flatpak.Builder`) | Linux Flatpak bundle (`tool/build_flatpak.sh`) |
 | Windows: Visual Studio (C++ desktop), vcpkg (`sqlcipher:x64-windows`) | Windows build; the release workflow builds it on GitHub (no local script) |
 | Web: Rust nightly + `wasm32-unknown-unknown`, `wasm-pack`, `wasm-bindgen-cli` 0.2.100, `flutter_rust_bridge_codegen` 2.13.0, Chrome | Web build (`tool/build_web.sh`, tests `tool/web_selftest.sh`, `tool/web_smoke.py`) |
 | Docker (optional) | Local test homeserver for the end-to-end tests |

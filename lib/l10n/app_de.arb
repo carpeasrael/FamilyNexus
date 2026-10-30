@@ -127,6 +127,7 @@
   "chatYou": "Du",
   "chatFormerMember": "Ehemaliges Mitglied",
   "logout": "Abmelden",
+  "logoutBody": "Termine, Einkaufszettel und Aufgaben werden von diesem Gerät entfernt. Was schon gesendet ist, bleibt verschlüsselt in deiner Familie und kommt nach der nächsten Anmeldung zurück; noch nicht gesendete Änderungen gehen verloren.",
   "settingsAccount": "Konto",
   "settingsServer": "Server",
   "serverContactUnknown": "Kontakt: nicht angegeben",
@@ -402,7 +403,10 @@
   "familyManage": "Verwaltung",
   "familyInvite": "Mitglied einladen",
   "familyInviteLinkTitle": "Jemanden einladen",
-  "familyInviteLinkHint": "Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist.",
+  "familyInviteLinkHint": "Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist. Gib ihn nur der Person, die du einladen willst.",
+  "familyInviteLinkHintManual": "Der Link ist {validity} gültig und nur einmal verwendbar. Ein Moderator bestätigt die Anfrage, bevor die Person aufgenommen wird.",
+  "familyInviteManual": "Anfragen selbst bestätigen",
+  "familyInviteManualHint": "Ohne diese Einstellung nimmt die App jede Person mit dem Link automatisch auf. Ändern erzeugt einen neuen Link.",
   "familyInviteShowQr": "QR-Code anzeigen",
   "familyInviteCopyLink": "Link kopieren",
   "familyInviteCopied": "Link kopiert.",
@@ -460,7 +464,7 @@
   "lockUnlock": "Entsperren",
   "lockReason": "FamilyNexus entsperren",
   "settingsLock": "App-Sperre",
-  "settingsLockHint": "Sperrt die App nach Inaktivität. Die Bestätigung erfolgt mit der Sperre deines Geräts; die App speichert keine eigene PIN.",
+  "settingsLockHint": "Sperrt die App nach Inaktivität. Die Bestätigung erfolgt mit der Sperre deines Geräts; die App speichert keine eigene PIN. Die Sperre ist ein Sichtschutz: Sie verdeckt die App, die Daten selbst schützt die Verschlüsselung und die Sperre deines Geräts.",
   "settingsLockUnavailable": "Auf diesem Gerät ist keine gesicherte Bildschirmsperre eingerichtet.",
   "settingsLockFailed": "Die Bestätigung war nicht erfolgreich.",
   "settingsLockTimeout": "Sperren nach",
@@ -963,6 +967,8 @@
   "webForgotPassword": "Passwort vergessen? Alle lokalen Daten löschen",
   "webTabBusyTitle": "FamilyNexus ist schon geöffnet",
   "webTabBusyBody": "Die App läuft bereits in einem anderen Tab oder Fenster dieses Browsers. Zwei Tabs gleichzeitig würden die lokalen Daten beschädigen. Schließe den anderen Tab und versuche es erneut.",
+  "webEmbeddedTitle": "In fremder Seite geöffnet",
+  "webEmbeddedBody": "FamilyNexus lässt sich aus Sicherheitsgründen nicht eingebettet in einer anderen Website verwenden. Öffne die App direkt in einem eigenen Tab.",
   "privacy13Title": "Browser-Version",
   "privacy13Body": "In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz und keine Erinnerungen bei geschlossener Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach.",
   "startCreateTitle": "Neue Familie gründen",
@@ -1411,6 +1417,13 @@
   },
   "familyInviteValidityLabel": "Gültig für",
   "@familyInviteLinkHint": {
+    "placeholders": {
+      "validity": {
+        "type": "String"
+      }
+    }
+  },
+  "@familyInviteLinkHintManual": {
     "placeholders": {
       "validity": {
         "type": "String"

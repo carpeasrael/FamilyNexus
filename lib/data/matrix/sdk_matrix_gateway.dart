@@ -1737,10 +1737,18 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// online ist. Prüfungen wie bei der manuellen Bestätigung ([approveRequest]); der Link ist einmalig.
   void _autoApprove(Family f) {
     if (!Permissions.canInvite(f)) return;
+    // Mehrere offene Anfragen mit derselben Link-ID: Der Link ist weitergegeben worden oder wird gleichzeitig
+    // benutzt. Dann entscheidet ein Moderator, statt dass die erste Anfrage gewinnt (Pen-Test F-01).
+    final pending = <String, int>{};
     for (final m in f.members) {
       if (m.status != MemberStatus.requested || m.request != RequestCheck.valid) continue;
       final nonce = _knockNonces[m.userId];
-      if (nonce == null || !_autoTickets.contains(nonce) || !_autoApproving.add(m.userId)) continue;
+      if (nonce != null) pending[nonce] = (pending[nonce] ?? 0) + 1;
+    }
+    for (final m in f.members) {
+      if (m.status != MemberStatus.requested || m.request != RequestCheck.valid) continue;
+      final nonce = _knockNonces[m.userId];
+      if (nonce == null || !_autoTickets.contains(nonce) || pending[nonce] != 1 || !_autoApproving.add(m.userId)) continue;
       approveRequest(m.userId).catchError((Object e) {
         AppLog.w('gateway', 'Automatische Bestätigung fehlgeschlagen');
       }).whenComplete(() => _autoApproving.remove(m.userId)).ignore();
@@ -1887,10 +1895,22 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (!Permissions.canDecideRequest(f, m)) throw const GatewayException(GatewayError.notAllowed);
     // Nur Anfragen mit eigenem, gültigem Link (wird dabei verbraucht, S2) oder per Familien-Code (E-65).
     if (m.request != RequestCheck.valid && m.request != RequestCheck.code) throw const GatewayException(GatewayError.notAllowed);
-    await _roomOp((room) => room.invite(userId));
     final nonce = _knockNonces[userId];
-    if (nonce != null) {
+    final viaLink = nonce != null && InviteLink.isNonce(nonce);
+    if (viaLink) {
+      // Der Stand aus [m] kann veraltet sein: erneut prüfen und den Link vor dem ersten `await` verbrauchen,
+      // damit eine zweite, gleichzeitige Bestätigung mit derselben Link-ID scheitert (Pen-Test F-01).
+      if (_checkRequest('$knockReasonPrefix$nonce') != RequestCheck.valid) throw const GatewayException(GatewayError.notAllowed);
       _usedTickets.add(nonce);
+    }
+    try {
+      // Die Link-ID steht im Grund der Einladung; so erkennen auch andere Moderator-Geräte den Link als verbraucht.
+      await _roomOp((room) => room.invite(userId, reason: viaLink ? '$knockReasonPrefix$nonce' : null));
+    } catch (_) {
+      if (viaLink) _usedTickets.remove(nonce);
+      rethrow;
+    }
+    if (viaLink) {
       await _publishTicket(InviteTicket(nonce: nonce, expires: _roomTickets[nonce] ?? _issuedInvites()[nonce] ?? DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000 + 60, used: true));
       final invites = _issuedInvites()..remove(nonce);
       try {
@@ -2985,7 +3005,16 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   Family _buildFamily(Room room, String me) {
     final members = <FamilyMember>[];
-    for (final u in room.getParticipants()) {
+    final participants = room.getParticipants();
+    // Einladungen mit Link-ID im Grund ([approveRequest]): Der Link gilt als verbraucht, auch wenn der Vermerk
+    // eines anderen Moderator-Geräts noch nicht angekommen ist (Pen-Test F-01). Einladen dürfen nur Moderatoren.
+    for (final u in participants) {
+      final reason = u.content['reason'];
+      if (u.membership != Membership.invite || reason is! String || !reason.startsWith(knockReasonPrefix)) continue;
+      final nonce = reason.substring(knockReasonPrefix.length);
+      if (InviteLink.isNonce(nonce)) _usedTickets.add(nonce);
+    }
+    for (final u in participants) {
       final MemberStatus? status = switch (u.membership) {
         Membership.join => MemberStatus.joined,
         Membership.invite => MemberStatus.invited,

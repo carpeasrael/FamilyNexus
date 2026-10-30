@@ -320,6 +320,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logout => 'Sign out';
 
   @override
+  String get logoutBody =>
+      'Events, the shopping list and tasks are removed from this device. Everything already sent stays encrypted in your family and comes back after you sign in again; changes not yet sent are lost.';
+
+  @override
   String get settingsAccount => 'Account';
 
   @override
@@ -879,8 +883,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String familyInviteLinkHint(String validity) {
-    return 'The link is valid for $validity and can be used once. Whoever opens it is admitted automatically as soon as a moderator\'s app is online.';
+    return 'The link is valid for $validity and can be used once. Whoever opens it is admitted automatically as soon as a moderator\'s app is online. Only give it to the person you want to invite.';
   }
+
+  @override
+  String familyInviteLinkHintManual(String validity) {
+    return 'The link is valid for $validity and can be used once. A moderator confirms the request before the person is admitted.';
+  }
+
+  @override
+  String get familyInviteManual => 'Confirm requests yourself';
+
+  @override
+  String get familyInviteManualHint =>
+      'Without this setting, the app admits anyone with the link automatically. Changing it creates a new link.';
 
   @override
   String get familyInviteShowQr => 'Show QR code';
@@ -1002,7 +1018,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLockHint =>
-      'Locks the app after inactivity. Confirmation uses your device lock; the app stores no PIN of its own.';
+      'Locks the app after inactivity. Confirmation uses your device lock; the app stores no PIN of its own. The lock is a privacy screen: it hides the app, while your data is protected by encryption and your device lock.';
 
   @override
   String get settingsLockUnavailable =>
@@ -1679,6 +1695,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get webTabBusyBody =>
       'The app is already running in another tab or window of this browser. Two tabs at the same time would corrupt the local data. Close the other tab and try again.';
+
+  @override
+  String get webEmbeddedTitle => 'Opened inside another page';
+
+  @override
+  String get webEmbeddedBody =>
+      'For security reasons, FamilyNexus cannot be used embedded in another website. Open the app directly in its own tab.';
 
   @override
   String get privacy13Title => 'Browser version';

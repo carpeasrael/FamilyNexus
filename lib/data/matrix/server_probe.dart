@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io' show IOException;
 
 import 'package:http/http.dart' as http;
 
 import '../../core/app_log.dart';
 import '../../domain/registration.dart';
 import '../../domain/server.dart';
+import '../../domain/text_sanitizer.dart';
 import 'matrix_gateway.dart';
 
 /// Prüft einen Homeserver: Erreichbarkeit, Protokollversionen, Passwort-Login
@@ -52,14 +54,18 @@ class ServerProbe {
       throw const GatewayException(GatewayError.serverUnreachable);
     } on http.ClientException {
       throw const GatewayException(GatewayError.serverUnreachable);
+    } on IOException catch (e) {
+      // TLS-Fehler (z. B. untergeschobenes Zertifikat) und Netzfehler nicht roh weiterreichen (Pen-Test I-03).
+      AppLog.w('probe', 'Server nicht erreichbar (${e.runtimeType})');
+      throw const GatewayException(GatewayError.serverUnreachable);
     }
   }
 
   static String? _cleanText(Object? v, {int max = 80}) {
     if (v is! String) return null;
-    final s = v.replaceAll(RegExp(r'[\x00-\x1F\x7F]'), ' ').trim();
-    if (s.isEmpty) return null;
-    return s.length > max ? s.substring(0, max) : s;
+    // Wie Anzeigenamen: auch Bidi- und unsichtbare Zeichen entfernen (Pen-Test F-08, Spoofing).
+    final s = TextSanitizer.clean(v, max: max);
+    return s.isEmpty ? null : s;
   }
 
   static final RegExp _verRe = RegExp(r'^v(\d{1,3})\.(\d{1,3})$');

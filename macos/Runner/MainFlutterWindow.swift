@@ -30,6 +30,20 @@ class MainFlutterWindow: NSWindow {
     window.setMethodCallHandler { call, result in
       if call.method == "setSecure" {
         result(nil) // bewusst ohne Wirkung: das Fenster bleibt aufnehmbar
+      } else if call.method == "copySecret" {
+        // Notfall-Schlüssel: nur auf diesem Mac (kein Universal Clipboard) und für Verlaufs-Werkzeuge
+        // als vertraulich markiert (nspasteboard.org). Das Leeren nach 60 s übernimmt Dart.
+        guard let text = call.arguments as? String, text.count <= 512 else {
+          result(FlutterError(code: "invalid", message: nil, details: nil))
+          return
+        }
+        let pb = NSPasteboard.general
+        pb.prepareForNewContents(with: .currentHostOnly)
+        let concealed = NSPasteboard.PasteboardType("org.nspasteboard.ConcealedType")
+        pb.declareTypes([.string, concealed], owner: nil)
+        pb.setString(text, forType: .string)
+        pb.setString("", forType: concealed)
+        result(nil)
       } else {
         result(FlutterMethodNotImplemented)
       }

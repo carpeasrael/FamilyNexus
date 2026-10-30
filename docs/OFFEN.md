@@ -44,7 +44,8 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
   Beendet das System die App während der Anmeldung im Browser, ist die OAuth- bzw. UIA-Sitzung verloren (der Einladungslink
   bleibt erhalten); es genügt, erneut auf „Konto erstellen“ zu tippen. Ältere App-Versionen lehnen Einladungslinks neuerer
   Version ab und melden „neuere Version“ (`v=2` ab 1.1.0, `v=3` mit E-63). Links von Servern im Heimnetz werden mit Warnung angenommen (E-59).
-- **SA-8:** Notfall-Schlüssel in Zwischenablage (Android: als vertraulich markiert; nach 60 s bzw. beim Zurückkehren in die App geleert – bleibt liegen, wenn die Person nicht zurückkehrt) bzw. als unverschlüsselte Datei, nur auf ausdrücklichen Tipp.
+- **SA-8:** Notfall-Schlüssel in Zwischenablage (Android: als vertraulich markiert; iOS/macOS: nur auf diesem Gerät, kein Universal Clipboard, iOS lässt ihn nach 60 s verfallen, macOS markiert ihn als vertraulich; überall nach 60 s bzw. beim Zurückkehren in die App geleert – unter Android, Linux und Windows bleibt er liegen, wenn die Person nicht zurückkehrt) bzw. als unverschlüsselte Datei, nur auf ausdrücklichen Tipp.
+- **SA-10 App-Sperre = Sichtschutz (E-17, Pen-Test F-04):** Die Datenbankschlüssel sind nicht an die Geräteanmeldung gebunden (Hintergrund-Erinnerungen und Synchronisierung brauchen sie ohne Anmeldung). Eine optionale „starke Sperre“ (Wrapping-Schlüssel mit Benutzer-Authentifizierung: Android `BiometricPrompt` + `CryptoObject`, iOS `kSecAccessControlUserPresence`) ist nicht umgesetzt.
 - **OAuth-Unit-Tests** (`test/data/sdk_registration_test.dart`, Gruppe OAuth) brauchen vodozemac und laufen deshalb in `tool/e2e.sh`, in CI werden sie übersprungen.
 
 - **Online-Status (E-38):** Mehrere Geräte desselben Kontos werden einzeln geführt; die Person gilt als online, solange irgendein
@@ -129,7 +130,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 ## Windows (E-52)
 
 - Gebaut mit dem Release-Workflow (Job `windows`) und der Datenbank-Bibliothek geladen/geprüft; **nicht auf einem Windows-Gerät bedient** (Anmeldung gegen echten Server, Anmeldeinformationsverwaltung, Erinnerungen, App-Sperre mit Windows Hello).
-- **SA-6:** kein Bildschirmschutz. Keine Code-Signatur: Windows SmartScreen warnt beim ersten Start („Weitere Informationen → Trotzdem ausführen“).
+- Bildschirmschutz (`SetWindowDisplayAffinity`, Pen-Test I-04) ist umgesetzt, aber **weder gebaut noch auf einem Windows-Gerät geprüft** (Screenshot, Teams/Zoom-Freigabe, Abschalten in den Einstellungen). Keine Code-Signatur: Windows SmartScreen warnt beim ersten Start („Weitere Informationen → Trotzdem ausführen“).
 - Einladungslinks aus dem Browser funktionieren nicht automatisch (Schema nicht registriert, keine Einzelinstanz); Start mit `familynexus.exe familynexus://join?…` oder Link in der App einfügen. Zwei gleichzeitig gestartete Instanzen sind nicht abgesichert.
 - Nur **x64**. Erinnerungen erscheinen nur, solange die App läuft. Kein Installer (Zip zum Entpacken).
 - Die Plugin-Vorlagen brauchen unter neueren Visual-Studio-Versionen `_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS` (`windows/CMakeLists.txt`); entfällt, sobald `local_auth_windows` auf C++20-Coroutinen umgestellt ist.
@@ -145,6 +146,8 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 - Nur ein Tab gleichzeitig (Web Locks). Ältere Browser ohne Web Locks erzwingen das nicht.
 - IndexedDB schreibt verzögert: Schließt man den Tab unmittelbar nach einer Änderung, kann sie fehlen.
 - `'unsafe-eval'` in der Inhaltsrichtlinie (vodozemac-Anbindung); entfällt, sobald die Anbindung ohne `new Function` auskommt.
+- Schutz vor Einbettung (Clickjacking, Pen-Test F-06): `frame-ancestors` geht nicht per `<meta>`, GitHub Pages setzt keine eigenen Header. Die App verweigert deshalb selbst den Start in einem fremden Rahmen (`isEmbedded`). Wer die Web-Version selbst hostet, sollte zusätzlich `Content-Security-Policy: frame-ancestors 'none'` setzen.
+- Der Tresor nimmt nur Rundenzahlen ab 600 000 an (Pen-Test F-06); ein untergeschobener Tresor mit weniger Runden wird nicht entsperrt.
 - Das SDK-Patch-Skript ist auf `matrix` 14.2.0 festgelegt und bricht bei jeder anderen Version ab (bewusst).
 
 ## Betrieb / Build

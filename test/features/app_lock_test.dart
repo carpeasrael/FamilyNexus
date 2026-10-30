@@ -63,6 +63,44 @@ void main() {
       expect(c.locked, isTrue);
     });
 
+    test('Pen-Test I-05: zurückgestellte Uhrzeit verhindert die Sperre nicht', () async {
+      var now = DateTime.utc(2026, 10, 21, 12);
+      var mono = Duration.zero;
+      final store = MemoryKeyValueStore()..data['lockEnabled'] = 'true'..data['lockTimeout'] = '60';
+      final settings = await SettingsController.load(store);
+      final c = AppLockController(settings: settings, auth: FakeDeviceAuth(), clock: () => now, monotonic: () => mono);
+      await c.unlock('x');
+
+      // Wanduhr um 10 s vor, monotone Uhr um 120 s: Jemand hat die Uhrzeit verstellt.
+      c.onPaused();
+      now = now.add(const Duration(seconds: 10));
+      mono += const Duration(seconds: 120);
+      c.onResumed();
+      expect(c.locked, isTrue, reason: 'monotone Uhr über der Auszeit');
+
+      await c.unlock('x');
+      // Wanduhr rückwärts, monotone Uhr kaum weiter.
+      c.onPaused();
+      now = now.subtract(const Duration(hours: 1));
+      mono += const Duration(seconds: 1);
+      c.onResumed();
+      expect(c.locked, isTrue, reason: 'rückwärts laufende Wanduhr');
+
+      await c.unlock('x');
+      // Gerät schlief: monotone Uhr stand still, die Wanduhr lief weiter.
+      c.onPaused();
+      now = now.add(const Duration(minutes: 5));
+      c.onResumed();
+      expect(c.locked, isTrue, reason: 'Wanduhr erfasst den Geräteschlaf');
+
+      await c.unlock('x');
+      c.onPaused();
+      now = now.add(const Duration(seconds: 30));
+      mono += const Duration(seconds: 30);
+      c.onResumed();
+      expect(c.locked, isFalse, reason: 'beide Uhren unter der Auszeit');
+    });
+
     test('Auszeit „sofort“ sperrt bei jeder Rückkehr', () async {
       final now = DateTime.utc(2026, 10, 21, 12);
       final store = MemoryKeyValueStore()..data['lockEnabled'] = 'true'..data['lockTimeout'] = '0';

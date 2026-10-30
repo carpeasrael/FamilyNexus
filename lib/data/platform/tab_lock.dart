@@ -2,3 +2,6 @@ import 'web/web_tab_lock_stub.dart' if (dart.library.js_interop) 'web/web_tab_lo
 
 /// Siehe `acquireWebTabLock`: nur im Browser wirksam.
 Future<bool> acquireTabLock() => impl.acquireWebTabLock();
+
+/// Siehe `isWebEmbedded`: nur im Browser wirksam.
+bool isEmbedded() => impl.isWebEmbedded();

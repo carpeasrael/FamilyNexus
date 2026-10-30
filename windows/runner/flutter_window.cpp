@@ -6,6 +6,11 @@
 #include "flutter/generated_plugin_registrant.h"
 #include "link_handler.h"
 
+// Ab Windows 10 Version 2004; ältere SDKs kennen die Konstante nicht.
+#ifndef WDA_EXCLUDEFROMCAPTURE
+#define WDA_EXCLUDEFROMCAPTURE 0x00000011
+#endif
+
 FlutterWindow::FlutterWindow(const flutter::DartProject& project,
                              const std::string& initial_link)
     : project_(project), initial_link_(initial_link) {}
@@ -49,6 +54,38 @@ bool FlutterWindow::OnCreate() {
           result->NotImplemented();
         }
       });
+
+  // Bildschirmschutz (E-18, Pen-Test I-04): Das Fenster fehlt in Screenshots, Aufnahmen und
+  // Bildschirmfreigaben. Ältere Windows-Versionen ohne WDA_EXCLUDEFROMCAPTURE zeigen es dort schwarz.
+  window_channel_ =
+      std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+          flutter_controller_->engine()->messenger(),
+          "de.inneso.familynexus/window",
+          &flutter::StandardMethodCodec::GetInstance());
+  window_channel_->SetMethodCallHandler(
+      [this](const flutter::MethodCall<flutter::EncodableValue>& call,
+             std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>>
+                 result) {
+        if (call.method_name() == "setSecure") {
+          bool secure = true;
+          if (const auto* value = std::get_if<bool>(call.arguments())) {
+            secure = *value;
+          }
+          HWND hwnd = GetHandle();
+          BOOL ok = SetWindowDisplayAffinity(
+              hwnd, secure ? WDA_EXCLUDEFROMCAPTURE : WDA_NONE);
+          if (!ok && secure) {
+            ok = SetWindowDisplayAffinity(hwnd, WDA_MONITOR);
+          }
+          if (ok) {
+            result->Success();
+          } else {
+            result->Error("affinity", "SetWindowDisplayAffinity failed");
+          }
+        } else {
+          result->NotImplemented();
+        }
+      });
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
@@ -65,6 +102,7 @@ bool FlutterWindow::OnCreate() {
 
 void FlutterWindow::OnDestroy() {
   link_channel_ = nullptr;
+  window_channel_ = nullptr;
   if (flutter_controller_) {
     flutter_controller_ = nullptr;
   }

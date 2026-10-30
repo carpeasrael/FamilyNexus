@@ -79,6 +79,41 @@ void main() {
       expect(d.invitations, isEmpty);
     });
 
+    test('Pen-Test F-01: zwei gleichzeitige Anfragen mit demselben Link – keine automatische Bestätigung, manuell nur eine', () async {
+      final a = await _login('inra');
+      await a.createFamily('Race-Familie');
+      await E2e.until(() => a.family != null, what: 'Familie bei A');
+      final link = InviteLink.tryParse(await a.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
+      final c = await _login('inrc');
+      final d = await _login('inrd');
+      // Das Gerät des Moderators synchronisiert kurz nicht (Hintergrund, Funkloch); beide Anfragen kommen zusammen an.
+      final client = a.sdkClient!;
+      client.backgroundSync = false;
+      await client.abortSync();
+      await Future.wait(<Future<void>>[c.requestToJoin(link), d.requestToJoin(link)]);
+      client.backgroundSync = true;
+      await E2e.until(
+        () => a.family?.member(c.userId!)?.request == RequestCheck.valid && a.family?.member(d.userId!)?.request == RequestCheck.valid,
+        what: 'A sieht beide Anfragen',
+      );
+      await Future<void>.delayed(const Duration(seconds: 8));
+      expect(c.invitations, isEmpty, reason: 'mehrere Anfragen je Link: der Moderator entscheidet');
+      expect(d.invitations, isEmpty, reason: 'mehrere Anfragen je Link: der Moderator entscheidet');
+
+      // Der Moderator bestätigt beide fast gleichzeitig: nur eine Einladung, der Link ist danach verbraucht.
+      final results = await Future.wait(<Future<bool>>[
+        a.approveRequest(c.userId!).then((_) => true, onError: (Object _) => false),
+        a.approveRequest(d.userId!).then((_) => true, onError: (Object _) => false),
+      ]);
+      expect(results.where((ok) => ok), hasLength(1));
+      final invited = results.first ? c : d;
+      final other = results.first ? d : c;
+      await E2e.until(() => invited.invitations.isNotEmpty, what: 'eine Einladung');
+      await E2e.until(() => a.family!.member(other.userId!)!.request == RequestCheck.unknown, what: 'Link verbraucht');
+      await expectLater(a.approveRequest(other.userId!), throwsA(isA<GatewayException>()));
+      expect(other.invitations, isEmpty);
+    });
+
     test('Familien-Code ohne Link: Moderator sieht die Anfrage als „Code“, nichts geschieht von allein, Bestätigung führt zum Beitritt', () async {
       final a = await _login('incda');
       await a.createFamily('Code-Familie');

@@ -12,7 +12,8 @@ import '../common/invite_link_text.dart';
 
 /// „Jemanden einladen“ (E-49, E-56): erzeugt einen einmaligen, zeitlich begrenzten Link und bietet
 /// drei einfache Wege an – QR-Code zum Abscannen, E-Mail mit Anleitung, Link kopieren. Die Gültigkeit
-/// ist wählbar (1, 3 oder 7 Tage, Issue #6); eine andere Wahl erzeugt einen neuen Link.
+/// ist wählbar (1, 3 oder 7 Tage, Issue #6); eine andere Wahl erzeugt einen neuen Link. Unter „Erweitert“
+/// lässt sich die automatische Bestätigung abschalten (Pen-Test I-01): Dann bestätigt ein Moderator jede Anfrage.
 Future<void> showInviteDialog(BuildContext context, MatrixGateway gateway) async {
   final l = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
@@ -46,6 +47,9 @@ class _InviteDialogState extends State<_InviteDialog> {
   late String _link = widget.firstLink;
   bool _busy = false;
 
+  /// Anfragen selbst bestätigen statt automatisch aufnehmen (E-64); der erste Link nimmt automatisch auf.
+  bool _manual = false;
+
   /// Server für Konto und Anmeldung der Eingeladenen (Feld `srv`, E-63); `null` = Server des Einladenden.
   String? _accountServer;
   final TextEditingController _server = TextEditingController();
@@ -62,16 +66,18 @@ class _InviteDialogState extends State<_InviteDialog> {
   }
 
   /// Neuer Link mit geänderter Gültigkeit und/oder anderem Konto-Server; der alte bleibt gültig, wird aber nicht mehr gezeigt.
-  Future<void> _regenerate({Duration? validity, String? accountServer, bool keepServer = true}) async {
+  Future<void> _regenerate({Duration? validity, String? accountServer, bool keepServer = true, bool? manual}) async {
     final l = AppLocalizations.of(context);
     final v = validity ?? _validity;
     final srv = keepServer ? _accountServer : accountServer;
+    final m = manual ?? _manual;
     setState(() => _busy = true);
     try {
-      final link = await widget.gateway.createInviteLink(validity: v, accountServer: srv);
+      final link = await widget.gateway.createInviteLink(validity: v, autoApprove: !m, accountServer: srv);
       if (mounted) {
         setState(() {
           _validity = v;
+          _manual = m;
           _accountServer = srv;
           _link = link;
           _serverError = null;
@@ -95,6 +101,11 @@ class _InviteDialogState extends State<_InviteDialog> {
   Future<void> _changeValidity(Duration d) async {
     if (d == _validity || _busy) return;
     await _regenerate(validity: d);
+  }
+
+  Future<void> _changeManual(bool manual) async {
+    if (manual == _manual || _busy) return;
+    await _regenerate(manual: manual);
   }
 
   /// Übernimmt den eingetragenen Server (leer = Standard). Eingabe wird wie überall als Server-Adresse geprüft.
@@ -175,6 +186,14 @@ class _InviteDialogState extends State<_InviteDialog> {
             title: Text(l.advTitle),
             expandedCrossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l.familyInviteManual),
+                subtitle: Text(l.familyInviteManualHint),
+                value: _manual,
+                onChanged: _busy ? null : _changeManual,
+              ),
+              const SizedBox(height: 8),
               Text(l.familyInviteServerHint, style: Theme.of(context).textTheme.bodySmall),
               const SizedBox(height: 8),
               TextField(
@@ -209,7 +228,10 @@ class _InviteDialogState extends State<_InviteDialog> {
               child: Semantics(liveRegion: true, child: Text(_notice!, textAlign: TextAlign.center)),
             ),
           const SizedBox(height: 12),
-          Text(l.familyInviteLinkHint(inviteValiditySentence(l, _validity)), style: Theme.of(context).textTheme.bodySmall),
+          Text(
+            (_manual ? l.familyInviteLinkHintManual : l.familyInviteLinkHint)(inviteValiditySentence(l, _validity)),
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
         ]),
       ),
       actions: <Widget>[

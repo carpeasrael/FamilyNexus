@@ -33,8 +33,9 @@ class PlatformInfo {
   /// Linux, Windows und Browser: SQLCipher/SQLite3MultipleCiphers über `sqflite_common_ffi(_web)`.
   static bool get usesFfiDatabase => kIsWeb || isLinux || isWindows;
 
-  /// Kein Schutz vor Bildschirmaufnahmen (SA-6, SA-7; macOS: bewusst erlaubt).
-  static bool get hasNoScreenProtection => kIsWeb || isLinux || isWindows || isMacOS;
+  /// Kein Schutz vor Bildschirmaufnahmen (SA-6, SA-7; macOS: bewusst erlaubt). Windows nimmt das Fenster
+  /// seit Pen-Test I-04 von Aufnahmen aus (`SetWindowDisplayAffinity`).
+  static bool get hasNoScreenProtection => kIsWeb || isLinux || isMacOS;
 
   /// Keine Geräteanmeldung für die App-Sperre (Linux, Browser).
   static bool get hasNoDeviceAuth => kIsWeb || isLinux;
