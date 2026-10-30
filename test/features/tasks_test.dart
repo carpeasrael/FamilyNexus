@@ -249,4 +249,19 @@ void main() {
     expect((e.by, e.listId, e.periodKey), (ben.gateway.userId, forBen.id, '2026-W43'));
     anna.services.closeCalendar(); // nie im Widget-Baum: Zeitgeber selbst beenden
   });
+
+  testWidgets('#98: Liste für ein nicht mehr vorhandenes Mitglied zeigt „Ehemaliges Mitglied“, nie die Matrix-ID', (tester) async {
+    _tall(tester);
+    final app = await buildTestApp(clock: () => DateTime.utc(2026, 10, 24, 8));
+    await _open(tester, app);
+    await app.services.tasks!.create(
+      title: 'Müll rausbringen',
+      assignee: '@geloescht:fake.test',
+      rule: const TaskRule.weekdays(),
+      items: <String>['Tonne raus'],
+    );
+    await _openTasks(tester);
+    expect(find.textContaining('Zugewiesen an Ehemaliges Mitglied'), findsOneWidget);
+    expect(find.textContaining('@geloescht'), findsNothing);
+  });
 }

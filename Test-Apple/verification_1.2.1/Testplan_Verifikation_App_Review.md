@@ -3,7 +3,7 @@
 **Planversion: 1.0** (28.10.2026) · Dokument-ID `TP-FN-VR-121` · Reports nennen Planversion und Git-Commit (z. B. „TP-FN-VR-121 v1.0 @ 0281d70“).
 
 Bezug: Anfrage von App Review (sechs Punkte und „Prevent Common Issues“, Wortlaut in Anhang C), `../Massnahmenplan_App_Store_Review.md` (Maßnahmen 1 bis 11), Gesamtplan `../Testplan_FamilyNexus.md` (TP-FN-001 v1.6), Review-Notizen `store/metadata/ios/review_notes.txt` bzw. `store/metadata/macos/review_notes.txt`, `docs/STORE.md` (Abschnitt 4), `docs/export-compliance/`, Issue #15.
-Soll-Version: `version:` in `pubspec.yaml` auf aktuellem `main` (beim Schreiben **1.2.1+19** = „1.2.1 (20)“). Maßgeblich ist der Build, der in App Store Connect zur Prüfung eingereicht ist bzw. wird.
+Soll-Version: `version:` in `pubspec.yaml` auf aktuellem `main` (beim Schreiben **1.2.1+21** = „1.2.1 (21)“). Maßgeblich ist der Build, der in App Store Connect zur Prüfung eingereicht ist bzw. wird.
 
 ## 1. Ziel und Aufbau
 
@@ -66,7 +66,7 @@ Ergebnisse: ✅ bestanden · ⚠️ bestanden mit Befund · ❌ fehlgeschlagen �
 | V-03 | G1 | **Neuestes Betriebssystem:** Einstellungen → Allgemein → Softwareupdate; danach Einstellungen → Allgemein → Info | „iOS ist auf dem neuesten Stand“; Version mit der aktuellen Version auf apple.com/ios vergleichen; Version in Abschnitt 2 eintragen. Beta-Versionen gelten **nicht** als neuestes Betriebssystem | | V-03a-G1, V-03b-G1 | |
 | V-04 | G1 | **App aus TestFlight installieren:** TestFlight → FamilyNexus → Soll-Build → „Installieren“. Liegt eine ältere Version vor: erst in der App Einstellungen → „Alle lokalen Daten löschen“, dann aktualisieren | TestFlight zeigt den Soll-Build als installiert | | V-04-G1 | |
 | V-05 | G1 | **Lokale Daten leer:** App starten; zeigt sie nicht „Willkommen“: Einstellungen → „Alle lokalen Daten löschen“ → „Endgültig löschen“; App beenden (App-Umschalter, nach oben wischen) | Nach dem Neustart „Willkommen bei FamilyNexus“ mit drei Wegen. Danach App **beenden**, damit die Aufnahme mit dem Start beginnt | | V-05-G1 | |
-| V-06 | G1 | **Version in der App:** vor V-05 oder auf G2 mit demselben Build: Menü unten bzw. Einstellungen → „Über die App“ | „Version 1.2.1 (20)“ = Soll | | V-06-G1 | |
+| V-06 | G1 | **Version in der App:** vor V-05 oder auf G2 mit demselben Build: Menü unten bzw. Einstellungen → „Über die App“ | „Version 1.2.1 (21)“ = Soll | | V-06-G1 | |
 | V-07 | G2 | **Prüfkonto R1 funktioniert:** auf G2 „Ich habe schon ein Konto“ → „Bei matrix.org anmelden“ → Browser → R1 → zurück → „Dieses Gerät freischalten“ → Notfall-Schlüssel aus den Review-Notizen (Platzhalter-Ersatz, nur lokal) → „Freischalten“ | Anmeldung ohne Rückfrage; Hauptansicht mit Beispielfamilie; R1 ist Moderator. Schlägt der Schlüssel fehl: neuen Notfall-Schlüssel erstellen (Einstellungen → „Notfall-Schlüssel und Geräte“) und in der Antwort/den Notizen aktualisieren | | V-07-G2 | |
 | V-08 | G2 | **Beispieldaten vollständig** (als R1): Tab „Familie“, „Heute“, Kalender, Chat, Einkauf, Menü → „Aufgaben“ | Familie mit R1 (Moderator) und R2 (Mitglied); mindestens: ein geteilter Termin in den nächsten 7 Tagen, ein wiederkehrender Termin, Chatverlauf mit Nachrichten von beiden, Einkaufsliste mit offenen und erledigten Einträgen, eine Aufgabenliste. Fehlendes ergänzen | | V-08a-G2 … V-08e-G2 | |
 | V-09 | G2 | **Prüfkonto R2 funktioniert:** auf G2 abmelden, R2 anmelden wie V-07 (eigener Notfall-Schlüssel von R2) → Tab „Familie“ | R2 ist Mitglied (kein „Mitglied einladen“, „Nur Moderatoren verwalten die Familie.“); Familie und Daten sichtbar | | V-09-G2 | |
@@ -90,7 +90,7 @@ Eine **zusammenhängende** Aufnahme auf G1, ohne Schnitt. Sie beginnt auf dem Ho
 | S-04 | **Familie gründen** | Name `Demo family` → „Create family“ → „Later“ | „Done! …“; Hauptansicht „Today“ | | |
 | S-05 | **Benachrichtigungen** | Hinweis „Notifications are blocked“ → „Allow“ → Systemdialog → „Allow“ | Systemdialog, danach Hinweis weg | | |
 | S-06 | **Typischer Ablauf (W1)** | Kalender → „New event“ → `Dentist`, morgen 10:00, „Shared“ → „Save“; Chat → `Hello family` → „Send“; Einkauf → `Milk` → „Add“ → abhaken; Menü → „Tasks“ (nur ansehen) | Termin mit „Shared“, Nachricht mit Uhrzeit, Eintrag unter „Done“ | | |
-| S-07 | **Version** | Menü öffnen → unten „Version …“ ablesen | „Version 1.2.1 (20)“ = eingereichter Build | | |
+| S-07 | **Version** | Menü öffnen → unten „Version …“ ablesen | „Version 1.2.1 (21)“ = eingereichter Build | | |
 | S-08 | **Kontolöschung (W1)** | Menü → Settings → Account → „Delete account“ → Dialog lesen → weiter zur Löschseite von matrix.org → Löschung bestätigen → zurück zur App | Dialog „Delete account?“; Löschseite des Anbieters; danach „Welcome“ (lokale Daten gelöscht) | | |
 | S-09 | **Anmeldung (R1)** | „I already have an account“ → „Sign in at matrix.org“ → Browser: R1 (Passwort tippen, es erscheint als Punkte) → „Continue“ → „Unlock this device“ → Notfall-Schlüssel R1 einfügen → „Unlock“ | Anmeldung wie in den Review-Notizen; Hauptansicht mit Beispielfamilie und Beispieldaten | | |
 | S-10 | **Beispielfamilie (R1)** | „Today“ ansehen; Tab „Family“ (R1 Moderator, R2 Mitglied); Kalender „Week“; Chat | Daten aus V-08; Rollen sichtbar | | |

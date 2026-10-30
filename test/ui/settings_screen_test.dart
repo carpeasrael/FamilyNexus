@@ -6,6 +6,7 @@ import 'package:family_nexus/app/app_version.dart';
 import '../support/memory_stores.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
+import 'package:family_nexus/data/platform/reminder_scheduler.dart';
 import 'package:family_nexus/domain/app_settings.dart';
 import 'package:family_nexus/ui/theme/tokens.dart';
 import 'package:flutter/material.dart';
@@ -240,5 +241,27 @@ void main() {
     expect(report, contains('Anna (@anna:fake.test) – Moderator – beigetreten'));
     expect(report, contains('Eigene Mitgliedschaft: beigetreten'));
     expect(report, contains('nur Ende-zu-Ende-verschlüsselt'));
+  });
+
+  testWidgets('#97: Hinweis „in den Systemeinstellungen ausgeschaltet“ nutzt die Breite, Schaltfläche sichtbar', (tester) async {
+    tester.view.physicalSize = const Size(393, 852);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final app = await buildTestApp(lang: 'de');
+    app.scheduler
+      ..current = ReminderPermission.notificationsDenied
+      ..grantOnRequest = false;
+    await tester.pumpWidget(FamilyNexusApp(services: app.services));
+    await tester.pumpAndSettle();
+    await app.services.reminders!.reschedule();
+    await app.services.reminders!.requestPermission();
+    await openSettings(tester);
+    final hint = find.textContaining('in den Systemeinstellungen ausgeschaltet');
+    await tester.scrollUntilVisible(hint, 300, scrollable: find.byType(Scrollable).first);
+    await tester.pumpAndSettle();
+    expect(hint, findsOneWidget);
+    // Vorher stand der Text in einer Spalte von ca. 12 Zeichen; er muss fast die volle Breite nutzen.
+    expect(tester.getSize(hint).width, greaterThan(250));
+    expect(find.widgetWithText(TextButton, 'Einstellungen öffnen'), findsOneWidget);
   });
 }

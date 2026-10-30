@@ -337,10 +337,16 @@ class _RemindersSection extends StatelessWidget {
           if (perm != ReminderPermission.granted)
             Builder(builder: (context) {
               final hint = reminderPermissionHint(l, coordinator, perm);
-              return ListTile(
-                leading: const Icon(Icons.notifications_off_outlined),
-                title: Text(hint.text),
-                trailing: TextButton(onPressed: hint.onPressed, child: Text(hint.action)),
+              // Kein ListTile: Eine lange Schaltfläche als trailing drückte den Text in eine schmale, abgeschnittene Spalte (#97).
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                    const Padding(padding: EdgeInsets.only(top: 2, right: 16), child: Icon(Icons.notifications_off_outlined)),
+                    Expanded(child: Text(hint.text)),
+                  ]),
+                  Align(alignment: AlignmentDirectional.centerEnd, child: TextButton(onPressed: hint.onPressed, child: Text(hint.action))),
+                ]),
               );
             }),
         ]);

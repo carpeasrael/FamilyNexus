@@ -7,6 +7,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
+import '../chat/sender_name.dart';
 import 'shopping_controller.dart';
 
 /// Gemeinsamer Einkaufszettel der Familie (E-40).
@@ -98,7 +99,7 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
       builder: (context, _) {
         final open = c.open;
         final done = c.done;
-        String nameOf(String id) => id == c.me ? l.chatYou : (services.gateway.family?.member(id)?.displayName ?? id);
+        String nameOf(String id) => memberLabel(l, services.gateway.family, id, me: c.me);
         return Column(children: <Widget>[
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
