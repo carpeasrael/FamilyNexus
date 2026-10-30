@@ -26,7 +26,7 @@ class EventTile extends StatelessWidget {
     final e = occurrence.event;
     final color = AuroraTokens.personColors[controller.displayColorIndex(e) % AuroraTokens.personColors.length];
     final mine = e.ownerId == controller.me;
-    final owner = mine ? '' : ', ${l.eventOwner(controller.nameOf(e.ownerId))}';
+    final owner = mine ? '' : ', ${l.eventOwner(controller.displayNameOf(e.ownerId) ?? l.chatFormerMember)}';
     final repeat = e.recurrence.isRecurring ? ', ${l.eventRecurring}' : '';
     final privateLabel = e.isShared ? l.visibilityShared : l.visibilityPrivate;
     final range = fmt.range(occurrence, l);
@@ -51,7 +51,7 @@ class EventTile extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(range, style: monoStyle(context, size: 13, color: t.textSecondary)),
                   if (!mine)
-                    Text(l.eventOwner(controller.nameOf(e.ownerId)), style: Theme.of(context).textTheme.bodySmall),
+                    Text(l.eventOwner(controller.displayNameOf(e.ownerId) ?? l.chatFormerMember), style: Theme.of(context).textTheme.bodySmall),
                   if (e.location.isNotEmpty)
                     Row(children: <Widget>[
                       Icon(Icons.place_outlined, size: 14, color: t.textSecondary),

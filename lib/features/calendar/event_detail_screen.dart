@@ -11,6 +11,7 @@ import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
 import '../reminders/reminder_coordinator.dart';
+import '../chat/sender_name.dart';
 import 'calendar_controller.dart';
 import 'event_editor_screen.dart';
 import 'event_tile.dart';
@@ -140,7 +141,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         final occurrence = _occurrenceOf(e);
         final mine = c.service.canEdit(e);
         final family = services.gateway.family;
-        String nameOf(String id) => id == c.me ? l.chatYou : (family?.member(id)?.displayName ?? id);
+        String nameOf(String id) => memberLabel(l, family, id, me: c.me);
         final rsvps = c.rsvpsOf(e.id);
         final defaults = services.settings.settings.defaultReminderMinutes;
         final reminderSet = c.remindersOf(e, defaults).toSet();

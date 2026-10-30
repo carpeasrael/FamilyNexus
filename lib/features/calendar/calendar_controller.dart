@@ -119,7 +119,13 @@ class CalendarController extends ChangeNotifier {
   int displayColorIndex(CalendarEvent e) => e.ownerId == me ? e.colorIndex : colorIndexFor(e.ownerId);
 
   /// Anzeigename einer Person (Familie), sonst die Kennung.
-  String nameOf(String userId) => userId == me ? me : (gateway.family?.member(userId)?.displayName ?? userId);
+  String nameOf(String userId) => userId == me ? me : (displayNameOf(userId) ?? userId);
+
+  /// Anzeigename aus der Familie; `null`, wenn die Person nicht (mehr) Mitglied oder der Name unbekannt ist (#98).
+  String? displayNameOf(String userId) {
+    final name = gateway.family?.member(userId)?.displayName;
+    return name == null || name.isEmpty ? null : name;
+  }
 
   /// Neonfarbe (Palettenindex) einer Person: gespeichert oder aus der ID abgeleitet.
   int colorIndexFor(String userId) =>

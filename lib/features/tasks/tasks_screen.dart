@@ -9,6 +9,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
+import '../chat/sender_name.dart';
 import 'tasks_controller.dart';
 
 /// Kurzlabel für die Kachel (Täglich, Mo–Fr, Wöchentlich, Monatlich).
@@ -78,8 +79,7 @@ String _date(BuildContext context, String doneOn) {
   return DateFormat.yMd(Localizations.localeOf(context).toLanguageTag()).format(DateTime(p.y, p.m, p.d));
 }
 
-String _nameOf(AppServices s, TasksController c, AppLocalizations l, String id) =>
-    id == c.me ? l.chatYou : (s.gateway.family?.member(id)?.displayName ?? id);
+String _nameOf(AppServices s, TasksController c, AppLocalizations l, String id) => memberLabel(l, s.gateway.family, id, me: c.me);
 
 void _toast(BuildContext context, String text) {
   if (!context.mounted) return;
