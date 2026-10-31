@@ -399,6 +399,15 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Verworfen:** Nextclouds eigene E2EE (Schlüssel an Nextcloud-Konten, doppelte Rechteverwaltung, keine stabile Client-Schnittstelle); Server-Side-Encryption (keine E2EE); ein Nextcloud-Konto je Person (Hürde für Familien, auf Wunsch abgelehnt).
 - **Grenze:** SA-9; Web-Version ohne CORS am Server nicht nutzbar (OFFEN).
 
+## E-75 Release-Review vor jedem Build (2026-10-31)
+- **Gewählt:** Vor jedem Build-Release prüfen je ein Agent Performance, Qualität und Coding Standards, Sicherheit und Konsistenz (`.claude/agents/review-*.md`, Ablauf im Skill `release-review`). Ein Control-Agent prüft jede Observation unabhängig am Code nach; nur bestätigte werden gh-Issues (Label `code-review`). Der Bericht `docs/release-reviews/<Version>.md` nennt den Fingerabdruck des App-Codes, `tool/check_release_review.sh` bricht in jedem Build-Job von `release.yml` ohne passenden Bericht ab. Der erste Lauf prüft den ganzen Code, danach den Unterschied zum letzten Bericht.
+- **Fingerabdruck statt Commit:** Hash über die Blob-Hashes des App-Codes. Er braucht keine Git-Historie im flachen CI-Checkout und bleibt beim Commit des Berichts und bei Merge-Commits gleich.
+- **Prüfung je Job:** Builds laufen meist einzeln per `workflow_dispatch`, nicht über Tags. Ein gemeinsamer vorgeschalteter Job genügt nicht, weil die Folge-Jobs auch bei übersprungenem `apk` laufen.
+- **Offene Issues blockieren nicht:** Das Gate belegt, dass geprüft wurde. Ob trotz eines Fundes gebaut wird, entscheidet der Mensch.
+- **Sicherheitsfunde:** Das Repository ist öffentlich. Bei `hoch` und `kritisch` nennen Issue und Bericht nur Bereich, Fehlerklasse und Schwere; Details liegen in `secure/release-reviews/` (nicht im Repository).
+- **Verworfen:** Review in der CI (bräuchte einen API-Schlüssel als Repository-Geheimnis und könnte keine lokale Nachprüfung wie Tests gegen Synapse nutzen); Gate nur bei Tag-Push (hätte die Builds 14 bis 22 nicht erfasst).
+- **Grenze:** Das Gate belegt nur, dass ein passender Bericht vorliegt. `skip_review` umgeht es bewusst für den Neubau alter Stände. Lokale Builds mit `tool/build_*.sh` werden nicht geprüft.
+
 ## E-78 Jeden Beitritt per Einladungslink bestätigt ein Moderator (2026-10-31, Issue #118) — hebt E-64 Teil 1 auf, ergänzt E-14, E-49, E-63
 - **Anlass:** Issue #118: Ein neues Mitglied muss erst durch einen Moderator bestätigt werden, bevor es an der Familie teilnehmen kann. Beim Einladungslink bestätigte bisher die App des Moderators selbst, ohne dass ein Mensch entschied (E-64). Familien-Code (E-65) und Einladung per Matrix-ID waren nicht betroffen.
 - **Auslegung:** Das Issue hebt die automatische Bestätigung auf (E-64 Teil 1). Den Ausweg über Element (E-64 Teil 2) nennt es nicht, er berührt die Bestätigung nicht und bleibt deshalb bestehen. Das ist eine Auslegung des Issues, kein Wortlaut.
