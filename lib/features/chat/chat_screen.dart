@@ -234,11 +234,12 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         }
         final threadId = current?.id ?? ChatThread.familyId;
-        final msgs = visibleMessages(g.messagesIn(threadId), blocked, myUserId: g.userId);
+        final msgs = _uniqueById(visibleMessages(g.messagesIn(threadId), blocked, myUserId: g.userId));
         if (widget.active && g.unreadIn(threadId) > 0) {
           WidgetsBinding.instance.addPostFrameCallback((_) => g.markChatRead(threadId: threadId).ignore());
         }
         final byId = <String, ChatMessage>{for (final m in msgs) m.id: m};
+        final positionById = <String, int>{for (var i = 0; i < msgs.length; i++) msgs[i].id: i};
         return Column(children: <Widget>[
           if (threads.length > 1)
             _ThreadBar(
@@ -271,10 +272,17 @@ class _ChatScreenState extends State<ChatScreen> {
                     reverse: true,
                     padding: const EdgeInsets.all(12),
                     itemCount: msgs.length,
+                    // Der State einer Blase (geladener Anhang) bleibt an seiner Nachricht, auch wenn neue
+                    // Nachrichten alle Indizes verschieben (#130).
+                    findChildIndexCallback: (key) {
+                      final position = positionById[(key as ValueKey<String>).value];
+                      return position == null ? null : msgs.length - 1 - position;
+                    },
                     itemBuilder: (context, i) {
                       final m = msgs[msgs.length - 1 - i];
-                      if (m.beforeJoin) return const _BeforeJoinNote();
+                      if (m.beforeJoin) return KeyedSubtree(key: ValueKey<String>(m.id), child: const _BeforeJoinNote());
                       return _Bubble(
+                        key: ValueKey<String>(m.id),
                         message: m,
                         mine: m.senderId == g.userId,
                         replied: m.replyToId == null ? null : byId[m.replyToId],
@@ -339,8 +347,19 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
+/// Entfernt doppelte IDs, das erste Vorkommen bleibt: Die SDK-Zeitleiste kann an einer Seitengrenze ein Ereignis
+/// doppelt liefern, und gleiche Keys sind in der Liste nicht zulässig (#130).
+List<ChatMessage> _uniqueById(List<ChatMessage> messages) {
+  final seen = <String>{};
+  return <ChatMessage>[
+    for (final m in messages)
+      if (seen.add(m.id)) m,
+  ];
+}
+
 class _Bubble extends StatelessWidget {
   const _Bubble({
+    super.key,
     required this.message,
     required this.mine,
     required this.replied,
