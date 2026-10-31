@@ -1,5 +1,4 @@
 import 'package:family_nexus/app/app.dart';
-import 'package:family_nexus/data/matrix/family_room_spec.dart';
 import 'package:family_nexus/data/platform/mail_launcher.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
@@ -131,11 +130,11 @@ void main() {
   test('E-78: Texte zum Beitritt sagen in beiden Sprachen nichts Automatisches zu', () {
     final de = lookupAppLocalizations(const Locale('de'));
     final en = lookupAppLocalizations(const Locale('en'));
-    for (final text in <String>[de.familyInviteLinkHint('7 Tage'), de.joinCardNote('Anna'), de.inviteMailBody('F', 'L', '7 Tage')]) {
+    for (final text in <String>[de.familyInviteLinkHint('7 Tage'), de.joinCardNote('Anna'), de.inviteMailBody('L', '7 Tage')]) {
       expect(text, isNot(contains('automatisch')));
       expect(text, contains('bestätig'));
     }
-    for (final text in <String>[en.familyInviteLinkHint('7 days'), en.joinCardNote('Anna'), en.inviteMailBody('F', 'L', '7 days')]) {
+    for (final text in <String>[en.familyInviteLinkHint('7 days'), en.joinCardNote('Anna'), en.inviteMailBody('L', '7 days')]) {
       expect(text, isNot(contains('automatic')));
       expect(text, contains('confirm'));
     }
@@ -145,11 +144,15 @@ void main() {
     expect(en.familyRequestCheckExpired, contains('new link'));
   });
 
-  test('E-78: Mailtext passt auch mit längstem Link und Familiennamen in den Entwurf', () {
+  test('E-79: Beitrittskarte ohne Familiennamen in beiden Sprachen', () {
+    expect(lookupAppLocalizations(const Locale('de')).joinCardBodyNoName('Anna', 'fake.test'), 'Du trittst einer Familie bei. Eingeladen hat dich Anna (Konto bei fake.test).');
+    expect(lookupAppLocalizations(const Locale('en')).joinCardBodyNoName('Anna', 'fake.test'), 'You are joining a family. You were invited by Anna (account at fake.test).');
+  });
+
+  test('E-78: Mailtext passt auch mit längstem Link in den Entwurf', () {
     final link = InviteLink.toWebLink('familynexus://join?${'x' * (InviteLink.maxLength - 'familynexus://join?'.length)}')!;
-    final family = 'F' * FamilyRoomSpec.nameMax;
-    final de = lookupAppLocalizations(const Locale('de')).inviteMailBody(family, link, 'einen Tag');
-    final en = lookupAppLocalizations(const Locale('en')).inviteMailBody(family, link, 'one day');
+    final de = lookupAppLocalizations(const Locale('de')).inviteMailBody(link, 'einen Tag');
+    final en = lookupAppLocalizations(const Locale('en')).inviteMailBody(link, 'one day');
     expect(de.length, lessThan(SystemMailLauncher.maxBodyLength));
     expect(en.length, lessThan(SystemMailLauncher.maxBodyLength));
   });
@@ -170,8 +173,8 @@ void main() {
     await tester.pumpAndSettle();
     final draft = app.mail.drafts.single;
     expect(draft.subject, 'Einladung zu FamilyNexus');
-    expect(draft.body, contains('„Familie Test“'));
-    expect(draft.body, contains('https://carpeasrael.github.io/FamilyNexus/join/#v=3'), reason: 'anklickbarer https-Link (E-68)');
+    expect(draft.body, isNot(contains('Familie Test')), reason: 'E-79: Familienname weder in der Mail noch im Link');
+    expect(draft.body, contains('https://carpeasrael.github.io/FamilyNexus/join/#v=4&d='), reason: 'anklickbarer https-Link (E-68)');
     expect(draft.body, contains('3 Tage gültig'));
     expect(draft.body, contains('„Ich wurde eingeladen“'), reason: 'Anleitung nennt den Weg in der App');
     expect(draft.body, contains('Ein Moderator muss deine Anfrage bestätigen'));

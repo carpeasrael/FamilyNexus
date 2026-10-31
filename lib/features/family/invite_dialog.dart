@@ -136,7 +136,7 @@ class _InviteDialogState extends State<_InviteDialog> {
     final services = AppScope.read(context);
     final ok = await services.mail.compose(
       subject: l.inviteMailSubject,
-      body: l.inviteMailBody(widget.gateway.family?.name ?? '', _shareLink, inviteValiditySentence(l, _validity)),
+      body: l.inviteMailBody(_shareLink, inviteValiditySentence(l, _validity)),
     );
     if (ok) return;
     await Clipboard.setData(ClipboardData(text: _shareLink));

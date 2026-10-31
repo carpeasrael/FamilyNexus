@@ -1,6 +1,8 @@
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/invite_links.dart';
+
 /// Issue #6: „Dieser Link ist ungültig oder abgelaufen“ bei Anmeldung per Link. Die Fälle der Analyse
 /// sind hier dauerhaft festgehalten.
 void main() {
@@ -15,10 +17,14 @@ void main() {
         nonce: n,
         ownHost: own,
         validity: validity,
-        familyName: 'Familie Müller',
         inviterName: 'Anna & Co. (Mama)',
       );
   final ok = mk('!AbCdEfGhIjKlMnOpQr:matrix.org', 'matrix.org', '@anna:matrix.org');
+  final exp = now.add(InviteLink.defaultValidity).millisecondsSinceEpoch ~/ 1000;
+  // Links der Version 3 gelten noch bis zu 7 Tage: Ihr Klartext-Pfad bleibt abgesichert.
+  String fields({String room = '!AbCdEfGhIjKlMnOpQr:matrix.org', String via = 'matrix.org', String srv = 'matrix.org', String inv = '@anna:matrix.org', int? expires, String? family, String? by}) =>
+      inviteFields(room: room, via: via, srv: srv, inv: inv, exp: expires ?? exp, family: family, by: by, n: n);
+  final okV3 = v3Link(fields(family: 'Familie Müller', by: 'Anna & Co. (Mama)'));
 
   InviteLinkCheck check(String text, {DateTime? at, String? own}) => InviteLink.check(text, now: at ?? now, ownHost: own);
 
@@ -53,14 +59,18 @@ void main() {
     });
 
     test('aus neuerer App-Version', () {
-      expect(check(ok.replaceFirst('v=3', 'v=4')).problem, InviteLinkProblem.newerVersion);
+      expect(check(ok.replaceFirst('v=4', 'v=5')).problem, InviteLinkProblem.newerVersion);
+      expect(check(okV3.replaceFirst('v=3', 'v=5')).problem, InviteLinkProblem.newerVersion);
     });
 
     test('beschädigt oder manipuliert', () {
       for (final t in <String>[
         'familynexus://join?v=1&room=x',
-        ok.replaceFirst('via=matrix.org', 'via=evil.example'),
-        ok.replaceAll(RegExp(r'&n=[0-9a-f]+'), ''),
+        okV3.replaceFirst('via=matrix.org', 'via=evil.example'),
+        okV3.replaceAll(RegExp(r'&n=[0-9a-f]+'), ''),
+        '$okV3&x=1',
+        v4(fields(via: 'evil.example')),
+        v4(fields().replaceAll(RegExp(r'&n=[0-9a-f]+'), '')),
         '$ok&x=1',
       ]) {
         expect(check(t).problem, InviteLinkProblem.damaged, reason: t);
@@ -81,8 +91,8 @@ void main() {
       'Text davor und danach': 'Hier dein Link: $ok – bis gleich!',
       'Punkt am Satzende': '$ok.',
       'in Klammern mit Satzzeichen': '($ok).',
-      'Zeilenumbruch nach =': ok.replaceFirst('&exp=', '&exp=\n'),
-      'Zeilenumbruch vor &': ok.replaceFirst('&n=', '\n&n='),
+      'Zeilenumbruch nach = (Version 3)': okV3.replaceFirst('&exp=', '&exp=\n'),
+      'Zeilenumbruch vor & (Version 3)': okV3.replaceFirst('&n=', '\n&n='),
       'Schema in Großbuchstaben': ok.replaceFirst('familynexus', 'FamilyNexus'),
       'nicht dekodiertes Quoted-Printable': '${ok.replaceAll('=', '=3D').substring(0, 60)}=\n${ok.replaceAll('=', '=3D').substring(60)}',
     };
@@ -90,7 +100,7 @@ void main() {
       test(name, () {
         final c = check(text);
         expect(c.ok, isTrue, reason: '$name: ${c.problem}');
-        expect(c.link!.familyName, 'Familie Müller');
+        expect(c.link!.inviterName, 'Anna & Co. (Mama)');
         expect(c.link!.nonce, n);
         expect(InviteLink.tryParse(c.raw!, now: now), isNotNull, reason: 'vorgemerkte Form ist streng lesbar');
       });
@@ -105,6 +115,82 @@ void main() {
       expect(InviteLink.extract('$ok\n\n3. Lege dein Konto an'), ok);
       expect(InviteLink.extract('$ok und dann weiter'), ok);
     });
+  });
+
+  group('E-79: Zeilenumbruch im Payload (Version 4)', () {
+    const prefix = 'familynexus://join?v=4&d=';
+    final payload = ok.substring(prefix.length);
+    final half = payload.length ~/ 2;
+    final first = '$prefix${payload.substring(0, half)}';
+    final second = payload.substring(half);
+    final wrappedAt76 = '${ok.substring(0, 76)}\n${ok.substring(76)}';
+
+    void repaired(String name, String text, {String? raw}) {
+      test(name, () {
+        final c = check(text);
+        expect(c.ok, isTrue, reason: '$name: ${c.problem}');
+        expect(c.raw, raw ?? ok);
+        expect(c.link!.inviterName, 'Anna & Co. (Mama)');
+      });
+    }
+
+    void stillDamaged(String name, String text) {
+      test(name, () => expect(check(text).problem, InviteLinkProblem.damaged));
+    }
+
+    test('Kontrolle: Link ist lang genug für einen Umbruch an Stelle 76', () {
+      expect(ok.length, greaterThan(76));
+    });
+    repaired('an Stelle 76', wrappedAt76);
+    repaired('Windows-Zeilenende', '$first\r\n$second');
+    repaired('mehrfach', <String>[for (var i = 0; i < ok.length; i += 40) ok.substring(i, i + 40 < ok.length ? i + 40 : ok.length)].join('\n'));
+    repaired('mit Folgetext', '$first\n$second\n\nViele Grüße\nAnna');
+    repaired('mit Folgetext direkt in der nächsten Zeile', '$first\n$second\nViele Grüße');
+    repaired('mit Text davor', 'Hier ist der Link:\n$first\n$second');
+    repaired('in spitzen Klammern', '<$first\n$second>');
+    repaired('Punkt am Satzende', '$first\n$second.');
+    repaired('in Klammern mit Punkt', '($first\n$second).');
+    repaired('direkt nach d= und danach ein weiterer Umbruch', '$prefix\n${payload.substring(0, half)}\n$second');
+    repaired('v=4 und &d= getrennt', 'familynexus://join?v=4\n&d=${payload.substring(0, half)}\n$second');
+    repaired('Präfix großgeschrieben', '${first.replaceFirst('familynexus://join', 'FAMILYNEXUS://JOIN')}\n$second');
+    repaired('Weblink', '${InviteLink.toWebLink(first)!}\n$second');
+    repaired('Quoted-Printable mit weichem Umbruch', '${ok.replaceAll('=', '=3D').substring(0, 76)}=\n${ok.replaceAll('=', '=3D').substring(76)}');
+
+    test('nach `-` im Payload', () {
+      final link = InviteLink.create(roomId: '!x:matrix.org', via: 'matrix.org', inviter: '@anna:matrix.org', now: now, nonce: n, inviterName: 'a~~~~~');
+      final i = link.indexOf('-') + 1;
+      expect(i, greaterThan(prefix.length), reason: 'Kontrolle: Payload enthält ein Minus');
+      expect(check('${link.substring(0, i)}\n${link.substring(i)}').raw, link);
+    });
+
+    test('32 Stücke werden angehängt, ein 33. nicht', () {
+      String chunks(int count) {
+        final size = payload.length ~/ count;
+        final parts = <String>[for (var i = 0; i < count; i++) payload.substring(i * size, i == count - 1 ? payload.length : (i + 1) * size)];
+        return '$prefix${parts.first}\n${parts.skip(1).join('\n')}';
+      }
+
+      expect(check(chunks(33)).ok, isTrue);
+      expect(check(chunks(34)).problem, InviteLinkProblem.damaged);
+    });
+
+    test('der unveränderte Link geht vor, Folgetext wird nie angehängt', () {
+      expect(InviteLink.extract('$ok\nViele'), ok);
+      expect(InviteLink.extract('$first\n$second'), first);
+      expect(check('$ok\nViele').raw, ok);
+    });
+
+    test('abgelaufen schlägt beschädigt', () {
+      expect(check(wrappedAt76, at: now.add(const Duration(days: 4))).problem, InviteLinkProblem.expired);
+    });
+
+    stillDamaged('Schlusszeichen im ersten Stück: keine Fortsetzung', '$first.\n$second');
+    stillDamaged('Schlusszeichen mitten im Link beendet ihn', '$first.\n${second.substring(0, 5)}\n${second.substring(5)}');
+    stillDamaged('Schlusszeichen in einem mittleren Stück beendet ihn', '$first\n${second.substring(0, 5)}.\n${second.substring(5)}');
+    stillDamaged('zitierte Zeilen bleiben beschädigt', '> $first\n> $second');
+    stillDamaged('fremdes Zeichen im Folgestück', '$first\n${second.substring(0, 5)}+${second.substring(5)}');
+    stillDamaged('abgeschnittener Link mit Folgetext', '$first\nViele Grüße\nAnna');
+    stillDamaged('Version 3 wird nicht stückweise zusammengesetzt', 'familynexus://join?v=3&d=${payload.substring(0, half)}\n$second');
   });
 
   group('Server im Heimnetz (vor der Anmeldung unbekannt)', () {
@@ -126,10 +212,16 @@ void main() {
     });
 
     test('Heimnetz-Server muss der Server des Raums sein', () {
-      final link = mk('!x:192.168.1.10', '192.168.1.10', '@anna:192.168.1.10', own: '192.168.1.10');
-      expect(check(link.replaceFirst('via=192.168.1.10', 'via=192.168.1.11')).problem, InviteLinkProblem.damaged);
-      final public = mk('!x:matrix.org', 'matrix.org', '@anna:matrix.org');
-      expect(check(public.replaceFirst('via=matrix.org', 'via=localhost')).problem, InviteLinkProblem.damaged);
+      final local = fields(room: '!x:192.168.1.10', via: '192.168.1.10', srv: '192.168.1.10', inv: '@anna:192.168.1.10');
+      final public = fields(room: '!x:matrix.org');
+      final otherLocal = local.replaceFirst('via=192.168.1.10', 'via=192.168.1.11');
+      final viaLocal = public.replaceFirst('via=matrix.org', 'via=localhost');
+      expect(check(v3Link(local)).ok, isTrue, reason: 'Kontrolle');
+      expect(check(v4(local)).ok, isTrue, reason: 'Kontrolle');
+      expect(check(v3Link(otherLocal)).problem, InviteLinkProblem.damaged);
+      expect(check(v4(otherLocal)).problem, InviteLinkProblem.damaged);
+      expect(check(v3Link(viaLocal)).problem, InviteLinkProblem.damaged);
+      expect(check(v4(viaLocal)).problem, InviteLinkProblem.damaged);
     });
   });
 
@@ -139,15 +231,7 @@ void main() {
   });
 
   group('Review-Funde', () {
-    String named(String family, String by) => InviteLink.create(
-          roomId: '!AbCdEfGhIjKlMnOpQr:matrix.org',
-          via: 'matrix.org',
-          inviter: '@anna:matrix.org',
-          now: now,
-          nonce: n,
-          familyName: family,
-          inviterName: by,
-        );
+    String named(String family, String by) => v3Link(fields(family: family, by: by));
 
     test('R1: Namen wie „3D-Club“ oder „12er“ werden nicht als Quoted-Printable verfälscht', () {
       for (final link in <String>[named('3D-Club', '3Dee'), named('12er Runde', 'Fam=3DMüller'), named('ABC', 'A=3D')]) {
@@ -198,14 +282,15 @@ void main() {
     });
 
     test('#59: App-Link mit „#“ statt „?“ (wie hinter der Landingpage) wird angenommen', () {
-      final hash = ok.replaceFirst('familynexus://join?', 'familynexus://join#');
-      final slashHash = ok.replaceFirst('familynexus://join?', 'familynexus://join/#');
+      final hash = okV3.replaceFirst('familynexus://join?', 'familynexus://join#');
+      final slashHash = okV3.replaceFirst('familynexus://join?', 'familynexus://join/#');
       for (final l in <String>[hash, slashHash, 'Einladung: $hash.']) {
         final r = check(l);
         expect(r.ok, isTrue, reason: l);
-        expect(r.link!.roomId, check(ok).link!.roomId);
+        expect(r.link!.roomId, check(okV3).link!.roomId);
         expect(r.link!.familyName, 'Familie Müller');
       }
+      expect(check(ok.replaceFirst('familynexus://join?', 'familynexus://join#')).raw, ok);
     });
   });
 }

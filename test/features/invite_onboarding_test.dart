@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_matrix.dart';
+import '../support/registration_form.dart';
 import '../support/test_app.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
@@ -51,8 +52,7 @@ Future<void> _createAccount(WidgetTester tester, {required String name}) async {
   await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), name);
   await tester.pump(const Duration(milliseconds: 700));
   await tester.pumpAndSettle();
-  await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'sicher-genug');
-  await tester.pumpAndSettle();
+  await enterNewPassword(tester, 'sicher-genug');
   await _tap(tester, 'Konto erstellen');
 }
 
@@ -84,7 +84,7 @@ void main() {
       await _emergencyKey(tester);
 
       expect(find.text('Schritt 3 von 3'), findsOneWidget);
-      expect(find.text('Du trittst der Familie „Familie Test“ bei. Eingeladen hat dich Anna (Konto bei fake.test).'), findsOneWidget);
+      expect(find.text('Du trittst einer Familie bei. Eingeladen hat dich Anna (Konto bei fake.test).'), findsOneWidget);
       expect(s.anna.gateway.family!.requests, isEmpty, reason: 'ohne Tipp wird nie angefragt (E-14)');
       await _tap(tester, 'Beitritt anfragen');
       expect(find.textContaining('Fast geschafft! Anna muss dich noch bestätigen.'), findsOneWidget);
@@ -198,7 +198,6 @@ void main() {
         inviter: '@anna:matrix.org',
         now: DateTime.now(),
         nonce: '0123456789abcdef0123456789abcdef',
-        familyName: 'Familie Test',
       );
       s.guest.links.initial = link;
       await _pump(tester, s.guest);
@@ -228,7 +227,7 @@ void main() {
       expect(s.guest.gateway.userId, '@ben:fake.test');
       await _emergencyKey(tester);
 
-      expect(find.text('Du trittst der Familie „Familie Test“ bei. Eingeladen hat dich Anna (Konto bei fake.test).'), findsOneWidget, reason: 'die Familie aus dem Link wird am Ende angeboten');
+      expect(find.text('Du trittst einer Familie bei. Eingeladen hat dich Anna (Konto bei fake.test).'), findsOneWidget, reason: 'die Einladung aus dem Link wird am Ende angeboten');
       await _tap(tester, 'Beitritt anfragen');
       expect(s.anna.gateway.family!.requests.single.displayName, 'Ben');
     });
@@ -277,7 +276,7 @@ void main() {
       await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), 'Hier ist er: <${s.link.replaceAll('&', '&amp;')}>.');
       await _tap(tester, 'Weiter');
       expect(find.text('Dein Konto liegt bei fake.test.'), findsOneWidget);
-      expect(s.guest.services.settings.settings.pendingInvite, startsWith('familynexus://join?v=3&'), reason: 'bereinigt vorgemerkt');
+      expect(s.guest.services.settings.settings.pendingInvite, startsWith('familynexus://join?v=4&d='), reason: 'bereinigt vorgemerkt');
     });
 
     testWidgets('TP-JOIN-03 Link geöffnet, obwohl bereits in einer Familie: Hinweis, nichts vorgemerkt', (tester) async {

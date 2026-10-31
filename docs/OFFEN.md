@@ -44,6 +44,12 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
   - **Mehrere Anfragen mit derselben Link-ID** zeigen beide „Gültiger Einladungslink“; ein eigenes Warnsignal gibt es nicht mehr. Der Moderator kann nur eine bestätigen.
   - **Verlorene Bestätigung:** Scheitert eine Bestätigung, weil der Link inzwischen verbraucht ist, meldet die App nur „Dafür fehlt die Berechtigung“.
 
+- **Einladungslink Version 4 (E-79):**
+  - **Kodierung, keine Verschlüsselung:** Wer den Link hat, kann ihn dekodieren. Der Link bleibt ein Inhaber-Token.
+  - **Alte Apps:** Moderatoren mit älterer App erzeugen weiter v3 im Klartext; das Ziel gilt für neue Links erst, wenn alle Moderator-Apps aktualisiert sind.
+  - **Reihenfolge beim Release:** Die neue Landingpage muss vor oder mit der ersten v4-App live sein, bei Teil-Builds zuerst `build=web`. Danach den Erfolg von `web-deploy` prüfen.
+  - **QR-Code:** Er wird etwas dichter; die Lesbarkeit auf echten Geräten ist nicht geprüft.
+
 - **Neuer Notfall-Schlüssel (E-72):** Der alte Schlüssel öffnet weiterhin den Master-Key (das SDK hält ihn nicht lokal vor, er
   lässt sich nicht unter den neuen Schlüssel umziehen). Ist der alte Schlüssel in fremde Hände geraten, hilft der neue daher
   nur bedingt; dafür bräuchte es ein Zurücksetzen der Identität, das die App nicht anbietet.
@@ -53,7 +59,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
   gegen den echten Anbieter manuell (Testplan TP-OAUTH-M1); der OAuth-Rücksprung braucht die Projektseite als `client_uri`.
   Beendet das System die App während der Anmeldung im Browser, ist die OAuth- bzw. UIA-Sitzung verloren (der Einladungslink
   bleibt erhalten); es genügt, erneut auf „Konto erstellen“ zu tippen. Ältere App-Versionen lehnen Einladungslinks neuerer
-  Version ab und melden „neuere Version“ (`v=2` ab 1.1.0, `v=3` mit E-63). Links von Servern im Heimnetz werden mit Warnung angenommen (E-59).
+  Version ab und melden „neuere Version“ (`v=2` ab 1.1.0, `v=3` mit E-63, `v=4` mit E-79). Links von Servern im Heimnetz werden mit Warnung angenommen (E-59).
 - **SA-8:** Notfall-Schlüssel in Zwischenablage (Android: als vertraulich markiert; iOS/macOS: nur auf diesem Gerät, kein Universal Clipboard, iOS lässt ihn nach 60 s verfallen, macOS markiert ihn als vertraulich; überall nach 60 s bzw. beim Zurückkehren in die App geleert – unter Android, Linux und Windows bleibt er liegen, wenn die Person nicht zurückkehrt) bzw. als unverschlüsselte Datei, nur auf ausdrücklichen Tipp.
 - **SA-10 App-Sperre = Sichtschutz (E-17, Pen-Test F-04):** Die Datenbankschlüssel sind nicht an die Geräteanmeldung gebunden (Hintergrund-Erinnerungen und Synchronisierung brauchen sie ohne Anmeldung). Eine optionale „starke Sperre“ (Wrapping-Schlüssel mit Benutzer-Authentifizierung: Android `BiometricPrompt` + `CryptoObject`, iOS `kSecAccessControlUserPresence`) ist nicht umgesetzt.
 - **OAuth-Unit-Tests** (`test/data/sdk_registration_test.dart`, Gruppe OAuth) brauchen vodozemac und laufen deshalb in `tool/e2e.sh`, in CI werden sie übersprungen.

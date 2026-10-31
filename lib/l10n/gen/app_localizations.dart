@@ -2597,8 +2597,8 @@ abstract class AppLocalizations {
   /// No description provided for @inviteMailBody.
   ///
   /// In de, this message translates to:
-  /// **'Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ein Moderator muss deine Anfrage bestätigen, bevor du aufgenommen wirst. Sag mir bitte kurz Bescheid, sobald du sie gestellt hast, denn Moderatoren werden nicht benachrichtigt.\n\nDer Link ist {validity} gültig. Auch die Bestätigung muss in diese Zeit fallen.'**
-  String inviteMailBody(String family, String link, String validity);
+  /// **'Hallo,\n\nich lade dich in unsere Familie bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ein Moderator muss deine Anfrage bestätigen, bevor du aufgenommen wirst. Sag mir bitte kurz Bescheid, sobald du sie gestellt hast, denn Moderatoren werden nicht benachrichtigt.\n\nDer Link ist {validity} gültig. Auch die Bestätigung muss in diese Zeit fallen.'**
+  String inviteMailBody(String link, String validity);
 
   /// No description provided for @familyInviteMailFailed.
   ///
@@ -3067,6 +3067,138 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Passwort verbergen'**
   String get passwordHide;
+
+  /// No description provided for @accountPasswordRepeat.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwort wiederholen'**
+  String get accountPasswordRepeat;
+
+  /// No description provided for @regPasswordMismatch.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Passwörter stimmen nicht überein.'**
+  String get regPasswordMismatch;
+
+  /// No description provided for @regPasswordTooShort.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Passwort braucht mindestens 8 Zeichen.'**
+  String get regPasswordTooShort;
+
+  /// No description provided for @regNameMissing.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte gib deinen Namen ein.'**
+  String get regNameMissing;
+
+  /// No description provided for @regProviderNotReady.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Anbieter ist noch nicht bereit. Warte einen Moment oder prüfe die Adresse.'**
+  String get regProviderNotReady;
+
+  /// No description provided for @passwordChangeTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwort ändern'**
+  String get passwordChangeTitle;
+
+  /// No description provided for @passwordChangeCurrent.
+  ///
+  /// In de, this message translates to:
+  /// **'Aktuelles Passwort'**
+  String get passwordChangeCurrent;
+
+  /// No description provided for @passwordChangeNew.
+  ///
+  /// In de, this message translates to:
+  /// **'Neues Passwort'**
+  String get passwordChangeNew;
+
+  /// No description provided for @passwordChangeHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Das neue Passwort gilt für neue Anmeldungen, dein Notfall-Schlüssel bleibt gleich. In der Web-Version bleibt das Passwort für diesen Browser unverändert.'**
+  String get passwordChangeHint;
+
+  /// No description provided for @passwordChanging.
+  ///
+  /// In de, this message translates to:
+  /// **'Ändere Passwort …'**
+  String get passwordChanging;
+
+  /// No description provided for @passwordChangeLogoutOthers.
+  ///
+  /// In de, this message translates to:
+  /// **'Andere Geräte abmelden'**
+  String get passwordChangeLogoutOthers;
+
+  /// No description provided for @passwordChangeLogoutOthersHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Melde alle anderen Geräte ab, wenn jemand dein Passwort kennen könnte. Diese Geräte musst du neu anmelden und mit diesem Gerät oder dem Notfall-Schlüssel freischalten; dort noch nicht gesendete Änderungen gehen verloren.'**
+  String get passwordChangeLogoutOthersHint;
+
+  /// No description provided for @passwordChangeConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwort ändern'**
+  String get passwordChangeConfirm;
+
+  /// No description provided for @passwordChangeCurrentMissing.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte gib dein aktuelles Passwort ein.'**
+  String get passwordChangeCurrentMissing;
+
+  /// No description provided for @passwordChangeTooLong.
+  ///
+  /// In de, this message translates to:
+  /// **'Das neue Passwort darf höchstens 512 Zeichen haben.'**
+  String get passwordChangeTooLong;
+
+  /// No description provided for @passwordChangeSame.
+  ///
+  /// In de, this message translates to:
+  /// **'Das neue Passwort muss sich vom aktuellen unterscheiden.'**
+  String get passwordChangeSame;
+
+  /// No description provided for @passwordChangeWrongCurrent.
+  ///
+  /// In de, this message translates to:
+  /// **'Das aktuelle Passwort stimmt nicht.'**
+  String get passwordChangeWrongCurrent;
+
+  /// No description provided for @passwordChangeUncertain.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Antwort vom Server. Wiederhole den Versuch. Meldet die App dann, das aktuelle Passwort stimme nicht, gilt dein neues Passwort bereits.'**
+  String get passwordChangeUncertain;
+
+  /// No description provided for @passwordChangeUnavailable.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Anbieter erlaubt keine Änderung des Passworts in der App.'**
+  String get passwordChangeUnavailable;
+
+  /// No description provided for @passwordChangeBrowserBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Passwort liegt bei deinem Anbieter. Du änderst es auf seiner Kontoseite im Browser.'**
+  String get passwordChangeBrowserBody;
+
+  /// No description provided for @passwordChangeBrowserOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontoseite öffnen'**
+  String get passwordChangeBrowserOpen;
+
+  /// No description provided for @passwordChanged.
+  ///
+  /// In de, this message translates to:
+  /// **'Passwort geändert.'**
+  String get passwordChanged;
 
   /// No description provided for @regCreate.
   ///
@@ -3725,7 +3857,7 @@ abstract class AppLocalizations {
   /// No description provided for @errWeakPassword.
   ///
   /// In de, this message translates to:
-  /// **'Das Passwort ist zu schwach. Bitte nimm ein längeres Passwort.'**
+  /// **'Das Passwort ist zu schwach. Bitte nimm ein sichereres Passwort.'**
   String get errWeakPassword;
 
   /// No description provided for @errRegistrationDisabled.
