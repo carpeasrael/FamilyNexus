@@ -1670,6 +1670,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final cached = _joinRequestCache;
     final cachedTs = _joinRequestCacheTs;
     if (cached != null && cachedTs != null && req['room_id'] != cached && (req['ts']! as int) < cachedTs) {
+      // Die Abfrage-Schleife läuft: Ohne Zeit läse sich der Dauerfall in Anhang G als „App fragt nicht ab“.
+      _joinDiagnostic.checked(trigger, DateTime.now());
       _noteJoinState('staleNote');
       return;
     }
@@ -2048,6 +2050,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       _joinRequestCacheTs = ts;
       _joinRequestCleared = false;
       _joinRejected = false;
+      // Die Diagnose gehört zu einer Anfrage: Ein altes `Erkannt` stünde sonst neben dem neuen Zustand.
+      _joinDiagnostic = _JoinDiagnostic();
       _watchJoinRequest();
       await client.setAccountData(client.userID!, joinRequestAccountData, <String, Object?>{
         'room_id': roomId,
@@ -3406,8 +3410,14 @@ class _JoinDiagnostic {
   }
 
   void polled(String by, DateTime now) {
-    trigger = by;
     polls++;
+    checked(by, now);
+  }
+
+  /// Durchlauf der Abfrage-Schleife, auch wenn er vor der Serveranfrage endet (`staleNote`): `Abfragen` zählt
+  /// nur, was den Server erreicht.
+  void checked(String by, DateTime now) {
+    trigger = by;
     final last = lastPoll;
     if (last != null && now.difference(last).inSeconds > maxGapSeconds) maxGapSeconds = now.difference(last).inSeconds;
     lastPoll = now;

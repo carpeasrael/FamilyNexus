@@ -5,6 +5,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:family_nexus/core/app_log.dart';
+import 'package:family_nexus/data/matrix/matrix_gateway.dart' show GatewayException;
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/server_probe.dart';
 import 'package:family_nexus/domain/server.dart';
@@ -20,6 +22,13 @@ const String _me = '@n2:hs.example';
 const String _room = '!familie:hs.example';
 const String _otherRoom = '!andere:hs.example';
 const Duration _settle = Duration(milliseconds: 350);
+
+/// Zeitschranke für Tests, die eine Abfrage anhalten: Sie muss länger sein als alles, was der Test währenddessen
+/// tut, sonst endet die Abfrage vor der Antwort in `timeout(headers)`.
+const Duration _long = Duration(seconds: 10);
+
+/// Zeit, bis `onSync` einen Auslöser zugestellt hat: `handleSync` kehrt früher zurück.
+const Duration _delivered = Duration(milliseconds: 50);
 
 http.StreamedResponse _json(Object body, [int status = 200]) => http.StreamedResponse(
       Stream<List<int>>.value(utf8.encode(json.encode(body))),
@@ -70,7 +79,8 @@ class _Hs {
   Future<http.StreamedResponse>? onRefresh;
 
   final List<http.BaseRequest> polls = <http.BaseRequest>[];
-  final Completer<void> _release = Completer<void>();
+  final List<http.BaseRequest> knocks = <http.BaseRequest>[];
+  Completer<void> _release = Completer<void>();
   int _syncs = 0;
 
   /// Räume, nach denen gefragt wurde.
@@ -80,6 +90,12 @@ class _Hs {
 
   void releaseSync() {
     if (!_release.isCompleted) _release.complete();
+  }
+
+  /// Für eine neue Sitzung am selben Gateway: Die Sync-Schleife steht wieder nach der ersten Antwort.
+  void rearmSync() {
+    _release = Completer<void>();
+    _syncs = 0;
   }
 
   http.Client get client => MockClient.streaming((req, body) async {
@@ -104,7 +120,10 @@ class _Hs {
           if (_syncs++ > 0) await _release.future;
           return _json(<String, Object?>{'next_batch': 's$_syncs'});
         }
-        if (path.contains('/knock/')) return await onKnock(req);
+        if (path.contains('/knock/')) {
+          knocks.add(req);
+          return await onKnock(req);
+        }
         if (req.method == 'PUT' || req.method == 'POST') return _json(<String, Object?>{});
         return _json(<String, Object?>{'errcode': 'M_UNRECOGNIZED', 'error': 'nicht vorhanden'}, 404);
       });
@@ -170,14 +189,17 @@ Future<void> _syncNote(SdkMatrixGateway g, String room, int ts) => _sync(g, <Str
     });
 
 /// Offene Anfrage mit Zeitgeber: Ohne ihn erzeugte `_refreshOnce` nach dem Sync zusätzlich den Sofort-Poll.
-Future<(_Hs, SdkMatrixGateway)> _armed() async {
-  final (hs, g) = await _signedIn();
+Future<(_Hs, SdkMatrixGateway)> _armed({Duration opTimeout = const Duration(milliseconds: 150)}) async {
+  final (hs, g) = await _signedIn(opTimeout: opTimeout);
   await g.requestToJoinByCode(_room);
   await Future<void>.delayed(_settle);
   expect(g.rejectionTimerActive, isTrue);
   expect(hs.polls, isEmpty);
   return (hs, g);
 }
+
+DateTime _lastPoll(SdkMatrixGateway g) =>
+    DateTime.parse(RegExp(r'Letzte Abfrage: (\S+)').firstMatch(g.joinRequestDiagnostic)!.group(1)!);
 
 /// Hält die nächste Abfrage an, bis der Test den Completer erfüllt.
 Completer<http.StreamedResponse> _holdPoll(_Hs hs) {
@@ -192,10 +214,13 @@ void main() {
   group('Zeitschranken (#116)', () {
     test('hängender Antwortkörper: Die Abfrage endet, die nächste läuft', () async {
       final (hs, g) = await _armed();
-      hs.onPoll = (_) => _hanging(200);
+      var cancelled = false;
+      hs.onPoll = (_) => _hanging(200, onCancel: () => cancelled = true);
       await g.pollRejectionForTest().timeout(const Duration(seconds: 3));
       expect(g.joinRequestDiagnostic, contains('Zustand: timeout(body)'));
       expect(g.joinRequestDiagnostic, contains('body=1'));
+      // Das Abo des Körpers endet mit der Zeitschranke und läuft nicht im Hintergrund weiter.
+      await _until(() => cancelled);
 
       hs.onPoll = (_) => _json(_section('knock'));
       await g.pollRejectionForTest().timeout(const Duration(seconds: 3));
@@ -220,6 +245,16 @@ void main() {
       await _syncNote(g, _room, DateTime.now().millisecondsSinceEpoch);
       await _until(() => g.joinRequestDiagnostic.contains('Zustand: timeout(auth)'));
       expect(hs.polls, isEmpty);
+    });
+
+    test('hängendes /refresh im Knock: Fehler, kein Knock', () async {
+      final hs = _Hs()
+        ..loginExtra = <String, Object?>{'expires_in_ms': 1000, 'refresh_token': 'ref'}
+        ..onRefresh = Completer<http.StreamedResponse>().future;
+      final (_, g) = await _signedIn(server: hs);
+      await expectLater(g.requestToJoinByCode(_room).timeout(const Duration(seconds: 3)), throwsA(isA<GatewayException>()));
+      expect(hs.knocks, isEmpty);
+      expect(g.joinRequestPending, isFalse);
     });
 
     test('Knock: hängender Körper bei Status 200 gilt als Erfolg und wird verworfen', () async {
@@ -250,6 +285,21 @@ void main() {
       expect(g.joinRequestDiagnostic, contains('Auslöser: sync'));
       expect(g.joinRequestDiagnostic, isNot(contains('Erkannt: -')));
       expect(g.joinRequestDiagnostic, contains('Timer aktiv: nein'));
+    });
+
+    test('leave entscheidet nicht selbst; die erkannte Ablehnung benachrichtigt die Oberfläche', () async {
+      final (hs, g) = await _armed(opTimeout: _long);
+      final held = _holdPoll(hs);
+      await _syncLeave(g);
+      await _until(() => hs.polls.length == 1);
+      expect(g.joinRequestRejected, isFalse);
+      await Future<void>.delayed(_settle);
+
+      bool? seen;
+      g.addListener(() => seen = g.joinRequestRejected);
+      held.complete(_json(_kick()));
+      await _until(() => g.joinRequestRejected);
+      expect(seen, isTrue);
     });
 
     test('altes leave bei offener neuer Anfrage: Abfrage läuft, kein Alarm', () async {
@@ -293,6 +343,32 @@ void main() {
       expect(hs.polls, hasLength(2));
     });
 
+    test('Zeitgeber während laufender Abfrage: keine Wiederholung', () async {
+      final (hs, g) = await _armed(opTimeout: _long);
+      final held = _holdPoll(hs);
+      final first = g.pollRejectionForTest();
+      await _until(() => hs.polls.length == 1);
+      await g.pollRejectionForTest();
+      held.complete(_json(_section('knock')));
+      await first;
+      await Future<void>.delayed(_settle);
+      expect(hs.polls, hasLength(1));
+    });
+
+    test('Rückzug löscht die Wiederholung', () async {
+      final (hs, g) = await _armed(opTimeout: _long);
+      final held = _holdPoll(hs);
+      await _syncLeave(g);
+      await _until(() => hs.polls.length == 1);
+      await _syncLeave(g);
+      await Future<void>.delayed(_delivered);
+      await g.cancelJoinRequest();
+      await g.requestToJoinByCode(_room);
+      held.complete(_json(_section('knock')));
+      await Future<void>.delayed(_settle);
+      expect(hs.polls, hasLength(1));
+    });
+
     test('wiederholtes Update ist unschädlich', () async {
       final (hs, g) = await _armed();
       await _syncLeave(g);
@@ -330,6 +406,91 @@ void main() {
       expect(g.joinRequestDiagnostic, isNot(contains('leaveRejected')));
     });
 
+    test('Rückzug allein: Die Spätantwort schreibt nichts', () async {
+      final (hs, g) = await _armed(opTimeout: _long);
+      final held = _holdPoll(hs);
+      final poll = g.pollRejectionForTest();
+      await _until(() => hs.polls.length == 1);
+      await g.cancelJoinRequest();
+      held.complete(_json(_kick()));
+      await poll;
+      expect(g.joinRequestDiagnostic, contains('Zustand: -\n'));
+    });
+
+    test('neue Anfrage ohne Rückzug überholt die laufende Abfrage: kein Alarm', () async {
+      final (hs, g) = await _armed(opTimeout: _long);
+      final held = _holdPoll(hs);
+      final poll = g.pollRejectionForTest();
+      await _until(() => hs.polls.length == 1);
+      await g.requestToJoinByCode(_room);
+      held.complete(_json(_kick()));
+      await poll;
+      expect(g.joinRequestRejected, isFalse);
+    });
+
+    test('Abmelden: Die Spätantwort schreibt nichts', () async {
+      final (hs, g) = await _armed(opTimeout: _long);
+      final held = _holdPoll(hs);
+      final poll = g.pollRejectionForTest();
+      await _until(() => hs.polls.length == 1);
+      hs.releaseSync();
+      await g.logout();
+      held.complete(_json(_kick()));
+      await poll;
+      expect(g.joinRequestDiagnostic, contains('Zustand: -\n'));
+    });
+
+    test('close: Die Spätantwort schreibt nichts', () async {
+      final (hs, g) = await _armed(opTimeout: _long);
+      final held = _holdPoll(hs);
+      final poll = g.pollRejectionForTest();
+      await _until(() => hs.polls.length == 1);
+      hs.releaseSync();
+      await g.close();
+      held.complete(_json(_kick()));
+      await poll;
+      expect(g.joinRequestDiagnostic, contains('Zustand: -\n'));
+    });
+
+    test('dispose: Die Spätantwort schreibt nichts', () async {
+      final (hs, g) = await _signedIn(opTimeout: _long, autoClose: false);
+      await g.requestToJoinByCode(_room);
+      await Future<void>.delayed(_settle);
+      final held = _holdPoll(hs);
+      final poll = g.pollRejectionForTest();
+      await _until(() => hs.polls.length == 1);
+      hs.releaseSync();
+      g.dispose();
+      held.complete(_json(_kick()));
+      await poll;
+      expect(g.joinRequestDiagnostic, contains('Zustand: -\n'));
+    });
+
+    test('Zeitüberschreitung eines alten Laufs schreibt nichts', () async {
+      final (hs, g) = await _armed(opTimeout: const Duration(seconds: 1));
+      hs.onPoll = (_) => _hanging(200);
+      final poll = g.pollRejectionForTest();
+      await _until(() => hs.polls.length == 1);
+      await g.cancelJoinRequest();
+      await g.requestToJoinByCode(_room);
+      expect(g.joinRequestDiagnostic, contains('Zustand: -\n'));
+      await poll;
+      expect(g.joinRequestDiagnostic, contains('Zustand: -\n'));
+      expect(g.joinRequestDiagnostic, contains('body=0'));
+    });
+
+    test('Fehler eines alten Laufs schreibt nichts', () async {
+      final (hs, g) = await _armed(opTimeout: _long);
+      final held = _holdPoll(hs);
+      final poll = g.pollRejectionForTest();
+      await _until(() => hs.polls.length == 1);
+      await g.cancelJoinRequest();
+      await g.requestToJoinByCode(_room);
+      held.completeError(const SocketException('x'));
+      await poll;
+      expect(g.joinRequestDiagnostic, contains('Zustand: -\n'));
+    });
+
     test('stehender Sync: alter Vermerk, neue Anfrage in anderem Raum: kein Alarm', () async {
       final (hs, g) = await _signedIn();
       await _syncNote(g, _otherRoom, DateTime.now().millisecondsSinceEpoch - 60000);
@@ -344,6 +505,37 @@ void main() {
       expect(hs.polls, hasLength(1));
       expect(g.joinRequestRejected, isFalse);
       expect(g.joinRequestDiagnostic, contains('Zustand: staleNote'));
+    });
+
+    test('staleNote aktualisiert Letzte Abfrage, zählt aber nicht als Abfrage', () async {
+      final (hs, g) = await _signedIn();
+      await _syncNote(g, _otherRoom, DateTime.now().millisecondsSinceEpoch - 60000);
+      await _until(() => hs.polls.length == 1);
+      await Future<void>.delayed(_settle);
+      await g.requestToJoinByCode(_room);
+      expect(g.joinRequestDiagnostic, contains('Letzte Abfrage: -\n'));
+
+      await g.pollRejectionForTest();
+      final first = _lastPoll(g);
+      await Future<void>.delayed(const Duration(milliseconds: 1100));
+      await g.pollRejectionForTest();
+      final d = g.joinRequestDiagnostic;
+      expect(d, contains('Zustand: staleNote\n'));
+      expect(d, contains('Auslöser: timer\n'));
+      expect(d, contains('Abfragen: 0\n'));
+      expect(_lastPoll(g).isAfter(first), isTrue);
+      expect(hs.polls, hasLength(1));
+    });
+
+    test('älterer Vermerk im gleichen Raum bricht nicht ab', () async {
+      final (hs, g) = await _signedIn();
+      await _syncNote(g, _room, DateTime.now().millisecondsSinceEpoch - 60000);
+      await _until(() => hs.polls.length == 1);
+      await Future<void>.delayed(_settle);
+      await g.requestToJoinByCode(_room);
+      await g.pollRejectionForTest();
+      expect(hs.polls, hasLength(2));
+      expect(g.joinRequestDiagnostic, isNot(contains('staleNote')));
     });
 
     test('zwei Geräte: Ein neuerer Vermerk gewinnt gegen die lokale Anfrage', () async {
@@ -374,6 +566,71 @@ void main() {
       hs.releaseSync();
       await g.close();
       expect(g.rejectionTimerActive, isFalse);
+    });
+
+    test('dispose löscht die Wiederholung', () async {
+      final (hs, g) = await _signedIn(opTimeout: _long, autoClose: false);
+      await g.requestToJoinByCode(_room);
+      await Future<void>.delayed(_settle);
+      final held = _holdPoll(hs);
+      await _syncLeave(g);
+      await _until(() => hs.polls.length == 1);
+      await _syncLeave(g);
+      await Future<void>.delayed(_delivered);
+      hs.releaseSync();
+      g.dispose();
+      held.complete(_json(_section('knock')));
+      await Future<void>.delayed(_settle);
+      expect(hs.polls, hasLength(1));
+    });
+
+    test('close löscht die Wiederholung: keine Abfrage aus der alten Sitzung', () async {
+      final (hs, g) = await _armed(opTimeout: _long);
+      final held = _holdPoll(hs);
+      await _syncLeave(g);
+      await _until(() => hs.polls.length == 1);
+      await _syncLeave(g);
+      await Future<void>.delayed(_delivered);
+      hs.releaseSync();
+      await g.close();
+      hs.rearmSync();
+      await g.restore();
+      await _until(() => g.rejectionTimerActive);
+      held.complete(_json(_section('knock')));
+      await Future<void>.delayed(_settle);
+      expect(hs.polls, hasLength(1));
+    });
+
+    // Die Sitzung bleibt am selben Client: Ohne Löschen liefe die Wiederholung gegen die neue Anfrage.
+    test('Abmelden löscht die Wiederholung', () async {
+      final (hs, g) = await _armed(opTimeout: _long);
+      final held = _holdPoll(hs);
+      await _syncLeave(g);
+      await _until(() => hs.polls.length == 1);
+      await _syncLeave(g);
+      await Future<void>.delayed(_delivered);
+      hs.releaseSync();
+      await g.logout();
+      hs.rearmSync();
+      await g.login(server: ServerUrl.tryParse('hs.example')!, username: 'n2', password: 'geheim123');
+      await Future<void>.delayed(_settle);
+      await g.requestToJoinByCode(_room);
+      expect(g.joinRequestPending, isTrue);
+      held.complete(_json(_section('knock')));
+      await Future<void>.delayed(_settle);
+      expect(hs.polls, hasLength(1));
+    });
+
+    test('Abmelden setzt die Diagnose zurück', () async {
+      final (hs, g) = await _armed();
+      await g.pollRejectionForTest();
+      expect(g.joinRequestDiagnostic, contains('Abfragen: 1\n'));
+      hs.releaseSync();
+      await g.logout();
+      final d = g.joinRequestDiagnostic;
+      expect(d, contains('Zustand: -\n'));
+      expect(d, contains('Abfragen: 0\n'));
+      expect(d, contains('Letzte Abfrage: -\n'));
     });
   });
 
@@ -438,6 +695,75 @@ void main() {
       expect(d, contains('eigen: ja'));
       expect(d, contains('Versatz: '));
       expect(leaks.hasMatch(d), isFalse);
+    });
+
+    test('Größter Abstand misst die Zeit zwischen zwei Abfragen', () async {
+      final (_, g) = await _armed();
+      await g.pollRejectionForTest();
+      expect(g.joinRequestDiagnostic, contains('Größter Abstand: 0s\n'));
+      await Future<void>.delayed(const Duration(milliseconds: 1100));
+      await g.pollRejectionForTest();
+      expect(g.joinRequestDiagnostic, isNot(contains('Größter Abstand: 0s\n')));
+    });
+
+    test('Neue Anfrage: Nichts von der vorigen bleibt stehen', () async {
+      final (hs, g) = await _armed();
+      hs.onPoll = (_) => _json(_kick());
+      await _syncLeave(g);
+      await _until(() => g.joinRequestRejected);
+      expect(g.joinRequestDiagnostic, isNot(contains('Erkannt: -\n')));
+
+      await g.cancelJoinRequest();
+      await g.requestToJoinByCode(_room);
+      final fresh = g.joinRequestDiagnostic;
+      expect(fresh, contains('Zustand: -\n'));
+      expect(fresh, contains('Erkannt: -\n'));
+      expect(fresh, contains('Abfragen: 0\n'));
+      expect(fresh, contains('Timer aktiv: ja\n'));
+
+      hs.onPoll = (_) => _json(_section('knock'));
+      await g.pollRejectionForTest();
+      expect(g.joinRequestDiagnostic, contains('Zustand: knock\n'));
+      expect(g.joinRequestDiagnostic, contains('Erkannt: -\n'));
+    });
+
+    test('Neue Anfrage ohne Rückzug: Die Zusatzzeilen von leaveOther verschwinden', () async {
+      final (hs, g) = await _armed();
+      hs.onPoll = (_) => _json(_kick(sender: _me));
+      await g.pollRejectionForTest();
+      expect(g.joinRequestDiagnostic, contains('membership: leave\n'));
+
+      await g.requestToJoinByCode(_room);
+      final d = g.joinRequestDiagnostic;
+      expect(d, contains('Zustand: -\n'));
+      for (final line in <String>['membership:', 'vorher:', 'eigen:', 'Versatz:']) {
+        expect(d, isNot(contains(line)));
+      }
+    });
+
+    test('Logzeile: Abbildung statt Rohwert, Zustand nur beim Wechsel', () async {
+      AppLog.capture = true;
+      AppLog.captured.clear();
+      addTearDown(() {
+        AppLog.capture = false;
+        AppLog.captured.clear();
+      });
+      int lines(String s) => AppLog.captured.where((l) => l.contains(s)).length;
+
+      final (hs, g) = await _armed();
+      await g.pollRejectionForTest();
+      await g.pollRejectionForTest();
+      expect(lines('Zustand knock'), 1);
+      hs.onPoll = (_) => _json(<String, Object?>{'rooms': <String, Object?>{}});
+      await g.pollRejectionForTest();
+      await g.pollRejectionForTest();
+      expect(lines('Zustand noRoom'), 1);
+      hs.onPoll = (_) => _json(_section('knock'));
+      await g.pollRejectionForTest();
+      expect(lines('Zustand knock'), 2);
+      hs.onPoll = (_) => _json(_kick(prev: '@boese:hs.example', sender: _me));
+      await g.pollRejectionForTest();
+      expect(lines('vorher=other'), 1);
     });
 
     test('Mitgliedschaft nur aus der festen Liste', () {
