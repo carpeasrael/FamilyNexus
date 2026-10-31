@@ -25,6 +25,13 @@ class TaskPeriod {
     return dateKey(t.year, t.month, t.day);
   }
 
+  /// Uhrzeit des Zeitpunkts [instant] in [loc] – dieselbe Zone wie [localDate], damit Datum und Uhrzeit
+  /// zusammenpassen (#163).
+  static ({int hour, int minute}) localClock(tz.Location loc, DateTime instant) {
+    final t = tz.TZDateTime.from(instant.toUtc(), loc);
+    return (hour: t.hour, minute: t.minute);
+  }
+
   /// Zerlegt ein Datum `yyyy-MM-dd`; `null`, wenn es kein echtes Kalenderdatum ist.
   static ({int y, int m, int d})? parseDate(String s) {
     final m = _dateRe.firstMatch(s);
