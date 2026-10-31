@@ -109,6 +109,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'The encrypted database could not be opened, for example because the device key is no longer available. For safety nothing was changed. You can reset the local data and set up again; data on the server and on other devices is kept.';
 
   @override
+  String get startupSessionLostTitle => 'Sign-in not restored';
+
+  @override
+  String get startupSessionLostBody =>
+      'Your sign-in on this device could not be loaded. Your family data stays on the device. Tap “Try again” and sign in again if needed.';
+
+  @override
   String get startupRetry => 'Try again';
 
   @override

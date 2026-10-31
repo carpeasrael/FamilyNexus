@@ -8,8 +8,10 @@ import '../ui/widgets/glass.dart';
 /// Wird gezeigt, wenn Schlüssel/Datenbank nicht geöffnet werden können.
 /// Sprache folgt dem Gerät (Einstellungen sind ja nicht lesbar).
 class StartupFailureApp extends StatelessWidget {
-  const StartupFailureApp({super.key, required this.onRetry, required this.onReset});
+  const StartupFailureApp({super.key, required this.onRetry, required this.onReset, this.sessionLost = false});
 
+  /// Die Anmeldung ging verloren, die Familiendaten sind unberührt (#134). Der allgemeine Text sagte „nichts verändert“.
+  final bool sessionLost;
   final VoidCallback onRetry;
   final Future<void> Function() onReset;
 
@@ -39,10 +41,13 @@ class StartupFailureApp extends StatelessWidget {
                       children: <Widget>[
                         Semantics(
                           header: true,
-                          child: Text(l.startupFailedTitle, style: Theme.of(context).textTheme.headlineSmall),
+                          child: Text(
+                            sessionLost ? l.startupSessionLostTitle : l.startupFailedTitle,
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
                         ),
                         const SizedBox(height: 12),
-                        Text(l.startupFailedBody),
+                        Text(sessionLost ? l.startupSessionLostBody : l.startupFailedBody),
                         const SizedBox(height: 20),
                         Wrap(spacing: 12, runSpacing: 12, children: <Widget>[
                           FilledButton(onPressed: onRetry, child: Text(l.startupRetry)),

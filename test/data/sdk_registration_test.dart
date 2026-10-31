@@ -14,7 +14,7 @@ import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:matrix/matrix.dart' show MatrixException;
+import 'package:matrix/matrix.dart' show MatrixException, MatrixSdkDatabase;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:vodozemac/vodozemac.dart' as vod;
 
@@ -91,18 +91,29 @@ Map<String, Object?> _uia(List<List<String>> flows, {List<String> completed = co
       'errcode': ?errcode,
     };
 
-Future<SdkMatrixGateway> _gateway(_Server server) async {
+Future<SdkMatrixGateway> _gateway(_Server server, {Future<Database> Function(String path, String key)? opener}) async {
   final dir = await Directory.systemTemp.createTemp('fn_reg');
   addTearDown(() => dir.delete(recursive: true));
   final g = SdkMatrixGateway(
     keyStore: MemoryKeyStore(),
     dbDirectory: dir.path,
     probe: ServerProbe(client: server.client),
-    databaseOpener: (path, key) => databaseFactoryFfi.openDatabase(inMemoryDatabasePath),
+    databaseOpener: opener ?? (path, key) => databaseFactoryFfi.openDatabase(inMemoryDatabasePath),
     httpClient: server.client,
   );
   addTearDown(g.close);
   return g;
+}
+
+/// Datenbank mit gespeicherter Sitzung, deren Adresse `client.init` scheitern lässt.
+Future<Database> _brokenSession({bool clearFails = false}) async {
+  final db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath, options: OpenDatabaseOptions(singleInstance: false));
+  final matrix = await MatrixSdkDatabase.init('familynexus', database: db);
+  await matrix.storeClient(homeserverUrl: 'http://[', token: 'tok', userId: '@n2:hs.example', deviceId: 'DEV1');
+  if (clearFails) {
+    await db.execute("CREATE TRIGGER fn_keep BEFORE DELETE ON box_client BEGIN SELECT RAISE(ABORT, 'Test'); END");
+  }
+  return db;
 }
 
 Matcher _error(GatewayError e) => throwsA(isA<GatewayException>().having((x) => x.error, 'error', e));
@@ -132,6 +143,30 @@ void main() {
     final g = await _gateway(_Server());
     await g.restore().catchError((Object _) {});
     expect(g.sdkClient!.customImageResizer, same(resizeImageInBackground));
+  });
+
+  group('#134: Wiederherstellen der Sitzung', () {
+    Matcher lost(bool sessionLost) =>
+        throwsA(isA<SessionRestoreException>().having((e) => e.sessionLost, 'sessionLost', sessionLost));
+
+    test('Matrix-Datenbank nicht zu öffnen: Die Sitzung gilt als unversehrt', () async {
+      final g = await _gateway(_Server(), opener: (path, key) async => throw StateError('kaputt'));
+      await expectLater(g.restore(), lost(false));
+      expect(g.session, SessionState.loggedOut);
+    });
+
+    test('scheitert `client.init`, hat das SDK die Sitzung gelöscht', () async {
+      final g = await _gateway(_Server(), opener: (path, key) => _brokenSession());
+      await expectLater(g.restore(), lost(true));
+      expect(g.session, SessionState.loggedOut);
+      await g.restore();
+      expect(g.session, SessionState.loggedOut, reason: 'der zweite Start läuft fehlerfrei ohne Sitzung');
+    });
+
+    test('roher Fehler aus dem `clear` des SDK zählt ebenfalls als verloren', () async {
+      final g = await _gateway(_Server(), opener: (path, key) => _brokenSession(clearFails: true));
+      await expectLater(g.restore(), lost(true));
+    });
   });
 
   group('#28: Anmeldung gelingt, ein Folgeschritt scheitert', () {

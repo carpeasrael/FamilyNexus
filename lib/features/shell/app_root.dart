@@ -88,6 +88,9 @@ class _AppRootState extends State<AppRoot> {
       listenable: Listenable.merge(<Listenable>[services.settings, services.gateway]),
       builder: (context, _) {
         final session = services.gateway.session == SessionState.ready;
+        if (session && services.keepAccountData) {
+          WidgetsBinding.instance.addPostFrameCallback((_) => services.sessionConfirmed().ignore());
+        }
         // Ohne verifiziertes Gerät keine Hauptansicht (Schlüsselsicherung ist Pflicht, SA-1).
         final secure = services.gateway.securityState == SecurityState.ready;
         final ready = services.settings.settings.onboardingDone && session && services.gateway.family != null && secure;
@@ -99,7 +102,7 @@ class _AppRootState extends State<AppRoot> {
           // entfernt, nicht bei vorübergehenden Zuständen (z. B. Kaltstart offline).
           final lostReady = _wasReady;
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            services.closeCalendar(cancelReminders: !session);
+            services.closeCalendar(cancelReminders: !session && !services.keepAccountData);
             // Sitzung beendet (Abmelden, Konto wechseln, auf einem anderen Gerät entfernt): Familiendaten vom Gerät.
             if (!session && !services.accountDeletionPending) {
               services.wipeAccountData().catchError((Object e) => AppLog.e('app', 'Lokale Familiendaten nicht gelöscht', e)).ignore();

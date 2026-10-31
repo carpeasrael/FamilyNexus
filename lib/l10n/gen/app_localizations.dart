@@ -290,6 +290,18 @@ abstract class AppLocalizations {
   /// **'Die verschlüsselte Datenbank konnte nicht geöffnet werden, zum Beispiel weil der Schlüssel des Geräts nicht mehr verfügbar ist. Aus Sicherheitsgründen wurde nichts verändert. Du kannst die lokalen Daten zurücksetzen und neu einrichten; Daten auf dem Server und anderen Geräten bleiben erhalten.'**
   String get startupFailedBody;
 
+  /// No description provided for @startupSessionLostTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Anmeldung nicht wiederhergestellt'**
+  String get startupSessionLostTitle;
+
+  /// No description provided for @startupSessionLostBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Deine Anmeldung auf diesem Gerät konnte nicht geladen werden. Deine Familiendaten bleiben auf dem Gerät. Tippe auf „Erneut versuchen“ und melde dich gegebenenfalls neu an.'**
+  String get startupSessionLostBody;
+
   /// No description provided for @startupRetry.
   ///
   /// In de, this message translates to:
