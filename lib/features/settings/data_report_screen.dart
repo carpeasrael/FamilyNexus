@@ -67,8 +67,8 @@ class _DataReportScreenState extends State<DataReportScreen> {
     final date = DataReport.formatTime(now).split(' ').first;
     final name = 'familynexus-${widget.kind.name}-$date.txt';
     try {
-      await files.saveFile(name: name, bytes: utf8.encode(text), mimeType: 'text/plain');
-      messenger.showSnackBar(SnackBar(content: Text(l.reportSaved)));
+      final saved = await files.saveFile(name: name, bytes: utf8.encode(text), mimeType: 'text/plain');
+      if (saved) messenger.showSnackBar(SnackBar(content: Text(l.reportSaved)));
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(errorText(l, e))));
     }

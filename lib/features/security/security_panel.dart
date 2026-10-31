@@ -108,8 +108,8 @@ class _SecurityPanelState extends State<SecurityPanel> {
     final date = '${now.day.toString().padLeft(2, '0')}.${now.month.toString().padLeft(2, '0')}.${now.year}';
     final text = l.keyFileBody(s.gateway.userId ?? '', s.gateway.server?.host ?? '', key, date);
     try {
-      await s.files.saveFile(name: l.keyFileName, bytes: utf8.encode(text), mimeType: 'text/plain');
-      m.showSnackBar(SnackBar(content: Text(l.keySavedFile)));
+      final saved = await s.files.saveFile(name: l.keyFileName, bytes: utf8.encode(text), mimeType: 'text/plain');
+      if (saved) m.showSnackBar(SnackBar(content: Text(l.keySavedFile)));
     } catch (e) {
       m.showSnackBar(SnackBar(content: Text(l.errUnknown)));
     }

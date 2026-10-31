@@ -177,13 +177,18 @@ class FakeFileAccess implements FileAccess {
   final List<String> saved = <String>[];
   final Map<String, Uint8List> contents = <String, Uint8List>{};
 
+  /// `true`: Der Systemdialog wird abgebrochen, nichts wird gespeichert.
+  bool cancelSave = false;
+
   @override
   Future<PickedFile?> pickFile() async => next;
 
   @override
-  Future<void> saveFile({required String name, required Uint8List bytes, required String mimeType}) async {
+  Future<bool> saveFile({required String name, required Uint8List bytes, required String mimeType}) async {
+    if (cancelSave) return false;
     saved.add(name);
     contents[name] = bytes;
+    return true;
   }
 }
 
