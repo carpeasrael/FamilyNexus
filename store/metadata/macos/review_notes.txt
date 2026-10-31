@@ -11,6 +11,7 @@ Emergency key of the review account: <EMERGENCY KEY OF THE REVIEW ACCOUNT>
 Account creation: Welcome screen → "Start a new family" → "What is your name?" → "Create account at matrix.org" → browser → back in the app "Create emergency key" → "I have stored the emergency key safely." → "Next" → family name → "Create family".
 Account deletion: menu (top right, "Open menu") → Settings → Account → "Delete account". At matrix.org the deletion is confirmed on the provider's page; afterwards all data on the device is deleted.
 Notifications: if "Today" shows "Notifications are blocked", click "Allow".
+network.server entitlement: used only during browser sign-in (OAuth, RFC 8252) for a local listener on 127.0.0.1 that receives the redirect; not reachable from the network.
 
 Encryption: end-to-end encryption (Matrix: Olm/Megolm, vodozemac) for messages, shared events and the shopping list; local database encrypted with SQLCipher (AES-256). Standard algorithms, no proprietary cryptography.
 No advertising, no analytics, no tracking. Source code: AGPL-3.0.
@@ -28,3 +29,4 @@ Prüfkonto (Benutzername und Passwort: siehe „Anmeldeinformationen“):
 Kontoanlage: Willkommen → „Neue Familie gründen“ → „Wie heißt du?“ → „Konto bei matrix.org erstellen“ → Browser → zurück in der App „Notfall-Schlüssel erstellen“ → „Ich habe den Notfall-Schlüssel sicher aufbewahrt.“ → „Weiter“ → Name der Familie → „Familie gründen“.
 Kontolöschung: Menü (oben rechts, „Menü öffnen“) → Einstellungen → Konto → „Konto löschen“. Bei matrix.org wird die Löschung auf der Seite des Anbieters bestätigt; danach werden alle Daten auf dem Gerät gelöscht.
 Benachrichtigungen: Zeigt „Heute“ „Benachrichtigungen sind blockiert“, „Erlauben“ klicken.
+Berechtigung network.server: nur für den Rücksprung der Browser-Anmeldung, lokal auf 127.0.0.1.
