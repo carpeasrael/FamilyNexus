@@ -1,5 +1,6 @@
 New in 1.2.1:
 • A moderator now confirms every join by invitation link. All moderators should update: older app versions can keep confirming such requests automatically.
+• Invitation links no longer show names and servers in readable form and no longer contain the family name. The content is only encoded, so keep treating the link like a key. Older app versions cannot read new links and keep creating readable ones: all moderators should update.
 • Screenshots and screen recordings are allowed on the Mac; the “Screen protection” switch is not shown there.
 • Signing in through the provider's website (e.g. matrix.org) works again. Before, the jump to the page already failed.
 • matrix.org stays the default provider. Previously, after signing in with a full ID (@name:server) or an invitation on another server, that server was shown as the default.

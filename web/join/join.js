@@ -1,13 +1,17 @@
 // Landingpage für Einladungslinks (E-68). Die Angaben stehen im Fragment (#…) der Adresse und gehen nie an den Server.
 // Sie werden nur geprüft und zu `familynexus://join?…` zusammengesetzt; ob der Link gültig ist, entscheidet die App.
+// Ab Version 4 stehen die Felder kodiert in `d` (E-79). Die Seite dekodiert sie nicht und erkennt abgeschnittene Links
+// deshalb nicht, das tut erst die App.
 (function () {
   'use strict';
 
-  var KEYS = ['v', 'room', 'via', 'srv', 'inv', 'exp', 'n', 'f', 'by'];
+  var KEYS = ['v', 'room', 'via', 'srv', 'inv', 'exp', 'n', 'f', 'by', 'd'];
   var MAX = 1024;
   var SAFE = /^[A-Za-z0-9%._~!$'()*+,;=:@\/?&\-]*$/;
+  var PAYLOAD = /^d=[A-Za-z0-9_\-]+$/;
 
   // Liefert den App-Link oder null. Streng: nur bekannte Felder, keine doppelten, nur unverfängliche Zeichen.
+  // Zwei Formen schließen einander aus: genau `v` und `d` (ab Version 4) oder die einzelnen Felder (Version 1 bis 3).
   function buildAppLink(hash) {
     var q = hash && hash.charAt(0) === '#' ? hash.slice(1) : hash;
     if (!q || q.length > MAX || !SAFE.test(q)) return null;
@@ -16,9 +20,10 @@
     for (var i = 0; i < parts.length; i++) {
       var key = parts[i].split('=')[0];
       if (KEYS.indexOf(key) < 0 || seen[key]) return null;
+      if (key === 'd' && !PAYLOAD.test(parts[i])) return null;
       seen[key] = true;
     }
-    if (!seen.v || !seen.room || !seen.n) return null;
+    if (!seen.v || (seen.d ? parts.length !== 2 : !seen.room || !seen.n)) return null;
     return 'familynexus://join?' + q;
   }
 

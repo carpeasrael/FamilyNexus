@@ -74,8 +74,8 @@ geteilt: Familienraum, privat: nur privater Raum des eigenen Kontos (Geräte-Syn
 - Einladung vor der Anmeldung: `AppRoot` merkt geprüfte Links in `AppSettings.pendingInvite` vor und stellt sie beim Start
   wieder her; OAuth-Rücksprünge (`AppLinkOAuthRedirect.isCallback`) werden dort nicht als Einladung behandelt.
 
-## Einladungen (E-49, E-56)
-- Link: `InviteLink` (Format v2, liest v1) + Vermerk `InviteTicket` als verschlüsseltes Raumereignis; `SdkMatrixGateway` führt die
+## Einladungen (E-49, E-56, E-79)
+- Link: `InviteLink` (Format v4 mit kodierten Feldern, ohne Familienname; liest v1 bis v3) + Vermerk `InviteTicket` als verschlüsseltes Raumereignis; `SdkMatrixGateway` führt die
   Vermerke der Moderatoren (`_roomTickets`, `_usedTickets`) zusätzlich zu den eigenen Kontodaten und prüft damit
   Beitrittsanfragen (`RequestCheck`). Jede Anfrage bestätigt ein Moderator (`approveRequest`, E-78). Teilen: QR, Kopieren,
   `MailLauncher` (`data/platform/mail_launcher.dart`, `url_launcher`).

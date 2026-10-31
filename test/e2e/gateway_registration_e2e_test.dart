@@ -84,15 +84,15 @@ void main() {
       expect(await g.checkUsername(E2e.server, 'Grossbuchstaben'), UsernameCheck.invalid);
     });
 
-    test('TP-E2E-03 Neuling: Konto anlegen → Link v2 mit Namen → Anfrage → Moderatorin sieht den Namen → bestätigt → Mitglied', () async {
+    test('TP-E2E-03 Neuling: Konto anlegen → Link v4 mit Namen → Anfrage → Moderatorin sieht den Namen → bestätigt → Mitglied', () async {
       final mod = await _registered('mod', 'Erika');
       await mod.createFamily('Familie E2E');
       await E2e.until(() => mod.family != null, what: 'Familie bei der Moderatorin');
 
       final raw = await mod.createInviteLink();
-      expect(raw, contains('v=3'));
+      expect(raw, contains('v=4'));
       final link = InviteLink.tryParse(raw, now: DateTime.now(), ownHost: 'localhost')!;
-      expect(link.familyName, 'Familie E2E');
+      expect(link.familyName, isNull, reason: 'E-79: kein Familienname im Link');
       expect(link.inviterName, 'Erika');
       expect(link.inviterServer, 'localhost', reason: 'Neulinge legen das Konto beim Anbieter des Einladenden an');
       expect(link.accountServer, 'localhost', reason: 'Der Link nennt den Server für Konto und Anmeldung ausdrücklich (E-63)');

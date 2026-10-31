@@ -807,12 +807,9 @@
   "privacy11Body": "The app remembers blocked members only on this device (encrypted database); the list is not transmitted. If you report a message, the operator of your server receives the message ID, the chosen reason and your optional text. They cannot read the encrypted content.",
   "familyInviteMail": "Send by email",
   "inviteMailSubject": "Invitation to FamilyNexus",
-  "inviteMailBody": "Hello,\n\nI am inviting you to our family “{family}” on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n{link}\n\n3. Create your account.\n4. A moderator must confirm your request before you are admitted. Please let me know briefly once you have sent it, because moderators are not notified.\n\nThe link is valid for {validity}. The confirmation must also happen within this time.",
+  "inviteMailBody": "Hello,\n\nI am inviting you to our family on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n{link}\n\n3. Create your account.\n4. A moderator must confirm your request before you are admitted. Please let me know briefly once you have sent it, because moderators are not notified.\n\nThe link is valid for {validity}. The confirmation must also happen within this time.",
   "@inviteMailBody": {
     "placeholders": {
-      "family": {
-        "type": "String"
-      },
       "link": {
         "type": "String"
       },

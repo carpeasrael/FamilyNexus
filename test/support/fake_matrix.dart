@@ -619,7 +619,6 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       validity: validity,
       nonce: nonce,
       ownHost: fake.host,
-      familyName: f.name,
       inviterName: fake.displayNameOf(f.myUserId),
       accountServer: accountServer,
     );

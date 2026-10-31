@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_matrix.dart';
+import '../support/invite_links.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
 
@@ -59,7 +60,7 @@ void main() {
       await _tap(tester, 'Beitreten');
       await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), s.link);
       await _tap(tester, 'Weiter');
-      expect(find.text('Du trittst der Familie „Familie Test“ bei. Eingeladen hat dich Anna (Konto bei fake.test).'), findsOneWidget,
+      expect(find.text('Du trittst einer Familie bei. Eingeladen hat dich Anna (Konto bei fake.test).'), findsOneWidget,
           reason: 'Namen statt technischer IDs');
       expect(find.textContaining('@anna:fake.test'), findsNothing, reason: 'ID nur unter „Details“');
       await _tap(tester, 'Details');
@@ -132,6 +133,26 @@ void main() {
       expect(find.descendant(of: find.byType(NavigationBar), matching: find.text('1')), findsNothing);
     });
 
+    testWidgets('E-79: Link der Version 3 zeigt die Karte weiter mit Familienname', (tester) async {
+      final s = await _benWithoutFamily();
+      await _pump(tester, s.ben);
+      await _tap(tester, 'Beitreten');
+      final invite = InviteLink.tryParse(s.link, now: DateTime.now(), ownHost: 'fake.test')!;
+      final old = v3Link(inviteFields(
+        room: invite.roomId,
+        via: invite.via,
+        srv: invite.accountServer,
+        inv: invite.inviter,
+        exp: invite.expires.millisecondsSinceEpoch ~/ 1000,
+        family: 'Familie Test',
+        by: invite.inviterName,
+        n: invite.nonce,
+      ));
+      await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), old);
+      await _tap(tester, 'Weiter');
+      expect(find.text('Du trittst der Familie „Familie Test“ bei. Eingeladen hat dich Anna (Konto bei fake.test).'), findsOneWidget);
+    });
+
     testWidgets('abgelaufener oder manipulierter Link wird abgelehnt, nichts wird gesendet', (tester) async {
       final s = await _benWithoutFamily();
       await _pump(tester, s.ben);
@@ -150,7 +171,7 @@ void main() {
         'familynexus://join?v=1&room=x': 'Der Link ist unvollständig oder beschädigt – oft passiert das beim Weiterleiten. Bitte kopiere ihn noch einmal vollständig oder scanne den QR-Code.',
         'hallo': 'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „https://carpeasrael.github.io/FamilyNexus/join/“ oder „familynexus://join“.',
         s.link.replaceFirst('familynexus', 'https'): 'Das ist kein Einladungslink. Ein Einladungslink beginnt mit „https://carpeasrael.github.io/FamilyNexus/join/“ oder „familynexus://join“.',
-        s.link.replaceFirst('v=3', 'v=9'): 'Dieser Link stammt aus einer neueren Version von FamilyNexus. Bitte aktualisiere die App und versuche es noch einmal.',
+        s.link.replaceFirst('v=4', 'v=9'): 'Dieser Link stammt aus einer neueren Version von FamilyNexus. Bitte aktualisiere die App und versuche es noch einmal.',
       };
       for (final c in cases.entries) {
         await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), c.key);

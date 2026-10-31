@@ -92,15 +92,16 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 
 | ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
 |---|---|---|---|---|---|
-| TP-INV-01 | Moderatorin | Link erzeugen | `v=3` mit Familienname und Name der Einladenden; Roundtrip | U `invite_link_test.dart`, S TP-E2E-03 | ✅ |
+| TP-INV-01 | Moderatorin | Link erzeugen | `v=4` mit kodierten Feldern, Name der Einladenden, ohne Familienname; keine lesbaren IDs, Server oder Namen; Roundtrip (E-79) | U `invite_link_test.dart`, S TP-E2E-03 | ✅ |
 | TP-INV-02 | alter Link `v=1` | einfügen | weiterhin gültig | U | ✅ |
-| TP-INV-03 | manipulierte Links | unbekannte/doppelte Felder, `v=1` mit `f`, `v=3`, fremder Server, CRLF, Überlänge | abgelehnt | U, `penetration_test.dart` | ✅ |
+| TP-INV-10 | Link der Version 3 mit `f` | einfügen | weiterhin gültig; Karte nennt die Familie | U, F `join_and_security_test.dart` | ✅ |
+| TP-INV-03 | manipulierte Links | unbekannte/doppelte Felder, `v=1` mit `f`, `v=3`, fremder Server, CRLF, Überlänge; bei `v=4`: kaputtes Base64, Padding, Länge mod 4 = 1, Zusatzfeld neben `d`, inneres `v` oder `f`, ungültiges UTF-8, fehlendes `srv` | abgelehnt | U, `penetration_test.dart` | ✅ |
 | TP-INV-04 | – | Namen mit Steuer-/Bidi-Zeichen, Überlänge, leer | bereinigt, auf 40 Zeichen begrenzt, leere Namen entfallen | U | ✅ |
 | TP-INV-06 | lange IDs und Namen, auch viele Emoji | Link erzeugen | passt in die Längengrenze (Namen werden notfalls gekürzt), bleibt lesbar | U | ✅ |
 | TP-INV-09 | Link in anderer Schreibweise (`FamilyNexus://…`) | öffnen, Neustart | einheitlich vorgemerkt, nach Neustart weiter da | U | ✅ |
 | TP-INV-07 | Moderatorin | „Jemanden einladen“ | ein Dialog mit QR-Code, „Per E-Mail senden“, „Link kopieren“; Benutzer-ID nur unter „Erweitert“ | F `family_screen_test.dart`, B 12–13 | ✅ |
 | TP-INV-08 | – | „Per E-Mail senden“ | Entwurf mit Schritt-für-Schritt-Anleitung („Ich wurde eingeladen“), ohne „Matrix“; ohne Mailprogramm wird kopiert | F | ✅ |
-| TP-JOIN-01 | frisches Gerät, Link geöffnet | Konto erstellen → Notfall-Schlüssel → „Beitritt anfragen“ → Bestätigung | keine Startseite, keine Serverfrage (Anbieter aus der Einladung); Beitrittskarte „Du trittst der Familie „…“ bei. Eingeladen hat dich Anna.“; Anfrage erst nach Tipp; Moderatorin sieht den Namen; nach Bestätigung automatisch Mitglied | F, S TP-E2E-03, B 14–18, A (Link-Kaltstart mit echtem matrix.org) | ✅ |
+| TP-JOIN-01 | frisches Gerät, Link geöffnet | Konto erstellen → Notfall-Schlüssel → „Beitritt anfragen“ → Bestätigung | keine Startseite, keine Serverfrage (Anbieter aus der Einladung); Beitrittskarte „Du trittst einer Familie bei. Eingeladen hat dich Anna (Konto bei …).“; Anfrage erst nach Tipp; Moderatorin sieht den Namen; nach Bestätigung automatisch Mitglied | F, S TP-E2E-03, B 14–18, A (Link-Kaltstart mit echtem matrix.org) | ✅ |
 | TP-JOIN-02 | Link vorgemerkt | App neu starten | Link weiter da, direkt „Konto erstellen“; abgelaufener Link wird verworfen | F | ✅ |
 | TP-JOIN-03 | bereits in einer Familie | Link öffnen | „Du bist bereits in einer Familie.“, nichts vorgemerkt | F | ✅ |
 | TP-JOIN-04 | Anfrage gesendet | „Anfrage zurückziehen“ | Anfrage weg, Link-Feld wieder da | F | ✅ |
@@ -118,7 +119,7 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-INV-07 | – | Link erzeugen, Standard und anderer Konto-Server | `srv` steht im Link; Standard = Server des Einladenden; getrennt von `inv` | U `invite_link_test.dart` | ✅ |
 | TP-INV-08 | Link der Version 2 | lesen | gültig; Konto-Server = Server des Einladenden | U | ✅ |
 | TP-INV-09 | Konto-Server im Heimnetz | erzeugen, lesen | nur der eigene beim Erzeugen; ohne `check` nur als eigener Server lesbar; Oberfläche fragt vor dem Verbinden | U | ✅ |
-| TP-LINK-10 | – | `srv` fehlt (v3), ungültig, mit Pfad/Zugangsdaten, doppelt, im Heimnetz | abgelehnt | U, Pen `penetration_test.dart` | ✅ |
+| TP-LINK-10 | – | `srv` fehlt (v3, v4), ungültig, mit Pfad/Zugangsdaten, doppelt, im Heimnetz | abgelehnt | U, Pen `penetration_test.dart` | ✅ |
 | TP-JOIN-10 | Link mit Server ≠ matrix.org | Link öffnen | „Anderen Anbieter verwenden“ gewählt, Adresse im Feld, „Erweitert“ aufgeklappt; Konto liegt auf diesem Server | F `invite_onboarding_test.dart`, E2E | ✅ |
 | TP-JOIN-11 | Link mit Server matrix.org | Link öffnen | Standardanbieter gewählt, kein eigenes Feld | F | ✅ |
 | TP-JOIN-12 | Person auf der Anmeldeseite | Link trifft ein, anmelden, Notfall-Schlüssel | Anbieter wechselt auf den Server aus dem Link; Anmeldung dort; am Ende die Beitrittskarte der Familie, ein Tipp sendet die Anfrage | F | ✅ |
@@ -130,8 +131,8 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-LINK-01 | – | abgelaufener Link | „Dieser Einladungslink ist abgelaufen. Bitte … um einen neuen Link.“ | U `invite_link_check_test.dart`, F `join_and_security_test.dart` | ✅ |
 | TP-LINK-02 | – | Text ohne Link, https-Link | „Das ist kein Einladungslink …“ | U, F | ✅ |
 | TP-LINK-03 | – | unvollständiger/manipulierter Link | „Der Link ist unvollständig oder beschädigt … erneut kopieren oder QR-Code scannen“ | U, F | ✅ |
-| TP-LINK-04 | – | Link mit `v=4` | „… neueren Version … bitte aktualisiere die App“ | U, F | ✅ |
-| TP-LINK-05 | – | `&amp;`, `<…>`, „…“, Text davor/danach, Satzzeichen, Umbruch im Link, Quoted-Printable | angenommen, bereinigt vorgemerkt; Text nach dem Link wird nicht angehängt | U, F `invite_onboarding_test.dart` | ✅ |
+| TP-LINK-04 | – | Link mit `v=5` | „… neueren Version … bitte aktualisiere die App“ | U, F | ✅ |
+| TP-LINK-05 | – | `&amp;`, `<…>`, „…“, Text davor/danach, Satzzeichen, Umbruch im Link (auch mitten im Payload von `v=4`, E-79), Quoted-Printable | angenommen, bereinigt vorgemerkt; Text nach dem Link wird nicht angehängt; Umbruch mit Zitatzeichen `>` bleibt beschädigt | U, F `invite_onboarding_test.dart` | ✅ |
 | TP-LINK-06 | Familie auf Server im Heimnetz (IP, localhost, Name ohne Punkt) | Link vor der Anmeldung öffnen, Konto anlegen | angenommen; Beitrittskarte warnt „Server im Heimnetz“; Anfrage erst nach Tipp | U, F, S (Synapse auf `localhost`) | ✅ |
 | TP-LINK-07 | – | `via` im Heimnetz, aber nicht der Server des Raums | abgelehnt (beschädigt) | U | ✅ |
 | TP-LINK-09 | Name „3D-Club“, Quoted-Printable-Mail, Neustart | – | Link unverfälscht, nach Neustart lesbar (Review R1) | U | ✅ |

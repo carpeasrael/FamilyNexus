@@ -807,12 +807,9 @@
   "privacy11Body": "Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen.",
   "familyInviteMail": "Per E-Mail senden",
   "inviteMailSubject": "Einladung zu FamilyNexus",
-  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ein Moderator muss deine Anfrage bestätigen, bevor du aufgenommen wirst. Sag mir bitte kurz Bescheid, sobald du sie gestellt hast, denn Moderatoren werden nicht benachrichtigt.\n\nDer Link ist {validity} gültig. Auch die Bestätigung muss in diese Zeit fallen.",
+  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ein Moderator muss deine Anfrage bestätigen, bevor du aufgenommen wirst. Sag mir bitte kurz Bescheid, sobald du sie gestellt hast, denn Moderatoren werden nicht benachrichtigt.\n\nDer Link ist {validity} gültig. Auch die Bestätigung muss in diese Zeit fallen.",
   "@inviteMailBody": {
     "placeholders": {
-      "family": {
-        "type": "String"
-      },
       "link": {
         "type": "String"
       },

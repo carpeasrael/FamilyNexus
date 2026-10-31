@@ -2597,8 +2597,8 @@ abstract class AppLocalizations {
   /// No description provided for @inviteMailBody.
   ///
   /// In de, this message translates to:
-  /// **'Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ein Moderator muss deine Anfrage bestätigen, bevor du aufgenommen wirst. Sag mir bitte kurz Bescheid, sobald du sie gestellt hast, denn Moderatoren werden nicht benachrichtigt.\n\nDer Link ist {validity} gültig. Auch die Bestätigung muss in diese Zeit fallen.'**
-  String inviteMailBody(String family, String link, String validity);
+  /// **'Hallo,\n\nich lade dich in unsere Familie bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ein Moderator muss deine Anfrage bestätigen, bevor du aufgenommen wirst. Sag mir bitte kurz Bescheid, sobald du sie gestellt hast, denn Moderatoren werden nicht benachrichtigt.\n\nDer Link ist {validity} gültig. Auch die Bestätigung muss in diese Zeit fallen.'**
+  String inviteMailBody(String link, String validity);
 
   /// No description provided for @familyInviteMailFailed.
   ///

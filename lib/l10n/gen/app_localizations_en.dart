@@ -1489,8 +1489,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inviteMailSubject => 'Invitation to FamilyNexus';
 
   @override
-  String inviteMailBody(String family, String link, String validity) {
-    return 'Hello,\n\nI am inviting you to our family “$family” on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n$link\n\n3. Create your account.\n4. A moderator must confirm your request before you are admitted. Please let me know briefly once you have sent it, because moderators are not notified.\n\nThe link is valid for $validity. The confirmation must also happen within this time.';
+  String inviteMailBody(String link, String validity) {
+    return 'Hello,\n\nI am inviting you to our family on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n$link\n\n3. Create your account.\n4. A moderator must confirm your request before you are admitted. Please let me know briefly once you have sent it, because moderators are not notified.\n\nThe link is valid for $validity. The confirmation must also happen within this time.';
   }
 
   @override

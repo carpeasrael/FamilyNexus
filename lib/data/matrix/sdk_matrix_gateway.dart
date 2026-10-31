@@ -1671,7 +1671,6 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         validity: validity,
         nonce: nonce,
         ownHost: _ownHostOf(f.myUserId),
-        familyName: f.name,
         inviterName: f.member(f.myUserId)?.displayName,
         accountServer: accountServer,
       );

@@ -1,5 +1,6 @@
 Neu in 1.2.1:
-• Jeden Beitritt bestätigt jetzt ein Moderator. Bitte alle Moderatoren aktualisieren.
+• Jeden Beitritt bestätigt jetzt ein Moderator.
+• Einladelinks ohne lesbare Namen; alte Apps lesen sie nicht. Moderatoren bitte aktualisieren.
 • matrix.org bleibt Standard-Anbieter, auch nach Anmeldung oder Einladung bei einem anderen Server.
 • Über die App: Speicherorte und Protokolle aller lokal und online gespeicherten Daten.
 • Konto löschen in den Einstellungen.
