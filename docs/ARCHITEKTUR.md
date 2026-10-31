@@ -77,7 +77,8 @@ geteilt: Familienraum, privat: nur privater Raum des eigenen Kontos (Geräte-Syn
 ## Einladungen (E-49, E-56)
 - Link: `InviteLink` (Format v2, liest v1) + Vermerk `InviteTicket` als verschlüsseltes Raumereignis; `SdkMatrixGateway` führt die
   Vermerke der Moderatoren (`_roomTickets`, `_usedTickets`) zusätzlich zu den eigenen Kontodaten und prüft damit
-  Beitrittsanfragen (`RequestCheck`). Teilen: QR, Kopieren, `MailLauncher` (`data/platform/mail_launcher.dart`, `url_launcher`).
+  Beitrittsanfragen (`RequestCheck`). Jede Anfrage bestätigt ein Moderator (`approveRequest`, E-78). Teilen: QR, Kopieren,
+  `MailLauncher` (`data/platform/mail_launcher.dart`, `url_launcher`).
 - Teilen über `features/family/invite_dialog.dart` (`showInviteDialog`: QR, E-Mail, Kopieren), genutzt von der
   Familienansicht und von „Jetzt einladen“ nach der Gründung.
 - Einrichtung: `FamilyStep` zeigt bei vorhandener Einladung die Einladungskarte statt der Auswahl Gründen/Beitreten, bei einem

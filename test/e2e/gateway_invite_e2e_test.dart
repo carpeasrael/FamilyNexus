@@ -2,6 +2,7 @@ import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
+import 'package:family_nexus/domain/invite_ticket.dart';
 import 'package:family_nexus/domain/security.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,7 +17,7 @@ Future<SdkMatrixGateway> _login(String prefix) async {
 }
 
 Future<void> _join(SdkMatrixGateway mod, SdkMatrixGateway user) async {
-  final link = InviteLink.tryParse(await mod.createInviteLink(autoApprove: false), now: DateTime.now(), ownHost: 'localhost')!;
+  final link = InviteLink.tryParse(await mod.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
   await user.requestToJoin(link);
   await E2e.until(() => mod.family?.member(user.userId!)?.status == MemberStatus.requested, what: 'Moderator sieht Anfrage');
   await mod.approveRequest(user.userId!);
@@ -38,7 +39,7 @@ void main() {
       await E2e.until(() => b.family?.myRole == Role.moderator, what: 'B ist Moderator');
 
       // A gibt den Link aus; die Anfrage trifft ein.
-      final link = InviteLink.tryParse(await a.createInviteLink(autoApprove: false), now: DateTime.now(), ownHost: 'localhost')!;
+      final link = InviteLink.tryParse(await a.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
       final c = await _login('invc');
       await c.requestToJoin(link);
       await E2e.until(() => b.family?.member(c.userId!)?.status == MemberStatus.requested, what: 'B sieht die Anfrage');
@@ -59,14 +60,24 @@ void main() {
       await E2e.until(() => a.family!.member(d.userId!)!.request == RequestCheck.unknown, what: 'A sieht den verbrauchten Link ebenso');
     });
 
-    test('Link mit automatischer Bestätigung: die App des Moderators lädt ohne Klick ein, nur einmal', () async {
+    test('E-78: Anfrage mit gültigem Link wartet auf den Moderator, obwohl dessen App online ist', () async {
       final a = await _login('inaa');
-      await a.createFamily('Auto-Familie');
+      await a.createFamily('Warte-Familie');
       await E2e.until(() => a.family != null, what: 'Familie bei A');
+      await a.sendMessage('Nur für die Familie');
       final link = InviteLink.tryParse(await a.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
       final c = await _login('inac');
       await c.requestToJoin(link);
-      await E2e.until(() => c.invitations.isNotEmpty, what: 'C erhält die Einladung ohne Zutun eines Moderators');
+      await E2e.until(() => a.family?.member(c.userId!)?.request == RequestCheck.valid, what: 'A sieht die gültige Anfrage');
+      await a.sendMessage('Der Sync von A läuft weiter');
+      await Future<void>.delayed(const Duration(seconds: 8));
+      expect(a.family!.member(c.userId!)!.status, MemberStatus.requested, reason: 'ohne Moderator keine Aufnahme');
+      expect(c.invitations, isEmpty);
+      expect(c.family, isNull, reason: 'Anfragende sehen die Familie nicht');
+      expect(c.messages, isEmpty, reason: 'Anfragende sehen keine Inhalte');
+
+      await a.approveRequest(c.userId!);
+      await E2e.until(() => c.invitations.isNotEmpty, what: 'C erhält die Einladung');
       await c.acceptInvitation(c.invitations.single.roomId);
       await E2e.until(() => c.family != null, what: 'C ist in der Familie');
       expect(c.family!.myRole, Role.member);
@@ -79,7 +90,59 @@ void main() {
       expect(d.invitations, isEmpty);
     });
 
-    test('Pen-Test F-01: zwei gleichzeitige Anfragen mit demselben Link – keine automatische Bestätigung, manuell nur eine', () async {
+    test('E-78: Vermerk einer alten App mit `auto` bestätigt nichts, die Anfrage bleibt manuell bestätigbar', () async {
+      final a = await _login('inoa');
+      await a.createFamily('Alt-Vermerk-Familie');
+      await E2e.until(() => a.family != null, what: 'Familie bei A');
+      // Genau das Ereignis, das eine alte App für einen automatischen Link sendet.
+      const nonce = 'feedfacefeedfacefeedfacefeedface';
+      final exp = DateTime.now().toUtc().add(const Duration(days: 1)).millisecondsSinceEpoch ~/ 1000;
+      await a.sdkClient!.getRoomById(a.family!.roomId)!.sendEvent(<String, Object?>{'v': 1, 'n': nonce, 'exp': exp, 'auto': true}, type: InviteTicket.type);
+      final c = await _login('inoc');
+      final link = InviteLink.tryParse(
+        InviteLink.create(roomId: a.family!.roomId, via: 'localhost', inviter: a.userId!, now: DateTime.now(), nonce: nonce, ownHost: 'localhost'),
+        now: DateTime.now(),
+        ownHost: 'localhost',
+      )!;
+      await c.requestToJoin(link);
+      await E2e.until(() => a.family?.member(c.userId!)?.request == RequestCheck.valid, what: 'A erkennt den alten Vermerk als gültig');
+      await Future<void>.delayed(const Duration(seconds: 8));
+      expect(a.family!.member(c.userId!)!.status, MemberStatus.requested);
+      expect(c.invitations, isEmpty, reason: 'alter Vermerk bestätigt nicht von selbst');
+
+      await a.approveRequest(c.userId!);
+      await E2e.until(() => c.invitations.isNotEmpty, what: 'C erhält die Einladung');
+      await c.acceptInvitation(c.invitations.single.roomId);
+      await E2e.until(() => c.family != null, what: 'C ist in der Familie');
+    });
+
+    test('E-78: Link läuft während des Wartens ab: nur noch ablehnbar, ein neuer Link führt zum Beitritt', () async {
+      final a = await _login('inxa');
+      await a.createFamily('Ablauf-Familie');
+      await E2e.until(() => a.family != null, what: 'Familie bei A');
+      final c = await _login('inxc');
+      final short = InviteLink.tryParse(await a.createInviteLink(validity: const Duration(seconds: 5)), now: DateTime.now(), ownHost: 'localhost')!;
+      await c.requestToJoin(short);
+      await E2e.until(() => a.family?.member(c.userId!)?.status == MemberStatus.requested, what: 'A sieht die rechtzeitige Anfrage');
+      await Future<void>.delayed(const Duration(seconds: 6));
+
+      final fresh = InviteLink.tryParse(await a.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
+      await E2e.until(() => a.family!.member(c.userId!)!.request == RequestCheck.expired, what: 'A sieht den abgelaufenen Link');
+      await expectLater(a.approveRequest(c.userId!), throwsA(isA<GatewayException>()));
+      expect(c.invitations, isEmpty);
+
+      await a.rejectRequest(c.userId!);
+      await E2e.until(() => c.joinRequestRejected, what: 'Ablehnung beim Anfragenden sichtbar');
+      await c.cancelJoinRequest();
+      await c.requestToJoin(fresh);
+      await E2e.until(() => a.family?.member(c.userId!)?.request == RequestCheck.valid, what: 'A sieht die neue Anfrage');
+      await a.approveRequest(c.userId!);
+      await E2e.until(() => c.invitations.isNotEmpty, what: 'C erhält die Einladung');
+      await c.acceptInvitation(c.invitations.single.roomId);
+      await E2e.until(() => c.family != null, what: 'C ist in der Familie');
+    });
+
+    test('Pen-Test F-01: zwei Anfragen mit demselben Link, gleichzeitig bestätigt: genau eine Einladung', () async {
       final a = await _login('inra');
       await a.createFamily('Race-Familie');
       await E2e.until(() => a.family != null, what: 'Familie bei A');
@@ -97,8 +160,8 @@ void main() {
         what: 'A sieht beide Anfragen',
       );
       await Future<void>.delayed(const Duration(seconds: 8));
-      expect(c.invitations, isEmpty, reason: 'mehrere Anfragen je Link: der Moderator entscheidet');
-      expect(d.invitations, isEmpty, reason: 'mehrere Anfragen je Link: der Moderator entscheidet');
+      expect(c.invitations, isEmpty, reason: 'jede Anfrage entscheidet ein Moderator (E-78)');
+      expect(d.invitations, isEmpty, reason: 'jede Anfrage entscheidet ein Moderator (E-78)');
 
       // Der Moderator bestätigt beide fast gleichzeitig: nur eine Einladung, der Link ist danach verbraucht.
       final results = await Future.wait(<Future<bool>>[

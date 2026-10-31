@@ -1,11 +1,14 @@
 // Pen-Test 2026-10-30 – Zugriffskontrolle Familie (E2E gegen lokalen Synapse, tool/synapse/up.sh).
 //
-// PT-A1: Einmal-Einladungslink mit automatischer Bestätigung. Ein weitergegebener/abgefangener Link wird
-//        von zwei Konten gleichzeitig benutzt, während das Gerät des Moderators kurz nicht synchronisiert
-//        (z. B. Hintergrund, Funkloch). Erwartung laut Design (S2): höchstens EINE Person wird eingeladen.
-// PT-A2: Beitrittsanfrage mit erfundener Link-ID → keine automatische Einladung.
-// PT-A3: Normales Mitglied veröffentlicht einen gefälschten „Link-Vermerk“ (InviteTicket) mit auto=true →
-//        wird ignoriert, Anfrage bleibt unbestätigt.
+// Seit E-78 bestätigt jede Anfrage ein Moderator; die automatische Bestätigung aus dem Pen-Test gibt es nicht mehr.
+//
+// PT-A1: Einmal-Einladungslink. Ein weitergegebener/abgefangener Link wird von zwei Konten gleichzeitig
+//        benutzt, während das Gerät des Moderators kurz nicht synchronisiert (z. B. Hintergrund, Funkloch).
+//        Erwartung: Niemand wird von selbst eingeladen; bestätigt der Moderator beide fast gleichzeitig,
+//        wird genau EINE Person eingeladen (S2).
+// PT-A2: Beitrittsanfrage mit erfundener Link-ID → keine Einladung, nicht bestätigbar.
+// PT-A3: Normales Mitglied veröffentlicht einen gefälschten „Link-Vermerk“ (InviteTicket, Rohformat einer alten
+//        App mit auto=true) → wird ignoriert, Anfrage bleibt unbestätigt.
 // ignore_for_file: invalid_use_of_visible_for_testing_member (Testcode außerhalb von test/)
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/domain/family.dart';
@@ -27,7 +30,7 @@ Future<SdkMatrixGateway> _login(String prefix) async {
 void main() {
   setUpAll(E2e.init);
 
-  test('PT-A1: Race – derselbe Auto-Link, zwei gleichzeitige Anfragen', () async {
+  test('PT-A1: Race – derselbe Link, zwei gleichzeitige Anfragen', () async {
     final a = await _login('ptra');
     await a.createFamily('PT-Race');
     await E2e.until(() => a.family != null, what: 'Familie bei A');
@@ -48,17 +51,27 @@ void main() {
       () => a.family?.member(c.userId!) != null && a.family?.member(d.userId!) != null,
       what: 'A sieht beide Anfragen',
     );
-    // Zeit für die automatische Bestätigung.
+    await E2e.until(
+      () => a.family?.member(c.userId!)?.request == RequestCheck.valid && a.family?.member(d.userId!)?.request == RequestCheck.valid,
+      what: 'A prüft beide Anfragen',
+    );
+    // Eine alte App würde hier von selbst bestätigen.
     await Future<void>.delayed(const Duration(seconds: 12));
-    final cInvited = c.invitations.isNotEmpty;
-    final dInvited = d.invitations.isNotEmpty;
+    expect(c.invitations, isEmpty, reason: 'keine Einladung ohne Moderator (E-78)');
+    expect(d.invitations, isEmpty, reason: 'keine Einladung ohne Moderator (E-78)');
+
+    // Der Moderator bestätigt beide fast gleichzeitig.
+    final results = await Future.wait(<Future<bool>>[
+      a.approveRequest(c.userId!).then((_) => true, onError: (Object _) => false),
+      a.approveRequest(d.userId!).then((_) => true, onError: (Object _) => false),
+    ]);
     // ignore: avoid_print
-    print('PT-A1: C eingeladen=$cInvited, D eingeladen=$dInvited; '
+    print('PT-A1: Bestätigung C=${results.first}, D=${results.last}; '
         'Status bei A: C=${a.family!.member(c.userId!)?.status.name}, D=${a.family!.member(d.userId!)?.status.name}');
-    expect(cInvited && dInvited, isFalse, reason: 'Einmal-Link darf nur EINE Person einladen');
+    expect(results.where((ok) => ok), hasLength(1), reason: 'Einmal-Link darf nur EINE Person einladen');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('PT-A2: erfundene Link-ID → keine automatische Einladung', () async {
+  test('PT-A2: erfundene Link-ID → keine Einladung', () async {
     final a = await _login('ptfa');
     await a.createFamily('PT-Fake');
     await E2e.until(() => a.family != null, what: 'Familie bei A');
@@ -89,7 +102,7 @@ void main() {
     await E2e.until(() => a.family != null, what: 'Familie bei A');
     // M wird normales Mitglied.
     final m = await _login('pttm');
-    final l1 = InviteLink.tryParse(await a.createInviteLink(autoApprove: false), now: DateTime.now(), ownHost: 'localhost')!;
+    final l1 = InviteLink.tryParse(await a.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
     await m.requestToJoin(l1);
     await E2e.until(() => a.family?.member(m.userId!)?.status == MemberStatus.requested, what: 'Anfrage M');
     await E2e.until(() => a.family!.member(m.userId!)!.request == RequestCheck.valid, what: 'Link M gültig');
@@ -103,7 +116,7 @@ void main() {
     const nonce = 'feedfacefeedfacefeedfacefeedface';
     final exp = DateTime.now().toUtc().add(const Duration(days: 1)).millisecondsSinceEpoch ~/ 1000;
     final room = m.sdkClient!.getRoomById(m.family!.roomId)!;
-    await room.sendEvent(InviteTicket(nonce: nonce, expires: exp, auto: true).encode(), type: InviteTicket.type);
+    await room.sendEvent(<String, Object?>{'v': InviteTicket.version, 'n': nonce, 'exp': exp, 'auto': true}, type: InviteTicket.type);
 
     final x = await _login('pttx');
     final forged = InviteLink.tryParse(

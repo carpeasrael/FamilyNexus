@@ -20,12 +20,14 @@ void main() {
     expect(InviteTicket.decode(t.encode(), nowSeconds: now)!.used, isTrue);
   });
 
-  test('automatische Bestätigung ist nur gesetzt, wenn der Vermerk es sagt', () {
-    final t = InviteTicket(nonce: nonce, expires: now + 60, auto: true);
-    expect(t.encode()['auto'], true);
-    expect(InviteTicket.decode(t.encode(), nowSeconds: now)!.auto, isTrue);
-    expect(InviteTicket.decode(InviteTicket(nonce: nonce, expires: now + 60).encode(), nowSeconds: now)!.auto, isFalse);
-    expect(InviteTicket.decode(<String, Object?>{...t.encode(), 'auto': 'ja'}, nowSeconds: now), isNull);
+  test('E-78: Vermerk einer alten App mit `auto` wird gelesen, wirkt aber nicht', () {
+    final raw = <String, Object?>{'v': 1, 'n': nonce, 'exp': now + 60, 'auto': true};
+    final t = InviteTicket.decode(raw, nowSeconds: now)!;
+    expect(t.nonce, nonce);
+    expect(t.expires, now + 60);
+    expect(t.encode(), <String, Object?>{'v': 1, 'n': nonce, 'exp': now + 60}, reason: '`auto` wird nicht übernommen und nie geschrieben');
+    expect(InviteTicket.decode(<String, Object?>{...raw, 'auto': false}, nowSeconds: now), isNotNull);
+    expect(InviteTicket.decode(<String, Object?>{...raw, 'auto': 'ja'}, nowSeconds: now), isNull);
   });
 
   test('ungültige Inhalte werden verworfen', () {

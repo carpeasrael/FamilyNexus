@@ -34,6 +34,16 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 
 - **Aufgabenlisten mit neuen Regeln oder Erklärung (E-58)** sind für App-Versionen vor dieser Änderung unsichtbar (Format v2); umgestellte Listen bleiben dort auf der letzten v1-Fassung stehen. Bearbeitet ein Moderator mit älterer App eine umgestellte Liste, gehen Regel und Erklärung verloren.
 
+- **Beitritt per Einladungslink (E-78):**
+  - **Alte Apps:** Links mit `auto: true` kann jede noch laufende alte Moderator-App weiter automatisch bestätigen, auch Links anderer Moderatoren. Lückenlos gilt die Moderator-Bestätigung erst, wenn kein Moderator-Gerät der Familie mehr eine alte Version nutzt. Eine Mindestversion gibt es nicht.
+  - **Keine Benachrichtigung:** Moderatoren sehen offene Anfragen nur am Abzeichen im Tab Familie. Die Einladungsmail bittet deshalb, der einladenden Person Bescheid zu sagen.
+  - **Zweite Moderatoren hängen am Vermerk:** Scheitert das Senden des Link-Vermerks, kann nur der Aussteller die Anfrage prüfen und bestätigen; andere Moderatoren sehen sie als „unbekannt“.
+  - **Abgelaufene Links:** Eine rechtzeitige Anfrage lässt sich nach dem Ablauf nicht mehr bestätigen, nur ablehnen. Danach braucht es einen neuen Link oder die Einladung per Matrix-ID. Nach einem Neustart kann eine abgelaufene Anfrage als „unbekannt“ erscheinen.
+  - **Anfragende nach Linkablauf:** Sie bleiben auf „wartet“, bis ein Moderator ablehnt; die Warteansicht gilt längstens 7 Tage.
+  - **Erneutes Anklopfen:** Eine Ablehnung verbraucht den Link nicht. Dieselbe Person kann mit demselben Link erneut anfragen, solange er gültig ist.
+  - **Mehrere Anfragen mit derselben Link-ID** zeigen beide „Gültiger Einladungslink“; ein eigenes Warnsignal gibt es nicht mehr. Der Moderator kann nur eine bestätigen.
+  - **Verlorene Bestätigung:** Scheitert eine Bestätigung, weil der Link inzwischen verbraucht ist, meldet die App nur „Dafür fehlt die Berechtigung“.
+
 - **Neuer Notfall-Schlüssel (E-72):** Der alte Schlüssel öffnet weiterhin den Master-Key (das SDK hält ihn nicht lokal vor, er
   lässt sich nicht unter den neuen Schlüssel umziehen). Ist der alte Schlüssel in fremde Hände geraten, hilft der neue daher
   nur bedingt; dafür bräuchte es ein Zurücksetzen der Identität, das die App nicht anbietet.

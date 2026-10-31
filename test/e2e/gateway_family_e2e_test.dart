@@ -21,7 +21,7 @@ Matcher _error(GatewayError e) => throwsA(isA<GatewayException>().having((x) => 
 
 /// Alle Teilnehmer treten über Anfrage → Bestätigung → Annahme bei.
 Future<void> _join(SdkMatrixGateway mod, SdkMatrixGateway user) async {
-  final link = InviteLink.tryParse(await mod.createInviteLink(autoApprove: false), now: DateTime.now(), ownHost: 'localhost')!;
+  final link = InviteLink.tryParse(await mod.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
   await user.requestToJoin(link);
   await E2e.until(() => user.joinRequestPending, what: 'Anfrage wartet');
   await E2e.until(
@@ -62,7 +62,7 @@ void main() {
       final real = await _login('real');
 
       // Link mit selbst gewählter ID (nicht vom Moderator ausgegeben).
-      final good = InviteLink.tryParse(await a.createInviteLink(autoApprove: false), now: DateTime.now(), ownHost: 'localhost')!;
+      final good = InviteLink.tryParse(await a.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
       final forged = InviteLink(roomId: good.roomId, via: good.via, inviter: good.inviter, expires: good.expires, nonce: 'a' * 32);
       await forger.requestToJoin(forged);
       await E2e.until(() => a.family?.member(forger.userId!)?.status == MemberStatus.requested, what: 'Anfrage des Fälschers');
@@ -212,7 +212,7 @@ void main() {
       await E2e.until(() => a.family != null);
       final d = await _login('fremd');
 
-      final link = InviteLink.tryParse(await a.createInviteLink(autoApprove: false), now: DateTime.now(), ownHost: 'localhost')!;
+      final link = InviteLink.tryParse(await a.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
       await d.requestToJoin(link);
       await E2e.until(() => a.family?.member(d.userId!)?.status == MemberStatus.requested);
       await a.rejectRequest(d.userId!);
