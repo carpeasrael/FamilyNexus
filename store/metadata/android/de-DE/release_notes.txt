@@ -5,4 +5,4 @@ Neu in 1.2.1:
 • Über die App: Speicherorte und Protokolle aller lokal und online gespeicherten Daten.
 • Konto löschen in den Einstellungen.
 • Neuer Notfall-Schlüssel; beim neuen Konto sicher angezeigt.
-• Nach dem Löschen startet die App mit der Startseite.
+• Passwort ändern; neue Konten mit Kontrolleingabe.

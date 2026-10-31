@@ -44,7 +44,7 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 
 | ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
 |---|---|---|---|---|---|
-| TP-REG-01 | Anbieter mit offener Registrierung | Name, Passwort, „Konto erstellen“ → Notfall-Schlüssel → Familienname → „Jetzt einladen“ | Konto angelegt, „Schritt 1/2/3 von 3“, Erfolgsansicht, Einladungsdialog, danach Hauptansicht als Moderator | F, B 02–13 | ✅ |
+| TP-REG-01 | Anbieter mit offener Registrierung | Name, Passwort, Wiederholung, „Konto erstellen“ → Notfall-Schlüssel → Familienname → „Jetzt einladen“ | Konto angelegt, „Schritt 1/2/3 von 3“, Erfolgsansicht, Einladungsdialog, danach Hauptansicht als Moderator | F, B 02–13 | ✅ |
 | TP-REG-02 | – | „Carla Groß“ eingeben | Benutzername `carla.gross` vorgeschlagen, „Der Benutzername ist frei.“ | F, U `username_suggestion_test.dart`, B 04 | ✅ |
 | TP-REG-03 | `anna` vergeben | Name „Anna“ | „Schon vergeben – wie wäre es mit „anna2“?“, Knopf übernimmt den Vorschlag, „Konto erstellen“ bis dahin gesperrt | F, U, B 03 | ✅ |
 | TP-REG-03b | Name wird zwischen Prüfung und Absenden vergeben | absenden | „Dieser Benutzername ist schon vergeben.“, nicht angemeldet | F `registration_test.dart`, S TP-E2E-01 | ✅ |
@@ -62,6 +62,11 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-REG-12 | – | Abläufe des Servers lesen | `POST /register` ohne Benutzername/Passwort, mit `inhibit_login`; einfachster unterstützter Ablauf; Telefon/SSO nie; 429/5xx → „Erneut versuchen“ statt „kein Konto möglich“ | U | ✅ |
 | TP-REG-13 | echtes Gateway | Bedingungen → Captcha, Zugangscode, Dummy-Schleife, Fehlercodes | Sitzung und erledigte Schritte werden weitergegeben; Passwort in jeder Anfrage; Captcha-Seite des Servers; falscher Code erkannt; Endlosschleife abgebrochen; M_USER_IN_USE/M_WEAK_PASSWORD/M_FORBIDDEN … richtig zugeordnet | U `sdk_registration_test.dart` | ✅ |
 | TP-REG-14 | Registrierung offen | Anmelden bzw. Fehler „endgültig“ | Registrierung samt Passwort verworfen | U, F | ✅ |
+| TP-REG-15 | – | Wiederholung fehlt, ist passender Anfang, weicht ab, gleich; erstes Feld danach ändern | Knopf nur bei Gleichheit aktiv; `Die Passwörter stimmen nicht überein.` erst, wenn die Eingabe nicht mehr passen kann | F `registration_password_test.dart` | ✅ |
+| TP-REG-15b | – | Wiederholung prüfen, Auge antippen | verdeckt, ohne Tastatur-Lernen und Smart-Ersetzungen; ein Schalter für beide Felder | F | ✅ |
+| TP-REG-16…16c | – | Enter im Passwort, Enter in der Wiederholung, Enter während des Absendens | erst Sprung, dann Absenden, kein zweiter Aufruf; beide Felder nach Abschluss leer | F | ✅ |
+| TP-REG-17…17f | Formular unvollständig | Enter: Anbieter nicht bereit, Name leer, Benutzername ungültig/vergeben, Passwort zu kurz, Wiederholung abweichend oder leer | Grund in Live-Zeile und am Feld (Semantik-`hint`), Fokus aufs Feld (Anbieter: keiner); verschwindet bei Eingabe, über den Vorschlag bzw. wenn der Anbieter bereit wird | F | ✅ |
+| TP-REG-17g | Serverfehler steht | Eingabe und Enter | Eingabegrund steht davor, Serverfehler bleibt bis zum nächsten Absenden | F | ✅ |
 
 ### 3.3 Anbieter (Homeserver) – „Erweitert“
 
@@ -165,6 +170,23 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-DEV-01 | Gerätename | „FamilyNexus Linux“ usw. statt fest „Android“ | S TP-E2E-01 | ✅ |
 | TP-E2E-01…05 | echter Synapse | Registrierungsweg, Name frei/vergeben, lokale Prüfungen, Link v2 → Anfrage → Bestätigung → Mitglied, Name der Einladenden, Abbruch | S `gateway_registration_e2e_test.dart` | ✅ |
 | TP-REG-M1 | echte Registrierung mit Bedingungen/Captcha | Server mit `m.login.terms`/reCAPTCHA | M (lokaler Synapse verlangt beides nicht) | ⏳ |
+
+### 3.8 Passwort ändern (Issue #117, E-80)
+
+| ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
+|---|---|---|---|---|---|
+| TP-PW-01 | angemeldet | Einstellungen → Konto → „Passwort ändern“ | Eintrag vor „Abmelden“; drei verdeckte Felder, ein Schalter, Autofill-Hinweise, „Andere Geräte abmelden“ aus, Knopf aktiv | F `password_change_test.dart`, `settings_screen_test.dart` | ✅ |
+| TP-PW-02 | – | Enter in jedem Feld | springt weiter, erst das letzte sendet (bewusste Abweichung von #68) | F, `enter_submits_test.dart` | ✅ |
+| TP-PW-03, 03b | – | jede Zeile der Prüfung über Knopf und Enter | Grund in Live-Zeile und am Feld, Fokus aufs Feld, kein Aufruf; verschwindet bei Eingabe | F | ✅ |
+| TP-PW-04, 05 | – | erfolgreich ändern, mit und ohne Schalter | Autofill-Abschluss vor dem Leeren, Dialog schließt, „Passwort geändert.“, Schalter wird übergeben | F | ✅ |
+| TP-PW-06…07b | – | falsches Passwort, schwaches Passwort, keine Antwort, sonstiger Fehler | Grund, Fokus aufs passende Feld, Text markiert; Felder bleiben gefüllt | F | ✅ |
+| TP-PW-08…09 | – | Esc, Barriere und Enter während des Absendens; Esc und Abbrechen im Leerlauf | während des Absendens wirkungslos, sonst schließt der Dialog ohne Autofill-Commit | F | ✅ |
+| TP-PW-10 | Anmeldung im Browser | Dialog öffnen, Kontoseite öffnen, ohne Browser | Text ohne Felder, Kontoseite, Meldung ohne Browser | F | ✅ |
+| TP-PW-11, 11b | Änderung nicht möglich | von vornherein bzw. nach dem Absenden | Text ohne Felder, Knopf „Schließen“; nach dem Absenden Felder geleert, Fokus und Hinweis auf dem Knopf | F | ✅ |
+| TP-PW-12, 13 | – | Weg nicht ermittelbar; Hinweistexte | SnackBar statt Dialog; Geltung und Folgen genannt | F | ✅ |
+| TP-PW-20…26 | echtes Gateway, MockClient | UIA-Ablauf, lokale Prüfungen, alle Serverantworten | altes Passwort nur an die Passwort-Stufe, `logout_devices` immer gesendet, feste Fehlerzuordnung, Kontoseite ohne `action` | U `sdk_registration_test.dart` | ✅ |
+| TP-PW-E2E | echter Synapse | Änderung, falsches Passwort, Sitzungen, Antworten des Servers, 512/513 Zeichen; mit `tool/synapse/password_variants.sh` auch abweichende Einstellungen | S `gateway_account_e2e_test.dart` | ⏳ noch nicht gelaufen |
+| TP-PW-M1 | Gerät mit Passwort-Manager und Screenreader | Änderung speichern lassen, Dialog mit TalkBack/VoiceOver bedienen | Speichern nur nach Erfolg, Gründe werden vorgelesen | M | ⏳ |
 
 ## 4. Ergebnisprotokoll
 

@@ -18,6 +18,9 @@ import 'registration_stage_view.dart';
 /// „Konto erstellen“ (E-55): Name, Benutzername (vorgeschlagen und live geprüft) und Passwort. Je nach
 /// Anbieter wird das Konto direkt in der App, auf der Seite des Anbieters im Browser oder – falls die
 /// App es nicht kann – auf dessen Webseite angelegt.
+/// Formularstelle, zu der ein Eingabegrund gehört; `provider` hat kein Feld.
+enum _Input { provider, name, user, pass, repeat }
+
 class AccountCreateStep extends StatefulWidget {
   const AccountCreateStep({super.key, required this.provider, required this.onLogin});
 
@@ -34,12 +37,22 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
   final TextEditingController _name = TextEditingController();
   final TextEditingController _user = TextEditingController();
   final TextEditingController _pass = TextEditingController();
+  final TextEditingController _passRepeat = TextEditingController();
+  final FocusNode _nameFocus = FocusNode();
+  final FocusNode _userFocus = FocusNode();
+  final FocusNode _passFocus = FocusNode();
+  final FocusNode _passRepeatFocus = FocusNode();
   bool _userEdited = false;
   bool _showPassword = false;
   bool _busy = false;
   bool _waitingForBrowser = false;
   bool _elementMissing = false;
   String? _error;
+
+  /// Warum Enter nicht abgeschickt hat. Getrennt von [_error]: Eingaben löschen nur diesen Grund,
+  /// Serverfehler bleiben bis zum nächsten Absenden stehen.
+  String? _inputError;
+  _Input? _inputField;
   RegistrationStage? _stage;
 
   UsernameCheck? _check;
@@ -64,6 +77,11 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
     _name.dispose();
     _user.dispose();
     _pass.dispose();
+    _passRepeat.dispose();
+    _nameFocus.dispose();
+    _userFocus.dispose();
+    _passFocus.dispose();
+    _passRepeatFocus.dispose();
     // Nichts darf weiterlaufen, wenn der Schritt verlassen wird: Registrierung (samt Passwort) und
     // Browser-Anmeldung beenden.
     _s.gateway.cancelRegistration();
@@ -75,9 +93,16 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
   void _onProvider() {
     final p = widget.provider;
     if (p.ready && p.server != _checkedServer && _user.text.trim().isNotEmpty) _scheduleCheck();
+    if (p.ready && _inputField == _Input.provider) setState(_clearInputError);
+  }
+
+  void _clearInputError() {
+    _inputError = null;
+    _inputField = null;
   }
 
   void _onName(String v) {
+    _clearInputError();
     if (!_userEdited) {
       _user.text = UsernameSuggestion.fromName(v);
       _scheduleCheck();
@@ -86,6 +111,7 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
   }
 
   void _onUser(String v) {
+    _clearInputError();
     _userEdited = v.isNotEmpty;
     _scheduleCheck();
   }
@@ -130,6 +156,7 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
   void _useSuggestion() {
     final s = _suggestion;
     if (s == null) return;
+    _clearInputError();
     _user.text = s;
     _userEdited = true;
     _scheduleCheck();
@@ -140,6 +167,7 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
     setState(() {
       _busy = true;
       _error = null;
+      _clearInputError();
     });
     try {
       await op();
@@ -162,14 +190,19 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
           displayName: _name.text,
           language: Localizations.localeOf(context).languageCode,
         );
-        if (stage == null) _pass.clear();
+        if (stage == null) _clearPasswords();
         if (mounted) setState(() => _stage = stage);
       });
+
+  void _clearPasswords() {
+    _pass.clear();
+    _passRepeat.clear();
+  }
 
   Future<void> _continue(RegistrationInput input) => _run(() async {
         try {
           final stage = await _s.gateway.continueRegistration(input);
-          if (stage == null) _pass.clear();
+          if (stage == null) _clearPasswords();
           if (mounted) setState(() => _stage = stage);
         } on GatewayException catch (e) {
           // Vorübergehend (Netz, Überlastung, Eingabe): Schritt bleibt, erneut versuchen möglich – das
@@ -222,7 +255,55 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
       UsernameSuggestion.isValid(_user.text.trim()) &&
       _check != UsernameCheck.taken &&
       _check != UsernameCheck.invalid &&
-      _pass.text.length >= 8;
+      _pass.text.length >= 8 &&
+      _pass.text == _passRepeat.text;
+
+  /// Enter im letzten Feld: absenden oder den ersten Grund nennen, der dagegen spricht.
+  void _submit() {
+    if (_busy) return;
+    if (_formOk) {
+      _register();
+      return;
+    }
+    final l = AppLocalizations.of(context);
+    final user = _user.text.trim();
+    if (!widget.provider.ready) {
+      _refuse(l.regProviderNotReady, _Input.provider);
+    } else if (_name.text.trim().isEmpty) {
+      _refuse(l.regNameMissing, _Input.name);
+    } else if (!UsernameSuggestion.isValid(user) || _check == UsernameCheck.invalid) {
+      _refuse(l.regUsernameInvalid, _Input.user);
+    } else if (_check == UsernameCheck.taken) {
+      _refuse(l.regUsernameTaken, _Input.user);
+    } else if (_pass.text.length < 8) {
+      _refuse(l.regPasswordTooShort, _Input.pass);
+    } else {
+      _refuse(l.regPasswordMismatch, _Input.repeat);
+    }
+  }
+
+  /// Der Grund steht in der Fehlerzeile und am Feld: Das Vorlesen des fokussierten Feldes kann die
+  /// Live-Region verdrängen, `errorText` wird mit dem Feld mitgelesen.
+  void _refuse(String text, _Input field) {
+    setState(() {
+      _inputError = text;
+      _inputField = field;
+    });
+    switch (field) {
+      case _Input.provider:
+        break;
+      case _Input.name:
+        _nameFocus.requestFocus();
+      case _Input.user:
+        _userFocus.requestFocus();
+      case _Input.pass:
+        _passFocus.requestFocus();
+      case _Input.repeat:
+        _passRepeatFocus.requestFocus();
+    }
+  }
+
+  String? _errorAt(_Input field) => _inputField == field ? _inputError : null;
 
   @override
   Widget build(BuildContext context) {
@@ -300,6 +381,7 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
             const SizedBox(height: 12),
             TextField(
               controller: _user,
+              focusNode: _userFocus,
               autocorrect: false,
               enableSuggestions: false,
               enableIMEPersonalizedLearning: false,
@@ -315,7 +397,7 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
                   null || UsernameCheck.unknown => l.regUsernameHint,
                   _ => null,
                 },
-                errorText: switch (_check) {
+                errorText: _errorAt(_Input.user) ?? switch (_check) {
                   UsernameCheck.taken => _suggestion == null ? l.regUsernameTaken : l.regUsernameTakenSuggest(_suggestion!),
                   UsernameCheck.invalid => l.regUsernameInvalid,
                   _ => null,
@@ -331,20 +413,49 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
             const SizedBox(height: 12),
             TextField(
               controller: _pass,
+              focusNode: _passFocus,
               obscureText: !_showPassword,
               autocorrect: false,
               enableSuggestions: false,
               enableIMEPersonalizedLearning: false,
-              onChanged: (_) => setState(() {}),
+              smartDashesType: SmartDashesType.disabled,
+              smartQuotesType: SmartQuotesType.disabled,
+              textInputAction: TextInputAction.next,
+              onChanged: (_) => setState(_clearInputError),
+              onSubmitted: (_) => _passRepeatFocus.requestFocus(),
               decoration: InputDecoration(
                 labelText: l.accountPassword,
                 helperText: l.regPasswordHint,
                 helperMaxLines: 3,
+                errorText: _errorAt(_Input.pass),
+                errorMaxLines: 3,
                 suffixIcon: IconButton(
                   tooltip: _showPassword ? l.passwordHide : l.passwordShow,
                   icon: Icon(_showPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined),
                   onPressed: () => setState(() => _showPassword = !_showPassword),
                 ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _passRepeat,
+              focusNode: _passRepeatFocus,
+              obscureText: !_showPassword,
+              autocorrect: false,
+              enableSuggestions: false,
+              enableIMEPersonalizedLearning: false,
+              smartDashesType: SmartDashesType.disabled,
+              smartQuotesType: SmartQuotesType.disabled,
+              textInputAction: TextInputAction.done,
+              onChanged: (_) => setState(_clearInputError),
+              onEditingComplete: () {},
+              onSubmitted: (_) => _submit(),
+              decoration: InputDecoration(
+                labelText: l.accountPasswordRepeat,
+                errorMaxLines: 3,
+                // Ein passender Anfang ist noch kein Fehler; den Grund nennt dann erst Enter.
+                errorText: _errorAt(_Input.repeat) ??
+                    (_passRepeat.text.isNotEmpty && !_pass.text.startsWith(_passRepeat.text) ? l.regPasswordMismatch : null),
               ),
             ),
             const SizedBox(height: 16),
@@ -357,12 +468,13 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
             ),
           ];
         }
+        final errorLine = _inputError ?? _error;
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
           ...main,
-          if (_error != null)
+          if (errorLine != null)
             Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: Semantics(liveRegion: true, child: Text(_error!, style: TextStyle(color: theme.colorScheme.error))),
+              child: Semantics(liveRegion: true, child: Text(errorLine, style: TextStyle(color: theme.colorScheme.error))),
             ),
           if (stage == null && !_waitingForBrowser) ...<Widget>[
             const SizedBox(height: 8),
@@ -389,9 +501,16 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
 
   Widget _nameField(AppLocalizations l) => TextField(
         controller: _name,
+        focusNode: _nameFocus,
         maxLength: 64,
         textCapitalization: TextCapitalization.words,
         onChanged: _onName,
-        decoration: InputDecoration(labelText: l.regNameLabel, hintText: l.regNameHint, counterText: ''),
+        decoration: InputDecoration(
+          labelText: l.regNameLabel,
+          hintText: l.regNameHint,
+          counterText: '',
+          errorText: _errorAt(_Input.name),
+          errorMaxLines: 3,
+        ),
       );
 }

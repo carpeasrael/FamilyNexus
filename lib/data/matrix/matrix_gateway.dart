@@ -8,6 +8,7 @@ import '../../domain/data_inventory.dart';
 import '../../domain/family.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/moderation.dart';
+import '../../domain/password_change.dart';
 import '../../domain/presence.dart';
 import '../../domain/registration.dart';
 import '../../domain/security.dart';
@@ -45,6 +46,9 @@ enum GatewayError {
 
   /// Rücksprung gehört nicht zur laufenden Anmeldung (fremder `state`); sie läuft weiter.
   oauthStateMismatch,
+
+  /// Der Anbieter erlaubt keine Passwortänderung über die App (#117).
+  passwordChangeUnavailable,
   unknown,
 }
 
@@ -130,6 +134,16 @@ abstract class MatrixGateway implements Listenable {
   /// beendet danach die Sitzung lokal. Falsches Passwort: `invalidCredentials`. Das Passwort wird
   /// nicht gespeichert.
   Future<void> deleteAccount({required String password});
+
+  /// Wie das Passwort des angemeldeten Kontos geändert wird (#117). Anmeldung im Browser (OAuth):
+  /// Kontoseite des Anbieters; kennt er keine, [PasswordChangeUnavailable].
+  Future<PasswordChange> passwordChange();
+
+  /// Ändert das Passwort (nur [PasswordChangeInApp]; sonst `notAllowed`). Falsches [oldPassword]:
+  /// `invalidCredentials`; Ablehnung durch den Anbieter: `passwordChangeUnavailable`. Mit
+  /// [logoutOtherDevices] enden alle anderen Sitzungen, die aktuelle bleibt. Passwörter werden nicht
+  /// gespeichert.
+  Future<void> changePassword({required String oldPassword, required String newPassword, required bool logoutOtherDevices});
 
   /// Nach der Löschung im Browser: `true`, wenn der Anbieter das Konto nicht mehr annimmt (gelöscht
   /// oder Sitzung beendet). Die Sitzung wird dann lokal beendet.

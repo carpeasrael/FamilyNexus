@@ -5,4 +5,4 @@ New in 1.2.1:
 • About the app: storage locations and reports of all data stored locally and online.
 • Delete your account in the settings.
 • Create a new emergency key; a new account now always shows it.
-• After deleting data, the app starts with the welcome screen.
+• Change your password; new accounts enter it twice.

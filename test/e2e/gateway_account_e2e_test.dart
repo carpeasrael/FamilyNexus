@@ -1,10 +1,16 @@
+import 'dart:convert';
+import 'dart:io' show Platform;
+
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/domain/account_deletion.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
+import 'package:family_nexus/domain/password_change.dart';
 import 'package:family_nexus/domain/security.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:matrix/matrix.dart' show MatrixException;
 
 import 'e2e_support.dart';
 
@@ -18,7 +24,214 @@ Future<({SdkMatrixGateway g, String user, String password})> _login(String prefi
   return (g: a.gateway, user: a.user, password: a.password);
 }
 
+/// Direkte Anfrage an einen Server: Die Annahmen zu Synapse (#117) gelten seinen Antworten, nicht der App.
+Future<(int, Map<String, Object?>)> _post(http.Client c, String base, String path, Map<String, Object?> body, {String? token}) async {
+  final res = await c.post(
+    Uri.parse('$base/_matrix/client/v3/$path'),
+    headers: <String, String>{'content-type': 'application/json', 'authorization': ?(token == null ? null : 'Bearer $token')},
+    body: json.encode(body),
+  );
+  return (res.statusCode, res.body.isEmpty ? <String, Object?>{} : json.decode(res.body) as Map<String, Object?>);
+}
+
+Future<String> _rawLogin(http.Client c, String user, String password) async {
+  final (status, body) = await _post(c, '${E2e.server.uri}', 'login', <String, Object?>{
+    'type': 'm.login.password',
+    'identifier': <String, String>{'type': 'm.id.user', 'user': user},
+    'password': password,
+  });
+  if (status != 200) throw StateError('Anmeldung fehlgeschlagen: $status $body');
+  return body['access_token']! as String;
+}
+
+Future<int> _loginStatus(http.Client c, String user, String password) async {
+  final (status, _) = await _post(c, '${E2e.server.uri}', 'login', <String, Object?>{
+    'type': 'm.login.password',
+    'identifier': <String, String>{'type': 'm.id.user', 'user': user},
+    'password': password,
+  });
+  return status;
+}
+
+Future<int> _whoami(http.Client c, String token) async {
+  final res = await c.get(Uri.parse('${E2e.server.uri}/_matrix/client/v3/account/whoami'), headers: <String, String>{'authorization': 'Bearer $token'});
+  return res.statusCode;
+}
+
+Map<String, Object?> _passwordAuth(String session, String user, String password) => <String, Object?>{
+      'type': 'm.login.password',
+      'session': session,
+      'password': password,
+      'identifier': <String, String>{'type': 'm.id.user', 'user': user},
+    };
+
+GatewayError? _mapped(Map<String, Object?> body) => SdkMatrixGateway.passwordChangeError(MatrixException.fromJson(body))?.error;
+
+bool _hasPasswordFlow(Map<String, Object?> body) => (body['flows']! as List<Object?>).any((f) {
+      final stages = (f! as Map<String, Object?>)['stages']! as List<Object?>;
+      return stages.length == 1 && stages.single == 'm.login.password';
+    });
+
 void main() {
+  group('Passwort ändern (#117) gegen echten Synapse', skip: E2e.enabled ? false : E2e.skipReason, () {
+    late http.Client c;
+    setUp(() => c = E2e.lenientClient());
+    tearDown(() => c.close());
+
+    test('richtiges Passwort: neues gilt, altes nicht mehr, aktuelle Sitzung bleibt', () async {
+      final a = await E2e.loggedIn('pwok');
+      await E2e.until(() => a.gateway.initialSyncDone, what: 'Sync');
+      expect(await a.gateway.passwordChange(), isA<PasswordChangeInApp>());
+      await a.gateway.changePassword(oldPassword: a.password, newPassword: 'neu-${a.password}', logoutOtherDevices: false);
+
+      expect(await _loginStatus(c, a.user, 'neu-${a.password}'), 200);
+      expect(await _loginStatus(c, a.user, a.password), 403);
+      expect(a.gateway.session, SessionState.ready);
+      expect(await a.gateway.checkAccountDeleted(), isFalse, reason: 'Sitzung gilt beim Server weiter');
+    });
+
+    test('falsches aktuelles Passwort: invalidCredentials, nichts geändert', () async {
+      final a = await E2e.loggedIn('pwbad');
+      await E2e.until(() => a.gateway.initialSyncDone, what: 'Sync');
+      await expectLater(
+        a.gateway.changePassword(oldPassword: 'falsch-falsch', newPassword: 'neu-und-lang', logoutOtherDevices: false),
+        _error(GatewayError.invalidCredentials),
+      );
+      expect(await _loginStatus(c, a.user, a.password), 200);
+      expect(await _loginStatus(c, a.user, 'neu-und-lang'), 403);
+    });
+
+    test('logoutOtherDevices: false lässt die zweite Sitzung bestehen, true beendet sie, die aktuelle bleibt', () async {
+      final a = await E2e.loggedIn('pwdev');
+      await E2e.until(() => a.gateway.initialSyncDone, what: 'Sync');
+      final other = await _rawLogin(c, a.user, a.password);
+
+      await a.gateway.changePassword(oldPassword: a.password, newPassword: 'zwei-${a.password}', logoutOtherDevices: false);
+      expect(await _whoami(c, other), 200);
+
+      await a.gateway.changePassword(oldPassword: 'zwei-${a.password}', newPassword: 'drei-${a.password}', logoutOtherDevices: true);
+      expect(await _whoami(c, other), 401);
+      expect(a.gateway.session, SessionState.ready);
+      expect(await a.gateway.checkAccountDeleted(), isFalse);
+    });
+
+    test('Annahme: Ohne `logout_devices` meldet Synapse andere Geräte ab', () async {
+      final acc = await E2e.registerUser('pwdef');
+      final token = await _rawLogin(c, acc.user, acc.password);
+      final other = await _rawLogin(c, acc.user, acc.password);
+      final base = '${E2e.server.uri}';
+      final (_, challenge) = await _post(c, base, 'account/password', <String, Object?>{'new_password': 'neu-und-lang'}, token: token);
+      final (status, _) = await _post(c, base, 'account/password', <String, Object?>{
+        'new_password': 'neu-und-lang',
+        'auth': _passwordAuth(challenge['session']! as String, acc.user, acc.password),
+      }, token: token);
+      expect(status, 200);
+      expect(await _whoami(c, other), 401);
+      expect(await _whoami(c, token), 200);
+    });
+
+    test('Annahme: Der erste Aufruf ohne `auth` fragt mit Passwort-Flow und Session nach', () async {
+      final acc = await E2e.registerUser('pwuia');
+      final token = await _rawLogin(c, acc.user, acc.password);
+      final (status, body) = await _post(c, '${E2e.server.uri}', 'account/password', <String, Object?>{'new_password': 'neu-und-lang', 'logout_devices': false}, token: token);
+      expect(status, 401);
+      expect(body['session'], isA<String>());
+      expect(_hasPasswordFlow(body), isTrue, reason: '$body');
+      expect(await _loginStatus(c, acc.user, acc.password), 200, reason: 'noch nichts geändert');
+    });
+
+    test('Annahme: Falsches Passwort antwortet mit Flows, Session und `M_FORBIDDEN`', () async {
+      final acc = await E2e.registerUser('pwwrong');
+      final token = await _rawLogin(c, acc.user, acc.password);
+      final base = '${E2e.server.uri}';
+      final (_, challenge) = await _post(c, base, 'account/password', <String, Object?>{'new_password': 'neu-und-lang'}, token: token);
+      final (status, body) = await _post(c, base, 'account/password', <String, Object?>{
+        'new_password': 'neu-und-lang',
+        'auth': _passwordAuth(challenge['session']! as String, acc.user, 'falsch-falsch'),
+      }, token: token);
+      expect(status, 401);
+      expect(body['errcode'], 'M_FORBIDDEN');
+      expect(body['session'], isA<String>());
+      expect(_hasPasswordFlow(body), isTrue, reason: '$body');
+      expect(_mapped(body), GatewayError.invalidCredentials);
+    });
+
+    test('Annahme: 512 Zeichen nimmt Synapse an (mit Anmeldung), 513 lehnt es ab', () async {
+      final a = await E2e.loggedIn('pwlen');
+      await E2e.until(() => a.gateway.initialSyncDone, what: 'Sync');
+      final longest = 'a' * PasswordChange.maxLength;
+      await a.gateway.changePassword(oldPassword: a.password, newPassword: longest, logoutOtherDevices: false);
+      expect(await _loginStatus(c, a.user, longest), 200);
+
+      final token = await _rawLogin(c, a.user, longest);
+      final base = '${E2e.server.uri}';
+      final tooLong = 'b' * (PasswordChange.maxLength + 1);
+      final (firstStatus, challenge) = await _post(c, base, 'account/password', <String, Object?>{'new_password': tooLong}, token: token);
+      var status = firstStatus;
+      if (status == 401 && challenge['session'] is String) {
+        (status, _) = await _post(c, base, 'account/password', <String, Object?>{
+          'new_password': tooLong,
+          'auth': _passwordAuth(challenge['session']! as String, a.user, longest),
+        }, token: token);
+      }
+      expect(status, greaterThanOrEqualTo(400), reason: '513 Zeichen');
+      expect(await _loginStatus(c, a.user, tooLong), 403);
+      expect(await _loginStatus(c, a.user, longest), 200);
+    });
+  });
+
+  // Braucht tool/synapse/password_variants.sh (tool/e2e.sh startet es); das Standard-Synapse hat diese
+  // Einstellungen nicht.
+  group(
+    'Passwort ändern (#117): Annahmen zu abweichenden Synapse-Einstellungen',
+    skip: E2e.enabled && Platform.environment['FN_E2E_PASSWORD_VARIANTS'] == '1' ? false : 'Setze FN_E2E_PASSWORD_VARIANTS=1, siehe tool/synapse/password_variants.sh',
+    () {
+      late http.Client c;
+      var n = 0;
+      setUp(() => c = http.Client());
+      tearDown(() => c.close());
+
+      /// Offene Registrierung liefert das Zugangstoken: Anmelden geht hier nicht immer.
+      Future<({String user, String password, String token})> register(String base) async {
+        final user = 'pwvar-${DateTime.now().millisecondsSinceEpoch.toRadixString(36)}-${n++}';
+        final password = 'pw-$user-12345';
+        final (status, body) = await _post(c, base, 'register', <String, Object?>{
+          'username': user,
+          'password': password,
+          'auth': <String, String>{'type': 'm.login.dummy'},
+        });
+        if (status != 200) throw StateError('Registrierung fehlgeschlagen: $status $body');
+        return (user: user, password: password, token: body['access_token']! as String);
+      }
+
+      test('Änderung abgeschaltet (`localdb_enabled: false`): `M_FORBIDDEN` ohne Flows nach richtigem Passwort', () async {
+        const base = 'http://127.0.0.1:18449';
+        final acc = await register(base);
+        final (firstStatus, challenge) = await _post(c, base, 'account/password', <String, Object?>{'new_password': 'neu-und-lang', 'logout_devices': false}, token: acc.token);
+        expect(firstStatus, 401, reason: '$challenge');
+        expect(_hasPasswordFlow(challenge), isTrue, reason: '$challenge');
+        final (status, body) = await _post(c, base, 'account/password', <String, Object?>{
+          'new_password': 'neu-und-lang',
+          'logout_devices': false,
+          'auth': _passwordAuth(challenge['session']! as String, acc.user, acc.password),
+        }, token: acc.token);
+        expect(status, 403, reason: '$body');
+        expect(body['errcode'], 'M_FORBIDDEN');
+        expect(body.containsKey('flows'), isFalse, reason: '$body');
+        expect(_mapped(body), GatewayError.passwordChangeUnavailable);
+      });
+
+      test('Ohne Passwort-Anmeldung (`enabled: false`): keine Passwort-Stufe in den Flows', () async {
+        const base = 'http://127.0.0.1:18450';
+        final acc = await register(base);
+        final (status, body) = await _post(c, base, 'account/password', <String, Object?>{'new_password': 'neu-und-lang', 'logout_devices': false}, token: acc.token);
+        expect(status, 401, reason: '$body');
+        expect(_hasPasswordFlow(body), isFalse, reason: '$body');
+        expect(_mapped(body), GatewayError.passwordChangeUnavailable);
+      });
+    },
+  );
+
   group('Kontolöschung (#12) gegen echten Synapse', skip: E2e.enabled ? false : E2e.skipReason, () {
     test('Passwort-Konto: falsches Passwort scheitert, danach gelöscht, Familie verlassen, Anmeldung unmöglich', () async {
       final mod = await _login('delmod');

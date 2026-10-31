@@ -24,6 +24,7 @@ String errorText(AppLocalizations l, Object error) {
       GatewayError.registrationDisabled => l.errRegistrationDisabled,
       GatewayError.emailInUse => l.errEmailInUse,
       GatewayError.oauthCancelled || GatewayError.oauthStateMismatch => l.errOAuthCancelled,
+      GatewayError.passwordChangeUnavailable => l.passwordChangeUnavailable,
       GatewayError.unknown => l.errUnknown,
     };
   }
