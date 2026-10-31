@@ -1,0 +1,6 @@
+TLS:
+subject=/CN=matrix-synapse-3ues.srv1348446.hstgr.cloud
+issuer=/C=US/O=Let's Encrypt/CN=YR1
+New, TLSv1/SSLv3, Cipher is AEAD-CHACHA20-POLY1305-SHA256
+    Protocol  : TLSv1.3
+    Verify return code: 0 (ok)

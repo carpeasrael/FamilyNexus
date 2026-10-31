@@ -1,0 +1,5 @@
+Got dependencies!
+23 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing FamilyNexus...                                        
+No issues found! (ran in 3.9s)
