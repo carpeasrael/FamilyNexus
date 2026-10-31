@@ -600,9 +600,9 @@ n = 3 zeigt nur häufige Fehler; das steht in jedem Ergebnis.
 |---|---|
 | `leaveRejected`, aber keine Meldung | Ansicht nicht neu aufgebaut: `notifyListeners` und `joinRequestRejected` prüfen |
 | `leaveRejected` ≤ 20 s, Meldung später | Anzeige verzögert: gilt nicht als bestanden |
+| `Zustand: -`, `Timer aktiv: ja`, höchstens 150 s seit dem Knock oder Neustart | Noch keine abgeschlossene Abfrage: kein Befund, weiter warten |
+| Kein `leaveRejected`, und `Timer aktiv: nein` oder `Letzte Abfrage` älter als 150 s oder 150 s nach dem Knock oder Neustart noch `-` | App fragt nicht ab: `_watchJoinRequest` und `_pollRejection` prüfen |
 | `http`, `failed`, `notHttps`, `timeout` | D, Art benannt; `timeout` mit Phase `auth`/`body` stützt C, gilt aber nur für diesen Lauf |
-| `Zustand: -`, `Timer aktiv: ja`, höchstens 150 s seit dem Knock | Direkt nach dem Knock noch keine Abfrage: kein Befund, weiter warten |
-| Kein `leaveRejected`, und `Timer aktiv: nein` oder `Letzte Abfrage` älter als 150 s oder 150 s nach dem Knock noch `-` | App fragt nicht ab: `_watchJoinRequest` und `_pollRejection` prüfen |
 | `knock`, `invite`, `join`, `noRoom`, `leaveNoOwnEvent`, `staleNote` | Abweichung Server gegen Client: Roh-`/sync` mit dem Konto prüfen. `staleNote` setzt `Letzte Abfrage` wie eine Abfrage, erhöht `Abfragen` aber nicht |
 | `leaveOther` | Bewertung falsch: `membership`, `eigen`, `vorher`, `Versatz` auswerten; auf echtem iPhone besonders die Uhr |
 | `leaveRejected` nach > 20 s | verspätet: `Größter Abstand`, `Auslöser`. Stützt B nur bei null Zeitüberschreitungen |
