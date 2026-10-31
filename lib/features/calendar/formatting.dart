@@ -6,6 +6,14 @@ import '../../domain/calendar_event.dart';
 import '../../domain/occurrence.dart';
 import '../../l10n/gen/app_localizations.dart';
 
+/// Uhrzeit [hour]:[minute] im Format des Geräts (12/24 Stunden) und der App-Sprache – die eine Stelle für
+/// alle angezeigten Uhrzeiten (#162). Rechnet nicht um: die Zone wählt der Aufrufer.
+String formatClock(BuildContext context, int hour, int minute) {
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  final f = MediaQuery.alwaysUse24HourFormatOf(context) ? DateFormat.Hm(locale) : DateFormat.jm(locale);
+  return f.format(DateTime(2000, 1, 1, hour, minute));
+}
+
 /// Formatierung von Terminzeiten in der Zeitzone des Betrachters.
 class Fmt {
   Fmt(this.context, this.zone)
@@ -19,7 +27,10 @@ class Fmt {
 
   tz.TZDateTime local(DateTime utc) => tz.TZDateTime.from(utc, zone);
 
-  String time(DateTime utc) => (use24h ? DateFormat.Hm(locale) : DateFormat.jm(locale)).format(local(utc));
+  String time(DateTime utc) {
+    final t = local(utc);
+    return formatClock(context, t.hour, t.minute);
+  }
 
   String dateLong(DateTime d) => DateFormat.yMMMMEEEEd(locale).format(d);
   String dateShort(DateTime d) => DateFormat.yMMMd(locale).format(d);

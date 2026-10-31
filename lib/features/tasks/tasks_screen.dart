@@ -9,6 +9,7 @@ import '../../domain/time_zones.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
+import '../calendar/formatting.dart';
 import '../common/error_text.dart';
 import '../chat/sender_name.dart';
 import 'tasks_controller.dart';
@@ -85,8 +86,9 @@ String _date(BuildContext context, String doneOn) {
 String _time(BuildContext context, TaskList list, DateTime at) {
   final loc = TimeZones.tryGet(list.timeZone);
   final c = loc == null ? null : TaskPeriod.localClock(loc, at);
-  final tod = c == null ? TimeOfDay.fromDateTime(at.toLocal()) : TimeOfDay(hour: c.hour, minute: c.minute);
-  return MaterialLocalizations.of(context).formatTimeOfDay(tod);
+  if (c != null) return formatClock(context, c.hour, c.minute);
+  final d = at.toLocal();
+  return formatClock(context, d.hour, d.minute);
 }
 
 String _nameOf(AppServices s, TasksController c, AppLocalizations l, String id) => memberLabel(l, s.gateway.family, id, me: c.me);

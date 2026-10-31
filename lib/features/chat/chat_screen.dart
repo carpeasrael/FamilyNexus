@@ -377,9 +377,9 @@ class _Bubble extends StatelessWidget {
   final String threadId;
   final VoidCallback onLongPress;
 
-  static String _time(DateTime t) {
+  static String _time(BuildContext context, DateTime t) {
     final lt = t.toLocal();
-    return '${lt.hour.toString().padLeft(2, '0')}:${lt.minute.toString().padLeft(2, '0')}';
+    return formatClock(context, lt.hour, lt.minute);
   }
 
   @override
@@ -441,7 +441,7 @@ class _Bubble extends StatelessWidget {
                     ),
                   const SizedBox(height: 2),
                   Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                    Text(_time(m.time), style: monoStyle(context, size: 11, color: t.textSecondary)),
+                    Text(_time(context, m.time), style: monoStyle(context, size: 11, color: t.textSecondary)),
                     if (m.status == MessageStatus.sending) ...<Widget>[
                       const SizedBox(width: 6),
                       Icon(Icons.schedule, size: 12, semanticLabel: l.chatSending),

@@ -229,6 +229,36 @@ void main() {
     expect(find.text('Du · 23.10.2026, 02:00'), findsOneWidget, reason: 'Verlaufszeile');
   });
 
+  testWidgets('#162: Erledigt-Uhrzeit folgt der 24-h-Einstellung des Geräts (englisch), Zone der Liste bleibt', (tester) async {
+    _tall(tester);
+    final now = DateTime.utc(2026, 10, 22, 12); // 02:00 am 23.10. auf Kiritimati
+    final app = await buildTestApp(clock: () => now, lang: 'en');
+    await app.services.openCalendar();
+    // 24-h-Gerät: Plattformwerte kommen aus der übergeordneten MediaQuery (siehe clock_format_test.dart).
+    await tester.pumpWidget(MediaQuery(
+      data: MediaQueryData.fromView(tester.view).copyWith(alwaysUse24HourFormat: true),
+      child: FamilyNexusApp(services: app.services),
+    ));
+    await tester.pumpAndSettle();
+    await app.services.tasks!.service.createList(
+        title: 'Far list', assignee: app.gateway.userId!, interval: TaskInterval.daily, timeZone: 'Pacific/Kiritimati', items: ['Bins']);
+    await app.services.tasks!.load();
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Open menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Tasks'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Far list'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(Checkbox).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Done'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining(RegExp(r'Done on .* at 02:00$')), findsOneWidget, reason: '24 h, nicht „2:00 AM“');
+    expect(find.textContaining(RegExp(r', 02:00$')), findsOneWidget, reason: 'Verlaufszeile');
+  });
+
   testWidgets('Mitglied ohne Moderatorenrecht: kein Anlegen; zugewiesene Liste kann abgehakt werden, fremde nicht', (tester) async {
     _tall(tester);
     final now = DateTime.utc(2026, 10, 22, 8);

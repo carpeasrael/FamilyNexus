@@ -7,6 +7,7 @@ import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 
 import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
@@ -31,6 +32,17 @@ Future<void> _openChat(WidgetTester tester, TestApp app) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _openChatEn(WidgetTester tester, TestApp app, {required bool use24h}) async {
+  // Plattformwerte kommen aus der übergeordneten MediaQuery (siehe clock_format_test.dart).
+  await tester.pumpWidget(MediaQuery(
+    data: MediaQueryData.fromView(tester.view).copyWith(alwaysUse24HourFormat: use24h),
+    child: FamilyNexusApp(services: app.services),
+  ));
+  await tester.pumpAndSettle();
+  await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   testWidgets('Nachricht senden erscheint im Verlauf, Eingabe wird geleert', (tester) async {
     final app = await buildTestApp();
@@ -45,6 +57,16 @@ void main() {
     expect(find.text('Hallo Familie'), findsOneWidget);
     expect(tester.widget<TextField>(find.byType(TextField)).controller!.text, isEmpty);
     expect(app.gateway.messages.single.body, 'Hallo Familie');
+  });
+
+  testWidgets('#162: Uhrzeit der Nachricht folgt der 12-h-Einstellung des Geräts (englisch)', (tester) async {
+    final app = await buildTestApp(lang: 'en');
+    final ben = await _joinBen(app);
+    await ben.sendMessage('Ich bin da');
+    await _openChatEn(tester, app, use24h: false);
+    final t = app.gateway.messages.single.time.toLocal();
+    expect(find.text(DateFormat.jm('en').format(t)), findsOneWidget);
+    expect(find.text('${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}'), findsNothing);
   });
 
   testWidgets('Nachricht von Ben wird mit Absendernamen angezeigt', (tester) async {
