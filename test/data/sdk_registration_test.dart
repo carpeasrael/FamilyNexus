@@ -4,6 +4,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:family_nexus/data/matrix/background_image_work.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/server_probe.dart';
@@ -126,6 +127,12 @@ final bool _vodAvailable = Directory(_vodLib).existsSync() &&
 
 void main() {
   setUpAll(sqfliteFfiInit);
+
+  test('#129: der Client verkleinert Bilder im Hintergrund', () async {
+    final g = await _gateway(_Server());
+    await g.restore().catchError((Object _) {});
+    expect(g.sdkClient!.customImageResizer, same(resizeImageInBackground));
+  });
 
   group('#28: Anmeldung gelingt, ein Folgeschritt scheitert', () {
     test('kein „Unbekannter Fehler.“: die Sitzung steht', () async {
