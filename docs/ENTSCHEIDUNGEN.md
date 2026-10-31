@@ -337,6 +337,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Verworfen:** Ablehnung über eine Nachricht im Familienraum (die anfragende Person ist dort nicht Mitglied); längerer Abfrageabstand (spürbare Verzögerung) oder Dauerverbindung (Akku).
 - **Grenzen:** Verzögerung bis 10 s und nur bei laufender App; Datenverbrauch gering (gefilterte Abfrage). Kein Push (E-16), das Abzeichen erscheint erst, wenn die App den Sync erhalten hat.
 - **Prüfung:** Widget (`join_and_security_test.dart`), E2E gegen Synapse (`gateway_family_e2e_test.dart`: „Ablehnen einer Anfrage …“).
+- **Änderung 2026-10-31 (E-81, Issues #116, #75):** Ein `leave` im normalen Sync löst die Abfrage sofort aus, beim Start läuft sie einmal ohne Warten; die Grenze „Verzögerung bis 10 s“ gilt nur noch für den Zeitgeber. Entschieden wird weiter nur über die Abfrage.
 
 ## E-67 Konto-Server im Einladungsdialog wählbar (2026-10-25) — ergänzt E-63
 - **Anlass:** E-63 erlaubt in Version-3-Links einen vom Einladenden abweichenden Konto-Server (`srv`), die Oberfläche erzeugte aber immer den eigenen.
@@ -469,6 +470,28 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
   - In der Kontoanlage bleibt der Knopf grau, solange die Wiederholung ein passender Anfang ist; der Grund erscheint dort über Enter.
   - Ob ein Passwort-Manager im Dialog speichert, ist nur am Gerät prüfbar. Das Verhalten mit TalkBack und VoiceOver ist nur per Widget-Test geprüft, der OAuth-Zweig nur mit Fake und Metadaten-Test.
 - **Prüfung:** Unit (`sdk_registration_test.dart`, MockClient), Widget (`registration_password_test.dart`, `password_change_test.dart`, `enter_submits_test.dart`, `settings_screen_test.dart`), E2E (`gateway_account_e2e_test.dart`, mit `tool/synapse/password_variants.sh` auch die drei abweichenden Synapse-Einstellungen).
+
+## E-81 Ablehnung: Sync als Auslöser, Zeitschranken, Diagnose „Details“ (2026-10-31, Issues #116, #75) — ergänzt E-66
+- **Anlass:** Lauf 17: Auf dem Mac als Anfragender erschien die Ablehnung nach 6 Minuten und Neustart laut Protokoll nicht (#116); #75 wartet auf die Messung am echten iPhone. **Die Ursache ist nicht belegt und nicht reproduziert:** 19 Roh-`/sync`-Varianten und 11 Gateway-Läufe gegen Synapse 1.163.2 erkennen die Ablehnung korrekt, der Pfad hat keinen Plattformzweig, und Lauf 17 hat weder Bild noch Serverbeleg für den Zustand nach „Ablehnen“. Diese Entscheidung erklärt Lauf 17 nicht. Sie behebt belegte Schwächen: Hängt der Antwortkörper, blieb `_rejectionPollRunning` für immer gesetzt (nach 70 s genau 1 Abfrage); der normale Sync kannte die Ablehnung nach 43 ms, die App wertete ihn nicht aus; `leave == null` endete ohne Spur, und im Release ist die Diagnose von `AppLog` unsichtbar.
+- **Gewählt:**
+  - *Ein Entscheidungsweg:* `_pollRejectionOnce` liest den aktuellen Stand. Ein inkrementelles `leave` ist Verlauf und kann zu einer früheren Anfrage gehören; es entscheidet nie selbst.
+  - *Zeitschranken innen:* `ensureNotSoftLoggedOut` und der Antwortstrom (`res.stream.timeout`) sind begrenzt, ebenso in `_knock`. Bei Status 200 verwirft `_knock` den Körper ohne `await`.
+  - *Sync als Auslöser:* `rooms.leave[roomId]` bei offener Anfrage löst eine Abfrage aus. Läuft gerade eine, gibt es genau eine Wiederholung (`_pollAgain`) durch alle Prüfungen. Der Auslöser feuert einmal; scheitert diese Abfrage, hilft der Zeitgeber.
+  - *Generation:* `_knock`, `_clearJoinRequest`, `_resetLocal`, `close` und `dispose` zählen `_joinRequestGeneration` hoch. Eine Abfrage schreibt Ablehnung und Diagnose nur bei unveränderter Generation. Das beseitigt auch den Fehlalarm, wenn eine laufende Abfrage Rückzug und neue Anfrage überholt.
+  - *Veralteter Vermerk:* Weicht `_joinRequestCache` vom Raum im Vermerk ab und ist der Vermerk älter als die lokale Anfrage (`_joinRequestCacheTs`), bricht die Abfrage ab (`staleNote`). Der Abbruch setzt `Letzte Abfrage` und `Auslöser`, zählt aber nicht als Abfrage, sonst läse sich der Dauerfall als „App fragt nicht ab“. Ein neuerer Vermerk (anderes Gerät) gewinnt.
+  - *Sofort-Abfrage:* nur beim Neuanlegen des Zeitgebers aus `_refreshOnce`, nicht in `_knock` (dort läge noch der alte Vermerk vor). `_refreshOnce` scharft nur bei `!_joinRejected`.
+  - *Diagnose:* `joinRequestDiagnostic`, nur im Arbeitsspeicher, über „Details“ mit „Kopieren“ in Warte- und Ablehnungsansicht, gelesen beim Antippen. Das Protokoll aus B-21 ist ohne Familie nicht erreichbar. Sie gilt je Anfrage: `_knock` setzt sie ganz zurück, damit kein altes `Erkannt` neben dem neuen Zustand steht. Sie enthält nur feste Wörter, Zahlen und Zeiten: Zustand, Auslöser, Zähler, größter Abstand, Zeitpunkte, „Timer aktiv“. Fehlerklassen kommen aus festen `is`-Prüfungen (`socket` vor `client`, `tls` deckt `HandshakeException` mit), nie aus `toString()` oder `runtimeType`, denn Release-Builds sind obfuskiert und Fehlertexte können Raum-IDs enthalten. `membership` und `vorher` sind auf eine feste Liste abgebildet. Der Text ist eine feste technische Ausgabe für Testberichte und deshalb nicht übersetzt; die Bedienelemente laufen über l10n.
+  - *Zeitgeber:* `dispose` und `close` stoppen ihn.
+- **Verworfen:** Änderung des Abfrageintervalls; `leave` aus dem Sync direkt auswerten (Fehlalarm bei alter Anfrage, verdeckte zudem einen Dauerfehler des HTTP-Wegs); Ausgabe von Fehlertexten in der Diagnose; Änderungen am Protokoll aus B-21.
+- **Grenzen/Risiko:**
+  - Lauf 17 bleibt ungeklärt. War der Kick nie am Server angekommen, ändert diese Entscheidung daran nichts.
+  - `Stream.timeout` begrenzt nur den Abstand zwischen Chunks; ein tröpfelnder Körper bleibt unbegrenzt.
+  - Hängt `/refresh`, läuft jede Abfrage in `timeout(auth)`, und auch der SDK-Sync hängt; das betrifft vor allem OAuth-Konten.
+  - Bei gescheitertem `setAccountData` oder einem zweiten Gerät mit nachgehender Uhr bleibt `staleNote` bis zum Neustart stehen. Das erzeugt keinen Fehlalarm und ist in der Diagnose sichtbar.
+  - Hängt der erste Abgleich, ist „Details“ nicht erreichbar, weil `SyncingView` vorher greift.
+  - Bestehen im Fix-Build allein widerlegt die Hypothesen zu Lauf 17 nicht, weil der Sync-Auslöser sie umgeht; deshalb gehört Build 22 zum Nachtest.
+  - Geprüft unter Linux gegen Synapse 1.163.2, nicht auf macOS-AOT und nicht gegen `matrix.chaostribunal.de`.
+- **Prüfung:** Unit (`test/data/join_rejection_test.dart`, MockClient, läuft ohne vodozemac), Widget (`join_and_security_test.dart`), E2E (`gateway_join_rejection_e2e_test.dart`). #116 und #75 bleiben offen; Nachtest und Schließkriterien stehen im Testplan, Anhang G.
 
 ## E-52 Windows-Version als Zip (2026-10-23)
 - **Frage:** Wie kommt die App auf Windows (x64), obwohl `sqflite_sqlcipher` dort nicht verfügbar ist?

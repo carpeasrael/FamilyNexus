@@ -6,6 +6,7 @@ import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/features/security/security_panel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_matrix.dart';
@@ -116,6 +117,43 @@ void main() {
       await _tap(tester, 'Verstanden');
       expect(find.textContaining('Deine Anfrage wurde abgelehnt'), findsNothing);
       expect(find.text('Einladungslink'), findsOneWidget);
+    });
+
+    testWidgets('Details zeigen in Warte- und Ablehnungsansicht den aktuellen Stand; Kopieren übernimmt ihn (#116)', (tester) async {
+      String? copied;
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+        if (call.method == 'Clipboard.setData') copied = (call.arguments as Map)['text'] as String?;
+        return null;
+      });
+      addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+      final s = await _benWithoutFamily();
+      await _pump(tester, s.ben);
+      await _tap(tester, 'Beitreten');
+      await tester.enterText(find.widgetWithText(TextField, 'Einladungslink'), s.link);
+      await _tap(tester, 'Weiter');
+      await _tap(tester, 'Beitritt anfragen');
+
+      s.ben.gateway.joinRequestDiagnostic = 'Zustand: knock';
+      await _tap(tester, 'Details');
+      expect(find.text('Zustand: knock'), findsOneWidget);
+      await _tap(tester, 'Kopieren');
+      expect(copied, 'Zustand: knock');
+      expect(find.text('Kopiert'), findsOneWidget);
+      await _tap(tester, 'Schließen');
+
+      s.ben.gateway.joinRequestDiagnostic = 'Zustand: timeout(body)';
+      await _tap(tester, 'Details');
+      expect(find.text('Zustand: timeout(body)'), findsOneWidget);
+      await _tap(tester, 'Schließen');
+
+      await s.anna.rejectRequest('@ben:fake.test');
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Deine Anfrage wurde abgelehnt'), findsOneWidget);
+      s.ben.gateway.joinRequestDiagnostic = 'Zustand: leaveRejected';
+      await _tap(tester, 'Details');
+      expect(find.text('Zustand: leaveRejected'), findsOneWidget);
+      await _tap(tester, 'Kopieren');
+      expect(copied, 'Zustand: leaveRejected');
     });
 
     testWidgets('Moderator-Abzeichen am Tab „Familie“ zählt offene Anfragen', (tester) async {

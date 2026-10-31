@@ -267,6 +267,9 @@ abstract class MatrixGateway implements Listenable {
   /// Die letzte Beitrittsanfrage wurde von einem Moderator abgelehnt (bis [cancelJoinRequest] oder eine neue Anfrage).
   bool get joinRequestRejected;
 
+  /// Technischer Stand der Ablehnungs-Abfrage für „Details“ (nur Arbeitsspeicher, ohne Raum-IDs, MXIDs und Fehlertexte).
+  String get joinRequestDiagnostic;
+
   /// Zieht die eigene wartende Beitrittsanfrage zurück.
   Future<void> cancelJoinRequest();
 

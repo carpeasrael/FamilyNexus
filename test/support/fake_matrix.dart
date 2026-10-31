@@ -602,6 +602,10 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   bool get joinRequestRejected => !_rejectionAcknowledged && fake.rooms.values.any((r) => r.rejected.contains(_userId));
 
+  /// Im Test frei setzbar; die Oberfläche soll beim Antippen den aktuellen Wert lesen.
+  @override
+  String joinRequestDiagnostic = 'Zustand: -';
+
   Family _fam() {
     final f = family;
     if (f == null) throw const GatewayException(GatewayError.notFound);
