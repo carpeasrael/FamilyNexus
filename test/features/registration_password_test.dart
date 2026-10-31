@@ -149,6 +149,23 @@ void main() {
       expect(app.gateway.userId, '@carla:fake.test');
     });
 
+    testWidgets('TP-REG-16d Enter und Knopf im selben Frame lösen genau einen Aufruf aus', (tester) async {
+      final gate = Completer<void>();
+      final app = await _open(tester, before: (a) => a.server.registerGate = gate);
+      await _name(tester, 'Carla');
+      await enterNewPassword(tester, 'sicher-genug');
+      await tester.showKeyboard(_field('Passwort wiederholen'));
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      // Bewusst kein `pump`: Der Knopf ist noch der aus dem letzten Frame.
+      expect(_create(tester).onPressed, isNotNull);
+      await tester.tap(find.widgetWithText(FilledButton, 'Konto erstellen'));
+      expect(app.server.registerCalls, 1);
+      gate.complete();
+      await tester.pumpAndSettle();
+      expect(app.server.registerCalls, 1);
+      expect(app.gateway.userId, '@carla:fake.test');
+    });
+
     testWidgets('TP-REG-17 Anbieter nicht bereit: Grund ohne Fokuswechsel, verschwindet, wenn er bereit wird', (tester) async {
       final app = await _open(tester, before: (a) => a.server.reachable = false);
       await _enter(tester);

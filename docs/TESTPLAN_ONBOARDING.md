@@ -64,7 +64,7 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-REG-14 | Registrierung offen | Anmelden bzw. Fehler „endgültig“ | Registrierung samt Passwort verworfen | U, F | ✅ |
 | TP-REG-15 | – | Wiederholung fehlt, ist passender Anfang, weicht ab, gleich; erstes Feld danach ändern | Knopf nur bei Gleichheit aktiv; `Die Passwörter stimmen nicht überein.` erst, wenn die Eingabe nicht mehr passen kann | F `registration_password_test.dart` | ✅ |
 | TP-REG-15b | – | Wiederholung prüfen, Auge antippen | verdeckt, ohne Tastatur-Lernen und Smart-Ersetzungen; ein Schalter für beide Felder | F | ✅ |
-| TP-REG-16…16c | – | Enter im Passwort, Enter in der Wiederholung, Enter während des Absendens | erst Sprung, dann Absenden, kein zweiter Aufruf; beide Felder nach Abschluss leer | F | ✅ |
+| TP-REG-16…16d | – | Enter im Passwort, Enter in der Wiederholung, Enter während des Absendens, Enter und Knopf im selben Frame | erst Sprung, dann Absenden, kein zweiter Aufruf; beide Felder nach Abschluss leer | F | ✅ |
 | TP-REG-17…17f | Formular unvollständig | Enter: Anbieter nicht bereit, Name leer, Benutzername ungültig/vergeben, Passwort zu kurz, Wiederholung abweichend oder leer | Grund in Live-Zeile und am Feld (Semantik-`hint`), Fokus aufs Feld (Anbieter: keiner); verschwindet bei Eingabe, über den Vorschlag bzw. wenn der Anbieter bereit wird | F | ✅ |
 | TP-REG-17g | Serverfehler steht | Eingabe und Enter | Eingabegrund steht davor, Serverfehler bleibt bis zum nächsten Absenden | F | ✅ |
 
@@ -185,7 +185,8 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-PW-11, 11b | Änderung nicht möglich | von vornherein bzw. nach dem Absenden | Text ohne Felder, Knopf „Schließen“; nach dem Absenden Felder geleert, Fokus und Hinweis auf dem Knopf | F | ✅ |
 | TP-PW-12, 13 | – | Weg nicht ermittelbar; Hinweistexte | SnackBar statt Dialog; Geltung und Folgen genannt | F | ✅ |
 | TP-PW-20…26 | echtes Gateway, MockClient | UIA-Ablauf, lokale Prüfungen, alle Serverantworten | altes Passwort nur an die Passwort-Stufe, `logout_devices` immer gesendet, feste Fehlerzuordnung, Kontoseite ohne `action` | U `sdk_registration_test.dart` | ✅ |
-| TP-PW-E2E | echter Synapse | Änderung, falsches Passwort, Sitzungen, Antworten des Servers, 512/513 Zeichen; mit `tool/synapse/password_variants.sh` auch abweichende Einstellungen | S `gateway_account_e2e_test.dart` | ⏳ noch nicht gelaufen |
+| TP-PW-E2E | echter Synapse | Änderung, falsches Passwort, Sitzungen, Antworten des Servers, 512/513 Zeichen | wie TP-PW-20…26, altes Passwort wird ungültig, aktuelle Sitzung bleibt | S `gateway_account_e2e_test.dart` | ✅ 2026-10-31, Synapse 1.163.2 |
+| TP-PW-E2E-V | `tool/synapse/password_variants.sh` | `localdb_enabled: false`, `enabled: false`, `only_for_reauth` | leere Flows: ein POST ohne Passwort, „nicht verfügbar“; `only_for_reauth`: falsches Passwort `invalidCredentials`, richtiges „nicht verfügbar“, Richtlinie `weakPassword` | S `gateway_account_e2e_test.dart` | ⏳ `enabled: false` bestanden; `localdb_enabled: false` (korrigiert) und `only_for_reauth` (neu) noch nicht gegen Synapse gelaufen |
 | TP-PW-M1 | Gerät mit Passwort-Manager und Screenreader | Änderung speichern lassen, Dialog mit TalkBack/VoiceOver bedienen | Speichern nur nach Erfolg, Gründe werden vorgelesen | M | ⏳ |
 
 ## 4. Ergebnisprotokoll

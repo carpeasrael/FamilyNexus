@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# Zwei zusätzliche Test-Homeserver NUR für die Annahmen zu Issue #117 (test/e2e/gateway_account_e2e_test.dart):
-#   http://127.0.0.1:18449  password_config.localdb_enabled: false (Passwortänderung abgeschaltet)
-#   http://127.0.0.1:18450  password_config.enabled: false         (keine Passwort-Anmeldung)
+# Drei zusätzliche Test-Homeserver NUR für die Annahmen zu Issue #117 (test/e2e/gateway_account_e2e_test.dart):
+#   http://127.0.0.1:18449  password_config.localdb_enabled: false   (keine Passwort-Anmeldung: 401 mit leeren Flows)
+#   http://127.0.0.1:18450  password_config.enabled: false           (keine Passwort-Anmeldung: 401 mit leeren Flows)
+#   http://127.0.0.1:18451  password_config.enabled: only_for_reauth (Passwort-Stufe vorhanden, richtiges Passwort: 403
+#                           `M_FORBIDDEN` ohne Flows; Anmeldung gesperrt; Richtlinie: mindestens 20 Zeichen, eine Ziffer)
 # Eigene Container und eigenes Netz; fn-synapse aus tool/synapse/up.sh bleibt unberührt.
 # Aufruf: tool/synapse/password_variants.sh up|down
 set -euo pipefail
@@ -46,9 +48,10 @@ case "${1:-}" in
     docker network inspect "$NET" >/dev/null 2>&1 || docker network create "$NET" >/dev/null
     start fn-synapse-pw-change-off 18449 '{localdb_enabled: false}'
     start fn-synapse-pw-login-off 18450 '{enabled: false}'
+    start fn-synapse-pw-reauth 18451 '{enabled: only_for_reauth, policy: {enabled: true, minimum_length: 20, require_digit: true}}'
     ;;
   down)
-    for name in fn-synapse-pw-change-off fn-synapse-pw-login-off; do
+    for name in fn-synapse-pw-change-off fn-synapse-pw-login-off fn-synapse-pw-reauth; do
       docker rm -f "$name" >/dev/null 2>&1 || true
       clean_data "/tmp/$name-data"
     done

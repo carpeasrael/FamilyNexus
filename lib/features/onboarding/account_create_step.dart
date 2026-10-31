@@ -258,7 +258,7 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
       _pass.text.length >= 8 &&
       _pass.text == _passRepeat.text;
 
-  /// Enter im letzten Feld: absenden oder den ersten Grund nennen, der dagegen spricht.
+  /// Enter im letzten Feld und Knopf: absenden oder den ersten Grund nennen, der dagegen spricht.
   void _submit() {
     if (_busy) return;
     if (_formOk) {
@@ -462,7 +462,8 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
             Align(
               alignment: Alignment.centerRight,
               child: FilledButton(
-                onPressed: _busy || !_formOk ? null : _register,
+                // `_submit`, nicht `_register`: Ein Tipp im selben Frame wie Enter sieht noch den alten Knopf.
+                onPressed: _busy || !_formOk ? null : _submit,
                 child: Text(_busy ? l.regCreating : l.regCreate),
               ),
             ),

@@ -9,7 +9,7 @@ export CARGO_TARGET_DIR=/tmp/vod-target
 [ -f /tmp/vod-target/release/libvodozemac_bindings_dart.dylib ] || (cd "$VOD_SRC" && cargo build --release --locked)
 tool/synapse/up.sh
 trap 'tool/synapse/password_variants.sh down; tool/synapse/down.sh' EXIT
-# Zusätzliche Homeserver für die Annahmen zu Issue #117.
+# Drei zusätzliche Homeserver für Issue #117: `localdb_enabled: false`, `enabled: false`, `enabled: only_for_reauth`.
 tool/synapse/password_variants.sh up
 # OAuth-Teil der Gateway-Unit-Tests braucht vodozemac (PKCE); ohne Bibliothek wird er in `flutter test` übersprungen.
 FN_VOD_LIB=/tmp/vod-target/release/ flutter test test/data/sdk_registration_test.dart

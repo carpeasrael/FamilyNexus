@@ -446,6 +446,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
   - *Standard „Andere Geräte abmelden: aus“:* Abmelden kostet die anderen Geräte die Freischaltung und noch nicht gesendete Änderungen, darum ist es eine bewusste Handlung; der Untertitel sagt, wann sie nötig ist. `logout_devices` wird immer ausdrücklich gesendet, weil Synapse ohne das Feld `true` annimmt.
   - *Eigener `GatewayError.passwordChangeUnavailable`:* `errServerUnsupported` rät zu einem anderen Anbieter unter „Erweitert“, was Angemeldeten nicht hilft.
   - *Fehlerzuordnung:* `SdkMatrixGateway.passwordChangeError` wertet nur `flows`, `session` und das rohe `errcode` aus. Der Getter `errcode` meldet bei UIA-Antworten ohne Code selbst `M_FORBIDDEN`, und der HTTP-Status steht an der Ausnahme nicht zur Verfügung. `M_PASSWORD*` zählt nur, wenn `errcode` eine Zeichenkette ist.
+  - *Abgeschaltete Änderung bei Synapse (gemessen mit 1.163.2):* Ohne Passwort-Anmeldung (`localdb_enabled: false`, `enabled: false`) antwortet der erste Aufruf mit 401 und leeren Flows; die App meldet nach genau einem POST `passwordChangeUnavailable`, das alte Passwort verlässt das Gerät nicht. `403 M_FORBIDDEN` ohne Flows tritt bei `enabled: only_for_reauth` auf: Dort gibt es die Passwort-Stufe, ein falsches Passwort ergibt 401 mit Flows (`invalidCredentials`), erst das richtige die Ablehnung (`passwordChangeUnavailable`). Anmelden kann sich die App dort nicht; den Pfad erreicht nur eine Sitzung, die vor der Umstellung des Servers begonnen hat.
   - *Autofill:* Gespeichert wird nur nach Erfolg; `TextInput.finishAutofillContext()` läuft vor dem Leeren der Felder, Abbrechen verwirft den Kontext.
   - *Keine Antwort:* `.timeout` bricht den Aufruf nicht ab. `passwordChangeUncertain` erklärt, woran man erkennt, dass das neue Passwort schon gilt; die Felder bleiben gefüllt.
 - **Verworfen:** Passwort vergessen oder zurücksetzen; Stärke-Anzeige; Kontrolleingabe bei der Anmeldung; Autofill in der Kontoanlage (heute ohne Hinweise, eine `AutofillGroup` schüfe beim Stufenwechsel Probleme); `oldPassword` des SDK (sendet das Passwort schon im ersten Aufruf und wiederholt nur bei genau einem Flow).
@@ -454,9 +455,11 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
   - Ein Server, der ein falsches Passwort als `M_FORBIDDEN` ohne Flows meldet, ergäbe „nicht verfügbar“, mit `M_UNAUTHORIZED` ohne Flows `unknown`.
   - Ein Server, der schon den ersten Aufruf ohne UIA annähme, änderte das Passwort ohne Prüfung des alten. Andere Server als Synapse wurden nicht geprüft.
   - Timeout, Verbindungsabbruch und 5xx nach der Wiederholung lassen den Ausgang offen.
+  - Bei bcrypt wertet Synapse nur die ersten 72 Byte aus. Unterscheiden sich altes und neues Passwort erst danach, meldet der Dialog Erfolg und das alte gilt weiter (gemessen).
+  - Fehlversuche an `/account/password` lösen in Synapse 1.163.2 kein 429 aus (gemessen), und die App hat keine eigene Bremse.
   - In der Kontoanlage bleibt der Knopf grau, solange die Wiederholung ein passender Anfang ist; der Grund erscheint dort über Enter.
   - Ob ein Passwort-Manager im Dialog speichert, ist nur am Gerät prüfbar. Das Verhalten mit TalkBack und VoiceOver ist nur per Widget-Test geprüft, der OAuth-Zweig nur mit Fake und Metadaten-Test.
-- **Prüfung:** Unit (`sdk_registration_test.dart`, MockClient), Widget (`registration_password_test.dart`, `password_change_test.dart`, `enter_submits_test.dart`, `settings_screen_test.dart`), E2E (`gateway_account_e2e_test.dart`, mit `tool/synapse/password_variants.sh` auch abweichende Synapse-Einstellungen).
+- **Prüfung:** Unit (`sdk_registration_test.dart`, MockClient), Widget (`registration_password_test.dart`, `password_change_test.dart`, `enter_submits_test.dart`, `settings_screen_test.dart`), E2E (`gateway_account_e2e_test.dart`, mit `tool/synapse/password_variants.sh` auch die drei abweichenden Synapse-Einstellungen).
 
 ## E-52 Windows-Version als Zip (2026-10-23)
 - **Frage:** Wie kommt die App auf Windows (x64), obwohl `sqflite_sqlcipher` dort nicht verfügbar ist?
