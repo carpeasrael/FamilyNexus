@@ -41,6 +41,7 @@ import '../platform/key_store.dart';
 import 'matrix_gateway.dart';
 import 'chat_mapper.dart';
 import 'family_room_spec.dart';
+import 'background_image_work.dart';
 import 'https_only_client.dart';
 import 'server_probe.dart';
 
@@ -262,6 +263,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       logLevel: Level.wtf,
       // Lücken nach längerer Offline-Zeit werden nachgeladen (sonst gingen Termine verloren).
       requestHistoryOnLimitedTimeline: true,
+      // Vorschaubilder entstehen in reinem Dart; im UI-Isolate fröre die Oberfläche beim Senden ein (#129).
+      customImageResizer: resizeImageInBackground,
     );
     _client = client;
     _syncSub = client.onSync.stream.listen((update) {

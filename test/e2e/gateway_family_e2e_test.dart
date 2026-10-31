@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/domain/family.dart';
@@ -37,6 +39,24 @@ Future<void> _join(SdkMatrixGateway mod, SdkMatrixGateway user) async {
 
 void main() {
   group('Familie, Einladung, Rollen gegen echten Synapse', skip: E2e.enabled ? false : E2e.skipReason, () {
+    test('#129: Foto mit Vorschaubild kommt beim Mitglied an, die Datei bleibt unverändert', () async {
+      final a = await _login('fotoa');
+      await a.createFamily('Familie Foto');
+      await E2e.until(() => a.family != null);
+      final b = await _login('fotob');
+      await _join(a, b);
+
+      final photo = File('assets/icon/app_icon.png').readAsBytesSync(); // 1254 × 1254 Pixel
+      await a.sendAttachment(fileName: 'foto.png', bytes: photo);
+      await E2e.until(() => b.messages.any((m) => m.attachment?.name == 'foto.png'), what: 'Foto beim Mitglied');
+      final message = b.messages.lastWhere((m) => m.attachment?.name == 'foto.png');
+      expect(await b.loadAttachment(message.id), photo);
+
+      final event = (await a.sdkClient!.getRoomById(a.family!.roomId)!.getEventById(message.id))!;
+      expect(event.type, 'm.room.message');
+      expect(event.content.tryGetMap<String, Object?>('info')?['thumbnail_file'], isNotNull, reason: 'Vorschaubild verschlüsselt');
+    });
+
     test('Beitritt per Link: Anfrage → Bestätigung → Annahme; Chat wird entschlüsselt', () async {
       final a = await _login('mod');
       await a.createFamily('Familie Einladung');
