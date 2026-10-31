@@ -1,28 +1,22 @@
 # Datenschutzerklärung für FamilyNexus
 
-**Stand: 31. Oktober 2026 · App-Version: 1.2.1 (Build 22)**
+**Stand: 31. Oktober 2026**
 
-**Geltungsbereich: native Apps für iOS, macOS, Windows, Linux und Android.**
-
-> **Vor Veröffentlichung ergänzen:** Name bzw. Firma, vollständige Postanschrift und
-> Datenschutz-Kontakt des Herausgebers in Abschnitt 1 fehlen noch. Falls ein
-> Datenschutzbeauftragter benannt ist, sind dessen Kontaktdaten zu ergänzen. Für selbst
-> betriebene Server sind außerdem die konkreten Betreiber-, Hosting-, Speicherfrist-
-> und gegebenenfalls Drittlandangaben aufzunehmen. Bis dahin ist dies ein Entwurf.
+**Plattform: native Apps für iOS, macOS, Windows, Linux, Flatpak und Android sowie Web-App.**
 
 FamilyNexus ist ein Familienkalender und Messenger mit gemeinsamer Einkaufs- und
 Aufgabenverwaltung. Diese Erklärung beschreibt die Verarbeitung personenbezogener
-Daten auf den genannten Betriebssystemen. Unterschiede sind ausdrücklich angegeben.
-Die eigenständige Web-App ist nicht Gegenstand dieser Erklärung. Browserseiten, die
-du aus einer nativen App heraus öffnest, werden in Abschnitt 8 berücksichtigt.
+Daten auf den genannten Plattformen. Unterschiede sind ausdrücklich angegeben.
+Browserseiten, die du aus einer nativen App heraus öffnest, werden in Abschnitt 8
+berücksichtigt.
 
 ## 1. Herausgeber, Verantwortlichkeit und Kontakt
 
 **Herausgeber und Kontakt für die in seinem Verantwortungsbereich liegende Verarbeitung:**
 
-- Name bzw. Firma: **[VOLLSTÄNDIGEN NAMEN / FIRMA EINTRAGEN]**
-- Postanschrift: **[STRASSE, HAUSNUMMER, POSTLEITZAHL, ORT, LAND EINTRAGEN]**
-- E-Mail für Datenschutzanfragen: **[KONTAKT-E-MAIL EINTRAGEN]**
+- Name bzw. Firma: **Alexander Ziemer**
+- Postanschrift: **Nahestrasse 31 - 55593 Rüdesheim**
+- E-Mail für Datenschutzanfragen: **mortisnexus@chaostribunal.de**
 
 FamilyNexus ist freie Software unter der AGPL-3.0-or-later. Der Herausgeber erhält
 über die App keine automatischen Nutzungsberichte und keine Kopien deiner
@@ -66,9 +60,11 @@ und mit den vorgesehenen Empfängern.
 ## 3. Lokale Speicherung und Schutz auf den Plattformen
 
 Die Anwendungs- und Matrix-Datenbanken werden auf dem Gerät mit **SQLCipher
-verschlüsselt** gespeichert. Darin liegen unter anderem synchronisierte Inhalte,
-Einstellungen und benötigte Sitzungsdaten. Für die Datenbankschlüssel verwendet
-die App die sichere Speicherlösung der jeweiligen Plattform.
+verschlüsselt** gespeichert, in der Web-App stattdessen mit SQLite3MultipleCiphers.
+Darin liegen unter anderem synchronisierte Inhalte, Einstellungen und benötigte
+Sitzungsdaten. Für die Datenbankschlüssel verwendet die App die sichere
+Speicherlösung der jeweiligen Plattform, in der Web-App einen passwortgeschützten
+Tresor im Browser.
 
 | Plattform | Schlüsselablage und Besonderheiten |
 |---|---|
@@ -77,19 +73,23 @@ die App die sichere Speicherlösung der jeweiligen Plattform.
 | macOS | Apple-Schlüsselbund; die App aktiviert für diese Schlüssel keine iCloud-Synchronisierung. |
 | Windows | Sichere Ablage über `flutter_secure_storage` mit Schutz durch die Windows-Anmeldeinformationsverwaltung. Die Datenbanken liegen im lokalen Benutzerprofil. |
 | Linux | Secret Service über `libsecret`, beispielsweise der Schlüsselbund deiner Desktopumgebung. Die Datenbanken liegen im App-Datenverzeichnis des Benutzerkontos. |
+| Flatpak | Ablage innerhalb der Sandbox über `libsecret` und das Secret-Portal; die App erhält keinen Zugriff auf den gesamten Schlüsselbund deiner Desktopumgebung. Die Datenbanken liegen im App-Datenverzeichnis der Sandbox. |
+| Web-App | Tresor im Browser-Speicher (`localStorage`), mit AES-256-GCM verschlüsselt. Der Schlüssel wird mit PBKDF2-SHA256 aus deinem Browser-Passwort abgeleitet; dieses wird nirgends gespeichert und kann nicht wiederhergestellt werden. Die Datenbanken liegen im Browser-Speicher (IndexedDB) dieser Webadresse. |
 
 Für Anzeige und Bearbeitung werden Inhalte auf dem Gerät entschlüsselt. Auf
 unterstützten Geräten nutzt die optionale App-Sperre die Geräteauthentifizierung,
 beispielsweise Face ID, Touch ID oder Windows Hello. Die App erhält dabei das
-Authentifizierungsergebnis, keine biometrischen Vorlagen und keine Geräte-PIN.
-Unter Linux steht diese App-Sperre nicht zur Verfügung.
+Authentifizierungsergebnis, keine biometrischen Vorlagen und keine Geräte-PIN. Unter
+Linux, im Flatpak und in der Web-App steht diese App-Sperre nicht zur Verfügung.
 
 Die App-Sperre verdeckt die Oberfläche; sie ist keine zusätzliche, an jede
 Entschlüsselung gekoppelte Schlüsselsperre. Bildschirmschutz und Schutz gegen
-Aufnahmen unterscheiden sich je nach Betriebssystem und verhindern nicht jede
-Form der Aufnahme. System-, Datenträger- und manuell angelegte Sicherungen können
-je nach Plattform und Geräteeinstellung weiterhin Daten enthalten. Ein genereller
-Ausschluss sämtlicher Backups auf allen fünf Plattformen wird nicht zugesagt.
+Aufnahmen unterscheiden sich je nach Betriebssystem und verhindern nicht jede Form
+der Aufnahme. Die Web-App bietet keinen Bildschirmschutz; verwende sie nicht auf
+fremden oder gemeinsam genutzten Rechnern. System-, Datenträger- und manuell
+angelegte Sicherungen können je nach Plattform und Geräteeinstellung weiterhin Daten
+enthalten. Ein genereller Ausschluss sämtlicher Backups auf allen Plattformen wird
+nicht zugesagt.
 
 ## 4. Verschlüsselung, Empfänger und sichtbare Metadaten
 
@@ -163,12 +163,13 @@ Firebase Cloud Messaging oder Apple Push Notification Service ein.
 | Systemdialoge für Dateien | Von dir ausgewählte Dateien einlesen oder von dir veranlasste Exporte speichern. |
 | Zwischenablage | Von dir ausgelöstes Kopieren, etwa von Einladungen, Datenprotokollen oder dem Notfall-Schlüssel. |
 
-Unter Windows und Linux werden Erinnerungen in dieser Version über Zeitgeber der
-laufenden App ausgelöst. Die App verlangt keinen Zugriff auf Kontakte,
-Gerätestandort, Kamera oder Mikrofon. Ein QR-Code kann mit einer externen
-Kamera-App gelesen werden; dadurch erhält FamilyNexus keinen Kamerazugriff.
-Berechtigungen kannst du, soweit das System dies unterstützt, dort widerrufen;
-betroffene Funktionen stehen dann gegebenenfalls nicht mehr zur Verfügung.
+Unter Windows, Linux und im Flatpak werden Erinnerungen über Zeitgeber der laufenden
+App ausgelöst. Die Web-App bietet keine Erinnerungen und Benachrichtigungen. Die App
+verlangt keinen Zugriff auf Kontakte, Gerätestandort, Kamera oder Mikrofon. Ein
+QR-Code kann mit einer externen Kamera-App gelesen werden; dadurch erhält FamilyNexus
+keinen Kamerazugriff. Berechtigungen kannst du, soweit das System dies unterstützt,
+dort widerrufen; betroffene Funktionen stehen dann gegebenenfalls nicht mehr zur
+Verfügung.
 
 ## 7. Schlüsselsicherung, Dateien und Datenprotokolle
 
@@ -209,6 +210,11 @@ den Hostinganbieter übermittelt. Die von der App erzeugten Einladungsdaten steh
 im URL-Fragment nach `#`; dieser Teil wird beim üblichen HTTP-Seitenabruf nicht an
 den Webserver gesendet, aber im Browser verarbeitet und kann im Browserverlauf
 stehen. Die Seite übergibt den Link auf deine Aktion an die App.
+
+Die Web-App wird unter `https://carpeasrael.github.io/FamilyNexus/` über GitHub Pages
+bereitgestellt und kann auch selbst gehostet werden. Beim Seitenabruf werden technisch
+notwendige Verbindungsdaten wie IP-Adresse und Browserinformationen an den jeweiligen
+Hostinganbieter übermittelt. Die Seite lädt nichts von Drittanbietern nach.
 
 Die öffentliche Projektseite dient außerdem als OAuth-Client-Webseite. Optional
 kann die App auf Element als externen Matrix-Client verweisen. Beim Teilen per
@@ -278,11 +284,13 @@ Wirkung über dich durch.
 ## 11. Speicherdauer und Löschung
 
 **Auf deinem Gerät:** Daten bleiben gespeichert, solange sie für die Nutzung
-vorgehalten werden und du sie nicht über die vorgesehenen Funktionen entfernst.
-Es gibt keine allgemeine automatische Löschfrist für Nachrichten, Termine oder
-Aufgabenverläufe. Unter **Einstellungen → Datenschutz → Alle lokalen Daten
-löschen** werden die App- und Matrix-Datenbanken, die zugehörigen lokal abgelegten
-Schlüssel und die durch die App verwalteten Erinnerungen entfernt.
+vorgehalten werden und du sie nicht über die vorgesehenen Funktionen entfernst. Es
+gibt keine allgemeine automatische Löschfrist für Nachrichten, Termine oder
+Aufgabenverläufe. In der Web-App kann der Browser Website-Daten auch von sich aus
+löschen, etwa bei Speichermangel; bei vergessenem Browser-Passwort lassen sich die
+lokalen Daten nur noch löschen. Unter **Einstellungen → Datenschutz → Alle lokalen
+Daten löschen** werden die App- und Matrix-Datenbanken, die zugehörigen lokal
+abgelegten Schlüssel und die durch die App verwalteten Erinnerungen entfernt.
 
 **Abmelden:** Beim Abmelden unter **Einstellungen → Konto → Abmelden** entfernt die
 App die Termine (auch private), Einkaufslisten und Aufgaben dieses Kontos vom Gerät
@@ -359,6 +367,6 @@ ergeben sich aus der
 ## 14. Änderungen dieser Erklärung
 
 Diese Erklärung wird angepasst, wenn sich die tatsächliche Verarbeitung oder die
-rechtlichen Anforderungen ändern. Stand-Datum und App-Version oben zeigen, auf
-welche Fassung sie sich bezieht. Neue Verarbeitungszwecke oder einwilligungspflichtige
-Funktionen werden nicht allein durch eine Änderung dieses Textes erlaubt.
+rechtlichen Anforderungen ändern. Das Stand-Datum oben zeigt, auf welche Fassung sie
+sich bezieht. Neue Verarbeitungszwecke oder einwilligungspflichtige Funktionen werden
+nicht allein durch eine Änderung dieses Textes erlaubt.
