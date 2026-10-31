@@ -27,7 +27,7 @@ void main() {
       final b = await _login('delmem');
       final bid = b.g.userId!;
 
-      final link = InviteLink.tryParse(await mod.g.createInviteLink(autoApprove: false), now: DateTime.now(), ownHost: 'localhost')!;
+      final link = InviteLink.tryParse(await mod.g.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
       await b.g.requestToJoin(link);
       await E2e.until(() => mod.g.family?.member(bid)?.status == MemberStatus.requested, what: 'Anfrage');
       await mod.g.approveRequest(bid);

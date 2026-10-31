@@ -1,7 +1,6 @@
 New in 1.2.1:
-• macOS: Signing in through the provider's website (e.g. matrix.org) works again.
+• A moderator now confirms every join. All moderators should update.
 • matrix.org stays the default provider, even after signing in or being invited on another server.
-• Windows: invitation links open the app.
 • About the app: storage locations and reports of all data stored locally and online.
 • Delete your account in the settings.
 • Create a new emergency key; a new account now always shows it.

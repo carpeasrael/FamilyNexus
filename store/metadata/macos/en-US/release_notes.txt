@@ -1,4 +1,5 @@
 New in 1.2.1:
+• A moderator now confirms every join by invitation link. All moderators should update: older app versions can keep confirming such requests automatically.
 • Screenshots and screen recordings are allowed on the Mac; the “Screen protection” switch is not shown there.
 • Signing in through the provider's website (e.g. matrix.org) works again. Before, the jump to the page already failed.
 • matrix.org stays the default provider. Previously, after signing in with a full ID (@name:server) or an invitation on another server, that server was shown as the default.

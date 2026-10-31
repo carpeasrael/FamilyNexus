@@ -403,10 +403,7 @@
   "familyManage": "Management",
   "familyInvite": "Invite a member",
   "familyInviteLinkTitle": "Invite someone",
-  "familyInviteLinkHint": "The link is valid for {validity} and can be used once. Whoever opens it is admitted automatically as soon as a moderator's app is online. Only give it to the person you want to invite.",
-  "familyInviteLinkHintManual": "The link is valid for {validity} and can be used once. A moderator confirms the request before the person is admitted.",
-  "familyInviteManual": "Confirm requests yourself",
-  "familyInviteManualHint": "Without this setting, the app admits anyone with the link automatically. Changing it creates a new link.",
+  "familyInviteLinkHint": "The link is valid for {validity} and can be used once. A moderator confirms the request before the person is admitted; the confirmation must also happen within this time. Only give it to the person you want to invite.",
   "familyInviteShowQr": "Show QR code",
   "familyInviteCopyLink": "Copy link",
   "familyInviteCopied": "Link copied.",
@@ -498,8 +495,8 @@
   "privacy9Title": "Your rights",
   "privacy9Body": "You can request access, correction and deletion at any time. You manage local data in this app and delete your account under Settings → Account → “Delete account”; other server data with your server's operator.",
   "familyRequestCheckValid": "Valid invitation link",
-  "familyRequestCheckExpired": "Link expired",
-  "familyRequestCheckUnknown": "Unknown link – not issued by a moderator",
+  "familyRequestCheckExpired": "Link expired – reject the request and send a new link",
+  "familyRequestCheckUnknown": "Unknown or already used link",
   "familyRequestApproveConfirm": "Add {user} to the family? The invitation link is used up.",
   "@familyRequestApproveConfirm": {
     "placeholders": {
@@ -810,7 +807,7 @@
   "privacy11Body": "The app remembers blocked members only on this device (encrypted database); the list is not transmitted. If you report a message, the operator of your server receives the message ID, the chosen reason and your optional text. They cannot read the encrypted content.",
   "familyInviteMail": "Send by email",
   "inviteMailSubject": "Invitation to FamilyNexus",
-  "inviteMailBody": "Hello,\n\nI am inviting you to our family “{family}” on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n{link}\n\n3. Create your account.\n4. As soon as a moderator's app is online, you are admitted automatically.\n\nThe link is valid for {validity}.",
+  "inviteMailBody": "Hello,\n\nI am inviting you to our family “{family}” on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n{link}\n\n3. Create your account.\n4. A moderator must confirm your request before you are admitted. Please let me know briefly once you have sent it, because moderators are not notified.\n\nThe link is valid for {validity}. The confirmation must also happen within this time.",
   "@inviteMailBody": {
     "placeholders": {
       "family": {
@@ -1225,7 +1222,7 @@
       }
     }
   },
-  "joinCardNote": "Details according to the invitation. A moderator's app admits you automatically as soon as it is online.",
+  "joinCardNote": "Details according to the invitation. A moderator must confirm your request before you are admitted.",
   "@joinCardNote": {
     "placeholders": {
       "inviter": {
@@ -1411,13 +1408,6 @@
   },
   "familyInviteValidityLabel": "Valid for",
   "@familyInviteLinkHint": {
-    "placeholders": {
-      "validity": {
-        "type": "String"
-      }
-    }
-  },
-  "@familyInviteLinkHintManual": {
     "placeholders": {
       "validity": {
         "type": "String"

@@ -75,7 +75,7 @@ Accept the available suggestion, record the actual username, choose a separate p
 3. Use **Copy link** and transfer it privately to G2. Links expire and are valid for one use. Keep G1 open and online.
 4. On G2, open the link, or select **I was invited** and paste it. If a web page opens, select **Open app**. Check that the registration provider is the test server.
 5. Create I2 with display name `Test User 2`, username `fnt-MMDD-i2` and a separate password. Create and securely store its emergency key as **KI2**, check the confirmation and continue.
-6. Check the family and inviter on the join card, then select **Request to join**. With automatic admission enabled, G1 admits the request while online. If **Confirm requests yourself** is enabled, approve the request on G1. Record the waiting time and any unexpected manual confirmation.
+6. Check the family and inviter on the join card, then select **Request to join**. G2 keeps waiting while G1 is online until a moderator decides: nothing may happen by itself. On G1, open **Family**, select **Approve** on the request and confirm the question. Record the waiting time, and report any admission without this confirmation.
 7. Confirm that G2 opens the same family as G1. N1 is the moderator and I2 is an ordinary member.
 
 ## What to check together

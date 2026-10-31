@@ -403,10 +403,7 @@
   "familyManage": "Verwaltung",
   "familyInvite": "Mitglied einladen",
   "familyInviteLinkTitle": "Jemanden einladen",
-  "familyInviteLinkHint": "Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist. Gib ihn nur der Person, die du einladen willst.",
-  "familyInviteLinkHintManual": "Der Link ist {validity} gültig und nur einmal verwendbar. Ein Moderator bestätigt die Anfrage, bevor die Person aufgenommen wird.",
-  "familyInviteManual": "Anfragen selbst bestätigen",
-  "familyInviteManualHint": "Ohne diese Einstellung nimmt die App jede Person mit dem Link automatisch auf. Ändern erzeugt einen neuen Link.",
+  "familyInviteLinkHint": "Der Link ist {validity} gültig und nur einmal verwendbar. Ein Moderator bestätigt die Anfrage, bevor die Person aufgenommen wird; auch die Bestätigung muss in diese Zeit fallen. Gib ihn nur der Person, die du einladen willst.",
   "familyInviteShowQr": "QR-Code anzeigen",
   "familyInviteCopyLink": "Link kopieren",
   "familyInviteCopied": "Link kopiert.",
@@ -498,8 +495,8 @@
   "privacy9Title": "Deine Rechte",
   "privacy9Body": "Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App, dein Konto löschst du unter Einstellungen → Konto → „Konto löschen“; weitere Serverdaten beim Betreiber deines Servers.",
   "familyRequestCheckValid": "Gültiger Einladungslink",
-  "familyRequestCheckExpired": "Link abgelaufen",
-  "familyRequestCheckUnknown": "Unbekannter Link – von keinem Moderator ausgegeben",
+  "familyRequestCheckExpired": "Link abgelaufen – lehne die Anfrage ab und schicke einen neuen Link",
+  "familyRequestCheckUnknown": "Unbekannter oder bereits verwendeter Link",
   "familyRequestApproveConfirm": "{user} in die Familie aufnehmen? Der Einladungslink wird dabei verbraucht.",
   "@familyRequestApproveConfirm": {
     "placeholders": {
@@ -810,7 +807,7 @@
   "privacy11Body": "Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen.",
   "familyInviteMail": "Per E-Mail senden",
   "inviteMailSubject": "Einladung zu FamilyNexus",
-  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Sobald die App eines Moderators online ist, wirst du automatisch aufgenommen.\n\nDer Link ist {validity} gültig.",
+  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ein Moderator muss deine Anfrage bestätigen, bevor du aufgenommen wirst. Sag mir bitte kurz Bescheid, sobald du sie gestellt hast, denn Moderatoren werden nicht benachrichtigt.\n\nDer Link ist {validity} gültig. Auch die Bestätigung muss in diese Zeit fallen.",
   "@inviteMailBody": {
     "placeholders": {
       "family": {
@@ -1231,7 +1228,7 @@
       }
     }
   },
-  "joinCardNote": "Angaben laut Einladung. Die App eines Moderators nimmt dich automatisch auf, sobald sie online ist.",
+  "joinCardNote": "Angaben laut Einladung. Ein Moderator muss deine Anfrage bestätigen, bevor du aufgenommen wirst.",
   "@joinCardNote": {
     "placeholders": {
       "inviter": {
@@ -1417,13 +1414,6 @@
   },
   "familyInviteValidityLabel": "Gültig für",
   "@familyInviteLinkHint": {
-    "placeholders": {
-      "validity": {
-        "type": "String"
-      }
-    }
-  },
-  "@familyInviteLinkHintManual": {
     "placeholders": {
       "validity": {
         "type": "String"

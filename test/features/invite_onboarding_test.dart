@@ -171,6 +171,8 @@ void main() {
       await _tap(tester, 'Anmelden');
       await _emergencyKey(tester);
       expect(find.widgetWithText(FilledButton, 'Beitritt anfragen'), findsOneWidget);
+      expect(find.textContaining('Ein Moderator muss deine Anfrage bestätigen'), findsOneWidget);
+      expect(find.textContaining('automatisch'), findsNothing, reason: 'E-78: keine Zusage einer automatischen Aufnahme');
     });
 
     testWidgets('TP-JOIN-10 Server aus dem Link (nicht matrix.org) steht im Feld „Anderen Anbieter verwenden“ und wird fürs Konto genutzt (E-63)', (tester) async {

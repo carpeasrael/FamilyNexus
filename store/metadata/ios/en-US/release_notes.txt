@@ -1,4 +1,5 @@
 New in 1.2.1:
+• A moderator now confirms every join by invitation link. All moderators should update: older app versions can keep confirming such requests automatically.
 • matrix.org stays the default provider. Previously, after signing in with a full ID (@name:server) or an invitation on another server, that server was shown as the default.
 • Settings → About the app: overview of where data is stored locally, and reports of all data stored locally and online to view, copy or save.
 • Settings → Account → “Delete account”: permanently delete the account at the provider, then all data on the device.

@@ -1,6 +1,9 @@
 import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/data/matrix/family_room_spec.dart';
+import 'package:family_nexus/data/platform/mail_launcher.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
+import 'package:family_nexus/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -109,24 +112,46 @@ void main() {
     expect(InviteLink.check(mailedLink(), now: app.server.now()).link!.accountServer, 'matrix.org', reason: 'Server bleibt bei neuer Gültigkeit');
   });
 
-  testWidgets('Pen-Test I-01: „Anfragen selbst bestätigen“ erzeugt einen Link ohne automatische Bestätigung', (tester) async {
+  testWidgets('E-78: Einladungsdialog ohne Umschalter, der Hinweis nennt die Bestätigung und behält die Mahnung', (tester) async {
     final app = await buildTestApp();
     await _openFamily(tester, app);
     await tester.tap(find.text('Jemanden einladen'));
     await tester.pumpAndSettle();
-    expect(app.gateway.lastInviteAutoApprove, isTrue, reason: 'Standard bleibt die automatische Bestätigung (E-64)');
-    expect(find.textContaining('automatisch aufgenommen'), findsOneWidget);
+    expect(find.textContaining('Ein Moderator bestätigt die Anfrage'), findsOneWidget);
+    expect(find.textContaining('auch die Bestätigung muss in diese Zeit fallen'), findsOneWidget);
+    expect(find.textContaining('Gib ihn nur der Person, die du einladen willst.'), findsOneWidget);
+    expect(find.textContaining('automatisch'), findsNothing);
 
     await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Erweitert')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Anfragen selbst bestätigen'));
-    await tester.pumpAndSettle();
-    expect(app.gateway.lastInviteAutoApprove, isFalse);
-    expect(find.textContaining('Ein Moderator bestätigt die Anfrage'), findsOneWidget);
+    expect(find.descendant(of: find.byType(AlertDialog), matching: find.byType(Switch)), findsNothing);
+    expect(find.text('Anfragen selbst bestätigen'), findsNothing);
+  });
 
-    await tester.tap(find.text('7 Tage'));
-    await tester.pumpAndSettle();
-    expect(app.gateway.lastInviteAutoApprove, isFalse, reason: 'bleibt bei neuer Gültigkeit');
+  test('E-78: Texte zum Beitritt sagen in beiden Sprachen nichts Automatisches zu', () {
+    final de = lookupAppLocalizations(const Locale('de'));
+    final en = lookupAppLocalizations(const Locale('en'));
+    for (final text in <String>[de.familyInviteLinkHint('7 Tage'), de.joinCardNote('Anna'), de.inviteMailBody('F', 'L', '7 Tage')]) {
+      expect(text, isNot(contains('automatisch')));
+      expect(text, contains('bestätig'));
+    }
+    for (final text in <String>[en.familyInviteLinkHint('7 days'), en.joinCardNote('Anna'), en.inviteMailBody('F', 'L', '7 days')]) {
+      expect(text, isNot(contains('automatic')));
+      expect(text, contains('confirm'));
+    }
+    expect(de.familyRequestCheckUnknown, 'Unbekannter oder bereits verwendeter Link');
+    expect(en.familyRequestCheckUnknown, 'Unknown or already used link');
+    expect(de.familyRequestCheckExpired, contains('neuen Link'));
+    expect(en.familyRequestCheckExpired, contains('new link'));
+  });
+
+  test('E-78: Mailtext passt auch mit längstem Link und Familiennamen in den Entwurf', () {
+    final link = InviteLink.toWebLink('familynexus://join?${'x' * (InviteLink.maxLength - 'familynexus://join?'.length)}')!;
+    final family = 'F' * FamilyRoomSpec.nameMax;
+    final de = lookupAppLocalizations(const Locale('de')).inviteMailBody(family, link, 'einen Tag');
+    final en = lookupAppLocalizations(const Locale('en')).inviteMailBody(family, link, 'one day');
+    expect(de.length, lessThan(SystemMailLauncher.maxBodyLength));
+    expect(en.length, lessThan(SystemMailLauncher.maxBodyLength));
   });
 
   testWidgets('Einladungslink per E-Mail: Entwurf mit Anleitung und Link, ohne Mailprogramm wird kopiert', (tester) async {
@@ -149,6 +174,10 @@ void main() {
     expect(draft.body, contains('https://carpeasrael.github.io/FamilyNexus/join/#v=3'), reason: 'anklickbarer https-Link (E-68)');
     expect(draft.body, contains('3 Tage gültig'));
     expect(draft.body, contains('„Ich wurde eingeladen“'), reason: 'Anleitung nennt den Weg in der App');
+    expect(draft.body, contains('Ein Moderator muss deine Anfrage bestätigen'));
+    expect(draft.body, contains('Bescheid'), reason: 'Moderatoren werden nicht benachrichtigt');
+    expect(draft.body, contains('Auch die Bestätigung muss in diese Zeit fallen.'));
+    expect(draft.body, isNot(contains('automatisch')));
     expect(draft.body, isNot(contains('Matrix')), reason: 'keine Fachbegriffe');
     final link = RegExp(r'https://carpeasrael\.github\.io/FamilyNexus/join/#\S+').firstMatch(draft.body)!.group(0)!;
     // Issue #6: andere Gültigkeit wählen → neuer Link, Text im Entwurf passt.
@@ -185,7 +214,7 @@ void main() {
     room.knockNonce['@cara:fake.test'] = 'f' * 32;
     await _openFamily(tester, app);
     expect(find.text('Gültiger Einladungslink'), findsOneWidget);
-    expect(find.text('Unbekannter Link – von keinem Moderator ausgegeben'), findsOneWidget);
+    expect(find.text('Unbekannter oder bereits verwendeter Link'), findsOneWidget);
     expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Bestätigen').last).onPressed, isNull, reason: 'unbekannter Link nicht bestätigbar');
     await tester.tap(find.text('Bestätigen').first);
     await tester.pumpAndSettle();
@@ -197,6 +226,20 @@ void main() {
     await tester.tap(find.text('Ablehnen').first);
     await tester.pumpAndSettle();
     expect(room.membership.containsKey('@cara:fake.test'), isFalse);
+  });
+
+  testWidgets('E-78: Anfrage mit abgelaufenem Link nennt den Ausweg und ist nur noch ablehnbar', (tester) async {
+    final app = await buildTestApp();
+    final room = app.gateway.familyRoom!;
+    room.membership['@ben:fake.test'] = MemberStatus.requested;
+    room.issued['0' * 32] = app.server.now().subtract(const Duration(minutes: 1));
+    room.knockNonce['@ben:fake.test'] = '0' * 32;
+    await _openFamily(tester, app);
+    expect(find.text('Link abgelaufen – lehne die Anfrage ab und schicke einen neuen Link'), findsOneWidget);
+    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Bestätigen')).onPressed, isNull);
+    await tester.tap(find.text('Ablehnen'));
+    await tester.pumpAndSettle();
+    expect(room.membership.containsKey('@ben:fake.test'), isFalse);
   });
 
   testWidgets('Ernennen und Entfernen verlangen Bestätigung', (tester) async {

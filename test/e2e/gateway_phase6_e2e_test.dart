@@ -24,7 +24,7 @@ Future<SdkMatrixGateway> _login(String prefix) async {
 }
 
 Future<void> _join(SdkMatrixGateway mod, SdkMatrixGateway user) async {
-  final link = InviteLink.tryParse(await mod.createInviteLink(autoApprove: false), now: DateTime.now(), ownHost: 'localhost')!;
+  final link = InviteLink.tryParse(await mod.createInviteLink(), now: DateTime.now(), ownHost: 'localhost')!;
   await user.requestToJoin(link);
   await E2e.until(() => mod.family?.member(user.userId!)?.status == MemberStatus.requested, what: 'Moderator sieht Anfrage');
   await mod.approveRequest(user.userId!);

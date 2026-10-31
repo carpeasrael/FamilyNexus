@@ -605,12 +605,11 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   @override
-  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, bool autoApprove = true, String? accountServer}) async {
+  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, String? accountServer}) async {
     final f = _fam();
     if (!Permissions.canInvite(f)) throw const GatewayException(GatewayError.notAllowed);
     final room = familyRoom!;
     final nonce = (_nonceCounter++).toRadixString(16).padLeft(32, '0');
-    lastInviteAutoApprove = autoApprove;
     room.issued[nonce] = fake.now().add(validity);
     return InviteLink.create(
       roomId: f.roomId,
@@ -627,9 +626,6 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   static int _nonceCounter = 1;
-
-  /// Ob der zuletzt erzeugte Link automatisch bestätigt wird (Pen-Test I-01).
-  bool? lastInviteAutoApprove;
 
   @override
   Future<void> requestToJoin(InviteLink link) async {
