@@ -19,7 +19,7 @@ EINKAUFSZETTEL
 SICHERHEIT UND DATENSCHUTZ
 • Ende-zu-Ende-verschlüsselt über das offene Matrix-Protokoll (Chat, geteilte Termine, Einkaufszettel)
 • Lokal verschlüsselte Datenbank, Schlüssel im Schlüsselspeicher des Geräts
-• App-Sperre über die Geräteanmeldung, Bildschirmschutz
+• App-Sperre über die Geräteanmeldung
 • Keine Werbung, keine Tracker, keine Analyse
 • Eigener Server möglich – der öffentliche Server ist nur voreingestellt
 • Freie Software (AGPL-3.0), Quellcode einsehbar
