@@ -48,6 +48,13 @@ void main() {
     expect(await clock(tester, const Locale('de'), use24h: true, hour: 2, minute: 5), '02:05');
   });
 
+  testWidgets('formatClock: Mitternacht und Mittag im 12-h-Format', (tester) async {
+    expect(await clock(tester, const Locale('en'), use24h: false, hour: 0, minute: 5), startsWith('12:05'));
+    expect(await clock(tester, const Locale('en'), use24h: false, hour: 0, minute: 5), contains('AM'));
+    expect(await clock(tester, const Locale('en'), use24h: false, hour: 12, minute: 0), contains('PM'));
+    expect(await clock(tester, const Locale('en'), use24h: true, hour: 0, minute: 5), '00:05');
+  });
+
   test('keyFileDate: Datum der Schlüsseldatei folgt der App-Sprache', () {
     final d = DateTime(2026, 10, 31);
     expect(keyFileDate(d, 'de'), '31.10.2026');
