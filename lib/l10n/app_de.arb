@@ -1545,7 +1545,7 @@
   "reportNotSet": "nicht gesetzt",
   "reportSectionSecurity": "Verschlüsselung",
   "reportCrossSigning": "Cross-Signing-Schlüssel",
-  "reportKeyBackup": "Schlüssel-Backup (mit deinem Wiederherstellungsschlüssel verschlüsselt)",
+  "reportKeyBackup": "Schlüssel-Backup (mit deinem Notfall-Schlüssel verschlüsselt)",
   "reportSetUp": "eingerichtet",
   "reportNotSetUp": "nicht eingerichtet",
   "reportSectionAccountData": "Kontodaten (nur Arten, Inhalte werden nicht angezeigt)",

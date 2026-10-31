@@ -2619,7 +2619,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportCrossSigning => 'Cross-signing keys';
 
   @override
-  String get reportKeyBackup => 'Key backup (encrypted with your recovery key)';
+  String get reportKeyBackup =>
+      'Key backup (encrypted with your emergency key)';
 
   @override
   String get reportSetUp => 'set up';
@@ -2774,11 +2775,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountDeleteNoBrowser => 'The browser could not be opened.';
 
   @override
-  String get chatOpening => 'Opening private chat …';
+  String get chatOpening => 'Opening direct chat …';
 
   @override
   String get chatOpenFailed =>
-      'The private chat could not be opened. Please try again.';
+      'The direct chat could not be opened. Please try again.';
 
   @override
   String get chatBeforeJoin =>
