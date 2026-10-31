@@ -11,6 +11,9 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
 
+/// Kleinstes gültiges PNG (1 × 1 Pixel).
+const _png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+
 /// Lässt Ben dem Familienraum beitreten und liefert sein Gerät.
 Future<FakeMatrixGateway> _joinBen(TestApp app) async {
   final ben = app.server.newDevice();
@@ -153,5 +156,90 @@ void main() {
     // Zum Speichern geladen: das Bild wird gezeigt, Speichern bleibt möglich.
     expect(find.byType(Image), findsOneWidget);
     expect(find.text('Speichern'), findsOneWidget);
+  });
+
+  group('#130: Anhänge bleiben an ihrer Nachricht', () {
+    Uint8List pngWith(int marker) => Uint8List.fromList(<int>[...base64.decode(_png), marker]);
+
+    Finder image(String name) => find.byWidgetPredicate((w) => w is Image && w.semanticLabel == name);
+
+    Finder inBubbleOf(String name, Finder what) => find.descendant(
+          of: find
+              .ancestor(of: find.text(name).first, matching: find.byWidgetPredicate((w) => w.runtimeType.toString() == '_Bubble'))
+              .first,
+          matching: what,
+        );
+
+    Future<void> tallView(WidgetTester tester) async {
+      tester.view.physicalSize = const Size(900, 2400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+    }
+
+    testWidgets('eine neue Nachricht übernimmt das geladene Bild nicht, Speichern schreibt die eigenen Bytes', (tester) async {
+      await tallView(tester);
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      final oldBytes = pngWith(1);
+      final newBytes = pngWith(2);
+      await ben.sendAttachment(fileName: 'alt.png', bytes: oldBytes);
+      await _openChat(tester, app);
+      await tester.tap(find.widgetWithText(TextButton, 'Anhang laden'));
+      await tester.pumpAndSettle();
+      expect(image('alt.png'), findsOneWidget);
+
+      await ben.sendAttachment(fileName: 'neu.png', bytes: newBytes);
+      await tester.pumpAndSettle();
+
+      expect(image('neu.png'), findsNothing, reason: 'nie automatisch geladen, schon gar nicht mit fremden Bytes');
+      expect(image('alt.png'), findsOneWidget, reason: 'das geladene Bild bleibt an seiner Nachricht');
+      expect(find.widgetWithText(TextButton, 'Anhang laden'), findsOneWidget);
+
+      await tester.tap(inBubbleOf('neu.png', find.widgetWithText(TextButton, 'Speichern')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+      await tester.pumpAndSettle();
+      final files = app.services.files as FakeFileAccess;
+      expect(files.saved, <String>['neu.png']);
+      expect(files.contents['neu.png'], newBytes);
+    });
+
+    testWidgets('beim Gesprächswechsel erscheint kein Bild aus dem anderen Gespräch', (tester) async {
+      await tallView(tester);
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      final direct = await app.gateway.startDirectChat(ben.userId!);
+      await app.gateway.sendAttachment(fileName: 'nur-ben.png', bytes: pngWith(2), threadId: direct);
+      await ben.sendAttachment(fileName: 'familie.png', bytes: pngWith(1));
+      await _openChat(tester, app);
+      await tester.tap(find.widgetWithText(TextButton, 'Anhang laden'));
+      await tester.pumpAndSettle();
+      expect(image('familie.png'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Ben'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Image), findsNothing);
+      expect(find.widgetWithText(TextButton, 'Anhang laden'), findsOneWidget);
+    });
+
+    testWidgets('eine doppelt gelieferte Nachricht erscheint einmal und stört die Liste nicht', (tester) async {
+      await tallView(tester);
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      await ben.sendMessage('einmal');
+      await _openChat(tester, app);
+      final room = app.gateway.familyRoom!;
+      room.events.add(room.events.last);
+      app.server.notifyAll();
+      await tester.pumpAndSettle();
+      expect(find.text('einmal'), findsOneWidget);
+
+      await ben.sendMessage('danach');
+      await tester.pumpAndSettle();
+      expect(find.text('einmal'), findsOneWidget);
+      expect(find.text('danach'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   });
 }
