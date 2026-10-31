@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_matrix.dart';
+import '../support/registration_form.dart';
 import '../support/test_app.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
@@ -51,8 +52,7 @@ Future<void> _createAccount(WidgetTester tester, {required String name}) async {
   await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), name);
   await tester.pump(const Duration(milliseconds: 700));
   await tester.pumpAndSettle();
-  await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'sicher-genug');
-  await tester.pumpAndSettle();
+  await enterNewPassword(tester, 'sicher-genug');
   await _tap(tester, 'Konto erstellen');
 }
 

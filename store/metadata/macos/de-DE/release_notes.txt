@@ -6,6 +6,7 @@ Neu in 1.2.1:
 • matrix.org bleibt der Standard-Anbieter. Zuvor wurde nach einer Anmeldung mit einer vollständigen ID (@name:server) oder einer Einladung auf einen anderen Server dieser als Standard angezeigt.
 • Einstellungen → Über die App: Übersicht, wo welche Daten lokal gespeichert sind, und Protokolle aller lokal und online gespeicherten Daten zum Ansehen, Kopieren oder Speichern.
 • Einstellungen → Konto → „Konto löschen“: Konto beim Anbieter dauerhaft löschen, danach alle Daten auf dem Gerät.
+• Einstellungen → Konto → „Passwort ändern“. Neue Konten fragen das Passwort zur Kontrolle zweimal ab.
 • Einstellungen → Notfall-Schlüssel und Geräte: neuen Notfall-Schlüssel erstellen. Beim Einrichten eines neuen Kontos wird der Schlüssel jetzt zuverlässig angezeigt.
 • Die Versionsanzeige nennt die Build-Nummer.
 • Nach „Alle lokalen Daten löschen“ oder „Konto löschen“ startet die App wieder mit der Startseite statt mit der Anmeldung.

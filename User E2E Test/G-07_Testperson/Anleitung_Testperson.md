@@ -24,7 +24,7 @@ Die App ist bereits installiert. Öffnen Sie sie.
 3. **Neue Familie gründen:** Wählen Sie „Neue Familie gründen“.
 4. **Anbieter einstellen:** Die App schlägt einen Anbieter vor. Verwenden Sie stattdessen **den Anbieter aus der Tabelle oben**. (Tipp: Es gibt einen Bereich „Erweitert“.) Weiter, wenn die App bestätigt, dass Ihr Konto dort liegt.
 5. **Name und Benutzername:** Tragen Sie `Testperson` als Namen ein und den Benutzernamen aus der Tabelle.
-6. **Passwort:** Wählen Sie ein Passwort und notieren Sie es auf dem Zettel.
+6. **Passwort:** Wählen Sie ein Passwort, geben Sie es ein zweites Mal ein und notieren Sie es auf dem Zettel.
 7. **Konto erstellen.**
 8. **Notfall-Schlüssel:** Die App zeigt einen Schlüssel. Sichern Sie ihn so, wie es die App vorschlägt (z. B. kopieren und in Notizen einfügen oder als Datei speichern). Gehen Sie weiter, wenn Sie bestätigen können, dass er sicher ist.
 9. **Familie gründen:** Geben Sie `Testfamilie` ein und gründen Sie die Familie.

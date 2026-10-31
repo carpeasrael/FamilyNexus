@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/nav.dart';
 import '../support/test_app.dart';
 
 /// #37: Auf dem Desktop schickt Enter ab (Chat senden, Einkauf hinzufügen); Umschalt+Enter macht im
@@ -51,6 +52,25 @@ void main() {
     await tester.testTextInput.receiveAction(TextInputAction.next);
     await tester.pumpAndSettle();
     expect(app.shoppingStore.items.values.single.title, 'Milch');
+  }, variant: desktop);
+
+  testWidgets('#117 Desktop: Enter ändert im letzten Feld das Passwort, vorher springt es weiter', (tester) async {
+    final app = await _open(tester, 'Familie');
+    await openSettings(tester);
+    await tester.ensureVisible(find.widgetWithText(ListTile, 'Passwort ändern'));
+    await tester.tap(find.widgetWithText(ListTile, 'Passwort ändern'));
+    await tester.pumpAndSettle();
+    await _type(tester, find.widgetWithText(TextField, 'Aktuelles Passwort'), 'geheim123');
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pumpAndSettle();
+    await _type(tester, find.widgetWithText(TextField, 'Neues Passwort'), 'neu-und-lang');
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pumpAndSettle();
+    expect(app.server.passwordChangeCalls, 0, reason: 'bewusste Abweichung von #68: erst das letzte Feld sendet');
+    await _type(tester, find.widgetWithText(TextField, 'Passwort wiederholen'), 'neu-und-lang');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(app.server.passwordOf('@anna:fake.test'), 'neu-und-lang');
   }, variant: desktop);
 
   testWidgets('#68 Desktop: Enter speichert im Dialog „Familienname ändern“', (tester) async {

@@ -82,6 +82,22 @@ void main() {
     expect(find.textContaining('Schritt 1 von 3'), findsOneWidget, reason: 'Abgemeldet: zurück zu „Anmelden“');
   });
 
+  testWidgets('#117 Konto: „Passwort ändern“ steht vor „Abmelden“ und öffnet den Dialog', (tester) async {
+    tester.view.physicalSize = const Size(900, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final app = await buildTestApp(lang: 'de');
+    await tester.pumpWidget(FamilyNexusApp(services: app.services));
+    await tester.pumpAndSettle();
+    await openSettings(tester);
+    final change = find.widgetWithText(ListTile, 'Passwort ändern');
+    await tester.ensureVisible(change);
+    expect(tester.getTopLeft(change).dy, lessThan(tester.getTopLeft(find.widgetWithText(ListTile, 'Abmelden')).dy));
+    await tester.tap(change);
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(TextField, 'Aktuelles Passwort'), findsOneWidget);
+  });
+
   testWidgets('Version mit Build-Nummer im Menü, unter „Über die App“ und im Datenbericht (#14)', (tester) async {
     tester.view.physicalSize = const Size(900, 3000);
     tester.view.devicePixelRatio = 1;
