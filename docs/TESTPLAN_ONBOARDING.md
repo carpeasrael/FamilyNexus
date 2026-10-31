@@ -151,7 +151,7 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
 |---|---|---|---|---|---|
 | TP-KEY-01 | angemeldet, nicht abgesichert | App öffnen | Notfall-Schlüssel zuerst, kein Überspringen, keine Hauptansicht | F | ✅ |
-| TP-KEY-02 | Schlüssel sichtbar | „Kopieren“, 61 s warten | Android: als vertraulich kopiert; Zwischenablage danach leer (im Hintergrund: beim Zurückkehren); Inhalt, den die Person inzwischen kopiert hat, bleibt | F | ✅ |
+| TP-KEY-02 | Schlüssel sichtbar | „Kopieren“, 61 s warten | Android: als vertraulich kopiert; Zwischenablage danach leer (im Hintergrund: beim Zurückkehren; ohne Rückkehr bleibt der Schlüssel unter Android, Linux und Windows liegen – akzeptiert, SA-8, #148); Inhalt, den die Person inzwischen kopiert hat, bleibt | F | ✅ |
 | TP-KEY-03 | Schlüssel sichtbar | „Als Datei speichern“ | Datei mit Schlüssel, Konto, Anbieter, Datum und Anleitung | F | ✅ |
 | TP-KEY-04 | Schlüssel sichtbar | – | Bildschirmschutz erzwungen | F, A (Bildschirmfoto bleibt schwarz) | ✅ |
 | TP-KEY-05 | zweites Gerät | falscher, dann richtiger Schlüssel; Bilder vergleichen | Fehlermeldung, dann freigeschaltet und weiter; Emoji-Vergleich über beide Geräte | F `join_and_security_test.dart`, `second_device_test.dart`, B 21 | ✅ |
