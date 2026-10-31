@@ -41,10 +41,11 @@ class AttachmentPolicy {
     'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   };
 
-  /// Entfernt Pfadanteile, Steuer- und Sonderzeichen, begrenzt die Länge.
+  /// Entfernt Pfadanteile, Steuer- und Sonderzeichen (dieselben unsichtbaren Zeichen wie
+  /// `TextSanitizer`, E-28), begrenzt die Länge.
   static String sanitizeFileName(String raw) {
     var name = raw.split(RegExp(r'[\\/]')).last;
-    name = name.replaceAll(RegExp('[\\x00-\\x1F\\x7F<>:"|?*\\u202A-\\u202E\\u2066-\\u2069]'), '_').trim();
+    name = name.replaceAll(RegExp('[\\x00-\\x1F\\x7F-\\x9F<>:"|?*\\u061C\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF]'), '_').trim();
     name = name.replaceAll(RegExp(r'^\.+'), '');
     if (name.isEmpty) name = 'datei';
     if (name.length > 100) {
