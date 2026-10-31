@@ -430,7 +430,7 @@ void main() {
       await _tap(tester, 'Kopieren');
       expect(clipboard, key);
       expect(sensitive, 1, reason: 'als vertraulich markiert (Android)');
-      expect(find.textContaining('Die Zwischenablage wird nach einer Minute geleert.'), findsOneWidget);
+      expect(find.textContaining('Die App versucht, die Zwischenablage nach einer Minute zu leeren.'), findsOneWidget);
       await tester.pump(const Duration(seconds: 61));
       await tester.pumpAndSettle();
       expect(clipboard, '', reason: 'Schlüssel bleibt nicht in der Zwischenablage');
