@@ -1498,7 +1498,7 @@
   "reportOnlineTitle": "Online gespeicherte Daten",
   "reportWarning": "Das Protokoll zeigt deine Daten im Klartext. Beim Kopieren oder Speichern verlassen sie den verschlüsselten Speicher der App.",
   "reportCopy": "Kopieren",
-  "reportCopied": "Protokoll kopiert.",
+  "reportCopied": "Protokoll kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im Zweifel selbst.",
   "reportSave": "Als Datei speichern",
   "reportSaved": "Protokoll gespeichert.",
   "reportGenerated": "Erstellt: {time} · App-Version {version}",

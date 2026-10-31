@@ -2553,7 +2553,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reportCopy => 'Kopieren';
 
   @override
-  String get reportCopied => 'Protokoll kopiert.';
+  String get reportCopied =>
+      'Protokoll kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im Zweifel selbst.';
 
   @override
   String get reportSave => 'Als Datei speichern';

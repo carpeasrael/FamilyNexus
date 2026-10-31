@@ -30,10 +30,12 @@ class MainFlutterWindow: NSWindow {
     window.setMethodCallHandler { call, result in
       if call.method == "setSecure" {
         result(nil) // bewusst ohne Wirkung: das Fenster bleibt aufnehmbar
-      } else if call.method == "copySecret" {
-        // Notfall-Schlüssel: nur auf diesem Mac (kein Universal Clipboard) und für Verlaufs-Werkzeuge
-        // als vertraulich markiert (nspasteboard.org). Das Leeren nach 60 s übernimmt Dart.
-        guard let text = call.arguments as? String, text.count <= 512 else {
+      } else if call.method == "copySecret" || call.method == "copySensitive" {
+        // Notfall-Schlüssel (512 Zeichen) und Datenprotokoll (#157, 100 000 Zeichen): nur auf diesem Mac
+        // (kein Universal Clipboard) und für Verlaufs-Werkzeuge als vertraulich markiert (nspasteboard.org).
+        // Das Leeren nach 60 s übernimmt Dart.
+        let limit = call.method == "copySecret" ? 512 : 100_000
+        guard let text = call.arguments as? String, text.count <= limit else {
           result(FlutterError(code: "invalid", message: nil, details: nil))
           return
         }

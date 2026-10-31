@@ -2533,7 +2533,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportCopy => 'Copy';
 
   @override
-  String get reportCopied => 'Report copied.';
+  String get reportCopied =>
+      'Report copied. The app tries to clear the clipboard after one minute. If in doubt, clear it yourself.';
 
   @override
   String get reportSave => 'Save as file';

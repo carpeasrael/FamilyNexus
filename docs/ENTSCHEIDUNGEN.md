@@ -606,3 +606,9 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Ist:** Die App-Sperre (E-17) verdeckt nur die Oberfläche. Die Datenbankschlüssel sind ohne Benutzer-Authentifizierung lesbar (Android-Keystore ohne `setUserAuthenticationRequired`, iOS-Schlüsselbund `first_unlock_this_device` ohne `.userPresence`). Auf einem entsperrten Gerät mit Root/Jailbreak oder Instrumentierung schützt sie keine Daten.
 - **Nächstsichere Lösung:** Schutz im Ruhezustand über SQLCipher und die Gerätesperre; der Einstellungstext nennt die App-Sperre einen Sichtschutz. Eine „starke Sperre“ mit Wrapping-Schlüssel und Benutzer-Authentifizierung kollidiert mit Erinnerungen und Synchronisierung im Hintergrund und ist nicht umgesetzt.
 - **Status:** akzeptiert, in OFFEN geführt.
+
+### SA-11 Datenprotokoll in Zwischenablage und Datei (2026-10-31, Issue #157, **Sicherheitsabweichung**)
+- **Vorgabe:** Inhalte verlassen den verschlüsselten Speicher der App nur auf ausdrücklichen Wunsch und so geschützt wie möglich (wie SA-8).
+- **Ist:** Das Datenprotokoll (Einstellungen → Über die App) zeigt alle gespeicherten Daten im Klartext. Auf ausdrücklichen Tipp wird es kopiert oder als Textdatei gespeichert; die Datei bleibt unverschlüsselt an dem gewählten Ort.
+- **Nächstsichere Lösung:** Kopieren geht wie beim Notfall-Schlüssel über den vertraulichen Weg (`copySensitive`: Android als vertraulich markiert; iOS/macOS nur auf diesem Gerät, iOS lässt es nach 60 s verfallen, macOS markiert es als vertraulich), Grenze der Adapter 100 000 Zeichen. Scheitert der Adapter, fällt Dart auf die normale Zwischenablage zurück; `clearClipboardLater` versucht in jedem Fall, sie nach 60 s zu leeren. Die App-Texte sagen „versucht“ (#148). Unter Android, Linux und Windows bleibt der Text liegen, wenn die Person nicht in die App zurückkehrt (wie SA-8).
+- **Status:** akzeptiert; Wirkung der nativen Adapter nur auf Geräten nachprüfbar (Nachtest B-21/H-08), in OFFEN geführt.

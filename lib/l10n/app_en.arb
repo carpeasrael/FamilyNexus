@@ -1492,7 +1492,7 @@
   "reportOnlineTitle": "Data stored online",
   "reportWarning": "The report shows your data in plain text. When you copy or save it, the data leaves the app's encrypted storage.",
   "reportCopy": "Copy",
-  "reportCopied": "Report copied.",
+  "reportCopied": "Report copied. The app tries to clear the clipboard after one minute. If in doubt, clear it yourself.",
   "reportSave": "Save as file",
   "reportSaved": "Report saved.",
   "reportGenerated": "Created: {time} · app version {version}",

@@ -4325,7 +4325,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportCopied.
   ///
   /// In de, this message translates to:
-  /// **'Protokoll kopiert.'**
+  /// **'Protokoll kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im Zweifel selbst.'**
   String get reportCopied;
 
   /// No description provided for @reportSave.
