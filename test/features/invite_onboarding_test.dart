@@ -444,6 +444,28 @@ void main() {
       expect(app.protection.last, isTrue, reason: 'Bildschirmschutz, solange der Schlüssel sichtbar ist (S6)');
     });
 
+    testWidgets('#136: Abgebrochenes Speichern des Notfall-Schlüssels meldet keinen Erfolg', (tester) async {
+      final app = await buildTestApp(loggedIn: false);
+      await _pump(tester, app);
+      await _tap(tester, 'Ich habe schon ein Konto');
+      await tester.enterText(find.widgetWithText(TextField, 'Benutzername'), 'anna');
+      await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'geheim123');
+      await tester.pumpAndSettle();
+      await _tap(tester, 'Anmelden');
+      await _tap(tester, 'Notfall-Schlüssel erstellen');
+      final files = app.services.files as FakeFileAccess;
+
+      files.cancelSave = true;
+      await _tap(tester, 'Als Datei speichern');
+      expect(files.saved, isEmpty);
+      expect(find.byType(SnackBar), findsNothing, reason: 'Abbruch bleibt still');
+
+      files.cancelSave = false;
+      await _tap(tester, 'Als Datei speichern');
+      expect(files.saved, hasLength(1));
+      expect(find.textContaining('Gespeichert. Bewahre die Datei sicher auf'), findsOneWidget);
+    });
+
     testWidgets('TP-KEY-02b Kopieren überschreibt nichts, was die Person inzwischen kopiert hat', (tester) async {
       final app = await buildTestApp(loggedIn: false);
       String? clipboard;

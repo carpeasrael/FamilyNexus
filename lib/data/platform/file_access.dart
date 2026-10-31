@@ -16,7 +16,8 @@ abstract class FileAccess {
   /// die Datei das Limit überschreitet.
   Future<PickedFile?> pickFile();
 
-  Future<void> saveFile({required String name, required Uint8List bytes, required String mimeType});
+  /// `true` = gespeichert, `false` = im Dialog abgebrochen.
+  Future<bool> saveFile({required String name, required Uint8List bytes, required String mimeType});
 }
 
 class FileTooLargeException implements Exception {
@@ -38,7 +39,9 @@ class SystemFileAccess implements FileAccess {
   }
 
   @override
-  Future<void> saveFile({required String name, required Uint8List bytes, required String mimeType}) async {
-    await FilePicker.saveFile(fileName: name, bytes: bytes, mimeType: mimeType);
+  Future<bool> saveFile({required String name, required Uint8List bytes, required String mimeType}) async {
+    final saved = await FilePicker.saveFile(fileName: name, bytes: bytes, mimeType: mimeType);
+    // Browser: Der Download liefert immer `null`, ein Abbruch ist dort nicht erkennbar.
+    return kIsWeb || saved != null;
   }
 }
