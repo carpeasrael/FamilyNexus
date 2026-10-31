@@ -8,6 +8,7 @@ import 'app/startup_failure.dart';
 import 'app/web_gate.dart';
 import 'core/app_log.dart';
 import 'core/platform_info.dart';
+import 'data/matrix/matrix_gateway.dart';
 import 'data/platform/key_store.dart';
 import 'data/platform/vault_key_store.dart';
 
@@ -88,7 +89,12 @@ class _BootstrapperState extends State<_Bootstrapper> {
         builder: (context, snap) {
           if (snap.hasError) {
             AppLog.e('startup', 'Start fehlgeschlagen', snap.error);
-            return StartupFailureApp(onRetry: _retry, onReset: _reset);
+            final error = snap.error;
+            return StartupFailureApp(
+              onRetry: _retry,
+              onReset: _reset,
+              sessionLost: error is SessionRestoreException && error.sessionLost,
+            );
           }
           final services = snap.data;
           if (services == null) return const SizedBox.shrink();

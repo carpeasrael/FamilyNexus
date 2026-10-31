@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart' show Database;
 
+import '../core/app_log.dart';
 import '../data/db/app_database.dart';
 import '../data/db/key_value_store.dart';
 import '../data/db/sql_event_store.dart';
@@ -46,6 +47,7 @@ class AppServices {
     required this.links,
     required this.lock,
     this.database,
+    this.keepAccountData = false,
     this.keyStore,
     this.dataInventory,
     this.calendarBuilder,
@@ -147,8 +149,37 @@ class AppServices {
   /// Abmelden hieß bisher nur „Sitzung beenden“; die Daten blieben bis zur Anmeldung eines anderen Kontos liegen
   /// (Pen-Test F-02).
   Future<void> wipeAccountData() async {
+    if (keepAccountData) return;
+    final wipe = debugWipeAccountData;
+    if (wipe != null) return wipe();
     final db = database?.db;
     if (db != null) await wipeAccountDataIn(db);
+  }
+
+  /// `true`: Das SDK kann die Sitzung beim Start wegen eines eigenen Fehlers gelöscht haben. Das ist kein gewolltes
+  /// Sitzungsende, Familiendaten und Erinnerungen bleiben bis zur nächsten Anmeldung (#134, E-82).
+  bool keepAccountData;
+
+  /// Ersetzt im Test das Löschen; `buildTestApp` hat keine Datenbank.
+  @visibleForTesting
+  Future<void> Function()? debugWipeAccountData;
+
+  bool _confirmingSession = false;
+
+  /// Eine Sitzung steht: Der Vermerk [keepAccountData] entfällt, ein späteres Abmelden löscht wieder.
+  Future<void> sessionConfirmed() async {
+    if (!keepAccountData || _confirmingSession) return;
+    _confirmingSession = true;
+    try {
+      final db = database?.db;
+      if (db != null) await SqlKeyValueStore(db).delete(keepAccountDataKey);
+      keepAccountData = false;
+    } catch (e) {
+      // Die Datenbank kann bereits geschlossen sein (`_fullReset`); sonst folgt der nächste Versuch beim nächsten Aufbau.
+      AppLog.e('app', 'Vermerk zu den Familiendaten nicht entfernt', e);
+    } finally {
+      _confirmingSession = false;
+    }
   }
 
   /// [wipeAccountData] für die App-Datenbank [db].
@@ -163,6 +194,9 @@ class AppServices {
 
   /// Einstellungsschlüssel: Konto und Familie, denen die lokalen Familiendaten gehören.
   static const String calendarOwnerKey = 'calendarOwner';
+
+  /// Einstellungsschlüssel zu [keepAccountData].
+  static const String keepAccountDataKey = 'keepAccountData';
 
   /// Beendet Synchronisation und Planung. [cancelReminders]: nur bei Abmeldung/Löschung –
   /// beim bloßen Schließen der Oberfläche müssen geplante Erinnerungen bestehen bleiben.

@@ -111,6 +111,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die verschlüsselte Datenbank konnte nicht geöffnet werden, zum Beispiel weil der Schlüssel des Geräts nicht mehr verfügbar ist. Aus Sicherheitsgründen wurde nichts verändert. Du kannst die lokalen Daten zurücksetzen und neu einrichten; Daten auf dem Server und anderen Geräten bleiben erhalten.';
 
   @override
+  String get startupSessionLostTitle => 'Anmeldung nicht wiederhergestellt';
+
+  @override
+  String get startupSessionLostBody =>
+      'Deine Anmeldung auf diesem Gerät konnte nicht geladen werden. Deine Familiendaten bleiben auf dem Gerät. Tippe auf „Erneut versuchen“ und melde dich gegebenenfalls neu an.';
+
+  @override
   String get startupRetry => 'Erneut versuchen';
 
   @override

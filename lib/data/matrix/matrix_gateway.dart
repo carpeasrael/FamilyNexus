@@ -52,6 +52,16 @@ enum GatewayError {
   unknown,
 }
 
+/// Die Sitzung konnte beim Start nicht wiederhergestellt werden (#134). [sessionLost]: Das SDK kann sie dabei
+/// gelöscht haben; sonst liegt sie noch unversehrt in der Datenbank.
+class SessionRestoreException implements Exception {
+  const SessionRestoreException({required this.sessionLost});
+  final bool sessionLost;
+
+  @override
+  String toString() => 'SessionRestoreException(sessionLost: $sessionLost)';
+}
+
 class GatewayException implements Exception {
   const GatewayException(this.error);
   final GatewayError error;

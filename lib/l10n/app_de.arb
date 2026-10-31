@@ -32,6 +32,8 @@
   "retry": "Erneut versuchen",
   "startupFailedTitle": "Lokale Daten nicht lesbar",
   "startupFailedBody": "Die verschlüsselte Datenbank konnte nicht geöffnet werden, zum Beispiel weil der Schlüssel des Geräts nicht mehr verfügbar ist. Aus Sicherheitsgründen wurde nichts verändert. Du kannst die lokalen Daten zurücksetzen und neu einrichten; Daten auf dem Server und anderen Geräten bleiben erhalten.",
+  "startupSessionLostTitle": "Anmeldung nicht wiederhergestellt",
+  "startupSessionLostBody": "Deine Anmeldung auf diesem Gerät konnte nicht geladen werden. Deine Familiendaten bleiben auf dem Gerät. Tippe auf „Erneut versuchen“ und melde dich gegebenenfalls neu an.",
   "startupRetry": "Erneut versuchen",
   "startupReset": "Lokale Daten zurücksetzen",
   "startupResetConfirmTitle": "Lokale Daten wirklich löschen?",

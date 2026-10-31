@@ -8,6 +8,8 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/encryption.dart';
 import 'package:matrix/matrix.dart';
+// ignore: implementation_imports
+import 'package:matrix/src/utils/client_init_exception.dart' show ClientInitPreconditionError;
 import 'package:path/path.dart' as p;
 import 'package:sqflite_sqlcipher/sqflite.dart' as sql;
 
@@ -246,7 +248,14 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     );
     final opener = _databaseOpener;
     final db = opener != null ? await opener(path, key) : await EncryptedDb.open(path, password: key, version: 1);
-    final database = await MatrixSdkDatabase.init('familynexus', database: db);
+    final MatrixSdkDatabase database;
+    try {
+      database = await MatrixSdkDatabase.init('familynexus', database: db);
+    } catch (_) {
+      // Sonst bliebe die Verbindung für „Erneut versuchen“ offen.
+      await db.close().catchError((Object _) {});
+      rethrow;
+    }
     final client = Client(
       'FamilyNexus',
       database: database,
@@ -277,7 +286,11 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       _retryFailedSends();
       _scheduleRefresh();
     });
-    _loginSub = client.onLoginStateChanged.stream.listen((_) => _scheduleRefresh());
+    _loginSub = client.onLoginStateChanged.stream.listen(
+      (_) => _scheduleRefresh(),
+      // `init` meldet seinen Fehler auch hier; behandelt wird er in `restore`.
+      onError: (Object e) => AppLog.e('gateway', 'Anmeldestatus nicht verfügbar', e),
+    );
     _verificationSub = client.onKeyVerificationRequest.stream.listen(_onIncomingVerification);
     _toDeviceSub = client.onToDeviceEvent.stream.listen(_onToDevice);
     return client;
@@ -317,14 +330,33 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<void> restore() async {
     try {
-      final client = await _ensureClient();
+      final Client client;
+      try {
+        client = await _ensureClient();
+      } on KeyLostException {
+        rethrow;
+      } catch (e) {
+        AppLog.e('gateway', 'Matrix-Datenbank nicht verfügbar', e);
+        throw const SessionRestoreException(sessionLost: false);
+      }
       if (!client.isLogged()) {
-        await client.init(waitForFirstSync: false);
+        try {
+          await client.init(waitForFirstSync: false);
+        } on ClientInitPreconditionError catch (e) {
+          AppLog.e('gateway', 'Sitzung konnte nicht geladen werden', e);
+          throw const SessionRestoreException(sessionLost: false);
+        } catch (e) {
+          // Bei jedem anderen Fehler kann das SDK die Sitzung bereits gelöscht haben (`clear(initFailed)`).
+          AppLog.e('gateway', 'Sitzung konnte nicht geladen werden', e);
+          throw const SessionRestoreException(sessionLost: true);
+        }
       }
       // Lokale Daten einer früheren Sitzung gelten als „bereits abgeglichen“.
       if (client.isLogged() && client.prevBatch != null) _syncedOnce = true;
       await _refresh();
     } on KeyLostException {
+      rethrow;
+    } on SessionRestoreException {
       rethrow;
     } catch (e) {
       AppLog.e('gateway', 'Sitzung konnte nicht wiederhergestellt werden', e);
