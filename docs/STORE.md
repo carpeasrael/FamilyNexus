@@ -47,7 +47,7 @@ tun muss, steht in Abschnitt 1. Rechtliche Angaben sind Hinweise, keine Rechtsbe
 
 ### Datensicherheit (Vorschlag – Verantwortung für die endgültigen Angaben liegt beim Herausgeber)
 
-Der Herausgeber betreibt keinen Server und erhält keine Daten. Die App sendet Daten ausschließlich an den **vom Nutzer gewählten Matrix-Server**; Inhalte sind Ende-zu-Ende-verschlüsselt, Metadaten (Konto-ID, Zeitpunkte, Raumgröße, Geräte) sieht der Serverbetreiber.
+Der Herausgeber betreibt keinen Server und erhält keine Daten. Die App sendet Daten ausschließlich an den **vom Nutzer gewählten Matrix-Server**; Inhalte sind Ende-zu-Ende-verschlüsselt, Metadaten (Konto-ID, Zeitpunkte, Raumgröße, Geräte, Raum- und Profilnamen) sieht der Serverbetreiber.
 
 | Datentyp | Erfasst? | Geteilt? | Hinweis |
 |---|---|---|---|

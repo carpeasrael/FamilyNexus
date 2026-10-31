@@ -71,7 +71,7 @@
     }
   },
   "serverNoPassword": "Bei diesem Anbieter ist keine Anmeldung mit Passwort möglich.",
-  "serverMetadataNote": "Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt. Wer das vermeiden möchte, nutzt einen eigenen Server.",
+  "serverMetadataNote": "Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.",
   "onbTitleAccount": "Anmelden",
   "accountUsername": "Benutzername",
   "accountPassword": "Passwort",
@@ -483,7 +483,7 @@
   "privacy2Title": "Welche Daten gibt es?",
   "privacy2Body": "Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt im sicheren Schlüsselspeicher deines Geräts (Android-Keystore bzw. Apple-Schlüsselbund) und nie in einer Datei.",
   "privacy3Title": "Was sieht der Server?",
-  "privacy3Body": "Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm). Der Server sieht nur verschlüsselte Ereignisse. Metadaten wie Konto-ID, Zeitpunkte, Raumgröße und Geräte bleiben für den Betreiber sichtbar. Wer das vermeiden möchte, nutzt einen eigenen Server.",
+  "privacy3Body": "Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.",
   "privacy4Title": "Private Termine",
   "privacy4Body": "Private Termine werden nie an die Familie gesendet. Zwischen deinen eigenen Geräten werden sie über einen privaten, verschlüsselten Raum abgeglichen, dem nur dein Konto angehört.",
   "privacy5Title": "Erinnerungen und Benachrichtigungen",
@@ -713,7 +713,7 @@
     }
   },
   "privacy10Title": "Online-Status, Einzelchats, Einkaufszettel",
-  "privacy10Body": "Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.",
+  "privacy10Body": "Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).",
   "onbFamilyFound": "Familie „{name}“ gefunden – du bist bereits Mitglied. Die Einrichtung wird abgeschlossen.",
   "@onbFamilyFound": {
     "placeholders": {
@@ -948,7 +948,7 @@
     }
   },
   "privacy12Title": "Aufgabenlisten",
-  "privacy12Body": "Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.",
+  "privacy12Body": "Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).",
   "webUnlockTitleCreate": "Browser-Tresor einrichten",
   "webUnlockBodyCreate": "Dieser Browser speichert deine Daten verschlüsselt. Wähle dafür ein Passwort. Es wird nirgends gespeichert und kann nicht wiederhergestellt werden; wer es vergisst, kann nur alle lokalen Daten löschen und sich neu anmelden.",
   "webUnlockTitle": "FamilyNexus entsperren",
@@ -1586,7 +1586,7 @@
     }
   },
   "reportFamilyMembers": "Mitglieder der Familie",
-  "reportOnlineNote": "Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.",
+  "reportOnlineNote": "Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.",
   "eventTypeMessage": "Nachrichten",
   "eventTypeReaction": "Reaktionen",
   "eventTypeSharedEvent": "Termine (geteilt)",

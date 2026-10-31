@@ -120,7 +120,7 @@ Security takes precedence over convenience: encryption cannot be turned off, and
 
 ### End-to-End Encryption
 
-- Matrix E2EE with Olm (1:1) and Megolm (rooms) for chat **and** appointments; the server sees only encrypted events.
+- Matrix E2EE with Olm (1:1) and Megolm (rooms) for chat **and** appointments; the server cannot read the content of events, but it sees metadata (including room and profile names).
 - Appointments are transmitted as encrypted room events in the family room.
 - Device verification via cross-signing; unverified devices receive no keys.
 - When a member is removed, the room keys are rotated so that departed persons cannot read new content.
@@ -130,7 +130,7 @@ Security takes precedence over convenience: encryption cannot be turned off, and
 
 | Risk | Countermeasure | Residual risk |
 | --- | --- | --- |
-| Eavesdropping on the server | E2EE, server sees only ciphertext | Metadata (who, when, room size, rhythm of status messages) remains visible |
+| Eavesdropping on the server | E2EE, server sees only ciphertext | Metadata (who, when, room size, room and profile names, rhythm of status messages) remains visible |
 | Forged online status | Only encrypted messages received from current family members count; format strictly validated | A member can only misreport their own status |
 | Loss or theft of the device | Database encryption, app lock, remote sign-out of the session | A weak PIN weakens the protection |
 | Foreign device in the family | Verification, moderator can block devices | Users skip verification |

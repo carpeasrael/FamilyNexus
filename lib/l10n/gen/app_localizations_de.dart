@@ -187,7 +187,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get serverMetadataNote =>
-      'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt. Wer das vermeiden möchte, nutzt einen eigenen Server.';
+      'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.';
 
   @override
   String get onbTitleAccount => 'Anmelden';
@@ -1088,7 +1088,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy3Body =>
-      'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm). Der Server sieht nur verschlüsselte Ereignisse. Metadaten wie Konto-ID, Zeitpunkte, Raumgröße und Geräte bleiben für den Betreiber sichtbar. Wer das vermeiden möchte, nutzt einen eigenen Server.';
+      'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.';
 
   @override
   String get privacy4Title => 'Private Termine';
@@ -1369,7 +1369,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy10Body =>
-      'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.';
+      'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).';
 
   @override
   String onbFamilyFound(String name) {
@@ -1658,7 +1658,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy12Body =>
-      'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.';
+      'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).';
 
   @override
   String get webUnlockTitleCreate => 'Browser-Tresor einrichten';
@@ -2701,7 +2701,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reportOnlineNote =>
-      'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.';
+      'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.';
 
   @override
   String get eventTypeMessage => 'Nachrichten';

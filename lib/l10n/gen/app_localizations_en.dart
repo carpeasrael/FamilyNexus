@@ -184,7 +184,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverMetadataNote =>
-      'The server cannot see content, but it does see metadata such as who writes to whom and when. Use your own server to avoid that.';
+      'The server cannot see content, but it does see metadata such as who writes to whom and when, as well as room and profile names (for example the family name). Your own server decides who sees them – it does not remove them.';
 
   @override
   String get onbTitleAccount => 'Sign in';
@@ -1079,7 +1079,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy3Body =>
-      'Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm). The server only sees encrypted events. Metadata such as account ID, timestamps, room size and devices remains visible to the operator. Use your own server to avoid that.';
+      'Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships and room and profile names (for example the family name). With your own server you decide who sees this information.';
 
   @override
   String get privacy4Title => 'Private events';
@@ -1358,7 +1358,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy10Body =>
-      'The online status (\"online\" or \"offline\" with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. The server only sees metadata such as timing and size.';
+      'The online status (\"online\" or \"offline\" with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. The server only sees the metadata it always sees (see “What does the server see?”).';
 
   @override
   String onbFamilyFound(String name) {
@@ -1646,7 +1646,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy12Body =>
-      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. The server only sees metadata such as times and size.';
+      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. The server only sees the metadata it always sees (see “What does the server see?”).';
 
   @override
   String get webUnlockTitleCreate => 'Set up the browser vault';
@@ -2680,7 +2680,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportOnlineNote =>
-      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, time and size of events and the types of account data. Event counts are based on this device\'s sync; the provider may hold older events as well.';
+      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), time and size of events and the types of account data. Event counts are based on this device\'s sync; the provider may hold older events as well.';
 
   @override
   String get eventTypeMessage => 'Messages';
