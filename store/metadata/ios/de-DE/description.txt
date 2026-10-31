@@ -26,6 +26,6 @@ SICHERHEIT UND DATENSCHUTZ
 
 FAMILIE
 • Moderatoren laden ein (Link oder QR-Code), bestätigen Beitritte und verwalten Rollen
-• Neue Geräte werden per Emoji-Vergleich oder Wiederherstellungsschlüssel verifiziert
+• Neue Geräte werden per Emoji-Vergleich oder Notfall-Schlüssel verifiziert
 
 Ein Konto legst du bei der Einrichtung direkt an – bei matrix.org, einem anderen Anbieter oder deinem eigenen Server. Ein bestehendes Matrix-Konto funktioniert ebenso.

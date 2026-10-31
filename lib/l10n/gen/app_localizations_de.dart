@@ -2640,7 +2640,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reportKeyBackup =>
-      'Schlüssel-Backup (mit deinem Wiederherstellungsschlüssel verschlüsselt)';
+      'Schlüssel-Backup (mit deinem Notfall-Schlüssel verschlüsselt)';
 
   @override
   String get reportSetUp => 'eingerichtet';

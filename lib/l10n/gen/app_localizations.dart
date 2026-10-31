@@ -4463,7 +4463,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportKeyBackup.
   ///
   /// In de, this message translates to:
-  /// **'Schlüssel-Backup (mit deinem Wiederherstellungsschlüssel verschlüsselt)'**
+  /// **'Schlüssel-Backup (mit deinem Notfall-Schlüssel verschlüsselt)'**
   String get reportKeyBackup;
 
   /// No description provided for @reportSetUp.

@@ -549,6 +549,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Frage:** Wie bleibt die Pflicht-Schlüsselsicherung (SA-1) verständlich, ohne an Sicherheit zu verlieren?
 - **Gewählt:** Bleibt Pflicht, heißt jetzt **„Notfall-Schlüssel“** („wie ein Ersatzschlüssel für die Haustür“), wird in Vierergruppen gezeigt und lässt sich **kopieren** (die Zwischenablage wird nach 60 s geleert, sofern sie dann noch den Schlüssel enthält) oder **als Textdatei speichern** (zum Ausdrucken; mit Konto, Anbieter, Datum und kurzer Anleitung „Ich habe schon ein Konto → Dieses Gerät freischalten“). Der Bildschirmschutz bleibt erzwungen, solange der Schlüssel sichtbar ist (S6). Zweites Gerät: „Dieses Gerät freischalten“ – mit einem anderen Gerät (Bilder vergleichen) oder dem Notfall-Schlüssel. Nach erfolgreicher Absicherung geht die Einrichtung ohne weiteren Tipp zum Familienschritt.
 - **Verworfen:** Schlüssel erst nach der Einrichtung sichern (Datenverlust bei frühem Geräteverlust); weiterhin „nicht kopierbar“ (führt in der Praxis zu Fotos des Bildschirms oder gar keiner Sicherung).
+- **Begriffe (#165):** „Notfall-Schlüssel“ / „emergency key“ gilt auch im Datenprotokoll und in den Store-Beschreibungen; Einzelchats heißen im Englischen durchgängig „direct chat“ („privat“ bleibt der Terminsichtbarkeit vorbehalten). `test/l10n/terminology_test.dart` sichert das ab.
 - **Sicherheitsabweichung SA-8:** siehe unten.
 
 ## Sicherheitsabweichungen
