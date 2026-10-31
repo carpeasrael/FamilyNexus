@@ -1,0 +1,5 @@
+TLS:
+subject=/CN=matrix-synapse-3ues.srv1348446.hstgr.cloud
+issuer=/C=US/O=Let's Encrypt/CN=YR1
+    Protocol  : TLSv1.3
+    Verify return code: 0 (ok)

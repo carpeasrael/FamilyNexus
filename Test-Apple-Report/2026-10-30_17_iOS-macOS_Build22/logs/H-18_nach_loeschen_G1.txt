@@ -1,0 +1,8 @@
+Documents nach F-03/F-04 (G1 iOS):
+81920 familynexus_app.db
+217088 familynexus_matrix.db
+familynexus_app.db alt: 13643af7cd2c jetzt: 106008eb09de
+familynexus_matrix.db alt: f3d48f5f2e1a jetzt: 3daf1deb642a
+Testfamilie 1030c: 0
+Hallo von Nutzer 1: 0
+Nur fuer dich: 0

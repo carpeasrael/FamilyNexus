@@ -1,0 +1,2 @@
+fnt-1030c-n1: {"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
+fnt-1030c-i2: {"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
