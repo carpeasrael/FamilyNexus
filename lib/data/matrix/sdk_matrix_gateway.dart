@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io' show SocketException;
+import 'dart:io' show SocketException, TlsException;
 import 'dart:math' show Random;
 import 'dart:typed_data';
 
@@ -54,13 +54,16 @@ import 'server_probe.dart';
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
-  /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat).
+  /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
+  /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
   SdkMatrixGateway({
     required this._keyStore,
     ServerProbe? probe,
     this._dbDirectory,
     @visibleForTesting this._databaseOpener,
     @visibleForTesting http.Client? httpClient,
+    @visibleForTesting this._joinOpTimeout = roomOpTimeout,
+    @visibleForTesting this._joinPollInterval = rejectionPollInterval,
   })  : _probe = probe ?? ServerProbe(),
         _http = HttpsOnlyClient(httpClient);
 
@@ -261,12 +264,13 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       requestHistoryOnLimitedTimeline: true,
     );
     _client = client;
-    _syncSub = client.onSync.stream.listen((_) {
+    _syncSub = client.onSync.stream.listen((update) {
       if (!_syncedOnce) {
         // „Abgeglichen“ gilt erst, wenn Familie und Sicherheitsstatus aus den ersten Daten berechnet
         // sind; sonst sähe ein bestehendes Mitglied kurz „keine Familie“ und könnte eine zweite gründen.
         _firstRefresh();
       }
+      _onSyncForJoinRequest(update);
       _retryFailedSends();
       _scheduleRefresh();
     });
@@ -716,6 +720,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _dmTimelines.clear();
     final c = _client;
     _client = null;
+    _stopWatchingJoinRequest();
+    _joinRequestGeneration++;
+    _pollAgain = false;
     _timeline = null;
     _privateTimeline = null;
     await c?.dispose();
@@ -975,8 +982,12 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _privateRoomIdCache = null;
     _privateVerified = null;
     _joinRequestCache = null;
+    _joinRequestCacheTs = null;
     _joinRequestCleared = false;
     _joinRejected = false;
+    _joinRequestGeneration++;
+    _pollAgain = false;
+    _joinDiagnostic = _JoinDiagnostic();
     _stopWatchingJoinRequest();
     _knownJoined = null;
     _verification = null;
@@ -1511,12 +1522,15 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return n.isEmpty ? null : n;
   }
 
-  /// Kontodaten-Schlüssel der eigenen wartenden Beitrittsanfrage. Das SDK liefert den
-  /// `knock`-Abschnitt des Syncs nicht aus; deshalb wird die Anfrage hier vermerkt.
+  /// Kontodaten-Schlüssel der eigenen wartenden Beitrittsanfrage. Das SDK führt angeklopfte
+  /// Räume nicht in seinem Zustand; deshalb wird die Anfrage hier vermerkt.
   static const String joinRequestAccountData = 'de.inneso.familynexus.join_request';
   static const Duration joinRequestMaxAge = Duration(days: 7);
 
   String? _joinRequestCache;
+
+  /// Zeitpunkt der Anfrage in [_joinRequestCache], derselbe Wert wie `ts` im Vermerk.
+  int? _joinRequestCacheTs;
 
   /// Lokal als beendet vermerkt, bis die geänderten Kontodaten per Sync eintreffen.
   bool _joinRequestCleared = false;
@@ -1538,22 +1552,53 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   bool get joinRequestPending => _family == null && _joinRequest() != null && !_joinRejected;
 
   /// Abgelehnt = ein anderes Konto hat uns aus dem Raum entfernt, nachdem wir angeklopft haben. Das SDK
-  /// liefert weder den Knock noch den späteren Austritt in seinem Zustand; deshalb fragt ein Zeitgeber
-  /// solange eine Anfrage offen ist den Server gezielt für diesen einen Raum ab ([_pollRejection]).
+  /// führt weder den Knock noch den späteren Austritt in seinem Zustand; deshalb fragt ein Zeitgeber
+  /// solange eine Anfrage offen ist den Server gezielt für diesen einen Raum ab ([_pollRejection]). Ein
+  /// `leave` im normalen Sync löst dieselbe Abfrage sofort aus, entscheidet aber nicht selbst: Es ist
+  /// Verlauf und kann zu einer früheren Anfrage gehören (E-81).
   @override
   bool get joinRequestRejected => _joinRejected && _family == null && _joinRequest() != null;
 
   bool _joinRejected = false;
   Timer? _rejectionTimer;
   static const Duration rejectionPollInterval = Duration(seconds: 10);
+  final Duration _joinOpTimeout;
+  final Duration _joinPollInterval;
+
+  /// Steigt mit jeder neuen oder beendeten Anfrage: Eine laufende Abfrage gehört dann zu einem alten Stand.
+  int _joinRequestGeneration = 0;
+
+  /// Ein `leave` im Sync kam während einer laufenden Abfrage: genau einmal wiederholen.
+  bool _pollAgain = false;
+
+  _JoinDiagnostic _joinDiagnostic = _JoinDiagnostic();
+
+  @override
+  String get joinRequestDiagnostic => _joinDiagnostic.render(timerActive: _rejectionTimer != null, now: DateTime.now());
+
+  /// Nur für Tests: Läuft der Zeitgeber der Ablehnungs-Abfrage?
+  @visibleForTesting
+  bool get rejectionTimerActive => _rejectionTimer != null;
 
   void _watchJoinRequest() {
-    _rejectionTimer ??= Timer.periodic(rejectionPollInterval, (_) => _pollRejection().ignore());
+    _rejectionTimer ??= Timer.periodic(_joinPollInterval, (_) => _pollRejection('timer').ignore());
   }
 
   void _stopWatchingJoinRequest() {
     _rejectionTimer?.cancel();
     _rejectionTimer = null;
+  }
+
+  /// Ein `leave` des angefragten Raums im normalen Sync: sofort abfragen, statt auf den Zeitgeber zu warten.
+  void _onSyncForJoinRequest(SyncUpdate update) {
+    try {
+      final req = _joinRequest();
+      if (req == null || _family != null || _joinRejected) return;
+      if (update.rooms?.leave?.containsKey(req['room_id']) != true) return;
+      _pollRejection('sync').ignore();
+    } catch (e) {
+      AppLog.w('gateway', 'Ablehnung der Beitrittsanfrage: Sync konnte nicht ausgewertet werden');
+    }
   }
 
   /// Abweichung zwischen Geräte- und Serveruhr, die beim Zeitvergleich hingenommen wird (#30).
@@ -1603,7 +1648,12 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   bool _rejectionPollRunning = false;
 
-  Future<void> _pollRejection() async {
+  /// Nur für Tests: eine Abfrage wie vom Zeitgeber.
+  @visibleForTesting
+  Future<void> pollRejectionForTest() => _pollRejection('timer');
+
+  /// [trigger]: `timer`, `sync` oder `start`.
+  Future<void> _pollRejection(String trigger) async {
     final c = _client;
     final req = _joinRequest();
     if (c == null || !c.isLogged() || req == null || _family != null) {
@@ -1612,38 +1662,96 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
     if (_joinRejected) return;
     // Eine hängende Abfrage nicht mit weiteren überholen: Antworten kämen sonst durcheinander an.
-    if (_rejectionPollRunning) return;
+    if (_rejectionPollRunning) {
+      if (trigger == 'sync') _pollAgain = true;
+      return;
+    }
+    // Bei stehendem Sync läge im Vermerk noch die alte Anfrage. Ein neuerer Vermerk (anderes Gerät) gewinnt.
+    final cached = _joinRequestCache;
+    final cachedTs = _joinRequestCacheTs;
+    if (cached != null && cachedTs != null && req['room_id'] != cached && (req['ts']! as int) < cachedTs) {
+      _noteJoinState('staleNote');
+      return;
+    }
     _rejectionPollRunning = true;
     try {
-      await _pollRejectionOnce(c, req);
+      await _pollRejectionOnce(c, req, trigger);
     } finally {
       _rejectionPollRunning = false;
     }
+    if (_pollAgain) {
+      _pollAgain = false;
+      await _pollRejection('sync');
+    }
   }
 
-  Future<void> _pollRejectionOnce(Client c, Map<String, Object?> req) async {
+  void _noteJoinState(String state) {
+    final changed = _joinDiagnostic.state != state;
+    _joinDiagnostic.note(state);
+    if (changed && (state == 'noRoom' || state == 'knock')) {
+      AppLog.w('gateway', 'Ablehnung der Beitrittsanfrage: Zustand $state');
+    }
+  }
+
+  /// Mitgliedschaft für Diagnose und Log: nur die feste Liste, nie der Wert aus dem Ereignis.
+  @visibleForTesting
+  static String membershipLabel(Object? membership) {
+    if (membership == null) return '-';
+    return const <String>{'join', 'knock', 'invite', 'leave', 'ban'}.contains(membership) ? membership as String : 'other';
+  }
+
+  /// Fehlerklasse für die Diagnose: feste `is`-Prüfungen, nie `toString()` oder `runtimeType`, denn
+  /// Release-Builds sind obfuskiert und Fehlertexte können Raum-IDs enthalten. `socket` steht vor
+  /// `client`, weil Verbindungsfehler des http-Pakets beides sind.
+  @visibleForTesting
+  static String failureClass(Object e) {
+    if (e is SocketException) return 'socket';
+    if (e is TlsException) return 'tls';
+    if (e is FormatException) return 'format';
+    if (e is MatrixException) return 'matrix';
+    if (e is http.ClientException) return 'client';
+    return 'other';
+  }
+
+  Future<void> _pollRejectionOnce(Client c, Map<String, Object?> req, String trigger) async {
     final roomId = req['room_id']! as String;
     final me = c.userID!;
+    final generation = _joinRequestGeneration;
+    var phase = 'auth';
+    _joinDiagnostic.polled(trigger, DateTime.now());
     try {
       final base = c.homeserver;
-      if (base == null || base.scheme != 'https') return;
-      await c.ensureNotSoftLoggedOut();
+      if (base == null || base.scheme != 'https') {
+        _noteJoinState('notHttps');
+        return;
+      }
+      await c.ensureNotSoftLoggedOut().timeout(_joinOpTimeout);
       final filter = rejectionPollFilter(roomId, ++_rejectionPolls);
       final uri = base.replace(
         path: '/_matrix/client/v3/sync',
         queryParameters: <String, String>{'filter': filter, 'timeout': '0', 'set_presence': 'offline'},
       );
       final req2 = http.Request('GET', uri)..headers['authorization'] = 'Bearer ${c.accessToken}';
-      final res = await _http.send(req2).timeout(roomOpTimeout);
-      final body = await res.stream.bytesToString();
+      phase = 'headers';
+      final res = await _http.send(req2).timeout(_joinOpTimeout);
+      phase = 'body';
+      // `timeout` am Strom beendet das Abo; am Future hinge der Körper weiter und damit jede spätere Abfrage.
+      final body = await http.ByteStream(res.stream.timeout(_joinOpTimeout)).bytesToString();
+      if (generation != _joinRequestGeneration) return;
       if (res.statusCode != 200) {
         // Nur der Status (keine Raum- oder Personendaten): So lässt sich eine nie eintreffende Ablehnung (#43) zuordnen.
         AppLog.w('gateway', 'Ablehnung der Beitrittsanfrage: Abfrage lieferte HTTP ${res.statusCode}');
+        _noteJoinState('http(${res.statusCode})');
         return;
       }
       final data = json.decode(body);
-      final leave = (((data as Map)['rooms'] as Map?)?['leave'] as Map?)?[roomId] as Map?;
-      if (leave == null) return;
+      final rooms = (data as Map)['rooms'] as Map?;
+      final leave = (rooms?['leave'] as Map?)?[roomId] as Map?;
+      if (leave == null) {
+        bool inSection(String section) => (rooms?[section] as Map?)?.containsKey(roomId) == true;
+        _noteJoinState(inSection('knock') ? 'knock' : (inSection('invite') ? 'invite' : (inSection('join') ? 'join' : 'noRoom')));
+        return;
+      }
       final events = <Object?>[
         ...((leave['state'] as Map?)?['events'] as List? ?? const <Object?>[]),
         ...((leave['timeline'] as Map?)?['events'] as List? ?? const <Object?>[]),
@@ -1655,34 +1763,51 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       }
       if (last == null) {
         AppLog.w('gateway', 'Ablehnung der Beitrittsanfrage: Raum unter „verlassen“, aber ohne eigenes Mitgliedsereignis');
+        _noteJoinState('leaveNoOwnEvent');
         return;
       }
       final rejected = isKnockRejection(last, me: me, requestedAt: req['ts']! as int);
       if (!rejected) {
         final content = last['content'];
         final unsigned = last['unsigned'];
+        final membership = membershipLabel(content is Map ? content['membership'] : null);
+        final previous = membershipLabel(unsigned is Map && unsigned['prev_content'] is Map ? (unsigned['prev_content'] as Map)['membership'] : null);
+        final own = last['sender'] == me;
+        final offset = ((last['origin_server_ts'] as int? ?? 0) - (req['ts']! as int)) ~/ 1000;
         AppLog.w(
           'gateway',
           'Ablehnung der Beitrittsanfrage: Ereignis nicht als Ablehnung gewertet '
-          '(membership=${content is Map ? content['membership'] : '?'}, eigenes=${last['sender'] == me}, '
-          'vorher=${unsigned is Map && unsigned['prev_content'] is Map ? (unsigned['prev_content'] as Map)['membership'] : '-'}, '
-          'Versatz=${((last['origin_server_ts'] as int? ?? 0) - (req['ts']! as int)) ~/ 1000}s)',
+          '(membership=$membership, eigenes=$own, vorher=$previous, Versatz=${offset}s)',
         );
+        _noteJoinState('leaveOther');
+        _joinDiagnostic.leaveOther(membership: membership, previous: previous, own: own, offsetSeconds: offset);
       }
       if (rejected) {
         _joinRejected = true;
+        _noteJoinState('leaveRejected');
+        _joinDiagnostic.detectedAt = DateTime.now();
         _stopWatchingJoinRequest();
         notifyListeners();
       }
+    } on TimeoutException {
+      if (generation != _joinRequestGeneration) return;
+      _joinDiagnostic.timedOut(phase);
+      _noteJoinState('timeout($phase)');
+      AppLog.w('gateway', 'Ablehnung der Beitrittsanfrage: Zeitüberschreitung ($phase)');
     } catch (e) {
+      if (generation != _joinRequestGeneration) return;
+      _noteJoinState('failed(${failureClass(e)})');
       AppLog.w('gateway', 'Ablehnung der Beitrittsanfrage konnte nicht geprüft werden');
     }
   }
 
   Future<void> _clearJoinRequest() async {
     _joinRejected = false;
+    _joinRequestGeneration++;
+    _pollAgain = false;
     _stopWatchingJoinRequest();
     _joinRequestCache = null;
+    _joinRequestCacheTs = null;
     _joinRequestCleared = true;
     final c = _client;
     if (c == null || !c.isLogged() || c.accountData[joinRequestAccountData]?.content.isEmpty != false) return;
@@ -1894,7 +2019,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     try {
       // Das SDK bietet keinen Knock-Aufruf; schmaler Rohaufruf gemäß Matrix-Spezifikation.
       // Kurzlebige Zugangsdaten (OAuth) vorher auffrischen, weil der Rohaufruf das nicht selbst tut.
-      await client.ensureNotSoftLoggedOut();
+      await client.ensureNotSoftLoggedOut().timeout(_joinOpTimeout);
       final base = client.homeserver;
       if (base == null || base.scheme != 'https') throw const GatewayException(GatewayError.serverUnsupported);
       final uri = base.replace(
@@ -1905,22 +2030,28 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         ..headers['authorization'] = 'Bearer ${client.accessToken}'
         ..headers['content-type'] = 'application/json'
         ..body = json.encode(<String, Object?>{'reason': reason});
-      final res = await _http.send(req).timeout(roomOpTimeout);
-      final body = await res.stream.bytesToString();
+      final res = await _http.send(req).timeout(_joinOpTimeout);
       if (res.statusCode != 200) {
+        final body = await http.ByteStream(res.stream.timeout(_joinOpTimeout)).bytesToString();
         final error = knockError(res.statusCode, body);
         // Nur Status und Fehlercode protokollieren (keine Raum- oder Personendaten), damit sich ein
         // „Unbekannter Fehler.“ beim nächsten Mal zuordnen lässt (#25).
         AppLog.w('gateway', 'Beitrittsanfrage abgelehnt: HTTP ${res.statusCode} ${_errcodeOf(body) ?? '-'} → ${error.error.name}');
         throw error;
       }
+      // Die Anfrage gilt; der Körper wird nicht gebraucht. Verwerfen statt warten, damit ein hängender
+      // Strom weder die Anfrage scheitern lässt noch eine zweite auslöst.
+      res.stream.listen(null).cancel().ignore();
+      final ts = DateTime.now().toUtc().millisecondsSinceEpoch;
+      _joinRequestGeneration++;
       _joinRequestCache = roomId;
+      _joinRequestCacheTs = ts;
       _joinRequestCleared = false;
       _joinRejected = false;
       _watchJoinRequest();
       await client.setAccountData(client.userID!, joinRequestAccountData, <String, Object?>{
         'room_id': roomId,
-        'ts': DateTime.now().toUtc().millisecondsSinceEpoch,
+        'ts': ts,
       });
       notifyListeners();
       _scheduleRefresh();
@@ -2384,8 +2515,12 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       _resetDirectChats();
       _presence.clear();
       _presenceRoomId = null;
-      // Offene Anfrage nach einem Neustart: weiter auf eine Ablehnung achten.
-      if (_joinRequest() != null) _watchJoinRequest();
+      // Offene Anfrage nach einem Neustart: weiter auf eine Ablehnung achten, die erste Abfrage sofort.
+      // Nicht aus `_knock` heraus: Dort läge noch der alte Vermerk vor.
+      if (_joinRequest() != null && !_joinRejected && _rejectionTimer == null) {
+        _watchJoinRequest();
+        _pollRejection('start').ignore();
+      }
       notifyListeners();
       return;
     }
@@ -3220,6 +3355,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   void dispose() {
     _debounce?.cancel();
+    _stopWatchingJoinRequest();
+    _joinRequestGeneration++;
+    _pollAgain = false;
     _syncSub?.cancel().ignore();
     _loginSub?.cancel().ignore();
     _timeline?.cancelSubscriptions();
@@ -3234,6 +3372,68 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _client?.dispose().ignore();
     _http.close();
     super.dispose();
+  }
+}
+
+/// Stand der Ablehnungs-Abfrage für „Details“ im Familienschritt (#116), nur im Arbeitsspeicher. Enthält
+/// ausschließlich feste Wörter, Zahlen und Zeiten: keine Raum-IDs, MXIDs oder Fehlertexte. Der Text ist
+/// eine feste technische Ausgabe für Testberichte und wird deshalb nicht übersetzt.
+class _JoinDiagnostic {
+  String state = '-';
+  String? membership;
+  String? previous;
+  bool? own;
+  int? offsetSeconds;
+  String trigger = '-';
+  int polls = 0;
+  final Map<String, int> timeouts = <String, int>{'auth': 0, 'headers': 0, 'body': 0};
+  int maxGapSeconds = 0;
+  DateTime? lastPoll;
+  DateTime? detectedAt;
+
+  void note(String newState) {
+    state = newState;
+    membership = previous = null;
+    own = null;
+    offsetSeconds = null;
+  }
+
+  void leaveOther({required String membership, required String previous, required bool own, required int offsetSeconds}) {
+    this.membership = membership;
+    this.previous = previous;
+    this.own = own;
+    this.offsetSeconds = offsetSeconds;
+  }
+
+  void polled(String by, DateTime now) {
+    trigger = by;
+    polls++;
+    final last = lastPoll;
+    if (last != null && now.difference(last).inSeconds > maxGapSeconds) maxGapSeconds = now.difference(last).inSeconds;
+    lastPoll = now;
+  }
+
+  void timedOut(String phase) => timeouts[phase] = timeouts[phase]! + 1;
+
+  static String _time(DateTime? t) => t == null ? '-' : '${t.toUtc().toIso8601String().substring(0, 19)}Z';
+
+  String render({required bool timerActive, required DateTime now}) {
+    final detected = detectedAt;
+    return <String>[
+      'Zustand: $state',
+      if (membership != null) 'membership: $membership',
+      if (previous != null) 'vorher: $previous',
+      if (own != null) 'eigen: ${own! ? 'ja' : 'nein'}',
+      if (offsetSeconds != null) 'Versatz: ${offsetSeconds}s',
+      'Auslöser: $trigger',
+      'Abfragen: $polls',
+      'Zeitüberschreitungen: auth=${timeouts['auth']} headers=${timeouts['headers']} body=${timeouts['body']}',
+      'Größter Abstand: ${maxGapSeconds}s',
+      'Letzte Abfrage: ${_time(lastPoll)}',
+      'Erkannt: ${detected == null ? '-' : '${_time(detected)} (${detected.millisecondsSinceEpoch})'}',
+      'Timer aktiv: ${timerActive ? 'ja' : 'nein'}',
+      'Angezeigt: ${_time(now)}',
+    ].join('\n');
   }
 }
 

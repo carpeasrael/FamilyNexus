@@ -14,6 +14,9 @@ import 'package:vodozemac/vodozemac.dart' as vod;
 
 import '../support/memory_stores.dart';
 
+/// Datenbankverzeichnis und Schlüsselspeicher eines Geräts.
+typedef E2eDevice = ({String dir, MemoryKeyStore keys});
+
 class E2e {
   static final bool enabled = Platform.environment['FN_E2E'] == '1';
   static const String skipReason = 'Setze FN_E2E=1 und starte tool/synapse/up.sh (siehe tool/e2e.sh)';
@@ -58,22 +61,35 @@ class E2e {
   }
 
   /// [httpClient] statt des Testclients für [server], z. B. für einen anderen Testserver.
-  static Future<SdkMatrixGateway> newGateway({http.Client? httpClient}) async {
-    final dir = await Directory.systemTemp.createTemp('fn_e2e');
+  /// Mit [device] nutzt ein zweites Gateway Datenbank und Schlüssel des ersten: wie ein Neustart der App.
+  static Future<SdkMatrixGateway> newGateway({
+    http.Client? httpClient,
+    E2eDevice? device,
+    Duration joinPollInterval = SdkMatrixGateway.rejectionPollInterval,
+  }) async {
+    final d = device ?? await newDevice();
     return SdkMatrixGateway(
-      keyStore: MemoryKeyStore(),
-      dbDirectory: dir.path,
+      keyStore: d.keys,
+      dbDirectory: d.dir,
       probe: ServerProbe(client: lenientClient()),
       databaseOpener: (path, key) => databaseFactoryFfi.openDatabase(path),
       httpClient: httpClient ?? lenientClient(),
+      joinPollInterval: joinPollInterval,
     );
   }
 
+  static Future<E2eDevice> newDevice() async =>
+      (dir: (await Directory.systemTemp.createTemp('fn_e2e')).path, keys: MemoryKeyStore());
+
   /// Registriert ein Konto und meldet ein neues Gerät an.
-  static Future<({SdkMatrixGateway gateway, String user, String password})> loggedIn(String prefix) async {
+  static Future<({SdkMatrixGateway gateway, String user, String password})> loggedIn(
+    String prefix, {
+    E2eDevice? device,
+    Duration joinPollInterval = SdkMatrixGateway.rejectionPollInterval,
+  }) async {
     await init();
     final acc = await registerUser(prefix);
-    final g = await newGateway();
+    final g = await newGateway(device: device, joinPollInterval: joinPollInterval);
     await g.restore();
     await g.login(server: server, username: acc.user, password: acc.password);
     return (gateway: g, user: acc.user, password: acc.password);

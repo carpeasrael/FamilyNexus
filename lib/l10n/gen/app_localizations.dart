@@ -3434,6 +3434,30 @@ abstract class AppLocalizations {
   /// **'Verstanden'**
   String get joinRejectedOk;
 
+  /// No description provided for @joinDiagnosticDetails.
+  ///
+  /// In de, this message translates to:
+  /// **'Details'**
+  String get joinDiagnosticDetails;
+
+  /// No description provided for @joinDiagnosticTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Technische Angaben'**
+  String get joinDiagnosticTitle;
+
+  /// No description provided for @joinDiagnosticCopy.
+  ///
+  /// In de, this message translates to:
+  /// **'Kopieren'**
+  String get joinDiagnosticCopy;
+
+  /// No description provided for @joinDiagnosticCopied.
+  ///
+  /// In de, this message translates to:
+  /// **'Kopiert'**
+  String get joinDiagnosticCopied;
+
   /// No description provided for @tabFamilyRequests.
   ///
   /// In de, this message translates to:

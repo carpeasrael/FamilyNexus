@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
@@ -345,9 +346,37 @@ class _FamilyStepState extends State<FamilyStep> {
         const SizedBox(height: 8),
         Align(
           alignment: Alignment.centerRight,
-          child: FilledButton(onPressed: _busy ? null : () => _run(g.cancelJoinRequest), child: Text(l.joinRejectedOk)),
+          child: Wrap(spacing: 8, children: <Widget>[
+            _joinDiagnosticButton(l, g),
+            FilledButton(onPressed: _busy ? null : () => _run(g.cancelJoinRequest), child: Text(l.joinRejectedOk)),
+          ]),
         ),
       ];
+
+  /// Technische Details für Testberichte: Das Protokoll aus den Einstellungen ist ohne Familie nicht erreichbar.
+  Widget _joinDiagnosticButton(AppLocalizations l, MatrixGateway g) => TextButton(
+        onPressed: () {
+          final text = g.joinRequestDiagnostic;
+          showDialog<void>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text(l.joinDiagnosticTitle),
+              content: SingleChildScrollView(child: SelectableText(text)),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: text));
+                    if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(l.joinDiagnosticCopied)));
+                  },
+                  child: Text(l.joinDiagnosticCopy),
+                ),
+                TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(l.close)),
+              ],
+            ),
+          );
+        },
+        child: Text(l.joinDiagnosticDetails),
+      );
 
   List<Widget> _waitingView(AppLocalizations l, MatrixGateway g) {
     final who = _waitingFor;
@@ -360,7 +389,10 @@ class _FamilyStepState extends State<FamilyStep> {
       const SizedBox(height: 8),
       Align(
         alignment: Alignment.centerRight,
-        child: OutlinedButton(onPressed: _busy ? null : () => _run(g.cancelJoinRequest), child: Text(l.joinCancel)),
+        child: Wrap(spacing: 8, children: <Widget>[
+          _joinDiagnosticButton(l, g),
+          OutlinedButton(onPressed: _busy ? null : () => _run(g.cancelJoinRequest), child: Text(l.joinCancel)),
+        ]),
       ),
     ];
   }

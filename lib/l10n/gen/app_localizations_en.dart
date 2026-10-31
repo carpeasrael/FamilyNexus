@@ -1982,6 +1982,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get joinRejectedOk => 'Got it';
 
   @override
+  String get joinDiagnosticDetails => 'Details';
+
+  @override
+  String get joinDiagnosticTitle => 'Technical details';
+
+  @override
+  String get joinDiagnosticCopy => 'Copy';
+
+  @override
+  String get joinDiagnosticCopied => 'Copied';
+
+  @override
   String tabFamilyRequests(int count) {
     return 'Family – $count open requests';
   }
