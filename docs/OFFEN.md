@@ -163,7 +163,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 - Passwort vergessen = alle lokalen Daten löschen. Keine Passwortänderung in der App.
 - Der Matrix-Server muss Browseranfragen von `https://carpeasrael.github.io` erlauben (CORS; Synapse tut das standardmäßig) und per `https` erreichbar sein.
 - Das Zip im Release ist für den Betrieb am Stamm einer Adresse gebaut (`<base href="/">`); für einen Unterpfad die Zeile in `index.html` anpassen. Auf GitHub Pages läuft die Fassung für `/FamilyNexus/`.
-- Keine Erinnerungen und keine Benachrichtigungen (kein Hintergrunddienst im Browser). Einladungslinks (`familynexus://`) öffnen nichts automatisch: Link in der App einfügen. Keine Zwei-Spalten-Ansicht für große Fenster.
+- Keine Erinnerungen und keine Benachrichtigungen (kein Hintergrunddienst im Browser), auch nicht bei offener Seite; die Bedienung ist dort ausgeblendet (#145, E-53). Einladungslinks (`familynexus://`) öffnen nichts automatisch: Link in der App einfügen. Keine Zwei-Spalten-Ansicht für große Fenster.
 - Nur ein Tab gleichzeitig (Web Locks). Ältere Browser ohne Web Locks erzwingen das nicht.
 - IndexedDB schreibt verzögert: Schließt man den Tab unmittelbar nach einer Änderung, kann sie fehlen.
 - `'unsafe-eval'` in der Inhaltsrichtlinie (vodozemac-Anbindung); entfällt, sobald die Anbindung ohne `new Function` auskommt.

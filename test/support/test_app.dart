@@ -75,6 +75,8 @@ Future<TestApp> buildTestApp({
   bool lockEnabled = false,
   String? defaultProvider,
   bool matrixOrgDefault = false,
+  // false: wie im Browser (E-53) – AppServices ohne Scheduler, `services.reminders` ist null. `TestApp.scheduler` bleibt befüllt.
+  bool withReminders = true,
 }) async {
   final store = MemoryKeyValueStore();
   if (lang != null) store.data['language'] = lang;
@@ -112,7 +114,7 @@ Future<TestApp> buildTestApp({
     dataInventory: FakeLocalDataInventory(),
     links: links,
     lock: AppLockController(settings: settingsController, auth: auth),
-    scheduler: scheduler,
+    scheduler: withReminders ? scheduler : null,
     mail: mail,
     browser: browser,
     element: element,

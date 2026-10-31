@@ -1103,6 +1103,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Internet (connection to the server), notifications and exact alarms (reminders), boot notification (re-schedule reminders) and device credentials (app lock). No contacts, location, camera or microphone are needed.';
 
   @override
+  String get privacy6BodyWeb =>
+      'Internet (connection to the server). The web version asks for no permission for notifications, reminders or device credentials. No contacts, location, camera or microphone are needed.';
+
+  @override
   String get privacy7Title => 'Backup and deletion';
 
   @override
@@ -1703,7 +1707,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy13Body =>
-      'In the web version your data is stored encrypted in this browser (IndexedDB, SQLite3MultipleCiphers). The key is protected by your browser password, which is stored nowhere. There is no screen protection and no reminders while the page is closed. Do not use the web version on a foreign or shared computer. The page loads nothing from third parties.';
+      'In the web version your data is stored encrypted in this browser (IndexedDB, SQLite3MultipleCiphers). The key is protected by your browser password, which is stored nowhere. There is no screen protection, no reminders and no notifications, even while the page is open. Do not use the web version on a foreign or shared computer. The page loads nothing from third parties.';
 
   @override
   String get startCreateTitle => 'Start a new family';
