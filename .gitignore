@@ -38,6 +38,10 @@ key.properties
 .env
 .env.*
 
+# Claude Code: lokale Arbeitskopien der Agenten
+.claude/worktrees/
+.claude/settings.local.json
+
 # Interner Erzeugungs-Prompt (enthält lokale Pfade)
 Prompt_FamilyNexus.md
 

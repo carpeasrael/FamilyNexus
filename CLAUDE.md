@@ -53,6 +53,10 @@ Erst wenn **beide** `OK` melden: Lösung als Kommentar ins Issue schreiben (Ursa
 - Keine Geheimnisse (Notfall-Schlüssel, Passwörter, Signaturen) in Repository oder Issues.
 - Bestehende Tests nicht abschwächen, um grün zu werden.
 
+## Release-Review vor jedem Build
+
+Vor jedem Build-Release läuft der Skill `release-review`: vier Agenten prüfen den App-Code, der Control-Agent prüft ihre Observations nach, bestätigte werden gh-Issues. Ohne passenden Bericht unter `docs/release-reviews/` bricht `release.yml` ab (E-75). Der Skill selbst ist kein Release: Er setzt keine Tags, ändert keine Build-Nummer und startet keinen Build. Bestätigte Issues folgen dem Standardablauf oben.
+
 ## Lokale Testumgebung
 
 `flutter` liegt unter `/home/carpeasrael/tools/flutter/bin/flutter`. E2E: `tool/e2e.sh` (Docker, Synapse). Der Host hat kein clang, Desktop-Integrationstests laufen daher nicht.

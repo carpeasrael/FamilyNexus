@@ -75,6 +75,7 @@ Einmalig je Plattform (Team-ID: developer.apple.com → Membership):
 1. App-ID `de.inneso.familynexus` registrieren (Developer-Portal → Identifiers) und in App Store Connect je Plattform einen App-Eintrag anlegen (iOS und macOS können unter einem Eintrag mit derselben Bundle-ID laufen).
 2. Team-ID in `ios/ExportOptions.plist` **und** `macos/ExportOptions.plist` eintragen (`HIER_TEAM_ID_EINTRAGEN` ersetzen).
 3. Versionen kommen aus `pubspec.yaml` (`1.2.1+22` → Version 1.2.1, Build 22) und gelten für beide Plattformen; vor jedem Upload die Buildnummer erhöhen.
+4. Vor jedem Build den Release-Review ausführen (`/release-review` in Claude Code) und den Bericht unter `docs/release-reviews/` mergen. Ohne passenden Bericht bricht der Workflow `Release` ab (E-75).
 
 Archiv bauen (die Skripte setzen Obfuskierung und Debug-Symbole, ein reines „Product → Archive“ in Xcode ohne vorherigen Flutter-Build tut das nicht):
 
