@@ -5,6 +5,7 @@ import '../../app/app_services.dart';
 import '../../domain/family.dart';
 import '../../domain/task_period.dart';
 import '../../domain/tasks.dart';
+import '../../domain/time_zones.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
@@ -77,6 +78,15 @@ String _date(BuildContext context, String doneOn) {
   final p = TaskPeriod.parseDate(doneOn);
   if (p == null) return doneOn;
   return DateFormat.yMd(Localizations.localeOf(context).toLanguageTag()).format(DateTime(p.y, p.m, p.d));
+}
+
+/// Uhrzeit der Erledigung in der Zeitzone der Liste – dieselbe Zone, aus der das Datum stammt (E-51, #163).
+/// Ist die Zone unbekannt, bleibt die Gerätezeit.
+String _time(BuildContext context, TaskList list, DateTime at) {
+  final loc = TimeZones.tryGet(list.timeZone);
+  final c = loc == null ? null : TaskPeriod.localClock(loc, at);
+  final tod = c == null ? TimeOfDay.fromDateTime(at.toLocal()) : TimeOfDay(hour: c.hour, minute: c.minute);
+  return MaterialLocalizations.of(context).formatTimeOfDay(tod);
 }
 
 String _nameOf(AppServices s, TasksController c, AppLocalizations l, String id) => memberLabel(l, s.gateway.family, id, me: c.me);
@@ -304,7 +314,7 @@ class TaskDetailScreen extends StatelessWidget {
                           ),
                           if (done[item.id] case final e?) ...<Widget>[
                             Text(
-                              l.tasksDoneOn(_date(context, e.doneOn), material.formatTimeOfDay(TimeOfDay.fromDateTime(e.at.toLocal()))),
+                              l.tasksDoneOn(_date(context, e.doneOn), _time(context, list, e.at)),
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary),
                             ),
                             if (e.comment.isNotEmpty) Text(e.comment, style: Theme.of(context).textTheme.bodySmall),
@@ -328,7 +338,7 @@ class TaskDetailScreen extends StatelessWidget {
                     l.tasksHistoryLine(
                       _nameOf(services, c, l, e.by),
                       _date(context, e.doneOn),
-                      material.formatTimeOfDay(TimeOfDay.fromDateTime(e.at.toLocal())),
+                      _time(context, list, e.at),
                     ),
                     if (e.comment.isNotEmpty) e.comment,
                   ].join('\n')),

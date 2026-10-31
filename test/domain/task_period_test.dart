@@ -6,6 +6,21 @@ void main() {
   setUpAll(TimeZones.ensureInitialized);
   final berlin = TimeZones.tryGet('Europe/Berlin')!;
 
+  test('#163: Uhrzeit in der Zone der Liste, passend zum Datum (localClock)', () {
+    // 02:00 UTC am 23.10. ist in Berlin (MESZ) 04:00 am 23.10.; in New York wäre es 22:00 am 22.10.
+    final t = DateTime.utc(2026, 10, 23, 2);
+    expect(TaskPeriod.localDate(berlin, t), '2026-10-23');
+    expect(TaskPeriod.localClock(berlin, t), (hour: 4, minute: 0));
+    final ny = TimeZones.tryGet('America/New_York')!;
+    expect(TaskPeriod.localDate(ny, t), '2026-10-22');
+    expect(TaskPeriod.localClock(ny, t), (hour: 22, minute: 0));
+    // Zeitumstellung (25.10.2026, 03:00 MESZ → 02:00 MEZ): dieselbe Wanduhr, verschiedene Zeitpunkte.
+    expect(TaskPeriod.localClock(berlin, DateTime.utc(2026, 10, 25, 0, 30)), (hour: 2, minute: 30));
+    expect(TaskPeriod.localClock(berlin, DateTime.utc(2026, 10, 25, 1, 30)), (hour: 2, minute: 30));
+    // Eine Zone mit halber Stunde Versatz.
+    expect(TaskPeriod.localClock(TimeZones.tryGet('Asia/Kolkata')!, DateTime.utc(2026, 10, 23, 0, 0)), (hour: 5, minute: 30));
+  });
+
   test('täglich: lokales Datum, nicht UTC-Datum', () {
     // 22:30 UTC am 21.10. ist in Berlin (UTC+2) bereits der 22.10.
     final t = DateTime.utc(2026, 10, 21, 22, 30);
