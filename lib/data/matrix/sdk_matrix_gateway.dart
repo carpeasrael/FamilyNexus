@@ -23,6 +23,7 @@ import '../../domain/family_code.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/invite_ticket.dart';
 import '../../domain/moderation.dart';
+import '../../domain/password_change.dart';
 import '../../domain/permissions.dart';
 import '../../domain/presence.dart';
 import '../../domain/registration.dart';
@@ -403,7 +404,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   static const String oauthScheme = 'io.github.carpeasrael.familynexus';
   static final Uri oauthMobileRedirect = Uri.parse('$oauthScheme:/oauth');
 
-  static const int minPasswordLength = 8;
+  static const int minPasswordLength = PasswordChange.minLength;
 
   @override
   Future<RegistrationOptions> registrationOptions(ServerUrl server) async {
@@ -750,20 +751,33 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return stored?.tryGet<String>('oidc_client_id') != null;
   }
 
-  /// Löschseite aus den OAuth-Metadaten (`account_management_uri`, MSC4191): mit der Aktion
-  /// „Konto löschen“, falls angeboten, sonst die Kontoseite selbst. `null` ohne gültige https-Adresse.
+  /// Bestätigt der Server mit dem Passwort allein?
+  static bool _offersPassword(List<AuthenticationFlow> flows) =>
+      flows.any((f) => f.stages.length == 1 && f.stages.single == AuthenticationTypes.password);
+
+  /// Kontoseite aus den OAuth-Metadaten (`account_management_uri`, MSC4191). `null` ohne gültige
+  /// https-Adresse.
   @visibleForTesting
-  static Uri? accountDeletionPage(Map<String, Object?> metadata) {
+  static Uri? accountManagementPage(Map<String, Object?> metadata) {
     final raw = metadata['account_management_uri'];
     final page = raw is String ? Uri.tryParse(raw) : null;
     if (page == null || page.scheme != 'https' || page.host.isEmpty || page.userInfo.isNotEmpty) return null;
+    return page;
+  }
+
+  /// Löschseite aus den OAuth-Metadaten: mit der Aktion „Konto löschen“, falls angeboten, sonst die
+  /// Kontoseite selbst. `null` ohne gültige https-Adresse.
+  @visibleForTesting
+  static Uri? accountDeletionPage(Map<String, Object?> metadata) {
+    final page = accountManagementPage(metadata);
+    if (page == null) return null;
     final actions = metadata['account_management_actions_supported'];
     if (actions is! List || !actions.contains(_deactivateAction)) return page;
     return page.replace(queryParameters: <String, String>{...page.queryParameters, 'action': _deactivateAction});
   }
 
   /// Liest die OAuth-Metadaten selbst: Das SDK-Modell bricht bei unbekannten Kontoaktionen ab.
-  Future<Uri?> _accountManagementPage(Client c) async {
+  Future<Uri?> _accountManagementPage(Client c, Uri? Function(Map<String, Object?> metadata) pick) async {
     final base = c.homeserver;
     if (base == null) return null;
     for (final path in const <String>['_matrix/client/v1/auth_metadata', '_matrix/client/unstable/org.matrix.msc2965/auth_metadata']) {
@@ -771,7 +785,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       if (res.statusCode == 404) continue;
       if (res.statusCode != 200) return null;
       final json = jsonDecode(utf8.decode(res.bodyBytes));
-      return json is Map<String, Object?> ? accountDeletionPage(json) : null;
+      return json is Map<String, Object?> ? pick(json) : null;
     }
     return null;
   }
@@ -782,7 +796,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
     try {
       if (!await _signedInViaOAuth(c)) return const AccountDeletionInApp();
-      final page = await _accountManagementPage(c);
+      final page = await _accountManagementPage(c, accountDeletionPage);
       if (page == null) throw const GatewayException(GatewayError.serverUnsupported);
       return AccountDeletionInBrowser(page);
     } on GatewayException {
@@ -806,7 +820,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       } on MatrixException catch (e) {
         final session = e.session;
         if (session == null || e.authenticationFlows == null) rethrow;
-        if (!e.authenticationFlows!.any((f) => f.stages.length == 1 && f.stages.single == AuthenticationTypes.password)) {
+        if (!_offersPassword(e.authenticationFlows!)) {
           throw const GatewayException(GatewayError.serverUnsupported);
         }
         await c.deactivateAccount(
@@ -848,6 +862,87 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return true;
   }
 
+  // ------------------------------------------------- Passwort ändern (#117)
+
+  @override
+  Future<PasswordChange> passwordChange() async {
+    final c = _client;
+    if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
+    try {
+      if (!await _signedInViaOAuth(c)) return const PasswordChangeInApp();
+      final page = await _accountManagementPage(c, accountManagementPage);
+      return page == null ? const PasswordChangeUnavailable() : PasswordChangeInBrowser(page);
+    } catch (e) {
+      AppLog.e('gateway', 'Kontoseite des Anbieters nicht ermittelt', e);
+      throw _map(e);
+    }
+  }
+
+  @override
+  Future<void> changePassword({required String oldPassword, required String newPassword, required bool logoutOtherDevices}) async {
+    try {
+      final c = _client;
+      if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
+      if (await _signedInViaOAuth(c)) throw const GatewayException(GatewayError.notAllowed);
+      if (newPassword.length < minPasswordLength) throw const GatewayException(GatewayError.weakPassword);
+      if (oldPassword.isEmpty || oldPassword.length > 1024 || newPassword.length > PasswordChange.maxLength) {
+        throw const GatewayException(GatewayError.invalidInput);
+      }
+      // Das SDK schickt `oldPassword` schon im ersten Aufruf und wiederholt nur bei genau einem Flow.
+      // Darum erst ohne Passwort fragen. `logoutDevices` immer senden: Ohne nimmt Synapse `true` an.
+      try {
+        await c.changePassword(newPassword, logoutDevices: logoutOtherDevices).timeout(roomOpTimeout);
+      } on MatrixException catch (e) {
+        final session = e.session;
+        final flows = e.authenticationFlows;
+        if (session == null || flows == null || !_offersPassword(flows)) rethrow;
+        await c
+            .changePassword(
+              newPassword,
+              logoutDevices: logoutOtherDevices,
+              auth: AuthenticationPassword(session: session, password: oldPassword, identifier: AuthenticationUserIdentifier(user: c.userID!)),
+            )
+            .timeout(roomOpTimeout);
+      }
+    } on GatewayException {
+      rethrow;
+    } catch (e) {
+      AppLog.e('gateway', 'Passwortänderung fehlgeschlagen', e);
+      if (e is MatrixException) {
+        final mapped = passwordChangeError(e);
+        if (mapped != null) throw mapped;
+      }
+      throw _map(e);
+    }
+  }
+
+  /// Fehler der Passwortänderung; `null` für [_map]. Wertet nur `flows`, `session` und das rohe
+  /// `errcode` aus: Der Getter meldet bei UIA-Antworten ohne `errcode` selbst `M_FORBIDDEN`, und den
+  /// HTTP-Status hat die Ausnahme hier nicht. Die Reihenfolge ist Teil der Zuordnung.
+  @visibleForTesting
+  static GatewayException? passwordChangeError(MatrixException e) {
+    final raw = e.raw['errcode'];
+    final code = raw is String ? raw : null;
+    final flows = e.authenticationFlows;
+    if (flows != null && (!_offersPassword(flows) || e.session == null)) {
+      return const GatewayException(GatewayError.passwordChangeUnavailable);
+    }
+    if (flows != null && (code == 'M_FORBIDDEN' || code == 'M_UNAUTHORIZED')) {
+      return const GatewayException(GatewayError.invalidCredentials);
+    }
+    if (code == 'M_USER_LOCKED' || code == 'M_USER_SUSPENDED' || code == 'M_USER_DEACTIVATED') {
+      return const GatewayException(GatewayError.notAllowed);
+    }
+    if (code == 'M_FORBIDDEN' || code == 'M_UNRECOGNIZED') {
+      return const GatewayException(GatewayError.passwordChangeUnavailable);
+    }
+    if (code == 'M_WEAK_PASSWORD' || (code != null && code.startsWith('M_PASSWORD'))) {
+      return const GatewayException(GatewayError.weakPassword);
+    }
+    if (flows != null && code == null) return const GatewayException(GatewayError.unknown);
+    return null;
+  }
+
   /// Das Konto ist beim Anbieter gelöscht: Sitzung nur noch lokal beenden (der Server kennt sie nicht mehr).
   Future<void> _endDeletedSession(Client c) async {
     cancelRegistration();
@@ -877,8 +972,6 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _signalHistory.clear();
     _roomTickets.clear();
     _usedTickets.clear();
-    _autoTickets.clear();
-    _autoApproving.clear();
     _privateRoomIdCache = null;
     _privateVerified = null;
     _joinRequestCache = null;
@@ -1657,7 +1750,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   @override
-  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, bool autoApprove = true, String? accountServer}) async {
+  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, String? accountServer}) async {
     final f = _requireFamily();
     if (!Permissions.canInvite(f)) throw const GatewayException(GatewayError.notAllowed);
     final via = f.roomId.substring(f.roomId.indexOf(':') + 1);
@@ -1673,7 +1766,6 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         validity: validity,
         nonce: nonce,
         ownHost: _ownHostOf(f.myUserId),
-        familyName: f.name,
         inviterName: f.member(f.myUserId)?.displayName,
         accountServer: accountServer,
       );
@@ -1690,8 +1782,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       throw _map(e);
     }
     _roomTickets[nonce] = invites[nonce]!;
-    if (autoApprove) _autoTickets.add(nonce);
-    await _publishTicket(InviteTicket(nonce: nonce, expires: invites[nonce]!, auto: autoApprove));
+    await _publishTicket(InviteTicket(nonce: nonce, expires: invites[nonce]!));
     return link;
   }
 
@@ -1699,10 +1790,6 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// verbrauchte IDs. Ergänzt die eigenen Kontodaten, damit jeder Moderator Anfragen prüfen kann (E-49).
   final Map<String, int> _roomTickets = <String, int>{};
   final Set<String> _usedTickets = <String>{};
-
-  /// Link-IDs, deren Anfragen ohne Rückfrage bestätigt werden, und laufende Bestätigungen (je Person).
-  final Set<String> _autoTickets = <String>{};
-  final Set<String> _autoApproving = <String>{};
 
   /// Meldet einen Link-Vermerk an die anderen Moderatoren. Scheitert das, bleibt der Link für den
   /// Aussteller selbst gültig; deshalb nur eine Warnung statt eines Fehlers.
@@ -1728,30 +1815,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         _usedTickets.add(t.nonce);
       } else {
         _roomTickets[t.nonce] = t.expires;
-        if (t.auto) _autoTickets.add(t.nonce);
       }
-    }
-  }
-
-  /// Bestätigt Anfragen mit gültigem Einladungslink automatisch, solange dieses Gerät eines Moderators
-  /// online ist. Prüfungen wie bei der manuellen Bestätigung ([approveRequest]); der Link ist einmalig.
-  void _autoApprove(Family f) {
-    if (!Permissions.canInvite(f)) return;
-    // Mehrere offene Anfragen mit derselben Link-ID: Der Link ist weitergegeben worden oder wird gleichzeitig
-    // benutzt. Dann entscheidet ein Moderator, statt dass die erste Anfrage gewinnt (Pen-Test F-01).
-    final pending = <String, int>{};
-    for (final m in f.members) {
-      if (m.status != MemberStatus.requested || m.request != RequestCheck.valid) continue;
-      final nonce = _knockNonces[m.userId];
-      if (nonce != null) pending[nonce] = (pending[nonce] ?? 0) + 1;
-    }
-    for (final m in f.members) {
-      if (m.status != MemberStatus.requested || m.request != RequestCheck.valid) continue;
-      final nonce = _knockNonces[m.userId];
-      if (nonce == null || !_autoTickets.contains(nonce) || pending[nonce] != 1 || !_autoApproving.add(m.userId)) continue;
-      approveRequest(m.userId).catchError((Object e) {
-        AppLog.w('gateway', 'Automatische Bestätigung fehlgeschlagen');
-      }).whenComplete(() => _autoApproving.remove(m.userId)).ignore();
     }
   }
 
@@ -2348,7 +2412,6 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
     _readTickets(room, _timeline!);
     _family = _buildFamily(room, client.userID!);
-    _autoApprove(_family!);
     _messages = ChatMapper.messages(_timeline!);
     if (_presenceRoomId != room.id) {
       // Andere Familie: der Status der alten gilt nicht weiter.

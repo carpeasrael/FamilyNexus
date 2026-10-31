@@ -7,11 +7,13 @@ import 'dart:io';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/server_probe.dart';
+import 'package:family_nexus/domain/password_change.dart';
 import 'package:family_nexus/domain/registration.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:matrix/matrix.dart' show MatrixException;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:vodozemac/vodozemac.dart' as vod;
 
@@ -28,6 +30,10 @@ class _Server {
   _Handler? register;
   _Handler? token;
   _Handler? login;
+
+  /// Antwort auf `POST /account/password`; [passwordBodies] sammelt die Anfragen.
+  _Handler? password;
+  final List<Map<String, Object?>> passwordBodies = <Map<String, Object?>>[];
 
   /// Antwort auf alle übrigen Anfragen nach der Anmeldung (z. B. Fehler bei Folgeschritten).
   _Handler? afterLogin;
@@ -46,6 +52,10 @@ class _Server {
         } else if (path == '/_matrix/client/v3/login' && req.method == 'POST' && login != null) {
           r = login!(req, jsonBody());
           loggedIn = r.$1 == 200;
+        } else if (path == '/_matrix/client/v3/account/password' && password != null) {
+          final b = jsonBody();
+          passwordBodies.add(b);
+          r = password!(req, b);
         } else if (afterLogin != null && loggedIn && !path.startsWith('/_matrix/client/v3/login')) {
           r = afterLogin!(req, const <String, Object?>{});
         } else if (path == '/_matrix/client/v3/login') {
@@ -134,6 +144,152 @@ void main() {
       final g = await _gateway(s);
       await expectLater(g.login(server: _hs, username: 'n2', password: 'falsch123'), _error(GatewayError.invalidCredentials));
       expect(g.session, SessionState.loggedOut);
+    });
+  });
+
+  group('Passwort ändern (SdkMatrixGateway, #117)', () {
+    Future<(_Server, SdkMatrixGateway)> signedIn() async {
+      final s = _Server();
+      s.login = (req, b) => (200, <String, Object?>{'user_id': '@n2:hs.example', 'access_token': 'tok', 'device_id': 'DEV1'});
+      s.afterLogin = (req, b) => (200, <String, Object?>{});
+      final g = await _gateway(s);
+      await g.login(server: _hs, username: 'n2', password: 'geheim123');
+      return (s, g);
+    }
+
+    Future<void> change(SdkMatrixGateway g, {bool logoutOthers = false}) =>
+        g.changePassword(oldPassword: 'geheim123', newPassword: 'neu-und-lang', logoutOtherDevices: logoutOthers);
+
+    final passwordFlow = <List<String>>[<String>['m.login.password']];
+
+    test('TP-PW-20 erster Aufruf ohne altes Passwort, Wiederholung mit Sitzung; logout_devices jedes Mal', () async {
+      final (s, g) = await signedIn();
+      s.password = (req, b) => b['auth'] == null ? (401, _uia(passwordFlow)) : (200, <String, Object?>{});
+      await change(g, logoutOthers: true);
+      expect(s.passwordBodies, hasLength(2));
+      expect(s.passwordBodies[0].containsKey('auth'), isFalse, reason: 'altes Passwort geht nur an die Passwort-Stufe');
+      expect(json.encode(s.passwordBodies[0]).contains('geheim123'), isFalse);
+      expect(s.passwordBodies[0]['logout_devices'], true);
+      expect(s.passwordBodies[1]['logout_devices'], true);
+      expect(s.passwordBodies[1]['new_password'], 'neu-und-lang');
+      final auth = s.passwordBodies[1]['auth']! as Map<String, Object?>;
+      expect(auth['type'], 'm.login.password');
+      expect(auth['session'], 'S1');
+      expect(auth['password'], 'geheim123');
+      expect(auth['identifier'], <String, Object?>{'type': 'm.id.user', 'user': '@n2:hs.example'});
+    });
+
+    test('TP-PW-20b `logout_devices: false` wird ausdrücklich gesendet', () async {
+      final (s, g) = await signedIn();
+      s.password = (req, b) => b['auth'] == null ? (401, _uia(passwordFlow)) : (200, <String, Object?>{});
+      await change(g);
+      expect(s.passwordBodies.map((b) => b['logout_devices']), <Object?>[false, false]);
+    });
+
+    test('TP-PW-20c mehrere Flows: der reine Passwort-Flow reicht', () async {
+      final (s, g) = await signedIn();
+      s.password = (req, b) => b['auth'] == null
+          ? (401, _uia(<List<String>>[<String>['m.login.sso'], <String>['m.login.password']]))
+          : (200, <String, Object?>{});
+      await change(g);
+      expect(s.passwordBodies, hasLength(2));
+    });
+
+    test('TP-PW-21 Prüfungen vor jeder Anfrage', () async {
+      final (s, g) = await signedIn();
+      await expectLater(g.changePassword(oldPassword: 'geheim123', newPassword: 'kurz', logoutOtherDevices: false), _error(GatewayError.weakPassword));
+      await expectLater(g.changePassword(oldPassword: '', newPassword: 'neu-und-lang', logoutOtherDevices: false), _error(GatewayError.invalidInput));
+      await expectLater(g.changePassword(oldPassword: 'a' * 1025, newPassword: 'neu-und-lang', logoutOtherDevices: false), _error(GatewayError.invalidInput));
+      await expectLater(g.changePassword(oldPassword: 'geheim123', newPassword: 'a' * 513, logoutOtherDevices: false), _error(GatewayError.invalidInput));
+      expect(s.passwordBodies, isEmpty);
+      s.password = (req, b) => (200, <String, Object?>{});
+      await g.changePassword(oldPassword: 'geheim123', newPassword: 'a' * 512, logoutOtherDevices: false);
+      expect(s.passwordBodies, hasLength(1));
+    });
+
+    test('TP-PW-21b nicht angemeldet: keine Anfrage', () async {
+      final s = _Server();
+      final g = await _gateway(s);
+      await expectLater(change(g), _error(GatewayError.notAllowed));
+      await expectLater(g.passwordChange(), _error(GatewayError.notAllowed));
+    });
+
+    test('TP-PW-22 klassische Anmeldung: Änderung in der App', () async {
+      final (_, g) = await signedIn();
+      expect(await g.passwordChange(), isA<PasswordChangeInApp>());
+    });
+
+    // Antworten des ersten Aufrufs: (Name, Status, Körper, erwarteter Fehler).
+    final first = <(String, int, Object, GatewayError)>[
+      ('flows: []', 401, _uia(<List<String>>[]), GatewayError.passwordChangeUnavailable),
+      ('nur SSO', 401, _uia(<List<String>>[<String>['m.login.sso']]), GatewayError.passwordChangeUnavailable),
+      ('Passwort + E-Mail', 401, _uia(<List<String>>[<String>['m.login.password', 'm.login.email.identity']]), GatewayError.passwordChangeUnavailable),
+      (
+        'Passwort-Flow ohne Session',
+        401,
+        <String, Object?>{'flows': <Object?>[<String, Object?>{'stages': <String>['m.login.password']}]},
+        GatewayError.passwordChangeUnavailable,
+      ),
+      ('M_FORBIDDEN ohne Flows (abgeschaltet)', 403, <String, Object?>{'errcode': 'M_FORBIDDEN'}, GatewayError.passwordChangeUnavailable),
+      ('M_USER_LOCKED', 401, <String, Object?>{'errcode': 'M_USER_LOCKED'}, GatewayError.notAllowed),
+      ('M_USER_SUSPENDED', 403, <String, Object?>{'errcode': 'M_USER_SUSPENDED'}, GatewayError.notAllowed),
+      ('M_USER_DEACTIVATED', 403, <String, Object?>{'errcode': 'M_USER_DEACTIVATED'}, GatewayError.notAllowed),
+      ('M_UNRECOGNIZED', 404, <String, Object?>{'errcode': 'M_UNRECOGNIZED'}, GatewayError.passwordChangeUnavailable),
+      ('M_LIMIT_EXCEEDED', 429, <String, Object?>{'errcode': 'M_LIMIT_EXCEEDED'}, GatewayError.rateLimited),
+      ('M_WEAK_PASSWORD', 400, <String, Object?>{'errcode': 'M_WEAK_PASSWORD'}, GatewayError.weakPassword),
+      ('M_PASSWORD_NO_DIGIT', 400, <String, Object?>{'errcode': 'M_PASSWORD_NO_DIGIT'}, GatewayError.weakPassword),
+      ('Körper ohne errcode', 500, <String, Object?>{'error': 'kaputt'}, GatewayError.unknown),
+      ('kein JSON', 502, '<html>Bad Gateway</html>', GatewayError.unknown),
+    ];
+    for (final (name, status, body, expected) in first) {
+      test('TP-PW-23 erster Aufruf: $name → ${expected.name}', () async {
+        final (s, g) = await signedIn();
+        s.password = (req, b) => (status, body);
+        await expectLater(change(g), _error(expected));
+        expect(s.passwordBodies, hasLength(1), reason: 'keine Wiederholung, altes Passwort bleibt beim Gerät');
+      });
+    }
+
+    // Antworten auf die Wiederholung mit Passwort.
+    final second = <(String, int, Object, GatewayError)>[
+      ('falsches Passwort (M_FORBIDDEN mit Flows)', 401, _uia(<List<String>>[<String>['m.login.password']], errcode: 'M_FORBIDDEN'), GatewayError.invalidCredentials),
+      ('M_UNAUTHORIZED mit Flows', 401, _uia(<List<String>>[<String>['m.login.password']], errcode: 'M_UNAUTHORIZED'), GatewayError.invalidCredentials),
+      ('Flows ohne errcode', 401, _uia(<List<String>>[<String>['m.login.password']]), GatewayError.unknown),
+      ('abgeschaltet nach richtigem Passwort', 403, <String, Object?>{'errcode': 'M_FORBIDDEN'}, GatewayError.passwordChangeUnavailable),
+      ('M_LIMIT_EXCEEDED', 429, <String, Object?>{'errcode': 'M_LIMIT_EXCEEDED'}, GatewayError.rateLimited),
+    ];
+    for (final (name, status, body, expected) in second) {
+      test('TP-PW-24 Wiederholung: $name → ${expected.name}', () async {
+        final (s, g) = await signedIn();
+        s.password = (req, b) => b['auth'] == null ? (401, _uia(passwordFlow)) : (status, body);
+        await expectLater(change(g), _error(expected));
+        expect(s.passwordBodies, hasLength(2));
+      });
+    }
+
+    test('TP-PW-25 Zuordnung: Nur das rohe errcode zählt, `M_PASSWORD*` nur als Zeichenkette', () {
+      GatewayError? of(Map<String, Object?> raw) => SdkMatrixGateway.passwordChangeError(MatrixException.fromJson(raw))?.error;
+      final flow = <Object?>[<String, Object?>{'stages': <String>['m.login.password']}];
+      expect(of(<String, Object?>{'flows': flow, 'session': 'S1'}), GatewayError.unknown, reason: 'Getter meldete hier M_FORBIDDEN');
+      expect(of(<String, Object?>{'flows': flow, 'session': 'S1', 'errcode': 42}), GatewayError.unknown);
+      expect(of(<String, Object?>{'errcode': 42}), isNull, reason: 'kein String: weiter an _map');
+      expect(of(<String, Object?>{'errcode': <String>['M_PASSWORD_TOO_SHORT']}), isNull);
+      expect(of(<String, Object?>{'errcode': 'M_PASSWORD_TOO_SHORT'}), GatewayError.weakPassword);
+      expect(of(<String, Object?>{'errcode': 'M_LIMIT_EXCEEDED'}), isNull);
+      expect(of(<String, Object?>{'errcode': 'M_FORBIDDEN', 'flows': <Object?>[], 'session': 'S1'}), GatewayError.passwordChangeUnavailable, reason: 'Schritt 1 vor Schritt 2');
+      expect(of(<String, Object?>{'errcode': 'M_USER_LOCKED', 'flows': flow, 'session': 'S1'}), GatewayError.notAllowed, reason: 'gesperrt ist kein falsches Passwort');
+    });
+
+    test('TP-PW-26 Kontoseite: ohne Löschaktion, nur https', () {
+      const meta = <String, Object?>{
+        'account_management_uri': 'https://hs.example/account?x=1',
+        'account_management_actions_supported': <String>['org.matrix.account_deactivate'],
+      };
+      expect(SdkMatrixGateway.accountManagementPage(meta), Uri.parse('https://hs.example/account?x=1'));
+      expect(SdkMatrixGateway.accountDeletionPage(meta)!.queryParameters['action'], 'org.matrix.account_deactivate');
+      expect(SdkMatrixGateway.accountManagementPage(const <String, Object?>{'account_management_uri': 'http://hs.example/account'}), isNull);
+      expect(SdkMatrixGateway.accountManagementPage(const <String, Object?>{'account_management_uri': 'https://u:p@hs.example/'}), isNull);
+      expect(SdkMatrixGateway.accountManagementPage(const <String, Object?>{}), isNull);
     });
   });
 

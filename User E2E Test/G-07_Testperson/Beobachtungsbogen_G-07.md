@@ -15,8 +15,8 @@ Pro Schritt: Ergebnis ✅ ohne Hilfe · ⚠️ mit Zögern/Fehlversuch/Rückfrag
 | 2 | Sprache English → Deutsch (A-02) | Wechsel sofort | | | | G07-02 |
 | 3 | „Neue Familie gründen“ (A-03) | Konto-Erstellung, vorgeschlagener Anbieter matrix.org | | | | G07-03 |
 | 4 | Anbieter einstellen über „Erweitert“ (A-04/A-05) | findet „Anderen Anbieter verwenden“, Adresse, Bestätigung „Dein Konto liegt bei …“ | | | | G07-04 |
-| 5 | Name + Benutzername (A-06/A-08) | Benutzername frei, „Konto erstellen“ nach Passwort aktiv | | | | G07-05 |
-| 6 | Passwort (A-08) | mindestens 8 Zeichen, Augen-Symbol | | | | G07-06 |
+| 5 | Name + Benutzername (A-06/A-08) | Benutzername frei, „Konto erstellen“ erst nach Passwort und Wiederholung aktiv | | | | G07-05 |
+| 6 | Passwort (A-08) | mindestens 8 Zeichen, Wiederholung gleich, Augen-Symbol | | | | G07-06 |
 | 7 | „Konto erstellen“ (A-09) | keine Wartezeit über 30 s (#27), kein Zusatzschritt | | | | G07-07 |
 | 8 | Notfall-Schlüssel sichern (A-10) | Schlüssel bleibt stehen (#10); kopiert oder als Datei gespeichert; erst nach Häkchen „Weiter“ | | | | G07-08 |
 | 9 | Familie gründen (A-11) | „Fertig! … ist eingerichtet.“ | | | | G07-09 |

@@ -883,20 +883,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String familyInviteLinkHint(String validity) {
-    return 'The link is valid for $validity and can be used once. Whoever opens it is admitted automatically as soon as a moderator\'s app is online. Only give it to the person you want to invite.';
+    return 'The link is valid for $validity and can be used once. A moderator confirms the request before the person is admitted; the confirmation must also happen within this time. Only give it to the person you want to invite.';
   }
-
-  @override
-  String familyInviteLinkHintManual(String validity) {
-    return 'The link is valid for $validity and can be used once. A moderator confirms the request before the person is admitted.';
-  }
-
-  @override
-  String get familyInviteManual => 'Confirm requests yourself';
-
-  @override
-  String get familyInviteManualHint =>
-      'Without this setting, the app admits anyone with the link automatically. Changing it creates a new link.';
 
   @override
   String get familyInviteShowQr => 'Show QR code';
@@ -1132,11 +1120,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get familyRequestCheckValid => 'Valid invitation link';
 
   @override
-  String get familyRequestCheckExpired => 'Link expired';
+  String get familyRequestCheckExpired =>
+      'Link expired – reject the request and send a new link';
 
   @override
-  String get familyRequestCheckUnknown =>
-      'Unknown link – not issued by a moderator';
+  String get familyRequestCheckUnknown => 'Unknown or already used link';
 
   @override
   String familyRequestApproveConfirm(String user) {
@@ -1501,8 +1489,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inviteMailSubject => 'Invitation to FamilyNexus';
 
   @override
-  String inviteMailBody(String family, String link, String validity) {
-    return 'Hello,\n\nI am inviting you to our family “$family” on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n$link\n\n3. Create your account.\n4. As soon as a moderator\'s app is online, you are admitted automatically.\n\nThe link is valid for $validity.';
+  String inviteMailBody(String link, String validity) {
+    return 'Hello,\n\nI am inviting you to our family on FamilyNexus – family calendar and chat, private and encrypted.\n\nHow it works (about 2 minutes):\n1. Install the FamilyNexus app.\n2. Tap this link – or open the app, choose “I was invited” and paste the link:\n\n$link\n\n3. Create your account.\n4. A moderator must confirm your request before you are admitted. Please let me know briefly once you have sent it, because moderators are not notified.\n\nThe link is valid for $validity. The confirmation must also happen within this time.';
   }
 
   @override
@@ -1778,6 +1766,82 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordHide => 'Hide password';
+
+  @override
+  String get accountPasswordRepeat => 'Repeat password';
+
+  @override
+  String get regPasswordMismatch => 'The passwords do not match.';
+
+  @override
+  String get regPasswordTooShort => 'The password needs at least 8 characters.';
+
+  @override
+  String get regNameMissing => 'Please enter your name.';
+
+  @override
+  String get regProviderNotReady =>
+      'The provider is not ready yet. Wait a moment or check the address.';
+
+  @override
+  String get passwordChangeTitle => 'Change password';
+
+  @override
+  String get passwordChangeCurrent => 'Current password';
+
+  @override
+  String get passwordChangeNew => 'New password';
+
+  @override
+  String get passwordChangeHint =>
+      'The new password applies to new sign-ins; your emergency key stays the same. In the web version, the password for this browser does not change.';
+
+  @override
+  String get passwordChanging => 'Changing password …';
+
+  @override
+  String get passwordChangeLogoutOthers => 'Sign out other devices';
+
+  @override
+  String get passwordChangeLogoutOthersHint =>
+      'Sign out all other devices if someone might know your password. You must sign in on those devices again and unlock them with this device or the emergency key; changes not yet sent there are lost.';
+
+  @override
+  String get passwordChangeConfirm => 'Change password';
+
+  @override
+  String get passwordChangeCurrentMissing =>
+      'Please enter your current password.';
+
+  @override
+  String get passwordChangeTooLong =>
+      'The new password can have at most 512 characters.';
+
+  @override
+  String get passwordChangeSame =>
+      'The new password must differ from the current one.';
+
+  @override
+  String get passwordChangeWrongCurrent =>
+      'The current password is not correct.';
+
+  @override
+  String get passwordChangeUncertain =>
+      'No response from the server. Try again. If the app then says the current password is not correct, your new password already applies.';
+
+  @override
+  String get passwordChangeUnavailable =>
+      'Your provider does not allow changing the password in the app.';
+
+  @override
+  String get passwordChangeBrowserBody =>
+      'Your password is held by your provider. You change it on their account page in the browser.';
+
+  @override
+  String get passwordChangeBrowserOpen => 'Open account page';
+
+  @override
+  String get passwordChanged => 'Password changed.';
 
   @override
   String get regCreate => 'Create account';
@@ -2103,7 +2167,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String joinCardNote(String inviter) {
-    return 'Details according to the invitation. A moderator\'s app admits you automatically as soon as it is online.';
+    return 'Details according to the invitation. A moderator must confirm your request before you are admitted.';
   }
 
   @override
@@ -2178,7 +2242,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errWeakPassword =>
-      'The password is too weak. Please use a longer one.';
+      'The password is too weak. Please choose a stronger password.';
 
   @override
   String get errRegistrationDisabled =>

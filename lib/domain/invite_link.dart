@@ -1,19 +1,26 @@
+import 'dart:convert';
+
 import 'server.dart';
 import 'text_sanitizer.dart';
 
-/// Einladungslink/QR-Inhalt (E-14, E-56, E-63):
-/// `familynexus://join?v=3&room=<roomId>&via=<server>&srv=<server>&inv=<mxid>&exp=<unix-sekunden>[&f=<familie>][&by=<name>]&n=<id>`
+/// Einladungslink/QR-Inhalt (E-14, E-56, E-63, E-79):
+/// `familynexus://join?v=4&d=<base64url ohne Padding>`, darin als UTF-8 die Felder
+/// `room=<roomId>&via=<server>&srv=<server>&inv=<mxid>&exp=<unix-sekunden>[&by=<name>]&n=<id>`
 /// (die Reihenfolge der Felder ist beim Lesen beliebig; `n` steht beim Erzeugen am Ende)
+///
+/// `d` ist eine Kodierung, keine Verschlüsselung: Sie verhindert beiläufiges Lesen und einfache
+/// Stichwortsuche, wer den Link hat, kann ihn aber in Sekunden dekodieren (E-79).
 ///
 /// Der Link ist nicht vertrauenswürdig: strikte Prüfung aller Felder. Die
 /// Gültigkeitsdauer wird in der App durchgesetzt; die eigentliche Sperre ist
 /// die Bestätigung durch einen Moderator.
 ///
 /// `via` ist der Server des Raums, `srv` der Server, auf dem Neulinge ihr Konto anlegen bzw. sich anmelden
-/// (standardmäßig der Heimserver des Einladenden). Version 2 (ohne `srv`; dann gilt der Server des
-/// Einladenden) und Version 1 (ohne `f`/`by`) werden weiterhin gelesen. Familien- und Einladendenname sind reine
-/// Anzeigehilfen für Neulinge, die vor der Anmeldung noch nichts vom Server abfragen können; sie
-/// werden bereinigt und nur als „laut Einladung“ gezeigt.
+/// (standardmäßig der Heimserver des Einladenden). Weiterhin gelesen werden Version 3 (Felder im Klartext,
+/// zusätzlich `f=<familie>`), Version 2 (ohne `srv`; dann gilt der Server des Einladenden) und Version 1
+/// (ohne `f`/`by`). Familien- und Einladendenname sind reine Anzeigehilfen für Neulinge, die vor der
+/// Anmeldung noch nichts vom Server abfragen können; sie werden bereinigt und nur als „laut Einladung“
+/// gezeigt. Version 4 enthält keinen Familiennamen mehr.
 class InviteLink {
   const InviteLink({
     required this.roomId,
@@ -29,7 +36,7 @@ class InviteLink {
 
   static const String scheme = 'familynexus';
   static const String host = 'join';
-  static const int version = 3;
+  static const int version = 4;
   static const int maxLength = 1024;
   static const int maxNameLength = 40;
   /// Standard und Auswahl beim Einladen (Issue #6): Einladungen werden oft erst am nächsten Tag geöffnet.
@@ -50,7 +57,7 @@ class InviteLink {
   /// bekannter, unverbrauchter ID werden bestätigt (S2).
   final String nonce;
 
-  /// Familienname laut Einladung (bereinigt, nicht vertrauenswürdig), `null` bei Version 1.
+  /// Familienname laut Einladung (bereinigt, nicht vertrauenswürdig), `null` bei Version 1 und 4.
   final String? familyName;
 
   /// Anzeigename des Einladenden laut Einladung (bereinigt, nicht vertrauenswürdig).
@@ -129,7 +136,8 @@ class InviteLink {
   /// entsteht `familynexus://join#…`). Die Angaben sind dieselben (#59).
   static final RegExp _appLinkFragment = RegExp('$scheme://$host/?#', caseSensitive: false);
 
-  /// Erzeugt den Link-Text.
+  /// Erzeugt den Link-Text. Wirft [ArgumentError] bei ungültigen Angaben und wenn der Link auch ohne
+  /// Namen länger als [maxLength] wäre (extrem lange Servernamen).
   static String create({
     required String roomId,
     required String via,
@@ -138,7 +146,6 @@ class InviteLink {
     required String nonce,
     Duration validity = defaultValidity,
     String? ownHost,
-    String? familyName,
     String? inviterName,
     String? accountServer,
   }) {
@@ -151,36 +158,32 @@ class InviteLink {
     if (validity <= Duration.zero || validity > maxValidity) throw ArgumentError('ungültige Gültigkeitsdauer');
     if (!viaMatchesRoom(roomId, via, ownHost: ownHost)) throw ArgumentError('Server passt nicht zum Raum');
     final exp = now.toUtc().add(validity).millisecondsSinceEpoch ~/ 1000;
-    String build(String? f, String? by) => Uri(
-          scheme: scheme,
-          host: host,
-          queryParameters: <String, String>{
-            'v': '$version',
-            'room': roomId,
-            'via': via,
-            'srv': srv,
-            'inv': inviter,
-            'exp': '$exp',
-            'f': ?f,
-            'by': ?by,
-            // Zuletzt: Wird der Link beim Weitergeben abgeschnitten, trifft es die Zufalls-ID fester
-            // Länge, und der Link gilt als beschädigt statt mit gekürztem Namen angenommen zu werden (#26).
-            'n': nonce,
-          },
-        ).toString();
-    var f = _name(familyName);
-    var by = _name(inviterName);
-    // Namen sind nur Anzeigehilfen: lieber kürzen bzw. weglassen, als einen zu langen Link zu erzeugen
-    // (z. B. viele Emoji, die prozentkodiert je 12 Zeichen belegen).
-    var link = build(f, by);
-    while (link.length > maxLength && (f != null || by != null)) {
-      if (by != null) {
-        by = _shorten(by);
-      } else {
-        f = _shorten(f!);
-      }
-      link = build(f, by);
+    String build(String? by) {
+      final inner = Uri(
+        queryParameters: <String, String>{
+          'room': roomId,
+          'via': via,
+          'srv': srv,
+          'inv': inviter,
+          'exp': '$exp',
+          'by': ?by,
+          // Zuletzt: Wird der Link beim Weitergeben abgeschnitten, trifft es die Zufalls-ID fester
+          // Länge, und der Link gilt als beschädigt statt mit gekürztem Namen angenommen zu werden (#26).
+          'n': nonce,
+        },
+      ).query;
+      final payload = base64Url.encode(utf8.encode(inner)).replaceAll('=', '');
+      return '$scheme://$host?v=$version&d=$payload';
     }
+    var by = _name(inviterName);
+    // Der Name ist nur eine Anzeigehilfe: lieber kürzen bzw. weglassen, als einen zu langen Link zu
+    // erzeugen (z. B. viele Emoji, die prozentkodiert je 12 Zeichen belegen).
+    var link = build(by);
+    while (link.length > maxLength && by != null) {
+      by = _shorten(by);
+      link = build(by);
+    }
+    if (link.length > maxLength) throw ArgumentError('Einladungslink zu lang');
     return link;
   }
 
@@ -194,6 +197,11 @@ class InviteLink {
   static const Set<String> _v1Keys = <String>{'v', 'room', 'via', 'inv', 'exp', 'n'};
   static const Set<String> _v2Keys = <String>{..._v1Keys, 'f', 'by'};
   static const Set<String> _v3Keys = <String>{..._v2Keys, 'srv'};
+  static const Set<String> _v4Keys = <String>{'v', 'd'};
+
+  /// Felder in `d`: ohne `f` und ohne `v`, damit das Innere nicht auf Version 1/2 ohne `srv`-Pflicht zurückfällt.
+  static const Set<String> _v4InnerKeys = <String>{'room', 'via', 'srv', 'inv', 'exp', 'by', 'n'};
+  static final RegExp _payloadRe = RegExp(r'^[A-Za-z0-9_-]+$');
 
   /// Liest einen Link. Liefert `null` bei jeder Abweichung (falsches Schema,
   /// fehlende/doppelte/zusätzliche Felder, ungültige Werte). Ob der Link
@@ -221,14 +229,21 @@ class InviteLink {
       return null;
     }
     if (all.values.any((v) => v.length != 1)) return null;
-    final q = <String, String>{for (final e in all.entries) e.key: e.value.single};
-    final allowed = switch (q['v']) {
+    var q = <String, String>{for (final e in all.entries) e.key: e.value.single};
+    final linkVersion = q['v'];
+    final allowed = switch (linkVersion) {
       '1' => _v1Keys,
       '2' => _v2Keys,
       '3' => _v3Keys,
+      '4' => _v4Keys,
       _ => null,
     };
     if (allowed == null || q.keys.toSet().difference(allowed).isNotEmpty) return null;
+    if (linkVersion == '4') {
+      final inner = _decodePayload(q['d']);
+      if (inner == null) return null;
+      q = inner;
+    }
     final room = q['room'];
     final via = q['via'];
     final inv = q['inv'];
@@ -236,10 +251,10 @@ class InviteLink {
     final nonce = q['n'];
     if (room == null || via == null || inv == null || exp == null || nonce == null) return null;
     if (!isNonce(nonce)) return null;
-    // Version 3 nennt den Server für Konto und Anmeldung ausdrücklich (E-63); er muss gültig sein und darf
-    // nur über [check] oder als eigener Server im Heimnetz liegen.
+    // Ab Version 3 steht der Server für Konto und Anmeldung ausdrücklich im Link (E-63); er muss gültig sein
+    // und darf nur über [check] oder als eigener Server im Heimnetz liegen.
     final srv = q['srv'];
-    if (q['v'] == '3') {
+    if (linkVersion == '3' || linkVersion == '4') {
       if (srv == null || !_viaRe.hasMatch(srv)) return null;
       if (isLocalServer(srv) && srv != ownHost && !allowLocal) return null;
     }
@@ -267,6 +282,24 @@ class InviteLink {
       onLocalServer: local,
       accountServer: srv,
     );
+  }
+
+  /// Felder aus `d` (Version 4) oder `null` bei jeder Abweichung: streng dekodiert, nur [_v4InnerKeys],
+  /// keine doppelten. Gelesen über `Uri(query:)`, damit ein `#` im Inneren nichts abschneidet.
+  static Map<String, String>? _decodePayload(String? d) {
+    if (d == null || !_payloadRe.hasMatch(d) || d.length % 4 == 1) return null;
+    final Map<String, List<String>> all;
+    try {
+      final inner = utf8.decode(base64Url.decode(base64Url.normalize(d)));
+      all = Uri(query: inner).queryParametersAll;
+    } on FormatException {
+      return null;
+    } on ArgumentError {
+      return null;
+    }
+    if (all.values.any((v) => v.length != 1)) return null;
+    if (all.keys.toSet().difference(_v4InnerKeys).isNotEmpty) return null;
+    return <String, String>{for (final e in all.entries) e.key: e.value.single};
   }
 
   bool isValidAt(DateTime now) => now.toUtc().isBefore(expires);
@@ -309,6 +342,10 @@ class InviteLink {
   static final RegExp _start = RegExp('$scheme://$host', caseSensitive: false);
   static final RegExp _qpHex = RegExp('=([0-9A-F]{2})');
   static final RegExp _trailing = RegExp('[>"\'\u201C\u201D\u201E\u00AB\u00BB)\\].,;:!?]+\$');
+  static final RegExp _v4Start = RegExp('^$scheme://$host\\?v=4&d=', caseSensitive: false);
+
+  /// Höchstens so viele Stücke werden an einen umbrochenen Payload angehängt.
+  static const int _maxPayloadPieces = 32;
 
   /// Längste Eingabe, die durchsucht wird (weitergeleitete Mails mit Zitat und Signatur passen hinein).
   static const int maxInput = 65536;
@@ -321,7 +358,9 @@ class InviteLink {
 
   /// Mögliche Links in einem Text (Mail, Messenger, Notiz), in der Reihenfolge, in der sie versucht werden.
   /// Repariert, was beim Weitergeben typischerweise passiert: HTML-`&amp;`, Zeilenumbrüche mitten im Link,
-  /// Klammern, Anführungszeichen und Satzzeichen am Ende. Quoted-Printable (`=3D`, `=` am Zeilenende)
+  /// Klammern, Anführungszeichen und Satzzeichen am Ende. Ein umbrochener Payload (Version 4) hat keine
+  /// Trennzeichen; dort werden die folgenden Stücke schrittweise als weitere Kandidaten versucht. Fremdtext
+  /// macht den Link dabei ungültig, weil `n` am Ende feste Länge hat. Quoted-Printable (`=3D`, `=` am Zeilenende)
   /// wird **nur zusätzlich** versucht – ein unveränderter Link geht immer vor, damit Namen wie „3D-Club“
   /// nie verfälscht werden (Review R1). Ein Satzzeichen am Ende eines Namens kann dabei wegfallen.
   static List<String> _candidates(String input) {
@@ -343,7 +382,9 @@ class InviteLink {
         final parts = t.substring(m.start, end).split(RegExp(r'\s+'));
         final buf = StringBuffer(parts.first);
         // Ein Umbruch mitten im Link: weiter, solange das Stück davor mit `=`/`&` endet oder das nächste mit `&` beginnt.
-        for (final p in parts.skip(1)) {
+        var next = 1;
+        for (; next < parts.length; next++) {
+          final p = parts[next];
           final prev = buf.toString();
           if (p.isEmpty || !(prev.endsWith('=') || prev.endsWith('&') || p.startsWith('&'))) break;
           buf.write(p);
@@ -352,6 +393,17 @@ class InviteLink {
         if (raw.length > maxLength * 2) continue;
         for (final c in <String>[raw.replaceFirst(_trailing, ''), raw]) {
           if (c.isNotEmpty && c.length <= maxLength && !out.contains(c)) out.add(c);
+        }
+        if (!_v4Start.hasMatch(raw) || _trailing.hasMatch(raw)) continue;
+        var joined = raw;
+        for (final p in parts.skip(next).take(_maxPayloadPieces)) {
+          final piece = p.replaceFirst(_trailing, '');
+          if (!_payloadRe.hasMatch(piece)) break;
+          joined += piece;
+          if (joined.length > maxLength) break;
+          if (!out.contains(joined)) out.add(joined);
+          // Ein Schlusszeichen beendet den Link.
+          if (piece.length != p.length) break;
         }
       }
     }

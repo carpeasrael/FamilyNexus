@@ -48,7 +48,7 @@ Deleted usernames remain taken on this server. If a name is unavailable, use a n
 1. On G1, choose **Start a new family**.
 2. Open **Advanced → Use another provider** and set the test provider address. Wait for the provider confirmation.
 3. Enter `Test N1` under **What is your name?** and your chosen `fnt-MMDD-n1` under **Your username**. Wait for **This username is available.**
-4. Enter your test password and select **Create account**. The expected next screen is **Your emergency key**.
+4. Enter your test password, enter it again under **Repeat password** and select **Create account**. The expected next screen is **Your emergency key**.
 5. Select **Create emergency key**. Save the key together with N1's username and provider in your password manager, or use **Save as file** and keep the file securely. A saved key file is unencrypted; copying a key clears the clipboard after one minute.
 6. Check **I have stored the emergency key safely.** and select **Next**. A password alone does not restore encrypted history on a new device.
 7. Enter `Test family MMDD` as the family name and select **Create family**. Choose **Later** if you want to prepare sample data before inviting someone.
@@ -66,7 +66,7 @@ Use N1 on both devices for the recovery checks in section C of the full plan. Af
 
 For section D of the full plan, use G2 and select **No account yet? Create one**. Select the test provider, enter `Test N2`, and deliberately enter N1's existing username. The app should report that it is taken and suggest an alternative, normally `fnt-MMDD-n12` when that name is free.
 
-Accept the available suggestion, record the actual username, choose a separate password and complete account creation. Save N2's emergency key as **KN2**. Follow section D to test joining by family code, rejection and creating N2's separate deletion-test family. Sign out afterwards so G2 is ready for the invitation test. Keep N2's account until the cleanup section.
+Accept the available suggestion, record the actual username, choose a separate password, repeat it and complete account creation. Save N2's emergency key as **KN2**. Follow section D to test joining by family code, rejection and creating N2's separate deletion-test family. Sign out afterwards so G2 is ready for the invitation test. Keep N2's account until the cleanup section.
 
 ## Create an invited test user
 
@@ -74,8 +74,8 @@ Accept the available suggestion, record the actual username, choose a separate p
 2. In the invitation dialog, open **Advanced**. Set **Account server for newcomers** to `matrix-synapse-3ues.srv1348446.hstgr.cloud`, then select **Create new link**. This is essential because the server's account-ID domain differs from its connection address.
 3. Use **Copy link** and transfer it privately to G2. Links expire and are valid for one use. Keep G1 open and online.
 4. On G2, open the link, or select **I was invited** and paste it. If a web page opens, select **Open app**. Check that the registration provider is the test server.
-5. Create I2 with display name `Test User 2`, username `fnt-MMDD-i2` and a separate password. Create and securely store its emergency key as **KI2**, check the confirmation and continue.
-6. Check the family and inviter on the join card, then select **Request to join**. With automatic admission enabled, G1 admits the request while online. If **Confirm requests yourself** is enabled, approve the request on G1. Record the waiting time and any unexpected manual confirmation.
+5. Create I2 with display name `Test User 2`, username `fnt-MMDD-i2` and a separate password (entered twice). Create and securely store its emergency key as **KI2**, check the confirmation and continue.
+6. Check the family and inviter on the join card, then select **Request to join**. G2 keeps waiting while G1 is online until a moderator decides: nothing may happen by itself. On G1, open **Family**, select **Approve** on the request and confirm the question. Record the waiting time, and report any admission without this confirmation.
 7. Confirm that G2 opens the same family as G1. N1 is the moderator and I2 is an ordinary member.
 
 ## What to check together

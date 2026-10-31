@@ -57,14 +57,15 @@ class E2e {
     return (user: user, password: password);
   }
 
-  static Future<SdkMatrixGateway> newGateway() async {
+  /// [httpClient] statt des Testclients für [server], z. B. für einen anderen Testserver.
+  static Future<SdkMatrixGateway> newGateway({http.Client? httpClient}) async {
     final dir = await Directory.systemTemp.createTemp('fn_e2e');
     return SdkMatrixGateway(
       keyStore: MemoryKeyStore(),
       dbDirectory: dir.path,
       probe: ServerProbe(client: lenientClient()),
       databaseOpener: (path, key) => databaseFactoryFfi.openDatabase(path),
-      httpClient: lenientClient(),
+      httpClient: httpClient ?? lenientClient(),
     );
   }
 

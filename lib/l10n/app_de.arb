@@ -403,10 +403,7 @@
   "familyManage": "Verwaltung",
   "familyInvite": "Mitglied einladen",
   "familyInviteLinkTitle": "Jemanden einladen",
-  "familyInviteLinkHint": "Der Link ist {validity} gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist. Gib ihn nur der Person, die du einladen willst.",
-  "familyInviteLinkHintManual": "Der Link ist {validity} gültig und nur einmal verwendbar. Ein Moderator bestätigt die Anfrage, bevor die Person aufgenommen wird.",
-  "familyInviteManual": "Anfragen selbst bestätigen",
-  "familyInviteManualHint": "Ohne diese Einstellung nimmt die App jede Person mit dem Link automatisch auf. Ändern erzeugt einen neuen Link.",
+  "familyInviteLinkHint": "Der Link ist {validity} gültig und nur einmal verwendbar. Ein Moderator bestätigt die Anfrage, bevor die Person aufgenommen wird; auch die Bestätigung muss in diese Zeit fallen. Gib ihn nur der Person, die du einladen willst.",
   "familyInviteShowQr": "QR-Code anzeigen",
   "familyInviteCopyLink": "Link kopieren",
   "familyInviteCopied": "Link kopiert.",
@@ -498,8 +495,8 @@
   "privacy9Title": "Deine Rechte",
   "privacy9Body": "Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App, dein Konto löschst du unter Einstellungen → Konto → „Konto löschen“; weitere Serverdaten beim Betreiber deines Servers.",
   "familyRequestCheckValid": "Gültiger Einladungslink",
-  "familyRequestCheckExpired": "Link abgelaufen",
-  "familyRequestCheckUnknown": "Unbekannter Link – von keinem Moderator ausgegeben",
+  "familyRequestCheckExpired": "Link abgelaufen – lehne die Anfrage ab und schicke einen neuen Link",
+  "familyRequestCheckUnknown": "Unbekannter oder bereits verwendeter Link",
   "familyRequestApproveConfirm": "{user} in die Familie aufnehmen? Der Einladungslink wird dabei verbraucht.",
   "@familyRequestApproveConfirm": {
     "placeholders": {
@@ -810,12 +807,9 @@
   "privacy11Body": "Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen Text. Den verschlüsselten Inhalt kann er nicht lesen.",
   "familyInviteMail": "Per E-Mail senden",
   "inviteMailSubject": "Einladung zu FamilyNexus",
-  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie „{family}“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Sobald die App eines Moderators online ist, wirst du automatisch aufgenommen.\n\nDer Link ist {validity} gültig.",
+  "inviteMailBody": "Hallo,\n\nich lade dich in unsere Familie bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n{link}\n\n3. Lege dein Konto an.\n4. Ein Moderator muss deine Anfrage bestätigen, bevor du aufgenommen wirst. Sag mir bitte kurz Bescheid, sobald du sie gestellt hast, denn Moderatoren werden nicht benachrichtigt.\n\nDer Link ist {validity} gültig. Auch die Bestätigung muss in diese Zeit fallen.",
   "@inviteMailBody": {
     "placeholders": {
-      "family": {
-        "type": "String"
-      },
       "link": {
         "type": "String"
       },
@@ -1005,6 +999,28 @@
   "regPasswordHint": "Mindestens 8 Zeichen. Mit Benutzername und Passwort meldest du dich später auch auf einem neuen Gerät an.",
   "passwordShow": "Passwort anzeigen",
   "passwordHide": "Passwort verbergen",
+  "accountPasswordRepeat": "Passwort wiederholen",
+  "regPasswordMismatch": "Die Passwörter stimmen nicht überein.",
+  "regPasswordTooShort": "Das Passwort braucht mindestens 8 Zeichen.",
+  "regNameMissing": "Bitte gib deinen Namen ein.",
+  "regProviderNotReady": "Der Anbieter ist noch nicht bereit. Warte einen Moment oder prüfe die Adresse.",
+  "passwordChangeTitle": "Passwort ändern",
+  "passwordChangeCurrent": "Aktuelles Passwort",
+  "passwordChangeNew": "Neues Passwort",
+  "passwordChangeHint": "Das neue Passwort gilt für neue Anmeldungen, dein Notfall-Schlüssel bleibt gleich. In der Web-Version bleibt das Passwort für diesen Browser unverändert.",
+  "passwordChanging": "Ändere Passwort …",
+  "passwordChangeLogoutOthers": "Andere Geräte abmelden",
+  "passwordChangeLogoutOthersHint": "Melde alle anderen Geräte ab, wenn jemand dein Passwort kennen könnte. Diese Geräte musst du neu anmelden und mit diesem Gerät oder dem Notfall-Schlüssel freischalten; dort noch nicht gesendete Änderungen gehen verloren.",
+  "passwordChangeConfirm": "Passwort ändern",
+  "passwordChangeCurrentMissing": "Bitte gib dein aktuelles Passwort ein.",
+  "passwordChangeTooLong": "Das neue Passwort darf höchstens 512 Zeichen haben.",
+  "passwordChangeSame": "Das neue Passwort muss sich vom aktuellen unterscheiden.",
+  "passwordChangeWrongCurrent": "Das aktuelle Passwort stimmt nicht.",
+  "passwordChangeUncertain": "Keine Antwort vom Server. Wiederhole den Versuch. Meldet die App dann, das aktuelle Passwort stimme nicht, gilt dein neues Passwort bereits.",
+  "passwordChangeUnavailable": "Dein Anbieter erlaubt keine Änderung des Passworts in der App.",
+  "passwordChangeBrowserBody": "Dein Passwort liegt bei deinem Anbieter. Du änderst es auf seiner Kontoseite im Browser.",
+  "passwordChangeBrowserOpen": "Kontoseite öffnen",
+  "passwordChanged": "Passwort geändert.",
   "regCreate": "Konto erstellen",
   "regCreating": "Erstelle Konto …",
   "regExtraTitle": "Noch ein kurzer Schritt",
@@ -1231,7 +1247,7 @@
       }
     }
   },
-  "joinCardNote": "Angaben laut Einladung. Die App eines Moderators nimmt dich automatisch auf, sobald sie online ist.",
+  "joinCardNote": "Angaben laut Einladung. Ein Moderator muss deine Anfrage bestätigen, bevor du aufgenommen wirst.",
   "@joinCardNote": {
     "placeholders": {
       "inviter": {
@@ -1280,7 +1296,7 @@
   },
   "errUsernameTaken": "Dieser Benutzername ist schon vergeben.",
   "errUsernameInvalid": "Dieser Benutzername ist nicht erlaubt. Bitte wähle einen anderen.",
-  "errWeakPassword": "Das Passwort ist zu schwach. Bitte nimm ein längeres Passwort.",
+  "errWeakPassword": "Das Passwort ist zu schwach. Bitte nimm ein sichereres Passwort.",
   "errRegistrationDisabled": "Bei diesem Anbieter kann die App kein Konto anlegen. Erstelle es auf seiner Webseite.",
   "errEmailInUse": "Diese E-Mail-Adresse wird schon für ein anderes Konto verwendet.",
   "errOAuthCancelled": "Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal.",
@@ -1417,13 +1433,6 @@
   },
   "familyInviteValidityLabel": "Gültig für",
   "@familyInviteLinkHint": {
-    "placeholders": {
-      "validity": {
-        "type": "String"
-      }
-    }
-  },
-  "@familyInviteLinkHintManual": {
     "placeholders": {
       "validity": {
         "type": "String"

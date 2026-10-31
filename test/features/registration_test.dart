@@ -4,6 +4,7 @@ import 'package:family_nexus/domain/registration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/registration_form.dart';
 import '../support/test_app.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
@@ -30,8 +31,7 @@ Future<void> _fillAndSubmit(WidgetTester tester, {String name = 'Emil', String p
   await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), name);
   await tester.pump(const Duration(milliseconds: 700));
   await tester.pumpAndSettle();
-  await tester.enterText(find.widgetWithText(TextField, 'Passwort'), password);
-  await tester.pumpAndSettle();
+  await enterNewPassword(tester, password);
   await _tap(tester, 'Konto erstellen');
 }
 
@@ -223,8 +223,7 @@ void main() {
     await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), 'Fritz');
     await tester.pump(const Duration(milliseconds: 700));
     await tester.pumpAndSettle();
-    await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'sicher-genug');
-    await tester.pumpAndSettle();
+    await enterNewPassword(tester, 'sicher-genug');
     app.server.addAccount('fritz', 'anderes'); // jemand war schneller
     await _tap(tester, 'Konto erstellen');
     expect(find.text('Dieser Benutzername ist schon vergeben.'), findsWidgets);

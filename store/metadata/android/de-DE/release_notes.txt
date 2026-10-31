@@ -1,8 +1,8 @@
 Neu in 1.2.1:
-• macOS: Die Anmeldung über die Webseite des Anbieters (z. B. matrix.org) funktioniert wieder.
+• Jeden Beitritt bestätigt jetzt ein Moderator.
+• Einladelinks ohne lesbare Namen; alte Apps lesen sie nicht. Moderatoren bitte aktualisieren.
 • matrix.org bleibt Standard-Anbieter, auch nach Anmeldung oder Einladung bei einem anderen Server.
-• Windows: Einladungslinks öffnen die App.
 • Über die App: Speicherorte und Protokolle aller lokal und online gespeicherten Daten.
 • Konto löschen in den Einstellungen.
 • Neuer Notfall-Schlüssel; beim neuen Konto sicher angezeigt.
-• Nach dem Löschen startet die App mit der Startseite.
+• Passwort ändern; neue Konten mit Kontrolleingabe.

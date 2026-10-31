@@ -19,6 +19,7 @@ import '../security/security_panel.dart' show RecoveryKeyRenewScreen;
 import 'account_deletion_dialog.dart';
 import 'data_report.dart';
 import 'data_report_screen.dart';
+import 'password_change_dialog.dart';
 import 'privacy_screen.dart';
 import '../reminders/permission_hint.dart';
 
@@ -268,6 +269,11 @@ class _AccountSection extends StatelessWidget {
       builder: (context, _) => _Section(title: l.settingsAccount, children: <Widget>[
         ListTile(title: Text(l.settingsServer), subtitle: Text(gateway.server?.host ?? '–')),
         ListTile(title: Text(l.accountUsername), subtitle: Text(gateway.userId ?? '–')),
+        ListTile(
+          leading: const Icon(Icons.password),
+          title: Text(l.passwordChangeTitle),
+          onTap: () => changePassword(context),
+        ),
         ListTile(
           leading: const Icon(Icons.logout),
           title: Text(l.logout),

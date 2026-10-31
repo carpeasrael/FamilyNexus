@@ -84,15 +84,15 @@ void main() {
       expect(await g.checkUsername(E2e.server, 'Grossbuchstaben'), UsernameCheck.invalid);
     });
 
-    test('TP-E2E-03 Neuling: Konto anlegen → Link v2 mit Namen → Anfrage → Moderatorin sieht den Namen → bestätigt → Mitglied', () async {
+    test('TP-E2E-03 Neuling: Konto anlegen → Link v4 mit Namen → Anfrage → Moderatorin sieht den Namen → bestätigt → Mitglied', () async {
       final mod = await _registered('mod', 'Erika');
       await mod.createFamily('Familie E2E');
       await E2e.until(() => mod.family != null, what: 'Familie bei der Moderatorin');
 
-      final raw = await mod.createInviteLink(autoApprove: false);
-      expect(raw, contains('v=3'));
+      final raw = await mod.createInviteLink();
+      expect(raw, contains('v=4'));
       final link = InviteLink.tryParse(raw, now: DateTime.now(), ownHost: 'localhost')!;
-      expect(link.familyName, 'Familie E2E');
+      expect(link.familyName, isNull, reason: 'E-79: kein Familienname im Link');
       expect(link.inviterName, 'Erika');
       expect(link.inviterServer, 'localhost', reason: 'Neulinge legen das Konto beim Anbieter des Einladenden an');
       expect(link.accountServer, 'localhost', reason: 'Der Link nennt den Server für Konto und Anmeldung ausdrücklich (E-63)');
@@ -118,7 +118,7 @@ void main() {
       final mod = await _registered('modl', 'Lena');
       await mod.createFamily('Familie Heimnetz');
       await E2e.until(() => mod.family != null, what: 'Familie');
-      final raw = await mod.createInviteLink(validity: const Duration(days: 7), autoApprove: false);
+      final raw = await mod.createInviteLink(validity: const Duration(days: 7));
       // Wie ein Neuling vor der Anmeldung: eigener Server noch unbekannt, Link aus einer HTML-Mail.
       final check = InviteLink.check('Dein Link: <${raw.replaceAll('&', '&amp;')}>', now: DateTime.now());
       expect(check.ok, isTrue, reason: '${check.problem}');

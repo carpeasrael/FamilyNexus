@@ -44,7 +44,7 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 
 | ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
 |---|---|---|---|---|---|
-| TP-REG-01 | Anbieter mit offener Registrierung | Name, Passwort, „Konto erstellen“ → Notfall-Schlüssel → Familienname → „Jetzt einladen“ | Konto angelegt, „Schritt 1/2/3 von 3“, Erfolgsansicht, Einladungsdialog, danach Hauptansicht als Moderator | F, B 02–13 | ✅ |
+| TP-REG-01 | Anbieter mit offener Registrierung | Name, Passwort, Wiederholung, „Konto erstellen“ → Notfall-Schlüssel → Familienname → „Jetzt einladen“ | Konto angelegt, „Schritt 1/2/3 von 3“, Erfolgsansicht, Einladungsdialog, danach Hauptansicht als Moderator | F, B 02–13 | ✅ |
 | TP-REG-02 | – | „Carla Groß“ eingeben | Benutzername `carla.gross` vorgeschlagen, „Der Benutzername ist frei.“ | F, U `username_suggestion_test.dart`, B 04 | ✅ |
 | TP-REG-03 | `anna` vergeben | Name „Anna“ | „Schon vergeben – wie wäre es mit „anna2“?“, Knopf übernimmt den Vorschlag, „Konto erstellen“ bis dahin gesperrt | F, U, B 03 | ✅ |
 | TP-REG-03b | Name wird zwischen Prüfung und Absenden vergeben | absenden | „Dieser Benutzername ist schon vergeben.“, nicht angemeldet | F `registration_test.dart`, S TP-E2E-01 | ✅ |
@@ -62,6 +62,11 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-REG-12 | – | Abläufe des Servers lesen | `POST /register` ohne Benutzername/Passwort, mit `inhibit_login`; einfachster unterstützter Ablauf; Telefon/SSO nie; 429/5xx → „Erneut versuchen“ statt „kein Konto möglich“ | U | ✅ |
 | TP-REG-13 | echtes Gateway | Bedingungen → Captcha, Zugangscode, Dummy-Schleife, Fehlercodes | Sitzung und erledigte Schritte werden weitergegeben; Passwort in jeder Anfrage; Captcha-Seite des Servers; falscher Code erkannt; Endlosschleife abgebrochen; M_USER_IN_USE/M_WEAK_PASSWORD/M_FORBIDDEN … richtig zugeordnet | U `sdk_registration_test.dart` | ✅ |
 | TP-REG-14 | Registrierung offen | Anmelden bzw. Fehler „endgültig“ | Registrierung samt Passwort verworfen | U, F | ✅ |
+| TP-REG-15 | – | Wiederholung fehlt, ist passender Anfang, weicht ab, gleich; erstes Feld danach ändern | Knopf nur bei Gleichheit aktiv; `Die Passwörter stimmen nicht überein.` erst, wenn die Eingabe nicht mehr passen kann | F `registration_password_test.dart` | ✅ |
+| TP-REG-15b | – | Wiederholung prüfen, Auge antippen | verdeckt, ohne Tastatur-Lernen und Smart-Ersetzungen; ein Schalter für beide Felder | F | ✅ |
+| TP-REG-16…16d | – | Enter im Passwort, Enter in der Wiederholung, Enter während des Absendens, Enter und Knopf im selben Frame | erst Sprung, dann Absenden, kein zweiter Aufruf; beide Felder nach Abschluss leer | F | ✅ |
+| TP-REG-17…17f | Formular unvollständig | Enter: Anbieter nicht bereit, Name leer, Benutzername ungültig/vergeben, Passwort zu kurz, Wiederholung abweichend oder leer | Grund in Live-Zeile und am Feld (Semantik-`hint`), Fokus aufs Feld (Anbieter: keiner); verschwindet bei Eingabe, über den Vorschlag bzw. wenn der Anbieter bereit wird | F | ✅ |
+| TP-REG-17g | Serverfehler steht | Eingabe und Enter | Eingabegrund steht davor, Serverfehler bleibt bis zum nächsten Absenden | F | ✅ |
 
 ### 3.3 Anbieter (Homeserver) – „Erweitert“
 
@@ -92,15 +97,16 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 
 | ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
 |---|---|---|---|---|---|
-| TP-INV-01 | Moderatorin | Link erzeugen | `v=3` mit Familienname und Name der Einladenden; Roundtrip | U `invite_link_test.dart`, S TP-E2E-03 | ✅ |
+| TP-INV-01 | Moderatorin | Link erzeugen | `v=4` mit kodierten Feldern, Name der Einladenden, ohne Familienname; keine lesbaren IDs, Server oder Namen; Roundtrip (E-79) | U `invite_link_test.dart`, S TP-E2E-03 | ✅ |
 | TP-INV-02 | alter Link `v=1` | einfügen | weiterhin gültig | U | ✅ |
-| TP-INV-03 | manipulierte Links | unbekannte/doppelte Felder, `v=1` mit `f`, `v=3`, fremder Server, CRLF, Überlänge | abgelehnt | U, `penetration_test.dart` | ✅ |
+| TP-INV-10 | Link der Version 3 mit `f` | einfügen | weiterhin gültig; Karte nennt die Familie | U, F `join_and_security_test.dart` | ✅ |
+| TP-INV-03 | manipulierte Links | unbekannte/doppelte Felder, `v=1` mit `f`, `v=3`, fremder Server, CRLF, Überlänge; bei `v=4`: kaputtes Base64, Padding, Länge mod 4 = 1, Zusatzfeld neben `d`, inneres `v` oder `f`, ungültiges UTF-8, fehlendes `srv` | abgelehnt | U, `penetration_test.dart` | ✅ |
 | TP-INV-04 | – | Namen mit Steuer-/Bidi-Zeichen, Überlänge, leer | bereinigt, auf 40 Zeichen begrenzt, leere Namen entfallen | U | ✅ |
 | TP-INV-06 | lange IDs und Namen, auch viele Emoji | Link erzeugen | passt in die Längengrenze (Namen werden notfalls gekürzt), bleibt lesbar | U | ✅ |
 | TP-INV-09 | Link in anderer Schreibweise (`FamilyNexus://…`) | öffnen, Neustart | einheitlich vorgemerkt, nach Neustart weiter da | U | ✅ |
 | TP-INV-07 | Moderatorin | „Jemanden einladen“ | ein Dialog mit QR-Code, „Per E-Mail senden“, „Link kopieren“; Benutzer-ID nur unter „Erweitert“ | F `family_screen_test.dart`, B 12–13 | ✅ |
 | TP-INV-08 | – | „Per E-Mail senden“ | Entwurf mit Schritt-für-Schritt-Anleitung („Ich wurde eingeladen“), ohne „Matrix“; ohne Mailprogramm wird kopiert | F | ✅ |
-| TP-JOIN-01 | frisches Gerät, Link geöffnet | Konto erstellen → Notfall-Schlüssel → „Beitritt anfragen“ → Bestätigung | keine Startseite, keine Serverfrage (Anbieter aus der Einladung); Beitrittskarte „Du trittst der Familie „…“ bei. Eingeladen hat dich Anna.“; Anfrage erst nach Tipp; Moderatorin sieht den Namen; nach Bestätigung automatisch Mitglied | F, S TP-E2E-03, B 14–18, A (Link-Kaltstart mit echtem matrix.org) | ✅ |
+| TP-JOIN-01 | frisches Gerät, Link geöffnet | Konto erstellen → Notfall-Schlüssel → „Beitritt anfragen“ → Bestätigung | keine Startseite, keine Serverfrage (Anbieter aus der Einladung); Beitrittskarte „Du trittst einer Familie bei. Eingeladen hat dich Anna (Konto bei …).“; Anfrage erst nach Tipp; Moderatorin sieht den Namen; nach Bestätigung automatisch Mitglied | F, S TP-E2E-03, B 14–18, A (Link-Kaltstart mit echtem matrix.org) | ✅ |
 | TP-JOIN-02 | Link vorgemerkt | App neu starten | Link weiter da, direkt „Konto erstellen“; abgelaufener Link wird verworfen | F | ✅ |
 | TP-JOIN-03 | bereits in einer Familie | Link öffnen | „Du bist bereits in einer Familie.“, nichts vorgemerkt | F | ✅ |
 | TP-JOIN-04 | Anfrage gesendet | „Anfrage zurückziehen“ | Anfrage weg, Link-Feld wieder da | F | ✅ |
@@ -118,7 +124,7 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-INV-07 | – | Link erzeugen, Standard und anderer Konto-Server | `srv` steht im Link; Standard = Server des Einladenden; getrennt von `inv` | U `invite_link_test.dart` | ✅ |
 | TP-INV-08 | Link der Version 2 | lesen | gültig; Konto-Server = Server des Einladenden | U | ✅ |
 | TP-INV-09 | Konto-Server im Heimnetz | erzeugen, lesen | nur der eigene beim Erzeugen; ohne `check` nur als eigener Server lesbar; Oberfläche fragt vor dem Verbinden | U | ✅ |
-| TP-LINK-10 | – | `srv` fehlt (v3), ungültig, mit Pfad/Zugangsdaten, doppelt, im Heimnetz | abgelehnt | U, Pen `penetration_test.dart` | ✅ |
+| TP-LINK-10 | – | `srv` fehlt (v3, v4), ungültig, mit Pfad/Zugangsdaten, doppelt, im Heimnetz | abgelehnt | U, Pen `penetration_test.dart` | ✅ |
 | TP-JOIN-10 | Link mit Server ≠ matrix.org | Link öffnen | „Anderen Anbieter verwenden“ gewählt, Adresse im Feld, „Erweitert“ aufgeklappt; Konto liegt auf diesem Server | F `invite_onboarding_test.dart`, E2E | ✅ |
 | TP-JOIN-11 | Link mit Server matrix.org | Link öffnen | Standardanbieter gewählt, kein eigenes Feld | F | ✅ |
 | TP-JOIN-12 | Person auf der Anmeldeseite | Link trifft ein, anmelden, Notfall-Schlüssel | Anbieter wechselt auf den Server aus dem Link; Anmeldung dort; am Ende die Beitrittskarte der Familie, ein Tipp sendet die Anfrage | F | ✅ |
@@ -130,8 +136,8 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-LINK-01 | – | abgelaufener Link | „Dieser Einladungslink ist abgelaufen. Bitte … um einen neuen Link.“ | U `invite_link_check_test.dart`, F `join_and_security_test.dart` | ✅ |
 | TP-LINK-02 | – | Text ohne Link, https-Link | „Das ist kein Einladungslink …“ | U, F | ✅ |
 | TP-LINK-03 | – | unvollständiger/manipulierter Link | „Der Link ist unvollständig oder beschädigt … erneut kopieren oder QR-Code scannen“ | U, F | ✅ |
-| TP-LINK-04 | – | Link mit `v=4` | „… neueren Version … bitte aktualisiere die App“ | U, F | ✅ |
-| TP-LINK-05 | – | `&amp;`, `<…>`, „…“, Text davor/danach, Satzzeichen, Umbruch im Link, Quoted-Printable | angenommen, bereinigt vorgemerkt; Text nach dem Link wird nicht angehängt | U, F `invite_onboarding_test.dart` | ✅ |
+| TP-LINK-04 | – | Link mit `v=5` | „… neueren Version … bitte aktualisiere die App“ | U, F | ✅ |
+| TP-LINK-05 | – | `&amp;`, `<…>`, „…“, Text davor/danach, Satzzeichen, Umbruch im Link (auch mitten im Payload von `v=4`, E-79), Quoted-Printable | angenommen, bereinigt vorgemerkt; Text nach dem Link wird nicht angehängt; Umbruch mit Zitatzeichen `>` bleibt beschädigt | U, F `invite_onboarding_test.dart` | ✅ |
 | TP-LINK-06 | Familie auf Server im Heimnetz (IP, localhost, Name ohne Punkt) | Link vor der Anmeldung öffnen, Konto anlegen | angenommen; Beitrittskarte warnt „Server im Heimnetz“; Anfrage erst nach Tipp | U, F, S (Synapse auf `localhost`) | ✅ |
 | TP-LINK-07 | – | `via` im Heimnetz, aber nicht der Server des Raums | abgelehnt (beschädigt) | U | ✅ |
 | TP-LINK-09 | Name „3D-Club“, Quoted-Printable-Mail, Neustart | – | Link unverfälscht, nach Neustart lesbar (Review R1) | U | ✅ |
@@ -164,6 +170,24 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-DEV-01 | Gerätename | „FamilyNexus Linux“ usw. statt fest „Android“ | S TP-E2E-01 | ✅ |
 | TP-E2E-01…05 | echter Synapse | Registrierungsweg, Name frei/vergeben, lokale Prüfungen, Link v2 → Anfrage → Bestätigung → Mitglied, Name der Einladenden, Abbruch | S `gateway_registration_e2e_test.dart` | ✅ |
 | TP-REG-M1 | echte Registrierung mit Bedingungen/Captcha | Server mit `m.login.terms`/reCAPTCHA | M (lokaler Synapse verlangt beides nicht) | ⏳ |
+
+### 3.8 Passwort ändern (Issue #117, E-80)
+
+| ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
+|---|---|---|---|---|---|
+| TP-PW-01 | angemeldet | Einstellungen → Konto → „Passwort ändern“ | Eintrag vor „Abmelden“; drei verdeckte Felder, ein Schalter, Autofill-Hinweise, „Andere Geräte abmelden“ aus, Knopf aktiv | F `password_change_test.dart`, `settings_screen_test.dart` | ✅ |
+| TP-PW-02 | – | Enter in jedem Feld | springt weiter, erst das letzte sendet (bewusste Abweichung von #68) | F, `enter_submits_test.dart` | ✅ |
+| TP-PW-03, 03b | – | jede Zeile der Prüfung über Knopf und Enter | Grund in Live-Zeile und am Feld, Fokus aufs Feld, kein Aufruf; verschwindet bei Eingabe | F | ✅ |
+| TP-PW-04, 05 | – | erfolgreich ändern, mit und ohne Schalter | Autofill-Abschluss vor dem Leeren, Dialog schließt, „Passwort geändert.“, Schalter wird übergeben | F | ✅ |
+| TP-PW-06…07b | – | falsches Passwort, schwaches Passwort, keine Antwort, sonstiger Fehler | Grund, Fokus aufs passende Feld, Text markiert; Felder bleiben gefüllt | F | ✅ |
+| TP-PW-08…09 | – | Esc, Barriere und Enter während des Absendens; Esc und Abbrechen im Leerlauf | während des Absendens wirkungslos, sonst schließt der Dialog ohne Autofill-Commit | F | ✅ |
+| TP-PW-10 | Anmeldung im Browser | Dialog öffnen, Kontoseite öffnen, ohne Browser | Text ohne Felder, Kontoseite, Meldung ohne Browser | F | ✅ |
+| TP-PW-11, 11b | Änderung nicht möglich | von vornherein bzw. nach dem Absenden | Text ohne Felder, Knopf „Schließen“; nach dem Absenden Felder geleert, Fokus und Hinweis auf dem Knopf | F | ✅ |
+| TP-PW-12, 13 | – | Weg nicht ermittelbar; Hinweistexte | SnackBar statt Dialog; Geltung und Folgen genannt | F | ✅ |
+| TP-PW-20…26 | echtes Gateway, MockClient | UIA-Ablauf, lokale Prüfungen, alle Serverantworten | altes Passwort nur an die Passwort-Stufe, `logout_devices` immer gesendet, feste Fehlerzuordnung, Kontoseite ohne `action` | U `sdk_registration_test.dart` | ✅ |
+| TP-PW-E2E | echter Synapse | Änderung, falsches Passwort, Sitzungen, Antworten des Servers, 512/513 Zeichen | wie TP-PW-20…26, altes Passwort wird ungültig, aktuelle Sitzung bleibt | S `gateway_account_e2e_test.dart` | ✅ 2026-10-31, Synapse 1.163.2 |
+| TP-PW-E2E-V | `tool/synapse/password_variants.sh` | `localdb_enabled: false`, `enabled: false`, `only_for_reauth` | leere Flows: ein POST ohne Passwort, „nicht verfügbar“; `only_for_reauth`: falsches Passwort `invalidCredentials`, richtiges „nicht verfügbar“, Richtlinie `weakPassword` | S `gateway_account_e2e_test.dart` | ⏳ `enabled: false` bestanden; `localdb_enabled: false` (korrigiert) und `only_for_reauth` (neu) noch nicht gegen Synapse gelaufen |
+| TP-PW-M1 | Gerät mit Passwort-Manager und Screenreader | Änderung speichern lassen, Dialog mit TalkBack/VoiceOver bedienen | Speichern nur nach Erfolg, Gründe werden vorgelesen | M | ⏳ |
 
 ## 4. Ergebnisprotokoll
 

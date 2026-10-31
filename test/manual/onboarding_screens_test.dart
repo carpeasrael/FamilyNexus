@@ -107,6 +107,7 @@ void main() {
       await _snap(tester, 'konto-erstellen-leer');
       await _type(tester, 'Wie heißt du?', 'Anna');
       await _type(tester, 'Passwort', 'sicher-genug');
+      await _type(tester, 'Passwort wiederholen', 'sicher-genug');
       await _snap(tester, 'benutzername-vergeben');
       await _type(tester, 'Wie heißt du?', 'Carla Groß');
       await _snap(tester, 'konto-erstellen-ausgefuellt');
@@ -148,6 +149,7 @@ void main() {
       await _snap(tester, 'eingeladen-konto-erstellen');
       await _type(tester, 'Wie heißt du?', 'Ben Neu');
       await _type(tester, 'Passwort', 'sicher-genug');
+      await _type(tester, 'Passwort wiederholen', 'sicher-genug');
       await _tap(tester, 'Konto erstellen');
       await _tap(tester, 'Notfall-Schlüssel erstellen');
       await tester.tap(find.byType(CheckboxListTile));

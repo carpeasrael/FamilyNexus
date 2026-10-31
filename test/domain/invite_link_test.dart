@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../support/invite_links.dart';
 
 void main() {
   final now = DateTime.utc(2026, 10, 21, 12);
@@ -12,6 +16,18 @@ void main() {
         validity: validity,
         nonce: nonce,
       );
+  final defaultExp = now.add(InviteLink.defaultValidity).millisecondsSinceEpoch ~/ 1000;
+  String fields({
+    String room = '!abc123:matrix.org',
+    String via = 'matrix.org',
+    String? srv = 'matrix.org',
+    String inv = '@mod:matrix.org',
+    int? exp,
+    String? family,
+    String? by,
+    String n = nonce,
+  }) =>
+      inviteFields(room: room, via: via, srv: srv, inv: inv, exp: exp ?? defaultExp, family: family, by: by, n: n);
 
   test('Roundtrip', () {
     final l = InviteLink.tryParse(make(), now: now)!;
@@ -38,12 +54,14 @@ void main() {
     expect(() => make(validity: Duration.zero), throwsArgumentError);
   });
 
+  // Die Manipulationen treffen die Felder im Klartext, also Version 3; Version 4 folgt in der nächsten Gruppe.
   group('Ablehnung manipulierter/falscher Links', () {
-    final good = make();
+    final good = v3Link(fields());
     final bad = <String, String>{
       'anderes Schema': good.replaceFirst('familynexus', 'https'),
       'anderer Host': good.replaceFirst('//join', '//evil'),
-      'Version 4': good.replaceFirst('v=3', 'v=4'),
+      'Version 4 mit Feldern im Klartext': good.replaceFirst('v=3', 'v=4'),
+      'Version 5': good.replaceFirst('v=3', 'v=5'),
       'Version fehlt': good.replaceFirst('v=3&', ''),
       'Version 1 mit Familienname': '${good.replaceFirst('v=3', 'v=1')}&f=Familie',
       'Version 2 mit Konto-Server': good.replaceFirst('v=3', 'v=2'),
@@ -81,6 +99,131 @@ void main() {
     }
   });
 
+  group('Ablehnung manipulierter Links der Version 4 (E-79)', () {
+    final inner = fields();
+    final payload = v4Payload(inner);
+    final bad = <String, String>{
+      'kaputtes base64': 'familynexus://join?v=4&d=!!!!',
+      'd fehlt': 'familynexus://join?v=4',
+      'd leer': 'familynexus://join?v=4&d=',
+      'Padding': '${v4(inner)}=',
+      'Padding prozentkodiert': '${v4(inner)}%3D',
+      'Länge mod 4 = 1': 'familynexus://join?v=4&d=${payload.substring(0, payload.length - (payload.length % 4))}A',
+      'Pluszeichen statt Minus': 'familynexus://join?v=4&d=+/8',
+      'Schrägstrich im Payload': '${v4(inner)}/',
+      'Zusatzfeld neben d': '${v4(inner)}&x=1',
+      'Felder im Klartext neben d': '${v4(inner)}&room=%21abc123%3Amatrix.org',
+      'd doppelt': '${v4(inner)}&d=$payload',
+      'doppeltes inneres Feld': v4('$inner&n=$nonce'),
+      'doppelter innerer Server': v4(fields().replaceFirst('srv=', 'srv=evil.example&srv=')),
+      'inneres v=1': v4('v=1&${fields(srv: null)}'),
+      'inneres v=4': v4('v=4&$inner'),
+      'inneres v=9': v4('v=9&$inner'),
+      'ungültiges UTF-8 als Prozentkodierung': v4(fields(by: 'x').replaceFirst('by=x', 'by=%FF')),
+      'ungültiges UTF-8 als rohes Byte': 'familynexus://join?v=4&d=${base64Url.encode(<int>[0xFF]).replaceAll('=', '')}',
+      'ungültiges UTF-8 am Ende': 'familynexus://join?v=4&d=${base64Url.encode(<int>[...utf8.encode(inner), 0xFF]).replaceAll('=', '')}',
+      'inneres f': v4(fields(family: 'Familie')),
+      'unbekanntes inneres Feld': v4('$inner&x=1'),
+      '%A in room': v4(inner.replaceFirst('abc123', 'abc%A')),
+      '# in room': v4(inner.replaceFirst('abc123', 'abc#')),
+      '%A in n': v4(inner.replaceFirst(nonce, '${nonce.substring(2)}%A')),
+      '# in n': v4(inner.replaceFirst(nonce, '${nonce.substring(1)}#')),
+      'leeres Inneres': 'familynexus://join?v=4&d=${v4Payload('=')}',
+      'Link ohne srv': v4(fields(srv: null)),
+      'srv ungültig': v4(fields(srv: 'evil.example/x')),
+      'srv im Heimnetz': v4(fields(srv: '192.168.0.2')),
+      'falscher Server in via': v4(fields(via: 'evil.example')),
+      'via IP': v4(fields(room: '!abc123:192.168.0.2', via: '192.168.0.2')),
+      'Einladender ungültig': v4(fields(inv: 'mod')),
+      'exp riesig': v4(fields(exp: 99999999999999)),
+      'Nonce ungültig': v4(fields(n: 'XYZ')),
+      'zu lang': v4(fields(by: 'a' * 800)),
+    };
+    for (final e in bad.entries) {
+      test(e.key, () => expect(InviteLink.tryParse(e.value, now: now), isNull));
+    }
+
+    test('Länge mod 4 = 1 wird schon vor dem Dekodieren abgelehnt', () {
+      final d = 'A' * 5;
+      expect(d.length % 4, 1);
+      expect(InviteLink.tryParse('familynexus://join?v=4&d=$d', now: now), isNull);
+    });
+
+    test('Kontrolle: das unveränderte Innere wird angenommen', () {
+      expect(InviteLink.tryParse(v4(inner), now: now), isNotNull);
+    });
+
+    test('%A und # im Namen bleiben Text, Uri(query:) kodiert sie nur um', () {
+      final l = InviteLink.tryParse(v4(fields(by: 'x').replaceFirst('by=x', 'by=100%A#1')), now: now)!;
+      expect(l.inviterName, '100%A#1');
+    });
+
+    test('abgelaufen: gelesen, aber als abgelaufen gemeldet', () {
+      final old = v4(fields(exp: now.subtract(const Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000));
+      expect(InviteLink.tryParse(old, now: now)!.isValidAt(now), isFalse);
+      expect(InviteLink.check(old, now: now).problem, InviteLinkProblem.expired);
+    });
+
+    test('Version 5: neuere Version statt beschädigt', () {
+      expect(InviteLink.check('familynexus://join?v=5&d=$payload', now: now).problem, InviteLinkProblem.newerVersion);
+    });
+
+    test('überlanger Server: create wirft, statt einen zu langen Link zu erzeugen', () {
+      final host = '${'h' * 200}.example';
+      final room = '!a:$host';
+      final inv = '@m:$host';
+      expect(InviteLink.viaMatchesRoom(room, host), isTrue, reason: 'Kontrolle: die Angaben selbst sind gültig');
+      expect(() => InviteLink.create(roomId: room, via: host, inviter: inv, now: now, nonce: nonce, accountServer: host, inviterName: 'Anna'), throwsArgumentError);
+    });
+  });
+
+  group('Keine lesbaren Angaben im Link (E-79)', () {
+    const room = '!raumgeheim:familie-mueller.example';
+    const server = 'familie-mueller.example';
+    const inviter = '@annamueller:familie-mueller.example';
+    String link(String? by) => InviteLink.create(roomId: room, via: server, inviter: inviter, now: now, nonce: nonce, inviterName: by);
+
+    test('Link und Weblink enthalten weder Raum, Matrix-ID, Server noch Namen, auch nicht prozentkodiert', () {
+      final app = link('Anna Müller');
+      final web = InviteLink.toWebLink(app)!;
+      expect(app, startsWith('familynexus://join?v=4&d='));
+      expect(web, startsWith('https://carpeasrael.github.io/FamilyNexus/join/#v=4&d='));
+      for (final text in <String>[app, web]) {
+        for (final secret in <String>[room, 'raumgeheim', server, 'mueller', inviter, 'annamueller', 'Anna', 'Müller', nonce]) {
+          expect(text.toLowerCase(), isNot(contains(secret.toLowerCase())), reason: secret);
+          expect(text.toLowerCase(), isNot(contains(Uri.encodeQueryComponent(secret).toLowerCase())), reason: secret);
+        }
+      }
+    });
+
+    test('der Payload enthält genau die erlaubten Felder, keinen Familiennamen', () {
+      final keys = Uri(query: v4Inner(link('Anna'))).queryParameters.keys.toSet();
+      expect(keys, <String>{'room', 'via', 'srv', 'inv', 'exp', 'by', 'n'});
+    });
+
+    test('Roundtrip mit Umlauten und Emoji im Namen', () {
+      final l = InviteLink.tryParse(link('Zoë Müller 🦄'), now: now)!;
+      expect(l.inviterName, 'Zoë Müller 🦄');
+      expect(l.familyName, isNull);
+      expect(l.roomId, room);
+      expect(l.accountServer, server);
+    });
+
+    test('Link ohne Namen: Einladender bleibt leer, Karte fällt auf die Matrix-ID zurück', () {
+      final l = InviteLink.tryParse(link(null), now: now)!;
+      expect(l.inviterName, isNull);
+      expect(Uri(query: v4Inner(link(null))).queryParameters.containsKey('by'), isFalse);
+    });
+
+    test('Namen werden bereinigt, leere entfallen', () {
+      final l = InviteLink.tryParse(link('\u202Egefährlich\u0000 ${'x' * 80}'), now: now)!;
+      expect(l.inviterName!.contains('\u202E'), isFalse);
+      expect(l.inviterName!.contains('\u0000'), isFalse);
+      expect(l.inviterName!.runes.length, lessThanOrEqualTo(InviteLink.maxNameLength));
+      expect(InviteLink.tryParse(link('   '), now: now)!.inviterName, isNull);
+    });
+  });
+
   test('via muss zur Raum-ID passen und darf nicht lokal/IP sein (außer eigener Server)', () {
     expect(InviteLink.viaMatchesRoom('!a:matrix.org', 'matrix.org'), isTrue);
     expect(InviteLink.viaMatchesRoom('!a:matrix.org', 'evil.example'), isFalse);
@@ -98,24 +241,31 @@ void main() {
     expect(InviteLink.tryParse('  ${make()}\n', now: now), isNotNull);
   });
 
-  group('Version 3 (E-56, E-63): Namen und Konto-Server für Neulinge', () {
-    String v3({String? family = 'Familie Müller', String? by = 'Anna'}) => InviteLink.create(
-          roomId: '!abc123:matrix.org',
-          via: 'matrix.org',
-          inviter: '@mod:matrix.org',
-          now: now,
-          nonce: nonce,
-          familyName: family,
-          inviterName: by,
-        );
+  group('Version 3 und 4 (E-56, E-63, E-79): Namen und Konto-Server für Neulinge', () {
+    String v3({String? family = 'Familie Müller', String? by = 'Anna'}) => v3Link(fields(family: family, by: by));
 
-    test('TP-INV-01 Roundtrip mit Familien- und Einladendenname', () {
-      final s = v3();
-      expect(s, contains('v=3'));
+    test('TP-INV-01 Roundtrip mit Einladendenname, ohne Familienname', () {
+      final s = InviteLink.create(
+        roomId: '!abc123:matrix.org',
+        via: 'matrix.org',
+        inviter: '@mod:matrix.org',
+        now: now,
+        nonce: nonce,
+        inviterName: 'Anna',
+      );
+      expect(s, contains('v=4'));
       final l = InviteLink.tryParse(s, now: now)!;
-      expect(l.familyName, 'Familie Müller');
+      expect(l.familyName, isNull);
       expect(l.inviterName, 'Anna');
       expect(l.inviterServer, 'matrix.org');
+    });
+
+    test('TP-INV-10 Links der Version 3 bleiben gültig, mit Familienname', () {
+      final l = InviteLink.tryParse(v3(), now: now)!;
+      expect(l.familyName, 'Familie Müller');
+      expect(l.inviterName, 'Anna');
+      expect(l.accountServer, 'matrix.org');
+      expect(InviteLink.check(v3(), now: now).ok, isTrue);
     });
 
     test('TP-INV-02 Links der Version 1 bleiben gültig', () {
@@ -128,9 +278,9 @@ void main() {
     });
 
     test('TP-INV-07 Konto-Server (srv): Standard ist der Server des Einladenden, ein anderer wird ausdrücklich übernommen', () {
-      final same = InviteLink.tryParse(v3(), now: now)!;
+      final same = InviteLink.tryParse(make(), now: now)!;
       expect(same.accountServer, 'matrix.org');
-      expect(v3(), contains('srv=matrix.org'));
+      expect(v4Inner(make()), contains('srv=matrix.org'));
 
       final other = InviteLink.create(
         roomId: '!abc123:matrix.org',
@@ -188,7 +338,6 @@ void main() {
         inviter: '@${'u' * 40}:${'h' * 40}.example',
         now: now,
         nonce: nonce,
-        familyName: 'Ü' * 40,
         inviterName: 'Ö' * 40,
       );
       expect(s.length, lessThanOrEqualTo(InviteLink.maxLength));
@@ -202,7 +351,6 @@ void main() {
         inviter: '@${'u' * 40}:${'h' * 40}.example',
         now: now,
         nonce: nonce,
-        familyName: '👨‍👩‍👧' * 20,
         inviterName: '🦄' * 40,
       );
       expect(s.length, lessThanOrEqualTo(InviteLink.maxLength));
@@ -226,13 +374,12 @@ void main() {
           inviter: '@anna:example.org',
           now: now,
           nonce: '0123456789abcdef0123456789abcdef',
-          familyName: 'Familie Test',
           inviterName: 'Anna',
         );
 
     test('Web-Link trägt dieselben Angaben im Fragment und wird wie der App-Link gelesen', () {
       final web = InviteLink.toWebLink(app())!;
-      expect(web, startsWith('https://carpeasrael.github.io/FamilyNexus/join/#v=3&'));
+      expect(web, startsWith('https://carpeasrael.github.io/FamilyNexus/join/#v=4&d='));
       expect(Uri.parse(web).hasQuery, isFalse, reason: 'nichts davon geht als Anfrage an den Server');
       final fromApp = InviteLink.check(app(), now: now).link!;
       final fromWeb = InviteLink.check(web, now: now);
@@ -267,13 +414,12 @@ void main() {
       inviter: '@anna:example.org',
       now: now,
       nonce: '0123456789abcdef0123456789abcdef',
-      familyName: 'Familie Test',
       inviterName: 'Test Nutzer 1',
     );
 
     test('die Zufalls-ID steht am Ende', () {
-      expect(link, endsWith('&n=0123456789abcdef0123456789abcdef'));
-      expect(InviteLink.toWebLink(link), endsWith('&n=0123456789abcdef0123456789abcdef'));
+      expect(v4Inner(link), endsWith('&n=0123456789abcdef0123456789abcdef'));
+      expect(v4Inner(InviteLink.toWebLink(link)!), endsWith('&n=0123456789abcdef0123456789abcdef'));
     });
 
     test('um die letzten Zeichen gekürzt: beschädigt, nicht mit gekürztem Namen angenommen', () {

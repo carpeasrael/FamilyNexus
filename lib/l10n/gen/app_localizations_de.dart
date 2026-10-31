@@ -891,20 +891,8 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String familyInviteLinkHint(String validity) {
-    return 'Der Link ist $validity gültig und nur einmal verwendbar. Wer ihn öffnet, wird automatisch aufgenommen, sobald die App eines Moderators online ist. Gib ihn nur der Person, die du einladen willst.';
+    return 'Der Link ist $validity gültig und nur einmal verwendbar. Ein Moderator bestätigt die Anfrage, bevor die Person aufgenommen wird; auch die Bestätigung muss in diese Zeit fallen. Gib ihn nur der Person, die du einladen willst.';
   }
-
-  @override
-  String familyInviteLinkHintManual(String validity) {
-    return 'Der Link ist $validity gültig und nur einmal verwendbar. Ein Moderator bestätigt die Anfrage, bevor die Person aufgenommen wird.';
-  }
-
-  @override
-  String get familyInviteManual => 'Anfragen selbst bestätigen';
-
-  @override
-  String get familyInviteManualHint =>
-      'Ohne diese Einstellung nimmt die App jede Person mit dem Link automatisch auf. Ändern erzeugt einen neuen Link.';
 
   @override
   String get familyInviteShowQr => 'QR-Code anzeigen';
@@ -1141,11 +1129,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get familyRequestCheckValid => 'Gültiger Einladungslink';
 
   @override
-  String get familyRequestCheckExpired => 'Link abgelaufen';
+  String get familyRequestCheckExpired =>
+      'Link abgelaufen – lehne die Anfrage ab und schicke einen neuen Link';
 
   @override
   String get familyRequestCheckUnknown =>
-      'Unbekannter Link – von keinem Moderator ausgegeben';
+      'Unbekannter oder bereits verwendeter Link';
 
   @override
   String familyRequestApproveConfirm(String user) {
@@ -1511,8 +1500,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get inviteMailSubject => 'Einladung zu FamilyNexus';
 
   @override
-  String inviteMailBody(String family, String link, String validity) {
-    return 'Hallo,\n\nich lade dich in unsere Familie „$family“ bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n$link\n\n3. Lege dein Konto an.\n4. Sobald die App eines Moderators online ist, wirst du automatisch aufgenommen.\n\nDer Link ist $validity gültig.';
+  String inviteMailBody(String link, String validity) {
+    return 'Hallo,\n\nich lade dich in unsere Familie bei FamilyNexus ein – Familienkalender und Chat, privat und verschlüsselt.\n\nSo geht’s (ca. 2 Minuten):\n1. Installiere die App FamilyNexus.\n2. Tippe auf diesen Link – oder öffne die App, wähle „Ich wurde eingeladen“ und füge den Link ein:\n\n$link\n\n3. Lege dein Konto an.\n4. Ein Moderator muss deine Anfrage bestätigen, bevor du aufgenommen wirst. Sag mir bitte kurz Bescheid, sobald du sie gestellt hast, denn Moderatoren werden nicht benachrichtigt.\n\nDer Link ist $validity gültig. Auch die Bestätigung muss in diese Zeit fallen.';
   }
 
   @override
@@ -1790,6 +1779,83 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get passwordHide => 'Passwort verbergen';
+
+  @override
+  String get accountPasswordRepeat => 'Passwort wiederholen';
+
+  @override
+  String get regPasswordMismatch => 'Die Passwörter stimmen nicht überein.';
+
+  @override
+  String get regPasswordTooShort =>
+      'Das Passwort braucht mindestens 8 Zeichen.';
+
+  @override
+  String get regNameMissing => 'Bitte gib deinen Namen ein.';
+
+  @override
+  String get regProviderNotReady =>
+      'Der Anbieter ist noch nicht bereit. Warte einen Moment oder prüfe die Adresse.';
+
+  @override
+  String get passwordChangeTitle => 'Passwort ändern';
+
+  @override
+  String get passwordChangeCurrent => 'Aktuelles Passwort';
+
+  @override
+  String get passwordChangeNew => 'Neues Passwort';
+
+  @override
+  String get passwordChangeHint =>
+      'Das neue Passwort gilt für neue Anmeldungen, dein Notfall-Schlüssel bleibt gleich. In der Web-Version bleibt das Passwort für diesen Browser unverändert.';
+
+  @override
+  String get passwordChanging => 'Ändere Passwort …';
+
+  @override
+  String get passwordChangeLogoutOthers => 'Andere Geräte abmelden';
+
+  @override
+  String get passwordChangeLogoutOthersHint =>
+      'Melde alle anderen Geräte ab, wenn jemand dein Passwort kennen könnte. Diese Geräte musst du neu anmelden und mit diesem Gerät oder dem Notfall-Schlüssel freischalten; dort noch nicht gesendete Änderungen gehen verloren.';
+
+  @override
+  String get passwordChangeConfirm => 'Passwort ändern';
+
+  @override
+  String get passwordChangeCurrentMissing =>
+      'Bitte gib dein aktuelles Passwort ein.';
+
+  @override
+  String get passwordChangeTooLong =>
+      'Das neue Passwort darf höchstens 512 Zeichen haben.';
+
+  @override
+  String get passwordChangeSame =>
+      'Das neue Passwort muss sich vom aktuellen unterscheiden.';
+
+  @override
+  String get passwordChangeWrongCurrent =>
+      'Das aktuelle Passwort stimmt nicht.';
+
+  @override
+  String get passwordChangeUncertain =>
+      'Keine Antwort vom Server. Wiederhole den Versuch. Meldet die App dann, das aktuelle Passwort stimme nicht, gilt dein neues Passwort bereits.';
+
+  @override
+  String get passwordChangeUnavailable =>
+      'Dein Anbieter erlaubt keine Änderung des Passworts in der App.';
+
+  @override
+  String get passwordChangeBrowserBody =>
+      'Dein Passwort liegt bei deinem Anbieter. Du änderst es auf seiner Kontoseite im Browser.';
+
+  @override
+  String get passwordChangeBrowserOpen => 'Kontoseite öffnen';
+
+  @override
+  String get passwordChanged => 'Passwort geändert.';
 
   @override
   String get regCreate => 'Konto erstellen';
@@ -2119,7 +2185,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String joinCardNote(String inviter) {
-    return 'Angaben laut Einladung. Die App eines Moderators nimmt dich automatisch auf, sobald sie online ist.';
+    return 'Angaben laut Einladung. Ein Moderator muss deine Anfrage bestätigen, bevor du aufgenommen wirst.';
   }
 
   @override
@@ -2194,7 +2260,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get errWeakPassword =>
-      'Das Passwort ist zu schwach. Bitte nimm ein längeres Passwort.';
+      'Das Passwort ist zu schwach. Bitte nimm ein sichereres Passwort.';
 
   @override
   String get errRegistrationDisabled =>

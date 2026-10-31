@@ -10,6 +10,7 @@ import 'package:family_nexus/domain/event_codec.dart';
 import 'package:family_nexus/domain/family_code.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/moderation.dart';
+import 'package:family_nexus/domain/password_change.dart';
 import 'package:family_nexus/domain/permissions.dart';
 import 'package:family_nexus/domain/presence.dart';
 import 'package:family_nexus/domain/registration.dart';
@@ -64,7 +65,7 @@ class FakeRoom {
 class _Account {
   _Account(this.userId, this.password);
   final String userId;
-  final String password;
+  String password;
   String displayName = '';
 }
 
@@ -140,6 +141,9 @@ class FakeMatrixServer {
   /// Zähler der Registrierungsanfragen (z. B. um zu prüfen, dass nichts gesendet wurde).
   int registerCalls = 0;
 
+  /// Hält die Kontoanlage an, bis der Test fortsetzt.
+  Completer<void>? registerGate;
+
   bool hasAccount(String localpart) => _accounts.containsKey('@$localpart:$host');
 
   /// Test-Uhr (für Ablauf von Einladungslinks).
@@ -164,6 +168,13 @@ class FakeMatrixServer {
 
   /// Kontoseite des Anbieters für Konten mit Anmeldung im Browser; `null` = keine angeboten.
   Uri? accountManagementPage = Uri.parse('https://fake.test/account?action=org.matrix.account_deactivate');
+
+  /// Passwortänderung (#117): erzwingt den Weg, speist einmal einen Fehler ein, hält den Aufruf an.
+  PasswordChange? passwordChangeMode;
+  GatewayException? passwordChangeFailure;
+  Completer<void>? passwordChangeGate;
+  int passwordChangeCalls = 0;
+  bool? lastLogoutOtherDevices;
 
   /// Gelöschte Konten (in der App oder beim Anbieter).
   final List<String> deactivated = <String>[];
@@ -605,12 +616,11 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   @override
-  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, bool autoApprove = true, String? accountServer}) async {
+  Future<String> createInviteLink({Duration validity = InviteLink.defaultValidity, String? accountServer}) async {
     final f = _fam();
     if (!Permissions.canInvite(f)) throw const GatewayException(GatewayError.notAllowed);
     final room = familyRoom!;
     final nonce = (_nonceCounter++).toRadixString(16).padLeft(32, '0');
-    lastInviteAutoApprove = autoApprove;
     room.issued[nonce] = fake.now().add(validity);
     return InviteLink.create(
       roomId: f.roomId,
@@ -620,16 +630,12 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       validity: validity,
       nonce: nonce,
       ownHost: fake.host,
-      familyName: f.name,
       inviterName: fake.displayNameOf(f.myUserId),
       accountServer: accountServer,
     );
   }
 
   static int _nonceCounter = 1;
-
-  /// Ob der zuletzt erzeugte Link automatisch bestätigt wird (Pen-Test I-01).
-  bool? lastInviteAutoApprove;
 
   @override
   Future<void> requestToJoin(InviteLink link) async {
@@ -897,6 +903,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }) async {
     _require();
     fake.registerCalls++;
+    await fake.registerGate?.future;
     if (_userId != null) throw const GatewayException(GatewayError.notAllowed);
     if (server.host != fake.host) throw const GatewayException(GatewayError.serverUnreachable);
     if (!UsernameSuggestion.isValid(username)) throw const GatewayException(GatewayError.usernameInvalid);
@@ -1107,6 +1114,36 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final page = fake.accountManagementPage;
     if (page == null) throw const GatewayException(GatewayError.serverUnsupported);
     return AccountDeletionInBrowser(page);
+  }
+
+  @override
+  Future<PasswordChange> passwordChange() async {
+    _requireSession();
+    _require();
+    final forced = fake.passwordChangeMode;
+    if (forced != null) return forced;
+    if (!_viaOAuth) return const PasswordChangeInApp();
+    final page = fake.accountManagementPage;
+    return page == null ? const PasswordChangeUnavailable() : PasswordChangeInBrowser(page);
+  }
+
+  @override
+  Future<void> changePassword({required String oldPassword, required String newPassword, required bool logoutOtherDevices}) async {
+    _requireSession();
+    _require();
+    fake.passwordChangeCalls++;
+    fake.lastLogoutOtherDevices = logoutOtherDevices;
+    await fake.passwordChangeGate?.future;
+    final failure = fake.passwordChangeFailure;
+    if (failure != null) {
+      fake.passwordChangeFailure = null;
+      throw failure;
+    }
+    if (_viaOAuth) throw const GatewayException(GatewayError.notAllowed);
+    if (newPassword.length < PasswordChange.minLength) throw const GatewayException(GatewayError.weakPassword);
+    final account = fake._accounts[_userId];
+    if (account?.password != oldPassword) throw const GatewayException(GatewayError.invalidCredentials);
+    account!.password = newPassword;
   }
 
   @override

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_matrix.dart';
+import '../support/registration_form.dart';
 import '../support/test_app.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
@@ -89,8 +90,7 @@ void main() {
     expect(find.text('Der Benutzername ist frei.'), findsOneWidget);
     final create = find.widgetWithText(FilledButton, 'Konto erstellen');
     expect(tester.widget<FilledButton>(create).onPressed, isNull, reason: 'ohne Passwort kein Absenden');
-    await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'sicher-genug');
-    await tester.pumpAndSettle();
+    await enterNewPassword(tester, 'sicher-genug');
     await _tapText(tester, 'Konto erstellen');
 
     // TP-REG-11: Konto mit Anzeigename beim Anbieter.
@@ -132,8 +132,7 @@ void main() {
     await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), 'Anna');
     await _settleCheck(tester);
     expect(find.text('Schon vergeben – wie wäre es mit „anna2“?'), findsOneWidget);
-    await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'sicher-genug');
-    await tester.pumpAndSettle();
+    await enterNewPassword(tester, 'sicher-genug');
     expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Konto erstellen')).onPressed, isNull);
     await _tapText(tester, '„anna2“ verwenden');
     await _settleCheck(tester);

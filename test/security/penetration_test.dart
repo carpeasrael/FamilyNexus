@@ -14,6 +14,7 @@ import 'package:family_nexus/domain/time_zones.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/events.dart';
+import '../support/invite_links.dart';
 
 final DateTime _now = DateTime.utc(2026, 10, 21, 12);
 const String _nonce = '0123456789abcdef0123456789abcdef';
@@ -24,6 +25,16 @@ String _validLink() => InviteLink.create(
   inviter: '@anna:example.org',
   now: _now,
   nonce: _nonce,
+);
+
+/// Felder des Links aus [_validLink]; Links der Version 3 werden weiter gelesen.
+String _fields() => inviteFields(
+  room: '!abc:example.org',
+  via: 'example.org',
+  srv: 'example.org',
+  inv: '@anna:example.org',
+  exp: _now.add(InviteLink.defaultValidity).millisecondsSinceEpoch ~/ 1000,
+  n: _nonce,
 );
 
 /// Zufällige, aber reproduzierbare Mutation (Seed fest → Fehler sind nachstellbar).
@@ -79,27 +90,34 @@ void main() {
       expect(l!.isValidAt(_now), isTrue);
     });
 
-    test('2000 zufällig mutierte Links: nie eine Ausnahme; angenommene Links sind in sich stimmig', () {
-      final r = Random(1337);
-      final base = _validLink();
-      var accepted = 0;
-      for (var i = 0; i < 2000; i++) {
-        final m = _mutate(base, r);
-        final InviteLink? l;
-        try {
-          l = InviteLink.tryParse(m, now: _now);
-        } catch (e) {
-          fail('Ausnahme bei "$m": $e');
+    void fuzz(String name, String Function(Random r) mutated) {
+      test('2000 zufällig mutierte Links ($name): nie eine Ausnahme; angenommene Links sind in sich stimmig', () {
+        final r = Random(1337);
+        var accepted = 0;
+        for (var i = 0; i < 2000; i++) {
+          final m = mutated(r);
+          final InviteLink? l;
+          try {
+            InviteLink.check(m, now: _now);
+            l = InviteLink.tryParse(m, now: _now);
+          } catch (e) {
+            fail('Ausnahme bei "$m": $e');
+          }
+          if (l == null) continue;
+          accepted++;
+          expect(MatrixIds.isRoomId(l.roomId), isTrue, reason: m);
+          expect(MatrixIds.isUserId(l.inviter), isTrue, reason: m);
+          expect(InviteLink.isNonce(l.nonce), isTrue, reason: m);
+          expect(InviteLink.viaMatchesRoom(l.roomId, l.via), isTrue, reason: m);
         }
-        if (l == null) continue;
-        accepted++;
-        expect(MatrixIds.isRoomId(l.roomId), isTrue, reason: m);
-        expect(MatrixIds.isUserId(l.inviter), isTrue, reason: m);
-        expect(InviteLink.isNonce(l.nonce), isTrue, reason: m);
-        expect(InviteLink.viaMatchesRoom(l.roomId, l.via), isTrue, reason: m);
-      }
-      expect(accepted, lessThan(2000));
-    });
+        expect(accepted, lessThan(2000));
+      });
+    }
+
+    fuzz('Version 4', (r) => _mutate(_validLink(), r));
+    fuzz('Version 3', (r) => _mutate(v3Link(_fields()), r));
+    // Mutationen am Payload treffen fast nur die Dekodierung; deshalb auch am Inneren.
+    fuzz('Inneres von Version 4', (r) => v4(_mutate(_fields(), r)));
 
     test('Regression: ungültige Prozentkodierung wirft nicht (präparierter Deep Link/QR)', () {
       for (final bad in <String>[
@@ -113,7 +131,8 @@ void main() {
     });
 
     test('Angriffsmuster werden abgelehnt', () {
-      final ok = _validLink();
+      final ok = v3Link(_fields());
+      expect(InviteLink.tryParse(ok, now: _now), isNotNull, reason: 'Kontrolle');
       final attacks = <String, String>{
         'anderer Server in via (Umleitung)': ok.replaceFirst('via=example.org', 'via=evil.example'),
         'via mit Zugangsdaten': ok.replaceFirst('via=example.org', 'via=evil@example.org'),
@@ -133,7 +152,8 @@ void main() {
         'Nonce zu kurz': ok.replaceFirst(_nonce, 'abc'),
         'exp als Gleitkommazahl': ok.replaceFirst(RegExp(r'exp=\d+'), 'exp=1.5e9'),
         'exp Überlauf': ok.replaceFirst(RegExp(r'exp=\d+'), 'exp=99999999999999999999'),
-        'Version 4': ok.replaceFirst('v=3', 'v=4'),
+        'Version 4 mit Feldern im Klartext': ok.replaceFirst('v=3', 'v=4'),
+        'Version 5': ok.replaceFirst('v=3', 'v=5'),
         'Version 1 mit Feldern aus Version 2': '${ok.replaceFirst('v=3', 'v=1')}&f=Familie',
         'Konto-Server fehlt (Version 3)': ok.replaceFirst(RegExp(r'srv=[^&]*&'), ''),
         'Konto-Server mit Pfad': ok.replaceFirst(RegExp(r'srv=[^&]*'), 'srv=evil.example%2Fx'),
@@ -142,6 +162,13 @@ void main() {
         'Konto-Server im Heimnetz': ok.replaceFirst(RegExp(r'srv=[^&]*'), 'srv=192.168.0.2'),
         'doppelter Familienname': '$ok&f=A&f=B',
         'überlang': '$ok&pad=${'a' * 600}',
+        'Version 4: anderer Server in via': v4(_fields().replaceFirst('via=example.org', 'via=evil.example')),
+        'Version 4: Rückfall auf Version 1 ohne srv': v4('v=1&${_fields().replaceFirst('srv=example.org&', '')}'),
+        'Version 4: srv fehlt': v4(_fields().replaceFirst('srv=example.org&', '')),
+        'Version 4: Zusatzfeld im Inneren': v4('${_fields()}&redirect=https://evil'),
+        'Version 4: Zusatzfeld neben d': '${v4(_fields())}&redirect=https://evil',
+        'Version 4: Familienname im Inneren': v4('${_fields()}&f=Familie'),
+        'Version 4: CRLF im Inneren': v4(_fields().replaceFirst('via=', 'via=%0d%0a')),
         'leer': '',
         'Leerzeichen': '   ',
       };
