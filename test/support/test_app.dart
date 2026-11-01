@@ -77,6 +77,9 @@ Future<TestApp> buildTestApp({
   bool matrixOrgDefault = false,
   // false: wie im Browser (E-53) – AppServices ohne Scheduler, `services.reminders` ist null. `TestApp.scheduler` bleibt befüllt.
   bool withReminders = true,
+  // Test: Familiendienste schlagen beim Öffnen fehl (#153).
+  Future<void> Function(String uid)? beforeCalendarBuild,
+  Future<void> Function(String uid)? beforeTasksBuild,
 }) async {
   final store = MemoryKeyValueStore();
   if (lang != null) store.data['language'] = lang;
@@ -130,6 +133,7 @@ Future<TestApp> buildTestApp({
       );
     },
     tasksBuilder: (uid) async {
+      await beforeTasksBuild?.call(uid);
       final service = TaskService(
         store: taskStore,
         myUserId: uid,
@@ -145,14 +149,17 @@ Future<TestApp> buildTestApp({
         periodCheck: const Duration(hours: 1),
       );
     },
-    calendarBuilder: (uid) async => buildCalendarController(
-      store: events,
-      gateway: gateway,
-      userId: uid,
-      zoneName: 'Europe/Berlin',
-      clock: clock,
-      retryInterval: const Duration(hours: 1),
-    ),
+    calendarBuilder: (uid) async {
+      await beforeCalendarBuild?.call(uid);
+      return buildCalendarController(
+        store: events,
+        gateway: gateway,
+        userId: uid,
+        zoneName: 'Europe/Berlin',
+        clock: clock,
+        retryInterval: const Duration(hours: 1),
+      );
+    },
   );
   return TestApp(
     services: services,

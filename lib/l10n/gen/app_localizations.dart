@@ -278,6 +278,12 @@ abstract class AppLocalizations {
   /// **'Erneut versuchen'**
   String get retry;
 
+  /// No description provided for @homeOpenFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Deine Familiendaten konnten nicht geöffnet werden. Prüfe den freien Speicherplatz und versuche es erneut. Deine Daten bleiben auf dem Gerät.'**
+  String get homeOpenFailed;
+
   /// No description provided for @startupFailedTitle.
   ///
   /// In de, this message translates to:

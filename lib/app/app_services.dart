@@ -122,21 +122,32 @@ class AppServices {
     if (uid == null || build == null) return;
     if (calendar != null && _calendarUser == uid) return;
     closeCalendar();
-    final c = await build(uid);
-    calendar = c;
-    _calendarUser = uid;
-    c.start();
-    final sb = shoppingBuilder;
-    if (sb != null) (shopping = await sb(uid)).start();
-    final tb = tasksBuilder;
-    if (tb != null) (tasks = await tb(uid)).start();
-    final p = PresenceSync(gateway: gateway, enabled: () => settings.settings.shareOnlineStatus);
-    presence = p;
-    settings.addListener(p.update);
-    p.start(foreground: WidgetsBinding.instance.lifecycleState != AppLifecycleState.paused);
-    final s = scheduler;
-    if (s != null) reminders = ReminderCoordinator(calendar: c, scheduler: s, settings: settings, clock: () => c.now)..start();
+    final attempt = ++_openAttempt;
+    try {
+      final c = await build(uid);
+      calendar = c;
+      _calendarUser = uid;
+      c.start();
+      final sb = shoppingBuilder;
+      if (sb != null) (shopping = await sb(uid)).start();
+      final tb = tasksBuilder;
+      if (tb != null) (tasks = await tb(uid)).start();
+      final p = PresenceSync(gateway: gateway, enabled: () => settings.settings.shareOnlineStatus);
+      presence = p;
+      settings.addListener(p.update);
+      p.start(foreground: WidgetsBinding.instance.lifecycleState != AppLifecycleState.paused);
+      final s = scheduler;
+      if (s != null) reminders = ReminderCoordinator(calendar: c, scheduler: s, settings: settings, clock: () => c.now)..start();
+    } catch (e) {
+      AppLog.e('app', 'Familiendienste konnten nicht geöffnet werden', e);
+      // Kein Teilzustand: Fehler heißt „nicht geöffnet“, ein Neuversuch baut alles neu auf (#153). Ein
+      // veralteter Aufruf baut einen neueren, erfolgreichen nicht ab.
+      if (attempt == _openAttempt) closeCalendar();
+      rethrow;
+    }
   }
+
+  int _openAttempt = 0;
 
   /// Meldet den Status als „offline“ und meldet dann ab.
   Future<void> logout() async {

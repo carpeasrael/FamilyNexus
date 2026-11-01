@@ -30,6 +30,7 @@
   "loading": "Loading …",
   "errorGeneric": "Something went wrong.",
   "retry": "Try again",
+  "homeOpenFailed": "Your family data could not be opened. Check the free storage space and try again. Your data stays on the device.",
   "startupFailedTitle": "Local data unreadable",
   "startupFailedBody": "The encrypted database could not be opened, for example because the device key is no longer available. For safety nothing was changed. You can reset the local data and set up again; data on the server and on other devices is kept.",
   "startupSessionLostTitle": "Sign-in not restored",

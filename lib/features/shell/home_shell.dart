@@ -25,7 +25,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   static const int _chatTab = 2;
   static const int _shoppingTab = 3;
   int _index = 0;
-  late final Future<void> _opening;
+  late Future<void> _opening;
   late final AppServices _services;
 
   @override
@@ -71,6 +71,42 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
     return FutureBuilder<void>(
       future: _opening,
       builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.done && snap.hasError) {
+          // Die Familiendienste ließen sich nicht öffnen (z. B. Speicher voll): Menü und Neuversuch bleiben (#153).
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(l.appName),
+              actions: <Widget>[
+                Builder(
+                  builder: (context) => IconButton(
+                    tooltip: l.menuOpen,
+                    icon: const Icon(Icons.menu),
+                    onPressed: () => Scaffold.of(context).openEndDrawer(),
+                  ),
+                ),
+              ],
+            ),
+            endDrawer: const _MenuDrawer(limited: true),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                  Text(l.homeOpenFailed, textAlign: TextAlign.center),
+                  const SizedBox(height: 16),
+                  FilledButton(
+                    onPressed: () {
+                      final reopening = _services.openCalendar();
+                      setState(() {
+                        _opening = reopening;
+                      });
+                    },
+                    child: Text(l.retry),
+                  ),
+                ]),
+              ),
+            ),
+          );
+        }
         if (snap.connectionState != ConnectionState.done || services.calendar == null) {
           return Scaffold(body: Center(child: Semantics(label: l.loading, child: const CircularProgressIndicator())));
         }
@@ -95,7 +131,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
               ),
             ],
           ),
-          endDrawer: _MenuDrawer(),
+          endDrawer: const _MenuDrawer(),
           body: SafeArea(child: IndexedStack(index: _index, children: pages)),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _index,
@@ -141,6 +177,11 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
 
 /// Seitenmenü (Burger-Menü rechts oben).
 class _MenuDrawer extends StatelessWidget {
+  const _MenuDrawer({this.limited = false});
+
+  /// Ohne Familiendienste (Fehleransicht): kein Eintrag, der sie braucht.
+  final bool limited;
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -157,11 +198,12 @@ class _MenuDrawer extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Semantics(header: true, child: Text(l.menuTitle, style: Theme.of(context).textTheme.titleLarge)),
           ),
-          ListTile(
-            leading: const Icon(Icons.checklist_outlined),
-            title: Text(l.tasksTitle),
-            onTap: () => open(const TasksScreen()),
-          ),
+          if (!limited)
+            ListTile(
+              leading: const Icon(Icons.checklist_outlined),
+              title: Text(l.tasksTitle),
+              onTap: () => open(const TasksScreen()),
+            ),
           ListTile(
             leading: const Icon(Icons.settings_outlined),
             title: Text(l.tabSettings),
