@@ -54,6 +54,11 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
   lässt sich nicht unter den neuen Schlüssel umziehen). Ist der alte Schlüssel in fremde Hände geraten, hilft der neue daher
   nur bedingt; dafür bräuchte es ein Zurücksetzen der Identität, das die App nicht anbietet.
 
+- **Identitätswechsel eines Mitglieds (E-37, #133):** Nach dem Akzeptieren gilt der neue Schlüssel lokal sofort, die Geräte bleiben
+  entsperrt. Bleiben Geräte gesperrt (Neustart, zweites eigenes Gerät), zeigt die App weiter „Identität geändert“ und bietet
+  „Akzeptieren“ an: Jedes Gerät bestätigt selbst, Kontodaten des Servers entsperren nichts. Der Pfad mit echten Geräteschlüsseln
+  ist nicht getestet (Testlücke Identitätswechsel gegen echten Server). Die Pin-Map hat Last-Writer-Wins zwischen eigenen Geräten.
+
 - **Einrichtung (E-55–E-57):** Zusatzschritte „Bedingungen“ und „kein Roboter“ (reCAPTCHA) sind nur gegen den Fake geprüft;
   der lokale Test-Synapse verlangt sie nicht. Die OAuth-Anmeldung (matrix.org) ist automatisch nur gegen den Fake geprüft,
   gegen den echten Anbieter manuell (Testplan TP-OAUTH-M1); der OAuth-Rücksprung braucht die Projektseite als `client_uri`.

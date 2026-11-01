@@ -45,6 +45,7 @@ import 'chat_mapper.dart';
 import 'family_room_spec.dart';
 import 'background_image_work.dart';
 import 'https_only_client.dart';
+import 'identity_pins.dart';
 import 'server_probe.dart';
 import 'sync_relevance.dart';
 
@@ -1029,6 +1030,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _knownJoined = null;
     _verification = null;
     _identityChanged.clear();
+    _pinBook.clear();
     _participantsLoaded = false;
     _participantsRequested = false;
     _syncedOnce = false;
@@ -3162,7 +3164,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   static const String pinsAccountData = 'de.inneso.familynexus.identity_pins';
 
   final Set<String> _identityChanged = <String>{};
-  final Map<String, String> _pendingPins = <String, String>{};
+  final IdentityPinBook _pinBook = IdentityPinBook();
   final Map<String, String> _knockNonces = <String, String>{};
   bool _pinsPersisting = false;
 
@@ -3187,6 +3189,13 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
   }
 
+  /// Ob ein Gerät des Mitglieds von der App gesperrt wurde (nur Geräte, nicht der Hauptschlüssel; #133).
+  bool _anyDeviceBlocked(String uid) {
+    final list = _client?.userDeviceKeys[uid];
+    if (list == null) return false;
+    return anyBlocked(list.deviceKeys.values.map((d) => (blocked: d.blocked, selfSigned: d.selfSigned)));
+  }
+
   IdentityStatus _identityOf(String uid, String me) {
     final c = _client;
     if (c == null) return IdentityStatus.unknown;
@@ -3194,29 +3203,34 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final master = c.userDeviceKeys[uid]?.masterKey;
     final pub = master?.publicKey;
     if (master == null || pub == null) return IdentityStatus.unknown;
-    final pinned = _pins()[uid] ?? _pendingPins[uid];
-    if (pinned == null) {
-      _pendingPins[uid] = pub;
-      _persistPins().ignore();
-      return master.verified ? IdentityStatus.verified : IdentityStatus.pinned;
+    final accountPins = _pins();
+    _pinBook.synced(accountPins);
+    final pinned = _pinBook.pinned(uid, accountPins);
+    switch (decide(pinned: pinned, pub: pub, anyBlocked: _anyDeviceBlocked(uid))) {
+      case IdentityDecision.firstSeen:
+        _identityChanged.remove(uid);
+        _pinBook.remember(uid, pub);
+        _persistPins().ignore();
+        return master.verified ? IdentityStatus.verified : IdentityStatus.pinned;
+      case IdentityDecision.changed:
+        _identityChanged.add(uid);
+        // Neu sperren nur bei einem anderen Schlüssel; entsperrt wird ausschließlich beim Akzeptieren (E-37).
+        if (pinned != null && pinned != pub) _setBlocked(uid, true);
+        return IdentityStatus.changed;
+      case IdentityDecision.ok:
+        _identityChanged.remove(uid);
+        return master.verified ? IdentityStatus.verified : IdentityStatus.pinned;
     }
-    if (pinned != pub) {
-      _identityChanged.add(uid);
-      _setBlocked(uid, true);
-      return IdentityStatus.changed;
-    }
-    _identityChanged.remove(uid);
-    return master.verified ? IdentityStatus.verified : IdentityStatus.pinned;
   }
 
   Future<void> _persistPins() async {
     final c = _client;
-    if (_pinsPersisting || c == null || !c.isLogged() || _pendingPins.isEmpty) return;
+    if (_pinsPersisting || c == null || !c.isLogged() || !_pinBook.hasPending) return;
     _pinsPersisting = true;
     try {
-      final merged = <String, String>{..._pins(), ..._pendingPins};
+      final merged = _pinBook.merged(_pins());
       await c.setAccountData(c.userID!, pinsAccountData, <String, Object?>{...merged});
-      _pendingPins.removeWhere((k, v) => merged[k] == v);
+      _pinBook.persisted(merged);
     } catch (e) {
       AppLog.w('gateway', 'Identitätsvermerke nicht gespeichert');
     } finally {
@@ -3230,13 +3244,17 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _requireMember(f, userId);
     final c = _client;
     final pub = c?.userDeviceKeys[userId]?.masterKey?.publicKey;
-    if (c == null || pub == null || !_identityChanged.contains(userId)) throw const GatewayException(GatewayError.notFound);
+    if (c == null || pub == null || !canAccept(identityChanged: _identityChanged.contains(userId), anyBlocked: _anyDeviceBlocked(userId))) {
+      throw const GatewayException(GatewayError.notFound);
+    }
+    final accountPins = _pins();
     try {
-      await c.setAccountData(c.userID!, pinsAccountData, <String, Object?>{..._pins(), userId: pub});
+      await c.setAccountData(c.userID!, pinsAccountData, <String, Object?>{..._pinBook.merged(accountPins), userId: pub});
     } catch (e) {
       throw _map(e);
     }
-    _pendingPins.remove(userId);
+    // Erst nach erfolgreichem Schreiben: Bis der Sync die Kontodaten bringt, gilt der akzeptierte Pin lokal.
+    _pinBook.accept(userId, pub, base: accountPins[userId]);
     _identityChanged.remove(userId);
     _setBlocked(userId, false);
     _scheduleRefresh();
