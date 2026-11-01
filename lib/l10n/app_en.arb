@@ -1485,6 +1485,7 @@
   "keyStoreAndroid": "Android Keystore (bound to this device)",
   "keyStoreApple": "Device keychain (not in iCloud)",
   "keyStoreLinux": "System keyring (Secret Service)",
+  "keyStoreLinuxFlatpak": "Protected storage of the Flatpak sandbox (Secret portal)",
   "keyStoreWindows": "Windows Credential Manager",
   "keyStoreBrowser": "Password-protected vault in browser storage (localStorage)",
   "settingsReportLocal": "Report: show all locally stored data",

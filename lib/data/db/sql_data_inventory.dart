@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import 'package:path/path.dart' as p;
 import 'package:sqflite_sqlcipher/sqflite.dart';
@@ -45,7 +46,17 @@ class SqlDataInventory implements LocalDataInventory {
     if (Platform.isAndroid) return KeyStoreKind.androidKeystore;
     if (Platform.isIOS || Platform.isMacOS) return KeyStoreKind.appleKeychain;
     if (Platform.isWindows) return KeyStoreKind.windowsCredentialManager;
-    return KeyStoreKind.linuxSecretService;
+    return linuxKeyStoreKind();
+  }
+
+  /// Linux: im Flatpak liegen die Schlüssel über das Secret-Portal in der Sandbox (E-50), sonst im
+  /// Secret Service des Systems. Erkennung wie üblich per `FLATPAK_ID` oder `/.flatpak-info`.
+  @visibleForTesting
+  static KeyStoreKind linuxKeyStoreKind({Map<String, String>? environment, bool Function(String path)? fileExists}) {
+    final env = environment ?? Platform.environment;
+    final exists = fileExists ?? (String p) => File(p).existsSync();
+    final inFlatpak = (env['FLATPAK_ID'] ?? '').isNotEmpty || exists('/.flatpak-info');
+    return inFlatpak ? KeyStoreKind.linuxFlatpakPortal : KeyStoreKind.linuxSecretService;
   }
 
   @override

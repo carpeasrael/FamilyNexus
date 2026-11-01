@@ -113,7 +113,7 @@ Security takes precedence over convenience: encryption cannot be turned off, and
 ### Storage on the Device
 
 - Local database (SQLite) with full encryption, e.g. SQLCipher with AES-256.
-- The database key is stored in the operating system's key store: Keychain (macOS, iOS, iPadOS), Keystore (Android), Credential Manager or DPAPI (Windows), Secret Service (Linux).
+- The database key is stored in the operating system's key store: Keychain (macOS, iOS, iPadOS), Keystore (Android), Credential Manager or DPAPI (Windows), Secret Service (Linux; in the Flatpak, the Secret portal of the sandbox).
 - Optional app lock via PIN, password or biometrics; automatic lock after inactivity.
 - Attachments and media are stored separately encrypted in the file system.
 - No plaintext previews in notifications, task switcher or backups (screenshot protection on request).
