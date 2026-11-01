@@ -10,8 +10,9 @@ import 'time_zones.dart';
 export 'task_period.dart' show TaskInterval;
 export 'task_rule.dart' show TaskRepeat, TaskRule;
 
+/// Ohne Steuer-/Bidi-Zeichen, erlaubt aber ZWNJ/ZWJ (U+200C/U+200D) wie die Erklärung (#161).
 final RegExp _badText = RegExp(
-  '[\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF]',
+  '[\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200B\\u200E\\u200F\\u202A-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF]',
 );
 
 /// Wie [_badText], erlaubt aber Zeilenumbrüche (mehrzeilige Erklärung) sowie ZWNJ/ZWJ (U+200C/U+200D),
@@ -19,6 +20,9 @@ final RegExp _badText = RegExp(
 final RegExp _badDescription = RegExp(
   '[\\u0000-\\u0009\\u000B-\\u001F\\u007F-\\u009F\\u061C\\u200B\\u200E\\u200F\\u202A-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF]',
 );
+
+/// Leer oder nur Leerraum und Verbinder (ZWNJ/ZWJ): sonst wäre ein Titel unsichtbar (#161).
+bool _blank(String s) => s.replaceAll(RegExp('[\\u200C\\u200D]'), '').trim().isEmpty;
 
 /// Ein Punkt einer Aufgabenliste.
 class TaskItem {
@@ -111,11 +115,11 @@ class TaskList {
     for (final i in items) {
       if (!CalendarEvent.isValidId(i.id) || !seen.add(i.id)) p.add('item-id');
       final t = i.title;
-      if (t.trim().isEmpty || t.runes.length > maxTitle || _badText.hasMatch(t)) p.add('item-title');
+      if (_blank(t) || t.runes.length > maxTitle || _badText.hasMatch(t)) p.add('item-title');
     }
     if (deleted) {
       if (title.isNotEmpty || items.isNotEmpty || description.isNotEmpty) p.add('tombstone');
-    } else if (title.trim().isEmpty) {
+    } else if (_blank(title)) {
       p.add('title');
     }
     return p;

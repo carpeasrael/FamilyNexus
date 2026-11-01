@@ -26,8 +26,24 @@ void main() {
       expect(_item(title: 'Mi\u0000lch').validate(), contains('text'));
       expect(_item(title: 'Mi\u202Elch').validate(), contains('text'));
       expect(_item(quantity: '2\n').validate(), contains('text'));
+      for (final bad in <String>['\u200B', '\u200E', '\u200F', '\u2060', '\uFEFF', '\u061C']) {
+        expect(_item(title: 'a${bad}b').validate(), contains('text'), reason: bad.codeUnits.toString());
+        expect(_item(quantity: '2$bad').validate(), contains('text'), reason: bad.codeUnits.toString());
+      }
       expect(_item(at: DateTime(2026)).validate(), contains('time'), reason: 'nicht UTC');
       expect(_item(at: DateTime.utc(1999)).validate(), contains('time'));
+    });
+
+    test('#161: zusammengesetzte Emojis und ZWNJ sind erlaubt, ein Titel nur aus Verbindern nicht', () {
+      expect(_item(title: '👨\u200D👩\u200D👧 Familienessen').validate(), isEmpty);
+      expect(_item(title: 'می\u200Cخواهم', quantity: '2\u200D').validate(), isEmpty);
+      expect(_item(title: '\u200D\u200C').validate(), contains('title'));
+      expect(_item(title: ' \u200D ').validate(), contains('title'));
+    });
+
+    test('#161: Rundlauf des Codecs mit ZWJ-Titel', () {
+      final i = _item(title: '👨\u200D👩\u200D👧 Eis', quantity: '2\u200C');
+      expect(ShoppingCodec.decode(ShoppingCodec.encode(i), sender: _anna), i);
     });
 
     test('Löschmarken tragen keinen Inhalt', () {

@@ -179,6 +179,14 @@ void main() {
       expect(ev().copyWith(note: 'a\u202Eb').validate(), contains('text'));
     });
 
+    test('#161: Termine bleiben bei E-33 – ZWJ/ZWNJ in Titel, Ort und Notiz werden weiter abgelehnt', () {
+      for (final z in <String>['\u200D', '\u200C']) {
+        expect(ev(title: '👨$z👩 Essen').validate(), contains('text'), reason: z.codeUnits.toString());
+        expect(ev().copyWith(location: 'Ort${z}x').validate(), contains('text'));
+        expect(ev().copyWith(note: 'Notiz${z}x').validate(), contains('text'));
+      }
+    });
+
     test('Wiederholungsende vor dem ersten Termin ist ungültig', () {
       final bad = ev(recurrence: Recurrence(frequency: Frequency.daily, until: DateTime.utc(2026, 3, 19)));
       expect(bad.validate(), contains('recurrence:until-before-start'));
