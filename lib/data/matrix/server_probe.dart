@@ -95,8 +95,11 @@ class ServerProbe {
     final base = hs is Map<String, Object?> ? hs['base_url'] : null;
     if (base is String) {
       final parsed = ServerUrl.tryParse(base);
-      if (parsed != null) return parsed;
-      AppLog.w('probe', 'well-known verweist auf ungültige/unsichere Adresse – ignoriert');
+      if (parsed != null && (url.isLocal || !parsed.isLocal)) return parsed;
+      // Ein öffentlicher Server darf nicht ins Heimnetz weiterleiten (E-59, #158).
+      AppLog.w('probe', parsed == null
+          ? 'well-known verweist auf ungültige/unsichere Adresse – ignoriert'
+          : 'well-known verweist ins Heimnetz – verworfen');
     }
     return url;
   }
@@ -171,7 +174,13 @@ class ServerProbe {
     if (meta == null) return null;
     final issuer = _httpsUri(meta['issuer']);
     const required = <String>['authorization_endpoint', 'registration_endpoint', 'token_endpoint', 'revocation_endpoint'];
-    return issuer != null && required.every((k) => _httpsUri(meta[k]) != null) ? issuer : null;
+    if (issuer == null || !required.every((k) => _httpsUri(meta[k]) != null)) return null;
+    // Ein öffentlicher Anbieter darf keine Endpunkte im Heimnetz nennen (E-59, #158).
+    if (!base.isLocal && [issuer, ...required.map((k) => _httpsUri(meta[k])!)].any((u) => ServerUrl.isLocalHost(u.host.toLowerCase()))) {
+      AppLog.w('probe', 'Anmeldedienst verweist ins Heimnetz – verworfen');
+      return null;
+    }
+    return issuer;
   }
 
   /// Wie bei [url] ein Konto angelegt wird (E-55). Fragt erst den OAuth-Dienst ab, sonst die

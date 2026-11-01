@@ -1,8 +1,8 @@
 # Eigenen Matrix-Homeserver betreiben (Vorlage)
 
 FamilyNexus funktioniert mit jedem Matrix-Homeserver, der die Client-Server-API ab **v1.1** unterstützt
-(Raumversion 10, Anklopfen/„knock“, Anmeldung mit Passwort). Ein eigener Server hält auch die
-**Metadaten** (wer schreibt wann mit wem) in deiner Hand. Inhalte sind ohnehin Ende-zu-Ende-verschlüsselt.
+(Raumversion 10, Anklopfen/„knock“, Anmeldung mit Passwort). Mit einem eigenen Server bestimmst du selbst,
+wer die **Metadaten** (wer schreibt wann mit wem, Raum- und Profilnamen wie der Familienname) sieht; sie verschwinden dadurch nicht. Inhalte sind ohnehin Ende-zu-Ende-verschlüsselt.
 
 > Diese Anleitung ist eine Ausgangsbasis, kein Ersatz für die Dokumentation von Synapse bzw. deines
 > Reverse-Proxys. Nimm aktuelle Versionen und halte sie aktuell.
@@ -73,7 +73,7 @@ matrix.example.org {
 - [ ] `https://matrix.example.org/_matrix/client/versions` liefert `v1.1` oder höher.
 - [ ] `https://matrix.example.org/_matrix/client/v3/login` nennt `m.login.password`.
 - [ ] Sicherungen der Datenbank des Servers sind verschlüsselt; Server-Logs enthalten keine Inhalte.
-- [ ] Mindestens **zwei Moderatoren** in der Familie und Wiederherstellungsschlüssel gesichert.
+- [ ] Mindestens **zwei Moderatoren** in der Familie und Notfall-Schlüssel gesichert.
 
 ## Serverwechsel
 Ein Wechsel des Homeservers bedeutet: neue Konten, neue Familie (neuer Raum), neue Einladungen. Ein

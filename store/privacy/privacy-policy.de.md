@@ -185,8 +185,8 @@ werden. Dann gelten zusätzlich dessen Zugriffs- und Datenschutzbedingungen.
 Ausgewählte Originaldateien bleiben an ihrem bisherigen Speicherort; beim
 Einlesen versucht die App, temporäre Auswahlkopien zu entfernen.
 
-Beim Kopieren des Notfall-Schlüssels versucht die App, den entsprechenden
-Zwischenablageeintrag nach einer Minute zu entfernen. Hintergrundbeschränkungen
+Beim Kopieren des Notfall-Schlüssels oder eines Datenprotokolls versucht die App,
+den entsprechenden Zwischenablageeintrag nach einer Minute zu entfernen. Hintergrundbeschränkungen
 und Zwischenablageverläufe können eine vollständige Entfernung verhindern.
 Andere Apps oder Systemdienste können kopierte Inhalte je nach Plattform verarbeiten.
 

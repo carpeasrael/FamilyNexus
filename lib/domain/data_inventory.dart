@@ -2,7 +2,7 @@ import 'family.dart';
 import 'security.dart';
 
 /// Wo die Schlüssel der lokalen Datenbanken liegen (je Plattform).
-enum KeyStoreKind { androidKeystore, appleKeychain, linuxSecretService, windowsCredentialManager, browserVault }
+enum KeyStoreKind { androidKeystore, appleKeychain, linuxSecretService, linuxFlatpakPortal, windowsCredentialManager, browserVault }
 
 /// Speicherorte der lokalen Daten dieser App.
 class StorageLocations {

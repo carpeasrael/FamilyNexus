@@ -1,14 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../app/app_services.dart';
 import '../../app/app_version.dart';
+import '../../data/platform/secret_clipboard.dart';
 import '../../domain/data_inventory.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
+import '../security/security_panel.dart' show clearClipboardLater;
 import 'data_report.dart';
 
 enum DataReportKind { local, online }
@@ -55,7 +56,9 @@ class _DataReportScreenState extends State<DataReportScreen> {
   Future<void> _copy(String text) async {
     final l = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    await Clipboard.setData(ClipboardData(text: text));
+    // Alle Inhalte im Klartext: wie der Notfall-Schlüssel vertraulich kopieren und nach einer Minute leeren (SA-11).
+    await copySensitive(text);
+    clearClipboardLater(text);
     messenger.showSnackBar(SnackBar(content: Text(l.reportCopied)));
   }
 

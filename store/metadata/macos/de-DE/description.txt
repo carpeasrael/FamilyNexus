@@ -19,13 +19,13 @@ EINKAUFSZETTEL
 SICHERHEIT UND DATENSCHUTZ
 • Ende-zu-Ende-verschlüsselt über das offene Matrix-Protokoll (Chat, geteilte Termine, Einkaufszettel)
 • Lokal verschlüsselte Datenbank, Schlüssel im Schlüsselspeicher des Geräts
-• App-Sperre über die Geräteanmeldung, Bildschirmschutz
+• App-Sperre über die Geräteanmeldung
 • Keine Werbung, keine Tracker, keine Analyse
 • Eigener Server möglich – der öffentliche Server ist nur voreingestellt
 • Freie Software (AGPL-3.0), Quellcode einsehbar
 
 FAMILIE
 • Moderatoren laden ein (Link oder QR-Code), bestätigen Beitritte und verwalten Rollen
-• Neue Geräte werden per Emoji-Vergleich oder Wiederherstellungsschlüssel verifiziert
+• Neue Geräte werden per Emoji-Vergleich oder Notfall-Schlüssel verifiziert
 
 Ein Konto legst du bei der Einrichtung direkt an – bei matrix.org, einem anderen Anbieter oder deinem eigenen Server. Ein bestehendes Matrix-Konto funktioniert ebenso.

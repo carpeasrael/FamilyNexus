@@ -430,26 +430,30 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
                 ]),
               ]),
             ),
-            const SizedBox(height: 12),
-            GlassCard(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                Text(l.remindersTitle, style: Theme.of(context).textTheme.titleSmall),
-                const SizedBox(height: 8),
-                Wrap(spacing: 8, runSpacing: 4, children: <Widget>[
-                  for (final m in kReminderChoices)
-                    FilterChip(
-                      label: Text(m == 0 ? l.reminderAtStart : l.reminderBefore(ReminderCoordinator.durationText(l, m))),
-                      selected: _reminders.contains(m),
-                      onSelected: (v) => setState(() {
-                        _reminderTouched = true;
-                        v ? _reminders.add(m) : _reminders.remove(m);
-                      }),
-                    ),
+            // Im Browser gibt es keine Erinnerungen (E-53, #145): keine Karte. Gespeicherte Werte bleiben unberührt
+            // (`_reminderTouched` wird nur durch die Chips gesetzt).
+            if (AppScope.of(context).reminders != null) ...<Widget>[
+              const SizedBox(height: 12),
+              GlassCard(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                  Text(l.remindersTitle, style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: 8),
+                  Wrap(spacing: 8, runSpacing: 4, children: <Widget>[
+                    for (final m in kReminderChoices)
+                      FilterChip(
+                        label: Text(m == 0 ? l.reminderAtStart : l.reminderBefore(ReminderCoordinator.durationText(l, m))),
+                        selected: _reminders.contains(m),
+                        onSelected: (v) => setState(() {
+                          _reminderTouched = true;
+                          v ? _reminders.add(m) : _reminders.remove(m);
+                        }),
+                      ),
+                  ]),
+                  const SizedBox(height: 6),
+                  Text(l.remindersHint, style: Theme.of(context).textTheme.bodySmall),
                 ]),
-                const SizedBox(height: 6),
-                Text(l.remindersHint, style: Theme.of(context).textTheme.bodySmall),
-              ]),
-            ),
+              ),
+            ],
             if (_error != null)
               Padding(
                 key: _errorKey,

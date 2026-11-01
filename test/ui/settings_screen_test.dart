@@ -252,7 +252,7 @@ void main() {
     expect(report, contains('Server: https://fake.test'));
     expect(report, contains('Anzeigename: Anna'));
     expect(report, contains('Gerät DEV1 (DEV1)'));
-    expect(report, contains('Schlüssel-Backup (mit deinem Wiederherstellungsschlüssel verschlüsselt): eingerichtet'));
+    expect(report, contains('Schlüssel-Backup (mit deinem Notfall-Schlüssel verschlüsselt): eingerichtet'));
     expect(report, contains('Ende-zu-Ende-verschlüsselt: ja'));
     expect(report, contains('Anna (@anna:fake.test) – Moderator – beigetreten'));
     expect(report, contains('Eigene Mitgliedschaft: beigetreten'));

@@ -352,7 +352,7 @@ void main() {
       await openSettings(tester);
       await _tap(tester, 'Neuen Notfall-Schlüssel erstellen');
       expect(find.byType(RecoveryKeyRenewScreen), findsOneWidget);
-      expect(find.textContaining('Der alte funktioniert danach nicht mehr'), findsOneWidget);
+      expect(find.textContaining('Danach gilt in der App nur noch der neue'), findsOneWidget);
       await _tap(tester, 'Neuen Notfall-Schlüssel erstellen');
       final newKey = first.server.recoveryKeys['@anna:fake.test']!;
       expect(newKey, isNot(oldKey));

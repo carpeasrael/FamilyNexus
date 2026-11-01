@@ -71,8 +71,11 @@ class SettingsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _SecuritySection(),
             const SizedBox(height: 16),
-            _RemindersSection(),
-            const SizedBox(height: 16),
+            // Im Browser gibt es keine Erinnerungen (E-53, #145): kein Abschnitt.
+            if (AppScope.of(context).reminders != null) ...<Widget>[
+              _RemindersSection(),
+              const SizedBox(height: 16),
+            ],
             _Section(title: l.settingsSectionPrivacy, children: <Widget>[
               // Ohne Geräteanmeldung (Linux, Browser) lässt sich die App-Sperre nicht einschalten: Schalter ausgeblendet (#67).
               if (AppScope.of(context).lock.auth.supported) _LockTiles(),

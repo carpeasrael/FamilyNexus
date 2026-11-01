@@ -62,10 +62,12 @@ class TodayScreen extends StatelessWidget {
                         ),
                     ]),
             ),
-            SectionCard(
-              title: l.remindersTitle,
-              child: Text(l.remindersPlanned(reminders?.plannedCount ?? 0)),
-            ),
+            // Im Browser gibt es keine Erinnerungen (E-53, #145): keine Karte.
+            if (reminders != null)
+              SectionCard(
+                title: l.remindersTitle,
+                child: Text(l.remindersPlanned(reminders.plannedCount)),
+              ),
             SectionCard(
               title: l.todayOnlineHeader,
               child: PresenceBuilder(builder: (context, now) => _OnlineList(services: services, now: now)),
