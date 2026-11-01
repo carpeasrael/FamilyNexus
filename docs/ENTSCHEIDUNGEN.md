@@ -32,6 +32,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Gewählt:** Kein State-Management-Paket: `ChangeNotifier`-Controller, bereitgestellt über einen `InheritedNotifier`; Navigator 1.0 mit Bottom-Navigation.
 - **Verworfen:** Riverpod, Bloc, go_router.
 - **Begründung:** Weniger Lieferkettenrisiko und Paket-API-Risiko; für den Umfang ausreichend; leicht ersetzbar.
+- **Nachtrag (2026-11-01, Issue #151):** `CalendarController.occurrences` speichert die Vorkommen je Fenster und Personenauswahl zwischen (höchstens 6, unveränderliche Listen, in `load()` geleert). `upcoming` beginnt sein Fenster zur vollen Minute und filtert mit der genauen Uhrzeit; das Ergebnis ist unverändert. Die Ansichten hängen weiter am Gateway (Umbau auf die Familie ausgeschlossen); Wirkung unter etwa 1000 Terminen nicht spürbar, auf dem Gerät nicht gemessen.
 
 ## E-07 Matrix-Server (offene Frage „Standardserver“)
 - **Gewählt:** Voreingestellt `https://matrix.org`; frei änderbar. Nur `https://` zulässig. Betreiberanzeige aus `/.well-known/matrix/support`, sonst „nicht angegeben“.

@@ -72,6 +72,7 @@ class CalendarController extends ChangeNotifier {
 
   Future<void> load() async {
     _events = await store.all();
+    _occurrenceCache.clear();
     _rsvps = await store.rsvps();
     _colors = await store.personColors();
     _reminders = await store.reminders();
@@ -80,21 +81,39 @@ class CalendarController extends ChangeNotifier {
 
   // ------------------------------------------------------------- Abfragen
 
+  /// Zwischenspeicher der Vorkommen je Fenster und Personenauswahl (#151): Die Ansichten rufen
+  /// [occurrences] im `build` bei jeder Benachrichtigung auf, auch verdeckt im Tab-Stapel. Er hängt nur an
+  /// [_events] (wird nur in [load] ersetzt, dort geleert) und an der festen Zeitzone des Controllers.
+  final Map<String, List<Occurrence>> _occurrenceCache = <String, List<Occurrence>>{};
+  static const int _occurrenceCacheSize = 6;
+
   /// Vorkommen im Zeitraum [from, to) für die Ansicht; [persons] leer = alle.
+  /// Die Liste ist unveränderlich und wird für gleiche Anfragen wiederverwendet.
   List<Occurrence> occurrences(DateTime from, DateTime to, {Set<String> persons = const <String>{}}) {
+    final key = '${from.microsecondsSinceEpoch}|${to.microsecondsSinceEpoch}|${(persons.toList()..sort()).join('\u0000')}';
+    final cached = _occurrenceCache[key];
+    if (cached != null) return cached;
     final out = <Occurrence>[];
     for (final e in _events) {
       if (e.deleted || !CalendarView.matchesPerson(e, persons)) continue;
       out.addAll(OccurrenceExpander.expand(e, from: from, to: to, viewer: zone));
     }
     out.sort(CalendarView.compare);
-    return out;
+    final result = List<Occurrence>.unmodifiable(out);
+    if (_occurrenceCache.length >= _occurrenceCacheSize) _occurrenceCache.remove(_occurrenceCache.keys.first);
+    _occurrenceCache[key] = result;
+    return result;
   }
 
-  /// Kommende Vorkommen ab jetzt, begrenzt auf [limit].
+  /// Kommende Vorkommen ab jetzt, begrenzt auf [limit]. Das Fenster beginnt zur vollen Minute, damit der
+  /// Zwischenspeicher innerhalb einer Minute greift; der Filter nutzt die genaue Uhrzeit (#151).
   List<Occurrence> upcoming({int limit = 10, Duration window = const Duration(days: 30)}) {
     final n = _clock().toUtc();
-    final list = occurrences(n, n.add(window)).where((o) => o.end.isAfter(n)).toList();
+    final minute = DateTime.utc(n.year, n.month, n.day, n.hour, n.minute);
+    final end = n.add(window);
+    final list = occurrences(minute, minute.add(window + const Duration(minutes: 1)))
+        .where((o) => o.end.isAfter(n) && o.start.isBefore(end))
+        .toList();
     return list.length > limit ? list.sublist(0, limit) : list;
   }
 
