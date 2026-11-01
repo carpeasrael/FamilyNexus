@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/app/app_services.dart';
+import 'package:family_nexus/features/shell/home_shell.dart';
+import 'package:family_nexus/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -97,5 +100,21 @@ void main() {
     await expectLater(first, throwsStateError);
     expect(app.services.calendar, isNotNull, reason: 'der neuere Aufruf bleibt bestehen');
     app.services.closeCalendar();
+  });
+
+  testWidgets('ohne Anmeldung (openCalendar kehrt ohne Fehler zurück) erscheint keine Fehleransicht', (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('de'),
+      home: AppScope(services: app.services, child: const HomeShell()),
+    ));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500)); // Ladekreis animiert endlos
+    expect(app.services.calendar, isNull);
+    expect(find.textContaining('Deine Familiendaten konnten nicht geöffnet werden'), findsNothing);
+    expect(find.text('Erneut versuchen'), findsNothing);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget, reason: 'wie bisher: Ladekreis, keine Fehlermeldung');
   });
 }
