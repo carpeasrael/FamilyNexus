@@ -176,7 +176,7 @@ affected functions may then no longer be available.
 During setup, an encrypted Matrix key backup is set up.
 It is used for restoration on additional or new devices. The provider
 stores encrypted key data in the process. Keep your **emergency key**
-safe and do not pass it on to support offices or other people.
+safe and do not pass it on to support staff or other people.
 
 When you expressly save attachments, data logs or the
 emergency key, **unencrypted files are created outside the protected
@@ -239,7 +239,7 @@ Germany, the EU or the European Economic Area.
 Processing outside this area may also take place when external websites are accessed or with
 cloud exports you choose yourself. The respective responsible
 provider must provide information about specific recipients, countries and relevant safeguards.
-Where the GDPR (DSGVO) applies, third-country transfers must meet the requirements
+Where the GDPR applies, third-country transfers must meet the requirements
 of Art. 44 et seq., such as a relevant adequacy decision or
 appropriate safeguards. Encryption alone does not replace these requirements.
 
