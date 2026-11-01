@@ -3,6 +3,7 @@ import 'dart:convert';
 import '../../domain/data_inventory.dart';
 import '../../domain/event_codec.dart';
 import '../../domain/family.dart';
+import '../../domain/reaction_codec.dart';
 import '../../domain/shopping.dart';
 import '../../domain/tasks.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -48,6 +49,7 @@ class DataReport {
     final label = switch (type) {
       'm.room.message' => l.eventTypeMessage,
       'm.reaction' => l.eventTypeReaction,
+      ReactionCodec.type => l.eventTypeReaction,
       'm.room.encrypted' => l.eventTypeEncrypted,
       EventCodec.sharedType => l.eventTypeSharedEvent,
       EventCodec.privateType => l.eventTypePrivateEvent,

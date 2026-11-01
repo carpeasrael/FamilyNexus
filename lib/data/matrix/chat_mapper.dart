@@ -4,6 +4,7 @@ import '../../core/app_log.dart';
 import '../../domain/attachment_policy.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/chat.dart';
+import '../../domain/reaction_codec.dart';
 import '../../domain/text_sanitizer.dart';
 import 'event_trust.dart';
 import 'local_sends.dart';
@@ -44,12 +45,13 @@ class ChatMapper {
     final me = myUserId ?? timeline.room.client.userID;
     final joinedAt = me == null ? null : _joinedAt(timeline, me);
     final pastNames = _pastNames(timeline);
+    final encryptedReactions = _encryptedReactions(timeline, me);
     final out = <ChatMessage>[];
     var hidden = 0;
     DateTime? firstHidden;
     for (final e in timeline.events.reversed) {
       try {
-        final m = _map(timeline, e, pastNames, me, threadId, sends);
+        final m = _map(timeline, e, pastNames, me, threadId, sends, encryptedReactions);
         if (m == null) continue;
         if (m.undecryptable && joinedAt != null && m.time.isBefore(joinedAt)) {
           hidden++;
@@ -69,6 +71,41 @@ class ChatMapper {
     }
     return out;
   }
+
+  /// Reaktionen vom eigenen Typ je Ziel und Emoji (E-86), mit dem Absender des Ereignisses. Fremde zählen nur verschlüsselt
+  /// angekommen, eigene noch lokale (`sending`, `sent` ohne Quelle) nur auf dem eigenen Gerät.
+  static Map<String, Map<String, Set<String>>> _encryptedReactions(Timeline timeline, String? me) {
+    final out = <String, Map<String, Set<String>>>{};
+    for (final e in timeline.events.reversed) {
+      try {
+        if (e.type != ReactionCodec.type || e.redacted || e.status.isError) continue;
+        final local = e.senderId == me && (e.status.isSending || e.status == EventStatus.sent);
+        if (!arrivedEncrypted(e) && !local) continue;
+        final r = ReactionCodec.decode(e.content, sender: e.senderId);
+        if (r == null) continue;
+        out.putIfAbsent(r.target, () => <String, Set<String>>{}).putIfAbsent(r.key, () => <String>{}).add(e.senderId);
+      } catch (err) {
+        AppLog.e('chat', 'Reaktion konnte nicht gelesen werden', err);
+      }
+    }
+    return out;
+  }
+
+  /// Hat [me] auf [target] schon mit [key] reagiert? Entscheidet nur, ob gesendet wird, nicht, was als echt gilt: Deshalb
+  /// zählt jedes eigene, nicht redigierte, nicht gescheiterte Ereignis, unabhängig von Status und Quelle. Der Server
+  /// erkennt Duplikate im Chiffretext nicht.
+  static bool hasOwnReaction(Timeline timeline, Event target, String key, String me) {
+    for (final e in timeline.events) {
+      if (e.type != ReactionCodec.type || e.senderId != me || e.redacted || e.status.isError) continue;
+      final r = ReactionCodec.decode(e.content, sender: me);
+      if (r != null && r.target == target.eventId && r.key == key) return true;
+    }
+    return target.aggregatedEvents(timeline, RelationshipTypes.reaction).any(
+          (e) => e.senderId == me && !e.redacted && !e.status.isError && _legacyReactionKey(e) == key,
+        );
+  }
+
+  static String? _legacyReactionKey(Event e) => e.content.tryGetMap<String, Object?>('m.relates_to')?.tryGet<String>('key');
 
   /// Ungelesene **lesbare** Nachrichten anderer, höchstens [serverCount] (#65).
   ///
@@ -192,6 +229,7 @@ class ChatMapper {
     String? me,
     String threadId,
     LocalSends sends,
+    Map<String, Map<String, Set<String>>> encryptedReactions,
   ) {
     final name = _senderName(e, pastNames);
     final status = _status(e, sends);
@@ -235,13 +273,19 @@ class ChatMapper {
       }
     }
 
+    // Alte `m.reaction` bleiben lesbar (E-86). Ein Mitglied zählt je Emoji einmal, die Obergrenze gilt für die Summe.
     final reactions = <String, Set<String>>{};
-    for (final r in e.aggregatedEvents(timeline, RelationshipTypes.reaction)) {
-      final key = r.content.tryGetMap<String, Object?>('m.relates_to')?.tryGet<String>('key');
-      if (key == null || !TextSanitizer.isReactionKey(key)) continue;
-      if (!reactions.containsKey(key) && reactions.length >= maxReactionKeys) continue;
-      reactions.putIfAbsent(key, () => <String>{}).add(r.senderId);
+    void addReaction(String key, Iterable<String> senders) {
+      if (!reactions.containsKey(key) && reactions.length >= maxReactionKeys) return;
+      reactions.putIfAbsent(key, () => <String>{}).addAll(senders);
     }
+
+    for (final r in e.aggregatedEvents(timeline, RelationshipTypes.reaction)) {
+      final key = _legacyReactionKey(r);
+      if (key == null || !TextSanitizer.isReactionKey(key)) continue;
+      addReaction(key, <String>[r.senderId]);
+    }
+    encryptedReactions[e.eventId]?.forEach(addReaction);
 
     final ref = d.content.tryGet<String>('de.inneso.familynexus.event_ref');
     return ChatMessage(
