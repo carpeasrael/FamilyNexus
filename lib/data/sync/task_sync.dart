@@ -5,6 +5,7 @@ import '../../domain/calendar_signal.dart';
 import '../../domain/task_store.dart';
 import '../../domain/tasks.dart';
 import '../matrix/matrix_gateway.dart';
+import 'send_backoff.dart';
 
 /// Verbindet die lokalen Aufgabenlisten mit Matrix (E-51), nach dem Muster von `ShoppingSync`:
 ///
@@ -17,12 +18,16 @@ class TaskSync {
     required this.service,
     required this.store,
     this.retryInterval = const Duration(seconds: 60),
-  });
+    DateTime Function()? clock,
+    Duration backoffBase = const Duration(seconds: 5),
+    Duration backoffMax = const Duration(seconds: 60),
+  }) : _backoff = SendBackoff(clock: clock, base: backoffBase, max: backoffMax);
 
   final MatrixGateway gateway;
   final TaskService service;
   final TaskStore store;
   final Duration retryInterval;
+  final SendBackoff _backoff;
 
   /// Wird nach jeder Änderung des lokalen Bestands aufgerufen.
   void Function()? onChanged;
@@ -52,7 +57,17 @@ class TaskSync {
   void start() {
     _sub ??= gateway.calendarSignals.listen(_enqueue);
     _timer ??= Timer.periodic(retryInterval, (_) => kick());
-    gateway.addListener(kick);
+    _backoff.changed(_gatewayState()); // Ausgangszustand merken, erst spätere Wechsel heben das Fenster auf
+    gateway.addListener(_onGatewayChanged);
+    kick();
+  }
+
+  Object _gatewayState() => (gateway.session, gateway.userId, gateway.server, gateway.family?.roomId, gateway.initialSyncDone);
+
+  /// Im Wartefenster nach einem Sendefehler löst eine Meldung des Gateways keinen neuen Versuch aus (#132).
+  void _onGatewayChanged() {
+    final changed = _backoff.changed(_gatewayState());
+    if (!changed && _backoff.blocked) return;
     kick();
   }
 
@@ -60,7 +75,7 @@ class TaskSync {
     _sub?.cancel().ignore();
     _timer?.cancel();
     _debounce?.cancel();
-    gateway.removeListener(kick);
+    gateway.removeListener(_onGatewayChanged);
   }
 
   void kick() {
@@ -128,6 +143,7 @@ class TaskSync {
               continue;
             }
             AppLog.w('tasks', 'Senden verschoben (${err.error.name})');
+            _backoff.failure();
             return;
           }
         }
@@ -142,9 +158,11 @@ class TaskSync {
               continue;
             }
             AppLog.w('tasks', 'Senden verschoben (${err.error.name})');
+            _backoff.failure();
             return;
           }
         }
+        _backoff.success();
       } while (_again);
     } finally {
       _publishing = false;

@@ -2477,6 +2477,24 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     });
   }
 
+  /// Was beim automatischen Wiederholen mit einem Ereignis der Zeitleiste geschieht (#132): Nur eigene
+  /// Chat-Nachrichten (`m.room.message`, auch Dateien) im Status „Fehler“ werden wiederholt. `Event.sendAgain`
+  /// sendet ohne Typ, andere Ereignisse (Kalender, Einkauf, Aufgaben, Reaktionen) gingen sonst mit falschem Typ
+  /// hinaus; die Sync-Klassen halten ihre eigene Warteschlange. Der Zähler wird nur gelöscht, wenn das Ereignis
+  /// gesendet ist, nicht schon im Zustand „wird gesendet“ (sonst ließe sich die Obergrenze umgehen).
+  @visibleForTesting
+  static RetryDecision retryDecision({
+    required String type,
+    required String senderId,
+    required String me,
+    required bool isError,
+    required bool isSent,
+  }) {
+    if (senderId != me || type != EventTypes.Message) return RetryDecision.skip;
+    if (isSent) return RetryDecision.forget;
+    return isError ? RetryDecision.retry : RetryDecision.skip;
+  }
+
   /// Automatisches Wiederholen nach einem Sync: höchstens [maxRetriesPerEvent]-mal,
   /// nie parallel für dasselbe Ereignis und nur, wenn Verschlüsselung gesichert ist.
   void _retryFailedSends() {
@@ -2489,9 +2507,14 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     for (final (t, room) in lines) {
       if (!_canEncryptIn(room)) continue;
       for (final e in t.events) {
-        if (e.senderId != me || !e.status.isError) {
-          _retries.remove(e.eventId);
-          continue;
+        switch (retryDecision(type: e.type, senderId: e.senderId, me: me, isError: e.status.isError, isSent: e.status.isSent)) {
+          case RetryDecision.skip:
+            continue;
+          case RetryDecision.forget:
+            _retries.remove(e.eventId);
+            continue;
+          case RetryDecision.retry:
+            break;
         }
         final tries = _retries[e.eventId] ?? 0;
         if (tries >= maxRetriesPerEvent || !_retryInFlight.add(e.eventId)) continue;
@@ -3518,3 +3541,6 @@ class _RegistrationSession {
   int sendAttempt = 0;
   String? sid;
 }
+
+/// Ergebnis von [SdkMatrixGateway.retryDecision].
+enum RetryDecision { skip, forget, retry }

@@ -803,6 +803,9 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Test-Hook: Ausfall der Verbindung für Veröffentlichungen simulieren.
   bool failPublishes = false;
 
+  /// Test-Hook: Zahl der Sendeversuche (`publish*`), auch der fehlgeschlagenen (#132).
+  int publishAttempts = 0;
+
   FakeRoom _privateRoom() => fake.privateRooms.putIfAbsent(
         _userId!,
         () => FakeRoom('${fake.nextId('!private')}:${fake.host}', 'privat')..membership[_userId!] = MemberStatus.joined,
@@ -812,6 +815,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> publishSharedEvent(CalendarEvent event) async {
     _requireSession();
     _require();
+    publishAttempts++;
     if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
     final room = familyRoom;
     if (room == null) throw const GatewayException(GatewayError.notFound);
@@ -828,6 +832,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> publishPrivateEvent(CalendarEvent event) async {
     _requireSession();
     _require();
+    publishAttempts++;
     if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
     final Map<String, Object?> content;
     try {
@@ -842,6 +847,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> publishRsvp(String eventId, RsvpStatus status, DateTime timestamp) async {
     _requireSession();
     _require();
+    publishAttempts++;
+    if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
     final room = familyRoom;
     if (room == null) throw const GatewayException(GatewayError.notFound);
     fake.post(room, _userId!, EventCodec.rsvpType, EventCodec.encodeRsvp(eventId, status, timestamp));
@@ -1343,6 +1350,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> publishShoppingItem(ShoppingItem item) async {
     _requireSession();
     _require();
+    publishAttempts++;
     if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
     final room = familyRoom;
     if (room == null) throw const GatewayException(GatewayError.notFound);
@@ -1362,6 +1370,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> publishTaskList(TaskList list) async {
     _requireSession();
     _require();
+    publishAttempts++;
     if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
     final room = familyRoom;
     if (room == null) throw const GatewayException(GatewayError.notFound);
@@ -1379,6 +1388,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> publishTaskLog(TaskLogEntry entry) async {
     _requireSession();
     _require();
+    publishAttempts++;
     if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
     final room = familyRoom;
     if (room == null) throw const GatewayException(GatewayError.notFound);

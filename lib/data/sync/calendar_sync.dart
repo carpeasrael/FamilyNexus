@@ -8,6 +8,7 @@ import '../../domain/conflict.dart';
 import '../../domain/event_codec.dart';
 import '../../domain/event_store.dart';
 import '../matrix/matrix_gateway.dart';
+import 'send_backoff.dart';
 
 /// Verbindet lokale Termine mit Matrix (E-09, E-13):
 ///
@@ -22,13 +23,17 @@ class CalendarSync {
     required this.store,
     DateTime Function()? clock,
     this.retryInterval = const Duration(seconds: 60),
-  }) : _clock = clock ?? DateTime.now;
+    Duration backoffBase = const Duration(seconds: 5),
+    Duration backoffMax = const Duration(seconds: 60),
+  })  : _clock = clock ?? DateTime.now,
+        _backoff = SendBackoff(clock: clock, base: backoffBase, max: backoffMax);
 
   final MatrixGateway gateway;
   final CalendarService service;
   final EventStore store;
   final Duration retryInterval;
   final DateTime Function() _clock;
+  final SendBackoff _backoff;
 
   /// Wird nach jeder Änderung des lokalen Bestands aufgerufen.
   void Function()? onChanged;
@@ -58,7 +63,19 @@ class CalendarSync {
   void start() {
     _sub ??= gateway.calendarSignals.listen(_enqueue);
     _timer ??= Timer.periodic(retryInterval, (_) => kick());
-    gateway.addListener(kick);
+    _backoff.changed(_gatewayState()); // Ausgangszustand merken, erst spätere Wechsel heben das Fenster auf
+    gateway.addListener(_onGatewayChanged);
+    kick();
+  }
+
+  Object _gatewayState() => (gateway.session, gateway.userId, gateway.server, gateway.family?.roomId, gateway.initialSyncDone);
+
+  /// Der Gateway meldet sich auch nach jedem Fehlerereignis eines Sendeversuchs; im Wartefenster nach einem
+  /// Fehler löst das keinen neuen Versuch aus (#132). Anmeldung, Wiederverbindung und Konto-/Familienwechsel
+  /// heben das Fenster auf.
+  void _onGatewayChanged() {
+    final changed = _backoff.changed(_gatewayState());
+    if (!changed && _backoff.blocked) return;
     kick();
   }
 
@@ -66,7 +83,7 @@ class CalendarSync {
     _sub?.cancel().ignore();
     _timer?.cancel();
     _debounce?.cancel();
-    gateway.removeListener(kick);
+    gateway.removeListener(_onGatewayChanged);
   }
 
   /// Plant einen Sendeversuch (entprellt).
@@ -148,15 +165,23 @@ class CalendarSync {
       do {
         _again = false;
         if (!_canPublish) break;
-        await _publishEvents();
-        await _publishRsvps();
+        // Beide Teile laufen immer; der Durchlauf zählt höchstens einen Fehler (#132).
+        final eventsOk = await _publishEvents();
+        final rsvpsOk = await _publishRsvps();
+        if (eventsOk && rsvpsOk) {
+          _backoff.success();
+        } else {
+          _backoff.failure();
+          break;
+        }
       } while (_again);
     } finally {
       _publishing = false;
     }
   }
 
-  Future<void> _publishEvents() async {
+  /// `false`, wenn ein Sendefehler den Durchlauf beendet hat.
+  Future<bool> _publishEvents() async {
     final pending = (await store.pendingPublish()).where((e) => e.ownerId == _me).toList()
       ..sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
     for (final e in pending) {
@@ -177,13 +202,14 @@ class CalendarSync {
           continue;
         }
         AppLog.w('sync', 'Senden verschoben (${err.error.name})');
-        return;
+        return false;
       }
     }
+    return true;
   }
 
-  Future<void> _publishRsvps() async {
-    if (gateway.family == null) return;
+  Future<bool> _publishRsvps() async {
+    if (gateway.family == null) return true;
     for (final r in await store.pendingRsvps(_me)) {
       final target = await store.get(r.eventId);
       if (target == null || !target.isShared || target.deleted) {
@@ -195,9 +221,10 @@ class CalendarSync {
         await store.markRsvpPublished(r.eventId, _me, r.timestamp);
       } on GatewayException catch (err) {
         AppLog.w('sync', 'Zusage verschoben (${err.error.name})');
-        return;
+        return false;
       }
     }
+    return true;
   }
 
   /// Beim Beitritt neuer Mitglieder: eigene aktuelle geteilte Termine erneut senden
@@ -211,6 +238,7 @@ class CalendarSync {
         await gateway.publishSharedEvent(e);
       } on GatewayException catch (err) {
         AppLog.w('sync', 'Resync abgebrochen (${err.error.name})');
+        _backoff.failure();
         return;
       }
     }
