@@ -305,7 +305,7 @@ Jede Funktion der App ist mindestens einem Schritt zugeordnet. Wird eine Funktio
 | Kontoanlage | über Einladungslink (Anbieter aus dem Link) | E-08, E-09 |
 | Kontoanlage | Zusatzschritte, Browser/OAuth | G-05 |
 | Notfall-Schlüssel | erstellen, bleibt stehen, kopieren, als Datei speichern, Häkchen-Pflicht (#10) | A-10, D-01, E-10 |
-| Notfall-Schlüssel | neu erstellen, Zurück gesperrt, alter ungültig (#11) | C-05 bis C-07 |
+| Notfall-Schlüssel | neu erstellen, Zurück gesperrt, alter Schlüssel schaltet kein Gerät frei (#11, #149) | C-05 bis C-07 |
 | Anmeldung | falsches Passwort, richtiges Passwort, Freischalten per Schlüssel, per anderem Gerät (Symbolvergleich), kein anderes Gerät | C-01, C-02, C-06, C-07, D-05 |
 | Abmelden | Dialog, danach „Anmelden“ | C-04 |
 | Familie | gründen, „Später“, umbenennen, Empfehlung zweiter Moderator | A-11, A-12, E-01, E-02 |
