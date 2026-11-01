@@ -1116,7 +1116,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy7Body =>
-      'Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, wird die Zwischenablage nach einer Minute geleert; speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.';
+      'Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.';
 
   @override
   String get privacy8Title => 'Kinder';
@@ -2113,7 +2113,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get keyCopied =>
-      'Kopiert. Füge ihn z. B. in deinen Passwort-Manager ein. Die Zwischenablage wird nach einer Minute geleert.';
+      'Kopiert. Füge ihn z. B. in deinen Passwort-Manager ein. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im Zweifel selbst.';
 
   @override
   String get keySave => 'Als Datei speichern';
@@ -2172,14 +2172,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get keyRenewIntro =>
-      'Du hast deinen Notfall-Schlüssel verloren oder willst ihn ersetzen? Dann erstelle hier einen neuen. Der alte funktioniert danach nicht mehr – bewahre nur den neuen auf. Deine Nachrichten, Termine und Geräte bleiben, wie sie sind.';
+      'Du hast deinen Notfall-Schlüssel verloren oder willst ihn ersetzen? Dann erstelle hier einen neuen. Danach gilt in der App nur noch der neue – bewahre nur ihn auf. Ist der alte in fremde Hände geraten, schützt dich das nicht vollständig. Deine Nachrichten, Termine und Geräte bleiben, wie sie sind.';
 
   @override
   String get keyRenew => 'Neuen Notfall-Schlüssel erstellen';
 
   @override
   String get securityKeyRenewHint =>
-      'Falls du ihn verloren hast. Der alte gilt danach nicht mehr.';
+      'Falls du ihn verloren hast. In der App gilt danach nur der neue.';
 
   @override
   String get inviteStepTitle => 'Einladung';
@@ -2640,7 +2640,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reportKeyBackup =>
-      'Schlüssel-Backup (mit deinem Wiederherstellungsschlüssel verschlüsselt)';
+      'Schlüssel-Backup (mit deinem Notfall-Schlüssel verschlüsselt)';
 
   @override
   String get reportSetUp => 'eingerichtet';

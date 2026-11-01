@@ -26,6 +26,6 @@ SECURITY AND PRIVACY
 
 FAMILY
 • Moderators invite (link or QR code), approve join requests and manage roles
-• New devices are verified by emoji comparison or recovery key
+• New devices are verified by emoji comparison or emergency key
 
 You create your account during setup – on matrix.org, another provider or your own server. An existing Matrix account works as well.

@@ -1107,7 +1107,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy7Body =>
-      'Android backups are disabled. If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. “Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the clipboard is cleared after one minute; if you save it as a file, it is stored unencrypted in the location you chose.';
+      'Android backups are disabled. If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. “Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.';
 
   @override
   String get privacy8Title => 'Children';
@@ -2097,7 +2097,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keyCopied =>
-      'Copied. Paste it e.g. into your password manager. The clipboard is cleared after one minute.';
+      'Copied. Paste it e.g. into your password manager. The app tries to clear the clipboard after one minute. If in doubt, clear it yourself.';
 
   @override
   String get keySave => 'Save as file';
@@ -2154,14 +2154,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keyRenewIntro =>
-      'Lost your emergency key or want to replace it? Create a new one here. The old one stops working – keep only the new one. Your messages, events and devices stay as they are.';
+      'Lost your emergency key or want to replace it? Create a new one here. From then on, only the new one counts in the app – keep only that one. If the old one has fallen into the wrong hands, this does not fully protect you. Your messages, events and devices stay as they are.';
 
   @override
   String get keyRenew => 'Create new emergency key';
 
   @override
   String get securityKeyRenewHint =>
-      'In case you lost it. The old one stops working.';
+      'In case you lost it. In the app, only the new one counts afterwards.';
 
   @override
   String get inviteStepTitle => 'Invitation';
@@ -2619,7 +2619,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportCrossSigning => 'Cross-signing keys';
 
   @override
-  String get reportKeyBackup => 'Key backup (encrypted with your recovery key)';
+  String get reportKeyBackup =>
+      'Key backup (encrypted with your emergency key)';
 
   @override
   String get reportSetUp => 'set up';
@@ -2774,11 +2775,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountDeleteNoBrowser => 'The browser could not be opened.';
 
   @override
-  String get chatOpening => 'Opening private chat …';
+  String get chatOpening => 'Opening direct chat …';
 
   @override
   String get chatOpenFailed =>
-      'The private chat could not be opened. Please try again.';
+      'The direct chat could not be opened. Please try again.';
 
   @override
   String get chatBeforeJoin =>

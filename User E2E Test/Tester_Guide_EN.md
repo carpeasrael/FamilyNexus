@@ -49,7 +49,7 @@ Deleted usernames remain taken on this server. If a name is unavailable, use a n
 2. Open **Advanced → Use another provider** and set the test provider address. Wait for the provider confirmation.
 3. Enter `Test N1` under **What is your name?** and your chosen `fnt-MMDD-n1` under **Your username**. Wait for **This username is available.**
 4. Enter your test password, enter it again under **Repeat password** and select **Create account**. The expected next screen is **Your emergency key**.
-5. Select **Create emergency key**. Save the key together with N1's username and provider in your password manager, or use **Save as file** and keep the file securely. A saved key file is unencrypted; copying a key clears the clipboard after one minute.
+5. Select **Create emergency key**. Save the key together with N1's username and provider in your password manager, or use **Save as file** and keep the file securely. A saved key file is unencrypted; copying a key makes the app try to clear the clipboard after one minute (if you leave the app, clear it yourself).
 6. Check **I have stored the emergency key safely.** and select **Next**. A password alone does not restore encrypted history on a new device.
 7. Enter `Test family MMDD` as the family name and select **Create family**. Choose **Later** if you want to prepare sample data before inviting someone.
 8. Confirm that the app opens the family and that N1 is a moderator. In the full plan, record N1's initial key as **KN1**.
