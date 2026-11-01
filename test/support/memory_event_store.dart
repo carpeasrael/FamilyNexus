@@ -77,10 +77,12 @@ class MemoryEventStore implements EventStore {
       };
 
   @override
-  Future<void> putRsvp(String eventId, String userId, RsvpStatus status, DateTime timestamp, {bool published = true}) async {
+  Future<bool> putRsvp(String eventId, String userId, RsvpStatus status, DateTime timestamp, {bool published = true}) async {
     final m = _rsvps.putIfAbsent(eventId, () => <String, ({RsvpStatus status, DateTime ts, bool published})>{});
     final cur = m[userId];
-    if (cur == null || timestamp.isAfter(cur.ts)) m[userId] = (status: status, ts: timestamp, published: published);
+    if (cur != null && !timestamp.isAfter(cur.ts)) return false;
+    m[userId] = (status: status, ts: timestamp, published: published);
+    return true;
   }
 
   @override

@@ -39,8 +39,8 @@ abstract class EventStore {
   /// Zusagen: Termin → Person → Status.
   Future<Map<String, Map<String, RsvpStatus>>> rsvps();
 
-  /// Übernimmt die Zusage, wenn [timestamp] neuer ist als die gespeicherte.
-  Future<void> putRsvp(
+  /// Übernimmt die Zusage, wenn [timestamp] neuer ist als die gespeicherte. `true`, wenn geschrieben wurde (#131).
+  Future<bool> putRsvp(
     String eventId,
     String userId,
     RsvpStatus status,

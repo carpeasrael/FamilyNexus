@@ -4,6 +4,7 @@ import '../../core/app_log.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_service.dart';
 import '../../domain/calendar_signal.dart';
+import '../../domain/conflict.dart';
 import '../../domain/event_codec.dart';
 import '../../domain/event_store.dart';
 import '../matrix/matrix_gateway.dart';
@@ -118,8 +119,8 @@ class CalendarSync {
             rejected++;
             return;
           }
-          await store.putRsvp(r.eventId, s.sender, r.status, r.timestamp);
-          onChanged?.call();
+          // Nur eine wirksame Änderung lädt den Kalender neu; Duplikate und ältere Zusagen nicht (#131).
+          if (await store.putRsvp(r.eventId, s.sender, r.status, r.timestamp)) onChanged?.call();
         case ShoppingSignal():
         case TaskListSignal():
         case TaskLogSignal():
@@ -142,8 +143,10 @@ class CalendarSync {
       AppLog.w('sync', 'Ungültiges Kalender-Ereignis verworfen (${r.error})');
       return;
     }
-    await service.applyIncoming(e);
-    onChanged?.call();
+    final resolution = await service.applyIncoming(e);
+    // Nur neue und geänderte Termine laden den Kalender neu. Duplikate, ältere Fassungen (nur Verlauf) und
+    // abgelehnte Absender ändern den Bestand nicht (#131).
+    if (resolution == Resolution.insert || resolution == Resolution.replace) onChanged?.call();
   }
 
   // -------------------------------------------------------------- ausgehend
