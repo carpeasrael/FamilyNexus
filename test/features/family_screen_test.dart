@@ -1,4 +1,5 @@
 import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/platform/mail_launcher.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
@@ -291,6 +292,61 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Einladen').last);
     await tester.pumpAndSettle();
     expect(app.gateway.familyRoom!.membership['@ben:fake.test'], MemberStatus.invited);
+  });
+
+  group('Einladen per Matrix-ID: Feld nach Ergebnis (#156)', () {
+    Future<TestApp> open(WidgetTester tester) async {
+      final app = await buildTestApp();
+      await _openFamily(tester, app);
+      await tester.ensureVisible(find.text('Erweitert'));
+      await tester.tap(find.text('Erweitert'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.widgetWithText(TextField, 'Per Benutzer-ID einladen'), '@ben:fake.test');
+      await tester.ensureVisible(find.text('Einladen'));
+      await tester.tap(find.text('Einladen'));
+      await tester.pumpAndSettle();
+      return app;
+    }
+
+    String field(WidgetTester tester) => tester.widget<TextField>(find.widgetWithText(TextField, 'Per Benutzer-ID einladen')).controller!.text;
+
+    testWidgets('Fehlschlag: Meldung, die ID bleibt für den Neuversuch stehen', (tester) async {
+      final app = await open(tester);
+      app.gateway.inviteError = const GatewayException(GatewayError.serverUnreachable);
+      await tester.tap(find.widgetWithText(FilledButton, 'Einladen').last);
+      await tester.pumpAndSettle();
+      expect(find.text('Einladung gesendet.'), findsNothing);
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(field(tester), '@ben:fake.test');
+      expect(app.gateway.familyRoom!.membership['@ben:fake.test'], isNull);
+
+      // Neuversuch ohne erneutes Tippen gelingt.
+      app.gateway.inviteError = null;
+      await tester.ensureVisible(find.text('Einladen').first);
+      await tester.tap(find.text('Einladen').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Einladen').last);
+      await tester.pumpAndSettle();
+      expect(app.gateway.familyRoom!.membership['@ben:fake.test'], MemberStatus.invited);
+      expect(field(tester), isEmpty);
+    });
+
+    testWidgets('Erfolg: Meldung und leeres Feld', (tester) async {
+      final app = await open(tester);
+      await tester.tap(find.widgetWithText(FilledButton, 'Einladen').last);
+      await tester.pumpAndSettle();
+      expect(find.text('Einladung gesendet.'), findsOneWidget);
+      expect(field(tester), isEmpty);
+      expect(app.gateway.familyRoom!.membership['@ben:fake.test'], MemberStatus.invited);
+    });
+
+    testWidgets('Abbruch der Rückfrage: die ID bleibt stehen', (tester) async {
+      final app = await open(tester);
+      await tester.tap(find.text('Abbrechen'));
+      await tester.pumpAndSettle();
+      expect(field(tester), '@ben:fake.test');
+      expect(app.gateway.familyRoom!.membership['@ben:fake.test'], isNull);
+    });
   });
 
   testWidgets('Geänderte Identität: Warnung, Badge mit Text, Akzeptieren nur nach Rückfrage', (tester) async {

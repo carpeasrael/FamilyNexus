@@ -84,14 +84,17 @@ class FamilyScreen extends StatelessWidget {
   }
 }
 
-Future<void> _act(BuildContext context, Future<void> Function() op, {String? success}) async {
+/// Führt [op] aus und meldet das Ergebnis in einer Snackbar. `true`, wenn die Aktion gelungen ist (#156).
+Future<bool> _act(BuildContext context, Future<void> Function() op, {String? success}) async {
   final l = AppLocalizations.of(context);
   final m = ScaffoldMessenger.of(context);
   try {
     await op();
     if (success != null) m.showSnackBar(SnackBar(content: Text(success)));
+    return true;
   } catch (e) {
     m.showSnackBar(SnackBar(content: Text(errorText(l, e))));
+    return false;
   }
 }
 
@@ -336,8 +339,9 @@ class _InvitePanelState extends State<_InvitePanel> {
     setState(() => _error = null);
     // Eingeladene erhalten Nachrichtenschlüssel schon vor der Annahme (SDK-Verhalten, SA-2): Rückfrage.
     if (!await _confirm(context, l.familyInvite, l.familyInviteConfirm(id), l.familyInviteSend) || !mounted) return;
-    await _act(context, () => widget.gateway.inviteUser(id), success: l.familyInviteSent);
-    if (mounted) _id.clear();
+    final ok = await _act(context, () => widget.gateway.inviteUser(id), success: l.familyInviteSent);
+    // Bei einem Fehlschlag bleibt die ID für den Neuversuch stehen (#156).
+    if (ok && mounted) _id.clear();
   }
 
   @override

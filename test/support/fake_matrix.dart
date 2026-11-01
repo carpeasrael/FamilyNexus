@@ -250,6 +250,9 @@ class FakeMatrixServer {
 }
 
 class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
+  /// Test: `inviteUser` scheitert mit diesem Fehler (#156).
+  Object? inviteError;
+
   FakeMatrixGateway(this.fake) {
     fake._register(this);
   }
@@ -690,6 +693,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   @override
   Future<void> inviteUser(String userId) async {
+    final error = inviteError;
+    if (error != null) throw error;
     final f = _fam();
     if (!MatrixIds.isUserId(userId)) throw const GatewayException(GatewayError.invalidInput);
     if (!Permissions.canInvite(f)) throw const GatewayException(GatewayError.notAllowed);
