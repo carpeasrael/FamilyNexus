@@ -1,6 +1,6 @@
 # Testplan FamilyNexus (Gesamtplan)
 
-**Planversion: 1.9** (31.10.2026) · Dokument-ID `TP-FN-001` · Änderungen siehe „Versionshistorie“ am Ende und Anhang E. Reports und Issues nennen Planversion und Git-Commit (z. B. „TP-FN-001 v1.0 @ 4abf400“).
+**Planversion: 1.10** (01.11.2026) · Dokument-ID `TP-FN-001` · Änderungen siehe „Versionshistorie“ am Ende und Anhang E. Reports und Issues nennen Planversion und Git-Commit (z. B. „TP-FN-001 v1.0 @ 4abf400“).
 
 Ersetzt: `Testplan_Nutzeranlage.md`, `Testplan_Pruefanleitung.md`, `Testplan_Einladung_Zweiter_Nutzer.md`, `Testdaten_Stammdaten.md` (Zuordnung der alten IDs: Anhang C)
 Bezug: `Massnahmenplan_App_Store_Review.md` (Maßnahme 6), Issues #10–#14, Nachtest #15
@@ -232,6 +232,7 @@ G2 zeigt nach D-06 „Willkommen“ (N2 ist abgemeldet und wird erst in F-01 wie
 | F-03 | G1 | **Alle lokalen Daten löschen (N1):** Einstellungen → „Alle lokalen Daten löschen“ → „Endgültig löschen“ | Rückfrage „Alle lokalen Daten löschen?“; danach „Willkommen“ (Builds **ohne** PR #22, d. h. vor Commit `d20f0e0`, zeigen „Anmelden“ (Befund B-1, Issue #23) → ⚠️; das gilt auch für frühe Builds mit der Nummer 16. Builds ab `d20f0e0`, z. B. die Release-Dateien v1.2.1 vom 26.10.2026 außer der macOS-DMG, zeigen „Willkommen“. Maßgeblich ist der Commit aus V-01/V-03, nicht die Build-Nummer); das Konto besteht weiter | | F-03-G1 | |
 | F-04 | G1 | App beenden, neu starten | „Willkommen“ (nicht „Anmelden“): Einstellungen und Daten sind weg | | F-04-G1 | |
 | F-05 | G1 | „Ich habe schon ein Konto“ → „Erweitert“ → Anbieter-Adresse (nach dem Löschen steht wieder matrix.org, der Server wird nicht gemerkt) → N1 anmelden → „Dieses Gerät freischalten“ mit **KN1b** | Freigeschaltet; Termine (auch private, über den privaten Raum), Chat, Einkauf und Aufgaben vom Server wiederhergestellt; Nachrichten von I2 mit Namen oder „Ehemaliges Mitglied“, nicht mit der Matrix-ID (#60) | | F-05-G1 | |
+| F-05a | G1 | **Temporäre Dateien (nur iOS auf echtem Gerät, Android, #141):** Einstellungen → „Neuen Notfall-Schlüssel erstellen“ (wie C-05; ersetzt KN1b, Schlüssel notieren, danach Häkchen → „Weiter“). In dieser Ansicht „Als Datei speichern“: einmal speichern, einmal abbrechen, einmal doppelt tippen. Im Chat eine zu große Datei wählen (`gross.txt` aus H-16). Danach Temp-Ordner des App-Containers prüfen (iOS: Xcode, Devices and Simulators, Container herunterladen; Android: `cache/file_picker`) | Ordner ohne Klartext-Datei; die gespeicherte Datei ist am Zielort vollständig lesbar; beim Doppeltipp läuft der erste Export durch | | F-05a-G1 | |
 | F-06 | G1 | **N1 löschen:** Einstellungen → „Konto löschen“ → Passwort → „Konto endgültig löschen“ | Kein Moderator-Hinweis (allein); „Willkommen“ (Builds **ohne** PR #22, d. h. vor Commit `d20f0e0`, zeigen „Anmelden“ (Befund B-1, Issue #23) → ⚠️; das gilt auch für frühe Builds mit der Nummer 16. Builds ab `d20f0e0`, z. B. die Release-Dateien v1.2.1 vom 26.10.2026 außer der macOS-DMG, zeigen „Willkommen“. Maßgeblich ist der Commit aus V-01/V-03, nicht die Build-Nummer) | | F-06a-G1, F-06b-G1 | |
 | F-07 | – | Gegenprobe N1 und I2: Anmeldung mit `fnt-MMTT-n1` bzw. `fnt-MMTT-i2` | Beide scheitern (`403 M_FORBIDDEN`) | | – | |
 | F-08 | – | **Zustand am Ende:** V-06 für alle Konten des Laufs; Registrierung offen lassen oder schließen (Absprache mit dem Betreiber) | Alle Konten gelöscht (`register/available` liefert für gelöschte Konten weiterhin `M_USER_IN_USE`, daher F-02/F-07 maßgeblich); Zustand im Report | | – | |
@@ -306,7 +307,7 @@ Jede Funktion der App ist mindestens einem Schritt zugeordnet. Wird eine Funktio
 | Kontoanlage | vergebener Name mit Vorschlag, Wechsel zur Anmeldung mit Namen, Abbruch ohne Konto, Registrierung geschlossen | D-01, D-04, D-06, D-07 |
 | Kontoanlage | über Einladungslink (Anbieter aus dem Link) | E-08, E-09 |
 | Kontoanlage | Zusatzschritte, Browser/OAuth | G-05 |
-| Notfall-Schlüssel | erstellen, bleibt stehen, kopieren, als Datei speichern, Häkchen-Pflicht (#10) | A-10, D-01, E-10 |
+| Notfall-Schlüssel | erstellen, bleibt stehen, kopieren, als Datei speichern, Häkchen-Pflicht (#10); keine Klartext-Reste im temporären Ordner (#141) | A-10, D-01, E-10, F-05a |
 | Notfall-Schlüssel | neu erstellen, Zurück gesperrt, alter Schlüssel schaltet kein Gerät frei (#11, #149) | C-05 bis C-07 |
 | Anmeldung | falsches Passwort, richtiges Passwort, Freischalten per Schlüssel, per anderem Gerät (Symbolvergleich), kein anderes Gerät | C-01, C-02, C-06, C-07, D-05 |
 | Abmelden | Dialog, danach „Anmelden“ | C-04 |
@@ -500,6 +501,7 @@ Quelle (Planversion 1.6 → 1.7): Lauf vom 28.10.2026 mit Build 1.2.1 (19) (macO
 | P-61 | E-05, E-06, E-07, H-14 | Link `v=3` im Klartext mit Familienname; Karte nennt die Familie | Link `v=4` mit kodierten Feldern, kein Familienname in Link und Mail; Karte „Du trittst einer Familie bei …“ (#115, E-79) |
 | P-62 | A-05, A-08, D-01, E-09, B-23 | Ein Passwortfeld, Knopf ab 8 Zeichen aktiv; keine Passwortänderung | Kontrolleingabe: Knopf erst mit gleicher Wiederholung aktiv, neu A-08b; neuer Schritt B-23, setzt das Passwort von N1 zurück (#117, E-80) |
 | P-63 | D-02, D-02a, D-03 | Lauf 17: Kein Bild nach „Ablehnen“, keine Diagnose im Release; „App neu starten und für D-03 ‚Gründen‘ wählen“ ist in der Warteansicht nicht ausführbar | Neues Pflichtbild D-02e-G1, neuer Schritt D-02a (Diagnose, Regex-Prüfung), Hinweis auf das Zurückziehen, Nachtest in Anhang G (#116, #75, E-81) |
+| P-64 | F-05a | Kein Schritt zu temporären Dateien | Neuer Schritt vor der Kontolöschung: Temp-Ordner nach Speichern, Abbruch, Doppeltipp und zu großer Datei ohne Klartext (nur iOS auf echtem Gerät und Android) (#141, E-19) |
 
 ## Anhang F: Hilfsbefehle für Abschnitt H
 
@@ -635,5 +637,6 @@ Regel: Änderungen an Schritten, erwarteten Ergebnissen oder Reihenfolge erhöhe
 | 1.7 | 29.10.2026 | Basis `ba36fed` | Soll-Version Build 20; Erwartungen und Hinweise zu B-02, B-19, D-02, E-18, E-23 nach dem Lauf mit Build 19 (P-54 bis P-59, Anhang E; #75 bis #78) |
 | 1.8 | 30.10.2026 | Basis `802eba1` | Neuer Abschnitt H „Verschlüsselung auf dem Gerät und Datenaustausch“ (H-01 bis H-19), Anhang F (Hilfsbefehle), Abdeckungsmatrix, Reihenfolge und Abnahme erweitert; A bis G unverändert |
 | 1.9 | 31.10.2026 | Basis `e627288` | Jeden Beitritt per Link bestätigt ein Moderator (#118, E-78): E-11 mit aktiver Bestätigung auf G1, D-02 mit neuem Wortlaut, Abdeckungsmatrix (P-60, Anhang E); Linkformat v4 ohne Familienname (#115, E-79): E-05 bis E-07 und H-14 (P-61, Anhang E); Kontrolleingabe und Passwort ändern (#117, E-80): A-05, A-08, A-08b, D-01, E-09, B-23, Abdeckungsmatrix (P-62, Anhang E); Erkennung der Ablehnung und Diagnose „Details“ (#116, #75, E-81): D-02, D-02a, D-03, Abdeckungsmatrix (P-63, Anhang E), neuer Anhang G |
+| 1.10 | 01.11.2026 | Basis `b24666d` | Neuer Schritt F-05a (iOS und Android): Temporäre Klartext-Dateien werden nach dem Speichern, Abbruch und zu großer Datei entfernt (#141, E-19), Abdeckungsmatrix (P-64, Anhang E) |
 
 **Zuordnung Issues zur Planversion:** #23 bis #27 (Lauf 1) beziehen sich auf v1.0 (`4abf400`), #28 bis #30 (Lauf 2) auf v1.2 (`d6cecbf`), #31 bis #40 (Lauf 3, Linux/Android) auf v1.0 (`4abf400`); die Plantexte dazu stehen seit v1.1, v1.3 bzw. v1.4 im Plan. Seit v1.5 beschreibt der Plan das Verhalten nach den Fixes aus PR #41 (#23 bereits durch PR #22). #75 bis #78 (Lauf mit Build 19) beziehen sich auf v1.6 (`f4c358c`); #43 bis #46 und #56 bis #69 beziehen sich auf v1.5 (`bb7f347` bzw. `423a3db`); seit v1.6 beschreibt der Plan das Verhalten nach den Fixes vom 28.10.2026.

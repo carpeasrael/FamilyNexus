@@ -104,9 +104,18 @@ Future<void> _closeAfterFailedStart(SdkMatrixGateway gateway, AppDatabase databa
 }
 
 /// Öffnet Schlüsselspeicher und Datenbank und baut die Dienste auf.
-Future<AppServices> bootstrap({KeyStore? keyStore}) async {
+///
+/// Räumt zuerst temporäre Klartext-Dateien auf, die ein beendeter Prozess hinterlassen hat, damit das auch bei einem
+/// Startfehler geschieht (#141). [openDatabase] ersetzt im Test `AppDatabase.open`, das sonst echte Pfade berührt.
+Future<AppServices> bootstrap({
+  KeyStore? keyStore,
+  FileAccess? files,
+  @visibleForTesting Future<AppDatabase> Function(KeyStore keys)? openDatabase,
+}) async {
   final keys = keyStore ?? SecureKeyStore();
-  final database = await AppDatabase.open(keyStore: keys);
+  final fileAccess = files ?? SystemFileAccess();
+  await fileAccess.clearTemporary();
+  final database = await (openDatabase?.call(keys) ?? AppDatabase.open(keyStore: keys));
   final kv = SqlKeyValueStore(database.db);
   final settings = await SettingsController.load(kv);
   await ensureCryptoInitialized();
@@ -170,7 +179,7 @@ Future<AppServices> bootstrap({KeyStore? keyStore}) async {
     },
     settings: settings,
     gateway: gateway,
-    files: SystemFileAccess(),
+    files: fileAccess,
     links: links,
     oauthRedirect: OAuthRedirect.forPlatform(links),
     lock: AppLockController(settings: settings, auth: PlatformInfo.hasNoDeviceAuth ? const UnavailableDeviceAuth() : LocalDeviceAuth()),
@@ -188,7 +197,16 @@ Future<AppServices> bootstrap({KeyStore? keyStore}) async {
 }
 
 /// Löscht alle lokalen Daten und Schlüssel (nur nach ausdrücklicher Bestätigung).
-Future<void> resetLocalData({KeyStore? keyStore}) async {
+///
+/// Temporäre Klartext-Dateien zuerst, damit ein Fehler beim Löschen sie nicht stehen lässt (#141). [destroyAll]
+/// ersetzt im Test alle übrigen Schritte, die sonst den echten Datenbankpfad des Rechners träfen.
+Future<void> resetLocalData({
+  KeyStore? keyStore,
+  FileAccess? files,
+  @visibleForTesting Future<void> Function()? destroyAll,
+}) async {
+  await (files ?? SystemFileAccess()).clearTemporary();
+  if (destroyAll != null) return destroyAll();
   await AppReminderCleanup.cancelAll();
   await AppDatabase.destroy();
   await AppDatabase.destroy(name: SdkMatrixGateway.matrixDbFileName);
