@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:family_nexus/app/web_gate.dart';
 import 'package:family_nexus/data/platform/key_store.dart';
 import 'package:family_nexus/data/platform/vault_key_store.dart';
@@ -51,15 +53,20 @@ class _Calls {
 
 /// #154: Scheitert der Tresor aus einem anderen Grund als „falsches Passwort“, erscheint eine Meldung.
 void main() {
-  Future<_Calls> pump(WidgetTester tester, _Vault vault, String lang, {Object? wipeError}) async {
+  Future<_Calls> pump(WidgetTester tester, _Vault vault, String lang,
+      {Object? wipeError, Future<void>? wipeGate, Object? unlockedError}) async {
     tester.platformDispatcher.localesTestValue = <Locale>[Locale(lang)];
     addTearDown(tester.platformDispatcher.clearLocalesTestValue);
     final calls = _Calls();
     await tester.pumpWidget(WebUnlockApp(
       backend: vault,
-      onUnlocked: (KeyStore keys) => calls.unlocked++,
+      onUnlocked: (KeyStore keys) {
+        calls.unlocked++;
+        if (unlockedError != null) throw unlockedError;
+      },
       onWipe: () async {
         calls.wiped++;
+        await wipeGate;
         if (wipeError != null) throw wipeError;
       },
     ));
@@ -156,6 +163,33 @@ void main() {
       await tester.pumpAndSettle();
       expect(calls.unlocked, 1);
       expect(find.textContaining(failed), findsNothing);
+    });
+
+    testWidgets('$lang: Während des Löschens sind Knöpfe und Felder gesperrt', (tester) async {
+      final gate = Completer<void>();
+      await pump(tester, _Vault(exists: true), lang, wipeGate: gate.future);
+      await tester.tap(find.text(forgot));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, delete));
+      await tester.pump();
+      expect(tester.widget<FilledButton>(find.byType(FilledButton)).onPressed, isNull);
+      expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
+      gate.complete();
+      await tester.pumpAndSettle();
+      expect(find.text(createAction), findsOneWidget);
+      expect(tester.widget<FilledButton>(find.byType(FilledButton)).onPressed, isNotNull);
+    });
+
+    testWidgets('$lang: Fehler im Rückruf nach dem Entsperren erscheint nicht als Tresorfehler', (tester) async {
+      await pump(tester, _Vault(exists: true), lang, unlockedError: StateError('Start'));
+      await enter(tester);
+      final uncaught = <Object>[];
+      await runZonedGuarded(() async {
+        await tester.tap(find.byType(FilledButton));
+        await tester.pumpAndSettle();
+      }, (e, st) => uncaught.add(e));
+      expect(find.textContaining(failed), findsNothing);
+      expect(uncaught.whereType<StateError>(), isNotEmpty, reason: 'der Fehler wird nicht als Tresorfehler verschluckt');
     });
   }
 }
