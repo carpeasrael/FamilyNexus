@@ -86,6 +86,10 @@ void main() {
 
     test('ohne Flatpak bleibt es der Secret Service des Systems', () {
       expect(
+        SqlDataInventory.linuxKeyStoreKind(environment: <String, String>{}, fileExists: (_) => false),
+        KeyStoreKind.linuxSecretService,
+      );
+      expect(
         SqlDataInventory.linuxKeyStoreKind(environment: <String, String>{'FLATPAK_ID': ''}, fileExists: (_) => false),
         KeyStoreKind.linuxSecretService,
       );
