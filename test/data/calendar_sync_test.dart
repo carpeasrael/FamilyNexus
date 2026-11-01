@@ -257,6 +257,86 @@ void main() {
     });
   });
 
+  group('onChanged nur bei wirksamer Änderung (#131)', () {
+    late int changed;
+
+    setUp(() {
+      changed = 0;
+      ben.sync.onChanged = () => changed++;
+    });
+
+    Map<String, Object?> sentContent(String id) =>
+        familyCalendarEvents().lastWhere((e) => e.content['id'] == id).content;
+
+    test('neuer und geänderter Termin melden eine Änderung, Duplikat und ältere Fassung nicht', () async {
+      final e = await anna.createEvent(title: 'Alt');
+      await anna.sync.publishPending();
+      await pumpEventQueue();
+      expect(changed, 1, reason: 'neu (insert)');
+      final v1 = Map<String, Object?>.of(sentContent(e.id));
+
+      ben.gateway.injectSignal(SharedEventSignal(anna.userId, DateTime.utc(2030), v1));
+      await pumpEventQueue();
+      expect(changed, 1, reason: 'Duplikat');
+
+      await anna.service.update(e.copyWith(title: 'Neu'));
+      await anna.sync.publishPending();
+      await pumpEventQueue();
+      expect(changed, 2, reason: 'neue Fassung (replace)');
+
+      ben.gateway.injectSignal(SharedEventSignal(anna.userId, DateTime.utc(2030), v1));
+      await pumpEventQueue();
+      expect(changed, 2, reason: 'ältere Fassung (nur Verlauf)');
+      expect((await ben.store.get(e.id))!.title, 'Neu');
+    });
+
+    test('abgelehnter Besitzer meldet keine Änderung', () async {
+      final e = await anna.createEvent(title: 'Annas');
+      await anna.sync.publishPending();
+      await pumpEventQueue();
+      expect(changed, 1);
+      // Cara gibt dieselbe Termin-ID mit höherer Version als eigenen Termin aus.
+      final forged = EventCodec.encodeStored(e.copyWith(version: e.version + 5, title: 'Fälschung'));
+      ben.gateway.injectSignal(SharedEventSignal('@cara:fake.test', DateTime.utc(2030), forged));
+      await pumpEventQueue();
+      expect(changed, 1);
+      expect((await ben.store.get(e.id))!.title, 'Annas');
+    });
+
+    test('Zusagen: neu und neuer melden eine Änderung, gleicher und älterer Zeitstempel nicht', () async {
+      final e = await anna.createEvent();
+      await anna.sync.publishPending();
+      await pumpEventQueue();
+      changed = 0;
+      RsvpSignal rsvp(RsvpStatus s, DateTime t) =>
+          RsvpSignal(anna.userId, DateTime.utc(2030), EventCodec.encodeRsvp(e.id, s, t));
+      final t1 = DateTime.utc(2026, 11, 1, 10);
+
+      ben.gateway.injectSignal(rsvp(RsvpStatus.accepted, t1));
+      await pumpEventQueue();
+      expect(changed, 1, reason: 'neu');
+      ben.gateway.injectSignal(rsvp(RsvpStatus.accepted, t1));
+      await pumpEventQueue();
+      expect(changed, 1, reason: 'gleicher Zeitstempel');
+      ben.gateway.injectSignal(rsvp(RsvpStatus.declined, t1.subtract(const Duration(minutes: 1))));
+      await pumpEventQueue();
+      expect(changed, 1, reason: 'älter');
+      ben.gateway.injectSignal(rsvp(RsvpStatus.declined, t1.add(const Duration(minutes: 1))));
+      await pumpEventQueue();
+      expect(changed, 2, reason: 'neuer');
+      expect((await ben.store.rsvps())[e.id]![anna.userId], RsvpStatus.declined);
+    });
+
+    test('putRsvp meldet, ob geschrieben wurde', () async {
+      final e = await anna.createEvent();
+      final t = DateTime.utc(2026, 11, 1);
+      expect(await anna.store.putRsvp(e.id, '@ben:fake.test', RsvpStatus.accepted, t), isTrue);
+      expect(await anna.store.putRsvp(e.id, '@ben:fake.test', RsvpStatus.declined, t), isFalse);
+      expect(await anna.store.putRsvp(e.id, '@ben:fake.test', RsvpStatus.declined, t.subtract(const Duration(seconds: 1))), isFalse);
+      expect(await anna.store.putRsvp(e.id, '@ben:fake.test', RsvpStatus.declined, t.add(const Duration(seconds: 1))), isTrue);
+    });
+  });
+
   group('Resync für neue Mitglieder', () {
     test('Anna sendet beim Beitritt von Cara ihre aktuellen geteilten Termine erneut', () async {
       final live = await anna.createEvent(title: 'Bleibt');

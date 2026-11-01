@@ -65,18 +65,48 @@ class CalendarController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     sync.onChanged = null;
     sync.dispose();
     super.dispose();
   }
 
-  Future<void> load() async {
+  Future<void>? _loading;
+  bool _loadAgain = false;
+  bool _disposed = false;
+
+  /// Lädt Termine, Zusagen, Farben und Erinnerungen. Läuft nie parallel: Ein Aufruf während eines laufenden
+  /// Ladens löst genau einen weiteren Durchlauf aus und wartet auf dessen Ende (#131).
+  Future<void> load() {
+    final running = _loading;
+    if (running != null) {
+      _loadAgain = true;
+      return running;
+    }
+    final done = _loadAll();
+    _loading = done;
+    return done;
+  }
+
+  Future<void> _loadAll() async {
+    try {
+      do {
+        _loadAgain = false;
+        await _loadOnce();
+      } while (_loadAgain && !_disposed);
+    } finally {
+      _loading = null;
+      _loadAgain = false;
+    }
+  }
+
+  Future<void> _loadOnce() async {
     _events = await store.all();
     _occurrenceCache.clear();
     _rsvps = await store.rsvps();
     _colors = await store.personColors();
     _reminders = await store.reminders();
-    notifyListeners();
+    if (!_disposed) notifyListeners();
   }
 
   // ------------------------------------------------------------- Abfragen

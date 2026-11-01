@@ -187,7 +187,7 @@ class SqlEventStore implements EventStore {
       );
 
   @override
-  Future<void> putRsvp(
+  Future<bool> putRsvp(
     String eventId,
     String userId,
     RsvpStatus status,
@@ -198,12 +198,13 @@ class SqlEventStore implements EventStore {
         final cur = await txn.query('rsvps',
             where: 'event_id = ? AND user_id = ?', whereArgs: <Object?>[eventId, userId], limit: 1);
         final ms = timestamp.millisecondsSinceEpoch;
-        if (cur.isNotEmpty && (cur.first['ts']! as int) >= ms) return;
+        if (cur.isNotEmpty && (cur.first['ts']! as int) >= ms) return false;
         await txn.insert(
           'rsvps',
           <String, Object?>{'event_id': eventId, 'user_id': userId, 'status': status.name, 'ts': ms, 'published': published ? 1 : 0},
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
+        return true;
       });
 
   @override
