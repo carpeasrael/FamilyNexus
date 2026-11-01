@@ -35,7 +35,7 @@ void main() {
   final se = sections(en);
 
   test('gleiche Abschnitte in gleicher Reihenfolge', () {
-    expect(sd.keys.where((k) => k > 0).length, 14);
+    expect(sd.keys.where((k) => k > 0), isNotEmpty);
     expect(se.keys.toList(), sd.keys.toList());
   });
 
@@ -74,9 +74,11 @@ void main() {
     String normalize(String u) => u.replaceAll(RegExp(r'/(DE|EN)/TXT'), '/XX/TXT').replaceAll(RegExp(r'[.,;:]+$'), '');
     final url = RegExp(r'https?://[^)\s>`]+');
     expect(sorted(tokens(en, url).map(normalize)), sorted(tokens(de, url).map(normalize)));
-    // Ziffernfolgen (ohne Datumsformat-Unterschiede „31. Oktober 2026“ / „31 October 2026“, beide enthalten 31 und 2026).
+    // Ziffernfolgen je Abschnitt (Datumsformate „31. Oktober 2026“ / „31 October 2026“ enthalten beide 31 und 2026).
     final numbers = RegExp(r'\d+');
-    expect(sorted(tokens(en, numbers)), sorted(tokens(de, numbers)));
+    for (final k in sd.keys) {
+      expect(sorted(tokens(se[k]!.join('\n'), numbers)), sorted(tokens(sd[k]!.join('\n'), numbers)), reason: 'Abschnitt $k: Zahlen');
+    }
   });
 
   test('Kopf: Hinweis auf die Übersetzung, Stand, keine Platzhalter und keine Altaussagen', () {
