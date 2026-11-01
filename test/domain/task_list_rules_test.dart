@@ -9,14 +9,21 @@ const String kBen = '@ben:fake.test';
 const String _list1 = '00000000-0000-4000-8000-000000000001';
 const String _item1 = '00000000-0000-4000-8000-000000000002';
 
-TaskList _list({TaskRule rule = const TaskRule.everyDay(), String description = '', bool deleted = false}) => TaskList(
+TaskList _list({
+  TaskRule rule = const TaskRule.everyDay(),
+  String description = '',
+  bool deleted = false,
+  String title = 'Haushalt',
+  String itemTitle = 'Müll raus',
+}) =>
+    TaskList(
       id: _list1,
-      title: deleted ? '' : 'Haushalt',
+      title: deleted ? '' : title,
       assignee: kBen,
       rule: rule,
       description: description,
       timeZone: 'Europe/Berlin',
-      items: deleted ? const <TaskItem>[] : const <TaskItem>[TaskItem(id: _item1, title: 'Müll raus')],
+      items: deleted ? const <TaskItem>[] : <TaskItem>[TaskItem(id: _item1, title: itemTitle)],
       by: kAnna,
       deleted: deleted,
       updatedAt: DateTime.utc(2026, 10, 21, 12),
@@ -51,6 +58,32 @@ void main() {
     test('ungültige Regel wird abgelehnt', () {
       expect(_list(rule: const TaskRule.weekly(9)).validate(), contains('rule'));
       expect(_list(rule: const TaskRule.monthlyByDate(32)).validate(), contains('rule'));
+    });
+  });
+
+  group('#161: zusammengesetzte Emojis und ZWNJ in Titeln und Punkten', () {
+    const family = '👨\u200D👩\u200D👧';
+    test('Listentitel und Punkt dürfen ZWJ/ZWNJ enthalten', () {
+      expect(_list(title: '$family Haushalt').validate(), isEmpty);
+      expect(_list(itemTitle: '$family Müll raus').validate(), isEmpty);
+      expect(_list(itemTitle: 'می\u200Cخواهم').validate(), isEmpty);
+    });
+
+    test('andere Steuer- und Bidi-Zeichen bleiben gesperrt', () {
+      for (final bad in <String>['\u200B', '\u200E', '\u200F', '\u202E', '\u2060', '\uFEFF', '\u061C', '\u2066']) {
+        expect(_list(title: 'a${bad}b').validate(), contains('title'), reason: bad.codeUnits.toString());
+        expect(_list(itemTitle: 'a${bad}b').validate(), contains('item-title'), reason: bad.codeUnits.toString());
+      }
+    });
+
+    test('ein Titel nur aus Verbindern ist leer (kein unsichtbarer Titel)', () {
+      expect(_list(title: '\u200D\u200C').validate(), contains('title'));
+      expect(_list(itemTitle: ' \u200D ').validate(), contains('item-title'));
+    });
+
+    test('Länge wird in Zeichen (Runen) gezählt, auch mit ZWJ', () {
+      expect(_list(itemTitle: 'a' * (TaskList.maxTitle - 1) + '\u200D').validate(), isEmpty);
+      expect(_list(itemTitle: 'a' * TaskList.maxTitle + '\u200D').validate(), contains('item-title'));
     });
   });
 

@@ -4,6 +4,9 @@ import 'calendar_event.dart';
 import 'server.dart';
 import 'shopping_store.dart';
 
+/// Leer oder nur Leerraum und Verbinder (ZWNJ/ZWJ): sonst wäre ein Titel unsichtbar (#161).
+bool _blank(String s) => s.replaceAll(RegExp('[\\u200C\\u200D]'), '').trim().isEmpty;
+
 /// Ein Eintrag der gemeinsamen Einkaufsliste (E-40).
 ///
 /// Jedes Familienmitglied darf jeden Eintrag ändern. Gleichzeitige Änderungen konvergieren über
@@ -46,8 +49,10 @@ class ShoppingItem {
   final String by;
   final DateTime updatedAt;
 
+  /// Ohne Steuer-/Bidi-Zeichen, erlaubt aber ZWNJ/ZWJ (U+200C/U+200D): Ohne sie wären zusammengesetzte Emojis
+  /// (👨‍👩‍👧) und viele Schriften nicht darstellbar (#161).
   static final RegExp _bad = RegExp(
-    '[\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF]',
+    '[\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200B\\u200E\\u200F\\u202A-\\u202E\\u2060-\\u2064\\u2066-\\u2069\\uFEFF]',
   );
 
   /// Fachliche Prüfung; leer = gültig.
@@ -62,7 +67,7 @@ class ShoppingItem {
     if (deleted) {
       // Löschmarken tragen keinen Inhalt.
       if (title.isNotEmpty || quantity.isNotEmpty || checked) p.add('tombstone');
-    } else if (title.trim().isEmpty) {
+    } else if (_blank(title)) {
       p.add('title');
     }
     return p;

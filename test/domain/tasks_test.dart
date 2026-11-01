@@ -94,6 +94,15 @@ void main() {
       expect(TaskCodec.decodeLog(TaskCodec.encodeLog(e), sender: kBen), e);
     });
 
+    test('#161: Kommentar mit zusammengesetztem Emoji; andere Steuerzeichen bleiben gesperrt', () {
+      final ok = _entry(comment: 'Erledigt 👨\u200D👩\u200D👧');
+      expect(ok.validate(), isEmpty);
+      expect(TaskCodec.decodeLog(TaskCodec.encodeLog(ok), sender: kBen), ok);
+      for (final bad in <String>['\u200B', '\u200E', '\u200F', '\u202E', '\uFEFF']) {
+        expect(_entry(comment: 'a${bad}b').validate(), contains('comment'), reason: bad.codeUnits.toString());
+      }
+    });
+
     test('by muss dem Absender entsprechen', () {
       expect(TaskCodec.decodeList(TaskCodec.encodeList(_list()), sender: kBen), isNull);
       expect(TaskCodec.decodeLog(TaskCodec.encodeLog(_entry()), sender: kAnna), isNull);
