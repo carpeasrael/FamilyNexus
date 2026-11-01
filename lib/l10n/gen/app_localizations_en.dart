@@ -2511,6 +2511,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keyStoreLinux => 'System keyring (Secret Service)';
 
   @override
+  String get keyStoreLinuxFlatpak =>
+      'Protected storage of the Flatpak sandbox (Secret portal)';
+
+  @override
   String get keyStoreWindows => 'Windows Credential Manager';
 
   @override

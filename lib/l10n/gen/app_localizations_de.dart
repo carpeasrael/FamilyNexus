@@ -2529,6 +2529,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get keyStoreLinux => 'Schlüsselbund des Systems (Secret Service)';
 
   @override
+  String get keyStoreLinuxFlatpak =>
+      'Geschützte Ablage der Flatpak-Sandbox (Secret-Portal)';
+
+  @override
   String get keyStoreWindows => 'Windows-Anmeldeinformationsverwaltung';
 
   @override

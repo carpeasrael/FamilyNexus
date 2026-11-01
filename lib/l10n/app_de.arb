@@ -1491,6 +1491,7 @@
   "keyStoreAndroid": "Android Keystore (an dieses Gerät gebunden)",
   "keyStoreApple": "Schlüsselbund des Geräts (nicht in iCloud)",
   "keyStoreLinux": "Schlüsselbund des Systems (Secret Service)",
+  "keyStoreLinuxFlatpak": "Geschützte Ablage der Flatpak-Sandbox (Secret-Portal)",
   "keyStoreWindows": "Windows-Anmeldeinformationsverwaltung",
   "keyStoreBrowser": "Passwortgeschützter Tresor im Browser-Speicher (localStorage)",
   "settingsReportLocal": "Protokoll: alle lokal gespeicherten Daten zeigen",

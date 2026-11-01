@@ -71,4 +71,24 @@ void main() {
     expect(<String, bool>{for (final k in inv.keys) k.name: k.present}, <String, bool>{'db.app': true, 'db.matrix': false});
     expect(inv.keys.map((k) => '${k.name}${k.present}').join(), isNot(contains(secret)));
   });
+
+  group('Schlüsselablage unter Linux (#169, E-50)', () {
+    test('Flatpak wird an FLATPAK_ID oder /.flatpak-info erkannt', () {
+      expect(
+        SqlDataInventory.linuxKeyStoreKind(environment: <String, String>{'FLATPAK_ID': 'de.inneso.familynexus'}, fileExists: (_) => false),
+        KeyStoreKind.linuxFlatpakPortal,
+      );
+      expect(
+        SqlDataInventory.linuxKeyStoreKind(environment: <String, String>{}, fileExists: (p) => p == '/.flatpak-info'),
+        KeyStoreKind.linuxFlatpakPortal,
+      );
+    });
+
+    test('ohne Flatpak bleibt es der Secret Service des Systems', () {
+      expect(
+        SqlDataInventory.linuxKeyStoreKind(environment: <String, String>{'FLATPAK_ID': ''}, fileExists: (_) => false),
+        KeyStoreKind.linuxSecretService,
+      );
+    });
+  });
 }

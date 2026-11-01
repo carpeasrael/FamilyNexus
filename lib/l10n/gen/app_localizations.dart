@@ -4280,6 +4280,12 @@ abstract class AppLocalizations {
   /// **'Schlüsselbund des Systems (Secret Service)'**
   String get keyStoreLinux;
 
+  /// No description provided for @keyStoreLinuxFlatpak.
+  ///
+  /// In de, this message translates to:
+  /// **'Geschützte Ablage der Flatpak-Sandbox (Secret-Portal)'**
+  String get keyStoreLinuxFlatpak;
+
   /// No description provided for @keyStoreWindows.
   ///
   /// In de, this message translates to:
