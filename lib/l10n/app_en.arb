@@ -974,6 +974,8 @@
   "webPasswordTooShort": "At least 10 characters.",
   "webPasswordMismatch": "The passwords do not match.",
   "webPasswordWrong": "Wrong password.",
+  "webVaultFailed": "The vault could not be opened. Possible reasons: the page is not loaded over a secure connection (https), or the browser storage is full or blocked.",
+  "webWipeFailed": "The data could not be deleted. Check whether the browser storage is blocked and try again.",
   "webUnlockAction": "Unlock",
   "webCreateAction": "Create vault",
   "webUnlockBusy": "Unlocking …",

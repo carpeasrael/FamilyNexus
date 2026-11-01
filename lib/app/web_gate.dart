@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import '../core/app_log.dart';
 import '../data/platform/key_store.dart';
 import '../data/platform/tab_lock.dart';
 import '../data/platform/vault_key_store.dart';
@@ -54,19 +55,24 @@ class _WebUnlockAppState extends State<WebUnlockApp> {
       _busy = true;
       _error = null;
     });
+    KeyStore? keys;
     try {
       if (_create) {
         await widget.backend.create(pw);
       } else {
         await widget.backend.unlock(pw);
       }
-      final keys = await VaultKeyStore.open(widget.backend);
-      widget.onUnlocked(keys);
+      keys = await VaultKeyStore.open(widget.backend);
     } on WrongVaultPasswordException {
       if (mounted) setState(() => _error = l.webPasswordWrong);
+    } catch (e) {
+      // z. B. keine sichere Verbindung (kein `crypto.subtle`) oder voller/gesperrter Browser-Speicher (#154).
+      AppLog.e('web', 'Tresor konnte nicht geöffnet werden', e);
+      if (mounted) setState(() => _error = l.webVaultFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+    if (keys != null) widget.onUnlocked(keys);
   }
 
   Future<void> _forgot(BuildContext context, AppLocalizations l) async {
@@ -81,12 +87,28 @@ class _WebUnlockAppState extends State<WebUnlockApp> {
         ],
       ),
     );
-    if (ok != true) return;
-    await widget.onWipe();
+    if (ok != true || !mounted) return;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await widget.onWipe();
+    } catch (e) {
+      AppLog.e('web', 'Tresor konnte nicht gelöscht werden', e);
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _error = l.webWipeFailed;
+        });
+      }
+      return;
+    }
     if (!mounted) return;
     _password.clear();
     _repeat.clear();
     setState(() {
+      _busy = false;
       _create = true;
       _error = null;
     });

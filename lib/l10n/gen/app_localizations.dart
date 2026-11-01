@@ -2960,6 +2960,18 @@ abstract class AppLocalizations {
   /// **'Falsches Passwort.'**
   String get webPasswordWrong;
 
+  /// No description provided for @webVaultFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Tresor konnte nicht geöffnet werden. Mögliche Gründe: Die Seite wird nicht über eine sichere Verbindung (https) geladen, oder der Speicher des Browsers ist voll oder gesperrt.'**
+  String get webVaultFailed;
+
+  /// No description provided for @webWipeFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Daten konnten nicht gelöscht werden. Prüfe, ob der Speicher des Browsers gesperrt ist, und versuche es erneut.'**
+  String get webWipeFailed;
+
   /// No description provided for @webUnlockAction.
   ///
   /// In de, this message translates to:

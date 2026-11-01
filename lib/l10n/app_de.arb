@@ -974,6 +974,8 @@
   "webPasswordTooShort": "Mindestens 10 Zeichen.",
   "webPasswordMismatch": "Die Passwörter stimmen nicht überein.",
   "webPasswordWrong": "Falsches Passwort.",
+  "webVaultFailed": "Der Tresor konnte nicht geöffnet werden. Mögliche Gründe: Die Seite wird nicht über eine sichere Verbindung (https) geladen, oder der Speicher des Browsers ist voll oder gesperrt.",
+  "webWipeFailed": "Die Daten konnten nicht gelöscht werden. Prüfe, ob der Speicher des Browsers gesperrt ist, und versuche es erneut.",
   "webUnlockAction": "Entsperren",
   "webCreateAction": "Tresor anlegen",
   "webUnlockBusy": "Wird entsperrt …",

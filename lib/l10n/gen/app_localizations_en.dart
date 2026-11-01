@@ -1709,6 +1709,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webPasswordWrong => 'Wrong password.';
 
   @override
+  String get webVaultFailed =>
+      'The vault could not be opened. Possible reasons: the page is not loaded over a secure connection (https), or the browser storage is full or blocked.';
+
+  @override
+  String get webWipeFailed =>
+      'The data could not be deleted. Check whether the browser storage is blocked and try again.';
+
+  @override
   String get webUnlockAction => 'Unlock';
 
   @override
