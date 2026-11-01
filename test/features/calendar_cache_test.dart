@@ -111,4 +111,33 @@ void main() {
       }
     }
   });
+
+  test('Reihenfolge der Personen ändert den Schlüssel nicht; der Speicher ist auf 6 Fenster begrenzt', () async {
+    await add('A', DateTime.utc(2026, 3, 21, 9), DateTime.utc(2026, 3, 21, 10));
+    await c.load();
+    final from = DateTime.utc(2026, 3, 1);
+    final to = DateTime.utc(2026, 4, 1);
+    final ab = c.occurrences(from, to, persons: <String>{'a', 'b'});
+    expect(identical(c.occurrences(from, to, persons: <String>{'b', 'a'}), ab), isTrue);
+
+    final first = c.occurrences(from, to);
+    for (var i = 1; i <= 6; i++) {
+      c.occurrences(from, to.add(Duration(days: i)));
+    }
+    expect(identical(c.occurrences(from, to), first), isFalse, reason: 'ältester Eintrag wurde verdrängt');
+  });
+
+  test('Sommerzeitwechsel: Vorkommen über den Wechsel gleich wie ohne Zwischenspeicher', () async {
+    // Europe/Berlin: Sommerzeit ab 29.03.2026; täglicher Termin 09:00 Ortszeit.
+    await add('täglich', DateTime.utc(2026, 3, 27, 8), DateTime.utc(2026, 3, 27, 9), recurrence: const Recurrence(frequency: Frequency.daily));
+    await c.load();
+    final from = DateTime.utc(2026, 3, 26);
+    final to = DateTime.utc(2026, 4, 2);
+    final list = c.occurrences(from, to);
+    final direct = <Occurrence>[
+      for (final e in c.events) ...OccurrenceExpander.expand(e, from: from, to: to, viewer: c.zone),
+    ]..sort(CalendarView.compare);
+    expect(ids(list), ids(direct));
+    expect(list.map((o) => o.start.hour).toSet(), <int>{8, 7}, reason: '09:00 Ortszeit = 08:00 UTC vor, 07:00 UTC nach dem Wechsel');
+  });
 }
