@@ -93,6 +93,8 @@ void main() {
     test('weniger als zwei beigetretene Mitglieder: keine Filterung', () {
       expect(CalendarView.activePersons(<String>{'ben'}, <String>['anna']), isEmpty);
       expect(CalendarView.activePersons(<String>{'ben'}, const <String>[]), isEmpty);
+      // genau ein beigetretenes Mitglied, das selbst gewählt ist: ohne Leiste gilt trotzdem keine Auswahl
+      expect(CalendarView.activePersons(<String>{'anna'}, <String>['anna']), isEmpty);
     });
 
     test('nur beigetretene Mitglieder zählen; die Auswahl selbst bleibt unverändert', () {
