@@ -140,4 +140,21 @@ void main() {
     expect(ids(list), ids(direct));
     expect(list.map((o) => o.start.hour).toSet(), <int>{8, 7}, reason: '09:00 Ortszeit = 08:00 UTC vor, 07:00 UTC nach dem Wechsel');
   });
+
+  test('upcoming nutzt innerhalb einer Minute denselben Cache-Eintrag (Fenster zur vollen Minute)', () async {
+    await add('A', DateTime.utc(2026, 3, 21, 9), DateTime.utc(2026, 3, 21, 10));
+    await c.load();
+    final minute = DateTime.utc(2026, 3, 20, 10);
+    final entry = c.occurrences(minute, minute.add(const Duration(days: 30, minutes: 1)));
+    // Cache bis zur Obergrenze (6) füllen: Ein neuer Eintrag würde den ältesten (entry) verdrängen.
+    for (var i = 1; i <= 5; i++) {
+      c.occurrences(minute, minute.add(Duration(days: i)));
+    }
+    for (final sec in <int>[5, 30, 59]) {
+      now = DateTime.utc(2026, 3, 20, 10, 0, sec);
+      expect(c.upcoming(), hasLength(1));
+    }
+    expect(identical(c.occurrences(minute, minute.add(const Duration(days: 30, minutes: 1))), entry), isTrue,
+        reason: 'upcoming hat keinen neuen Eintrag angelegt und den Cache getroffen');
+  });
 }
