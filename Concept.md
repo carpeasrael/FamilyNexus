@@ -113,14 +113,14 @@ Security takes precedence over convenience: encryption cannot be turned off, and
 ### Storage on the Device
 
 - Local database (SQLite) with full encryption, e.g. SQLCipher with AES-256.
-- The database key is stored in the operating system's key store: Keychain (macOS, iOS, iPadOS), Keystore (Android), Credential Manager or DPAPI (Windows), Secret Service (Linux).
+- The database key is stored in the operating system's key store: Keychain (macOS, iOS, iPadOS), Keystore (Android), Credential Manager or DPAPI (Windows), Secret Service (Linux; in the Flatpak, the Secret portal of the sandbox).
 - Optional app lock via PIN, password or biometrics; automatic lock after inactivity.
 - Attachments and media are stored separately encrypted in the file system.
 - No plaintext previews in notifications, task switcher or backups (screenshot protection on request).
 
 ### End-to-End Encryption
 
-- Matrix E2EE with Olm (1:1) and Megolm (rooms) for chat **and** appointments; the server sees only encrypted events.
+- Matrix E2EE with Olm (1:1) and Megolm (rooms) for chat **and** appointments; the server cannot read the content of events, but it sees metadata (including room and profile names).
 - Appointments are transmitted as encrypted room events in the family room.
 - Device verification via cross-signing; unverified devices receive no keys.
 - When a member is removed, the room keys are rotated so that departed persons cannot read new content.
@@ -130,7 +130,7 @@ Security takes precedence over convenience: encryption cannot be turned off, and
 
 | Risk | Countermeasure | Residual risk |
 | --- | --- | --- |
-| Eavesdropping on the server | E2EE, server sees only ciphertext | Metadata (who, when, room size, rhythm of status messages) remains visible |
+| Eavesdropping on the server | E2EE, server sees only ciphertext | Metadata (who, when, room size, room and profile names, rhythm of status messages) remains visible |
 | Forged online status | Only encrypted messages received from current family members count; format strictly validated | A member can only misreport their own status |
 | Loss or theft of the device | Database encryption, app lock, remote sign-out of the session | A weak PIN weakens the protection |
 | Foreign device in the family | Verification, moderator can block devices | Users skip verification |

@@ -425,7 +425,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverMetadataNote.
   ///
   /// In de, this message translates to:
-  /// **'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt. Wer das vermeiden möchte, nutzt einen eigenen Server.'**
+  /// **'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.'**
   String get serverMetadataNote;
 
   /// No description provided for @onbTitleAccount.
@@ -1919,8 +1919,8 @@ abstract class AppLocalizations {
   /// No description provided for @privacy2Body.
   ///
   /// In de, this message translates to:
-  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt im sicheren Schlüsselspeicher deines Geräts (Android-Keystore bzw. Apple-Schlüsselbund) und nie in einer Datei.'**
-  String get privacy2Body;
+  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.'**
+  String privacy2Body(String keyStore);
 
   /// No description provided for @privacy3Title.
   ///
@@ -1931,7 +1931,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy3Body.
   ///
   /// In de, this message translates to:
-  /// **'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm). Der Server sieht nur verschlüsselte Ereignisse. Metadaten wie Konto-ID, Zeitpunkte, Raumgröße und Geräte bleiben für den Betreiber sichtbar. Wer das vermeiden möchte, nutzt einen eigenen Server.'**
+  /// **'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.'**
   String get privacy3Body;
 
   /// No description provided for @privacy4Title.
@@ -1964,11 +1964,47 @@ abstract class AppLocalizations {
   /// **'Berechtigungen'**
   String get privacy6Title;
 
-  /// No description provided for @privacy6Body.
+  /// No description provided for @privacy6Net.
   ///
   /// In de, this message translates to:
-  /// **'Internet (Verbindung zum Server), Benachrichtigungen und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen) und Geräteanmeldung (App-Sperre). Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.'**
-  String get privacy6Body;
+  /// **'Internet (Verbindung zum Server)'**
+  String get privacy6Net;
+
+  /// No description provided for @privacy6NotifAndroid.
+  ///
+  /// In de, this message translates to:
+  /// **'Benachrichtigungen und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen)'**
+  String get privacy6NotifAndroid;
+
+  /// No description provided for @privacy6NotifApple.
+  ///
+  /// In de, this message translates to:
+  /// **'Benachrichtigungen (Erinnerungen)'**
+  String get privacy6NotifApple;
+
+  /// No description provided for @privacy6DesktopNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Erinnerungen erscheinen nur, solange die App läuft; dafür fragt die App keine Berechtigung an.'**
+  String get privacy6DesktopNote;
+
+  /// No description provided for @privacy6Lock.
+  ///
+  /// In de, this message translates to:
+  /// **'Geräteanmeldung (App-Sperre)'**
+  String get privacy6Lock;
+
+  /// No description provided for @privacy6Tail.
+  ///
+  /// In de, this message translates to:
+  /// **'Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.'**
+  String get privacy6Tail;
+
+  /// No description provided for @privacy6BodyWeb.
+  ///
+  /// In de, this message translates to:
+  /// **'Internet (Verbindung zum Server). Die Web-Version fragt keine Berechtigung für Benachrichtigungen, Erinnerungen oder eine Geräteanmeldung an. Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.'**
+  String get privacy6BodyWeb;
 
   /// No description provided for @privacy7Title.
   ///
@@ -1976,11 +2012,35 @@ abstract class AppLocalizations {
   /// **'Sicherung und Löschung'**
   String get privacy7Title;
 
-  /// No description provided for @privacy7Body.
+  /// No description provided for @privacy7BackupAndroid.
   ///
   /// In de, this message translates to:
-  /// **'Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.'**
-  String get privacy7Body;
+  /// **'Android-Backups sind ausgeschaltet.'**
+  String get privacy7BackupAndroid;
+
+  /// No description provided for @privacy7BackupIos.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Daten der App sind von Backups ausgenommen.'**
+  String get privacy7BackupIos;
+
+  /// No description provided for @privacy7BackupMacos.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Daten der App sind von Sicherungen (z. B. Time Machine) ausgenommen.'**
+  String get privacy7BackupMacos;
+
+  /// No description provided for @privacy7BackupOther.
+  ///
+  /// In de, this message translates to:
+  /// **'Die App legt selbst keine Sicherung deiner Daten an.'**
+  String get privacy7BackupOther;
+
+  /// No description provided for @privacy7Rest.
+  ///
+  /// In de, this message translates to:
+  /// **'Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.'**
+  String get privacy7Rest;
 
   /// No description provided for @privacy8Title.
   ///
@@ -2363,7 +2423,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy10Body.
   ///
   /// In de, this message translates to:
-  /// **'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.'**
+  /// **'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).'**
   String get privacy10Body;
 
   /// No description provided for @onbFamilyFound.
@@ -2843,7 +2903,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy12Body.
   ///
   /// In de, this message translates to:
-  /// **'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.'**
+  /// **'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).'**
   String get privacy12Body;
 
   /// No description provided for @webUnlockTitleCreate.
@@ -2957,7 +3017,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy13Body.
   ///
   /// In de, this message translates to:
-  /// **'In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz und keine Erinnerungen bei geschlossener Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach.'**
+  /// **'In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz, keine Erinnerungen und keine Benachrichtigungen, auch nicht bei geöffneter Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach.'**
   String get privacy13Body;
 
   /// No description provided for @startCreateTitle.
@@ -4274,6 +4334,12 @@ abstract class AppLocalizations {
   /// **'Schlüsselbund des Systems (Secret Service)'**
   String get keyStoreLinux;
 
+  /// No description provided for @keyStoreLinuxFlatpak.
+  ///
+  /// In de, this message translates to:
+  /// **'Geschützte Ablage der Flatpak-Sandbox (Secret-Portal)'**
+  String get keyStoreLinuxFlatpak;
+
   /// No description provided for @keyStoreWindows.
   ///
   /// In de, this message translates to:
@@ -4325,7 +4391,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportCopied.
   ///
   /// In de, this message translates to:
-  /// **'Protokoll kopiert.'**
+  /// **'Protokoll kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im Zweifel selbst.'**
   String get reportCopied;
 
   /// No description provided for @reportSave.
@@ -4559,7 +4625,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportOnlineNote.
   ///
   /// In de, this message translates to:
-  /// **'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.'**
+  /// **'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.'**
   String get reportOnlineNote;
 
   /// No description provided for @eventTypeMessage.

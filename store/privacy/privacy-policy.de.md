@@ -76,7 +76,7 @@ die App die sichere Speicherlösung der jeweiligen Plattform.
 | iOS | Apple-Schlüsselbund mit gerätegebundener Zugänglichkeit nach dem ersten Entsperren. Die verwendete Schlüsselkonfiguration sieht keine Übertragung dieser Schlüssel auf andere Geräte vor. |
 | macOS | Apple-Schlüsselbund; die App aktiviert für diese Schlüssel keine iCloud-Synchronisierung. |
 | Windows | Sichere Ablage über `flutter_secure_storage` mit Schutz durch die Windows-Anmeldeinformationsverwaltung. Die Datenbanken liegen im lokalen Benutzerprofil. |
-| Linux | Secret Service über `libsecret`, beispielsweise der Schlüsselbund deiner Desktopumgebung. Die Datenbanken liegen im App-Datenverzeichnis des Benutzerkontos. |
+| Linux | Secret Service über `libsecret`, beispielsweise der Schlüsselbund deiner Desktopumgebung. Im Flatpak liegen die Schlüssel über das Secret-Portal in der geschützten Ablage der Sandbox, nicht im Schlüsselbund des Systems. Die Datenbanken liegen im App-Datenverzeichnis des Benutzerkontos. |
 
 Für Anzeige und Bearbeitung werden Inhalte auf dem Gerät entschlüsselt. Auf
 unterstützten Geräten nutzt die optionale App-Sperre die Geräteauthentifizierung,
@@ -184,8 +184,8 @@ werden. Dann gelten zusätzlich dessen Zugriffs- und Datenschutzbedingungen.
 Ausgewählte Originaldateien bleiben an ihrem bisherigen Speicherort; beim
 Einlesen versucht die App, temporäre Auswahlkopien zu entfernen.
 
-Beim Kopieren des Notfall-Schlüssels versucht die App, den entsprechenden
-Zwischenablageeintrag nach einer Minute zu entfernen. Hintergrundbeschränkungen
+Beim Kopieren des Notfall-Schlüssels oder eines Datenprotokolls versucht die App,
+den entsprechenden Zwischenablageeintrag nach einer Minute zu entfernen. Hintergrundbeschränkungen
 und Zwischenablageverläufe können eine vollständige Entfernung verhindern.
 Andere Apps oder Systemdienste können kopierte Inhalte je nach Plattform verarbeiten.
 

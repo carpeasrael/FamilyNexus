@@ -80,21 +80,29 @@ class MainActivity : FlutterFragmentActivity() {
                     }
                     // Notfall-Schlüssel kopieren (E-57/SA-8): als „vertraulich“ markiert, damit Android 13+
                     // keine Vorschau zeigt und Tastatur-Apps ihn nicht in den Verlauf übernehmen.
-                    "copySecret" -> {
+                    // "copySensitive": längere sensible Texte (Datenprotokoll, #157), Grenze 100 000 Zeichen
+                    // wegen des Binder-Limits; schlägt das Setzen fehl, meldet der Kanal "failed" (Dart fällt
+                    // dann auf die normale Zwischenablage zurück und leert sie später).
+                    "copySecret", "copySensitive" -> {
                         val text = call.arguments as? String
-                        if (text == null || text.length > 512) {
+                        val limit = if (call.method == "copySecret") 512 else 100_000
+                        if (text == null || text.length > limit) {
                             result.error("invalid", null, null)
                         } else {
-                            val clip = ClipData.newPlainText("FamilyNexus", text)
-                            val extras = PersistableBundle()
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                extras.putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
-                            } else {
-                                extras.putBoolean("android.content.extra.IS_SENSITIVE", true)
+                            try {
+                                val clip = ClipData.newPlainText("FamilyNexus", text)
+                                val extras = PersistableBundle()
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    extras.putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+                                } else {
+                                    extras.putBoolean("android.content.extra.IS_SENSITIVE", true)
+                                }
+                                clip.description.extras = extras
+                                (getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).setPrimaryClip(clip)
+                                result.success(null)
+                            } catch (e: RuntimeException) {
+                                result.error("failed", null, null)
                             }
-                            clip.description.extras = extras
-                            (getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).setPrimaryClip(clip)
-                            result.success(null)
                         }
                     }
                     else -> result.notImplemented()

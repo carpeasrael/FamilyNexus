@@ -184,7 +184,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverMetadataNote =>
-      'The server cannot see content, but it does see metadata such as who writes to whom and when. Use your own server to avoid that.';
+      'The server cannot see content, but it does see metadata such as who writes to whom and when, as well as room and profile names (for example the family name). Your own server decides who sees them – it does not remove them.';
 
   @override
   String get onbTitleAccount => 'Sign in';
@@ -1071,15 +1071,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacy2Title => 'What data exists?';
 
   @override
-  String get privacy2Body =>
-      'Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted (SQLCipher) on your device. The key is held in your device\'s secure key store (Android Keystore or Apple Keychain) and never in a file.';
+  String privacy2Body(String keyStore) {
+    return 'Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted (SQLCipher) on your device. The key is held here: $keyStore – not in the database file.';
+  }
 
   @override
   String get privacy3Title => 'What does the server see?';
 
   @override
   String get privacy3Body =>
-      'Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm). The server only sees encrypted events. Metadata such as account ID, timestamps, room size and devices remains visible to the operator. Use your own server to avoid that.';
+      'Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships and room and profile names (for example the family name). With your own server you decide who sees this information.';
 
   @override
   String get privacy4Title => 'Private events';
@@ -1099,15 +1100,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacy6Title => 'Permissions';
 
   @override
-  String get privacy6Body =>
-      'Internet (connection to the server), notifications and exact alarms (reminders), boot notification (re-schedule reminders) and device credentials (app lock). No contacts, location, camera or microphone are needed.';
+  String get privacy6Net => 'Internet (connection to the server)';
+
+  @override
+  String get privacy6NotifAndroid =>
+      'notifications and exact alarms (reminders), boot notification (re-schedule reminders)';
+
+  @override
+  String get privacy6NotifApple => 'notifications (reminders)';
+
+  @override
+  String get privacy6DesktopNote =>
+      'Reminders only appear while the app is running; the app asks for no permission for this.';
+
+  @override
+  String get privacy6Lock => 'device credentials (app lock)';
+
+  @override
+  String get privacy6Tail =>
+      'No contacts, location, camera or microphone are needed.';
+
+  @override
+  String get privacy6BodyWeb =>
+      'Internet (connection to the server). The web version asks for no permission for notifications, reminders or device credentials. No contacts, location, camera or microphone are needed.';
 
   @override
   String get privacy7Title => 'Backup and deletion';
 
   @override
-  String get privacy7Body =>
-      'Android backups are disabled. If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. “Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.';
+  String get privacy7BackupAndroid => 'Android backups are disabled.';
+
+  @override
+  String get privacy7BackupIos => 'The app\'s data is excluded from backups.';
+
+  @override
+  String get privacy7BackupMacos =>
+      'The app\'s data is excluded from backups (e.g. Time Machine).';
+
+  @override
+  String get privacy7BackupOther =>
+      'The app does not create a backup of your data itself.';
+
+  @override
+  String get privacy7Rest =>
+      'If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. “Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.';
 
   @override
   String get privacy8Title => 'Children';
@@ -1354,7 +1390,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy10Body =>
-      'The online status (\"online\" or \"offline\" with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. The server only sees metadata such as timing and size.';
+      'The online status (\"online\" or \"offline\" with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. The server only sees the metadata it always sees (see “What does the server see?”).';
 
   @override
   String onbFamilyFound(String name) {
@@ -1642,7 +1678,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy12Body =>
-      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. The server only sees metadata such as times and size.';
+      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. The server only sees the metadata it always sees (see “What does the server see?”).';
 
   @override
   String get webUnlockTitleCreate => 'Set up the browser vault';
@@ -1703,7 +1739,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy13Body =>
-      'In the web version your data is stored encrypted in this browser (IndexedDB, SQLite3MultipleCiphers). The key is protected by your browser password, which is stored nowhere. There is no screen protection and no reminders while the page is closed. Do not use the web version on a foreign or shared computer. The page loads nothing from third parties.';
+      'In the web version your data is stored encrypted in this browser (IndexedDB, SQLite3MultipleCiphers). The key is protected by your browser password, which is stored nowhere. There is no screen protection, no reminders and no notifications, even while the page is open. Do not use the web version on a foreign or shared computer. The page loads nothing from third parties.';
 
   @override
   String get startCreateTitle => 'Start a new family';
@@ -2507,6 +2543,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keyStoreLinux => 'System keyring (Secret Service)';
 
   @override
+  String get keyStoreLinuxFlatpak =>
+      'Protected storage of the Flatpak sandbox (Secret portal)';
+
+  @override
   String get keyStoreWindows => 'Windows Credential Manager';
 
   @override
@@ -2533,7 +2573,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportCopy => 'Copy';
 
   @override
-  String get reportCopied => 'Report copied.';
+  String get reportCopied =>
+      'Report copied. The app tries to clear the clipboard after one minute. If in doubt, clear it yourself.';
 
   @override
   String get reportSave => 'Save as file';
@@ -2676,7 +2717,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportOnlineNote =>
-      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, time and size of events and the types of account data. Event counts are based on this device\'s sync; the provider may hold older events as well.';
+      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), time and size of events and the types of account data. Event counts are based on this device\'s sync; the provider may hold older events as well.';
 
   @override
   String get eventTypeMessage => 'Messages';

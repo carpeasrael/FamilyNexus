@@ -16,6 +16,7 @@ class DataReport {
         KeyStoreKind.androidKeystore => l.keyStoreAndroid,
         KeyStoreKind.appleKeychain => l.keyStoreApple,
         KeyStoreKind.linuxSecretService => l.keyStoreLinux,
+        KeyStoreKind.linuxFlatpakPortal => l.keyStoreLinuxFlatpak,
         KeyStoreKind.windowsCredentialManager => l.keyStoreWindows,
         KeyStoreKind.browserVault => l.keyStoreBrowser,
       };

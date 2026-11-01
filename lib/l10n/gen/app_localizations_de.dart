@@ -187,7 +187,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get serverMetadataNote =>
-      'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt. Wer das vermeiden möchte, nutzt einen eigenen Server.';
+      'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.';
 
   @override
   String get onbTitleAccount => 'Anmelden';
@@ -1080,15 +1080,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get privacy2Title => 'Welche Daten gibt es?';
 
   @override
-  String get privacy2Body =>
-      'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt im sicheren Schlüsselspeicher deines Geräts (Android-Keystore bzw. Apple-Schlüsselbund) und nie in einer Datei.';
+  String privacy2Body(String keyStore) {
+    return 'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: $keyStore – nicht in der Datenbankdatei.';
+  }
 
   @override
   String get privacy3Title => 'Was sieht der Server?';
 
   @override
   String get privacy3Body =>
-      'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm). Der Server sieht nur verschlüsselte Ereignisse. Metadaten wie Konto-ID, Zeitpunkte, Raumgröße und Geräte bleiben für den Betreiber sichtbar. Wer das vermeiden möchte, nutzt einen eigenen Server.';
+      'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.';
 
   @override
   String get privacy4Title => 'Private Termine';
@@ -1108,15 +1109,51 @@ class AppLocalizationsDe extends AppLocalizations {
   String get privacy6Title => 'Berechtigungen';
 
   @override
-  String get privacy6Body =>
-      'Internet (Verbindung zum Server), Benachrichtigungen und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen) und Geräteanmeldung (App-Sperre). Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.';
+  String get privacy6Net => 'Internet (Verbindung zum Server)';
+
+  @override
+  String get privacy6NotifAndroid =>
+      'Benachrichtigungen und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen)';
+
+  @override
+  String get privacy6NotifApple => 'Benachrichtigungen (Erinnerungen)';
+
+  @override
+  String get privacy6DesktopNote =>
+      'Erinnerungen erscheinen nur, solange die App läuft; dafür fragt die App keine Berechtigung an.';
+
+  @override
+  String get privacy6Lock => 'Geräteanmeldung (App-Sperre)';
+
+  @override
+  String get privacy6Tail =>
+      'Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.';
+
+  @override
+  String get privacy6BodyWeb =>
+      'Internet (Verbindung zum Server). Die Web-Version fragt keine Berechtigung für Benachrichtigungen, Erinnerungen oder eine Geräteanmeldung an. Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.';
 
   @override
   String get privacy7Title => 'Sicherung und Löschung';
 
   @override
-  String get privacy7Body =>
-      'Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.';
+  String get privacy7BackupAndroid => 'Android-Backups sind ausgeschaltet.';
+
+  @override
+  String get privacy7BackupIos =>
+      'Die Daten der App sind von Backups ausgenommen.';
+
+  @override
+  String get privacy7BackupMacos =>
+      'Die Daten der App sind von Sicherungen (z. B. Time Machine) ausgenommen.';
+
+  @override
+  String get privacy7BackupOther =>
+      'Die App legt selbst keine Sicherung deiner Daten an.';
+
+  @override
+  String get privacy7Rest =>
+      'Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.';
 
   @override
   String get privacy8Title => 'Kinder';
@@ -1365,7 +1402,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy10Body =>
-      'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.';
+      'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).';
 
   @override
   String onbFamilyFound(String name) {
@@ -1654,7 +1691,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy12Body =>
-      'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur Metadaten wie Zeitpunkte und Größe.';
+      'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).';
 
   @override
   String get webUnlockTitleCreate => 'Browser-Tresor einrichten';
@@ -1716,7 +1753,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy13Body =>
-      'In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz und keine Erinnerungen bei geschlossener Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach.';
+      'In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz, keine Erinnerungen und keine Benachrichtigungen, auch nicht bei geöffneter Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach.';
 
   @override
   String get startCreateTitle => 'Neue Familie gründen';
@@ -2525,6 +2562,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get keyStoreLinux => 'Schlüsselbund des Systems (Secret Service)';
 
   @override
+  String get keyStoreLinuxFlatpak =>
+      'Geschützte Ablage der Flatpak-Sandbox (Secret-Portal)';
+
+  @override
   String get keyStoreWindows => 'Windows-Anmeldeinformationsverwaltung';
 
   @override
@@ -2553,7 +2594,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reportCopy => 'Kopieren';
 
   @override
-  String get reportCopied => 'Protokoll kopiert.';
+  String get reportCopied =>
+      'Protokoll kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im Zweifel selbst.';
 
   @override
   String get reportSave => 'Als Datei speichern';
@@ -2696,7 +2738,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reportOnlineNote =>
-      'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.';
+      'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.';
 
   @override
   String get eventTypeMessage => 'Nachrichten';

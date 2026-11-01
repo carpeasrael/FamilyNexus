@@ -48,9 +48,11 @@ import UserNotifications
         self?.secure = (call.arguments as? Bool) ?? true
         if self?.secure == false { self?.hideCover() }
         result(nil)
-      } else if call.method == "copySecret" {
-        // Notfall-Schlüssel: nur auf diesem Gerät (kein Universal Clipboard) und nach 60 s verfallen.
-        guard let text = call.arguments as? String, text.count <= 512 else {
+      } else if call.method == "copySecret" || call.method == "copySensitive" {
+        // Notfall-Schlüssel (512 Zeichen) und Datenprotokoll (#157, 100 000 Zeichen): nur auf diesem Gerät
+        // (kein Universal Clipboard) und nach 60 s verfallen.
+        let limit = call.method == "copySecret" ? 512 : 100_000
+        guard let text = call.arguments as? String, text.count <= limit else {
           result(FlutterError(code: "invalid", message: nil, details: nil))
           return
         }

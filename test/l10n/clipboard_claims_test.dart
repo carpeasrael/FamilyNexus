@@ -15,7 +15,7 @@ void main() {
   );
 
   for (final (lang, tries) in [('de', 'versucht'), ('en', 'tries')]) {
-    for (final key in ['keyCopied', 'privacy7Body']) {
+    for (final key in ['keyCopied', 'privacy7Rest']) {
       test('$lang/$key: „$tries“ statt fester Zusage', () {
         final text = arb(lang)[key] as String;
         expect(promise.hasMatch(text), isFalse, reason: 'feste Zusage: $text');
