@@ -632,3 +632,11 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Test:** `test/features/privacy_platform_test.dart` prüft je Plattform und Abschnitt (de/en).
 - **Ausgeschlossen:** Store-Texte, englische Datenschutzerklärung im Store (#147).
 
+## E-85 Leere Sync-Antworten lösen keinen Abgleich aus (2026-11-01, Issue #150) — ergänzt E-81
+
+- **Problem:** Jeder `onSync` (auch die leere Long-Poll-Antwort im Leerlauf) löste `_refreshOnce` aus: Familie bauen, alle Nachrichten mappen, `notifyListeners()` für alle Tabs.
+- **Gewählt:** `syncNeedsRefresh` (`lib/data/matrix/sync_relevance.dart`): Der Abgleich läuft nur bei Kontodaten, Gerätenachrichten, Räumen in `join`/`invite`/`leave`/`knock`, `presence` oder geänderten Geräten, und immer beim ersten Sync. `_onSyncForJoinRequest`, `_retryFailedSends`, Anmeldestatus und Timeline-Rückrufe bleiben unverändert.
+- **Folge:** Der Wiederholungsversuch der Einzelchats (`_dmRetryAfter`, 1 Minute) hängt nicht mehr an leeren Antworten, sondern am nächsten nichtleeren Sync oder Timeline-Rückruf.
+- **Grenze:** Presence-Heartbeats, Quittungen und Tipp-Anzeigen kommen in `rooms.join` und lösen weiter den vollen Abgleich aus. Die Kosten eines Abgleichs sind nicht gemessen.
+- **Ausgeschlossen (Folgeissue nur nach Messung):** Versionszähler je Zeitleiste, selektives Neumappen, `notifyListeners` nur bei Änderung.
+
