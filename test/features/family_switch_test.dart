@@ -72,6 +72,26 @@ void main() {
     expect(find.byType(NavigationBar), findsOneWidget);
   });
 
+  testWidgets('A → keine Familie → B: Dienste schließen, Anspruch und Neuaufbau für B', (tester) async {
+    final owners = <String>[];
+    final app = await buildTestApp(familyDataClaim: (o) async => owners.add(o));
+    final roomA = app.gateway.familyRoom!.id;
+    final roomB = app.server.addFamilyRoom('Familie B', '@anna:fake.test').id;
+    await start(tester, app);
+
+    app.gateway.detachFamilyRoom();
+    await tester.pumpAndSettle();
+    expect(app.services.calendar, isNull);
+    expect(app.services.openFamilyRoom, isNull);
+
+    app.gateway.attachFamilyRoom(roomB);
+    await tester.pumpAndSettle();
+    expect(app.calendarRooms, <String>[roomA, roomB]);
+    expect(owners, <String>['@anna:fake.test|$roomA', '@anna:fake.test|$roomB']);
+    expect(app.services.calendar!.sync.sameFamily, isTrue);
+    expect(find.byType(NavigationBar), findsOneWidget);
+  });
+
   for (final phase in <String>['Kalender', 'Einkauf', 'Aufgaben']) {
     testWidgets('Wechsel während des Öffnens ($phase): genau ein Neuaufbau, danach Dienste für B, kein Ladekreis', (tester) async {
       late TestApp app;

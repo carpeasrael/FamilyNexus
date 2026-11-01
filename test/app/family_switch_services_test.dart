@@ -67,8 +67,14 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(TimeZones.ensureInitialized);
 
-  /// Die Entprellung der Sync-Klassen (200 ms) läuft ab.
-  Future<void> settle() => Future<void>.delayed(const Duration(milliseconds: 300));
+  /// Führt die Sendeläufe der offenen Dienste direkt aus, statt die 200 ms der Entprellung abzuwarten, die unter Last
+  /// beliebig spät ablaufen. Fake und Speicher-Ablagen warten auf nichts: Ein Lauf endet ohne Zwischenstopp, ein Lauf
+  /// aus der Entprellung kann ihn nicht überholen.
+  Future<void> publishAll(TestApp app) async {
+    await app.services.calendar?.sync.publishPending();
+    await app.services.shopping?.sync.publishPending();
+    await app.services.tasks?.sync.publishPending();
+  }
 
   late String roomA;
   late String roomB;
@@ -162,6 +168,17 @@ void main() {
       expect(app.services.calendar!.sync.sameFamily, isFalse, reason: 'Bindung und Ablage bleiben bei A');
     });
 
+    test('Sprung während des Anspruchs: Builder und Bindung bekommen den Raum vom Beginn des Öffnens', () async {
+      late TestApp app;
+      app = await make(claim: (_) async => app.gateway.attachFamilyRoom(roomB));
+      await app.services.openCalendar();
+      expect(app.calendarRooms, <String>[roomA]);
+      expect(app.shoppingRooms, <String>[roomA]);
+      expect(app.taskRooms, <String>[roomA]);
+      expect(app.services.openFamilyRoom, roomA);
+      expect(app.services.calendar!.sync.sameFamily, isFalse);
+    });
+
     test('nach dem Wechsel meldet „Im Chat teilen“ einen Fehler und sendet nichts', () async {
       final app = await make();
       await app.services.openCalendar();
@@ -206,7 +223,7 @@ void main() {
         await seed(app);
         final room = app.server.rooms[roomB]!;
         await app.services.openCalendar();
-        await settle();
+        await publishAll(app);
         expect(room.events, isEmpty);
         expect(app.services.openFamilyRoom, roomA, reason: 'AppRoot erkennt daran den Wechsel');
         expect(owner, '$_anna|$roomA');
@@ -223,9 +240,7 @@ void main() {
           visibility: EventVisibility.shared,
         );
         await app.services.shopping!.service.add('Aus B');
-        cal.sync.kick();
-        app.services.shopping!.sync.kick();
-        await settle();
+        await publishAll(app);
         expect(room.events.where((e) => e.type == EventCodec.sharedType), hasLength(1), reason: 'kein doppelter Dienst');
         expect(room.events.where((e) => e.type == ShoppingCodec.type), hasLength(1), reason: 'kein doppelter Dienst');
       });
@@ -256,9 +271,10 @@ void main() {
         expect(app.services.presence, isNull);
         expect(app.services.reminders, isNull);
         expect(app.services.openFamilyRoom, isNull);
+        if (phase == 'Kalender') expectDisposed(app.builtCalendars.single);
         if (phase == 'Einkauf') expectDisposed(app.builtShopping.single);
         if (phase == 'Aufgaben') expectDisposed(app.builtTasks.single);
-        await settle();
+        expect(app.gateway.debugHasListeners, isFalse, reason: 'kein gestarteter Dienst bleibt übrig, also kein späterer Sendelauf');
         expect(app.gateway.publishAttempts, 0);
       });
 
@@ -292,6 +308,7 @@ void main() {
         expect(app.services.shopping, same(shopping));
         expect(app.services.tasks, same(tasks));
         expect(app.services.presence, same(presence));
+        if (phase == 'Kalender') expectDisposed(app.builtCalendars.last);
         if (phase == 'Einkauf') expectDisposed(app.builtShopping.last);
         if (phase == 'Aufgaben') expectDisposed(app.builtTasks.last);
       });

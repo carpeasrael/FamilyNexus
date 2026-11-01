@@ -292,6 +292,15 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (notify) notifyListeners();
   }
 
+  /// Test-Hook: Dieser Nutzer hat keine Familie mehr (entfernt, Raum verlassen).
+  void detachFamilyRoom() {
+    _familyRoomId = null;
+    notifyListeners();
+  }
+
+  /// Hört noch ein gestarteter Dienst zu?
+  bool get debugHasListeners => hasListeners;
+
   RequestCheck _check(FakeRoom room, String user) {
     final n = room.knockNonce[user];
     if (n == 'code') return RequestCheck.code;

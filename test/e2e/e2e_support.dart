@@ -113,4 +113,13 @@ class E2e {
       await Future<void>.delayed(const Duration(milliseconds: 150));
     }
   }
+
+  /// [until] für eine Bedingung, die erst den Server oder die Ablage fragen muss.
+  static Future<void> untilAsync(Future<bool> Function() cond, {Duration timeout = const Duration(seconds: 30), String? what}) async {
+    final end = DateTime.now().add(timeout);
+    while (!await cond()) {
+      if (DateTime.now().isAfter(end)) throw StateError('Zeitüberschreitung${what == null ? '' : ': $what'}');
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+    }
+  }
 }

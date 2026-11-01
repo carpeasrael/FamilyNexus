@@ -166,6 +166,17 @@ void main() {
       expect(sent(roomB, EventCodec.sharedType), 0);
     });
 
+    test('„keine Familie“ ist kein Wechsel: Die Bindung hält, der private Termin geht hinaus', () async {
+      await event('Privat', visibility: EventVisibility.private);
+      sync.start(familyRoom: roomA.id);
+      gateway.detachFamilyRoom();
+      expect(gateway.family, isNull);
+      expect(sync.sameFamily, isTrue);
+      await sync.publishPending();
+      expect(server.log.where((e) => e.type == EventCodec.privateType), hasLength(1));
+      expect(await store.pendingPublish(), isEmpty);
+    });
+
     test('der Abbruch ändert das Wartefenster nicht, weder als Erfolg noch als Fehler', () async {
       await event('A1');
       await event('A2');

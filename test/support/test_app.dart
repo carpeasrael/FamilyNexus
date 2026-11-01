@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:family_nexus/app/app_services.dart';
 import 'package:family_nexus/app/calendar_factory.dart';
 import 'package:family_nexus/data/sync/shopping_sync.dart';
+import 'package:family_nexus/features/calendar/calendar_controller.dart';
 import 'package:family_nexus/domain/shopping.dart';
 import 'package:family_nexus/features/shopping/shopping_controller.dart';
 import 'package:family_nexus/data/sync/task_sync.dart';
@@ -47,6 +48,7 @@ class TestApp {
     required this.calendarRooms,
     required this.shoppingRooms,
     required this.taskRooms,
+    required this.builtCalendars,
     required this.builtShopping,
     required this.builtTasks,
   });
@@ -73,6 +75,7 @@ class TestApp {
   final List<String?> taskRooms;
 
   /// Gebaute Controller, auch die eines verworfenen Öffnungslaufs.
+  final List<CalendarController> builtCalendars;
   final List<ShoppingController> builtShopping;
   final List<TasksController> builtTasks;
 }
@@ -133,6 +136,7 @@ Future<TestApp> buildTestApp({
   final calendarRooms = <String?>[];
   final shoppingRooms = <String?>[];
   final taskRooms = <String?>[];
+  final builtCalendars = <CalendarController>[];
   final builtShopping = <ShoppingController>[];
   final builtTasks = <TasksController>[];
   final services = AppServices(
@@ -186,7 +190,7 @@ Future<TestApp> buildTestApp({
     calendarBuilder: (uid, room) async {
       calendarRooms.add(room);
       await beforeCalendarBuild?.call(uid);
-      return buildCalendarController(
+      final controller = buildCalendarController(
         store: events,
         gateway: gateway,
         userId: uid,
@@ -194,6 +198,8 @@ Future<TestApp> buildTestApp({
         clock: clock,
         retryInterval: const Duration(hours: 1),
       );
+      builtCalendars.add(controller);
+      return controller;
     },
   );
   return TestApp(
@@ -215,6 +221,7 @@ Future<TestApp> buildTestApp({
     calendarRooms: calendarRooms,
     shoppingRooms: shoppingRooms,
     taskRooms: taskRooms,
+    builtCalendars: builtCalendars,
     builtShopping: builtShopping,
     builtTasks: builtTasks,
   );

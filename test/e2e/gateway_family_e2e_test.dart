@@ -3,15 +3,23 @@ import 'dart:io';
 
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
+import 'package:family_nexus/data/sync/calendar_sync.dart';
+import 'package:family_nexus/data/sync/shopping_sync.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
+import 'package:family_nexus/domain/calendar_service.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
+import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/security.dart';
+import 'package:family_nexus/domain/shopping.dart';
+import 'package:family_nexus/domain/time_zones.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' hide Role;
 
 import '../support/events.dart';
+import '../support/memory_event_store.dart';
+import '../support/memory_shopping_store.dart';
 import 'e2e_support.dart';
 
 /// Wie in der App: Anmeldung, dann Pflicht-Schlüsselsicherung (nur verifizierte Geräte erhalten Schlüssel).
@@ -124,6 +132,142 @@ void main() {
       final next = await _login('leerneu');
       await _join(t.modB, next);
       await E2e.until(() => fresh.whereType<MemberJoinedSignal>().any((s) => s.sender == next.userId), what: 'echter Beitritt gemeldet');
+    });
+
+    test('Issue-Szenario über Gateway, Sync und Ablage: eigene Daten aus A erreichen B nicht', () async {
+      TimeZones.ensureInitialized();
+      final t = await twoFamilies('schichten');
+      await _join(t.modA, t.user);
+      final uid = t.user.userId!;
+      Future<int> mine(SdkMatrixGateway reader, String roomId) async {
+        final raw = await reader.sdkClient!.getRoomEvents(roomId, Direction.b, limit: 100);
+        return raw.chunk.where((e) => e.type == 'm.room.encrypted' && e.senderId == uid).length;
+      }
+
+      final events = MemoryEventStore();
+      final items = MemoryShoppingStore();
+      final cal = CalendarService(store: events, myUserId: uid);
+      final shop = ShoppingService(store: items, myUserId: uid);
+      CalendarSync newCal(String room) =>
+          CalendarSync(gateway: t.user, service: cal, store: events, retryInterval: const Duration(hours: 1))..start(familyRoom: room);
+      ShoppingSync newShop(String room) =>
+          ShoppingSync(gateway: t.user, service: shop, store: items, retryInterval: const Duration(hours: 1))..start(familyRoom: room);
+      Future<void> termin(String title) => cal.create(
+            title: title,
+            start: DateTime.utc(2026, 12, 1, 9),
+            end: DateTime.utc(2026, 12, 1, 10),
+            timeZone: 'Europe/Berlin',
+            visibility: EventVisibility.shared,
+          );
+
+      var cs = newCal(t.roomA);
+      var ss = newShop(t.roomA);
+      addTearDown(() {
+        cs.dispose();
+        ss.dispose();
+      });
+
+      /// `publishPending` kehrt sofort zurück, solange der Lauf aus `start` sendet: Die Warteschlange zählt.
+      Future<void> sendAll(String what) => E2e.untilAsync(() async {
+            await cs.publishPending();
+            await ss.publishPending();
+            return (await events.pendingPublish()).isEmpty && (await items.pendingPublish()).isEmpty;
+          }, what: what);
+
+      await termin('AUS-A');
+      await shop.add('AUS-A');
+      await sendAll('Warteschlange von A leer');
+      expect(await mine(t.modA, t.roomA), greaterThanOrEqualTo(2), reason: 'Voraussetzung: beide gingen nach A');
+
+      await t.modA.removeMember(uid);
+      await E2e.until(() => t.user.family == null, what: 'Familie entfernt');
+      // Offen beim Wechsel: Das ist, was die alten Dienste nach B tragen könnten.
+      await termin('OFFEN-A');
+      await shop.add('OFFEN-A');
+      await _join(t.modB, t.user);
+      await E2e.until(() => t.user.debugParticipantsLoaded, what: 'Mitglieder von B');
+      await t.modB.sendMessage('Marke');
+      await E2e.until(() => t.user.messages.any((m) => m.body == 'Marke'), what: 'Abgleich in B');
+
+      // Die alten Dienste laufen noch, bis AppRoot schließt.
+      await cs.publishPending();
+      await ss.publishPending();
+      await cs.idle();
+      await ss.idle();
+      expect(await mine(t.modB, t.roomB), 0, reason: 'die alten Dienste senden nichts nach B');
+      expect(await events.pendingPublish(), isNotEmpty, reason: 'der offene Termin blieb in der Warteschlange');
+
+      // Wie AppServices: schließen, Anspruch löscht, neue Dienste für B.
+      cs.dispose();
+      ss.dispose();
+      await events.wipe();
+      await items.wipe();
+      cs = newCal(t.roomB);
+      ss = newShop(t.roomB);
+
+      final fresh = _listen(t.user);
+      await t.modB.publishSharedEvent(_shared(t.modB, _idB, 'AUS-B'));
+      await E2e.until(() => _sharedFrom(fresh, t.modB).isNotEmpty, what: 'Signal aus B');
+      await cs.idle();
+      await ss.idle();
+      expect((await events.all()).map((e) => e.title), isNot(contains('AUS-A')), reason: 'Termine aus A kehren nicht zurück');
+      expect(await items.all(), isEmpty, reason: 'Einkauf aus A kehrt nicht zurück');
+      await cs.publishPending();
+      await ss.publishPending();
+      expect(await mine(t.modB, t.roomB), 0, reason: 'die neuen Dienste senden nichts aus A');
+
+      // Positivkontrolle: Neues geht nach B.
+      await termin('NEU-B');
+      await sendAll('Warteschlange von B leer');
+      expect(await mine(t.modB, t.roomB), 1);
+    });
+
+    test('direkter Wechsel: Einzelchats aus A sind sofort weg, auch vor der Mitgliederliste von B', () async {
+      final t = await twoFamilies('dm');
+      await _join(t.modA, t.user);
+      await _rawJoin(t.modB, t.user);
+      await E2e.until(() => t.user.debugParticipantsLoaded, what: 'Mitglieder von A');
+      final dm = await t.user.startDirectChat(t.modA.userId!);
+      await E2e.until(() => t.user.threads.any((x) => x.id == dm), what: 'Einzelchat in A');
+
+      final gate = Completer<void>();
+      t.user.debugBeforeParticipantsLoaded = () => gate.future;
+      addTearDown(() {
+        if (!gate.isCompleted) gate.complete();
+      });
+      await _pointFamilyTo(t.user, t.roomB);
+      await E2e.until(() => t.user.family?.roomId == t.roomB, what: 'Familie B übernommen');
+      expect(t.user.threads.where((x) => x.kind == ThreadKind.direct), isEmpty);
+      expect(t.user.messagesIn(dm), isEmpty);
+
+      gate.complete();
+      await E2e.until(() => t.user.debugParticipantsLoaded, what: 'Mitglieder von B');
+      await t.modB.sendMessage('Marke');
+      await E2e.until(() => t.user.messages.any((m) => m.body == 'Marke'), what: 'Abgleich in B');
+      expect(t.user.threads.where((x) => x.kind == ThreadKind.direct), isEmpty, reason: 'das Gegenüber ist nicht in B');
+    });
+
+    test('direkter Wechsel: Die Mitgliederliste von A gilt nicht als geladen für B', () async {
+      final t = await twoFamilies('geladen');
+      await _join(t.modA, t.user);
+      await _rawJoin(t.modB, t.user);
+      await E2e.until(() => t.user.debugParticipantsLoaded, what: 'Mitglieder von A');
+
+      final gate = Completer<void>();
+      t.user.debugBeforeParticipantsLoaded = () => gate.future;
+      addTearDown(() {
+        if (!gate.isCompleted) gate.complete();
+      });
+      await _pointFamilyTo(t.user, t.roomB);
+      await E2e.until(() => t.user.family?.roomId == t.roomB, what: 'Familie B übernommen');
+      expect(t.user.debugParticipantsLoaded, isFalse, reason: 'Lazy Loading: Die Liste von B steht noch aus');
+
+      final fresh = _listen(t.user);
+      gate.complete();
+      await E2e.until(() => t.user.debugParticipantsLoaded, what: 'Liste aus B');
+      await t.modB.publishSharedEvent(_shared(t.modB, _idB, 'AUS-B'));
+      await E2e.until(() => _sharedFrom(fresh, t.modB).isNotEmpty, what: 'Abgleich nach der Liste aus B');
+      expect(fresh.whereType<MemberJoinedSignal>(), isEmpty);
     });
 
     test('direkter Wechsel über die Kontodaten: kein Signal aus A, Mitgliederliste von B geladen', () async {
