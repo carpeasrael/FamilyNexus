@@ -1722,6 +1722,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get webPasswordWrong => 'Falsches Passwort.';
 
   @override
+  String get webVaultFailed =>
+      'Der Tresor konnte nicht geöffnet werden. Mögliche Gründe: Die Seite wird nicht über eine sichere Verbindung (https) geladen, oder der Speicher des Browsers ist voll oder gesperrt.';
+
+  @override
+  String get webWipeFailed =>
+      'Die Daten konnten nicht gelöscht werden. Prüfe, ob der Speicher des Browsers gesperrt ist, und versuche es erneut.';
+
+  @override
   String get webUnlockAction => 'Entsperren';
 
   @override
