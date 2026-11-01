@@ -1,3 +1,5 @@
+import 'invite_link.dart';
+
 /// Validierte Homeserver-URL: ausschließlich `https`, ohne Zugangsdaten,
 /// Query oder Fragment (E-07).
 class ServerUrl {
@@ -8,6 +10,12 @@ class ServerUrl {
   String get host => uri.host;
   @override
   String toString() => uri.toString();
+
+  /// Server im Heimnetz (E-59), auch IPv6-Literale (`::1`, `fd00::5`); siehe [InviteLink.isLocalServer].
+  bool get isLocal => isLocalHost(uri.host);
+
+  /// Wie [isLocal] für einen reinen Hostnamen ohne Port; IPv6-Literale gelten als lokal.
+  static bool isLocalHost(String host) => host.contains(':') || InviteLink.isLocalServer(host);
 
   static final RegExp _hostRe = RegExp(
     r'^(?:[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?)(?:\.[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?)*$',
