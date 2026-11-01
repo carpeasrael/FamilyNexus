@@ -1,6 +1,6 @@
 # Export Compliance für App Store Connect
 
-Stand: 2026-10-23, App-Version 1.0.4 (Build 6). **Dies ist keine Rechtsberatung.** Alle Einordnungen sind Vorschläge auf Grundlage
+Stand: 2026-10-31, App-Version 1.2.1. **Dies ist keine Rechtsberatung.** Alle Einordnungen sind Vorschläge auf Grundlage
 von Apples Anleitung und der Projektquellen; Stellen mit **[verify]** bzw. „[publisher to confirm]“ muss der Herausgeber selbst klären.
 Eingereicht oder hochgeladen wurde nichts; personenbezogene Angaben (Name, Anschrift) sind bewusst nicht eingetragen.
 
@@ -52,7 +52,7 @@ lassen). Welche Unterlagen ein Einzelentwickler ohne Firma braucht, klärt die A
 1. **Entscheiden:** Weg A oder B (oben).
 2. **Platzhalter ausfüllen** in `encryption-description-en.md` (Herausgeber, Anschrift, Kontakt, Vertriebsländer, ECCN-Einschätzung) und die mit
    **[verify]** markierten Punkte prüfen (TLS-Suiten der Dart-Laufzeit; Krypto-Anbieter von SQLCipher im Pod).
-3. **PDF erzeugen** (Pages/Word „Als PDF exportieren“, oder `brew install pandoc` und `pandoc encryption-description-en.md -o encryption-description-en.pdf`).
+3. **PDF erzeugen:** `encryption-description-en.pdf` ist im AURORA-Design gesetzt (Quelle: `encryption-description-en.md`; erzeugt mit Chrome headless, Schriften aus `assets/fonts`). Das französische PDF liegt ebenfalls bei.
 4. **App Store Connect:** App öffnen → *App-Informationen* → neben *App-Verschlüsselungsdokumentation* auf **+** → Fragen beantworten →
    *Datei auswählen* → *Sichern*. Vorher müssen App-Beschreibung und Verfügbarkeit gepflegt sein. Rollen: Account-Inhaber, Admin
    oder App-Manager. Apple nennt etwa zwei Werktage Prüfdauer. Alternativ: Bei einem Build mit fehlender Angabe (Tab *TestFlight*
@@ -64,7 +64,7 @@ lassen). Welche Unterlagen ein Einzelentwickler ohne Firma braucht, klärt die A
    tool/set_export_compliance.sh <Schlüsselwert>
    ```
    Das setzt `ITSAppUsesNonExemptEncryption = true` und `ITSEncryptionExportComplianceCode` in `ios/Runner/Info.plist` und
-   `macos/Runner/Info.plist`. Danach **Buildnummer erhöhen** (`pubspec.yaml`, z. B. `1.0.4+7`), `tool/build_ios_release.sh` und
+   `macos/Runner/Info.plist`. Danach **Buildnummer erhöhen** (`pubspec.yaml`, z. B. `1.2.1+23`), `tool/build_ios_release.sh` und
    `tool/build_macos_release.sh` ausführen und hochladen. Ohne die Angabe in der Info.plist fragt App Store Connect bei jedem Upload erneut.
 7. **Ohne Unterlagen (Weg A):** `tool/set_export_compliance.sh --no-code` setzt nur `ITSAppUsesNonExemptEncryption = true`; die
    Fragen im Fragebogen beantwortest du weiterhin selbst, bis Apple einen Schlüsselwert vergibt oder die Angabe akzeptiert.
