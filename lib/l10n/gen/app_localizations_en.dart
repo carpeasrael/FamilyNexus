@@ -2154,14 +2154,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keyRenewIntro =>
-      'Lost your emergency key or want to replace it? Create a new one here. The old one stops working – keep only the new one. Your messages, events and devices stay as they are.';
+      'Lost your emergency key or want to replace it? Create a new one here. From then on, only the new one counts in the app – keep only that one. If the old one has fallen into the wrong hands, this does not fully protect you. Your messages, events and devices stay as they are.';
 
   @override
   String get keyRenew => 'Create new emergency key';
 
   @override
   String get securityKeyRenewHint =>
-      'In case you lost it. The old one stops working.';
+      'In case you lost it. In the app, only the new one counts afterwards.';
 
   @override
   String get inviteStepTitle => 'Invitation';

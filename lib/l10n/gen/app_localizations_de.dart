@@ -2172,14 +2172,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get keyRenewIntro =>
-      'Du hast deinen Notfall-Schlüssel verloren oder willst ihn ersetzen? Dann erstelle hier einen neuen. Der alte funktioniert danach nicht mehr – bewahre nur den neuen auf. Deine Nachrichten, Termine und Geräte bleiben, wie sie sind.';
+      'Du hast deinen Notfall-Schlüssel verloren oder willst ihn ersetzen? Dann erstelle hier einen neuen. Danach gilt in der App nur noch der neue – bewahre nur ihn auf. Ist der alte in fremde Hände geraten, schützt dich das nicht vollständig. Deine Nachrichten, Termine und Geräte bleiben, wie sie sind.';
 
   @override
   String get keyRenew => 'Neuen Notfall-Schlüssel erstellen';
 
   @override
   String get securityKeyRenewHint =>
-      'Falls du ihn verloren hast. Der alte gilt danach nicht mehr.';
+      'Falls du ihn verloren hast. In der App gilt danach nur der neue.';
 
   @override
   String get inviteStepTitle => 'Einladung';
