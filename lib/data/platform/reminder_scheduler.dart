@@ -72,8 +72,6 @@ class LocalReminderScheduler implements ReminderScheduler {
       notificationDetails: const NotificationDetails(linux: LinuxNotificationDetails()),
     ),
   );
-  static const Duration tickInterval = Duration(seconds: 30);
-
   /// Verpasste Erinnerungen erscheinen nur, wenn sie höchstens so alt sind.
   static const Duration staleAfter = InAppReminders.staleAfter;
 

@@ -77,12 +77,19 @@ void main() {
     expect(shown, hasLength(1));
   });
 
-  test('clear zeigt nichts mehr an', () async {
+  test('clear leert die Liste und beendet den Takt', () async {
     replace(<PlannedReminder>[planned(1, base.add(const Duration(minutes: 1)))]);
     r.clear();
+    expect(r.isEmpty, isTrue);
+    expect(r.tickActive, isFalse);
     await r.fireDue(base.add(const Duration(hours: 1)));
     expect(shown, isEmpty);
+  });
+
+  test('eine leere Planung legt keinen Takt an', () {
+    replace(const <PlannedReminder>[]);
     expect(r.tickActive, isFalse);
+    expect(r.isEmpty, isTrue);
   });
 
   test('ein fehlschlagendes show verhindert die übrigen Anzeigen nicht', () async {
