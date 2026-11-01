@@ -8,6 +8,7 @@ import '../../core/app_log.dart';
 import '../../core/platform_info.dart';
 import '../../domain/reminder_planner.dart';
 import '../../domain/time_zones.dart';
+import 'in_app_reminders.dart';
 
 enum ReminderPermission {
   granted,
@@ -63,12 +64,16 @@ class LocalReminderScheduler implements ReminderScheduler {
   /// App hält die Erinnerungen selbst und zeigt fällige an, solange sie läuft. Geprüft wird gegen die Uhrzeit (nicht
   /// mit einem langen Timer), damit Erinnerungen auch nach einem Standby noch erscheinen.
   final bool _inAppTimers;
-  List<_InAppReminder> _inApp = const <_InAppReminder>[];
-  Timer? _tick;
-  static const Duration tickInterval = Duration(seconds: 30);
-
-  /// Verpasste Erinnerungen (z. B. Rechner im Standby) erscheinen nur, wenn sie höchstens so alt sind.
-  static const Duration staleAfter = Duration(minutes: 30);
+  late final InAppReminders _inApp = InAppReminders(
+    show: (id, title, body) => _plugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: const NotificationDetails(linux: LinuxNotificationDetails()),
+    ),
+  );
+  /// Verpasste Erinnerungen erscheinen nur, wenn sie höchstens so alt sind.
+  static const Duration staleAfter = InAppReminders.staleAfter;
 
   AndroidFlutterLocalNotificationsPlugin? get _android =>
       _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
@@ -230,57 +235,19 @@ class LocalReminderScheduler implements ReminderScheduler {
     List<PlannedReminder> planned, {
     required String title,
     required String Function(int minutesBefore) bodyFor,
-  }) {
-    _inApp = <_InAppReminder>[
-      for (final r in planned) _InAppReminder(r.id, r.fireAt.toUtc(), title, bodyFor(r.minutesBefore)),
-    ];
-    _tick?.cancel();
-    _tick = _inApp.isEmpty ? null : Timer.periodic(tickInterval, (_) => fireDue());
-    fireDue();
-  }
+  }) =>
+      _inApp.replace(planned, title: title, bodyFor: bodyFor);
 
-  /// Zeigt fällige Erinnerungen (Linux); öffentlich nur für Tests.
-  Future<void> fireDue([DateTime? now]) async {
-    final t = (now ?? DateTime.now()).toUtc();
-    final due = _inApp.where((r) => !r.fireAt.isAfter(t)).toList();
-    if (due.isEmpty) return;
-    _inApp = _inApp.where((r) => r.fireAt.isAfter(t)).toList();
-    if (_inApp.isEmpty) {
-      _tick?.cancel();
-      _tick = null;
-    }
-    for (final r in due) {
-      if (t.difference(r.fireAt) > staleAfter) continue;
-      try {
-        await _plugin.show(
-          id: r.id,
-          title: r.title,
-          body: r.body,
-          notificationDetails: const NotificationDetails(linux: LinuxNotificationDetails()),
-        );
-      } catch (e) {
-        AppLog.e('reminders', 'Erinnerung konnte nicht angezeigt werden', e);
-      }
-    }
-  }
+  /// Zeigt fällige Erinnerungen (Linux, Windows); öffentlich nur für Tests.
+  Future<void> fireDue([DateTime? now]) => _inApp.fireDue(now);
 
   @override
   Future<void> cancelAll() async {
-    _inApp = const <_InAppReminder>[];
-    _tick?.cancel();
-    _tick = null;
+    _inApp.clear();
     try {
       await _plugin.cancelAll();
     } catch (e) {
       AppLog.e('reminders', 'Erinnerungen konnten nicht entfernt werden', e);
     }
   }
-}
-
-class _InAppReminder {
-  const _InAppReminder(this.id, this.fireAt, this.title, this.body);
-  final int id;
-  final DateTime fireAt;
-  final String title;
-  final String body;
 }
