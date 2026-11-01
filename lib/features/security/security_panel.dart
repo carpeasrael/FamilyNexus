@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
@@ -58,6 +59,9 @@ void clearClipboardLater(String secret, {Duration delay = const Duration(seconds
 /// Überspringen: Ohne Verifizierung erhält ein Gerät keine Raumschlüssel (SA-1).
 ///
 /// Mit [renew] ersetzt das Panel auf einem verifizierten Gerät den Schlüssel durch einen neuen (#11).
+/// Datum der Schlüsseldatei in der Schreibweise der App-Sprache, z. B. `31.10.2026` bzw. `10/31/2026` (#162).
+String keyFileDate(DateTime d, String locale) => DateFormat.yMd(locale).format(d);
+
 class SecurityPanel extends StatefulWidget {
   const SecurityPanel({super.key, this.onReady, this.renew = false, this.onDone});
 
@@ -105,7 +109,7 @@ class _SecurityPanelState extends State<SecurityPanel> {
     final s = AppScope.read(context);
     final m = ScaffoldMessenger.of(context);
     final now = DateTime.now();
-    final date = '${now.day.toString().padLeft(2, '0')}.${now.month.toString().padLeft(2, '0')}.${now.year}';
+    final date = keyFileDate(now, Localizations.localeOf(context).toLanguageTag());
     final text = l.keyFileBody(s.gateway.userId ?? '', s.gateway.server?.host ?? '', key, date);
     try {
       final saved = await s.files.saveFile(name: l.keyFileName, bytes: utf8.encode(text), mimeType: 'text/plain');
