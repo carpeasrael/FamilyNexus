@@ -433,6 +433,16 @@ void main() {
       expect(m.map((e) => e.body), <String>['echt bearbeitet']);
     });
 
+    test('die neueste von zwei echten Bearbeitungen gewinnt, unabhängig von der Listenfolge', () {
+      expect(map(<Event>[ev(r'$a', text('Original'), ts: 1), ev(r'$1', edit(r'$a', 'erste'), ts: 2), ev(r'$2', edit(r'$a', 'zweite'), ts: 3)]).map((e) => e.body), <String>['zweite']);
+      expect(map(<Event>[ev(r'$a', text('Original'), ts: 1), ev(r'$2', edit(r'$a', 'zweite'), ts: 3), ev(r'$1', edit(r'$a', 'erste'), ts: 2)]).map((e) => e.body), <String>['zweite']);
+    });
+
+    test('m.new_content als Text ist keine Bearbeitung', () {
+      final m = map(<Event>[ev(r'$a', text('Original'), ts: 1), ev(r'$e', <String, Object?>{...edit(r'$a', 'x'), 'm.new_content': 'kein Objekt'}, ts: 2)]);
+      expect(m.first.body, 'Original');
+    });
+
     test('Klartext-Bearbeitung allein ändert nichts und erscheint nicht', () {
       final m = map(<Event>[ev(r'$a', text('Original'), ts: 1), ev(r'$f', edit(r'$a', 'gefälscht'), encrypted: false, ts: 9)]);
       expect(m.map((e) => e.body), <String>['Original']);

@@ -74,6 +74,23 @@ void main() {
       expect(app.gateway.retried, <String>[id]);
     });
 
+    testWidgets('im Einzelchat wiederholt der Knopf in diesem Thread', (tester) async {
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      final dm = await app.gateway.startDirectChat(ben.userId!);
+      await app.gateway.sendMessage('Nur für Ben', threadId: dm);
+      final id = app.gateway.messagesIn(dm).single.id;
+      app.gateway.sendStates[id] = (status: MessageStatus.failed, retryable: true);
+      await _openChat(tester, app);
+      await tester.tap(find.text('Ben'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Senden fehlgeschlagen – tippen zum Wiederholen'));
+      await tester.pumpAndSettle();
+      expect(app.gateway.retried, <String>[id]);
+      expect(app.gateway.retriedThreads, <String>[dm]);
+    });
+
     testWidgets('nicht wiederholbar: Hinweis statt Knopf, Tippen löst nichts aus', (tester) async {
       final app = await buildTestApp();
       await app.gateway.sendMessage('Hallo');
@@ -104,6 +121,24 @@ void main() {
       expect(find.text('Nicht gesendet. Bitte erneut schreiben.'), findsNothing);
       expect(find.text('Senden fehlgeschlagen – tippen zum Wiederholen'), findsNothing);
     });
+  });
+
+  testWidgets('#138: Nicht Entschlüsseltes bietet „Antworten“ nicht an', (tester) async {
+    final app = await buildTestApp();
+    await app.gateway.sendMessage('Lesbar');
+    await app.gateway.sendMessage('Verborgen');
+    app.gateway.undecryptable.add(app.gateway.messages.last.id);
+    await _openChat(tester, app);
+
+    await tester.longPress(find.text('Nachricht kann nicht entschlüsselt werden'));
+    await tester.pumpAndSettle();
+    expect(find.text('Antworten'), findsNothing);
+    await tester.tapAt(Offset.zero);
+    await tester.pumpAndSettle();
+
+    await tester.longPress(find.text('Lesbar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Antworten'), findsOneWidget);
   });
 
   testWidgets('#162: Uhrzeit der Nachricht folgt der 12-h-Einstellung des Geräts (englisch)', (tester) async {

@@ -148,6 +148,11 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @visibleForTesting
   Future<void> Function()? debugBeforeFamilyTimeline;
 
+  /// Nur für Tests: läuft im Abgleich nach `room.getTimeline`. Dann zeigt die Zeitleiste schon den neuen Raum, [family]
+  /// noch den alten; das Lesen für die Echo-Reparatur hält diesen Stand ebenso offen.
+  @visibleForTesting
+  Future<void> Function()? debugAfterFamilyTimeline;
+
   /// Nur für Tests: läuft, wenn die Mitgliederliste da ist, vor der Prüfung der Generation.
   @visibleForTesting
   Future<void> Function()? debugBeforeParticipantsLoaded;
@@ -2370,11 +2375,13 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return null;
   }
 
+  /// Antwortziel im Thread. Das SDK zitiert dessen Text in der verschlüsselten Antwort, im Namen dieses Geräts: Was nicht
+  /// verschlüsselt ankam und auch keine eigene Sendung ist ([ChatMapper.visible]), wäre Text des Servers.
   Event? _replyTarget(String? replyToId, String threadId) {
     if (replyToId == null) return null;
     final e = _findEvent(replyToId, threadId);
     // Nicht stillschweigend ohne Antwortbezug senden.
-    if (e == null) throw const GatewayException(GatewayError.notFound);
+    if (e == null || !ChatMapper.visible(e, _client?.userID, _localSends)) throw const GatewayException(GatewayError.notFound);
     return e;
   }
 
@@ -2524,6 +2531,16 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return room;
   }
 
+  /// Ließe [_roomForSend] jetzt einen Versuch durch?
+  bool _canSendTo(String threadId, String roomId) {
+    try {
+      _roomForSend(threadId, roomId);
+      return true;
+    } on GatewayException {
+      return false;
+    }
+  }
+
   /// Begrenzter Download: bricht ab, sobald mehr als das Limit ankommt (der im
   /// Ereignis behauptete Wert ist nicht vertrauenswürdig).
   Future<Uint8List> _boundedDownload(Uri uri) async {
@@ -2608,8 +2625,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       senderId == me && type == EventTypes.Message && isError && canRetry ? RetryDecision.retry : RetryDecision.skip;
 
   /// Automatisches Wiederholen nach einem Sync: höchstens [maxRetriesPerEvent]-mal, nie parallel für dieselbe Sendung und
-  /// nur, wenn Verschlüsselung gesichert ist. Ein Fall für den Zähler ist erst, was wirklich ansteht: Fehlt die
-  /// Verschlüsselung nur vorübergehend, bleiben die Versuche erhalten.
+  /// nur, wenn der Versuch auch laufen kann ([_roomForSend]). Ein Fall für den Zähler ist erst, was wirklich ansteht: Fehlt
+  /// die Verschlüsselung nur vorübergehend oder steht der Abgleich nach einem Familienwechsel noch aus, bleiben die
+  /// Versuche erhalten.
   void _retryFailedSends() {
     final me = _client?.userID;
     if (me == null) return;
@@ -2620,8 +2638,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       for (final e in _dmTimelines.entries) (e.key, e.value),
     ];
     for (final (threadId, t) in lines) {
-      if (!_canEncryptIn(_roomForThread(threadId))) continue;
       final roomId = t.room.id;
+      if (!_canSendTo(threadId, roomId)) continue;
       for (final e in List<Event>.of(t.events)) {
         final decision = retryDecision(
           type: e.type,
@@ -2727,6 +2745,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       );
       _timelineRoomId = room.id;
       _backfill(_timeline!).ignore();
+      await debugAfterFamilyTimeline?.call();
     }
     final timeline = _timeline!;
     bool stale() => _client != client || !identical(_timeline, timeline);

@@ -145,14 +145,16 @@ class _ChatScreenState extends State<ChatScreen> {
       context: context,
       builder: (c) => SafeArea(
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          ListTile(
-            leading: const Icon(Icons.reply),
-            title: Text(l.chatReply),
-            onTap: () {
-              Navigator.pop(c);
-              setState(() => _replyTo = m);
-            },
-          ),
+          // Nicht Entschlüsseltes ist kein Antwortziel, das Gateway wiese es ab.
+          if (!m.undecryptable)
+            ListTile(
+              leading: const Icon(Icons.reply),
+              title: Text(l.chatReply),
+              onTap: () {
+                Navigator.pop(c);
+                setState(() => _replyTo = m);
+              },
+            ),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Wrap(spacing: 8, children: <Widget>[

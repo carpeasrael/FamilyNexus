@@ -12,6 +12,8 @@ import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/invite_ticket.dart';
 import 'package:family_nexus/domain/security.dart';
+import 'package:family_nexus/domain/shopping.dart';
+import 'package:family_nexus/domain/tasks.dart';
 import 'package:family_nexus/domain/time_zones.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -34,6 +36,9 @@ class _Net extends http.BaseClient {
   final http.Client _inner = E2e.lenientClient();
   bool failSends = false;
   Future<void> Function()? holdResponse;
+
+  /// Hält die Antworten auf `/sync` zurück: Das Sync-Echo bleibt aus.
+  Future<void>? syncGate;
   final List<String> puts = <String>[];
 
   int putsTo(String roomId) => puts.where((p) => p.contains(roomId)).length;
@@ -50,6 +55,8 @@ class _Net extends http.BaseClient {
       );
     }
     final res = await _inner.send(request);
+    final gate = syncGate;
+    if (gate != null && request.url.path.endsWith('/sync')) await gate;
     final hold = holdResponse;
     if (isSend && hold != null) await hold();
     return res;
@@ -543,6 +550,316 @@ void main() {
       await E2e.until(() => _message(t.g, 'WIEDERHOLT')?.status == MessageStatus.sent, what: 'wiederholt nach dem Rennen');
       await Future<void>.delayed(const Duration(milliseconds: 400));
       expect(_message(t.g, 'WIEDERHOLT')?.status, MessageStatus.sent);
+    });
+
+    test('Klartext aller Signal-Typen in Familie, privatem Raum und Einzelchat', () async {
+      final t = await _familyWithNet('zsig');
+      final me = t.g.userId!;
+      final got = _listen(t.g);
+      await t.g.publishPrivateEvent(ev(owner: me, id: _id2, title: 'ECHT PRIVAT', visibility: EventVisibility.private));
+      await E2e.until(() => got.whereType<PrivateEventSignal>().length == 1, what: 'echter privater Termin');
+      final privateId = t.g.sdkClient!.accountData[SdkMatrixGateway.privateAccountData]!.content['room_id']! as String;
+      final dm = await t.g.startDirectChat(t.peer.userId!);
+      await E2e.until(() => t.g.threads.any((x) => x.id == dm), what: 'Einzelchat bei G');
+      await E2e.until(() => t.peer.threads.any((x) => x.id == dm), what: 'Einzelchat beim Mitglied');
+
+      final raw = t.peer.sdkClient!;
+      final own = t.g.sdkClient!;
+      const junk = <String, Object?>{'x': 'KLARTEXT'};
+      for (final type in <String>[EventCodec.sharedType, EventCodec.rsvpType, ShoppingCodec.type, TaskCodec.listType, TaskCodec.logType]) {
+        await raw.sendMessage(t.roomId, type, raw.generateUniqueTransactionId(), junk);
+      }
+      await own.sendMessage(privateId, EventCodec.privateType, own.generateUniqueTransactionId(), junk);
+      await own.sendMessage(t.roomId, 'm.room.message', own.generateUniqueTransactionId(), <String, Object?>{'msgtype': 'm.text', 'body': 'EIGENER KLARTEXT'});
+      await raw.sendMessage(dm, 'm.room.message', raw.generateUniqueTransactionId(), <String, Object?>{'msgtype': 'm.text', 'body': 'KLARTEXT DM'});
+
+      await t.peer.sendMessage('DANACH');
+      await t.peer.sendMessage('DANACH DM', threadId: dm);
+      await E2e.until(() => _message(t.g, 'DANACH') != null && _message(t.g, 'DANACH DM', threadId: dm) != null, what: 'Abgleich danach');
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      expect(_message(t.g, 'EIGENER KLARTEXT'), isNull);
+      expect(_message(t.g, 'KLARTEXT DM', threadId: dm), isNull);
+      expect(got.whereType<SharedEventSignal>(), isEmpty);
+      expect(got.whereType<RsvpSignal>(), isEmpty);
+      expect(got.whereType<ShoppingSignal>(), isEmpty);
+      expect(got.whereType<TaskListSignal>(), isEmpty);
+      expect(got.whereType<TaskLogSignal>(), isEmpty);
+      expect(got.whereType<PrivateEventSignal>(), hasLength(1), reason: 'nur der echte');
+    });
+
+    test('Einzelchat: automatisch und von Hand wiederholt, nur in diesen Raum', () async {
+      final t = await _familyWithNet('zdm');
+      final dm = await t.g.startDirectChat(t.peer.userId!);
+      await E2e.until(() => t.g.threads.any((x) => x.id == dm), what: 'Einzelchat bei G');
+      await E2e.until(() => t.peer.threads.any((x) => x.id == dm), what: 'Einzelchat beim Mitglied');
+      final family = t.net.putsTo(t.roomId);
+
+      t.net.failSends = true;
+      await _failedSend(t.g, 'DM AUTO', threadId: dm);
+      t.net.failSends = false;
+      await t.peer.sendMessage('ANSTOSS');
+      await E2e.until(() => _message(t.peer, 'DM AUTO', threadId: dm) != null, what: 'automatisch angekommen');
+      await E2e.until(() => _message(t.g, 'DM AUTO', threadId: dm)?.status == MessageStatus.sent, what: 'gesendet');
+
+      t.net.failSends = true;
+      final txid = await _failedSend(t.g, 'DM HAND', threadId: dm);
+      await expectLater(t.g.retryMessage(txid), _error(GatewayError.notFound));
+      t.net.failSends = false;
+      await t.g.retryMessage(txid, threadId: dm);
+      await E2e.until(() => _message(t.peer, 'DM HAND', threadId: dm) != null, what: 'von Hand angekommen');
+      await E2e.until(() => t.g.debugLocalSends.openCount == 0, what: 'nichts offen');
+      expect(t.net.putsTo(t.roomId), family, reason: 'nichts geht in den Familienraum');
+    });
+
+    test('Antwort da, Sync-Echo aus: Text, Antwort, Anhang und Karte bleiben sichtbar', () async {
+      final t = await _familyWithNet('zfen');
+      await t.g.sendMessage('BASIS');
+      await E2e.until(() => _message(t.g, 'BASIS')?.status == MessageStatus.sent, what: 'Basis');
+      await Future<void>.delayed(const Duration(seconds: 1));
+      final basis = _message(t.g, 'BASIS')!.id;
+
+      void sichtbar(String wann) {
+        expect(_message(t.g, 'IM FENSTER')?.status, MessageStatus.sent, reason: 'Text $wann');
+        expect(_message(t.g, 'ANTWORT')?.status, MessageStatus.sent, reason: 'Antwort $wann');
+        expect(t.g.messages.where((m) => m.attachment?.name == 'notiz.txt' && m.status == MessageStatus.sent), hasLength(1), reason: 'Anhang $wann');
+        expect(t.g.messages.where((m) => m.sharedEventId == _id1 && m.status == MessageStatus.sent), hasLength(1), reason: 'Karte $wann');
+      }
+
+      final gate = Completer<void>();
+      t.net.syncGate = gate.future;
+      await t.g.sendMessage('IM FENSTER');
+      await t.g.sendMessage('ANTWORT', replyToId: basis);
+      await t.g.sendAttachment(fileName: 'notiz.txt', bytes: utf8.encode('Inhalt des Anhangs'));
+      await t.g.shareEventInChat(ev(owner: t.g.userId!, id: _id1, title: 'Karte', visibility: EventVisibility.shared));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      sichtbar('vor dem Echo');
+      expect(t.g.debugLocalSends.openCount, 0);
+
+      t.net.syncGate = null;
+      gate.complete();
+      await E2e.until(() => t.peer.messages.any((m) => m.sharedEventId == _id1), what: 'beim Mitglied');
+      await Future<void>.delayed(const Duration(seconds: 1));
+      sichtbar('nach dem Echo');
+      expect(t.g.messages.where((m) => m.body == 'IM FENSTER'), hasLength(1), reason: 'genau einmal');
+    });
+
+    test('echte Bearbeitung über Megolm gilt, Klartext-Bearbeitung danach nicht', () async {
+      final t = await _familyWithNet('zedit');
+      await t.peer.sendMessage('ORIGINAL');
+      await E2e.until(() => _message(t.g, 'ORIGINAL') != null, what: 'Original');
+      final id = _message(t.g, 'ORIGINAL')!.id;
+      final raw = t.peer.sdkClient!;
+      await raw.getRoomById(t.roomId)!.sendTextEvent('BEARBEITET', editEventId: id, parseMarkdown: false, parseCommands: false);
+      await E2e.until(() => _message(t.g, 'BEARBEITET') != null, what: 'Bearbeitung');
+      expect(_message(t.g, 'ORIGINAL'), isNull);
+      expect(_message(t.g, '* BEARBEITET'), isNull, reason: 'nicht als eigene Nachricht');
+
+      await raw.sendMessage(t.roomId, 'm.room.message', raw.generateUniqueTransactionId(), <String, Object?>{
+        'msgtype': 'm.text',
+        'body': '* GEFAELSCHT',
+        'm.new_content': <String, Object?>{'msgtype': 'm.text', 'body': 'GEFAELSCHT'},
+        'm.relates_to': <String, Object?>{'rel_type': 'm.replace', 'event_id': id},
+      });
+      await t.peer.sendMessage('DANACH');
+      await E2e.until(() => _message(t.g, 'DANACH') != null, what: 'Abgleich danach');
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      expect(_message(t.g, 'GEFAELSCHT'), isNull);
+      expect(_message(t.g, 'BEARBEITET'), isNotNull);
+    });
+
+    test('offene Sendung aus A, Wechsel nach B und zurück: geht nur nach A', () async {
+      final t = await _familyWithNet('zrueck');
+      final b = await secondFamily(t.g, 'zrueck');
+      t.net.failSends = true;
+      await _failedSend(t.g, 'NUR FUER A');
+      final inB = await _sent(b.modB, b.roomB);
+
+      await t.g.sdkClient!.setAccountData(t.g.userId!, SdkMatrixGateway.familyAccountData, <String, Object?>{'room_id': b.roomB});
+      await E2e.until(() => t.g.family?.roomId == b.roomB, what: 'Familie B übernommen');
+      t.net.puts.clear();
+      await t.g.sdkClient!.setAccountData(t.g.userId!, SdkMatrixGateway.familyAccountData, <String, Object?>{'room_id': t.roomId});
+      await E2e.until(() => t.g.family?.roomId == t.roomId, what: 'zurück in A');
+      t.net.failSends = false;
+      await t.peer.sendMessage('ANSTOSS');
+      await E2e.until(() => _message(t.peer, 'NUR FUER A') != null, what: 'kommt in A an');
+      expect(t.net.putsTo(b.roomB), 0, reason: 'nichts nach B');
+      expect(await _sent(b.modB, b.roomB), inB);
+    });
+
+    test('Sync-Echo vor der Sendeantwort im Einzelchat und im privaten Raum', () async {
+      final t = await _familyWithNet('zecho');
+      final me = t.g.userId!;
+      final dm = await t.g.startDirectChat(t.peer.userId!);
+      await E2e.until(() => t.g.threads.any((x) => x.id == dm), what: 'Einzelchat bei G');
+      await E2e.until(() => t.peer.threads.any((x) => x.id == dm), what: 'Einzelchat beim Mitglied');
+      final got = _listen(t.g);
+      var echoes = 0;
+      final sub = t.g.sdkClient!.onTimelineEvent.stream.listen((e) {
+        if (e.senderId == me && arrivedEncrypted(e)) echoes++;
+      });
+      addTearDown(sub.cancel);
+
+      Future<void> raced(Future<void> Function() send) async {
+        final before = echoes;
+        t.net.holdResponse = () => E2e.until(() => echoes > before, what: 'Sync-Echo');
+        await send();
+        t.net.holdResponse = null;
+      }
+
+      await raced(() => t.g.sendMessage('RENNEN DM', threadId: dm));
+      await E2e.until(() => _message(t.g, 'RENNEN DM', threadId: dm)?.status == MessageStatus.sent, what: 'Einzelchat nach dem Rennen');
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      expect(_message(t.g, 'RENNEN DM', threadId: dm)?.status, MessageStatus.sent, reason: 'bleibt nach dem Abgleich');
+
+      await raced(() => t.g.publishPrivateEvent(ev(owner: me, id: _id2, title: 'RENNEN PRIVAT', visibility: EventVisibility.private)));
+      await E2e.until(() => got.whereType<PrivateEventSignal>().length == 1, what: 'privates Signal nach dem Rennen');
+    });
+
+    test('eigener Klartext-Termin ohne bekannte Kennung, sent und synced: kein Signal', () async {
+      final t = await _familyWithNet('xeig');
+      final me = t.g.userId!;
+      final got = _listen(t.g);
+      final shared = EventCodec.encodeShared(ev(owner: me, id: _id1, title: 'GEFAELSCHT'));
+      for (final (i, status) in <EventStatus>[EventStatus.sent, EventStatus.synced].indexed) {
+        await _forge(t.g, t.roomId, _forged('\$x$i', sender: me, type: EventCodec.sharedType, content: shared, status: status));
+      }
+      await t.peer.sendMessage('DANACH');
+      await E2e.until(() => _message(t.g, 'DANACH') != null, what: 'Abgleich danach');
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      expect(_titles(got), isEmpty);
+    });
+
+    test('eigener Termin: Scan im Zustand gesendet, danach Echo: Signal kommt', () async {
+      final t = await _familyWithNet('xvor');
+      final me = t.g.userId!;
+      final got = _listen(t.g);
+      final gate = Completer<void>();
+      t.net.syncGate = gate.future;
+      await t.g.publishSharedEvent(ev(owner: me, id: _id1, title: 'IM FENSTER'));
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      expect(_titles(got), isEmpty, reason: 'vor dem Echo kein Signal');
+      t.net.syncGate = null;
+      gate.complete();
+      await E2e.until(() => _titles(got).contains('IM FENSTER'), what: 'Signal nach dem Echo');
+    });
+
+    test('Sync-Echo vor der Sendeantwort im privaten Raum, Antwort sofort nach dem Echo', () async {
+      final t = await _familyWithNet('xpriv');
+      final me = t.g.userId!;
+      final got = _listen(t.g);
+      await t.g.publishPrivateEvent(ev(owner: me, id: _id2, title: 'VORAB', visibility: EventVisibility.private));
+      await E2e.until(() => got.whereType<PrivateEventSignal>().length == 1, what: 'erstes privates Signal');
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      final echo = Completer<void>();
+      final sub = t.g.sdkClient!.onTimelineEvent.stream.listen((e) {
+        if (e.senderId == me && e.type == EventCodec.privateType && arrivedEncrypted(e) && !echo.isCompleted) echo.complete();
+      });
+      addTearDown(sub.cancel);
+      t.net.holdResponse = () => echo.future.timeout(const Duration(seconds: 30));
+      await t.g.publishPrivateEvent(ev(owner: me, id: _id1, title: 'RENNEN', visibility: EventVisibility.private));
+      t.net.holdResponse = null;
+      await E2e.until(() => got.whereType<PrivateEventSignal>().length == 2, what: 'privates Signal nach dem Rennen');
+    });
+
+    test('gefälschtes Fehler-Ereignis mit derselben Kennung tauscht den Inhalt nicht', () async {
+      final t = await _familyWithNet('xtausch');
+      final me = t.g.userId!;
+      t.net.failSends = true;
+      final txid = await _failedSend(t.g, 'ECHTER INHALT');
+      await _forge(t.g, t.roomId, _forged(txid, sender: me, status: EventStatus.error, txid: txid, content: <String, Object?>{'msgtype': 'm.text', 'body': 'GETAUSCHT'}));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      t.net.failSends = false;
+      await t.peer.sendMessage('ANSTOSS');
+      await E2e.until(() => _message(t.peer, 'ECHTER INHALT') != null || _message(t.peer, 'GETAUSCHT') != null, what: 'Wiederholung kommt an');
+      expect(_message(t.peer, 'GETAUSCHT'), isNull);
+      expect(_message(t.peer, 'ECHTER INHALT'), isNotNull);
+    });
+
+    test('Antwortziel: Klartext wird abgewiesen, nichts geht hinaus; Verschlüsseltes bleibt beantwortbar', () async {
+      final t = await _familyWithNet('antwort');
+      final me = t.g.userId!;
+      final peer = t.peer.userId!;
+      await t.peer.sendMessage('ECHT');
+      await E2e.until(() => _message(t.g, 'ECHT') != null, what: 'echte Nachricht');
+      await t.g.sendMessage('EIGENE');
+      await E2e.until(() => _message(t.g, 'EIGENE')?.status == MessageStatus.sent, what: 'eigene Nachricht');
+      final genuine = _message(t.g, 'ECHT')!.id;
+      final own = _message(t.g, 'EIGENE')!.id;
+
+      await _forge(t.g, t.roomId, _forged(r'$fremd', sender: peer));
+      await _forge(t.g, t.roomId, _forged(r'$eigen', sender: me, status: EventStatus.synced));
+      await _forge(t.g, t.roomId, _forged(r'$quelle', sender: peer, originalSource: _forged(r'$quelle', sender: peer, type: 'm.room.encrypted')));
+      // Text in einer angeblich verschlüsselten Hülle: `body` kommt in das Zitat, gelesen hat das Gerät es nicht.
+      await _forge(t.g, t.roomId, _forged(r'$huelle', sender: peer, type: 'm.room.encrypted', content: <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2', 'body': 'GEFAELSCHT'}));
+      t.net.puts.clear();
+
+      for (final id in <String>[r'$fremd', r'$eigen', r'$quelle', r'$huelle']) {
+        await expectLater(t.g.sendMessage('ANTWORT', replyToId: id), _error(GatewayError.notFound));
+        await expectLater(t.g.sendAttachment(fileName: 'notiz.txt', bytes: utf8.encode('Inhalt'), replyToId: id), _error(GatewayError.notFound));
+      }
+      expect(t.net.puts, isEmpty, reason: 'kein Versuch');
+      expect(t.g.debugLocalSends.openCount, 0);
+
+      await t.g.sendMessage('AUF ECHT', replyToId: genuine);
+      await t.g.sendMessage('AUF EIGENE', replyToId: own);
+      await E2e.until(() => _message(t.peer, 'AUF ECHT') != null && _message(t.peer, 'AUF EIGENE') != null, what: 'Antworten kommen an');
+      expect(_message(t.peer, 'AUF ECHT')!.replyToId, genuine);
+      expect(_message(t.peer, 'AUF EIGENE')!.replyToId, own);
+    });
+
+    test('Antwortziel: Die eigene Nachricht zählt auch zwischen Sendeantwort und Sync-Echo', () async {
+      final t = await _familyWithNet('fensterantwort');
+      final gate = Completer<void>();
+      t.net.syncGate = gate.future;
+      addTearDown(() {
+        if (!gate.isCompleted) gate.complete();
+      });
+      await t.g.sendMessage('OHNE ECHO');
+      await E2e.until(() => _message(t.g, 'OHNE ECHO')?.status == MessageStatus.sent, what: 'gesendet');
+      final id = _message(t.g, 'OHNE ECHO')!.id;
+      await t.g.sendMessage('ANTWORT', replyToId: id);
+      t.net.syncGate = null;
+      gate.complete();
+      await E2e.until(() => _message(t.peer, 'ANTWORT') != null, what: 'Antwort kommt an');
+      expect(_message(t.peer, 'ANTWORT')!.replyToId, id);
+    });
+
+    test('Fenster vor dem Abgleich: Zeitleiste schon zurück in A, `family` noch B: kein Versuch verbraucht', () async {
+      final t = await _familyWithNet('zaehler');
+      final b = await secondFamily(t.g, 'zaehler');
+      t.net.puts.clear();
+      t.net.failSends = true;
+      final txid = await _failedSend(t.g, 'NUR FUER A');
+      final client = t.g.sdkClient!;
+      await client.setAccountData(t.g.userId!, SdkMatrixGateway.familyAccountData, <String, Object?>{'room_id': b.roomB});
+      await E2e.until(() => t.g.family?.roomId == b.roomB, what: 'Familie B übernommen');
+
+      var entered = false;
+      final gate = Completer<void>();
+      t.g.debugAfterFamilyTimeline = () {
+        entered = true;
+        return gate.future;
+      };
+      addTearDown(() {
+        if (!gate.isCompleted) gate.complete();
+      });
+      await client.setAccountData(t.g.userId!, SdkMatrixGateway.familyAccountData, <String, Object?>{'room_id': t.roomId});
+      await E2e.until(() => entered, what: 'Zeitleiste von A geladen');
+      expect(t.g.family!.roomId, b.roomB, reason: 'Der Abgleich steht aus: `_requireEncryptedRoom` lehnt ab');
+
+      final before = t.net.puts.length;
+      for (var i = 0; i < 8; i++) {
+        await _forge(t.g, t.roomId, _forged(txid, sender: t.g.userId!, status: EventStatus.error, txid: txid));
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      expect(t.net.puts, hasLength(before));
+
+      final used = before - 1;
+      var left = 0;
+      while (t.g.debugLocalSends.takeAutoRetry(txid)) {
+        left++;
+      }
+      expect(left, SdkMatrixGateway.maxRetriesPerEvent - used, reason: 'nur echte Versuche zählen');
     });
 
     test('Abmelden während einer laufenden Sendung: kein Absturz, nichts bleibt offen', () async {

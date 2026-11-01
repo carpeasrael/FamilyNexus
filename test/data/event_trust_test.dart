@@ -220,6 +220,15 @@ void main() {
       expect(ChatMapper.messages(t, threadId: 'family', sends: LocalSends(), myUserId: me), isEmpty);
     });
 
+    test('Quelle ohne Verschlüsselung: Zeitleiste bleibt unverändert', () async {
+      await client.database.storeEventUpdate(roomId, Event.fromJson(plain(r'$x'), room), EventUpdateType.timeline, client);
+      final forged = Event.fromMatrixEvent(MatrixEvent.fromJson(plain(r'$x', txid: 'txn1')), room);
+      final t = Timeline(room: room, chunk: TimelineChunk(events: <Event>[forged]));
+      addTearDown(t.cancelSubscriptions);
+      await repair(t);
+      expect(identical(t.events.single, forged), isTrue);
+    });
+
     test('Kennung unbekannt in der Datenbank: nichts geschieht', () async {
       final forged = Event.fromMatrixEvent(MatrixEvent.fromJson(plain(r'$neu')), room);
       final t = Timeline(room: room, chunk: TimelineChunk(events: <Event>[forged]));

@@ -34,7 +34,7 @@ class ChatMapper {
   /// einzigen Hinweis zusammengefasst (#35).
   ///
   /// Klartext wird verworfen, nicht gekennzeichnet: In einem Megolm-Raum sendet kein regulärer Client Nachrichten im
-  /// Klartext. Sichtbar bleibt nur die eigene laufende oder gescheiterte Sendung (siehe [_visible]).
+  /// Klartext. Sichtbar bleibt nur die eigene laufende oder gescheiterte Sendung (siehe [visible]).
   static List<ChatMessage> messages(
     Timeline timeline, {
     required String threadId,
@@ -145,7 +145,8 @@ class ChatMapper {
   /// Gerät: während des Sendens und nach einem Fehler; im Zustand „gesendet“ nur, wenn der Server genau diese
   /// Kennung für diesen Text geliefert hat oder die Sendung noch läuft (das SDK meldet „gesendet“ vor der Rückkehr
   /// von `sendEvent`). `sent` und `synced` lassen sich aus `unsigned` setzen, `isSent` wäre deshalb zu weit.
-  static bool _visible(Event e, String? me, LocalSends sends) {
+  /// Dasselbe gilt für Antwortziele: Das SDK zitiert deren Text in der verschlüsselten Antwort.
+  static bool visible(Event e, String? me, LocalSends sends) {
     if (arrivedEncrypted(e)) return true;
     if (e.senderId != me) return false;
     switch (e.status) {
@@ -209,7 +210,7 @@ class ChatMapper {
     if (e.type != EventTypes.Message || _isEdit(e) || e.redacted) {
       return null;
     }
-    if (!_visible(e, me, sends)) return null;
+    if (!visible(e, me, sends)) return null;
 
     // Geräte-Verifizierung (`m.key.verification.request` als Raumnachricht) ist kein Chat-Inhalt (#29).
     if (e.messageType.startsWith('m.key.verification.')) return null;
