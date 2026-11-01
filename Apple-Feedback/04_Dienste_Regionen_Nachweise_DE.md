@@ -20,7 +20,7 @@ Im untersuchten App-Code und den direkten Abhängigkeiten ist kein Werbe-, Analy
 
 Belege: [Standardanbieter](../lib/domain/app_settings.dart), [Matrix-Gateway](../lib/data/matrix/sdk_matrix_gateway.dart), [Einladungslink](../lib/domain/invite_link.dart), [Element-Verweis](../lib/data/platform/element_launcher.dart), [Abhängigkeiten](../pubspec.yaml) und [lokale Benachrichtigungen](../lib/data/platform/reminder_scheduler.dart).
 
-Die öffentlich erreichbare Datenschutz- und Support-URL aus App Store Connect zusätzlich prüfen. Aus einer Website-Adresse im Code folgt nicht, dass die aktuellen Rechtstexte dort vollständig veröffentlicht sind. Die [Datenschutzvorlage](../store/privacy/privacy-policy.en.md) enthält noch Herausgeber-Platzhalter.
+Die öffentlich erreichbare Datenschutz- und Support-URL aus App Store Connect zusätzlich prüfen. Aus einer Website-Adresse im Code folgt nicht, dass die aktuellen Rechtstexte dort vollständig veröffentlicht sind. Die [englische Fassung](../store/privacy/privacy-policy.en.md) ist eine Übersetzung der deutschen (Deutsch maßgeblich) und noch nicht zur Veröffentlichung freigegeben.
 
 ## 2. Regionen und Sprachen (Apple-Punkt 5)
 
