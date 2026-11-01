@@ -39,13 +39,29 @@ void main() {
       expect(wiped, 0, reason: 'eine Bestätigung während des Aufräumens löscht die behaltenen Daten nicht');
     });
 
+    test('ein Fehler beim Löschen der Familiendaten lässt keine Temp-Datei stehen', () async {
+      final app = await buildTestApp();
+      final files = app.services.files as FakeFileAccess;
+      app.services.debugWipeAccountData = () async => throw StateError('gesperrt');
+      await expectLater(app.services.wipeAccountData(), throwsStateError);
+      expect(files.cleared, 1);
+    });
+
     test('resetLocalData räumt zuerst auf, auch wenn das Löschen scheitert', () async {
       final files = FakeFileAccess();
+      var clearedAtDestroy = -1;
       await expectLater(
-        resetLocalData(keyStore: MemoryKeyStore(), files: files, destroyAll: () async => throw StateError('voll')),
+        resetLocalData(
+          keyStore: MemoryKeyStore(),
+          files: files,
+          destroyAll: () async {
+            clearedAtDestroy = files.cleared;
+            throw StateError('voll');
+          },
+        ),
         throwsStateError,
       );
-      expect(files.cleared, 1);
+      expect(clearedAtDestroy, 1);
     });
 
     test('resetLocalData führt das Löschen aus', () async {

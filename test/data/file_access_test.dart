@@ -8,9 +8,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Attrappe einer ausgewählten Datei.
 final class _File extends PlatformFile {
-  _File({required this.size, this.readError});
+  _File({required this.size, this.readError, this.onRead});
   final int size;
   final Object? readError;
+
+  /// Läuft beim Einlesen, vor dem Ergebnis.
+  final void Function()? onRead;
 
   @override
   String get name => 'a.txt';
@@ -22,6 +25,7 @@ final class _File extends PlatformFile {
   Future<int> length() async => size;
   @override
   Future<Uint8List> readAsBytes() async {
+    onRead?.call();
     if (readError != null) throw readError!;
     return Uint8List(size);
   }
@@ -152,6 +156,16 @@ void main() {
       FilePickerPlatform.instance = p;
       final f = await pick();
       expect(f!.bytes.length, 3);
+      expect(p.clears, 1);
+    });
+
+    test('#141: räumt erst nach dem Einlesen auf, sonst wäre die Kopie unter iOS schon weg', () async {
+      late _Picker p;
+      var clearsAtRead = -1;
+      p = _Picker(pickResult: _File(size: 3, onRead: () => clearsAtRead = p.clears));
+      FilePickerPlatform.instance = p;
+      await pick();
+      expect(clearsAtRead, 0);
       expect(p.clears, 1);
     });
 
