@@ -8,8 +8,8 @@ tun muss, steht in Abschnitt 1. Rechtliche Angaben sind Hinweise, keine Rechtsbe
 | # | Punkt | Wo |
 |---|---|---|
 | 1 | **Entwicklerkonten:** Google Play Console, Apple Developer Program (kostenpflichtig; Organisationskonten brauchen u. a. eine D-U-N-S-Nummer) | Play Console / developer.apple.com |
-| 2 | **Verantwortlicher, Anschrift, Kontakt** (Impressum) in `store/privacy/privacy-policy.*.md` eintragen (`<NAME UND ANSCHRIFT …>`, `<KONTAKT-E-MAIL>`) | `store/privacy/` |
-| 3 | **Datenschutzerklärung öffentlich hosten** (feste URL, de/en); URL in beiden Stores eintragen. Zusätzlich Support-URL und Support-Mail | Hosting des Herausgebers |
+| 2 | **Verantwortlicher, Anschrift, Kontakt** (Impressum): in `store/privacy/privacy-policy.de.md` eingetragen; die englische Fassung ist eine Übersetzung davon und übernimmt die Angaben unverändert | `store/privacy/` |
+| 3 | **Datenschutzerklärung öffentlich hosten** (feste URL); URL in beiden Stores eintragen. Die deutsche Fassung ist maßgeblich; die englische Übersetzung wird erst nach Freigabe durch den Herausgeber gehostet und verlinkt. Zusätzlich Support-URL und Support-Mail | Hosting des Herausgebers |
 | 4 | **Upload-Schlüssel erzeugen**: `tool/create_upload_key.sh` (legt `android/key.properties` an, nicht eingecheckt) und den Schlüssel mehrfach sichern | lokal |
 | 5 | **Apple-Team-ID** in `ios/ExportOptions.plist` (`HIER_TEAM_ID_EINTRAGEN`) eintragen; in Xcode mit dem Apple-Konto anmelden; Bundle-ID `de.inneso.familynexus` bei Apple registrieren | lokal / developer.apple.com |
 | 6 | **Prüfkonto** für die Review: ein Matrix-Konto (z. B. auf matrix.org) mit eingerichteter Schlüsselsicherung, Moderator einer Beispielfamilie mit zweitem Mitglied und Beispieldaten (#15); Benutzername und Passwort in App Store Connect („Anmeldeinformationen“) und in der Play Console („App-Zugriff“), den **Notfall-Schlüssel** in den Review-Notizen (Platzhalter ersetzen, Punkt 4.8) hinterlegen. Neuer Schlüssel: Einstellungen → „Notfall-Schlüssel und Geräte“ → „Neuen Notfall-Schlüssel erstellen“ (E-72) | Stores |
@@ -28,7 +28,7 @@ tun muss, steht in Abschnitt 1. Rechtliche Angaben sind Hinweise, keine Rechtsbe
 | Android | Release: R8/Shrink, `--obfuscate`, Symbole für native Bibliotheken, unsigniert ohne `key.properties`; **App Bundle:** `tool/build_release.sh aab` (≈ 79 MB) |
 | iOS | iPhone-only (`TARGETED_DEVICE_FAMILY=1`, keine iPad-Screenshots nötig), Mindestversion iOS 15, `PrivacyInfo.xcprivacy` (kein Tracking, keine Datenerhebung), Face-ID-Hinweistext, `ios/ExportOptions.plist`, Build `tool/build_ios_release.sh` (`--check` ohne Signatur) |
 | Store-Texte | `store/metadata/android/{de-DE,en-US}` (Titel, Kurz-/Langbeschreibung) und `store/metadata/ios/{de-DE,en-US}` (Name, Untertitel, Beschreibung, Schlüsselwörter, Werbetext, Neuerungen) + `review_notes.txt` (je für iOS und macOS, englisch und deutsch; `test/store/review_notes_test.dart` prüft, dass jede zitierte Beschriftung in der App vorkommt); Längen sind gegen die Store-Grenzen geprüft |
-| Datenschutz | `store/privacy/privacy-policy.{de,en}.md` (identisch zum App-Text) |
+| Datenschutz | `store/privacy/privacy-policy.de.md` (maßgeblich) und `privacy-policy.en.md` (Übersetzung, bis zur Freigabe nicht verlinkt); beide sind eigene Fassungen und nicht identisch zum Text in der App (`privacy*`-Schlüssel in `lib/l10n/`); Strukturgleichheit sichert `test/store/privacy_policy_parity_test.dart` |
 
 ## 3. Google Play
 
