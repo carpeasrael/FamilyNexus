@@ -102,6 +102,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Gewählt:** Beginn/Ende als UTC-Instant plus IANA-Zeitzone des Termins; Wiederholungen werden in der Zeitzone des Termins auf Wanduhrzeit berechnet (Sommerzeit-korrekt). Ganztägig: Datum ohne Zeit (zeitzonenfrei).
 - **Verworfen:** Nur UTC (Wiederholungen driften über Sommerzeit); RRULE-Bibliothek (Abhängigkeit, wir brauchen nur ein Teilset).
 - **Begründung:** Korrekte Wanduhrsemantik, voll testbar. Eigener Code nur für Kalenderlogik, nicht für Kryptografie.
+- **Anzeige von Uhrzeiten (#162):** Jede angezeigte Uhrzeit läuft über `formatClock` (`features/calendar/formatting.dart`): Format nach der 12/24-Stunden-Einstellung des Geräts und der App-Sprache; die Zone wählt der Aufrufer (Termine: Zone des Betrachters, Aufgaben: Zone der Liste, E-51, Chat: Gerätezeit). Das Datum der Notfall-Schlüssel-Datei folgt der App-Sprache (`31.10.2026` / `10/31/2026`). Technische Exporte (Datenprotokoll) bleiben ISO.
 
 ## E-21 Schriften und Netzwerk
 - **Gewählt:** Schriften (Space Grotesk, IBM Plex Sans/Mono, OFL) im App-Paket gebündelt.
