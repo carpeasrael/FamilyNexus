@@ -93,7 +93,12 @@ class _AppRootState extends State<AppRoot> {
         }
         // Ohne verifiziertes Gerät keine Hauptansicht (Schlüsselsicherung ist Pflicht, SA-1).
         final secure = services.gateway.securityState == SecurityState.ready;
-        final ready = services.settings.settings.onboardingDone && session && services.gateway.family != null && secure;
+        // Familie direkt gewechselt (#140), ohne Zwischenstand „keine Familie“: Die offenen Dienste gehören noch zur alten.
+        // Der Abbau darunter setzt `openFamilyRoom` zurück, danach öffnet die neue Hauptansicht die Dienste für die neue Familie.
+        final family = services.gateway.family;
+        final open = services.openFamilyRoom;
+        final familyChanged = open != null && family != null && open != family.roomId;
+        final ready = services.settings.settings.onboardingDone && session && family != null && secure && !familyChanged;
         if (session && services.settings.settings.onboardingDone && services.gateway.securityState == SecurityState.unknown) {
           return Scaffold(body: Center(child: Semantics(label: AppLocalizations.of(context).loading, child: const CircularProgressIndicator())));
         }
@@ -115,6 +120,7 @@ class _AppRootState extends State<AppRoot> {
             // Beim Verlassen der Hauptansicht geöffnete Seiten (z. B. Einstellungen) schließen, sonst
             // blieben sie über der Einrichtung stehen. Dialoge der Einrichtung bleiben unberührt.
             if (lostReady && mounted) Navigator.of(context).popUntil((r) => r.isFirst);
+            if (familyChanged && mounted) setState(() {});
           });
         }
         _wasReady = ready;

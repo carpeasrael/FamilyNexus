@@ -21,7 +21,7 @@ void main() {
 
   Future<void> setUpApp({String? lang = 'de'}) async {
     app = await buildTestApp(lang: lang, clock: () => now);
-    cal = await app.services.calendarBuilder!('@anna:fake.test');
+    cal = await app.services.calendarBuilder!('@anna:fake.test', null);
     sched = FakeReminderScheduler();
     coord = ReminderCoordinator(
       calendar: cal,

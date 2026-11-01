@@ -24,11 +24,12 @@ class ShoppingController extends ChangeNotifier {
   List<ShoppingItem> get done => <ShoppingItem>[for (final i in _items) if (i.checked) i];
   int get openCount => _items.where((i) => !i.checked).length;
 
-  void start() {
+  /// [familyRoom]: Familie, zu der der lokale Bestand gehört (`AppServices.openCalendar`).
+  void start({String? familyRoom}) {
     if (_started) return;
     _started = true;
     sync.onChanged = () => load().ignore();
-    sync.start();
+    sync.start(familyRoom: familyRoom);
     load().ignore();
   }
 

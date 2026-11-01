@@ -43,6 +43,7 @@ import '../platform/key_store.dart';
 import 'matrix_gateway.dart';
 import 'chat_mapper.dart';
 import 'family_room_spec.dart';
+import 'family_scope.dart';
 import 'background_image_work.dart';
 import 'https_only_client.dart';
 import 'identity_pins.dart';
@@ -135,6 +136,22 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   bool _participantsLoaded = false;
   bool _syncedOnce = false;
   Family? _family;
+
+  /// Zu welchem Familienraum die Zustände dieses Gateways gehören (#140).
+  final FamilyScope _scope = FamilyScope();
+
+  /// Nur für Tests: läuft im Abgleich vor `room.getTimeline`. Dann zeigt `_familyRoom()` schon auf den neuen Raum,
+  /// [family] noch auf den alten.
+  @visibleForTesting
+  Future<void> Function()? debugBeforeFamilyTimeline;
+
+  /// Nur für Tests: läuft, wenn die Mitgliederliste da ist, vor der Prüfung der Generation.
+  @visibleForTesting
+  Future<void> Function()? debugBeforeParticipantsLoaded;
+
+  /// Nur für Tests: Ist die Mitgliederliste der aktuellen Familie vollständig geladen?
+  @visibleForTesting
+  bool get debugParticipantsLoaded => _participantsLoaded;
   List<ChatMessage> _messages = const <ChatMessage>[];
   final Map<String, int> _retries = <String, int>{};
   final Set<String> _retryInFlight = <String>{};
@@ -1033,6 +1050,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _pinBook.clear();
     _participantsLoaded = false;
     _participantsRequested = false;
+    _scope.clear();
     _syncedOnce = false;
     _family = null;
     _messages = const <ChatMessage>[];
@@ -1040,6 +1058,26 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _retryInFlight.clear();
     _confirmedBase.clear();
   }
+
+  /// Die Familie hat gewechselt (auch nach „keine Familie“ und direkt von A nach B): Was aus dem bisherigen Raum
+  /// stammt, gilt nicht weiter (#140). Die Historie spielte es sonst den neuen Diensten vor, `_knownJoined` meldete
+  /// die Mitglieder der neuen Familie als neu, und Link-Vermerke aus A machten Anfragen in B gültig. `_signaled`
+  /// gehört dazu: `claimFamilyData` löscht auch private Termine, sie müssen beim nächsten Scan wiederkommen.
+  void _leaveFamilyScope() {
+    _signalHistory.clear();
+    _signaled.clear();
+    _roomTickets.clear();
+    _usedTickets.clear();
+    _knownJoined = null;
+    _participantsLoaded = false;
+    _participantsRequested = false;
+    _resetDirectChats();
+  }
+
+  /// Hat der Abgleich den Raum [room] als Familie übernommen? `_familyRoom()` zeigt nach einem Sync sofort auf einen
+  /// neuen Raum, `_family` erst nach `getTimeline`. Bis dahin geht nichts dorthin: Der Abgleich der Dienste steht noch
+  /// aus, und ihre Warteschlangen enthalten Daten des alten Raums (#140).
+  bool _isCurrentFamily(Room room) => room.id == _family?.roomId;
 
   // ------------------------------------------------------------- Familie
 
@@ -1962,6 +2000,10 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> _publishTicket(InviteTicket ticket) async {
     final room = _familyRoom();
     if (room == null) return;
+    if (!_isCurrentFamily(room)) {
+      AppLog.w('gateway', 'Link-Vermerk nicht gesendet: Familie wechselt gerade');
+      return;
+    }
     try {
       await _sendCalendar(room, InviteTicket.type, ticket.encode());
     } catch (e) {
@@ -2109,6 +2151,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> _roomOp(Future<void> Function(Room room) op) async {
     final room = _familyRoom();
     if (room == null) throw const GatewayException(GatewayError.notFound);
+    if (!_isCurrentFamily(room)) throw const GatewayException(GatewayError.serverUnreachable);
     try {
       await op(room).timeout(roomOpTimeout);
       _scheduleRefresh();
@@ -2284,6 +2327,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Room _requireEncryptedRoom([String threadId = ChatThread.familyId]) {
     final room = _roomForThread(threadId);
     if (room == null) throw const GatewayException(GatewayError.notFound);
+    if (threadId == ChatThread.familyId && !_isCurrentFamily(room)) {
+      throw const GatewayException(GatewayError.serverUnreachable);
+    }
     final client = _client;
     if (client == null || !client.encryptionEnabled || room.encryptionAlgorithm != FamilyRoomSpec.megolm) {
       throw const GatewayException(GatewayError.encryptionUnavailable);
@@ -2571,6 +2617,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       return;
     }
     final room = _familyRoom();
+    if (_scope.enter(room?.id)) _leaveFamilyScope();
     if (room == null) {
       _timeline?.cancelSubscriptions();
       _timeline = null;
@@ -2592,7 +2639,11 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
     if (!_participantsRequested) {
       _participantsRequested = true;
-      room.requestParticipants().then((_) {
+      final generation = _scope.generation;
+      room.requestParticipants().then((_) async {
+        await debugBeforeParticipantsLoaded?.call();
+        // Die Liste einer früheren Familie ist keine Basis für die jetzige.
+        if (generation != _scope.generation) return;
         _participantsLoaded = true;
         _scheduleRefresh();
       }).catchError((Object e) {
@@ -2600,6 +2651,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       }).ignore();
     }
     if (_timelineRoomId != room.id) {
+      await debugBeforeFamilyTimeline?.call();
       _timeline?.cancelSubscriptions();
       _timeline = await room.getTimeline(
         onUpdate: _scheduleRefresh,

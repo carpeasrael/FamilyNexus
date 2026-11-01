@@ -261,7 +261,7 @@ void main() {
   });
 
   group('Ansichten', () {
-    Future<CalendarEvent> seed(TestApp app) => app.services.calendarBuilder!('@anna:fake.test').then((c) async {
+    Future<CalendarEvent> seed(TestApp app) => app.services.calendarBuilder!('@anna:fake.test', null).then((c) async {
           final e = await c.service.create(
             title: 'Zahnarzt',
             start: DateTime.utc(2026, 3, 20, 13),
@@ -292,7 +292,7 @@ void main() {
       final room = app.gateway.familyRoom!;
       expect(room.membership['@ben:fake.test'], MemberStatus.joined);
       // Bens Termin per Signal-Pfad einspielen
-      final c = await app.services.calendarBuilder!('@anna:fake.test');
+      final c = await app.services.calendarBuilder!('@anna:fake.test', null);
       c.dispose();
       await _start(tester, app, tab: 'Kalender');
       final cal = app.services.calendar!;
@@ -324,7 +324,7 @@ void main() {
   group('Personenfilter nach Wegfall des Mitglieds (#155)', () {
     Future<void> seedBenFilter(WidgetTester tester, TestApp app) async {
       await _joinBen(app);
-      final c = await app.services.calendarBuilder!('@anna:fake.test');
+      final c = await app.services.calendarBuilder!('@anna:fake.test', null);
       c.dispose();
       await _start(tester, app, tab: 'Kalender');
       await app.services.calendar!.create(

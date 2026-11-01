@@ -44,6 +44,11 @@ class TestApp {
     required this.browser,
     required this.element,
     required this.oauth,
+    required this.calendarRooms,
+    required this.shoppingRooms,
+    required this.taskRooms,
+    required this.builtShopping,
+    required this.builtTasks,
   });
 
   final AppServices services;
@@ -61,6 +66,15 @@ class TestApp {
   final FakeBrowser browser;
   final FakeElement element;
   final FakeOAuthRedirect oauth;
+
+  /// Räume, die `AppServices` den Buildern übergeben hat, je Aufruf (#140).
+  final List<String?> calendarRooms;
+  final List<String?> shoppingRooms;
+  final List<String?> taskRooms;
+
+  /// Gebaute Controller, auch die eines verworfenen Öffnungslaufs.
+  final List<ShoppingController> builtShopping;
+  final List<TasksController> builtTasks;
 }
 
 /// Baut die App-Dienste mit Fake-Matrix. `loggedIn: true` legt zusätzlich
@@ -79,7 +93,14 @@ Future<TestApp> buildTestApp({
   bool withReminders = true,
   // Test: Familiendienste schlagen beim Öffnen fehl (#153).
   Future<void> Function(String uid)? beforeCalendarBuild,
+  Future<void> Function(String uid)? beforeShoppingBuild,
   Future<void> Function(String uid)? beforeTasksBuild,
+  // Test: Besitzer der lokalen Daten (#140). Ohne Angabe wie ohne Datenbank: kein Anspruch.
+  Future<void> Function(String owner)? familyDataClaim,
+  // Test: Ablagen mit Haken (#140).
+  MemoryEventStore? eventStore,
+  MemoryShoppingStore? shoppingItems,
+  MemoryTaskStore? taskItems,
 }) async {
   final store = MemoryKeyValueStore();
   if (lang != null) store.data['language'] = lang;
@@ -98,9 +119,9 @@ Future<TestApp> buildTestApp({
   final protection = NoopScreenProtection();
   if (!secureScreen) store.data['secureScreen'] = 'false';
   if (lockEnabled) store.data['lockEnabled'] = 'true';
-  final events = MemoryEventStore();
-  final shoppingStore = MemoryShoppingStore();
-  final taskStore = MemoryTaskStore();
+  final events = eventStore ?? MemoryEventStore();
+  final shoppingStore = shoppingItems ?? MemoryShoppingStore();
+  final taskStore = taskItems ?? MemoryTaskStore();
   final scheduler = FakeReminderScheduler();
   final links = FakeLinkSource();
   final auth = FakeDeviceAuth();
@@ -109,6 +130,11 @@ Future<TestApp> buildTestApp({
   final element = FakeElement();
   final oauth = FakeOAuthRedirect();
   final settingsController = await SettingsController.load(store);
+  final calendarRooms = <String?>[];
+  final shoppingRooms = <String?>[];
+  final taskRooms = <String?>[];
+  final builtShopping = <ShoppingController>[];
+  final builtTasks = <TasksController>[];
   final services = AppServices(
     settings: settingsController,
     screenProtection: screenProtection ?? protection,
@@ -124,15 +150,21 @@ Future<TestApp> buildTestApp({
     oauthRedirect: oauth,
     // Standard-Anbieter ist im Test der Fake-Server (statt matrix.org), außer ein Test will den echten Standard.
     defaultProvider: matrixOrgDefault ? null : ServerUrl.tryParse(defaultProvider ?? fake.host),
-    shoppingBuilder: (uid) async {
+    familyDataClaim: familyDataClaim,
+    shoppingBuilder: (uid, room) async {
+      shoppingRooms.add(room);
+      await beforeShoppingBuild?.call(uid);
       final service = ShoppingService(store: shoppingStore, myUserId: uid, clock: clock);
-      return ShoppingController(
+      final controller = ShoppingController(
         service: service,
         store: shoppingStore,
         sync: ShoppingSync(gateway: gateway, service: service, store: shoppingStore, retryInterval: const Duration(hours: 1)),
       );
+      builtShopping.add(controller);
+      return controller;
     },
-    tasksBuilder: (uid) async {
+    tasksBuilder: (uid, room) async {
+      taskRooms.add(room);
       await beforeTasksBuild?.call(uid);
       final service = TaskService(
         store: taskStore,
@@ -140,7 +172,7 @@ Future<TestApp> buildTestApp({
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
         clock: clock,
       );
-      return TasksController(
+      final controller = TasksController(
         service: service,
         store: taskStore,
         sync: TaskSync(gateway: gateway, service: service, store: taskStore, retryInterval: const Duration(hours: 1)),
@@ -148,8 +180,11 @@ Future<TestApp> buildTestApp({
         zoneName: 'Europe/Berlin',
         periodCheck: const Duration(hours: 1),
       );
+      builtTasks.add(controller);
+      return controller;
     },
-    calendarBuilder: (uid) async {
+    calendarBuilder: (uid, room) async {
+      calendarRooms.add(room);
       await beforeCalendarBuild?.call(uid);
       return buildCalendarController(
         store: events,
@@ -177,6 +212,11 @@ Future<TestApp> buildTestApp({
     browser: browser,
     element: element,
     oauth: oauth,
+    calendarRooms: calendarRooms,
+    shoppingRooms: shoppingRooms,
+    taskRooms: taskRooms,
+    builtShopping: builtShopping,
+    builtTasks: builtTasks,
   );
 }
 

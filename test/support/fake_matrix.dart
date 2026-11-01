@@ -219,6 +219,15 @@ class FakeMatrixServer {
     }
   }
 
+  /// Legt einen weiteren Familienraum an, in dem [userId] Mitglied ist (Familienwechsel, #140).
+  FakeRoom addFamilyRoom(String name, String userId) {
+    final room = FakeRoom('${nextId('!room')}:$host', name)
+      ..membership[userId] = MemberStatus.joined
+      ..power[userId] = PowerLevels.admin;
+    rooms[room.id] = room;
+    return room;
+  }
+
   /// Nimmt [userId] in den Raum auf (wie nach Einladung und Beitritt) und
   /// benachrichtigt die übrigen Mitglieder.
   void addMember(FakeRoom room, String userId, {int power = 0}) {
@@ -276,10 +285,11 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   FakeRoom? get familyRoom => _familyRoomId == null ? null : fake.rooms[_familyRoomId];
 
-  /// Test-Hook: Familienraum für diesen Nutzer festlegen (z. B. nach Einladung).
-  void attachFamilyRoom(String roomId) {
+  /// Test-Hook: Familienraum für diesen Nutzer festlegen (z. B. nach Einladung). [notify]: `false` wie im echten
+  /// Gateway, wo `family` wechselt, bevor der Abgleich am Ende die Zuhörer benachrichtigt (#140).
+  void attachFamilyRoom(String roomId, {bool notify = true}) {
     _familyRoomId = roomId;
-    notifyListeners();
+    if (notify) notifyListeners();
   }
 
   RequestCheck _check(FakeRoom room, String user) {

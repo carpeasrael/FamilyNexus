@@ -55,11 +55,12 @@ class CalendarController extends ChangeNotifier {
   tz.TZDateTime get localNow => tz.TZDateTime.from(_clock().toUtc(), zone);
   Map<String, List<int>> get reminders => _reminders;
 
-  void start() {
+  /// [familyRoom]: Familie, zu der der lokale Bestand gehört (`AppServices.openCalendar`).
+  void start({String? familyRoom}) {
     if (_started) return;
     _started = true;
     sync.onChanged = () => load().ignore();
-    sync.start();
+    sync.start(familyRoom: familyRoom);
     load().ignore();
   }
 
@@ -278,7 +279,11 @@ class CalendarController extends ChangeNotifier {
     await load();
   }
 
-  Future<void> shareInChat(CalendarEvent e) => gateway.shareEventInChat(e);
+  Future<void> shareInChat(CalendarEvent e) async {
+    // Die Karte verwiese sonst in der neuen Familie auf einen Termin der alten (#140).
+    if (!sync.sameFamily) throw const GatewayException(GatewayError.serverUnreachable);
+    await gateway.shareEventInChat(e);
+  }
 
   Future<void> _changed() async {
     await load();

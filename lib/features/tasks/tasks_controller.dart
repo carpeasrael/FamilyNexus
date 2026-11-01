@@ -68,11 +68,12 @@ class TasksController extends ChangeNotifier {
 
   List<TaskLogEntry> history(TaskList l) => TaskProgress.history(l, _log);
 
-  void start() {
+  /// [familyRoom]: Familie, zu der der lokale Bestand gehört (`AppServices.openCalendar`).
+  void start({String? familyRoom}) {
     if (_started) return;
     _started = true;
     sync.onChanged = () => load().ignore();
-    sync.start();
+    sync.start(familyRoom: familyRoom);
     // Periodenwechsel (Mitternacht, Wochen-, Monatswechsel) braucht keine Daten, nur eine neue Anzeige.
     _timer = Timer.periodic(periodCheck, (_) => _checkPeriods());
     load().ignore();
