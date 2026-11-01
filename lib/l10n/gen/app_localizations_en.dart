@@ -102,6 +102,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retry => 'Try again';
 
   @override
+  String get homeOpenFailed =>
+      'Your family data could not be opened. Check the free storage space and try again. Your data stays on the device.';
+
+  @override
   String get startupFailedTitle => 'Local data unreadable';
 
   @override
