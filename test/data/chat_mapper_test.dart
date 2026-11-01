@@ -359,6 +359,7 @@ void main() {
           expect(has(<Event>[neu(r'$r', '👍', sender: me, target: r'$b')]), isFalse);
           expect(has(<Event>[neu(r'$r', '👍', sender: me)], key: '🎉'), isFalse);
           expect(has(<Event>[neu(r'$r', '👍')]), isFalse);
+          expect(has(<Event>[neu(r'$r', '👍', claimed: me)]), isFalse);
         });
 
         Event alt({int? status, Map<String, Object?>? unsigned, String sender = me}) => ev(r'$alt', <String, Object?>{
