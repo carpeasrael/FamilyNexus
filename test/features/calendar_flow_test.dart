@@ -356,6 +356,25 @@ void main() {
       });
     }
 
+    testWidgets('drei Mitglieder, nur das ausgeschiedene gewählt: Leiste bleibt, „Alle“ ist markiert', (tester) async {
+      final app = await _app();
+      app.server.addAccount('carl', 'geheim789', displayName: 'Carl');
+      await seedBenFilter(tester, app);
+      final carl = app.server.newDevice();
+      await carl.login(server: ServerUrl.tryParse(app.server.host)!, username: 'carl', password: 'geheim789');
+      final room = app.gateway.familyRoom!;
+      app.server.addMember(room, '@carl:fake.test');
+      carl.attachFamilyRoom(room.id);
+      await tester.pumpAndSettle();
+      expect(find.text('Zahnarzt'), findsNothing, reason: 'Auswahl {Ben} gilt bei drei Mitgliedern');
+
+      await app.gateway.removeMember('@ben:fake.test');
+      await tester.pumpAndSettle();
+      expect(find.widgetWithText(FilterChip, 'Carl'), findsOneWidget, reason: 'zwei Mitglieder: Leiste bleibt');
+      expect(tester.widget<FilterChip>(find.widgetWithText(FilterChip, 'Alle')).selected, isTrue);
+      expect(find.text('Zahnarzt'), findsOneWidget);
+    });
+
     testWidgets('tritt Ben wieder bei, gilt die frühere Auswahl wieder', (tester) async {
       final app = await _app();
       await seedBenFilter(tester, app);
