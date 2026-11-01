@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
+import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter/material.dart';
@@ -57,6 +58,52 @@ void main() {
     expect(find.text('Hallo Familie'), findsOneWidget);
     expect(tester.widget<TextField>(find.byType(TextField)).controller!.text, isEmpty);
     expect(app.gateway.messages.single.body, 'Hallo Familie');
+  });
+
+  group('#138: gescheiterte Nachricht', () {
+    testWidgets('wiederholbar: Knopf löst retryMessage aus', (tester) async {
+      final app = await buildTestApp();
+      await app.gateway.sendMessage('Hallo');
+      final id = app.gateway.messages.single.id;
+      app.gateway.sendStates[id] = (status: MessageStatus.failed, retryable: true);
+      await _openChat(tester, app);
+
+      expect(find.text('Nicht gesendet. Bitte erneut schreiben.'), findsNothing);
+      await tester.tap(find.text('Senden fehlgeschlagen – tippen zum Wiederholen'));
+      await tester.pumpAndSettle();
+      expect(app.gateway.retried, <String>[id]);
+    });
+
+    testWidgets('nicht wiederholbar: Hinweis statt Knopf, Tippen löst nichts aus', (tester) async {
+      final app = await buildTestApp();
+      await app.gateway.sendMessage('Hallo');
+      app.gateway.sendStates[app.gateway.messages.single.id] = (status: MessageStatus.failed, retryable: false);
+      await _openChat(tester, app);
+
+      expect(find.text('Senden fehlgeschlagen – tippen zum Wiederholen'), findsNothing);
+      await tester.tap(find.text('Nicht gesendet. Bitte erneut schreiben.'));
+      await tester.pumpAndSettle();
+      expect(app.gateway.retried, isEmpty);
+    });
+
+    testWidgets('englisch', (tester) async {
+      final app = await buildTestApp(lang: 'en');
+      await app.gateway.sendMessage('Hello');
+      app.gateway.sendStates[app.gateway.messages.single.id] = (status: MessageStatus.failed, retryable: false);
+      await _openChatEn(tester, app, use24h: true);
+      expect(find.text('Not sent. Please write it again.'), findsOneWidget);
+    });
+
+    testWidgets('„wird gesendet“ zeigt die Uhr, keinen Hinweis', (tester) async {
+      final app = await buildTestApp();
+      await app.gateway.sendMessage('Hallo');
+      app.gateway.sendStates[app.gateway.messages.single.id] = (status: MessageStatus.sending, retryable: false);
+      await _openChat(tester, app);
+
+      expect(find.byIcon(Icons.schedule), findsOneWidget);
+      expect(find.text('Nicht gesendet. Bitte erneut schreiben.'), findsNothing);
+      expect(find.text('Senden fehlgeschlagen – tippen zum Wiederholen'), findsNothing);
+    });
   });
 
   testWidgets('#162: Uhrzeit der Nachricht folgt der 12-h-Einstellung des Geräts (englisch)', (tester) async {

@@ -42,11 +42,13 @@ import '../db/encrypted_db.dart';
 import '../platform/key_store.dart';
 import 'matrix_gateway.dart';
 import 'chat_mapper.dart';
+import 'event_trust.dart';
 import 'family_room_spec.dart';
 import 'family_scope.dart';
 import 'background_image_work.dart';
 import 'https_only_client.dart';
 import 'identity_pins.dart';
+import 'local_sends.dart';
 import 'server_probe.dart';
 import 'sync_relevance.dart';
 
@@ -96,6 +98,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   static const int maxMessageLength = 8000;
   static const int maxFamilyNameLength = 60;
   static const int maxRetriesPerEvent = 5;
+  static const int maxPlaintextWarnings = 2000;
   static const Duration roomSyncTimeout = Duration(seconds: 30);
 
   final KeyStore _keyStore;
@@ -152,9 +155,15 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Nur für Tests: Ist die Mitgliederliste der aktuellen Familie vollständig geladen?
   @visibleForTesting
   bool get debugParticipantsLoaded => _participantsLoaded;
+  /// Nur für Tests: die offenen Chat-Sendungen.
+  @visibleForTesting
+  LocalSends get debugLocalSends => _localSends;
   List<ChatMessage> _messages = const <ChatMessage>[];
-  final Map<String, int> _retries = <String, int>{};
-  final Set<String> _retryInFlight = <String>{};
+
+  /// Offene Chat-Sendungen. Nur hier liegt, was wiederholt werden darf (#138).
+  final LocalSends _localSends = LocalSends(maxRetries: maxRetriesPerEvent);
+  final EchoRepair _echoRepair = EchoRepair();
+  final BoundedIdSet _plaintextWarned = BoundedIdSet(maxPlaintextWarnings);
 
   /// Bei der Serverprüfung bestätigte Basisadresse je Eingabe: Der Login nutzt
   /// genau diese und löst nicht erneut auf (kein Wechsel zwischen Prüfung und Anmeldung).
@@ -1054,8 +1063,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _syncedOnce = false;
     _family = null;
     _messages = const <ChatMessage>[];
-    _retries.clear();
-    _retryInFlight.clear();
+    _localSends.clear();
+    _echoRepair.clear();
+    _plaintextWarned.clear();
     _confirmedBase.clear();
   }
 
@@ -2011,11 +2021,16 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
   }
 
-  /// Liest die Link-Vermerke aus dem Verlauf des Familienraums. Nur Vermerke von Moderatoren zählen.
+  /// Liest die Link-Vermerke aus dem Verlauf des Familienraums. Nur verschlüsselt angekommene Vermerke von Moderatoren
+  /// zählen (#138).
   void _readTickets(Room room, Timeline timeline) {
     final nowSec = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
     for (final e in timeline.events) {
       if (e.type != InviteTicket.type || e.redacted || e.status.isError) continue;
+      if (!arrivedEncrypted(e)) {
+        _warnPlaintext(e);
+        continue;
+      }
       if (room.getPowerLevelByUserId(e.senderId).level < PowerLevels.moderator) continue;
       final t = InviteTicket.decode(e.content, nowSeconds: nowSec);
       if (t == null) continue;
@@ -2370,12 +2385,21 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
     final room = _requireEncryptedRoom(threadId);
     final target = _replyTarget(replyToId, threadId);
+    final roomId = room.id;
+    final txid = room.client.generateUniqueTransactionId();
     try {
-      await room.sendTextEvent(
-        text,
-        inReplyTo: target,
-        parseMarkdown: false,
-        parseCommands: false,
+      await _sendTracked(
+        txid: txid,
+        threadId: threadId,
+        roomId: roomId,
+        tail: text,
+        send: () => _roomForSend(threadId, roomId).sendTextEvent(
+          text,
+          txid: txid,
+          inReplyTo: target,
+          parseMarkdown: false,
+          parseCommands: false,
+        ),
       );
     } catch (e) {
       AppLog.e('gateway', 'Nachricht konnte nicht gesendet werden', e);
@@ -2425,13 +2449,24 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
     final room = _requireEncryptedRoom(threadId);
     final target = _replyTarget(replyToId, threadId);
+    final roomId = room.id;
+    final txid = room.client.generateUniqueTransactionId();
     try {
-      final file = MatrixFile.fromMimeType(
-        bytes: bytes,
-        name: name,
-        mimeType: AttachmentPolicy.mimeForName(name),
+      await _sendTracked(
+        txid: txid,
+        threadId: threadId,
+        roomId: roomId,
+        tail: name,
+        bytes: bytes.lengthInBytes,
+        send: () {
+          final file = MatrixFile.fromMimeType(
+            bytes: bytes,
+            name: name,
+            mimeType: AttachmentPolicy.mimeForName(name),
+          );
+          return _roomForSend(threadId, roomId).sendFileEvent(file, txid: txid, inReplyTo: target);
+        },
       );
-      await room.sendFileEvent(file, inReplyTo: target);
     } catch (e) {
       AppLog.e('gateway', 'Anhang konnte nicht gesendet werden', e);
       throw _map(e);
@@ -2441,17 +2476,52 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<void> retryMessage(String messageId, {String threadId = ChatThread.familyId}) async {
     final e = _findEvent(messageId, threadId);
-    if (e == null || !e.status.isError) throw const GatewayException(GatewayError.notFound);
+    // `sending` zählt mit: Ohne laufende Sendung zeigt der Chat das als gescheitert (Ausnahme ohne Fehler-Echo).
+    if (e == null || e.status.isSent) throw const GatewayException(GatewayError.notFound);
     if (!_canEncryptIn(_roomForThread(threadId))) throw const GatewayException(GatewayError.encryptionUnavailable);
-    if (!_retryInFlight.add(messageId)) return;
+    if (_localSends.isRunning(messageId)) return;
+    final roomId = _timelineFor(threadId)!.room.id;
+    if (!_localSends.canRetry(messageId, threadId, roomId)) throw const GatewayException(GatewayError.notFound);
     try {
-      await e.sendAgain();
+      await _retryTracked(messageId, threadId, roomId);
     } catch (err) {
       AppLog.e('gateway', 'Wiederholen fehlgeschlagen', err);
       throw _map(err);
-    } finally {
-      _retryInFlight.remove(messageId);
     }
+  }
+
+  /// Führt eine Sendung über [LocalSends] aus. Der Abgleich danach ordnet das Ergebnis ein: Das letzte Ereignis der
+  /// Zeitleiste kam vor der Rückkehr von [send], der Stand von [LocalSends] danach.
+  Future<void> _sendTracked({
+    required String txid,
+    required String threadId,
+    required String roomId,
+    required String tail,
+    int bytes = 0,
+    required SendAttempt send,
+  }) async {
+    try {
+      await _localSends.run(txid: txid, threadId: threadId, roomId: roomId, tail: tail, bytes: bytes, send: send);
+    } finally {
+      _scheduleRefresh();
+    }
+  }
+
+  Future<void> _retryTracked(String txid, String threadId, String roomId) async {
+    try {
+      await _localSends.retry(txid, threadId, roomId);
+    } finally {
+      _scheduleRefresh();
+    }
+  }
+
+  /// Raum für einen Sendeversuch einer gemerkten Sendung, vor jedem Versuch neu aufgelöst und geprüft ([_requireEncryptedRoom]).
+  /// Für die Familie ist die Thread-Kennung eine Konstante und der Raum stammt aus unverschlüsselten Kontodaten: Zeigen
+  /// sie auf einen anderen Raum, geht nichts dorthin, sondern nur in den beim ersten Senden geprüften Raum [roomId].
+  Room _roomForSend(String threadId, String roomId) {
+    final room = _requireEncryptedRoom(threadId);
+    if (room.id != roomId) throw const GatewayException(GatewayError.notAllowed);
+    return room;
   }
 
   /// Begrenzter Download: bricht ab, sobald mehr als das Limit ankommt (der im
@@ -2524,51 +2594,46 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   /// Was beim automatischen Wiederholen mit einem Ereignis der Zeitleiste geschieht (#132): Nur eigene
-  /// Chat-Nachrichten (`m.room.message`, auch Dateien) im Status „Fehler“ werden wiederholt. `Event.sendAgain`
-  /// sendet ohne Typ, andere Ereignisse (Kalender, Einkauf, Aufgaben, Reaktionen) gingen sonst mit falschem Typ
-  /// hinaus; die Sync-Klassen halten ihre eigene Warteschlange. Der Zähler wird nur gelöscht, wenn das Ereignis
-  /// gesendet ist, nicht schon im Zustand „wird gesendet“ (sonst ließe sich die Obergrenze umgehen).
+  /// Chat-Nachrichten (`m.room.message`, auch Dateien) im Status „Fehler“ werden wiederholt, und nur, wenn zu ihnen
+  /// eine offene Sendung in diesem Thread und Raum gehört ([LocalSends.canRetry], #138). Die Sync-Klassen für
+  /// Kalender, Einkauf und Aufgaben halten ihre eigene Warteschlange. Die Obergrenze zählt [LocalSends.takeAutoRetry].
   @visibleForTesting
   static RetryDecision retryDecision({
     required String type,
     required String senderId,
     required String me,
     required bool isError,
-    required bool isSent,
-  }) {
-    if (senderId != me || type != EventTypes.Message) return RetryDecision.skip;
-    if (isSent) return RetryDecision.forget;
-    return isError ? RetryDecision.retry : RetryDecision.skip;
-  }
+    required bool canRetry,
+  }) =>
+      senderId == me && type == EventTypes.Message && isError && canRetry ? RetryDecision.retry : RetryDecision.skip;
 
-  /// Automatisches Wiederholen nach einem Sync: höchstens [maxRetriesPerEvent]-mal,
-  /// nie parallel für dasselbe Ereignis und nur, wenn Verschlüsselung gesichert ist.
+  /// Automatisches Wiederholen nach einem Sync: höchstens [maxRetriesPerEvent]-mal, nie parallel für dieselbe Sendung und
+  /// nur, wenn Verschlüsselung gesichert ist. Ein Fall für den Zähler ist erst, was wirklich ansteht: Fehlt die
+  /// Verschlüsselung nur vorübergehend, bleiben die Versuche erhalten.
   void _retryFailedSends() {
     final me = _client?.userID;
     if (me == null) return;
-    final lines = <(Timeline, Room?)>[
-      if (_timeline != null) (_timeline!, _familyRoom()),
-      for (final e in _dmTimelines.entries) (e.value, _roomForThread(e.key)),
+    final timeline = _timeline;
+    final lines = <(String, Timeline)>[
+      // Ein Sync kann die Kontodaten schon umgestellt haben, während die Zeitleiste noch den alten Raum zeigt.
+      if (timeline != null && timeline.room.id == _familyRoom()?.id) (ChatThread.familyId, timeline),
+      for (final e in _dmTimelines.entries) (e.key, e.value),
     ];
-    for (final (t, room) in lines) {
-      if (!_canEncryptIn(room)) continue;
-      for (final e in t.events) {
-        switch (retryDecision(type: e.type, senderId: e.senderId, me: me, isError: e.status.isError, isSent: e.status.isSent)) {
-          case RetryDecision.skip:
-            continue;
-          case RetryDecision.forget:
-            _retries.remove(e.eventId);
-            continue;
-          case RetryDecision.retry:
-            break;
-        }
-        final tries = _retries[e.eventId] ?? 0;
-        if (tries >= maxRetriesPerEvent || !_retryInFlight.add(e.eventId)) continue;
-        _retries[e.eventId] = tries + 1;
-        e.sendAgain().catchError((Object err) {
+    for (final (threadId, t) in lines) {
+      if (!_canEncryptIn(_roomForThread(threadId))) continue;
+      final roomId = t.room.id;
+      for (final e in List<Event>.of(t.events)) {
+        final decision = retryDecision(
+          type: e.type,
+          senderId: e.senderId,
+          me: me,
+          isError: e.status.isError,
+          canRetry: _localSends.canRetry(e.eventId, threadId, roomId),
+        );
+        if (decision != RetryDecision.retry || !_localSends.takeAutoRetry(e.eventId)) continue;
+        _retryTracked(e.eventId, threadId, roomId).catchError((Object err) {
           AppLog.e('gateway', 'Automatisches Wiederholen fehlgeschlagen', err);
-          return null;
-        }).whenComplete(() => _retryInFlight.remove(e.eventId)).ignore();
+        }).ignore();
       }
     }
   }
@@ -2663,9 +2728,12 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       _timelineRoomId = room.id;
       _backfill(_timeline!).ignore();
     }
-    _readTickets(room, _timeline!);
+    final timeline = _timeline!;
+    bool stale() => _client != client || !identical(_timeline, timeline);
+    if (!await _repairEchoes(client, timeline) || stale()) return;
+    _readTickets(room, timeline);
     _family = _buildFamily(room, client.userID!);
-    _messages = ChatMapper.messages(_timeline!);
+    _messages = ChatMapper.messages(timeline, threadId: ChatThread.familyId, sends: _localSends);
     if (_presenceRoomId != room.id) {
       // Andere Familie: der Status der alten gilt nicht weiter.
       _presence.clear();
@@ -2675,13 +2743,24 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       _presence.retainOnly(<String>{for (final m in _family!.joined) m.userId});
     }
     await _syncDirectChats(client, _family!, room);
+    if (stale()) return;
     _acceptDirectInvites(client, _family!);
     // Erst nach vollständig geladener Mitgliederliste als Basis (Lazy Loading liefert anfangs nur Teile).
     if (_participantsLoaded) _emitMemberJoins(_family!);
     await _ensurePrivateTimeline(client);
+    final private = _privateTimeline;
+    if (private != null && !await _repairEchoes(client, private)) return;
     _scanForSignals(_timeline, shared: true);
     _scanForSignals(_privateTimeline, shared: false);
     notifyListeners();
+  }
+
+  /// Stellt eigene Ereignisse wieder her, die das Sync-Echo verdrängt hat (#138), vor jeder Prüfung von [arrivedEncrypted].
+  /// Liefert `false`, wenn der Client unterwegs gewechselt hat oder abgemeldet ist.
+  Future<bool> _repairEchoes(Client client, Timeline t) async {
+    final me = client.userID;
+    if (me == null) return false;
+    return _echoRepair.run(t, me: me, database: client.database, isCurrent: () => _client == client);
   }
 
   // ----------------------------------------------------------- Kalender
@@ -2744,10 +2823,18 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
   }
 
+  /// Klartext löst kein Signal aus (#138). Keine Ausnahme für eigene Ereignisse: `sender`, Kennungen und Status
+  /// setzt der Server, und eigene Sendungen stehen ohnehin im lokalen Store. Erst nach der Prüfung gilt ein Ereignis
+  /// als behandelt, damit ein eigenes Echo nach seiner Reparatur noch ankommt.
   void _scanForSignals(Timeline? t, {required bool shared}) {
     if (t == null) return;
     for (final e in t.events.reversed) {
-      if (e.redacted || e.status.isError || !_signaled.add(e.eventId)) continue;
+      if (e.redacted || e.status.isError) continue;
+      if (e.type != EventTypes.Encrypted && !arrivedEncrypted(e)) {
+        _warnPlaintext(e);
+        continue;
+      }
+      if (!_signaled.add(e.eventId)) continue;
       final c = e.content;
       if (shared && e.type == EventCodec.sharedType) {
         _emit(SharedEventSignal(e.senderId, e.originServerTs, c));
@@ -2766,6 +2853,23 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         _signaled.remove(e.eventId);
       }
     }
+  }
+
+  static const Set<String> _appEventTypes = <String>{
+    EventCodec.sharedType,
+    EventCodec.rsvpType,
+    EventCodec.privateType,
+    ShoppingCodec.type,
+    TaskCodec.listType,
+    TaskCodec.logType,
+    InviteTicket.type,
+  };
+
+  /// Einmal je Ereignis, ohne Inhalt, nur für die Typen, die etwas auslösen würden. Das lokale Echo einer eigenen
+  /// Sendung ist bis zum Sync kein Vorfall.
+  void _warnPlaintext(Event e) {
+    if (!e.status.isSynced || !_appEventTypes.contains(e.type) || !_plaintextWarned.add(e.eventId)) return;
+    AppLog.w('gateway', 'Klartext-Ereignis eines App-Typs verworfen');
   }
 
   Future<void> _ensurePrivateRoom() async {
@@ -2829,11 +2933,11 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
   }
 
-  Future<String?> _sendCalendar(Room room, String type, Map<String, Object?> content) async {
+  Future<String?> _sendCalendar(Room room, String type, Map<String, Object?> content, {String? txid}) async {
     if (!(_client?.encryptionEnabled ?? false) || room.encryptionAlgorithm != FamilyRoomSpec.megolm) {
       throw const GatewayException(GatewayError.encryptionUnavailable);
     }
-    final id = await room.sendEvent(content, type: type);
+    final id = await room.sendEvent(content, type: type, txid: txid);
     // `null` = das SDK hat nach Wiederholungen aufgegeben.
     if (id == null) throw const GatewayException(GatewayError.serverUnreachable);
     return id;
@@ -2898,12 +3002,22 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> shareEventInChat(CalendarEvent event) async {
     if (!event.isShared || event.deleted) throw const GatewayException(GatewayError.invalidInput);
     final room = _requireEncryptedRoom();
+    final roomId = room.id;
+    final title = TextSanitizer.clean(event.title, max: 120);
+    final txid = room.client.generateUniqueTransactionId();
     try {
-      await _sendCalendar(room, EventTypes.Message, <String, Object?>{
-        'msgtype': MessageTypes.Text,
-        'body': TextSanitizer.clean(event.title, max: 120),
-        eventRefKey: event.id,
-      });
+      await _sendTracked(
+        txid: txid,
+        threadId: ChatThread.familyId,
+        roomId: roomId,
+        tail: title,
+        send: () => _sendCalendar(
+          _roomForSend(ChatThread.familyId, roomId),
+          EventTypes.Message,
+          <String, Object?>{'msgtype': MessageTypes.Text, 'body': title, eventRefKey: event.id},
+          txid: txid,
+        ),
+      );
     } on GatewayException {
       rethrow;
     } catch (e) {
@@ -3007,8 +3121,10 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
           _dmCreating.remove(e.key);
         }
       }
-      for (final e in _dmTimelines.entries) {
-        _dmMessages[e.key] = ChatMapper.messages(e.value);
+      for (final e in _dmTimelines.entries.toList()) {
+        if (!await _repairEchoes(client, e.value)) return;
+        if (!identical(_dmTimelines[e.key], e.value)) continue;
+        _dmMessages[e.key] = ChatMapper.messages(e.value, threadId: e.key, sends: _localSends);
       }
     }
     final dms = <ChatThread>[
@@ -3595,4 +3711,4 @@ class _RegistrationSession {
 }
 
 /// Ergebnis von [SdkMatrixGateway.retryDecision].
-enum RetryDecision { skip, forget, retry }
+enum RetryDecision { skip, retry }

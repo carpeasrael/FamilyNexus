@@ -385,6 +385,7 @@ void main() {
       final message = t.user.sendMessage('falscher Raum');
       await expectLater(shared, _error(GatewayError.serverUnreachable));
       await expectLater(message, _error(GatewayError.serverUnreachable));
+      expect(t.user.debugLocalSends.openCount, 0, reason: '#138: Die Prüfung vor dem Senden hinterlässt keinen Eintrag');
 
       await _pointFamilyTo(t.user, t.roomB);
       await E2e.until(() => t.user.family?.roomId == t.roomB, what: 'Familie B übernommen');

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:family_nexus/data/matrix/chat_mapper.dart';
+import 'package:family_nexus/data/matrix/local_sends.dart';
 import 'package:family_nexus/domain/attachment_policy.dart';
 import 'package:family_nexus/domain/chat.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,6 +15,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 void main() {
   late Client client;
   late Room room;
+  late LocalSends sends;
   var n = 0;
 
   setUpAll(sqfliteFfiInit);
@@ -20,6 +24,7 @@ void main() {
     final db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
     client = Client('test', database: await MatrixSdkDatabase.init('t${n++}', database: db));
     room = Room(id: '!room:fake.test', client: client);
+    sends = LocalSends();
   });
 
   Event ev(
@@ -29,6 +34,8 @@ void main() {
     String sender = '@ben:fake.test',
     int ts = 1000,
     int? status,
+    bool encrypted = true,
+    Map<String, Object?>? unsigned,
   }) =>
       Event.fromJson(<String, Object?>{
         'type': type,
@@ -37,11 +44,26 @@ void main() {
         'origin_server_ts': ts,
         'content': content,
         'status': ?status,
+        'unsigned': ?unsigned,
+        // Wie nach der Entschlüsselung: Die Quelle setzt nur das SDK, aus der Datenbank kommt sie so zurück.
+        if (encrypted)
+          'original_source': <String, Object?>{
+            'type': 'm.room.encrypted',
+            'event_id': id,
+            'sender': sender,
+            'origin_server_ts': ts,
+            'content': <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2', 'ciphertext': 'x'},
+          },
       }, room);
 
   Timeline timeline(List<Event> newestFirst) => Timeline(room: room, chunk: TimelineChunk(events: newestFirst));
 
-  List<ChatMessage> map(List<Event> chronological) => ChatMapper.messages(timeline(chronological.reversed.toList()));
+  List<ChatMessage> map(List<Event> chronological, {String? me}) => ChatMapper.messages(
+        timeline(chronological.reversed.toList()),
+        threadId: 'family',
+        sends: sends,
+        myUserId: me,
+      );
 
   Map<String, Object?> text(String body, {Map<String, Object?>? extra}) =>
       <String, Object?>{'msgtype': 'm.text', 'body': body, ...?extra};
@@ -201,8 +223,7 @@ void main() {
     Event encrypted(String id, int ts) => ev(id, <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2', 'ciphertext': 'x'},
         type: 'm.room.encrypted', ts: ts);
 
-    List<ChatMessage> mapAs(List<Event> chronological) =>
-        ChatMapper.messages(timeline(chronological.reversed.toList()), myUserId: me);
+    List<ChatMessage> mapAs(List<Event> chronological) => map(chronological, me: me);
 
     test('werden zu einem Hinweis zusammengefasst, spätere bleiben einzeln sichtbar', () {
       final m = mapAs(<Event>[
@@ -258,6 +279,7 @@ void main() {
           ev(r'$c', text('neu'), ts: 3),
           ev(r'$edit', text('* neu', extra: <String, Object?>{
             'm.relates_to': <String, Object?>{'rel_type': 'm.replace', 'event_id': r'$c'},
+            'm.new_content': <String, Object?>{'msgtype': 'm.text', 'body': 'neu'},
           }), ts: 4),
         ];
         expect(unread(withOwn, 3), 1, reason: 'Bearbeitung zählt nicht extra');
@@ -278,6 +300,237 @@ void main() {
       final m = mapAs(<Event>[encrypted(r'$e1', 10), encrypted(r'$e2', 20)]);
       expect(m.map((e) => e.id), <String>[r'$e1', r'$e2']);
       expect(m.any((e) => e.beforeJoin), isFalse);
+    });
+  });
+
+  group('#138: Klartext in verschlüsselten Räumen', () {
+    const me = '@ida:fake.test';
+    const room138 = '!room:fake.test';
+
+    Event own(String id, String body, EventStatus status, {String? txid, bool encrypted = false, int ts = 1000}) => ev(
+          id,
+          text(body),
+          sender: me,
+          status: status.intValue,
+          encrypted: encrypted,
+          ts: ts,
+          unsigned: <String, Object?>{'transaction_id': ?txid},
+        );
+
+    /// Merkt eine laufende Sendung; [Completer.complete] beendet sie.
+    Completer<String?> running(String txid, {String tail = 'x', String threadId = 'family', String roomId = room138}) {
+      final c = Completer<String?>();
+      unawaited(sends.run(txid: txid, threadId: threadId, roomId: roomId, tail: tail, send: () => c.future));
+      return c;
+    }
+
+    /// Sendung, deren Versuch gescheitert ist: bleibt offen.
+    Future<void> failed(String txid, {String threadId = 'family', String roomId = room138}) =>
+        sends.run(txid: txid, threadId: threadId, roomId: roomId, tail: 'x', send: () async => null);
+
+    test('Klartext anderer wird verworfen, Verschlüsseltes bleibt sichtbar', () {
+      final m = map(<Event>[
+        ev(r'$plain', text('gefälscht'), encrypted: false, ts: 1),
+        ev(r'$real', text('echt'), ts: 2),
+      ], me: me);
+      expect(m.map((e) => e.body), <String>['echt']);
+    });
+
+    test('Klartext mit angeblich eigenem Absender und Status synced wird verworfen', () {
+      expect(map(<Event>[ev(r'$a', text('gefälscht'), sender: me, encrypted: false)], me: me), isEmpty);
+    });
+
+    test('laufende eigene Sendung bleibt sichtbar und zeigt „wird gesendet“', () async {
+      final c = running('txn1');
+      final m = map(<Event>[own('txn1', 'Hallo', EventStatus.sending, txid: 'txn1')], me: me).single;
+      expect(m.status, MessageStatus.sending);
+      expect(m.retryable, isFalse, reason: 'während des Laufs nie wiederholbar');
+      c.complete(r'$server');
+    });
+
+    test('der Zustand „gesendet“ kommt vor der Rückkehr von run: sichtbar, solange die Sendung läuft', () async {
+      final c = running('txn1');
+      expect(map(<Event>[own(r'$server', 'Hallo', EventStatus.sent, txid: 'txn1')], me: me), hasLength(1));
+      c.complete(null);
+      await Future<void>.delayed(Duration.zero);
+      expect(map(<Event>[own(r'$server', 'Hallo', EventStatus.sent, txid: 'txn1')], me: me), isEmpty, reason: 'Sendung läuft nicht mehr');
+    });
+
+    test('„gesendet“ mit der Kennung und dem Text aus der Antwort des Servers ist sichtbar', () async {
+      await sends.run(txid: 'txn1', threadId: 'family', roomId: room138, tail: 'Hallo', send: () async => r'$server');
+      expect(map(<Event>[own(r'$server', 'Hallo', EventStatus.sent)], me: me).single.body, 'Hallo');
+      expect(map(<Event>[own(r'$server', '> <@b:x> Frage\n\nHallo', EventStatus.sent)], me: me), hasLength(1), reason: 'Antwort stellt das Zitat voran');
+    });
+
+    test('nur exakt „gesendet“ nutzt die gemerkte Kennung: synced ohne Quelle bleibt draußen', () async {
+      await sends.run(txid: 'txn1', threadId: 'family', roomId: room138, tail: 'Hallo', send: () async => r'$server');
+      expect(map(<Event>[own(r'$server', 'Hallo', EventStatus.synced)], me: me), isEmpty, reason: 'den Status setzt der Server');
+    });
+
+    test('gefälschtes „gesendet“ ohne Treffer oder mit fremdem Text wird verworfen', () async {
+      await sends.run(txid: 'txn1', threadId: 'family', roomId: room138, tail: 'Hallo', send: () async => r'$server');
+      expect(map(<Event>[own(r'$anders', 'Hallo', EventStatus.sent)], me: me), isEmpty, reason: 'unbekannte Kennung');
+      expect(map(<Event>[own(r'$server', 'Zahl an Konto 123', EventStatus.sent)], me: me), isEmpty, reason: 'falscher Text');
+    });
+
+    test('fremdes Klartext-Ereignis nützt kein Status und keine bekannte Kennung', () async {
+      await sends.run(txid: 'txn1', threadId: 'family', roomId: room138, tail: 'Hallo', send: () async => r'$server');
+      final c = running('txn2');
+      for (final s in <EventStatus>[EventStatus.sent, EventStatus.sending, EventStatus.error, EventStatus.synced]) {
+        expect(
+          map(<Event>[
+            ev(r'$server', text('Hallo'), status: s.intValue, encrypted: false, unsigned: <String, Object?>{'transaction_id': 'txn2'}),
+          ], me: me),
+          isEmpty,
+          reason: '$s',
+        );
+      }
+      c.complete(null);
+    });
+
+    test('„wird gesendet“ ohne laufende Sendung gilt als gescheitert (Neustart)', () {
+      final m = map(<Event>[own('txn1', 'alt', EventStatus.sending, txid: 'txn1')], me: me).single;
+      expect(m.status, MessageStatus.failed);
+      expect(m.retryable, isFalse, reason: 'nach dem Neustart liegt nichts mehr vor');
+    });
+
+    test('„wird gesendet“ mit offener, nicht laufender Sendung: Ausnahme ohne Fehler-Echo hängt nicht', () async {
+      await failed('txn1');
+      final m = map(<Event>[own('txn1', 'Hallo', EventStatus.sending, txid: 'txn1')], me: me).single;
+      expect(m.status, MessageStatus.failed);
+      expect(m.retryable, isTrue);
+    });
+
+    test('Fehler ohne offene Sendung ist sichtbar, aber nicht wiederholbar', () {
+      final m = map(<Event>[own('txn1', 'Hallo', EventStatus.error, txid: 'txn1')], me: me).single;
+      expect(m.status, MessageStatus.failed);
+      expect(m.retryable, isFalse);
+    });
+
+    test('wiederholbar nur im gleichen Thread und Raum', () async {
+      await failed('txn1');
+      await failed('txn2', threadId: '!dm:fake.test', roomId: '!dm:fake.test');
+      await failed('txn3', roomId: '!anderer:fake.test');
+      final m = map(<Event>[
+        own('txn1', 'eins', EventStatus.error, txid: 'txn1', ts: 1),
+        own('txn2', 'zwei', EventStatus.error, txid: 'txn2', ts: 2),
+        own('txn3', 'drei', EventStatus.error, txid: 'txn3', ts: 3),
+      ], me: me);
+      expect(m.map((e) => e.retryable), <bool>[true, false, false]);
+    });
+
+    Map<String, Object?> edit(String target, String body) => text('* $body', extra: <String, Object?>{
+          'm.relates_to': <String, Object?>{'rel_type': 'm.replace', 'event_id': target},
+          'm.new_content': <String, Object?>{'msgtype': 'm.text', 'body': body},
+        });
+
+    test('Klartext-Bearbeitung mit späterem Zeitstempel verdrängt die echte nicht', () {
+      final m = map(<Event>[
+        ev(r'$a', text('Original'), ts: 1),
+        ev(r'$e', edit(r'$a', 'echt bearbeitet'), ts: 2),
+        ev(r'$f', edit(r'$a', 'gefälscht'), encrypted: false, ts: 9),
+      ]);
+      expect(m.map((e) => e.body), <String>['echt bearbeitet']);
+    });
+
+    test('Klartext-Bearbeitung allein ändert nichts und erscheint nicht', () {
+      final m = map(<Event>[ev(r'$a', text('Original'), ts: 1), ev(r'$f', edit(r'$a', 'gefälscht'), encrypted: false, ts: 9)]);
+      expect(m.map((e) => e.body), <String>['Original']);
+    });
+
+    test('Bearbeitung anderen Typs oder anderen Absenders wird ignoriert', () {
+      final m = map(<Event>[
+        ev(r'$a', text('Original'), ts: 1),
+        ev(r'$t', edit(r'$a', 'anderer Typ'), type: 'de.inneso.familynexus.event', ts: 2),
+        ev(r'$s', edit(r'$a', 'anderer Absender'), sender: '@cara:fake.test', ts: 3),
+      ]);
+      expect(m.map((e) => e.body), <String>['Original']);
+    });
+
+    test('Hülle „m.replace“ ohne m.new_content: bleibt eine normale Nachricht und ersetzt nichts', () {
+      final m = map(<Event>[
+        ev(r'$a', text('Original'), ts: 1),
+        ev(r'$b', text('Meine Antwort', extra: <String, Object?>{
+          'm.relates_to': <String, Object?>{'rel_type': 'm.replace', 'event_id': r'$a'},
+        }), ts: 2),
+      ]);
+      expect(m.map((e) => e.body), <String>['Original', 'Meine Antwort']);
+    });
+
+    test('entfernte Nachricht zeigt keine Bearbeitung', () {
+      final redacted = ev(r'$a', text('Original'), ts: 1, unsigned: <String, Object?>{
+        'redacted_because': <String, Object?>{
+          'type': 'm.room.redaction',
+          'event_id': r'$r',
+          'sender': '@ben:fake.test',
+          'origin_server_ts': 2,
+          'content': <String, Object?>{},
+        },
+      });
+      expect(map(<Event>[redacted, ev(r'$e', edit(r'$a', 'neu'), ts: 3)]), isEmpty);
+    });
+
+    test('m.reaction bleibt hier zulässig (#139)', () {
+      final m = map(<Event>[
+        ev(r'$a', text('Hi'), ts: 1),
+        ev(r'$r', <String, Object?>{
+          'm.relates_to': <String, Object?>{'rel_type': 'm.annotation', 'event_id': r'$a', 'key': '👍'},
+        }, type: 'm.reaction', encrypted: false, ts: 2),
+      ]).single;
+      expect(m.reactions.keys, <String>['👍']);
+    });
+
+    group('Ungelesen', () {
+      int unread(List<Event> chronological, int server) =>
+          ChatMapper.unreadReadable(timeline(chronological.reversed.toList()), serverCount: server, myUserId: me);
+
+      test('Klartext anderer zählt nicht', () {
+        expect(unread(<Event>[ev(r'$a', text('Lock'), encrypted: false, ts: 1), ev(r'$b', text('echt'), ts: 2)], 5), 1);
+      });
+
+      test('angeblich eigener Klartext stoppt die Zählung nicht', () {
+        final events = <Event>[
+          ev(r'$a', text('eins'), ts: 1),
+          ev(r'$own', text('gefälscht'), sender: me, encrypted: false, ts: 2),
+          ev(r'$b', text('zwei'), ts: 3),
+        ];
+        expect(unread(events, 5), 2);
+      });
+
+      test('eigene verschlüsselte Nachricht und Mitglieds-Ereignis stoppen sie', () {
+        expect(
+          unread(<Event>[ev(r'$a', text('alt'), ts: 1), ev(r'$own', text('meins'), sender: me, ts: 2), ev(r'$b', text('neu'), ts: 3)], 5),
+          1,
+        );
+        final member = Event.fromJson(<String, Object?>{
+          'type': 'm.room.member',
+          'event_id': r'$m',
+          'sender': me,
+          'state_key': me,
+          'origin_server_ts': 2,
+          'content': <String, Object?>{'membership': 'join'},
+        }, room);
+        expect(unread(<Event>[ev(r'$a', text('alt'), ts: 1), member, ev(r'$b', text('neu'), ts: 3)], 5), 1);
+      });
+
+      test('eigener verschlüsselter Termin stoppt sie nicht', () {
+        final events = <Event>[
+          ev(r'$a', text('eins'), ts: 1),
+          ev(r'$cal', <String, Object?>{'id': 'x'}, type: 'de.inneso.familynexus.event', sender: me, ts: 2),
+          ev(r'$b', text('zwei'), ts: 3),
+        ];
+        expect(unread(events, 5), 2);
+      });
+
+      test('echte Nachricht mit Hülle „m.replace“ ohne m.new_content zählt', () {
+        final events = <Event>[
+          ev(r'$a', text('Original'), ts: 1),
+          ev(r'$b', text('Antwort', extra: <String, Object?>{
+            'm.relates_to': <String, Object?>{'rel_type': 'm.replace', 'event_id': r'$a'},
+          }), ts: 2),
+        ];
+        expect(unread(events, 5), 2);
+      });
     });
   });
 

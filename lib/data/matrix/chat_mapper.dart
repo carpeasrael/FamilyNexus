@@ -5,6 +5,8 @@ import '../../domain/attachment_policy.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/chat.dart';
 import '../../domain/text_sanitizer.dart';
+import 'event_trust.dart';
+import 'local_sends.dart';
 
 /// Übersetzt SDK-Ereignisse in Domänenmodelle. Alle Eingaben stammen von
 /// anderen Teilnehmern und gelten als nicht vertrauenswürdig: Typen werden
@@ -30,7 +32,15 @@ class ChatMapper {
   /// Nicht entschlüsselbare Ereignisse aus der Zeit vor dem eigenen Beitritt (dafür gibt es keine
   /// Schlüssel; es können auch Kalender-, Einkaufs- oder Aufgabenänderungen sein) werden zu einem
   /// einzigen Hinweis zusammengefasst (#35).
-  static List<ChatMessage> messages(Timeline timeline, {String? myUserId}) {
+  ///
+  /// Klartext wird verworfen, nicht gekennzeichnet: In einem Megolm-Raum sendet kein regulärer Client Nachrichten im
+  /// Klartext. Sichtbar bleibt nur die eigene laufende oder gescheiterte Sendung (siehe [_visible]).
+  static List<ChatMessage> messages(
+    Timeline timeline, {
+    required String threadId,
+    required LocalSends sends,
+    String? myUserId,
+  }) {
     final me = myUserId ?? timeline.room.client.userID;
     final joinedAt = me == null ? null : _joinedAt(timeline, me);
     final pastNames = _pastNames(timeline);
@@ -39,7 +49,7 @@ class ChatMapper {
     DateTime? firstHidden;
     for (final e in timeline.events.reversed) {
       try {
-        final m = _map(timeline, e, pastNames);
+        final m = _map(timeline, e, pastNames, me, threadId, sends);
         if (m == null) continue;
         if (m.undecryptable && joinedAt != null && m.time.isBefore(joinedAt)) {
           hidden++;
@@ -78,10 +88,11 @@ class ChatMapper {
       if (marker.isNotEmpty && e.eventId == marker) break;
       if (e.originServerTs.millisecondsSinceEpoch <= readAt) break;
       if (e.senderId == me) {
-        if (e.type == EventTypes.Message || e.type == EventTypes.RoomMember) break;
+        // `sender` kann der Server frei setzen: Eine eigene Nachricht zählt nur, wenn sie verschlüsselt ankam.
+        if ((e.type == EventTypes.Message && arrivedEncrypted(e)) || e.type == EventTypes.RoomMember) break;
         continue;
       }
-      if (e.type != EventTypes.Message || e.relationshipType == RelationshipTypes.edit || e.redacted) continue;
+      if (e.type != EventTypes.Message || !arrivedEncrypted(e) || _isEdit(e) || e.redacted) continue;
       if (e.messageType.startsWith('m.key.verification.')) continue;
       if (++n >= serverCount) break;
     }
@@ -126,11 +137,63 @@ class ChatMapper {
     return gone ? '' : TextSanitizer.displayName(null, e.senderId);
   }
 
-  static ChatMessage? _map(Timeline timeline, Event e, Map<String, String> pastNames) {
+  /// Bearbeitung nur mit `m.new_content` im entschlüsselten Inhalt. `m.relates_to` stammt aus der unverschlüsselten
+  /// Hülle: Heftet der Server es einer echten Nachricht an, bleibt sie eine normale Nachricht und ersetzt nichts.
+  static bool _isEdit(Event e) => e.relationshipType == RelationshipTypes.edit && e.content['m.new_content'] is Map;
+
+  /// Darf diese Nachricht im Chat erscheinen? Verschlüsselt angekommen: ja. Sonst nur die eigene auf dem eigenen
+  /// Gerät: während des Sendens und nach einem Fehler; im Zustand „gesendet“ nur, wenn der Server genau diese
+  /// Kennung für diesen Text geliefert hat oder die Sendung noch läuft (das SDK meldet „gesendet“ vor der Rückkehr
+  /// von `sendEvent`). `sent` und `synced` lassen sich aus `unsigned` setzen, `isSent` wäre deshalb zu weit.
+  static bool _visible(Event e, String? me, LocalSends sends) {
+    if (arrivedEncrypted(e)) return true;
+    if (e.senderId != me) return false;
+    switch (e.status) {
+      case EventStatus.error:
+      case EventStatus.sending:
+        return true;
+      case EventStatus.sent:
+        return sends.sentMatches(e.eventId, e.body) || sends.isRunning(e.transactionId);
+      case EventStatus.synced:
+        return false;
+    }
+  }
+
+  /// `sending` ohne laufende Sendung gilt als gescheitert: nach einem Neustart oder wenn eine Ausnahme kein
+  /// Fehler-Echo hinterlassen hat. Die Nachricht hinge sonst dauerhaft auf „wird gesendet“.
+  static MessageStatus _status(Event e, LocalSends sends) {
+    if (e.status.isError) return MessageStatus.failed;
+    if (e.status.isSending) return sends.isRunning(e.transactionId) ? MessageStatus.sending : MessageStatus.failed;
+    return MessageStatus.sent;
+  }
+
+  /// Neueste gültige Bearbeitung: vom selben Absender, Typ `m.room.message`, verschlüsselt angekommen, mit
+  /// `m.new_content` im entschlüsselten Inhalt. `Event.getDisplayEvent` prüft das nicht und wählte sonst nach dem
+  /// vom Server gesetzten Zeitstempel eine Klartext-Bearbeitung.
+  static Event _displayEvent(Event e, Timeline timeline) {
+    if (e.redacted) return e;
+    Event? newest;
+    for (final edit in e.aggregatedEvents(timeline, RelationshipTypes.edit)) {
+      if (edit.senderId != e.senderId || edit.type != EventTypes.Message) continue;
+      if (!arrivedEncrypted(edit) || edit.content['m.new_content'] is! Map) continue;
+      if (newest == null || edit.originServerTs.isAfter(newest.originServerTs)) newest = edit;
+    }
+    if (newest == null) return e;
+    final raw = newest.toJson();
+    raw['content'] = newest.content['m.new_content'];
+    return Event.fromJson(raw, e.room);
+  }
+
+  static ChatMessage? _map(
+    Timeline timeline,
+    Event e,
+    Map<String, String> pastNames,
+    String? me,
+    String threadId,
+    LocalSends sends,
+  ) {
     final name = _senderName(e, pastNames);
-    final status = e.status.isError
-        ? MessageStatus.failed
-        : (e.status.isSent ? MessageStatus.sent : MessageStatus.sending);
+    final status = _status(e, sends);
 
     // Nicht entschlüsselbare Nachrichten sichtbar machen, statt sie zu verschlucken.
     if (e.type == EventTypes.Encrypted) {
@@ -143,14 +206,15 @@ class ChatMapper {
         status: status,
       );
     }
-    if (e.type != EventTypes.Message || e.relationshipType == RelationshipTypes.edit || e.redacted) {
+    if (e.type != EventTypes.Message || _isEdit(e) || e.redacted) {
       return null;
     }
+    if (!_visible(e, me, sends)) return null;
 
     // Geräte-Verifizierung (`m.key.verification.request` als Raumnachricht) ist kein Chat-Inhalt (#29).
     if (e.messageType.startsWith('m.key.verification.')) return null;
 
-    final d = e.getDisplayEvent(timeline);
+    final d = _displayEvent(e, timeline);
     final isFile = _fileTypes.contains(d.messageType);
     AttachmentInfo? attachment;
     var blocked = false;
@@ -191,6 +255,7 @@ class ChatMapper {
       attachment: attachment,
       blockedAttachment: blocked,
       status: status,
+      retryable: sends.canRetry(e.eventId, threadId, timeline.room.id),
     );
   }
 }

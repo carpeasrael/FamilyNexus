@@ -397,7 +397,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
                   mimeType: e.content['mime']! as String,
                   size: e.content['size']! as int,
                 ),
-        ),
+        ).copyWith(status: sendStates[e.id]?.status, retryable: sendStates[e.id]?.retryable),
     ];
   }
 
@@ -1285,8 +1285,14 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _files[e.id] = bytes;
   }
 
+  /// Sendestand einzelner Nachrichten für Widget-Tests: Kennung → Status und Wiederholbarkeit.
+  final Map<String, ({MessageStatus status, bool retryable})> sendStates = <String, ({MessageStatus status, bool retryable})>{};
+
+  /// Kennungen, für die [retryMessage] aufgerufen wurde.
+  final List<String> retried = <String>[];
+
   @override
-  Future<void> retryMessage(String messageId, {String threadId = ChatThread.familyId}) async {}
+  Future<void> retryMessage(String messageId, {String threadId = ChatThread.familyId}) async => retried.add(messageId);
 
   @override
   Future<Uint8List> loadAttachment(String messageId, {String threadId = ChatThread.familyId}) async {
