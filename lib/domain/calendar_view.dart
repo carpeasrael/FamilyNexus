@@ -87,6 +87,15 @@ class CalendarView {
     return out;
   }
 
+  /// Die wirksame Personenauswahl (#155): Ohne Filterleiste (weniger als zwei beigetretene Mitglieder) kann
+  /// niemand filtern, also gilt keine Auswahl; sonst nur Personen, die noch beigetreten sind. Die gewählte
+  /// Menge bleibt unverändert, tritt jemand wieder bei, gilt seine Auswahl wieder.
+  static Set<String> activePersons(Set<String> selected, Iterable<String> joinedIds) {
+    final joined = joinedIds.toSet();
+    if (joined.length < 2) return <String>{};
+    return selected.intersection(joined);
+  }
+
   /// Ob ein Termin zur Personenauswahl passt (Besitzer oder Teilnehmer).
   static bool matchesPerson(CalendarEvent e, Set<String> persons) =>
       persons.isEmpty || persons.contains(e.ownerId) || e.attendees.any(persons.contains);
