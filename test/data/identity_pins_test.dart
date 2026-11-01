@@ -106,6 +106,20 @@ void main() {
       expect(book.pinned(ben, <String, String>{}), k2);
     });
 
+    test('Akzeptieren löscht einen ungespeicherten ersten Pin des Mitglieds', () {
+      book.remember(ben, k1);
+      expect(book.hasPending, isTrue);
+      book.accept(ben, k2, base: null);
+      expect(book.hasPending, isFalse, reason: 'sonst folgte ein überflüssiger Schreibversuch');
+    });
+
+    test('erneutes Akzeptieren desselben Pins (base == Pin) entfällt, sobald die Kontodaten ihn zeigen', () {
+      book.accept(ben, k1, base: k1);
+      book.synced(<String, String>{ben: k1});
+      // Der akzeptierte Eintrag ist weg: ein späterer Kontodaten-Pin gilt wieder allein.
+      expect(book.pinned(ben, <String, String>{ben: k3}), k3);
+    });
+
     test('Mitglieder sind unabhängig voneinander', () {
       book.accept(ben, k2, base: k1);
       expect(book.pinned(cara, <String, String>{cara: k1}), k1);
