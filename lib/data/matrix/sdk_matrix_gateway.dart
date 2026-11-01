@@ -46,6 +46,7 @@ import 'family_room_spec.dart';
 import 'background_image_work.dart';
 import 'https_only_client.dart';
 import 'server_probe.dart';
+import 'sync_relevance.dart';
 
 /// Produktive Implementierung auf Basis des Matrix-Dart-SDK (E-01).
 ///
@@ -284,7 +285,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       }
       _onSyncForJoinRequest(update);
       _retryFailedSends();
-      _scheduleRefresh();
+      // Leere Long-Poll-Antworten ändern nichts: kein voller Abgleich samt Neuaufbau aller Tabs (#150).
+      if (!_syncedOnce || syncNeedsRefresh(update)) _scheduleRefresh();
     });
     _loginSub = client.onLoginStateChanged.stream.listen(
       (_) => _scheduleRefresh(),

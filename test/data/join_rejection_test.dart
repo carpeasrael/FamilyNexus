@@ -813,6 +813,23 @@ void main() {
       g.sdkClient!.homeserver = Uri.parse('https://hs.example');
     });
   });
+
+  group('Leere Syncs lösen keinen Abgleich aus (#150)', () {
+    test('leere Antwort: kein Abgleich; Raum-Update: Abgleich (Kontrollfall)', () async {
+      final (_, g) = await _signedIn();
+      var notified = 0;
+      g.addListener(() => notified++);
+
+      await _sync(g, <String, Object?>{});
+      await _sync(g, <String, Object?>{'device_one_time_keys_count': <String, Object?>{'signed_curve25519': 50}});
+      await Future<void>.delayed(_settle);
+      expect(notified, 0, reason: 'leere Antworten dürfen nichts neu aufbauen');
+
+      await _syncLeave(g, '!anderer:hs.example');
+      await Future<void>.delayed(_settle);
+      expect(notified, greaterThan(0), reason: 'Kontrollfall: ein Raum-Update löst den Abgleich weiter aus');
+    });
+  });
 }
 
 /// Wie `_ClientSocketException` des http-Pakets: beides zugleich.
