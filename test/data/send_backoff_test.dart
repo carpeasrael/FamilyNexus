@@ -198,6 +198,94 @@ void main() {
     });
   });
 
+  group('Kalender: Lücken aus der Prüfung', () {
+    late FakeMatrixServer server;
+    late Peer anna;
+    late DateTime now;
+
+    Future<CalendarSync> start({Duration retryInterval = const Duration(hours: 1)}) async {
+      now = DateTime.utc(2026, 11, 1, 10);
+      server = FakeMatrixServer()..addAccount('anna', 'pw1', displayName: 'Anna');
+      anna = await Peer.create(server, 'anna', 'pw1');
+      await anna.gateway.createFamily('Familie');
+      anna.sync.dispose();
+      final sync = CalendarSync(
+        gateway: anna.gateway,
+        service: anna.service,
+        store: anna.store,
+        clock: () => now,
+        retryInterval: retryInterval,
+      )..start();
+      addTearDown(sync.dispose);
+      await settle();
+      return sync;
+    }
+
+    test('ein Erfolg setzt das Fenster zurück: der nächste Fehler beginnt wieder bei 5 s', () async {
+      final sync = await start();
+      await anna.createEvent(title: 'A');
+      anna.gateway.failPublishes = true;
+      await sync.publishPending(); // Fehler 1: 5 s
+      now = now.add(const Duration(seconds: 6));
+      server.notifyAll();
+      await settle(); // Fehler 2: 10 s
+      anna.gateway.failPublishes = false;
+      now = now.add(const Duration(seconds: 11));
+      server.notifyAll();
+      await settle(); // Erfolg
+      expect(await anna.store.pendingPublish(), isEmpty);
+      await settle();
+
+      await anna.createEvent(title: 'B');
+      anna.gateway.failPublishes = true;
+      await sync.publishPending(); // neuer Fehler 1: wieder 5 s
+      final before = anna.gateway.publishAttempts;
+      now = now.add(const Duration(seconds: 6));
+      server.notifyAll();
+      await settle();
+      expect(anna.gateway.publishAttempts, greaterThan(before), reason: 'Fenster 5 s, nicht 20 s');
+    });
+
+    test('der periodische Timer ist im Wartefenster nicht gesperrt', () async {
+      final sync = await start(retryInterval: const Duration(milliseconds: 400));
+      await anna.createEvent();
+      anna.gateway.failPublishes = true;
+      await sync.publishPending();
+      final before = anna.gateway.publishAttempts;
+      await Future<void>.delayed(const Duration(milliseconds: 1100)); // mehrere Timer-Takte, Uhr steht still
+      expect(anna.gateway.publishAttempts, greaterThan(before));
+    });
+
+    test('ein leerer Durchlauf (nicht sendebereit) setzt das Fenster nicht zurück', () async {
+      final sync = await start();
+      await anna.createEvent();
+      anna.gateway.failPublishes = true;
+      await sync.publishPending();
+      final before = anna.gateway.publishAttempts;
+      anna.gateway.syncDone = false;
+      await sync.publishPending(); // nicht sendebereit: kein Versuch, kein Erfolg
+      anna.gateway.syncDone = true;
+      server.notifyAll(); // Zustand wie beim Start des Fensters, ohne Zustandswechsel
+      await settle();
+      expect(anna.gateway.publishAttempts, before, reason: 'Fenster gilt weiter');
+    });
+
+    test('ein Fehler beim Resync öffnet ebenfalls ein Wartefenster', () async {
+      final sync = await start();
+      await anna.createEvent();
+      await sync.publishPending();
+      await settle();
+      await anna.createEvent(title: 'Ausstehend'); // würde bei einem Anstoß ohne Fenster gesendet
+      anna.gateway.failPublishes = true;
+      final before = anna.gateway.publishAttempts;
+      await sync.resyncOwnShared();
+      expect(anna.gateway.publishAttempts, before + 1);
+      server.notifyAll();
+      await settle();
+      expect(anna.gateway.publishAttempts, before + 1, reason: 'im Fenster');
+    });
+  });
+
   group('Einkauf', () {
     test('Anstöße im Wartefenster erzeugen keinen Versuch', () async {
       final server = FakeMatrixServer()..addAccount('anna', 'pw1', displayName: 'Anna');
