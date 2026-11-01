@@ -3725,7 +3725,7 @@ abstract class AppLocalizations {
   /// No description provided for @keyRenewIntro.
   ///
   /// In de, this message translates to:
-  /// **'Du hast deinen Notfall-Schlüssel verloren oder willst ihn ersetzen? Dann erstelle hier einen neuen. Der alte funktioniert danach nicht mehr – bewahre nur den neuen auf. Deine Nachrichten, Termine und Geräte bleiben, wie sie sind.'**
+  /// **'Du hast deinen Notfall-Schlüssel verloren oder willst ihn ersetzen? Dann erstelle hier einen neuen. Danach gilt in der App nur noch der neue – bewahre nur ihn auf. Ist der alte in fremde Hände geraten, schützt dich das nicht vollständig. Deine Nachrichten, Termine und Geräte bleiben, wie sie sind.'**
   String get keyRenewIntro;
 
   /// No description provided for @keyRenew.
@@ -3737,7 +3737,7 @@ abstract class AppLocalizations {
   /// No description provided for @securityKeyRenewHint.
   ///
   /// In de, this message translates to:
-  /// **'Falls du ihn verloren hast. Der alte gilt danach nicht mehr.'**
+  /// **'Falls du ihn verloren hast. In der App gilt danach nur der neue.'**
   String get securityKeyRenewHint;
 
   /// No description provided for @inviteStepTitle.
@@ -4475,7 +4475,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportKeyBackup.
   ///
   /// In de, this message translates to:
-  /// **'Schlüssel-Backup (mit deinem Wiederherstellungsschlüssel verschlüsselt)'**
+  /// **'Schlüssel-Backup (mit deinem Notfall-Schlüssel verschlüsselt)'**
   String get reportKeyBackup;
 
   /// No description provided for @reportSetUp.

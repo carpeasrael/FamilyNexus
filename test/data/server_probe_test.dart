@@ -287,4 +287,63 @@ void main() {
       expect(flows.first, <String>['m.login.dummy']);
     });
   });
+
+  group('well-known ins Heimnetz (#158, E-59)', () {
+    const targets = <String>[
+      'https://192.168.1.5',
+      'https://nas',
+      'https://x.local:8448',
+      'https://localhost',
+      'https://[::1]:8448',
+      'https://[fd00::5]',
+    ];
+    Map<String, (int, Object)> routes(String base) => <String, (int, Object)>{
+          '/.well-known/matrix/client': (200, <String, Object>{
+            'm.homeserver': <String, Object>{'base_url': base},
+          }),
+          '/_matrix/client/versions': (200, <String, Object>{'versions': <String>['v1.1']}),
+        };
+
+    for (final t in targets) {
+      test('öffentlicher Server darf nicht nach $t weiterleiten', () async {
+        final seen = <Uri>[];
+        final probe = ServerProbe(client: _client(routes(t), seen: seen));
+        expect((await probe.resolveBase(_url)).host, 'example.org');
+        final info = await probe.probe(_url);
+        expect(info.url.host, 'example.org');
+        await probe.registrationOptions(_url);
+        final host = Uri.parse(t).host;
+        expect(seen.where((u) => u.host == host), isEmpty, reason: 'kein Kontakt ins Heimnetz');
+      });
+    }
+
+    test('lokaler Server darf auf lokalen verweisen', () async {
+      final probe = ServerProbe(client: _client(routes('https://192.168.1.5')));
+      expect((await probe.resolveBase(ServerUrl.tryParse('nas')!)).host, '192.168.1.5');
+    });
+
+    test('öffentlich auf öffentlich bleibt erlaubt', () async {
+      final probe = ServerProbe(client: _client(routes('https://matrix.example.org')));
+      expect((await probe.resolveBase(_url)).host, 'matrix.example.org');
+    });
+
+    test('OAuth-Endpunkte im Heimnetz zählen bei öffentlichem Anbieter nicht', () async {
+      const meta = <String, Object>{
+        'issuer': 'https://account.example.org/',
+        'authorization_endpoint': 'https://account.example.org/authorize',
+        'registration_endpoint': 'https://account.example.org/oauth2/registration',
+        'token_endpoint': 'https://[fd00::5]/token',
+        'revocation_endpoint': 'https://account.example.org/oauth2/revoke',
+      };
+      final probe = ServerProbe(client: _client(<String, (int, Object)>{
+        '/_matrix/client/v1/auth_metadata': (200, meta),
+      }));
+      expect(await probe.oauthIssuer(_url), isNull);
+      expect(await probe.oauthIssuer(ServerUrl.tryParse('nas')!), isNotNull);
+      final ok = ServerProbe(client: _client(<String, (int, Object)>{
+        '/_matrix/client/v1/auth_metadata': (200, <String, Object>{...meta, 'token_endpoint': 'https://account.example.org/t'}),
+      }));
+      expect(await ok.oauthIssuer(_url), isNotNull);
+    });
+  });
 }

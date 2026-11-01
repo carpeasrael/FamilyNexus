@@ -73,7 +73,7 @@ matrix.example.org {
 - [ ] `https://matrix.example.org/_matrix/client/versions` liefert `v1.1` oder höher.
 - [ ] `https://matrix.example.org/_matrix/client/v3/login` nennt `m.login.password`.
 - [ ] Sicherungen der Datenbank des Servers sind verschlüsselt; Server-Logs enthalten keine Inhalte.
-- [ ] Mindestens **zwei Moderatoren** in der Familie und Wiederherstellungsschlüssel gesichert.
+- [ ] Mindestens **zwei Moderatoren** in der Familie und Notfall-Schlüssel gesichert.
 
 ## Serverwechsel
 Ein Wechsel des Homeservers bedeutet: neue Konten, neue Familie (neuer Raum), neue Einladungen. Ein
