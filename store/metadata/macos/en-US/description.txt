@@ -19,7 +19,7 @@ SHOPPING LIST
 SECURITY AND PRIVACY
 • End-to-end encrypted over the open Matrix protocol (chat, shared events, shopping list)
 • Locally encrypted database, key kept in the device key store
-• App lock with the device credentials, screen protection
+• App lock with the device credentials
 • No ads, no trackers, no analytics
 • Bring your own server – the public server is only a default
 • Free software (AGPL-3.0), source code available
