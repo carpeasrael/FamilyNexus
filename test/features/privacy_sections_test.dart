@@ -17,7 +17,7 @@ void main() {
     test(
       '$lang: Web ohne Erinnerungs-Abschnitt, Berechtigungen ohne Alarme und App-Sperre',
       () {
-        final web = privacySections(l, web: true);
+        final web = privacySections(l, platform: PrivacyPlatform.web);
         expect(web.map((s) => s.$1), isNot(contains(l.privacy5Title)));
         expect(web.map((s) => s.$1), contains(l.privacy13Title));
         final perms = web.singleWhere((s) => s.$1 == l.privacy6Title).$2;
@@ -31,7 +31,7 @@ void main() {
           androidOnly.hasMatch(
             privacySections(
               l,
-              web: false,
+              platform: PrivacyPlatform.android,
             ).singleWhere((s) => s.$1 == l.privacy6Title).$2,
           ),
           isTrue,
@@ -41,12 +41,12 @@ void main() {
     );
 
     test('$lang: App (nicht Web) unverändert', () {
-      final app = privacySections(l, web: false);
+      final app = privacySections(l, platform: PrivacyPlatform.android);
       expect(app.map((s) => s.$1), contains(l.privacy5Title));
       expect(app.map((s) => s.$1), isNot(contains(l.privacy13Title)));
       expect(
         app.singleWhere((s) => s.$1 == l.privacy6Title).$2,
-        l.privacy6Body,
+        privacyPermissions(l, PrivacyPlatform.android),
       );
     });
 

@@ -53,9 +53,7 @@ class SqlDataInventory implements LocalDataInventory {
   /// Secret Service des Systems. Erkennung wie üblich per `FLATPAK_ID` oder `/.flatpak-info`.
   @visibleForTesting
   static KeyStoreKind linuxKeyStoreKind({Map<String, String>? environment, bool Function(String path)? fileExists}) {
-    final env = environment ?? Platform.environment;
-    final exists = fileExists ?? (String p) => File(p).existsSync();
-    final inFlatpak = (env['FLATPAK_ID'] ?? '').isNotEmpty || exists('/.flatpak-info');
+    final inFlatpak = PlatformInfo.detectFlatpak(environment: environment, fileExists: fileExists);
     return inFlatpak ? KeyStoreKind.linuxFlatpakPortal : KeyStoreKind.linuxSecretService;
   }
 

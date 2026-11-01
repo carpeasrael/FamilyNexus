@@ -1,4 +1,4 @@
-import 'dart:io' show Platform;
+import 'dart:io' show File, Platform;
 
 import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform, kIsWeb;
 
@@ -10,6 +10,17 @@ class PlatformInfo {
   static bool get isLinux => !kIsWeb && Platform.isLinux;
   static bool get isMacOS => !kIsWeb && Platform.isMacOS;
   static bool get isWindows => !kIsWeb && Platform.isWindows;
+  static bool get isAndroid => !kIsWeb && Platform.isAndroid;
+  static bool get isIOS => !kIsWeb && Platform.isIOS;
+
+  /// Läuft die App als Flatpak? Erkennung per `FLATPAK_ID` oder `/.flatpak-info`; Umgebung und Dateiprüfung
+  /// sind für Tests austauschbar (#169).
+  static bool detectFlatpak({Map<String, String>? environment, bool Function(String path)? fileExists}) {
+    final env = environment ?? Platform.environment;
+    final exists = fileExists ?? (String p) => File(p).existsSync();
+    return (env['FLATPAK_ID'] ?? '').isNotEmpty || exists('/.flatpak-info');
+  }
+
   static bool get isMobile => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
 
   /// Bedienung mit Hardware-Tastatur (Desktop, auch im Browser): Enter schickt Eingaben ab (#37).

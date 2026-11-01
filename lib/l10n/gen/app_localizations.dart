@@ -1919,8 +1919,8 @@ abstract class AppLocalizations {
   /// No description provided for @privacy2Body.
   ///
   /// In de, this message translates to:
-  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt im sicheren Schlüsselspeicher deines Geräts (Android-Keystore bzw. Apple-Schlüsselbund) und nie in einer Datei.'**
-  String get privacy2Body;
+  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.'**
+  String privacy2Body(String keyStore);
 
   /// No description provided for @privacy3Title.
   ///
@@ -1964,11 +1964,41 @@ abstract class AppLocalizations {
   /// **'Berechtigungen'**
   String get privacy6Title;
 
-  /// No description provided for @privacy6Body.
+  /// No description provided for @privacy6Net.
   ///
   /// In de, this message translates to:
-  /// **'Internet (Verbindung zum Server), Benachrichtigungen und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen) und Geräteanmeldung (App-Sperre). Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.'**
-  String get privacy6Body;
+  /// **'Internet (Verbindung zum Server)'**
+  String get privacy6Net;
+
+  /// No description provided for @privacy6NotifAndroid.
+  ///
+  /// In de, this message translates to:
+  /// **'Benachrichtigungen und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen)'**
+  String get privacy6NotifAndroid;
+
+  /// No description provided for @privacy6NotifApple.
+  ///
+  /// In de, this message translates to:
+  /// **'Benachrichtigungen (Erinnerungen)'**
+  String get privacy6NotifApple;
+
+  /// No description provided for @privacy6DesktopNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Erinnerungen erscheinen nur, solange die App läuft; dafür fragt die App keine Berechtigung an.'**
+  String get privacy6DesktopNote;
+
+  /// No description provided for @privacy6Lock.
+  ///
+  /// In de, this message translates to:
+  /// **'Geräteanmeldung (App-Sperre)'**
+  String get privacy6Lock;
+
+  /// No description provided for @privacy6Tail.
+  ///
+  /// In de, this message translates to:
+  /// **'Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.'**
+  String get privacy6Tail;
 
   /// No description provided for @privacy6BodyWeb.
   ///
@@ -1982,11 +2012,35 @@ abstract class AppLocalizations {
   /// **'Sicherung und Löschung'**
   String get privacy7Title;
 
-  /// No description provided for @privacy7Body.
+  /// No description provided for @privacy7BackupAndroid.
   ///
   /// In de, this message translates to:
-  /// **'Android-Backups sind ausgeschaltet. Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.'**
-  String get privacy7Body;
+  /// **'Android-Backups sind ausgeschaltet.'**
+  String get privacy7BackupAndroid;
+
+  /// No description provided for @privacy7BackupIos.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Daten der App sind von Backups ausgenommen.'**
+  String get privacy7BackupIos;
+
+  /// No description provided for @privacy7BackupMacos.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Daten der App sind von Sicherungen (z. B. Time Machine) ausgenommen.'**
+  String get privacy7BackupMacos;
+
+  /// No description provided for @privacy7BackupOther.
+  ///
+  /// In de, this message translates to:
+  /// **'Die App legt selbst keine Sicherung deiner Daten an.'**
+  String get privacy7BackupOther;
+
+  /// No description provided for @privacy7Rest.
+  ///
+  /// In de, this message translates to:
+  /// **'Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.'**
+  String get privacy7Rest;
 
   /// No description provided for @privacy8Title.
   ///

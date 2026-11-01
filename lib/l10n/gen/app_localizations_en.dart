@@ -1071,8 +1071,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacy2Title => 'What data exists?';
 
   @override
-  String get privacy2Body =>
-      'Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted (SQLCipher) on your device. The key is held in your device\'s secure key store (Android Keystore or Apple Keychain) and never in a file.';
+  String privacy2Body(String keyStore) {
+    return 'Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted (SQLCipher) on your device. The key is held here: $keyStore – not in the database file.';
+  }
 
   @override
   String get privacy3Title => 'What does the server see?';
@@ -1099,8 +1100,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacy6Title => 'Permissions';
 
   @override
-  String get privacy6Body =>
-      'Internet (connection to the server), notifications and exact alarms (reminders), boot notification (re-schedule reminders) and device credentials (app lock). No contacts, location, camera or microphone are needed.';
+  String get privacy6Net => 'Internet (connection to the server)';
+
+  @override
+  String get privacy6NotifAndroid =>
+      'notifications and exact alarms (reminders), boot notification (re-schedule reminders)';
+
+  @override
+  String get privacy6NotifApple => 'notifications (reminders)';
+
+  @override
+  String get privacy6DesktopNote =>
+      'Reminders only appear while the app is running; the app asks for no permission for this.';
+
+  @override
+  String get privacy6Lock => 'device credentials (app lock)';
+
+  @override
+  String get privacy6Tail =>
+      'No contacts, location, camera or microphone are needed.';
 
   @override
   String get privacy6BodyWeb =>
@@ -1110,8 +1128,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacy7Title => 'Backup and deletion';
 
   @override
-  String get privacy7Body =>
-      'Android backups are disabled. If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. “Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.';
+  String get privacy7BackupAndroid => 'Android backups are disabled.';
+
+  @override
+  String get privacy7BackupIos => 'The app\'s data is excluded from backups.';
+
+  @override
+  String get privacy7BackupMacos =>
+      'The app\'s data is excluded from backups (e.g. Time Machine).';
+
+  @override
+  String get privacy7BackupOther =>
+      'The app does not create a backup of your data itself.';
+
+  @override
+  String get privacy7Rest =>
+      'If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. “Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.';
 
   @override
   String get privacy8Title => 'Children';
