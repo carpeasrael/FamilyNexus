@@ -45,8 +45,8 @@ share with you or that your provider supplies for synchronisation.
 | Username, Matrix account ID, display name, provider address; when registering, where applicable email address, password and verification steps | Create an account and sign in, assign the profile and establish access to the provider. With browser sign-in, the details are entered on the provider's page. |
 | Device identifiers and names, access token, where applicable refresh token, verification information and cryptographic keys | Keep the sign-in active, connect your own devices, encrypt and decrypt content, verify devices and restore keys. |
 | Messages, replies, reactions and selected file attachments including file names | Family chat and direct chats between family members. |
-| Shared and private events, titles, locations, notes, times, time zones, recurrences and acceptances or declinations | Calendar, event coordination and local reminders. An event location you enter is not a capture of the device location. |
-| Shopping items, quantities and processing states | Shared shopping list. |
+| Shared and private events, titles, locations, notes, times, time zones, recurrences and acceptances or declines | Calendar, event coordination and local reminders. An event location you enter is not a capture of the device location. |
+| Shopping items, quantities and editing states | Shared shopping list. |
 | Task lists, assignments, recurrence rules, completions, times and voluntary comments | Distribute tasks and display the completion history. The history is retained even after a periodic reset of the list. |
 | Family and room names, memberships, roles, invitations and join requests | Manage the family and control access to shared content. |
 | Online/offline status with time | Optionally show other family members your availability. |
