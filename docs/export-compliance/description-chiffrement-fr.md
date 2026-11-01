@@ -1,15 +1,15 @@
 # FamilyNexus – Description technique des fonctions cryptographiques
 
-*Projet de document pour la déclaration relative à un moyen de cryptologie (ANSSI, https://demarche.numerique.gouv.fr/commencer/declaration-relative-a-un-moyen-de-cryptologie) et pour App Store Connect. Les points marqués **[à vérifier]** n'ont pas pu être confirmés à partir des sources du projet. Cette traduction est un projet : à faire relire par un locuteur natif ou un conseil juridique avant tout dépôt. Version de référence : `encryption-description-en.md`.*
+*État : 31/10/2026, correspond à la version 1.2.1. Projet de document pour la déclaration relative à un moyen de cryptologie (ANSSI, https://demarche.numerique.gouv.fr/commencer/declaration-relative-a-un-moyen-de-cryptologie) et pour App Store Connect. Les points marqués **[à vérifier]** n'ont pas pu être confirmés à partir des sources du projet. Cette traduction est un projet : à faire relire par un locuteur natif ou un conseil juridique avant tout dépôt. Version de référence : `encryption-description-en.md`.*
 
 ## 1. Produit
 
 | | |
 |---|---|
 | Nom du produit | FamilyNexus |
-| Version | 1.0.4 (build 6) |
+| Version | 1.2.1 |
 | Identifiant | `de.inneso.familynexus` |
-| Plateformes | iOS 15+, macOS 12+ |
+| Plateformes | iOS 15+, macOS 12+ (App Store). Autres versions (Android 8.0+, Linux, Windows, navigateur) non diffusées via l'App Store, même conception cryptographique |
 | Fournisseur / éditeur | **Alexander Ziemer, Nahestr. 31, 55593 Rüdesheim, Germany** |
 | Code source | Public, licence AGPL-3.0-or-later : https://github.com/carpeasrael/FamilyNexus |
 | Fonction principale | Agenda familial, messagerie familiale et liste de courses partagée |
@@ -29,9 +29,10 @@ L'application utilise le protocole Matrix (https://spec.matrix.org) pour la mess
 | 4 | Vérification des appareils et signature croisée | Ed25519 ; vérification SAS : Curve25519 (ECDH), HKDF-SHA-256, HMAC-SHA-256, SHA-256 | 256 bits | `vodozemac`, Matrix Dart SDK 14.2.0 |
 | 5 | Sauvegarde chiffrée des clés et stockage de secrets (clé de récupération) | Curve25519 + HKDF-SHA-256 + AES-256-CBC + HMAC-SHA-256 ; AES-256-CTR + HMAC-SHA-256 ; clé de récupération aléatoire de 256 bits | 256 bits | `vodozemac`, Matrix Dart SDK |
 | 6 | Pièces jointes chiffrées | AES-256-CTR (clé aléatoire de 256 bits, IV de 128 bits), empreinte SHA-256 | 256 bits | Matrix Dart SDK / `vodozemac` |
-| 7 | Base de données locale chiffrée | SQLCipher 4.x : AES-256-CBC, HMAC-SHA-512, PBKDF2-HMAC-SHA-512 | 256 bits | `sqflite_sqlcipher` 3.4.1 avec SQLCipher ~> 4.6 **[fournisseur cryptographique à vérifier]** |
-| 8 | Clé de la base | 32 octets aléatoires (générateur cryptographiquement sûr), conservés dans le trousseau du système (Keychain) | 256 bits | `flutter_secure_storage` 11.2.0 (chiffrement intégré au système d'exploitation) |
-| 9 | Verrouillage de l'application | Authentification biométrique / code de l'appareil par le système (LocalAuthentication) | – | Système d'exploitation Apple |
+| 7 | Base de données locale chiffrée | SQLCipher 4.x : AES-256-CBC, HMAC-SHA-512, PBKDF2-HMAC-SHA-512 | 256 bits | `sqflite_sqlcipher` 3.4.1 avec SQLCipher 4.10.0 (iOS et macOS) **[fournisseur cryptographique à vérifier]** |
+| 8 | Clé de la base | 32 octets aléatoires (générateur cryptographiquement sûr), conservés dans le trousseau du système (Keychain ; lisibles après le premier déverrouillage, uniquement sur cet appareil, jamais synchronisés ni inclus dans les sauvegardes) | 256 bits | `flutter_secure_storage` 11.2.0 (chiffrement intégré au système d'exploitation) |
+| 9 | Verrouillage de l'application | Authentification biométrique / code de l'appareil par le système (LocalAuthentication) ; l'application ne conserve ni code ni mot de passe propre | – | `local_auth` 3.0.2 (système d'exploitation Apple) |
+| 10 | Version navigateur uniquement (hors applications App Store) | Coffre de clés dans `localStorage` : AES-256-GCM, clé dérivée du mot de passe par PBKDF2-HMAC-SHA-256 (600 000 itérations) ; base : SQLite3MultipleCiphers (WebAssembly) | 256 bits | WebCrypto (`SubtleCrypto`) du navigateur |
 
 Non utilisés : séquestre ou recouvrement de clés par un tiers, protocoles d'échange de clés propriétaires, chiffrement pour la gestion des droits numériques, chiffrement de code exécutable, stéganographie, cryptographie anti-falsification.
 
