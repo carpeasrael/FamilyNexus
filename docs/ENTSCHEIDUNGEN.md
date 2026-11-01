@@ -158,6 +158,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - Der private Raum wird vor jedem Senden geprüft (nicht der Familienraum, nur das eigene Konto als Mitglied).
 - Erinnerungen ganztägiger Termine beziehen sich auf 09:00 Ortszeit; eigene Absagen erzeugen keine Erinnerung; Planung serialisiert, bei Rückkehr in die App aufgefrischt; Abmeldung/Datenlöschung/Kontowechsel entfernen geplante Erinnerungen, das bloße Schließen der Oberfläche nicht.
 - Text in Titel/Ort/Notiz: Steuer-, Bidi- und Nullbreiten-Zeichen führen zum Verwerfen des Ereignisses.
+- **Nachtrag (2026-11-01, Issue #155):** Die Personenauswahl im Kalender (Filterleiste) wirkt nur für beigetretene Mitglieder und nur, solange mindestens zwei beigetreten sind (`CalendarView.activePersons`). Die gewählte Menge bleibt unverändert; scheidet jemand aus, gilt sein Filter nicht mehr, tritt er wieder bei, gilt die frühere Auswahl wieder. So bleiben Termine nicht hinter einem unsichtbaren Filter verborgen.
 
 ## E-34 Einladungen, QR und Deep Links (Phase 4)
 - Der Einladungslink wird als QR-Code **angezeigt**; Empfänger scannen ihn mit der System-Kamera, die `familynexus://join?…` an die App übergibt (Intent-Filter nur für dieses Schema/Host; Länge ≤ 512; strikte Prüfung; die App handelt nie automatisch, sondern verlangt eine Bestätigung mit Server und Einladendem). Ein In-App-Scanner (mobile_scanner/ML Kit) wurde **nicht** aufgenommen: ML Kit kann Nutzungsdaten an Google senden (Verstoß gegen „keine Telemetrie/Analyse-SDKs“); Alternative → OFFEN.

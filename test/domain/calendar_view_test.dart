@@ -88,4 +88,25 @@ void main() {
     final g = CalendarView.groupByDay(occ, berlin, DateTime.utc(2026, 3, 1), DateTime.utc(2026, 4, 30));
     expect(g.keys.map((d) => d.day), <int>[23, 30, 6]);
   });
+
+  group('wirksame Personenauswahl (#155)', () {
+    test('weniger als zwei beigetretene Mitglieder: keine Filterung', () {
+      expect(CalendarView.activePersons(<String>{'ben'}, <String>['anna']), isEmpty);
+      expect(CalendarView.activePersons(<String>{'ben'}, const <String>[]), isEmpty);
+      // genau ein beigetretenes Mitglied, das selbst gewählt ist: ohne Leiste gilt trotzdem keine Auswahl
+      expect(CalendarView.activePersons(<String>{'anna'}, <String>['anna']), isEmpty);
+    });
+
+    test('nur beigetretene Mitglieder zählen; die Auswahl selbst bleibt unverändert', () {
+      final selected = <String>{'ben', 'carl'};
+      expect(CalendarView.activePersons(selected, <String>['anna', 'ben']), <String>{'ben'});
+      expect(CalendarView.activePersons(selected, <String>['anna', 'ben', 'carl']), <String>{'ben', 'carl'});
+      expect(CalendarView.activePersons(<String>{'carl'}, <String>['anna', 'ben', 'dora']), isEmpty);
+      expect(selected, <String>{'ben', 'carl'});
+    });
+
+    test('leere Auswahl bleibt leer', () {
+      expect(CalendarView.activePersons(<String>{}, <String>['anna', 'ben']), isEmpty);
+    });
+  });
 }

@@ -28,6 +28,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
   late DateTime _focus;
   final Set<String> _persons = <String>{};
 
+  /// Die wirksame Auswahl: ohne Filterleiste oder für ausgeschiedene Mitglieder gilt kein Filter (#155).
+  Set<String> get _activePersons => CalendarView.activePersons(
+        _persons,
+        AppScope.of(context).gateway.family?.joined.map((m) => m.userId) ?? const <String>[],
+      );
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -146,7 +152,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             padding: const EdgeInsets.only(right: 8),
             child: FilterChip(
               label: Text(l.calendarAll),
-              selected: _persons.isEmpty,
+              selected: _activePersons.isEmpty,
               onSelected: (_) => setState(_persons.clear),
             ),
           ),
@@ -175,7 +181,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       case CalendarMode.agenda:
         final from = CalendarView.startOfDay(c.zone, _focus).toUtc();
         final to = from.add(const Duration(days: 60));
-        final occ = c.occurrences(from, to, persons: _persons);
+        final occ = c.occurrences(from, to, persons: _activePersons);
         final groups = CalendarView.groupByDay(occ, c.zone, from, to);
         if (groups.isEmpty) return Center(child: Text(l.calendarNoEvents));
         return ListView(padding: const EdgeInsets.fromLTRB(12, 12, 12, 96), children: <Widget>[
@@ -217,7 +223,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget _dayList(CalendarController c, AppLocalizations l, Fmt fmt, List<DateTime> days, {required bool showHeaders}) {
     final from = CalendarView.startOfDay(c.zone, days.first).toUtc();
     final to = CalendarView.endOfDay(c.zone, days.last).toUtc();
-    final occ = c.occurrences(from, to, persons: _persons);
+    final occ = c.occurrences(from, to, persons: _activePersons);
     final children = <Widget>[];
     for (final d in days) {
       final list = CalendarView.forDay(occ, c.zone, d);
@@ -238,7 +244,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final grid = CalendarView.monthGrid(_focus);
     final from = CalendarView.startOfDay(c.zone, grid.first).toUtc();
     final to = CalendarView.endOfDay(c.zone, grid.last).toUtc();
-    final occ = c.occurrences(from, to, persons: _persons);
+    final occ = c.occurrences(from, to, persons: _activePersons);
     final selected = CalendarView.forDay(occ, c.zone, _focus);
     final weekdays = CalendarView.weekDays(_focus);
     return ListView(padding: const EdgeInsets.fromLTRB(12, 12, 12, 96), children: <Widget>[

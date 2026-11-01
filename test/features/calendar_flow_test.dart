@@ -321,6 +321,74 @@ void main() {
     });
   });
 
+  group('Personenfilter nach Wegfall des Mitglieds (#155)', () {
+    Future<void> seedBenFilter(WidgetTester tester, TestApp app) async {
+      await _joinBen(app);
+      final c = await app.services.calendarBuilder!('@anna:fake.test');
+      c.dispose();
+      await _start(tester, app, tab: 'Kalender');
+      await app.services.calendar!.create(
+        title: 'Zahnarzt',
+        start: DateTime.utc(2026, 3, 20, 13),
+        end: DateTime.utc(2026, 3, 20, 14),
+        visibility: EventVisibility.shared,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilterChip, 'Ben'));
+      await tester.pumpAndSettle();
+      expect(find.text('Zahnarzt'), findsNothing, reason: 'gefiltert auf Ben');
+    }
+
+    for (final view in <String>['Tag', 'Woche', 'Monat', 'Agenda']) {
+      testWidgets('$view: nach dem Entfernen von Ben sind eigene Termine wieder sichtbar', (tester) async {
+        final app = await _app();
+        await seedBenFilter(tester, app);
+        await tester.tap(find.text(view).first);
+        await tester.pumpAndSettle();
+        expect(find.text('Zahnarzt'), findsNothing, reason: '$view: Filter wirkt bei zwei Mitgliedern');
+
+        await app.gateway.removeMember('@ben:fake.test');
+        await tester.pumpAndSettle();
+        expect(find.byType(FilterChip), findsNothing, reason: 'keine Filterleiste bei einem Mitglied');
+        expect(find.text('Zahnarzt'), findsOneWidget, reason: '$view: Filter wirkt nicht mehr');
+        // Die Wochenansicht nennt leere Tage einzeln „Keine Termine“; sonst darf es keine Leermeldung geben.
+        if (view != 'Woche') expect(find.text('Keine Termine'), findsNothing);
+      });
+    }
+
+    testWidgets('drei Mitglieder, nur das ausgeschiedene gewählt: Leiste bleibt, „Alle“ ist markiert', (tester) async {
+      final app = await _app();
+      app.server.addAccount('carl', 'geheim789', displayName: 'Carl');
+      await seedBenFilter(tester, app);
+      final carl = app.server.newDevice();
+      await carl.login(server: ServerUrl.tryParse(app.server.host)!, username: 'carl', password: 'geheim789');
+      final room = app.gateway.familyRoom!;
+      app.server.addMember(room, '@carl:fake.test');
+      carl.attachFamilyRoom(room.id);
+      await tester.pumpAndSettle();
+      expect(find.text('Zahnarzt'), findsNothing, reason: 'Auswahl {Ben} gilt bei drei Mitgliedern');
+
+      await app.gateway.removeMember('@ben:fake.test');
+      await tester.pumpAndSettle();
+      expect(find.widgetWithText(FilterChip, 'Carl'), findsOneWidget, reason: 'zwei Mitglieder: Leiste bleibt');
+      expect(tester.widget<FilterChip>(find.widgetWithText(FilterChip, 'Alle')).selected, isTrue);
+      expect(find.text('Zahnarzt'), findsOneWidget);
+    });
+
+    testWidgets('tritt Ben wieder bei, gilt die frühere Auswahl wieder', (tester) async {
+      final app = await _app();
+      await seedBenFilter(tester, app);
+      await app.gateway.removeMember('@ben:fake.test');
+      await tester.pumpAndSettle();
+      expect(find.text('Zahnarzt'), findsOneWidget);
+
+      await _joinBen(app);
+      await tester.pumpAndSettle();
+      expect(find.text('Zahnarzt'), findsNothing, reason: 'Auswahl {Ben} gilt wieder');
+      expect(find.widgetWithText(FilterChip, 'Alle'), findsOneWidget);
+    });
+  });
+
   group('Detail, Zusage, Löschen', () {
     testWidgets('Zusage wird lokal gespeichert und an die Familie gesendet', (tester) async {
       final app = await _app();
