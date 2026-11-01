@@ -1112,6 +1112,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Internet (Verbindung zum Server), Benachrichtigungen und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen) und Geräteanmeldung (App-Sperre). Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.';
 
   @override
+  String get privacy6BodyWeb =>
+      'Internet (Verbindung zum Server). Die Web-Version fragt keine Berechtigung für Benachrichtigungen, Erinnerungen oder eine Geräteanmeldung an. Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.';
+
+  @override
   String get privacy7Title => 'Sicherung und Löschung';
 
   @override
@@ -1716,7 +1720,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy13Body =>
-      'In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz und keine Erinnerungen bei geschlossener Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach.';
+      'In der Web-Version liegen deine Daten verschlüsselt im Speicher dieses Browsers (IndexedDB, SQLite3MultipleCiphers). Der Schlüssel dafür ist mit deinem Browser-Passwort geschützt, das nirgends gespeichert wird. Es gibt keinen Bildschirmschutz, keine Erinnerungen und keine Benachrichtigungen, auch nicht bei geöffneter Seite. Auf einem fremden oder gemeinsam genutzten Rechner solltest du die Web-Version nicht verwenden. Die Seite lädt nichts von Drittanbietern nach.';
 
   @override
   String get startCreateTitle => 'Neue Familie gründen';

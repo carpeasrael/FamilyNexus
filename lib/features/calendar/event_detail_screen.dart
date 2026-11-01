@@ -232,27 +232,30 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ),
                   ),
               ],
-              const SizedBox(height: 12),
-              GlassCard(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                  Text(l.eventYourReminders, style: Theme.of(context).textTheme.titleSmall),
-                  const SizedBox(height: 8),
-                  Wrap(spacing: 8, runSpacing: 4, children: <Widget>[
-                    for (final m in kReminderChoices)
-                      FilterChip(
-                        label: Text(m == 0 ? l.reminderAtStart : l.reminderBefore(ReminderCoordinator.durationText(l, m))),
-                        selected: reminderSet.contains(m),
-                        onSelected: (v) {
-                          final next = <int>{...reminderSet};
-                          v ? next.add(m) : next.remove(m);
-                          c.setReminders(e.id, (next.toList()..sort((a, b) => b.compareTo(a)))).ignore();
-                        },
-                      ),
+              // Im Browser gibt es keine Erinnerungen (E-53, #145): keine Karte; gespeicherte Werte bleiben unberührt.
+              if (services.reminders != null) ...<Widget>[
+                const SizedBox(height: 12),
+                GlassCard(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                    Text(l.eventYourReminders, style: Theme.of(context).textTheme.titleSmall),
+                    const SizedBox(height: 8),
+                    Wrap(spacing: 8, runSpacing: 4, children: <Widget>[
+                      for (final m in kReminderChoices)
+                        FilterChip(
+                          label: Text(m == 0 ? l.reminderAtStart : l.reminderBefore(ReminderCoordinator.durationText(l, m))),
+                          selected: reminderSet.contains(m),
+                          onSelected: (v) {
+                            final next = <int>{...reminderSet};
+                            v ? next.add(m) : next.remove(m);
+                            c.setReminders(e.id, (next.toList()..sort((a, b) => b.compareTo(a)))).ignore();
+                          },
+                        ),
+                    ]),
+                    if (c.hasCustomReminders(e.id))
+                      TextButton(onPressed: () => c.setReminders(e.id, null), child: Text(l.eventResetReminders)),
                   ]),
-                  if (c.hasCustomReminders(e.id))
-                    TextButton(onPressed: () => c.setReminders(e.id, null), child: Text(l.eventResetReminders)),
-                ]),
-              ),
+                ),
+              ],
               _History(controller: c, event: e),
             ]),
           ),
