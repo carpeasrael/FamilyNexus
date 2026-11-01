@@ -1,9 +1,10 @@
 # FamilyNexus
 
-Family calendar and messenger for Android, iOS, macOS and Linux – **local-first**, end-to-end encrypted via the
-[Matrix](https://matrix.org) protocol. Built with Flutter (Android; iOS verified in the simulator since phase 6; the
-codebase is platform-neutral, platform code lives in clearly separated adapters under `lib/data/platform/`, `android/`
-and `ios/`).
+Family calendar and messenger for Android, iOS, macOS, Windows, Linux (Flatpak, AppImage) and the web – **local-first**,
+end-to-end encrypted via the [Matrix](https://matrix.org) protocol. Built with Flutter. Android is the most tested
+platform; the other platforms are built from the same codebase, and what has and has not been verified on each of them is
+listed in [`docs/OFFEN.md`](docs/OFFEN.md). The codebase is platform-neutral, platform code lives in clearly separated
+adapters under `lib/data/platform/` and the platform folders (`android/`, `ios/`, `macos/`, `windows/`, `linux/`, `web/`).
 
 Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their rationale:
 [`docs/ENTSCHEIDUNGEN.md`](docs/ENTSCHEIDUNGEN.md).
@@ -17,7 +18,7 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
   email confirmation, invitation codes and captchas are guided) or, on providers with browser sign-in such as matrix.org,
   on the provider's page with an automatic return to the app. The provider is preselected and checked automatically;
   changing it is under *Advanced*. An invitation link takes newcomers straight to *create account* at the inviter's
-  provider and then to a join card with names instead of IDs. The mandatory key backup is the **emergency key** (copy with
+  provider and then to a join card that names the inviting person and their provider (not the family, E-79). The mandatory key backup is the **emergency key** (copy with
   auto-clearing clipboard, or save as a printable file).
 - **Family chat and direct chats** (encrypted): messages, replies, reactions, attachments (validated, never opened
   automatically), offline queue. Direct chats exist for every pair of joined members ("Send message" in the family view
@@ -30,9 +31,10 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
   and can be turned off under *Settings → Privacy → Share online status*.
 - **Shopping list:** shared family list (item, quantity, check off, edit, delete, "Remove completed"), transmitted and
   stored encrypted, offline-capable, deterministic merge of concurrent changes.
-- **Task lists:** moderators create lists with items and assign them to a family member; they repeat daily, weekly or
-  monthly and start over automatically at the period boundary (midnight, Monday, 1st of the month, in the list's time
-  zone). Only the assigned person ticks items off (optional comment); date and time are logged in a history that is kept
+- **Task lists:** moderators create lists with items and assign them to a family member; they repeat on a schedule
+  you choose (every day, Monday to Friday, weekly on a weekday, monthly on the first/second/third/fourth/last weekday, or
+  monthly on a calendar day – the last day if the month is shorter, E-58), can carry an explanation, and start over
+  automatically at the period boundary in the list's time zone. Only the assigned person ticks items off (optional comment); date and time are logged in a history that is kept
   across resets. Transmitted and stored encrypted, offline-capable.
 - **Calendar** with day/week/month/agenda views, person filter, recurrences (including exceptions, daylight saving
   time), time zones, **private** (own devices only) and **shared** events (encrypted in the family room), accept/decline,
@@ -41,8 +43,11 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
 - **Family and roles:** member/moderator; invite via link (share by email, QR code or copy; single-use, time-limited) or
   Matrix ID, confirm join requests (any moderator can check and confirm a link issued by another), promote, remove (key
   rotation). An invited account sees the invitation right after sign-in instead of the create/join question.
-- **Security:** encrypted local database (SQLCipher, key in the Android Keystore), app lock via device authentication,
-  screen protection, device verification by emoji comparison, identity verification of members.
+- **Security:** encrypted local database (SQLCipher); the key is held in the platform's secure store (Android Keystore,
+  Apple Keychain, Windows Credential Manager, Secret Service or – in the Flatpak – the Secret portal, a password-protected
+  vault in the browser). App lock via device authentication and screen protection where the platform offers them (not
+  on Linux and in the browser; no screen protection on macOS), device verification by emoji comparison, identity
+  verification of members.
 - German/English, light/dark (glass/neon look based on the AURORA colors) with a **selectable neon accent color**
   (settings in the burger menu at the top right), "Reduce effects" option, WCAG AA contrast.
 
@@ -125,7 +130,7 @@ Preparation for Google Play and the App Store (versions, icons, store texts, pri
 
 - Run your own homeserver: [`docs/EIGENER_SERVER.md`](docs/EIGENER_SERVER.md).
 - [Privacy policy / Datenschutzerklärung (Deutsch)](store/privacy/privacy-policy.de.md) for iOS, macOS, Windows,
-  Linux and Android. Privacy information and "Delete all local data" are also available in the app under *Settings → Privacy*.
+  Linux (also Flatpak), Android and the web app. Privacy information and "Delete all local data" are also available in the app under *Settings → Privacy*.
 - Dependencies, licenses, SBOM: [`docs/ABHAENGIGKEITEN.md`](docs/ABHAENGIGKEITEN.md) (`python3 tool/sbom.py`).
 - Architecture: [`docs/ARCHITEKTUR.md`](docs/ARCHITEKTUR.md); planning and acceptance: [`docs/PLAN.md`](docs/PLAN.md);
   reviews: [`docs/REVIEW.md`](docs/REVIEW.md).
