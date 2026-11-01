@@ -114,7 +114,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 - Nicht automatisiert getestet: Deep-Link-/Kamera-Pfad (nur Verhalten des Parsers und der Oberfläche), Akku-Optimierungen
   einzelner Hersteller für Erinnerungen, Identitätswechsel gegen echten Server, Prozess-Tod bei Schlüsselanzeige.
 
-- „Anhang speichern“ schreibt bewusst unverschlüsselt (SA-3).
+- „Anhang speichern“ schreibt bewusst unverschlüsselt (SA-3). Der Klartext im temporären Ordner, den der Speicherdialog unter iOS anlegt, wird nach jedem Dialog entfernt (#141, E-19); Löschfehler meldet iOS nicht, und solange der Dialog offen ist, liegt die Datei dort.
 - `USE_EXACT_ALARM` ist bei Verteilung über den Play Store richtlinienkritisch; für APK-Verteilung (E-02) vertretbar.
 - Der Sichtbarkeitswechsel mit gleichzeitiger Textänderung läuft in zwei Schritten; zwischen ihnen kann die noch nicht
   überarbeitete Fassung veröffentlicht werden (Kalenderdienst-Funktion mit gemeinsamer Sperre fehlt).

@@ -189,6 +189,18 @@ class FakeFileAccess implements FileAccess {
   /// `true`: Der Systemdialog wird abgebrochen, nichts wird gespeichert.
   bool cancelSave = false;
 
+  /// Aufrufe von [clearTemporary].
+  int cleared = 0;
+
+  /// Läuft während [clearTemporary], vor dessen Ende.
+  Future<void> Function()? onClear;
+
+  @override
+  Future<void> clearTemporary() async {
+    cleared++;
+    await onClear?.call();
+  }
+
   @override
   Future<PickedFile?> pickFile() async => next;
 

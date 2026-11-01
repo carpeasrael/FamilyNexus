@@ -160,10 +160,13 @@ class AppServices {
   /// Abmelden hieß bisher nur „Sitzung beenden“; die Daten blieben bis zur Anmeldung eines anderen Kontos liegen
   /// (Pen-Test F-02).
   Future<void> wipeAccountData() async {
-    if (keepAccountData) return;
+    // Zuerst lesen: Der Vermerk (#134) darf nicht hinter die Rundreise des Aufräumens rücken.
+    final keep = keepAccountData;
     final wipe = debugWipeAccountData;
-    if (wipe != null) return wipe();
     final db = database?.db;
+    await files.clearTemporary(); // auch bei `keep`: Temp-Dateien sind keine Familiendaten (#141)
+    if (keep) return;
+    if (wipe != null) return wipe();
     if (db != null) await wipeAccountDataIn(db);
   }
 
