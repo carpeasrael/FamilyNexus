@@ -618,6 +618,14 @@ void main() {
         expect(s.tokenBodies, isEmpty);
       });
 
+      test('Start scheitert nach dem Festhalten (Client-Anmeldung abgelehnt): Festlegung aufgehoben', () async {
+        // Öffentlich und https, aber die dynamische Client-Anmeldung liefert 404.
+        final s = _Server(version: 'v1.15', meta: <String, Object?>{..._meta, 'registration_endpoint': 'https://hs.example/oauth2/fehlt'});
+        final g = await _gateway(s);
+        await expectLater(g.startOAuth(server: _hs, redirectUri: redirect, create: true), throwsA(isA<GatewayException>()));
+        expect((g.sdkClient! as dynamic).pinnedAuthMetadata, isNull);
+      });
+
       for (final (name, second) in <(String, Map<String, Object?>)>[
         ('Endpunkte im Heimnetz', _metaOn('https://$_lan')),
         ('unsicherer Token-Endpunkt', <String, Object?>{..._meta, 'token_endpoint': 'http://hs.example/oauth2/token'}),
