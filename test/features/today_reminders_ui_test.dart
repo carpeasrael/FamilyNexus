@@ -158,6 +158,21 @@ void main() {
       expect(find.text('Geplant (1)'), findsNothing);
     });
 
+    testWidgets('T7 nach einer Auslösung ohne Datenänderung: Karte zählt geplant und fällig wie die Übersicht (#223)', (tester) async {
+      final app = await open(tester);
+      await make(tester, app, 'A', DateTime.utc(2026, 3, 20, 12));
+      await make(tester, app, 'B', DateTime.utc(2026, 3, 20, 13));
+      await make(tester, app, 'C', DateTime.utc(2026, 3, 20, 14));
+      expect(find.text('3 Erinnerungen geplant'), findsOneWidget);
+      now = DateTime.utc(2026, 3, 20, 11, 51); // erste Auslösung 11:50
+      await tester.pump(const Duration(seconds: 30));
+      expect(find.text('2 Erinnerungen geplant'), findsOneWidget);
+      expect(find.text('1 Erinnerung fällig'), findsOneWidget);
+      await overview(tester);
+      expect(find.text('Geplant (2)'), findsOneWidget);
+      expect(find.text('Fällig (1)'), findsOneWidget);
+    });
+
     testWidgets('im Browser keine Erinnerungskarte, „Alle Termine“ bleibt', (tester) async {
       await open(tester, withReminders: false);
       expect(find.text('Übersicht'), findsNothing);
