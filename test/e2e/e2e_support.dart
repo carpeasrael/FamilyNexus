@@ -66,6 +66,7 @@ class E2e {
     http.Client? httpClient,
     E2eDevice? device,
     Duration joinPollInterval = SdkMatrixGateway.rejectionPollInterval,
+    Duration participantsRetryBase = SdkMatrixGateway.participantsRetryDelay,
   }) async {
     final d = device ?? await newDevice();
     return SdkMatrixGateway(
@@ -75,6 +76,7 @@ class E2e {
       databaseOpener: (path, key) => databaseFactoryFfi.openDatabase(path),
       httpClient: httpClient ?? lenientClient(),
       joinPollInterval: joinPollInterval,
+      participantsRetryBase: participantsRetryBase,
     );
   }
 
@@ -86,10 +88,11 @@ class E2e {
     String prefix, {
     E2eDevice? device,
     Duration joinPollInterval = SdkMatrixGateway.rejectionPollInterval,
+    Duration participantsRetryBase = SdkMatrixGateway.participantsRetryDelay,
   }) async {
     await init();
     final acc = await registerUser(prefix);
-    final g = await newGateway(device: device, joinPollInterval: joinPollInterval);
+    final g = await newGateway(device: device, joinPollInterval: joinPollInterval, participantsRetryBase: participantsRetryBase);
     await g.restore();
     await g.login(server: server, username: acc.user, password: acc.password);
     return (gateway: g, user: acc.user, password: acc.password);
