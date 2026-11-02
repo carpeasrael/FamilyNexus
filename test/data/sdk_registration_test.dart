@@ -23,11 +23,17 @@ import '../support/memory_stores.dart';
 typedef _Handler = (int, Object) Function(http.Request req, Map<String, Object?> body);
 
 /// Nachgestellter Homeserver `https://hs.example`; [register] und [token] liefern die Antworten.
+/// Antwortet unabhängig vom Host; [requests] hält jede Anfrage fest (Host und Pfad).
 class _Server {
-  _Server({this.version = 'v1.11', this.meta});
+  _Server({this.version = 'v1.11', Map<String, Object?>? meta}) : metas = <Map<String, Object?>>[?meta];
 
   final String version;
-  final Map<String, Object?>? meta;
+
+  /// OAuth-Metadaten je Abruf von `auth_metadata` (#222): der n-te Abruf erhält den n-ten Eintrag,
+  /// danach immer den letzten; leer = nicht vorhanden. Umschaltbar während eines Tests.
+  List<Map<String, Object?>> metas;
+  int metaFetches = 0;
+  final List<Uri> requests = <Uri>[];
   _Handler? register;
   _Handler? token;
   _Handler? login;
@@ -45,6 +51,7 @@ class _Server {
 
   http.Client get client => MockClient((req) async {
         final path = req.url.path;
+        requests.add(req.url);
         Map<String, Object?> jsonBody() =>
             req.body.isEmpty ? <String, Object?>{} : json.decode(req.body) as Map<String, Object?>;
         (int, Object) r;
@@ -61,8 +68,9 @@ class _Server {
           r = afterLogin!(req, const <String, Object?>{});
         } else if (path == '/_matrix/client/v3/login') {
           r = (200, <String, Object?>{'flows': <Object?>[<String, Object?>{'type': 'm.login.password'}]});
-        } else if (path == '/_matrix/client/v1/auth_metadata' && meta != null) {
-          r = (200, meta!);
+        } else if (path == '/_matrix/client/v1/auth_metadata' && metas.isNotEmpty) {
+          r = (200, metas[metaFetches < metas.length ? metaFetches : metas.length - 1]);
+          metaFetches++;
         } else if (path == '/_matrix/client/v3/register' && req.method == 'POST' && register != null) {
           final b = jsonBody();
           registerBodies.add(b);
@@ -130,6 +138,18 @@ const Map<String, Object?> _meta = <String, Object?>{
   'code_challenge_methods_supported': <String>['S256'],
   'prompt_values_supported': <String>['create'],
 };
+
+/// Wie [_meta], alle Endpunkte unter [origin] (z. B. `https://192.168.1.10` für das Heimnetz).
+Map<String, Object?> _metaOn(String origin) => <String, Object?>{
+      ..._meta,
+      'issuer': '$origin/',
+      'authorization_endpoint': '$origin/authorize',
+      'token_endpoint': '$origin/oauth2/token',
+      'registration_endpoint': '$origin/oauth2/registration',
+      'revocation_endpoint': '$origin/oauth2/revoke',
+    };
+
+const String _lan = '192.168.1.10';
 
 /// PKCE nutzt im SDK vodozemac; die Bibliothek baut `tool/e2e.sh` (ohne sie wird die OAuth-Gruppe übersprungen).
 final String _vodLib = Platform.environment['FN_VOD_LIB'] ?? '/tmp/vod-target/release/';
@@ -507,6 +527,151 @@ void main() {
       final state = (await g.startOAuth(server: _hs, redirectUri: loop, create: false)).queryParameters['state']!;
       await expectLater(g.completeOAuth(Uri.parse('http://127.0.0.1:41234/oauth#code=f&state=$state')), _error(GatewayError.oauthCancelled));
       expect(s.tokenBodies.single['code'], 'f');
+    });
+
+    group('#222: Metadaten einmal prüfen und festhalten', () {
+      // Hosts aller Anfragen an den nachgestellten Server mit [path].
+      List<String> hostsFor(_Server s, String path) => <String>[for (final u in s.requests) if (u.path == path) u.host];
+      bool touchedLan(_Server s) => s.requests.any((u) => u.host == _lan);
+
+      // Erster Abruf öffentlich (Serverprüfung), jeder weitere nennt Endpunkte im Heimnetz.
+      Future<(_Server, SdkMatrixGateway, String)> started() async {
+        final s = _Server(version: 'v1.15', meta: _meta)..metas.add(_metaOn('https://$_lan'));
+        s.token = (req, b) => (400, <String, Object?>{'error': 'invalid_grant'});
+        final g = await _gateway(s);
+        final uri = await g.startOAuth(server: _hs, redirectUri: redirect, create: true);
+        return (s, g, uri.queryParameters['state']!);
+      }
+
+      test('R1 Start: genau ein Abruf, Registrierung beim geprüften Host, kein Kontakt ins Heimnetz', () async {
+        final (s, _, _) = await started();
+        expect(s.metaFetches, 1, reason: 'kein zweiter Abruf nach der Serverprüfung');
+        expect(hostsFor(s, '/oauth2/registration'), <String>['hs.example']);
+        expect(touchedLan(s), isFalse);
+      });
+
+      test('R2 Rücksprung: Token-POST an den geprüften Host', () async {
+        final (s, g, state) = await started();
+        await expectLater(g.completeOAuth(Uri.parse('$redirect?code=echt&state=$state')), _error(GatewayError.oauthCancelled));
+        expect(hostsFor(s, '/oauth2/token'), <String>['hs.example']);
+        expect(s.tokenBodies.single['code'], 'echt');
+        expect(touchedLan(s), isFalse);
+      });
+
+      test('R2b fremder Rücksprung hebt die Festlegung nicht auf', () async {
+        final (s, g, state) = await started();
+        await expectLater(g.completeOAuth(Uri.parse('$redirect?code=c&state=fremd')), _error(GatewayError.oauthStateMismatch));
+        await expectLater(g.completeOAuth(Uri.parse('$redirect?code=echt&state=$state')), _error(GatewayError.oauthCancelled));
+        expect(hostsFor(s, '/oauth2/token'), <String>['hs.example']);
+        expect(touchedLan(s), isFalse);
+      });
+
+      test('R3 öffentlicher Server, Registrierungs-Endpunkt im Heimnetz: serverUnsupported, kein Kontakt', () async {
+        for (final lan in <String>['https://$_lan', 'https://nas', 'https://[fd00::5]', 'https://localhost:8448']) {
+          final s = _Server(version: 'v1.15', meta: <String, Object?>{..._meta, 'registration_endpoint': '$lan/oauth2/registration'});
+          final g = await _gateway(s);
+          await expectLater(g.startOAuth(server: _hs, redirectUri: redirect, create: true), _error(GatewayError.serverUnsupported), reason: lan);
+          expect(s.oidcRegistrations, 0, reason: lan);
+          expect(s.requests.where((u) => u.host != 'hs.example'), isEmpty, reason: lan);
+        }
+      });
+
+      test('R4 lokaler Server mit lokalen Endpunkten wird nicht abgewiesen', () async {
+        final local = ServerUrl.tryParse('localhost:8448')!;
+        expect(local.isLocal, isTrue);
+        final s = _Server(version: 'v1.15', meta: _metaOn('https://localhost:8448'));
+        final g = await _gateway(s);
+        final uri = await g.startOAuth(server: local, redirectUri: redirect, create: true);
+        expect(uri.host, 'localhost');
+        expect(hostsFor(s, '/oauth2/registration'), <String>['localhost']);
+      });
+
+      test('R5 die Festlegung lebt so lange wie die Anmeldung', () async {
+        // Fremder state: die Anmeldung läuft weiter, die Metadaten bleiben festgehalten.
+        var (s, g, state) = await started();
+        await expectLater(g.completeOAuth(Uri.parse('$redirect?code=c&state=fremd')), _error(GatewayError.oauthStateMismatch));
+        var before = s.metaFetches;
+        await g.sdkClient!.getAuthMetadata();
+        expect(s.metaFetches, before, reason: 'nach fremdem state festgehalten');
+
+        // Abgeschlossen (Token-Endpunkt lehnt ab): aufgehoben.
+        await expectLater(g.completeOAuth(Uri.parse('$redirect?code=echt&state=$state')), _error(GatewayError.oauthCancelled));
+        before = s.metaFetches;
+        await g.sdkClient!.getAuthMetadata();
+        expect(s.metaFetches, before + 1, reason: 'nach completeOAuth aufgehoben');
+
+        // Abbruch beim Anbieter (error=): aufgehoben.
+        (s, g, state) = await started();
+        await expectLater(g.completeOAuth(Uri.parse('$redirect?error=access_denied&state=$state')), _error(GatewayError.oauthCancelled));
+        before = s.metaFetches;
+        await g.sdkClient!.getAuthMetadata();
+        expect(s.metaFetches, before + 1, reason: 'nach error= aufgehoben');
+
+        // Abmelden: aufgehoben. Danach kennt der Client keinen Homeserver mehr, ein Abruf ist nicht
+        // möglich; geprüft wird über die Testöffnung des Clients.
+        (s, g, state) = await started();
+        Object? pin() => (g.sdkClient! as dynamic).pinnedAuthMetadata;
+        expect(pin(), isNotNull);
+        await g.logout();
+        expect(pin(), isNull, reason: 'nach logout aufgehoben');
+        await expectLater(g.completeOAuth(Uri.parse('$redirect?code=echt&state=$state')), _error(GatewayError.oauthCancelled));
+        expect(s.tokenBodies, isEmpty);
+      });
+
+      test('Start scheitert nach dem Festhalten (Client-Anmeldung abgelehnt): Festlegung aufgehoben', () async {
+        // Öffentlich und https, aber die dynamische Client-Anmeldung liefert 404.
+        final s = _Server(version: 'v1.15', meta: <String, Object?>{..._meta, 'registration_endpoint': 'https://hs.example/oauth2/fehlt'});
+        final g = await _gateway(s);
+        await expectLater(g.startOAuth(server: _hs, redirectUri: redirect, create: true), throwsA(isA<GatewayException>()));
+        expect((g.sdkClient! as dynamic).pinnedAuthMetadata, isNull);
+      });
+
+      for (final (name, second) in <(String, Map<String, Object?>)>[
+        ('Endpunkte im Heimnetz', _metaOn('https://$_lan')),
+        ('unsicherer Token-Endpunkt', <String, Object?>{..._meta, 'token_endpoint': 'http://hs.example/oauth2/token'}),
+      ]) {
+        test('R6 gescheiterter zweiter Start ($name) verwirft die erste Anmeldung', () async {
+          final s = _Server(version: 'v1.15', meta: _meta);
+          s.token = (req, b) => (400, <String, Object?>{'error': 'invalid_grant'});
+          final g = await _gateway(s);
+          final stateA = (await g.startOAuth(server: _hs, redirectUri: redirect, create: true)).queryParameters['state']!;
+          s
+            ..metas = <Map<String, Object?>>[second]
+            ..metaFetches = 0;
+          await expectLater(g.startOAuth(server: _hs, redirectUri: redirect, create: true), _error(GatewayError.serverUnsupported));
+          await expectLater(g.completeOAuth(Uri.parse('$redirect?code=echt&state=$stateA')), _error(GatewayError.oauthCancelled));
+          expect(s.tokenBodies, isEmpty, reason: 'kein Token-POST für die verworfene Anmeldung');
+          expect(touchedLan(s), isFalse);
+        });
+      }
+
+      test('R7 Passwort-Anmeldung hebt Anmeldung und Festlegung vor der Serverprüfung auf', () async {
+        final (s, g, state) = await started();
+        s.login = (req, b) => (403, <String, Object?>{'errcode': 'M_FORBIDDEN', 'error': 'Invalid password'});
+        final before = s.metaFetches;
+        await expectLater(g.login(server: _hs, username: 'n2', password: 'falsch123'), _error(GatewayError.invalidCredentials));
+        expect(s.metaFetches, before + 1, reason: 'die Serverprüfung (v1.15) holt frische Metadaten statt der festgehaltenen');
+        await g.sdkClient!.getAuthMetadata();
+        expect(s.metaFetches, before + 2, reason: 'Festlegung aufgehoben');
+        await expectLater(g.completeOAuth(Uri.parse('$redirect?code=echt&state=$state')), _error(GatewayError.oauthCancelled));
+        expect(s.tokenBodies, isEmpty);
+      });
+
+      test('ohne Festlegung kein Token-POST (doppelte Sicherung)', () async {
+        final (s, g, state) = await started();
+        // Nur über diese Testöffnung erreichbar: das Gateway hebt Anmeldung und Festlegung gemeinsam auf.
+        (g.sdkClient! as dynamic).pinnedAuthMetadata = null;
+        await expectLater(g.completeOAuth(Uri.parse('$redirect?code=echt&state=$state')), _error(GatewayError.oauthCancelled));
+        expect(s.tokenBodies, isEmpty);
+        expect(touchedLan(s), isFalse);
+      });
+
+      test('Metadaten nicht abrufbar: serverUnsupported ohne Client-Anmeldung (bewusste Änderung)', () async {
+        final s = _Server(version: 'v1.15');
+        final g = await _gateway(s);
+        await expectLater(g.startOAuth(server: _hs, redirectUri: redirect, create: true), _error(GatewayError.serverUnsupported));
+        expect(s.oidcRegistrations, 0);
+      });
     });
   });
 }
