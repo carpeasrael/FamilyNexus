@@ -189,7 +189,16 @@ class AppServices {
       settings.addListener(p.update);
       p.start(foreground: WidgetsBinding.instance.lifecycleState != AppLifecycleState.paused);
       final s = scheduler;
-      if (s != null) reminders = ReminderCoordinator(calendar: c, scheduler: s, settings: settings, clock: () => c.now)..start();
+      final appDb = database?.db;
+      if (s != null) {
+        reminders = ReminderCoordinator(
+          calendar: c,
+          scheduler: s,
+          settings: settings,
+          store: appDb == null ? null : SqlKeyValueStore(appDb),
+          clock: () => c.now,
+        )..start();
+      }
     } catch (e) {
       AppLog.e('app', 'Familiendienste konnten nicht geöffnet werden', e);
       // Kein Teilzustand: Fehler heißt „nicht geöffnet“, ein Neuversuch baut alles neu auf (#153). Ein
@@ -256,7 +265,8 @@ class AppServices {
     await SqlEventStore(db).wipe();
     await SqlShoppingStore(db).wipe();
     await SqlTaskStore(db).wipe();
-    await kv.delete(calendarOwnerKey);
+    // Bestätigte Erinnerungen gehören zu den Familiendaten (E-87); der Besitzer fällt zuletzt bzw. zugleich.
+    await kv.apply(deletes: <String>[ReminderCoordinator.acknowledgedKey, calendarOwnerKey]);
   }
 
   /// Beansprucht die lokalen Familiendaten für [owner]: Gehörten sie jemand anderem (Nutzer oder Familie), werden sie
@@ -270,6 +280,7 @@ class AppServices {
       await SqlEventStore(db).wipe();
       await SqlShoppingStore(db).wipe();
       await SqlTaskStore(db).wipe();
+      await kv.delete(ReminderCoordinator.acknowledgedKey);
       await onWiped?.call();
     }
     await kv.write(calendarOwnerKey, owner);

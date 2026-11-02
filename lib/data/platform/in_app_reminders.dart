@@ -57,6 +57,15 @@ class InAppReminders {
     }
   }
 
+  /// Entfernt eine noch nicht gezeigte Erinnerung; sie erscheint dann weder beim Takt noch bei [replace] (#218).
+  void remove(int id) {
+    _list = _list.where((r) => r.id != id).toList();
+    if (_list.isEmpty) {
+      _tick?.cancel();
+      _tick = null;
+    }
+  }
+
   void clear() {
     _list = const <_InApp>[];
     _tick?.cancel();

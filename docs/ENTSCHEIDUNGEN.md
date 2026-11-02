@@ -664,3 +664,13 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Kontakträume:** `docs/KONTAKTE.md:91` schließt eigene Ereignistypen in Kontakträumen aus, `docs/KONTAKTE.md:187` nennt, dass es dort keine App-Ereignisse gibt, die den Ungelesen-Zähler verfälschen. Einzelchats der Familie nutzen den neuen Typ. Kommt das Kontakte-Konzept, ist beides neu zu bewerten.
 - **Verworfen:** `m.reaction` beibehalten (Klartext); Patch des SDK; alte Reaktionen redigieren (eine Redaktion je Ereignis).
 - **Folge für ältere App-Versionen und andere Matrix-Clients:** Sie zeigen neue Reaktionen nicht. In die Release-Notes: alle Geräte aktualisieren (vgl. E-58). Offene Punkte stehen in `docs/OFFEN.md`.
+
+## E-87 Erinnerungs-Übersicht und Bestätigen (2026-11-02, Issue #218) — ergänzt E-15 und E-82
+- **Frage:** Wie sieht man ausgelöste Erinnerungen in der App und bestätigt sie, und wie viel zeigt „Heute“?
+- **Gewählt (Entscheidung des Herausgebers):** Die Karte „Erinnerungen“ auf „Heute“ öffnet eine Übersicht. Oben stehen fällige Erinnerungen mit „Bestätigen“ (einzeln, ab zwei auch „Alle bestätigen“), darunter die geplanten. Ein Tipp öffnet den Termin. „Heute“ zeigt auf allen Plattformen höchstens drei nächste Termine; „Alle Termine“ öffnet den Kalender in der Agenda ab heute.
+- **Fällig:** Auslösezeit erreicht und Vorkommen noch nicht vorbei; rechnerisch, nicht „vom System angezeigt“. Dieselbe ID wie die Benachrichtigung (`ReminderPlanner.stableId`, ganztägig Bezug 09:00 Ortszeit). Bestätigte fallen vor der Grenze von 50 weg.
+- **Bestätigen:** gilt nur auf diesem Gerät, keine Synchronisation. Entfernt die Benachrichtigung (`cancel`); unter Linux und Windows auch die noch nicht gezeigte In-App-Erinnerung (E-50, E-52). Gespeichert unter `reminders.acknowledged` in der verschlüsselten Tabelle `settings`: nur IDs und Endzeiten der Vorkommen, kein Inhalt, höchstens 500, Abgelaufenes fällt weg.
+- **Familiendaten:** Die Ablage gehört zu den Familiendaten (aus Termin-IDs gebildet). Abmelden (`wipeAccountDataIn`) und Familienwechsel (`claimFamilyData`) löschen sie; mit dem Vermerk aus E-82 bleibt sie wie die übrigen Familiendaten stehen.
+- **Datenschutz:** Termintitel stehen nur in der App; Benachrichtigungen bleiben generisch (E-15). Im Browser gibt es keine Erinnerungen und keine Karte (E-53).
+- **Grenzen:** Verschieben eines Termins oder ein Zeitzonenwechsel (ganztägige Termine) ändert die ID; eine bestätigte Erinnerung kann dann wieder fällig werden. Unter iOS plant das System höchstens 60, „Geplant“ zeigt wie die Zahl auf „Heute“ bis zu 100.
+- **Verworfen:** Synchronisation der Bestätigung (Erinnerungen sind je Gerät, E-15); Öffnen der Übersicht aus der Benachrichtigung (keine Nutzlast, E-15); Schlummern.

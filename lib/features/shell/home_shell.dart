@@ -24,7 +24,17 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   static const int _chatTab = 2;
   static const int _shoppingTab = 3;
+  static const int _calendarTab = 1;
   int _index = 0;
+
+  /// „Alle Termine“ auf „Heute“: Kalender in der Agenda ab heute (#218).
+  final ValueNotifier<CalendarMode?> _calendarMode = ValueNotifier<CalendarMode?>(null);
+
+  void _openAgenda() {
+    _calendarMode.value = CalendarMode.agenda;
+    _calendarMode.value = null;
+    setState(() => _index = _calendarTab);
+  }
   late Future<void> _opening;
   late final AppServices _services;
 
@@ -58,6 +68,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   void dispose() {
     _services.chatRequest.removeListener(_chatRequested);
     WidgetsBinding.instance.removeObserver(this);
+    _calendarMode.dispose();
     // Synchronisation und Erinnerungen laufen nur, solange die Oberfläche existiert.
     _services.closeCalendar();
     super.dispose();
@@ -111,8 +122,12 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
           return Scaffold(body: Center(child: Semantics(label: l.loading, child: const CircularProgressIndicator())));
         }
         final pages = <Widget>[
-          TodayScreen(onOpenChat: () => setState(() => _index = _chatTab), onOpenShopping: () => setState(() => _index = _shoppingTab)),
-          const CalendarScreen(),
+          TodayScreen(
+            onOpenChat: () => setState(() => _index = _chatTab),
+            onOpenShopping: () => setState(() => _index = _shoppingTab),
+            onOpenAgenda: _openAgenda,
+          ),
+          CalendarScreen(modeRequest: _calendarMode),
           ChatScreen(active: _index == _chatTab),
           const ShoppingScreen(),
           const FamilyScreen(),

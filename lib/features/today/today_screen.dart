@@ -12,12 +12,20 @@ import '../tasks/tasks_screen.dart';
 import '../../domain/family.dart';
 import '../../domain/presence.dart';
 import '../reminders/permission_hint.dart';
+import '../reminders/reminders_screen.dart';
+import '../../ui/widgets/clock_tick.dart';
 
 /// „Heute“: nächste Termine, Erinnerungen, ungelesene Nachrichten.
 class TodayScreen extends StatelessWidget {
-  const TodayScreen({super.key, required this.onOpenChat, required this.onOpenShopping});
+  const TodayScreen({super.key, required this.onOpenChat, required this.onOpenShopping, required this.onOpenAgenda});
   final VoidCallback onOpenChat;
   final VoidCallback onOpenShopping;
+
+  /// Kalender in der Agenda ab heute (#218).
+  final VoidCallback onOpenAgenda;
+
+  /// Höchstzahl der Termine unter „Nächste Termine“ (#218).
+  static const int maxUpcoming = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +44,7 @@ class TodayScreen extends StatelessWidget {
       body: ListenableBuilder(
         listenable: Listenable.merge(<Listenable>[c, services.gateway, ?reminders, ?services.shopping, ?services.tasks]),
         builder: (context, _) {
-          final upcoming = c.upcoming(limit: 5);
+          final upcoming = c.upcoming(limit: maxUpcoming);
           final unread = services.gateway.unreadCount;
           final perm = reminders?.permission ?? ReminderPermission.granted;
           return ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, 96), children: <Widget>[
@@ -51,6 +59,7 @@ class TodayScreen extends StatelessWidget {
               }),
             SectionCard(
               title: l.todayNext,
+              trailing: TextButton(onPressed: onOpenAgenda, child: Text(l.todayAllEvents)),
               child: upcoming.isEmpty
                   ? Text(l.todayNoUpcoming)
                   : Column(children: <Widget>[
@@ -66,7 +75,19 @@ class TodayScreen extends StatelessWidget {
             if (reminders != null)
               SectionCard(
                 title: l.remindersTitle,
-                child: Text(l.remindersPlanned(reminders.plannedCount)),
+                trailing: TextButton(
+                  onPressed: () => Navigator.of(context)
+                      .push(MaterialPageRoute<void>(builder: (_) => RemindersScreen(reminders: reminders, calendar: c))),
+                  child: Text(l.remindersOverview),
+                ),
+                // Fällig wird eine Erinnerung mit der Zeit, ohne dass sich Daten ändern.
+                child: ClockTick(builder: (context) {
+                  final due = reminders.dueCount;
+                  return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                    Text(l.remindersPlanned(reminders.plannedCount)),
+                    if (due > 0) Text(l.remindersDueCount(due)),
+                  ]);
+                }),
               ),
             SectionCard(
               title: l.todayOnlineHeader,

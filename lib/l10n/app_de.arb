@@ -199,6 +199,50 @@
   "remindersAllow": "Erlauben",
   "remindersPermissionSystem": "Benachrichtigungen sind in den Systemeinstellungen ausgeschaltet. Erlaube sie dort für FamilyNexus, sonst erscheinen keine Erinnerungen.",
   "remindersOpenSettings": "Einstellungen öffnen",
+  "todayAllEvents": "Alle Termine",
+  "remindersOverview": "Übersicht",
+  "remindersDueHeader": "Fällig ({count})",
+  "@remindersDueHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersPlannedHeader": "Geplant ({count})",
+  "@remindersPlannedHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersDueCount": "{count, plural, =1{1 Erinnerung fällig} other{{count} Erinnerungen fällig}}",
+  "@remindersDueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersAcknowledge": "Erinnerung an {title} bestätigen",
+  "@remindersAcknowledge": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "remindersAcknowledgeAll": "Alle bestätigen",
+  "remindersEmpty": "Keine Erinnerungen fällig oder geplant.",
+  "remindersFiresAt": "erinnert {time}",
+  "@remindersFiresAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "remindersPlanned": "{count, plural, =0{Keine Erinnerung geplant} =1{1 Erinnerung geplant} other{{count} Erinnerungen geplant}}",
   "@remindersPlanned": {
     "placeholders": {

@@ -44,6 +44,9 @@ abstract class ReminderScheduler {
     required String Function(int minutesBefore) bodyFor,
   });
 
+  /// Entfernt die Benachrichtigung [id], angezeigt oder noch geplant (Bestätigen, #218).
+  Future<void> dismiss(int id);
+
   Future<void> cancelAll();
 }
 
@@ -240,6 +243,18 @@ class LocalReminderScheduler implements ReminderScheduler {
 
   /// Zeigt fällige Erinnerungen (Linux, Windows); öffentlich nur für Tests.
   Future<void> fireDue([DateTime? now]) => _inApp.fireDue(now);
+
+  @override
+  Future<void> dismiss(int id) async {
+    // Linux/Windows: noch nicht gezeigte Erinnerungen hält die App selbst.
+    _inApp.remove(id);
+    if (!_ready) return;
+    try {
+      await _plugin.cancel(id: id);
+    } catch (e) {
+      AppLog.e('reminders', 'Erinnerung konnte nicht entfernt werden', e);
+    }
+  }
 
   @override
   Future<void> cancelAll() async {

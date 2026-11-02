@@ -854,6 +854,60 @@ abstract class AppLocalizations {
   /// **'Einstellungen öffnen'**
   String get remindersOpenSettings;
 
+  /// No description provided for @todayAllEvents.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Termine'**
+  String get todayAllEvents;
+
+  /// No description provided for @remindersOverview.
+  ///
+  /// In de, this message translates to:
+  /// **'Übersicht'**
+  String get remindersOverview;
+
+  /// No description provided for @remindersDueHeader.
+  ///
+  /// In de, this message translates to:
+  /// **'Fällig ({count})'**
+  String remindersDueHeader(int count);
+
+  /// No description provided for @remindersPlannedHeader.
+  ///
+  /// In de, this message translates to:
+  /// **'Geplant ({count})'**
+  String remindersPlannedHeader(int count);
+
+  /// No description provided for @remindersDueCount.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Erinnerung fällig} other{{count} Erinnerungen fällig}}'**
+  String remindersDueCount(int count);
+
+  /// No description provided for @remindersAcknowledge.
+  ///
+  /// In de, this message translates to:
+  /// **'Erinnerung an {title} bestätigen'**
+  String remindersAcknowledge(String title);
+
+  /// No description provided for @remindersAcknowledgeAll.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle bestätigen'**
+  String get remindersAcknowledgeAll;
+
+  /// No description provided for @remindersEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Erinnerungen fällig oder geplant.'**
+  String get remindersEmpty;
+
+  /// No description provided for @remindersFiresAt.
+  ///
+  /// In de, this message translates to:
+  /// **'erinnert {time}'**
+  String remindersFiresAt(String time);
+
   /// No description provided for @remindersPlanned.
   ///
   /// In de, this message translates to:

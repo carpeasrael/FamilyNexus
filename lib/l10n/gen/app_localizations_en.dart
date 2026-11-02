@@ -448,6 +448,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remindersOpenSettings => 'Open settings';
 
   @override
+  String get todayAllEvents => 'All events';
+
+  @override
+  String get remindersOverview => 'Overview';
+
+  @override
+  String remindersDueHeader(int count) {
+    return 'Due ($count)';
+  }
+
+  @override
+  String remindersPlannedHeader(int count) {
+    return 'Scheduled ($count)';
+  }
+
+  @override
+  String remindersDueCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reminders due',
+      one: '1 reminder due',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String remindersAcknowledge(String title) {
+    return 'Acknowledge reminder for $title';
+  }
+
+  @override
+  String get remindersAcknowledgeAll => 'Acknowledge all';
+
+  @override
+  String get remindersEmpty => 'No reminders due or scheduled.';
+
+  @override
+  String remindersFiresAt(String time) {
+    return 'reminds $time';
+  }
+
+  @override
   String remindersPlanned(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
