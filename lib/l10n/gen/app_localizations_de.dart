@@ -1130,8 +1130,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get privacy2Title => 'Welche Daten gibt es?';
 
   @override
-  String privacy2Body(String keyStore) {
-    return 'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: $keyStore – nicht in der Datenbankdatei.';
+  String privacy2Body(String keyStore, String cipher) {
+    return 'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ($cipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: $keyStore – nicht in der Datenbankdatei.';
   }
 
   @override
@@ -1202,8 +1202,20 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die App legt selbst keine Sicherung deiner Daten an.';
 
   @override
+  String get privacy7Save =>
+      'Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner.';
+
+  @override
+  String get privacy7Wipe =>
+      'Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät.';
+
+  @override
+  String get privacy7WipeWeb =>
+      'Mit „Alle lokalen Daten löschen“ entfernst du alle Daten und Schlüssel aus diesem Browser.';
+
+  @override
   String get privacy7Rest =>
-      'Speicherst du einen Anhang bewusst über „Speichern“, liegt die entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.';
+      'Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.';
 
   @override
   String get privacy8Title => 'Kinder';
