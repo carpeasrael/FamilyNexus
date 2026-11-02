@@ -520,6 +520,10 @@
   "settingsPrivacyPolicy": "Privacy policy",
   "settingsDeleteData": "Delete all local data",
   "settingsDeleteDataHint": "Signs you out and deletes the database, keys and reminders on this device.",
+  "settingsDeleteDataHintWeb": "Signs you out and deletes the database and keys in this browser.",
+  "@settingsDeleteDataHintWeb": {
+    "description": "Subtitle of “Delete all local data” in the browser: there are no reminders there (E-53, #237)."
+  },
   "deleteDataTitle": "Delete all local data?",
   "deleteDataBody": "All data of this app on this device will be deleted permanently and you will be signed out. Messages and shared events on other family members' devices cannot technically be deleted. Your account on the server remains; you can delete it under Settings → Account → “Delete account”.",
   "deleteDataConfirm": "Delete permanently",

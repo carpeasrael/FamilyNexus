@@ -1107,6 +1107,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Meldet dich ab und löscht Datenbank, Schlüssel und Erinnerungen auf diesem Gerät.';
 
   @override
+  String get settingsDeleteDataHintWeb =>
+      'Meldet dich ab und löscht Datenbank und Schlüssel in diesem Browser.';
+
+  @override
   String get deleteDataTitle => 'Alle lokalen Daten löschen?';
 
   @override

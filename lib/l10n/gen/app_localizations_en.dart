@@ -1098,6 +1098,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Signs you out and deletes the database, keys and reminders on this device.';
 
   @override
+  String get settingsDeleteDataHintWeb =>
+      'Signs you out and deletes the database and keys in this browser.';
+
+  @override
   String get deleteDataTitle => 'Delete all local data?';
 
   @override
