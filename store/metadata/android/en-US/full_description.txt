@@ -1,4 +1,4 @@
-FamilyNexus combines a family calendar, a messenger and a shared shopping list in one app – without your data ending up at a central provider.
+FamilyNexus combines a family calendar, a messenger, a shared shopping list and task lists in one app – without your data ending up at a central provider.
 
 CALENDAR
 • Day, week, month and agenda views, filter by person
@@ -16,8 +16,13 @@ SHOPPING LIST
 • Shared list for the whole family, works offline
 • Check off, edit, add quantities, remove done items
 
+TASKS
+• Moderators create task lists and assign them to a family member
+• Start over on a schedule: daily, Monday to Friday, weekly or monthly
+• The assigned person ticks items off, with an optional comment; the history is kept
+
 SECURITY AND PRIVACY
-• End-to-end encrypted over the open Matrix protocol (chat, shared events, shopping list)
+• End-to-end encrypted over the open Matrix protocol (chat, shared events, shopping list, tasks)
 • Locally encrypted database, key kept in the device key store
 • App lock with the device credentials, screen protection
 • No ads, no trackers, no analytics
