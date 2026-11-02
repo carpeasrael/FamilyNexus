@@ -60,6 +60,18 @@ void main() {
     expect(app.gateway.messages.single.body, 'Hallo Familie');
   });
 
+  testWidgets('#236: Eingabe begrenzt nach UTF-16-Einheiten wie die Prüfung, kein halbes Emoji', (tester) async {
+    final app = await buildTestApp();
+    await _openChat(tester, app);
+    final composer = find.widgetWithText(TextField, 'Nachricht schreiben');
+    // 7000 sichtbare Zeichen, aber 9000 UTF-16-Einheiten: früher nahm das Feld alles, das Gateway lehnte ab.
+    await tester.enterText(composer, '${'a' * 5000}${'😀' * 2000}');
+    await tester.pump();
+    final text = tester.widget<TextField>(composer).controller!.text;
+    expect(text.length, ChatMessage.maxBody);
+    expect(text, '${'a' * 5000}${'😀' * 1500}');
+  });
+
   group('#138: gescheiterte Nachricht', () {
     testWidgets('wiederholbar: Knopf löst retryMessage aus', (tester) async {
       final app = await buildTestApp();
