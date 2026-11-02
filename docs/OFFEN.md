@@ -102,8 +102,8 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 - **Einzelchats (E-39):** Entfernt man ein Mitglied, bleibt der gemeinsame Raum bestehen (er wird ausgeblendet, nichts wird
   mehr gesendet); das automatische Verlassen fehlt. Entsteht durch gleichzeitiges Anlegen ein zweiter Raum für dasselbe
   Paar, gilt auf beiden Seiten der mit der kleinsten Raum-ID; Nachrichten im anderen Raum sind dann unsichtbar.
-  Einzelchats werden nur nach vollständig geladener Mitgliederliste angezeigt; Einladungen Fremder bleiben unbeantwortet (scheitert der Abruf der Liste, versucht die App es nach 1 bis 15 Minuten erneut, #135)
-  liegen (nicht abgelehnt).
+  Einzelchats werden nur nach vollständig geladener Mitgliederliste angezeigt; Einladungen Fremder bleiben unbeantwortet
+  liegen (nicht abgelehnt). Scheitert der Abruf der Liste, versucht die App es nach 1 bis 15 Minuten erneut (#135).
 - **Aufgabenlisten (E-51):** Der „Reset“ ist ein abgeleiteter Zustand (Periodenschlüssel), kein Ereignis; er wirkt auf jedem Gerät beim nächsten Neuzeichnen (Minutentakt, beim Öffnen). Rechte (nur Moderatoren legen an, nur die zugewiesene Person hakt ab) werden bei manipulierten Geräten nur beim Empfang durchgesetzt. Wird die zugewiesene Person entfernt, bleibt die Liste bestehen, abgehakt werden kann erst nach Neuzuweisung. Ein Zeitzonenwechsel der Liste verschiebt Periodengrenzen. Der Backfill ist auf 20 Seiten/5000 Signale begrenzt; ältere Verlaufseinträge fehlen ggf. auf neuen Geräten.
 - **Einkaufszettel (E-40):** Ein Mitglied mit manipuliertem Gerät kann Einträge ändern oder löschen wie jedes Mitglied
   (Versionssprünge sind begrenzt); Schaden begrenzt auf die Liste. Sind 300 aktive Einträge erreicht, muss man
