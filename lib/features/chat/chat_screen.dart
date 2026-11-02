@@ -145,14 +145,16 @@ class _ChatScreenState extends State<ChatScreen> {
       context: context,
       builder: (c) => SafeArea(
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          ListTile(
-            leading: const Icon(Icons.reply),
-            title: Text(l.chatReply),
-            onTap: () {
-              Navigator.pop(c);
-              setState(() => _replyTo = m);
-            },
-          ),
+          // Nicht Entschlüsseltes ist kein Antwortziel, das Gateway wiese es ab.
+          if (!m.undecryptable)
+            ListTile(
+              leading: const Icon(Icons.reply),
+              title: Text(l.chatReply),
+              onTap: () {
+                Navigator.pop(c);
+                setState(() => _replyTo = m);
+              },
+            ),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Wrap(spacing: 8, children: <Widget>[
@@ -447,7 +449,16 @@ class _Bubble extends StatelessWidget {
                       Icon(Icons.schedule, size: 12, semanticLabel: l.chatSending),
                     ],
                   ]),
-                  if (m.status == MessageStatus.failed)
+                  if (m.status == MessageStatus.failed && !m.retryable)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                        Icon(Icons.error_outline, size: 16, color: t.danger),
+                        const SizedBox(width: 4),
+                        Flexible(child: Text(l.chatNotSent, style: TextStyle(color: t.danger))),
+                      ]),
+                    ),
+                  if (m.status == MessageStatus.failed && m.retryable)
                     InkWell(
                       onTap: () => gateway.retryMessage(m.id, threadId: threadId).catchError((Object e) {
                         if (context.mounted) {

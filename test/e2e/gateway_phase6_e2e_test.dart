@@ -5,6 +5,7 @@ import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/presence.dart';
+import 'package:family_nexus/domain/reaction_codec.dart';
 import 'package:family_nexus/domain/security.dart';
 import 'package:family_nexus/domain/shopping.dart';
 import 'package:family_nexus/domain/task_period.dart';
@@ -44,8 +45,63 @@ Future<(SdkMatrixGateway, SdkMatrixGateway)> _family(String name) async {
   return (a, b);
 }
 
+/// #139: Reaktion hin und zurück in einem Thread, mit Nachweis am Server und Doppelsendungen.
+Future<void> _expectEncryptedReactions(SdkMatrixGateway a, SdkMatrixGateway b, String threadId, String roomId) async {
+  Future<List<MatrixEvent>> onServer() async =>
+      (await a.sdkClient!.getRoomEvents(roomId, Direction.b, limit: 100)).chunk;
+  Future<int> ciphertexts() async => (await onServer()).where((e) => e.type == 'm.room.encrypted').length;
+
+  await a.sendMessage('Reaktionsziel', threadId: threadId);
+  await E2e.until(() => b.messagesIn(threadId).any((m) => m.body == 'Reaktionsziel'), what: 'B entschlüsselt');
+  final target = b.messagesIn(threadId).firstWhere((m) => m.body == 'Reaktionsziel').id;
+  await E2e.until(() => a.messagesIn(threadId).any((m) => m.id == target), what: 'A kennt die Server-Kennung');
+  final before = await ciphertexts();
+
+  // Parallel und nacheinander: Der Server erkennt Duplikate im Chiffretext nicht, es darf nur ein Ereignis entstehen.
+  await Future.wait(<Future<void>>[
+    a.sendReaction(target, '👍', threadId: threadId),
+    a.sendReaction(target, '👍', threadId: threadId),
+  ]);
+  await a.sendReaction(target, '👍', threadId: threadId);
+  await a.sendReaction(target, '👍', threadId: threadId);
+
+  ChatMessage byId(SdkMatrixGateway g) => g.messagesIn(threadId).firstWhere((m) => m.id == target);
+  await E2e.until(() => byId(b).reactions['👍']?.contains(a.userId) ?? false, what: 'Reaktion kommt bei B an');
+  await E2e.until(() => byId(a).reactions['👍']?.contains(a.userId) ?? false, what: 'eigene Reaktion bleibt nach dem Sync');
+  await b.sendReaction(target, '👍', threadId: threadId);
+  await E2e.until(() => byId(a).reactions['👍']?.length == 2, what: 'A sieht beide Mitglieder');
+  await a.sendReaction(target, '👍', threadId: threadId);
+  expect(await ciphertexts(), before + 2, reason: 'je Mitglied ein Ereignis');
+
+  // Am rohen Ereignis in der Zeitleiste: Emoji und Ziel kamen verschlüsselt an.
+  final timeline = await b.sdkClient!.getRoomById(roomId)!.getTimeline();
+  addTearDown(timeline.cancelSubscriptions);
+  final raw = timeline.events.firstWhere((e) => e.type == ReactionCodec.type && e.senderId == a.userId);
+  expect(raw.originalSource?.type, 'm.room.encrypted');
+  expect(raw.originalSource!.content.containsKey('m.relates_to'), isFalse);
+  expect(raw.originalSource!.content.toString(), isNot(contains('👍')));
+
+  // Über die Server-API: nur Chiffretext, kein m.reaction, keine Annotation, kein Emoji, kein Typ im Klartext.
+  final chunk = await onServer();
+  expect(chunk.where((e) => e.type == 'm.reaction'), isEmpty);
+  expect(chunk.where((e) => e.type == ReactionCodec.type), isEmpty);
+  final dump = chunk.map((e) => '${e.type} ${e.content}').join('\n');
+  expect(dump, isNot(contains('m.annotation')));
+  expect(dump, isNot(contains('👍')));
+  expect(dump, isNot(contains(target)), reason: 'das Ziel bleibt im Chiffretext');
+}
+
 void main() {
   group('Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse', skip: E2e.enabled ? false : E2e.skipReason, () {
+    test('#139: Reaktionen bleiben verschlüsselt, im Familien- und im Einzelchat, ohne Doppelsendung', () async {
+      final (a, b) = await _family('Reaktions-Familie');
+      await _expectEncryptedReactions(a, b, ChatThread.familyId, a.family!.roomId);
+
+      final id = await a.startDirectChat(b.userId!);
+      await E2e.until(() => b.threads.any((t) => t.peerId == a.userId), what: 'B nimmt die Einladung automatisch an');
+      await _expectEncryptedReactions(a, b, id, id);
+    });
+
     test('Online-Status: verschlüsselt zugestellt, Anfrage wird beantwortet, Fremde und Klartext werden ignoriert', () async {
       final (a, b) = await _family('Status-Familie');
       final asks = <String>[];

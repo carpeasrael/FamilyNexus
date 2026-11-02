@@ -306,6 +306,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chatRetry => 'Senden fehlgeschlagen – tippen zum Wiederholen';
 
   @override
+  String get chatNotSent => 'Nicht gesendet. Bitte erneut schreiben.';
+
+  @override
   String get chatSending => 'Wird gesendet …';
 
   @override

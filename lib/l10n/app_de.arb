@@ -114,6 +114,7 @@
   "chatCancelReply": "Antwort abbrechen",
   "chatReact": "Reagieren",
   "chatRetry": "Senden fehlgeschlagen – tippen zum Wiederholen",
+  "chatNotSent": "Nicht gesendet. Bitte erneut schreiben.",
   "chatSending": "Wird gesendet …",
   "chatEncryptedNote": "Ende-zu-Ende-verschlüsselt",
   "chatAttachmentBlocked": "Anhang blockiert (Typ oder Größe nicht erlaubt)",

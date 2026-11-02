@@ -638,6 +638,12 @@ abstract class AppLocalizations {
   /// **'Senden fehlgeschlagen – tippen zum Wiederholen'**
   String get chatRetry;
 
+  /// No description provided for @chatNotSent.
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht gesendet. Bitte erneut schreiben.'**
+  String get chatNotSent;
+
   /// No description provided for @chatSending.
   ///
   /// In de, this message translates to:

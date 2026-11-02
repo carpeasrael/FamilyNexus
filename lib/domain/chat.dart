@@ -20,6 +20,7 @@ class ChatMessage {
     this.reactions = const <String, Set<String>>{},
     this.attachment,
     this.status = MessageStatus.sent,
+    this.retryable = false,
     this.sharedEventId,
     this.blockedAttachment = false,
     this.undecryptable = false,
@@ -39,6 +40,10 @@ class ChatMessage {
   final AttachmentInfo? attachment;
   final MessageStatus status;
 
+  /// Die Sendung einer gescheiterten Nachricht ist noch offen und lässt sich wiederholen. Nach einem Neustart gilt das
+  /// nicht: Der Inhalt läge dann nur noch in der Zeitleiste, und die ist nicht vertrauenswürdig.
+  final bool retryable;
+
   /// Gesetzt, wenn die Nachricht einen geteilten Termin als Karte referenziert.
   final String? sharedEventId;
 
@@ -55,6 +60,7 @@ class ChatMessage {
   ChatMessage copyWith({
     Map<String, Set<String>>? reactions,
     MessageStatus? status,
+    bool? retryable,
   }) =>
       ChatMessage(
         id: id,
@@ -66,6 +72,7 @@ class ChatMessage {
         reactions: reactions ?? this.reactions,
         attachment: attachment,
         status: status ?? this.status,
+        retryable: retryable ?? this.retryable,
         sharedEventId: sharedEventId,
         blockedAttachment: blockedAttachment,
         undecryptable: undecryptable,

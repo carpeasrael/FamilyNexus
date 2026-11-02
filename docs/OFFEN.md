@@ -59,6 +59,31 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
   „Akzeptieren“ an: Jedes Gerät bestätigt selbst, Kontodaten des Servers entsperren nichts. Der Pfad mit echten Geräteschlüsseln
   ist nicht getestet (Testlücke Identitätswechsel gegen echten Server). Die Pin-Map hat Last-Writer-Wins zwischen eigenen Geräten.
 
+- **Klartext in verschlüsselten Räumen (E-30, #138):**
+  - **Verschlüsselung, nicht Herkunft:** `arrivedEncrypted` belegt, dass ein Ereignis verschlüsselt ankam, nicht, von wem es stammt. Der Server kann für ein Mitglied ein eigenes Gerät anlegen und echt verschlüsselt senden. Der eigene Homeserver des Opfers kann sogar ohne Gerät eine selbst erzeugte Megolm-Sitzung in die Online-Schlüsselsicherung schreiben (der öffentliche Schlüssel genügt); das SDK lädt sie bei unbekannter Sitzung ohne Absenderprüfung. Dann besteht frei gewählter Inhalt mit frei gewähltem `sender` die Prüfung, auf diesem Gerät. Eine Prüfung der Sitzungsherkunft wäre eigene Arbeit.
+  - **Absender nicht an die Sitzung gebunden:** Das SDK bindet die Sitzung beim Entschlüsseln nicht an den `sender`. Chiffretext mit gleicher ID und gleichem Zeitstempel lässt sich mit anderem Absender erneut zustellen, mit anderer ID oder anderem Zeitstempel nur beim ersten Empfang.
+  - **Immer unverschlüsselt:** Zustandsereignisse, Redaktionen und In-Raum-Verifizierungsanfragen (nur Störung, der Emoji-Vergleich bleibt).
+  - **Verschwinden lassen:** Der Server kann schon Empfangenes verschwinden lassen: Klartext mit gleicher `event_id` überschreibt den Eintrag in der SDK-Datenbank, `unsigned.transaction_id` löscht Einträge. Einen neuen Inhalt erzeugt das nicht.
+  - **Bearbeitungen und Antworten:** Echte Bearbeitungen und Antworten lassen sich über die unverschlüsselte Hülle umlenken, die Reihenfolge über Zeitstempel. Das bleibt ohne Protokolländerung offen.
+  - **Link-Vermerke in Kontodaten:** `_issuedInvites()` liest unverschlüsselte Kontodaten. Der Homeserver eines Moderators kann eine Anfrage auf dessen Gerät weiter als gültigen Link erscheinen lassen. Bestätigen muss weiterhin der Moderator.
+  - **Eigene Nachrichten auf dem eigenen Gerät:** Der eigene Homeserver kann angebliche eigene Nachrichten im Zustand „wird gesendet“ oder „Fehler“ zeigen, auch als Anhang, bis zum Neustart oder länger; sie sind nicht wiederholbar. Eine eigene Nachricht im Zustand „gesendet“ lässt sich mit passendem Textende fälschen, solange der Server das Echo zurückhält, und mit frei gewähltem Text, solange er eine laufende Sendung hängen lässt. Das bleibt auf dem Gerät; eine Antwort darauf zitiert den Text durch den Nutzer. Anderes kommt als Antwortziel nicht in Frage: Was nicht verschlüsselt ankam und nicht nach diesen Regeln als eigene Sendung sichtbar ist, weist das Gateway ab. Gegenüber dem Stand davor keine Verschlechterung. Umgekehrt kann er eine gescheiterte eigene Nachricht mit einem gefälschten „gesendet“ unter ihrer Transaktions-ID ausblenden; das SDK behält den höheren Status, sie ist dann weder sichtbar noch wiederholbar. Zustellen müsste sie ohnehin derselbe Server.
+  - **Altbestand:** Früher angenommene gefälschte Signale bleiben im lokalen Store. Gespeicherte Ereignisse ohne `original_source` gelten als Klartext; die Abhängigkeit steht seit Beginn auf `matrix` 14.2.0.
+  - **Antwort verloren:** Kommt erst das Sync-Echo und dann der Fehler aus der Zeitüberschreitung, ersetzt das SDK den Eintrag durch einen mit `id = txid` ohne Quelle; die Nachricht fehlt bis zum Neustart.
+  - **Nach einem Neustart:** Fehlgeschlagene Nachrichten werden nicht mehr wiederholt, sie bleiben mit „Nicht gesendet. Bitte erneut schreiben.“ sichtbar; Verwerfen gibt es weiterhin nicht. Anhänge gescheiterter Sendungen bleiben als `cache://`-Datei in der SDK-Datenbank liegen.
+
+- **Verschlüsselte Reaktionen (E-86, #139):**
+  - **Alte Reaktionen:** Vorhandene und von älteren App-Versionen gesendete `m.reaction` bleiben auf dem Server im Klartext. Für neue Reaktionen stimmt die Aussage der Datenschutzerklärungen, für diese nicht. Eine Bereinigung wäre eine Redaktion je Ereignis und ist nicht vorgesehen.
+  - **Andere Versionen:** Ältere App-Versionen und andere Matrix-Clients zeigen neue Reaktionen nicht.
+  - **Gefälschte Reaktionen:** Da `m.reaction` lesbar bleibt, kann der Server weiter Klartext-Reaktionen im Namen eines Mitglieds zeigen (nur Emoji, kein Inhalt). Über die Restrisiken aus #138 (Herkunft der Sitzung) gilt das auch für den neuen Typ.
+  - **Metadaten:** Der Server sieht weiter Absender, Zeitpunkt und Größe. Kurze Ereignisse in zeitlicher Nähe zu einer Nachricht lassen vermuten, dass es Reaktionen sind.
+  - **Nicht entschlüsselbar:** Solche Reaktionen erscheinen als „nicht entschlüsselbar“ oder im Sammelhinweis (#35); bei Reaktionen ist das häufiger als bei Terminen.
+  - **Hängende Sendung:** Eine durch App-Abbruch hängende Reaktion im Zustand `sending` zählt als gültig und blockiert die Wiederholung, bis das SDK sie beim nächsten Neustart nach Ablauf einer Minute auf Fehler setzt.
+  - **Störung der Doppelprüfung:** Der eigene Homeserver kann mit gefälschtem Klartext die Doppelprüfung auslösen, sodass die echte Reaktion nicht gesendet wird. Das stört nur das eigene Gerät.
+  - **Doppelsendungen:** Zwei Geräte desselben Kontos, eine Lücke nach einem `limited`-Sync und ein nicht entschlüsselbares eigenes Ereignis können zu einem zweiten Ereignis führen. Die Anzeige zählt es einmal.
+  - **Ungelesen:** Reaktionen laufen unter den Regeln für verschlüsselte Ereignisse, `notificationCount` steigt. `unreadReadable` begrenzt die Anzeige, Push gibt es nicht (E-16); bei einer Änderung von E-16 ist das zu beachten.
+  - **Verlauf:** Reaktionen auf Nachrichten außerhalb des geladenen Verlaufs erscheinen erst, wenn beide geladen sind.
+  - **Zurücknehmen:** Eine Reaktion zurücknehmen geht weiterhin nicht.
+
 - **Einrichtung (E-55–E-57):** Zusatzschritte „Bedingungen“ und „kein Roboter“ (reCAPTCHA) sind nur gegen den Fake geprüft;
   der lokale Test-Synapse verlangt sie nicht. Die OAuth-Anmeldung (matrix.org) ist automatisch nur gegen den Fake geprüft,
   gegen den echten Anbieter manuell (Testplan TP-OAUTH-M1); der OAuth-Rücksprung braucht die Projektseite als `client_uri`.

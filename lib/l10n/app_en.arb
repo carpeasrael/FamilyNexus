@@ -114,6 +114,7 @@
   "chatCancelReply": "Cancel reply",
   "chatReact": "React",
   "chatRetry": "Sending failed – tap to retry",
+  "chatNotSent": "Not sent. Please write it again.",
   "chatSending": "Sending …",
   "chatEncryptedNote": "End-to-end encrypted",
   "chatAttachmentBlocked": "Attachment blocked (type or size not allowed)",

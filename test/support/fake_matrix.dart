@@ -389,6 +389,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
           body: (e.content['body'] as String?) ?? '',
           replyToId: e.content['reply_to'] as String?,
           sharedEventId: e.content['event_ref'] as String?,
+          undecryptable: undecryptable.contains(e.id),
           reactions: reactions[e.id] ?? const <String, Set<String>>{},
           attachment: e.content['file_name'] == null
               ? null
@@ -397,7 +398,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
                   mimeType: e.content['mime']! as String,
                   size: e.content['size']! as int,
                 ),
-        ),
+        ).copyWith(status: sendStates[e.id]?.status, retryable: sendStates[e.id]?.retryable),
     ];
   }
 
@@ -1285,8 +1286,21 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _files[e.id] = bytes;
   }
 
+  /// Sendestand einzelner Nachrichten für Widget-Tests: Kennung → Status und Wiederholbarkeit.
+  final Map<String, ({MessageStatus status, bool retryable})> sendStates = <String, ({MessageStatus status, bool retryable})>{};
+
+  /// Kennungen, die der Chat als nicht entschlüsselbar zeigt.
+  final Set<String> undecryptable = <String>{};
+
+  /// Kennungen, für die [retryMessage] aufgerufen wurde, und der jeweilige Thread.
+  final List<String> retried = <String>[];
+  final List<String> retriedThreads = <String>[];
+
   @override
-  Future<void> retryMessage(String messageId, {String threadId = ChatThread.familyId}) async {}
+  Future<void> retryMessage(String messageId, {String threadId = ChatThread.familyId}) async {
+    retried.add(messageId);
+    retriedThreads.add(threadId);
+  }
 
   @override
   Future<Uint8List> loadAttachment(String messageId, {String threadId = ChatThread.familyId}) async {
