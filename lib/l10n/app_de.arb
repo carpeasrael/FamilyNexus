@@ -1063,6 +1063,10 @@
   "webUnlockAction": "Entsperren",
   "webCreateAction": "Tresor anlegen",
   "webUnlockBusy": "Wird entsperrt …",
+  "webWipeBusy": "Wird gelöscht …",
+  "@webWipeBusy": {
+    "description": "Beschriftung des Hauptknopfs im Browser, während „Alle lokalen Daten löschen“ läuft (#227)."
+  },
   "webForgotPassword": "Passwort vergessen? Alle lokalen Daten löschen",
   "webTabBusyTitle": "FamilyNexus ist schon geöffnet",
   "webTabBusyBody": "Die App läuft bereits in einem anderen Tab oder Fenster dieses Browsers. Zwei Tabs gleichzeitig würden die lokalen Daten beschädigen. Schließe den anderen Tab und versuche es erneut.",

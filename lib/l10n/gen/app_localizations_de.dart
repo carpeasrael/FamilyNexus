@@ -1819,6 +1819,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get webUnlockBusy => 'Wird entsperrt …';
 
   @override
+  String get webWipeBusy => 'Wird gelöscht …';
+
+  @override
   String get webForgotPassword =>
       'Passwort vergessen? Alle lokalen Daten löschen';
 

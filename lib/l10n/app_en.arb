@@ -1063,6 +1063,10 @@
   "webUnlockAction": "Unlock",
   "webCreateAction": "Create vault",
   "webUnlockBusy": "Unlocking …",
+  "webWipeBusy": "Deleting …",
+  "@webWipeBusy": {
+    "description": "Beschriftung des Hauptknopfs im Browser, während „Alle lokalen Daten löschen“ läuft (#227)."
+  },
   "webForgotPassword": "Forgot the password? Delete all local data",
   "webTabBusyTitle": "FamilyNexus is already open",
   "webTabBusyBody": "The app is already running in another tab or window of this browser. Two tabs at the same time would corrupt the local data. Close the other tab and try again.",

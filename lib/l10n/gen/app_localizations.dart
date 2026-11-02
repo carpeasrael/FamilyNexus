@@ -3098,6 +3098,12 @@ abstract class AppLocalizations {
   /// **'Wird entsperrt …'**
   String get webUnlockBusy;
 
+  /// Beschriftung des Hauptknopfs im Browser, während „Alle lokalen Daten löschen“ läuft (#227).
+  ///
+  /// In de, this message translates to:
+  /// **'Wird gelöscht …'**
+  String get webWipeBusy;
+
   /// No description provided for @webForgotPassword.
   ///
   /// In de, this message translates to:
