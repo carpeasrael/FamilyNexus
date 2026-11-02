@@ -2,7 +2,7 @@
 
 **This is a translation of the German original (`privacy-policy.de.md`). If the two versions differ, the German version prevails.**
 
-**Last updated: 31 October 2026**
+**Last updated: 2 November 2026**
 
 **Platform: native apps for iOS, macOS, Windows, Linux, Flatpak and Android as well as web app.**
 
@@ -46,7 +46,7 @@ share with you or that your provider supplies for synchronisation.
 | Device identifiers and names, access token, where applicable refresh token, verification information and cryptographic keys | Keep the sign-in active, connect your own devices, encrypt and decrypt content, verify devices and restore keys. |
 | Messages, replies, reactions and selected file attachments including file names | Family chat and direct chats between family members. |
 | Shared and private events, titles, locations, notes, times, time zones, recurrences and acceptances or declines | Calendar, event coordination and local reminders. An event location you enter is not a capture of the device location. |
-| Shopping items, quantities and editing states | Shared shopping list. |
+| Shopping items, quantities, groups and editing states | Shared shopping list. |
 | Task lists, assignments, recurrence rules, completions, times and voluntary comments | Distribute tasks and display the completion history. The history is retained even after a periodic reset of the list. |
 | Family and room names, memberships, roles, invitations and join requests | Manage the family and control access to shared content. |
 | Online/offline status with time | Optionally show other family members your availability. |

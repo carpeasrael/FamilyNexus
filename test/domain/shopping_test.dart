@@ -8,8 +8,8 @@ const String _ben = '@ben:example.org';
 const String _id = '11111111-1111-4111-8111-111111111111';
 final DateTime _t0 = DateTime.utc(2026, 10, 21, 12);
 
-ShoppingItem _item({String id = _id, String title = 'Milch', String by = _anna, int version = 1, DateTime? at, bool checked = false, bool deleted = false, String quantity = ''}) =>
-    ShoppingItem(id: id, title: title, by: by, version: version, updatedAt: at ?? _t0, checked: checked, deleted: deleted, quantity: quantity);
+ShoppingItem _item({String id = _id, String title = 'Milch', String by = _anna, int version = 1, DateTime? at, bool checked = false, bool deleted = false, String quantity = '', String group = ''}) =>
+    ShoppingItem(id: id, title: title, by: by, version: version, updatedAt: at ?? _t0, checked: checked, deleted: deleted, quantity: quantity, group: group);
 
 void main() {
   group('ShoppingItem.validate', () {
@@ -250,6 +250,136 @@ void main() {
       expect(await service.applyIncoming(_item(by: _ben, version: 5)), isTrue);
       expect(await service.applyIncoming(_item(by: _ben, version: 5 + ShoppingItem.maxVersionJump + 1)), isFalse);
       expect(await service.applyIncoming(_item(by: _ben, version: 5 + ShoppingItem.maxVersionJump)), isTrue);
+    });
+  });
+
+  group('Gruppen (#211)', () {
+    Map<String, Object?> json(ShoppingItem i) => ShoppingCodec.encode(i);
+
+    test('validate: Länge, gesperrte Zeichen, nur Leerraum, Löschmarke', () {
+      expect(_item(group: 'Aldi').validate(), isEmpty);
+      expect(_item(group: 'c' * 30).validate(), isEmpty);
+      expect(_item(group: 'c' * 31).validate(), contains('length'));
+      expect(_item(group: 'Al\u202Edi').validate(), contains('text'));
+      expect(_item(group: 'Al\ndi').validate(), contains('text'));
+      expect(_item(group: '   ').validate(), contains('group'));
+      expect(_item(group: '‌‍').validate(), contains('group'));
+      expect(_item(group: '👨‍👩').validate(), isEmpty, reason: 'ZWJ bleibt erlaubt');
+      expect(_item(title: '', deleted: true, group: 'Aldi').validate(), contains('tombstone'));
+    });
+
+    test('Codec: Rundreise; ohne Gruppe entsteht kein Schlüssel, das Ereignis bleibt bytegleich', () {
+      expect(json(_item(group: 'Aldi'))['grp'], 'Aldi');
+      expect(ShoppingCodec.decode(json(_item(group: 'Aldi')), sender: _anna)!.group, 'Aldi');
+      expect(json(_item()).containsKey('grp'), isFalse);
+      expect(ShoppingCodec.decode(json(_item()), sender: _anna)!.group, '');
+    });
+
+    test('Codec: falscher Typ, Überlänge und gesperrte Zeichen werden abgelehnt', () {
+      Map<String, Object?> withGrp(Object? g) => <String, Object?>{...json(_item()), 'grp': g};
+      expect(ShoppingCodec.decode(withGrp(1), sender: _anna), isNull);
+      expect(ShoppingCodec.decode(withGrp(null), sender: _anna), isNull);
+      expect(ShoppingCodec.decode(withGrp('x' * 31), sender: _anna), isNull);
+      expect(ShoppingCodec.decode(withGrp('x' * 100000), sender: _anna), isNull);
+      expect(ShoppingCodec.decode(withGrp('a\u202Eb'), sender: _anna), isNull);
+      expect(ShoppingCodec.decode(withGrp('a‍b'), sender: _anna)!.group, 'a‍b');
+    });
+
+    test('Merge: mit Gruppe gewinnt gegen ohne, in beiden Reihenfolgen', () {
+      final plain = _item();
+      final grouped = _item(group: 'Aldi');
+      expect(ShoppingMerge.incomingWins(plain, grouped), isTrue);
+      expect(ShoppingMerge.incomingWins(grouped, plain), isFalse);
+      expect(ShoppingMerge.incomingWins(grouped, grouped), isFalse);
+    });
+
+    test('Merge: zwei verschiedene Gruppen ergeben in beiden Reihenfolgen dieselbe Fassung', () {
+      final a = _item(group: 'Aldi');
+      final b = _item(group: 'Rewe');
+      expect(ShoppingMerge.incomingWins(a, b), isNot(ShoppingMerge.incomingWins(b, a)));
+    });
+
+    test('Merge: Titel und Menge entscheiden wie bisher vor der Gruppe', () {
+      final a = _item(quantity: '2', group: 'Zoo');
+      final b = _item(quantity: '2 Liter');
+      expect(ShoppingMerge.incomingWins(a, b), isTrue, reason: 'alte Apps entscheiden genauso');
+      expect(ShoppingMerge.incomingWins(b, a), isFalse);
+    });
+
+    test('Service: add normalisiert, edit mit null behält, mit Leertext entfernt die Gruppe', () async {
+      final s = ShoppingService(store: MemoryShoppingStore(), myUserId: _anna, clock: () => _t0);
+      final i = await s.add('Milch', group: '  Rewe   Süd ');
+      expect(i.group, 'Rewe Süd');
+      expect((await s.edit(i.id, title: 'Hafermilch')).group, 'Rewe Süd');
+      expect((await s.edit(i.id, title: 'Hafermilch', group: 'Aldi')).group, 'Aldi');
+      expect((await s.setChecked(i.id, true)).group, 'Aldi');
+      expect((await s.edit(i.id, title: 'Hafermilch', group: '  ')).group, '');
+    });
+
+    test('Service: remove und clearChecked leeren die Gruppe', () async {
+      final store = MemoryShoppingStore();
+      final s = ShoppingService(store: store, myUserId: _anna, clock: () => _t0);
+      final a = await s.add('Eier', group: 'Aldi');
+      await s.remove(a.id);
+      expect((await store.get(a.id))!.group, '');
+      final b = await s.add('Mehl', group: 'Aldi');
+      await s.setChecked(b.id, true);
+      expect(await s.clearChecked(), 1);
+      expect((await store.get(b.id))!.group, '');
+    });
+
+    test('Service: Gruppe nur aus Verbindern wird abgelehnt', () async {
+      final s = ShoppingService(store: MemoryShoppingStore(), myUserId: _anna, clock: () => _t0);
+      expect(s.add('Milch', group: '‍'), throwsA(isA<ShoppingException>()));
+    });
+
+    test('shoppingGroupKey: Leerraum, Schreibweise und Verbinder zählen nicht', () {
+      expect(shoppingGroupKey('  ALDI   Süd '), 'aldi süd');
+      expect(shoppingGroupKey('Al‍di'), shoppingGroupKey('Aldi'));
+      expect(shoppingGroupKey(' ‌ '), '');
+    });
+
+    group('groupShoppingItems', () {
+      ShoppingItem it(String title, String group) => _item(title: title, group: group);
+
+      test('sortiert nach Schlüssel, ohne Gruppe zuletzt, Reihenfolge innerhalb bleibt', () {
+        final g = groupShoppingItems(<ShoppingItem>[it('1', ''), it('2', 'rewe'), it('3', 'Aldi'), it('4', 'Rewe'), it('5', '')]);
+        expect(g.map((e) => e.label), <String?>['Aldi', 'Rewe', null]);
+        expect(g[1].items.map((e) => e.title), <String>['2', '4']);
+        expect(g[2].items.map((e) => e.title), <String>['1', '5']);
+      });
+
+      test('Schreibweise hängt nicht von der Eingangsreihenfolge ab', () {
+        final a = it('1', 'aldi');
+        final b = it('2', 'ALDI');
+        expect(groupShoppingItems(<ShoppingItem>[a, b]).single.label, 'ALDI');
+        expect(groupShoppingItems(<ShoppingItem>[b, a]).single.label, 'ALDI');
+      });
+
+      test('ZWJ-Variante ist dieselbe Gruppe, Roh-Leerraum ergibt ein sauberes Label', () {
+        expect(groupShoppingItems(<ShoppingItem>[it('1', 'Al‍di'), it('2', 'Aldi')]).length, 1);
+        expect(groupShoppingItems(<ShoppingItem>[it('1', '  Al   di ')]).single.label, 'Al di');
+      });
+
+      test('leere Eingabe', () => expect(groupShoppingItems(const <ShoppingItem>[]), isEmpty));
+    });
+
+    group('groupSuggestions', () {
+      const names = <String>['Aldi', 'Baumarkt', 'Rewe'];
+
+      test('leerer Text zeigt alle', () {
+        expect(groupSuggestions(names, ''), names);
+        expect(groupSuggestions(names, '  '), names);
+      });
+
+      test('Teiltreffer filtert ohne Rücksicht auf die Schreibweise', () {
+        expect(groupSuggestions(names, 'AR'), <String>['Baumarkt']);
+        expect(groupSuggestions(names, 'xyz'), isEmpty);
+      });
+
+      test('genauer Treffer zeigt die übrigen, auch in anderer Schreibweise', () {
+        expect(groupSuggestions(names, 'aldi'), <String>['Baumarkt', 'Rewe']);
+      });
     });
   });
 }

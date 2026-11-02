@@ -1,6 +1,6 @@
 # Datenschutzerklärung für FamilyNexus
 
-**Stand: 31. Oktober 2026**
+**Stand: 2. November 2026**
 
 **Plattform: native Apps für iOS, macOS, Windows, Linux, Flatpak und Android sowie Web-App.**
 
@@ -45,7 +45,7 @@ teilen oder die dein Anbieter zur Synchronisierung bereitstellt.
 | Gerätekennungen und -namen, Zugriffstoken, gegebenenfalls Aktualisierungstoken, Verifizierungsinformationen und kryptografische Schlüssel | Anmeldung aufrechterhalten, eigene Geräte verbinden, Inhalte ver- und entschlüsseln, Geräte überprüfen und Schlüssel wiederherstellen. |
 | Nachrichten, Antworten, Reaktionen und ausgewählte Dateianhänge einschließlich Dateinamen | Familienchat und Einzelchats zwischen Familienmitgliedern. |
 | Gemeinsame und private Termine, Titel, Orte, Notizen, Zeiten, Zeitzonen, Wiederholungen und Zu- oder Absagen | Kalender, Terminabstimmung und lokale Erinnerungen. Ein eingegebener Terminort ist keine Erfassung des Gerätestandorts. |
-| Einkaufsartikel, Mengen und Bearbeitungszustände | Gemeinsame Einkaufsliste. |
+| Einkaufsartikel, Mengen, Gruppen und Bearbeitungszustände | Gemeinsame Einkaufsliste. |
 | Aufgabenlisten, Zuordnungen, Wiederholungsregeln, Erledigungen, Zeitpunkte und freiwillige Kommentare | Aufgaben verteilen und den Erledigungsverlauf anzeigen. Der Verlauf bleibt auch nach einem periodischen Neustart der Liste erhalten. |
 | Familien- und Raumnamen, Mitgliedschaften, Rollen, Einladungen und Beitrittsanfragen | Familie verwalten und den Zugriff auf gemeinsame Inhalte steuern. |
 | Online-/Offline-Status mit Zeitpunkt | Optional anderen Familienmitgliedern die Erreichbarkeit anzeigen. |

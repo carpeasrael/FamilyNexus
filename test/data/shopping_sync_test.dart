@@ -131,4 +131,58 @@ void main() {
     expect((await dora.store.get(a1.id))!.title, 'A-Eintrag');
     expect((await dora.store.get(b1.id))!.checked, isTrue);
   });
+
+  group('Gruppen (#211)', () {
+    test('die Gruppe kommt beim anderen Mitglied an, Ändern und Entfernen ebenso', () async {
+      final i = await anna.service.add('Eier', group: 'Aldi');
+      await anna.flush(<ShoppingPeer>[ben]);
+      expect((await ben.store.get(i.id))!.group, 'Aldi');
+      await ben.service.edit(i.id, title: 'Eier', group: 'Rewe');
+      await ben.flush(<ShoppingPeer>[anna]);
+      expect((await anna.store.get(i.id))!.group, 'Rewe');
+      await anna.service.edit(i.id, title: 'Eier', group: '');
+      await anna.flush(<ShoppingPeer>[ben]);
+      expect((await ben.store.get(i.id))!.group, '');
+    });
+
+    test('Abhaken auf einem anderen Gerät behält die Gruppe', () async {
+      final i = await anna.service.add('Eier', group: 'Aldi');
+      await anna.flush(<ShoppingPeer>[ben]);
+      await ben.service.setChecked(i.id, true);
+      await ben.flush(<ShoppingPeer>[anna]);
+      expect((await anna.store.get(i.id))!.group, 'Aldi');
+    });
+
+    test('ein Resync an neue Mitglieder enthält die Gruppe', () async {
+      final i = await anna.service.add('Eier', group: 'Aldi');
+      await anna.flush(<ShoppingPeer>[ben]);
+      server.addAccount('dora', 'pw4', displayName: 'Dora');
+      final dora = await ShoppingPeer.create(server, 'dora', 'pw4', familyRoomId: anna.gateway.familyRoom!.id);
+      addTearDown(dora.dispose);
+      server.addMember(anna.gateway.familyRoom!, '@dora:fake.test');
+      await ShoppingPeer.pumpAll(<ShoppingPeer>[anna, ben, dora]);
+      await anna.sync.publishPending();
+      await ShoppingPeer.pumpAll(<ShoppingPeer>[anna, ben, dora]);
+      expect((await dora.store.get(i.id))!.group, 'Aldi');
+    });
+
+    test('ein Ereignis einer älteren App ohne grp wird angenommen', () async {
+      final i = await anna.service.add('Eier');
+      final raw = ShoppingCodec.encode(i);
+      expect(raw.containsKey('grp'), isFalse);
+      await anna.flush(<ShoppingPeer>[ben]);
+      expect((await ben.store.get(i.id))!.group, '');
+    });
+
+    test('gleiche Version ohne Gruppe lokal: Die Fassung mit grp setzt sich durch und bleibt', () async {
+      final at = DateTime.utc(2026, 11, 2, 12);
+      final local = ShoppingItem(id: '00000000-0000-4000-8000-0000000000bb', title: 'Eier', by: anna.userId, updatedAt: at);
+      final grouped = local.copyWith(group: 'Aldi');
+      expect(await ben.service.applyIncoming(local), isTrue);
+      expect(await ben.service.applyIncoming(grouped), isTrue, reason: 'Replay nach dem Update');
+      expect((await ben.store.get(local.id))!.group, 'Aldi');
+      expect(await ben.service.applyIncoming(local), isFalse, reason: 'Resync einer älteren App löscht die Gruppe nicht');
+      expect((await ben.store.get(local.id))!.group, 'Aldi');
+    });
+  });
 }

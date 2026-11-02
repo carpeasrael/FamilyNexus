@@ -656,6 +656,34 @@
   "shoppingNote": "Gemeinsam mit der Familie, Ende-zu-Ende-verschlüsselt",
   "shoppingHintItem": "Was wird gebraucht?",
   "shoppingHintQuantity": "Menge (optional)",
+  "shoppingHintGroup": "Gruppe (optional)",
+  "shoppingGroupHeader": "{name} ({count})",
+  "@shoppingGroupHeader": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shoppingNoGroup": "Ohne Gruppe ({count})",
+  "@shoppingNoGroup": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shoppingUseGroup": "Gruppe {name} übernehmen",
+  "@shoppingUseGroup": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "shoppingAdd": "Hinzufügen",
   "shoppingEmpty": "Der Einkaufszettel ist leer. Füge oben etwas hinzu.",
   "shoppingOpenHeader": "Zu besorgen ({count})",
