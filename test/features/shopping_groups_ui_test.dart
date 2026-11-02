@@ -79,6 +79,19 @@ void main() {
       expect(find.text('Rewe (1)'), findsOneWidget, reason: 'zurück in der Gruppe');
     });
 
+    testWidgets('Haken in beide Richtungen, zurückgesetzt steht der Eintrag wieder in der Gruppe', (tester) async {
+      final app = await _open(tester);
+      await _seed(tester, app, <String, String>{'Eier': 'Aldi'});
+      await tester.tap(find.byType(Checkbox));
+      await tester.pumpAndSettle();
+      expect(find.text('Erledigt (1)'), findsOneWidget);
+      expect(app.shoppingStore.items.values.single.checked, isTrue);
+      await tester.tap(find.byType(Checkbox));
+      await tester.pumpAndSettle();
+      expect(find.text('Aldi (1)'), findsOneWidget);
+      expect(app.shoppingStore.items.values.single.checked, isFalse);
+    });
+
     testWidgets('Unterüberschrift ist eine Überschrift für den Screenreader', (tester) async {
       final handle = tester.ensureSemantics();
       final app = await _open(tester);

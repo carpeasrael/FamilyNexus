@@ -285,6 +285,12 @@ void main() {
       expect(ShoppingCodec.decode(withGrp('a‍b'), sender: _anna)!.group, 'a‍b');
     });
 
+    test('Gleichheit und Hash beziehen die Gruppe ein', () {
+      expect(_item(group: 'Aldi'), _item(group: 'Aldi'));
+      expect(_item(group: 'Aldi').hashCode, _item(group: 'Aldi').hashCode);
+      expect(_item(group: 'Aldi'), isNot(_item(group: 'Rewe')));
+    });
+
     test('Merge: mit Gruppe gewinnt gegen ohne, in beiden Reihenfolgen', () {
       final plain = _item();
       final grouped = _item(group: 'Aldi');
