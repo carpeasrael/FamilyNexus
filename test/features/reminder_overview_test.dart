@@ -229,5 +229,26 @@ void main() {
       expect(c.dueCount, 1);
       expect(c.plannedCount, 0);
     });
+
+    test('T8 Uhr springt zurück (auch innerhalb derselben Minute): neu gerechnet', () async {
+      await make('Sekunden', DateTime.utc(2026, 3, 20, 10, 20, 30)); // Auslösung 10:10:30
+      final c = coordinator();
+      now = DateTime.utc(2026, 3, 20, 10, 10, 40);
+      expect(c.dueCount, 1);
+      now = DateTime.utc(2026, 3, 20, 10, 10, 20);
+      expect(c.dueCount, 0, reason: 'vor der Auslösung, obwohl dieselbe Minute');
+      expect(c.plannedCount, 1);
+    });
+
+    test('T9 die Listen aus dem Speicher sind unveränderlich', () async {
+      await make('Arzt', DateTime.utc(2026, 3, 20, 10, 5));
+      await make('Später', DateTime.utc(2026, 3, 20, 12));
+      final c = coordinator();
+      expect(c.due(), isNotEmpty);
+      expect(c.planned(), isNotEmpty);
+      expect(() => c.due().clear(), throwsUnsupportedError);
+      expect(() => c.planned().removeAt(0), throwsUnsupportedError);
+      expect(c.dueCount, 1);
+    });
   });
 }
