@@ -1794,6 +1794,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webUnlockBusy => 'Unlocking …';
 
   @override
+  String get webWipeBusy => 'Deleting …';
+
+  @override
   String get webForgotPassword => 'Forgot the password? Delete all local data';
 
   @override

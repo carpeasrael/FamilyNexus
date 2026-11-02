@@ -33,6 +33,9 @@ class _WebUnlockAppState extends State<WebUnlockApp> {
   late Future<bool> _tab = acquireTabLock();
   late bool _create = !widget.backend.exists;
   bool _busy = false;
+
+  /// Löschen läuft (#227): eigene Beschriftung, gesperrt wird weiter über [_busy].
+  bool _wiping = false;
   String? _error;
 
   @override
@@ -90,6 +93,7 @@ class _WebUnlockAppState extends State<WebUnlockApp> {
     if (ok != true || !mounted) return;
     setState(() {
       _busy = true;
+      _wiping = true;
       _error = null;
     });
     try {
@@ -99,6 +103,7 @@ class _WebUnlockAppState extends State<WebUnlockApp> {
       if (mounted) {
         setState(() {
           _busy = false;
+          _wiping = false;
           _error = l.webWipeFailed;
         });
       }
@@ -109,6 +114,7 @@ class _WebUnlockAppState extends State<WebUnlockApp> {
     _repeat.clear();
     setState(() {
       _busy = false;
+      _wiping = false;
       _create = true;
       _error = null;
     });
@@ -192,7 +198,7 @@ class _WebUnlockAppState extends State<WebUnlockApp> {
                     Wrap(spacing: 12, runSpacing: 12, children: <Widget>[
                       FilledButton(
                         onPressed: _busy ? null : () => _submit(l),
-                        child: Text(_busy ? l.webUnlockBusy : (_create ? l.webCreateAction : l.webUnlockAction)),
+                        child: Text(_wiping ? l.webWipeBusy : _busy ? l.webUnlockBusy : (_create ? l.webCreateAction : l.webUnlockAction)),
                       ),
                       if (!_create) TextButton(onPressed: _busy ? null : () => _forgot(context, l), child: Text(l.webForgotPassword)),
                     ]),
