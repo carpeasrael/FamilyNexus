@@ -1,4 +1,5 @@
 import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/features/shopping/shopping_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -135,6 +136,23 @@ void main() {
       expect(_chip('Laden 7'), findsOneWidget);
     });
 
+    testWidgets('auch Gruppen erledigter Einträge bleiben Vorschläge', (tester) async {
+      final app = await _open(tester);
+      await _seed(tester, app, <String, String>{'Eier': 'Aldi'});
+      await app.services.shopping!.setChecked(app.shoppingStore.items.values.single.id, true);
+      await tester.pumpAndSettle();
+      expect(_chip('Aldi'), findsOneWidget);
+    });
+
+    testWidgets('Gruppenfeld begrenzt die Länge in Hauptansicht und Dialog', (tester) async {
+      final app = await _open(tester);
+      await _seed(tester, app, <String, String>{'Eier': ''});
+      expect(tester.widget<TextField>(_groupField).maxLength, 30);
+      await _openEdit(tester, 'Eier');
+      final field = find.descendant(of: find.byType(AlertDialog), matching: find.byType(TextField)).at(2);
+      expect(tester.widget<TextField>(field).maxLength, 30);
+    });
+
     testWidgets('Chip-Knoten trägt Beschriftung und Aktion', (tester) async {
       final handle = tester.ensureSemantics();
       final app = await _open(tester);
@@ -227,6 +245,15 @@ void main() {
       }
     }
 
+    testWidgets('das Formular belegt höchstens 60 % der Höhe, die Liste behält den Rest', (tester) async {
+      final app = await _open(tester, size: const Size(640, 360));
+      await _seed(tester, app, <String, String>{for (var i = 0; i < 8; i++) 'Ding $i': 'Laden $i'});
+      final body = tester.getSize(find.byType(ShoppingScreen)).height;
+      final form = tester.getSize(find.descendant(of: find.byType(ShoppingScreen), matching: find.byType(SingleChildScrollView))).height;
+      expect(form, lessThanOrEqualTo(body * 0.6));
+      expect(form, greaterThan(body * 0.5), reason: 'der Inhalt ist hier höher als die Grenze');
+    });
+
     testWidgets('Textskala 1,3 im Hochformat', (tester) async {
       _size(tester, const Size(360, 640), textScale: 1.3);
       final app = await buildTestApp();
@@ -275,9 +302,25 @@ void main() {
       final material = find.descendant(of: find.byType(Dialog), matching: find.byType(Material)).first;
       final before = tester.getSize(material).width;
       expect(before, lessThan(500));
+      expect(tester.getSize(dialogField(0)).width, 400, reason: 'feste Wunschbreite, auch bei kurzen Chips');
       await tester.enterText(dialogField(2), 'xyz');
       await tester.pump();
       expect(tester.getSize(material).width, before);
+    });
+
+    testWidgets('Chip im Dialog: Fokus und Tastatur bleiben zwischen Pointer-Down und Up', (tester) async {
+      final app = await _open(tester);
+      await _seed(tester, app, <String, String>{'Eier': 'Aldi', 'Tee': 'Rewe'});
+      await _openEdit(tester, 'Eier');
+      await tester.tap(dialogField(2));
+      await tester.pump();
+      final g = await tester.startGesture(tester.getCenter(find.descendant(of: find.byType(AlertDialog), matching: _chip('Rewe'))));
+      await tester.pump();
+      expect(_focused(tester, dialogField(2)), isTrue);
+      expect(tester.testTextInput.isVisible, isTrue);
+      await g.up();
+      await tester.pumpAndSettle();
+      expect(_focused(tester, dialogField(2)), isTrue);
     });
 
     testWidgets('Dialog auf 320×568 ohne Exception', (tester) async {

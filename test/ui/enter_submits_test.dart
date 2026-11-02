@@ -180,6 +180,7 @@ void main() {
     await tester.pumpAndSettle();
     final fields = find.descendant(of: find.byType(AlertDialog), matching: find.byType(TextField));
     await _type(tester, fields.at(1), '2');
+    expect(tester.widget<TextField>(fields.at(1)).textInputAction, TextInputAction.next);
     await tester.testTextInput.receiveAction(TextInputAction.next);
     await tester.pumpAndSettle();
     expect(find.byType(AlertDialog), findsOneWidget, reason: '„Weiter“ speichert nicht');
