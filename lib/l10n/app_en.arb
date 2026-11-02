@@ -656,6 +656,34 @@
   "shoppingNote": "Shared with your family, end-to-end encrypted",
   "shoppingHintItem": "What do you need?",
   "shoppingHintQuantity": "Quantity (optional)",
+  "shoppingHintGroup": "Group (optional)",
+  "shoppingGroupHeader": "{name} ({count})",
+  "@shoppingGroupHeader": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shoppingNoGroup": "No group ({count})",
+  "@shoppingNoGroup": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shoppingUseGroup": "Use group {name}",
+  "@shoppingUseGroup": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "shoppingAdd": "Add",
   "shoppingEmpty": "The shopping list is empty. Add something above.",
   "shoppingOpenHeader": "To buy ({count})",

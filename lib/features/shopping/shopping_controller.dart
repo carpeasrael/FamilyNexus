@@ -24,6 +24,15 @@ class ShoppingController extends ChangeNotifier {
   List<ShoppingItem> get done => <ShoppingItem>[for (final i in _items) if (i.checked) i];
   int get openCount => _items.where((i) => !i.checked).length;
 
+  /// Offene Einträge nach Gruppe (#211).
+  List<ShoppingGroup> get openGroups => groupShoppingItems(open);
+
+  /// Vorhandene Gruppennamen aller aktiven Einträge, je Gruppe einmal und sortiert.
+  List<String> get groupNames => <String>[
+        for (final g in groupShoppingItems(_items))
+          if (g.label != null) g.label!,
+      ];
+
   /// [familyRoom]: Familie, zu der der lokale Bestand gehört (`AppServices.openCalendar`).
   void start({String? familyRoom}) {
     if (_started) return;
@@ -51,8 +60,8 @@ class ShoppingController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> add(String title, {String quantity = ''}) async {
-    await service.add(title, quantity: quantity);
+  Future<void> add(String title, {String quantity = '', String group = ''}) async {
+    await service.add(title, quantity: quantity, group: group);
     await _changed();
   }
 
@@ -61,8 +70,8 @@ class ShoppingController extends ChangeNotifier {
     await _changed();
   }
 
-  Future<void> edit(String id, {required String title, String quantity = ''}) async {
-    await service.edit(id, title: title, quantity: quantity);
+  Future<void> edit(String id, {required String title, String quantity = '', String? group}) async {
+    await service.edit(id, title: title, quantity: quantity, group: group);
     await _changed();
   }
 

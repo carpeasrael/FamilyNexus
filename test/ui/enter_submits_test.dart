@@ -104,6 +104,94 @@ void main() {
     expect((item.title, item.quantity), ('Vollkornbrot', '2 Stück'));
   }, variant: desktop);
 
+  testWidgets('#211 Desktop: Enter in Menge und Gruppe fügt hinzu, nimmt den getippten Text und keinen Vorschlag', (tester) async {
+    final app = await _open(tester, 'Einkauf');
+    await app.services.shopping!.add('Eier', group: 'Aldi');
+    await tester.pumpAndSettle();
+    await _type(tester, find.widgetWithText(TextField, 'Was wird gebraucht?'), 'Mehl');
+    await _type(tester, find.byType(TextField).at(2), 'Al');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(app.shoppingStore.items.values.map((i) => (i.title, i.group)), contains(('Mehl', 'Al')));
+
+    await _type(tester, find.widgetWithText(TextField, 'Was wird gebraucht?'), 'Salz');
+    await _type(tester, find.byType(TextField).at(1), '1 kg');
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pumpAndSettle();
+    expect(app.shoppingStore.items.values.map((i) => (i.title, i.quantity)), contains(('Salz', '1 kg')));
+  }, variant: desktop);
+
+  testWidgets('#211 Desktop: Tab führt von Titel über Menge zur Gruppe', (tester) async {
+    await _open(tester, 'Einkauf');
+    await tester.tap(find.widgetWithText(TextField, 'Was wird gebraucht?'));
+    await tester.pump();
+    bool focused(int i) => tester.widget<EditableText>(find.descendant(of: find.byType(TextField).at(i), matching: find.byType(EditableText))).focusNode.hasFocus;
+    expect(focused(0), isTrue);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(focused(1), isTrue);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(focused(2), isTrue);
+  }, variant: desktop);
+
+  testWidgets('#211 Desktop: Enter im Gruppenfeld speichert im Dialog', (tester) async {
+    final app = await _open(tester, 'Einkauf');
+    await app.services.shopping!.add('Brot');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Brot'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Bearbeiten'));
+    await tester.pumpAndSettle();
+    await _type(tester, find.descendant(of: find.byType(AlertDialog), matching: find.byType(TextField)).at(2), 'Bäcker');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(app.shoppingStore.items.values.single.group, 'Bäcker');
+  }, variant: desktop);
+
+  testWidgets('#211 Mobil: „Weiter“ in der Menge springt zur Gruppe, „Fertig“ dort fügt hinzu', (tester) async {
+    final app = await _open(tester, 'Einkauf');
+    await _type(tester, find.widgetWithText(TextField, 'Was wird gebraucht?'), 'Milch');
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pumpAndSettle();
+    final qty = find.byType(TextField).at(1);
+    expect(tester.widget<TextField>(qty).textInputAction, TextInputAction.next);
+    await tester.enterText(qty, '2 l');
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pumpAndSettle();
+    expect(app.shoppingStore.items, isEmpty, reason: '„Weiter“ fügt nichts hinzu');
+    final group = find.byType(TextField).at(2);
+    expect(tester.widget<EditableText>(find.descendant(of: group, matching: find.byType(EditableText))).focusNode.hasFocus, isTrue);
+    await tester.enterText(group, 'Rewe');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    final item = app.shoppingStore.items.values.single;
+    expect((item.title, item.quantity, item.group), ('Milch', '2 l', 'Rewe'));
+  }, variant: TargetPlatformVariant.only(TargetPlatform.android));
+
+  testWidgets('#211 Mobil: Im Dialog springt „Weiter“ zur Gruppe, „Fertig“ dort speichert', (tester) async {
+    final app = await _open(tester, 'Einkauf');
+    await app.services.shopping!.add('Brot');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Brot'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Bearbeiten'));
+    await tester.pumpAndSettle();
+    final fields = find.descendant(of: find.byType(AlertDialog), matching: find.byType(TextField));
+    await _type(tester, fields.at(1), '2');
+    expect(tester.widget<TextField>(fields.at(1)).textInputAction, TextInputAction.next);
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget, reason: '„Weiter“ speichert nicht');
+    await tester.enterText(fields.at(2), 'Bäcker');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    final item = app.shoppingStore.items.values.single;
+    expect((item.quantity, item.group), ('2', 'Bäcker'));
+  }, variant: TargetPlatformVariant.only(TargetPlatform.android));
+
   testWidgets('Mobil: „Weiter“ im Einkaufsfeld springt nur zur Menge, Enter sendet im Chat nicht', (tester) async {
     final app = await _open(tester, 'Einkauf');
     await _type(tester, find.widgetWithText(TextField, 'Was wird gebraucht?'), 'Milch');

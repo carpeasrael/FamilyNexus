@@ -18,6 +18,7 @@ class ShoppingItem {
     required this.by,
     required this.updatedAt,
     this.quantity = '',
+    this.group = '',
     this.checked = false,
     this.deleted = false,
     this.version = 1,
@@ -25,6 +26,7 @@ class ShoppingItem {
 
   static const int maxTitle = 100;
   static const int maxQuantity = 30;
+  static const int maxGroup = 30;
   static const int maxVersion = 1000000;
 
   /// Höchstzahl aktiver Einträge und aller Datensätze (inkl. Löschmarken), Speicherschutz.
@@ -41,6 +43,9 @@ class ShoppingItem {
   final String id;
   final String title;
   final String quantity;
+
+  /// Freier Gruppenname, zum Beispiel ein Geschäft; leer = ohne Gruppe (#211).
+  final String group;
   final bool checked;
   final bool deleted;
   final int version;
@@ -62,20 +67,22 @@ class ShoppingItem {
     if (!MatrixIds.isUserId(by)) p.add('by');
     if (version < 1 || version > maxVersion) p.add('version');
     if (!updatedAt.isUtc || updatedAt.isBefore(CalendarEvent.minDate) || updatedAt.isAfter(CalendarEvent.maxDate)) p.add('time');
-    if (title.runes.length > maxTitle || quantity.runes.length > maxQuantity) p.add('length');
-    if (_bad.hasMatch(title) || _bad.hasMatch(quantity)) p.add('text');
+    if (title.runes.length > maxTitle || quantity.runes.length > maxQuantity || group.runes.length > maxGroup) p.add('length');
+    if (_bad.hasMatch(title) || _bad.hasMatch(quantity) || _bad.hasMatch(group)) p.add('text');
     if (deleted) {
       // Löschmarken tragen keinen Inhalt.
-      if (title.isNotEmpty || quantity.isNotEmpty || checked) p.add('tombstone');
+      if (title.isNotEmpty || quantity.isNotEmpty || group.isNotEmpty || checked) p.add('tombstone');
     } else if (_blank(title)) {
       p.add('title');
     }
+    if (group.isNotEmpty && _blank(group)) p.add('group');
     return p;
   }
 
   ShoppingItem copyWith({
     String? title,
     String? quantity,
+    String? group,
     bool? checked,
     bool? deleted,
     int? version,
@@ -86,6 +93,7 @@ class ShoppingItem {
         id: id,
         title: title ?? this.title,
         quantity: quantity ?? this.quantity,
+        group: group ?? this.group,
         checked: checked ?? this.checked,
         deleted: deleted ?? this.deleted,
         version: version ?? this.version,
@@ -99,6 +107,7 @@ class ShoppingItem {
       other.id == id &&
       other.title == title &&
       other.quantity == quantity &&
+      other.group == group &&
       other.checked == checked &&
       other.deleted == deleted &&
       other.version == version &&
@@ -106,7 +115,7 @@ class ShoppingItem {
       other.updatedAt == updatedAt;
 
   @override
-  int get hashCode => Object.hash(id, title, quantity, checked, deleted, version, by, updatedAt);
+  int get hashCode => Object.hash(id, title, quantity, group, checked, deleted, version, by, updatedAt);
 }
 
 /// Ereignisformat v1 der Einkaufsliste: verschlüsseltes Raumereignis im Familienraum.
@@ -127,6 +136,8 @@ class ShoppingCodec {
       'deleted': i.deleted,
       'title': i.title,
       'qty': i.quantity,
+      // Ohne Gruppe bleibt das Ereignis bytegleich zum bisherigen Format (#211).
+      if (i.group.isNotEmpty) 'grp': i.group,
       'checked': i.checked,
       'ts': i.updatedAt.millisecondsSinceEpoch,
     };
@@ -144,16 +155,20 @@ class ShoppingCodec {
     final qty = c['qty'];
     final checked = c['checked'];
     final ts = c['ts'];
+    final grp = c.containsKey('grp') ? c['grp'] : '';
+    if (grp is! String) return null;
     if (id is! String || by is! String || version is! int || deleted is! bool) return null;
     if (title is! String || qty is! String || checked is! bool || ts is! int) return null;
     if (by != sender) return null;
     // Vor dem Umrechnen begrenzen (kein Überlauf bei absurden Zahlen).
     if (ts < CalendarEvent.minDate.millisecondsSinceEpoch || ts > CalendarEvent.maxDate.millisecondsSinceEpoch) return null;
     if (title.length > ShoppingItem.maxTitle * 2 || qty.length > ShoppingItem.maxQuantity * 2) return null;
+    if (grp.length > ShoppingItem.maxGroup * 2) return null;
     final item = ShoppingItem(
       id: id,
       title: title,
       quantity: qty,
+      group: grp,
       checked: checked,
       deleted: deleted,
       version: version,
@@ -176,10 +191,62 @@ class ShoppingMerge {
     if (byTime != 0) return byTime > 0;
     final byAuthor = incoming.by.compareTo(current.by);
     if (byAuthor != 0) return byAuthor > 0;
-    return _tie(incoming).compareTo(_tie(current)) > 0;
+    final byTie = _tie(incoming).compareTo(_tie(current));
+    if (byTie != 0) return byTie > 0;
+    // Nicht Teil von [_tie]: Ältere Apps kennen die Gruppe nicht und müssen bei allem anderen gleich
+    // entscheiden. Nur bei völligem Gleichstand gewinnt die Fassung mit Gruppe (#211).
+    return incoming.group.compareTo(current.group) > 0;
   }
 
+  /// Unverändert seit E-40, siehe oben.
   static String _tie(ShoppingItem i) => '${i.deleted}|${i.checked}|${i.title}|${i.quantity}';
+}
+
+/// Einzige Regel für „dieselbe Gruppe“: ohne ZWNJ/ZWJ, Leerraum zusammengefasst, Kleinschreibung (#211).
+String shoppingGroupKey(String raw) =>
+    _spaces(raw.replaceAll(RegExp('[\\u200C\\u200D]'), '')).toLowerCase();
+
+String _spaces(String s) => s.replaceAll(RegExp(r'\s+'), ' ').trim();
+
+/// Einträge einer Gruppe. [label] ist `null` für Einträge ohne Gruppe.
+class ShoppingGroup {
+  const ShoppingGroup(this.label, this.items);
+  final String? label;
+  final List<ShoppingItem> items;
+}
+
+/// Teilt [items] in Gruppen, nach Schlüssel sortiert, Einträge ohne Gruppe zuletzt. Die Reihenfolge
+/// innerhalb einer Gruppe bleibt erhalten. Bei abweichender Schreibweise gewinnt die kleinste, damit alle
+/// Geräte unabhängig von der Eingangsreihenfolge dasselbe anzeigen.
+List<ShoppingGroup> groupShoppingItems(List<ShoppingItem> items) {
+  final byKey = <String, List<ShoppingItem>>{};
+  final labels = <String, String>{};
+  final none = <ShoppingItem>[];
+  for (final i in items) {
+    final key = shoppingGroupKey(i.group);
+    if (key.isEmpty) {
+      none.add(i);
+      continue;
+    }
+    byKey.putIfAbsent(key, () => <ShoppingItem>[]).add(i);
+    final label = _spaces(i.group);
+    final known = labels[key];
+    if (known == null || label.compareTo(known) < 0) labels[key] = label;
+  }
+  return <ShoppingGroup>[
+    for (final key in byKey.keys.toList()..sort()) ShoppingGroup(labels[key], byKey[key]!),
+    if (none.isNotEmpty) ShoppingGroup(null, none),
+  ];
+}
+
+/// Vorschläge aus [names] zum Feldtext [text]. Trifft [text] einen Namen genau, zeigt die Funktion die
+/// übrigen, damit ein vorbelegtes Feld den Wechsel zu einer anderen Gruppe erlaubt.
+List<String> groupSuggestions(List<String> names, String text) {
+  final key = shoppingGroupKey(text);
+  if (key.isEmpty) return names;
+  final keys = <String, String>{for (final n in names) n: shoppingGroupKey(n)};
+  if (keys.containsValue(key)) return <String>[for (final n in names) if (keys[n] != key) n];
+  return <String>[for (final n in names) if (keys[n]!.contains(key)) n];
 }
 
 enum ShoppingError { invalid, notFound, limit }
@@ -220,11 +287,12 @@ class ShoppingService {
 
   static String _norm(String s) => s.replaceAll(RegExp(r'\s+'), ' ').trim();
 
-  Future<ShoppingItem> add(String title, {String quantity = ''}) => _serial(() async {
+  Future<ShoppingItem> add(String title, {String quantity = '', String group = ''}) => _serial(() async {
         final item = ShoppingItem(
           id: _newId(),
           title: _norm(title),
           quantity: _norm(quantity),
+          group: _norm(group),
           by: myUserId,
           updatedAt: _now,
         );
@@ -243,8 +311,11 @@ class ShoppingService {
 
   Future<ShoppingItem> setChecked(String id, bool checked) => _change(id, (c) => c.copyWith(checked: checked));
 
-  Future<ShoppingItem> edit(String id, {required String title, String quantity = ''}) =>
-      _change(id, (c) => c.copyWith(title: _norm(title), quantity: _norm(quantity)));
+  /// [group]: `null` lässt die Gruppe unverändert, `''` entfernt sie.
+  Future<ShoppingItem> edit(String id, {required String title, String quantity = '', String? group}) => _change(
+        id,
+        (c) => c.copyWith(title: _norm(title), quantity: _norm(quantity), group: group == null ? null : _norm(group)),
+      );
 
   Future<void> remove(String id) => _change(id, _tombstone);
 
@@ -263,7 +334,7 @@ class ShoppingService {
       });
 
   ShoppingItem _tombstone(ShoppingItem c) =>
-      c.copyWith(title: '', quantity: '', checked: false, deleted: true);
+      c.copyWith(title: '', quantity: '', group: '', checked: false, deleted: true);
 
   ShoppingItem _bump(ShoppingItem changed, ShoppingItem from) =>
       changed.copyWith(version: from.version + 1, by: myUserId, updatedAt: _now);

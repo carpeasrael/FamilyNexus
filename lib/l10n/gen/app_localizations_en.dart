@@ -1320,6 +1320,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shoppingHintQuantity => 'Quantity (optional)';
 
   @override
+  String get shoppingHintGroup => 'Group (optional)';
+
+  @override
+  String shoppingGroupHeader(String name, int count) {
+    return '$name ($count)';
+  }
+
+  @override
+  String shoppingNoGroup(int count) {
+    return 'No group ($count)';
+  }
+
+  @override
+  String shoppingUseGroup(String name) {
+    return 'Use group $name';
+  }
+
+  @override
   String get shoppingAdd => 'Add';
 
   @override

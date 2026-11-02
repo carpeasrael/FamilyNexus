@@ -191,6 +191,32 @@ void main() {
       expect(a.threads.map((t) => t.id), <String>[ChatThread.familyId]);
     });
 
+    test('Einkaufszettel: Gruppe setzen, ändern und entfernen erreicht das zweite Mitglied (#211)', () async {
+      final (a, b) = await _family('Gruppen-Familie');
+      final got = <ShoppingSignal>[];
+      final sub = b.calendarSignals.listen((s) {
+        if (s is ShoppingSignal) got.add(s);
+      });
+      addTearDown(sub.cancel);
+      final v1 = ShoppingItem(
+        id: '00000000-0000-4000-8000-0000000000ab',
+        title: 'Eier',
+        group: 'Aldi',
+        by: a.userId!,
+        updatedAt: DateTime.now().toUtc(),
+      );
+      await a.publishShoppingItem(v1);
+      await E2e.until(() => got.isNotEmpty, what: 'B erhält den Eintrag mit Gruppe');
+      expect(ShoppingCodec.decode(got.last.content, sender: a.userId!)!.group, 'Aldi');
+      await a.publishShoppingItem(v1.copyWith(group: 'Rewe', version: 2, updatedAt: DateTime.now().toUtc()));
+      await E2e.until(() => got.length >= 2, what: 'B erhält die geänderte Gruppe');
+      expect(ShoppingCodec.decode(got.last.content, sender: a.userId!)!.group, 'Rewe');
+      await a.publishShoppingItem(v1.copyWith(group: '', version: 3, updatedAt: DateTime.now().toUtc()));
+      await E2e.until(() => got.length >= 3, what: 'B erhält den Eintrag ohne Gruppe');
+      expect(got.last.content.containsKey('grp'), isFalse);
+      expect(ShoppingCodec.decode(got.last.content, sender: a.userId!)!.group, '');
+    });
+
     test('Einkaufszettel: verschlüsselt im Familienraum, beide Mitglieder erhalten Einträge, Server sieht keinen Klartext', () async {
       final (a, b) = await _family('Einkaufs-Familie');
       final got = <ShoppingSignal>[];

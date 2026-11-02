@@ -2318,6 +2318,30 @@ abstract class AppLocalizations {
   /// **'Menge (optional)'**
   String get shoppingHintQuantity;
 
+  /// No description provided for @shoppingHintGroup.
+  ///
+  /// In de, this message translates to:
+  /// **'Gruppe (optional)'**
+  String get shoppingHintGroup;
+
+  /// No description provided for @shoppingGroupHeader.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} ({count})'**
+  String shoppingGroupHeader(String name, int count);
+
+  /// No description provided for @shoppingNoGroup.
+  ///
+  /// In de, this message translates to:
+  /// **'Ohne Gruppe ({count})'**
+  String shoppingNoGroup(int count);
+
+  /// No description provided for @shoppingUseGroup.
+  ///
+  /// In de, this message translates to:
+  /// **'Gruppe {name} übernehmen'**
+  String shoppingUseGroup(String name);
+
   /// No description provided for @shoppingAdd.
   ///
   /// In de, this message translates to:

@@ -20,7 +20,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 | EXIF-Entfernung bei Bildern | Anhänge werden unverändert (verschlüsselt) gesendet. |
 | Mehrere Familien je Konto | Eine Familie je Konto. |
 | Gruppenchats außer dem Familienchat | Einzelchats gibt es nur zwischen zwei Mitgliedern (E-39). |
-| Mehrere Einkaufslisten, Kategorien, Preise | Eine gemeinsame Liste je Familie (E-40). |
+| Mehrere Einkaufslisten, eigene Gruppen-Datensätze, Preise | Eine gemeinsame Liste je Familie, freie Gruppennamen je Eintrag (E-40, #211). |
 | Erinnerungen und Benachrichtigung zum Periodenwechsel bei Aufgabenlisten | Der Erinnerungs-Planer kennt nur Termine und ersetzt bei `replaceAll` alle geplanten Benachrichtigungen (E-51). |
 | Nachträgliches Abhaken früherer Perioden, Fälligkeitszeiten, Unteraufgaben | Umfang (E-51). |
 | Mehrere Wochentage je Liste (z. B. Montag und Donnerstag), „alle zwei Wochen“ | Nicht verlangt (Issue #1); Regeln sind genau eine Art je Liste (E-58). |
