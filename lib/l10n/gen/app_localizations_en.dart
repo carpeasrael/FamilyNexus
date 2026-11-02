@@ -1121,8 +1121,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacy2Title => 'What data exists?';
 
   @override
-  String privacy2Body(String keyStore) {
-    return 'Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted (SQLCipher) on your device. The key is held here: $keyStore – not in the database file.';
+  String privacy2Body(String keyStore, String cipher) {
+    return 'Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
   }
 
   @override
@@ -1192,8 +1192,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'The app does not create a backup of your data itself.';
 
   @override
+  String get privacy7Save =>
+      'If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose.';
+
+  @override
+  String get privacy7Wipe =>
+      '“Delete all local data” removes all data, keys and reminders from this device.';
+
+  @override
+  String get privacy7WipeWeb =>
+      '“Delete all local data” removes all data and keys from this browser.';
+
+  @override
   String get privacy7Rest =>
-      'If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. “Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.';
+      '“Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.';
 
   @override
   String get privacy8Title => 'Children';

@@ -21,6 +21,9 @@ enum PrivacyPlatform {
   final KeyStoreKind keyStore;
 
   bool get isWeb => this == web;
+
+  /// Verschlüsselung der lokalen Datenbank: im Browser SQLite3MultipleCiphers (E-53), sonst SQLCipher (#225).
+  String get dbCipher => isWeb ? 'SQLite3MultipleCiphers' : 'SQLCipher';
   bool get isDesktopLinuxOrWindows =>
       this == windows || this == linux || this == linuxFlatpak;
 
@@ -57,7 +60,8 @@ String privacyBackup(AppLocalizations l, PrivacyPlatform p) {
     PrivacyPlatform.macos => l.privacy7BackupMacos,
     _ => l.privacy7BackupOther,
   };
-  return '$first ${l.privacy7Rest}';
+  // Im Browser gibt es keine Erinnerungen (E-53, #225).
+  return '$first ${l.privacy7Save} ${p.isWeb ? l.privacy7WipeWeb : l.privacy7Wipe} ${l.privacy7Rest}';
 }
 
 /// Die Abschnitte der Datenschutzerklärung. Im Browser gibt es keine Erinnerungen und keine
@@ -71,7 +75,7 @@ List<(String, String)> privacySections(
   (l.privacy1Title, l.privacy1Body),
   (
     l.privacy2Title,
-    l.privacy2Body(DataReport.keyStoreText(l, platform.keyStore)),
+    l.privacy2Body(DataReport.keyStoreText(l, platform.keyStore), platform.dbCipher),
   ),
   (l.privacy3Title, l.privacy3Body),
   (l.privacy4Title, l.privacy4Body),
