@@ -137,23 +137,13 @@ Future<AppServices> bootstrap({
   return AppServices(
     keepAccountData: keepAccountData,
     scheduler: scheduler,
-    calendarBuilder: (userId) async {
-      // Anderer Nutzer oder andere Familie als zuletzt: lokale Termine vollständig entfernen,
-      // damit sich Daten verschiedener Familien nie vermischen (S7).
+    familyDataClaim: (owner) => AppServices.claimFamilyData(database.db, owner, onWiped: scheduler?.cancelAll),
+    calendarBuilder: (userId, familyRoom) async {
       final store = SqlEventStore(database.db);
-      final owner = '$userId|${gateway.family?.roomId ?? ''}';
-      final previous = (await kv.readAll())[AppServices.calendarOwnerKey];
-      if (previous != null && previous != owner) {
-        await store.wipe();
-        await SqlShoppingStore(database.db).wipe();
-        await SqlTaskStore(database.db).wipe();
-        await scheduler?.cancelAll();
-      }
-      await kv.write(AppServices.calendarOwnerKey, owner);
       final zone = await SystemDeviceTimeZone().current();
       return buildCalendarController(store: store, gateway: gateway, userId: userId, zoneName: zone);
     },
-    shoppingBuilder: (userId) async {
+    shoppingBuilder: (userId, familyRoom) async {
       final store = SqlShoppingStore(database.db);
       final service = ShoppingService(store: store, myUserId: userId);
       return ShoppingController(
@@ -162,7 +152,7 @@ Future<AppServices> bootstrap({
         sync: ShoppingSync(gateway: gateway, service: service, store: store),
       );
     },
-    tasksBuilder: (userId) async {
+    tasksBuilder: (userId, familyRoom) async {
       final store = SqlTaskStore(database.db);
       final service = TaskService(
         store: store,

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
+
 import '../../core/app_log.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_service.dart';
@@ -48,6 +50,21 @@ class CalendarSync {
 
   String get _me => service.myUserId;
 
+  /// Fehlerstand der Warteschlange (Tests).
+  @visibleForTesting
+  SendBackoff get backoff => _backoff;
+
+  /// Familie, zu der der lokale Bestand gehört (#140). Ohne Angabe beim Start: die erste bekannte.
+  String? _room;
+
+  /// `false`: Der Bestand gehört zu einer anderen Familie als der aktuellen. Dann geht nichts mehr hinaus und nichts
+  /// mehr hinein, bis `AppRoot` die Dienste neu aufgebaut hat. „Keine Familie“ ist kein Wechsel.
+  bool get sameFamily {
+    final current = gateway.family?.roomId;
+    final room = _room ??= current;
+    return room == null || current == null || room == current;
+  }
+
   // Eingehende Signale werden strikt nacheinander verarbeitet (keine Überholvorgänge).
   Future<void> _queue = Future<void>.value();
 
@@ -60,7 +77,9 @@ class CalendarSync {
   /// Wartet, bis alle bisher eingegangenen Signale verarbeitet sind (Tests).
   Future<void> idle() => _queue;
 
-  void start() {
+  /// [familyRoom]: Familie, für die `AppServices.openCalendar` den lokalen Bestand beansprucht hat.
+  void start({String? familyRoom}) {
+    _room ??= familyRoom;
     _sub ??= gateway.calendarSignals.listen(_enqueue);
     _timer ??= Timer.periodic(retryInterval, (_) => kick());
     _backoff.changed(_gatewayState()); // Ausgangszustand merken, erst spätere Wechsel heben das Fenster auf
@@ -95,6 +114,8 @@ class CalendarSync {
   // ------------------------------------------------------------- eingehend
 
   Future<void> _onSignal(CalendarSignal s) async {
+    // Bleibt in der Historie des Gateways für die neuen Dienste.
+    if (!sameFamily) return;
     try {
       switch (s) {
         case SharedEventSignal():
@@ -151,7 +172,7 @@ class CalendarSync {
 
   // -------------------------------------------------------------- ausgehend
 
-  bool get _canPublish => gateway.session == SessionState.ready && gateway.initialSyncDone;
+  bool get _canPublish => gateway.session == SessionState.ready && gateway.initialSyncDone && sameFamily;
 
   /// Sendet alle noch nicht veröffentlichten eigenen Termine und Zusagen.
   /// Läuft nie parallel; bei Fehlern bleibt alles für den nächsten Versuch erhalten.
@@ -168,6 +189,8 @@ class CalendarSync {
         // Beide Teile laufen immer; der Durchlauf zählt höchstens einen Fehler (#132).
         final eventsOk = await _publishEvents();
         final rsvpsOk = await _publishRsvps();
+        // Abgebrochen (#140): zählt weder als Erfolg noch als Fehler.
+        if (!_canPublish) break;
         if (eventsOk && rsvpsOk) {
           _backoff.success();
         } else {
@@ -180,11 +203,12 @@ class CalendarSync {
     }
   }
 
-  /// `false`, wenn ein Sendefehler den Durchlauf beendet hat.
+  /// `false`, wenn ein Sendefehler oder ein Abbruch ([_canPublish]) den Durchlauf beendet hat.
   Future<bool> _publishEvents() async {
     final pending = (await store.pendingPublish()).where((e) => e.ownerId == _me).toList()
       ..sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
     for (final e in pending) {
+      if (!_canPublish) return false;
       try {
         if (e.isShared) {
           if (gateway.family == null) continue;
@@ -216,6 +240,7 @@ class CalendarSync {
         await store.markRsvpPublished(r.eventId, _me, r.timestamp);
         continue;
       }
+      if (!_canPublish) return false;
       try {
         await gateway.publishRsvp(r.eventId, r.status, r.timestamp);
         await store.markRsvpPublished(r.eventId, _me, r.timestamp);
@@ -234,6 +259,7 @@ class CalendarSync {
     if (!_canPublish || gateway.family == null) return;
     for (final e in await store.all()) {
       if (e.ownerId != _me || !e.isShared || e.deleted) continue;
+      if (!_canPublish) return;
       try {
         await gateway.publishSharedEvent(e);
       } on GatewayException catch (err) {

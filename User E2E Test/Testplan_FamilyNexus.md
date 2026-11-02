@@ -1,6 +1,6 @@
 # Testplan FamilyNexus (Gesamtplan)
 
-**Planversion: 1.10** (01.11.2026) · Dokument-ID `TP-FN-001` · Änderungen siehe „Versionshistorie“ am Ende und Anhang E. Reports und Issues nennen Planversion und Git-Commit (z. B. „TP-FN-001 v1.0 @ 4abf400“).
+**Planversion: 1.11** (01.11.2026) · Dokument-ID `TP-FN-001` · Änderungen siehe „Versionshistorie“ am Ende und Anhang E. Reports und Issues nennen Planversion und Git-Commit (z. B. „TP-FN-001 v1.0 @ 4abf400“).
 
 Ersetzt: `Testplan_Nutzeranlage.md`, `Testplan_Pruefanleitung.md`, `Testplan_Einladung_Zweiter_Nutzer.md`, `Testdaten_Stammdaten.md` (Zuordnung der alten IDs: Anhang C)
 Bezug: `Massnahmenplan_App_Store_Review.md` (Maßnahme 6), Issues #10–#14, Nachtest #15
@@ -245,7 +245,7 @@ G2 zeigt nach D-06 „Willkommen“ (N2 ist abgemeldet und wird erst in F-01 wie
 | G-02 | – | `flutter test` (Linux: `LD_LIBRARY_PATH` auf libsqlcipher) | Alle Tests bestehen; Anzahl bestanden/übersprungen notieren | | – | |
 | G-03 | – | `flutter test test/store/review_notes_test.dart` (Review-Notizen gegen die App, #13) | Grün; jede zitierte Beschriftung steht so in der App, Länge ≤ 4000 | | – | |
 | G-04 | – | Optional: `tool/e2e.sh` (lokaler Synapse) | Alle E2E-Tests bestehen | | – | |
-| G-05 | – | **Nicht manuell auslösbar, durch Tests abgedeckt:** Zusatzschritte der Registrierung (Bedingungen, E-Mail, Zugangscode, Captcha: `test/features/registration_test.dart`), Anmeldung im Browser/OAuth (`test/data/sdk_registration_test.dart`), abgelaufener Link und Link aus neuerer Version (`test/domain/invite_link_test.dart`), geänderte Identität eines Mitglieds, Startfehler „Lokale Daten nicht lesbar“ und „Anmeldung nicht wiederhergestellt“ (`test/app/restore_session_test.dart`, #134) | In G-02 enthalten und grün | | – | |
+| G-05 | – | **Nicht manuell auslösbar, durch Tests abgedeckt:** Zusatzschritte der Registrierung (Bedingungen, E-Mail, Zugangscode, Captcha: `test/features/registration_test.dart`), Anmeldung im Browser/OAuth (`test/data/sdk_registration_test.dart`), abgelaufener Link und Link aus neuerer Version (`test/domain/invite_link_test.dart`), geänderte Identität eines Mitglieds, Startfehler „Lokale Daten nicht lesbar“ und „Anmeldung nicht wiederhergestellt“ (`test/app/restore_session_test.dart`, #134), Familienwechsel im selben Prozess, auch direkt von A nach B ohne Zwischenstand; die App hat keinen Weg, eine Familie zu verlassen, und der direkte Wechsel kommt nur über die Kontodaten zustande (`test/data/family_switch_sync_test.dart`, `test/app/family_switch_services_test.dart`, `test/app/family_owner_test.dart`, `test/features/family_switch_test.dart`, gegen den Server in G-04: `test/e2e/gateway_family_e2e_test.dart`, #140) | In G-02 enthalten und grün | | – | |
 | G-06 | G1 | **Review-Notizen manuell:** `store/metadata/ios/review_notes.txt` (bzw. `macos/`) Schritt für Schritt in der App nachvollziehen | Jeder Schritt auffindbar; Abweichung bei der Anmeldung im Browser (matrix.org) ist erwartet und gehört zu #15 | | G-06-G1 | |
 | G-07 | G1 | **Durchlauf mit einer Person ohne Vorwissen:** A-01 bis A-12 und B-01 bis B-03 nach Anleitung | Ohne Rückfrage ausführbar; Rückfragen notieren | | – | |
 | G-08 | Web | **Nur Plattform Web:** erster Aufruf → „Browser-Tresor einrichten“ (Passwort < 10 Zeichen, nicht übereinstimmend, dann gültig); Seite neu laden → „FamilyNexus entsperren“ (falsches, dann richtiges Passwort); zweiten Tab öffnen; „Passwort vergessen? Alle lokalen Daten löschen“ | „Mindestens 10 Zeichen.“, „Die Passwörter stimmen nicht überein.“, „Falsches Passwort.“; Entsperren klappt; zweiter Tab: „FamilyNexus ist schon geöffnet“; Löschen führt zu „Willkommen“ | | G-08a … | |
@@ -315,6 +315,7 @@ Jede Funktion der App ist mindestens einem Schritt zugeordnet. Wird eine Funktio
 | Familie | Familien-Code kopieren, Beitritt per Code, Anfrage ablehnen, Ablehnung beim Anfragenden, Wechsel „neue Familie gründen“ | D-02, D-03 |
 | Familie | Diagnose „Details“ beim Anfragenden, ohne Kennungen (#116); Nachtest der Ablehnung auf Mac und iPhone (#116, #75) | D-02a, Anhang G |
 | Familie | Einladen per Benutzer-ID, Eingeladenen entfernen | E-03, E-04 |
+| Familie | Wechsel im selben Prozess, auch direkt von A nach B: Termine, Mitgliederstand und Link-Vermerke der alten Familie kehren nicht zurück, nichts aus der alten Familie geht in die neue (#140) | G-04, G-05 |
 | Einladung | Link mit Gültigkeit, Konto-Server für Neue, QR-Code, E-Mail, Link kopieren | E-05 |
 | Einladung | kein Link, beschädigter Link, Beitrittskarte mit Details, Aufnahme nur nach Bestätigung durch den Moderator, verbrauchter Link über das System, bereits Mitglied | E-06, E-07, E-10 bis E-12 |
 | Rollen | Mitglied ohne Verwaltung, nur Moderatoren legen Aufgaben an, zum Moderator ernennen | E-14, E-30 |
@@ -344,7 +345,7 @@ Jede Funktion der App ist mindestens einem Schritt zugeordnet. Wird eine Funktio
 | Datenaustausch | Räume Ende-zu-Ende-verschlüsselt, Server sieht nur Chiffretext und Metadaten, privater Raum | H-10 bis H-13 |
 | Datenaustausch | Einladungslink ohne Geheimnisse, Anhänge (unverändert, Dateiname, Typ und Größe), Transport und Verbindungen | H-14 bis H-17 |
 | Schlüssel | Löschen entfernt Dateien und Schlüssel, Schlüssel verloren (Startfehler, Wiederherstellung) | H-18, H-19 |
-| Nicht manuell | Zusatzschritte, OAuth, abgelaufener Link, geänderte Identität, Startfehler | G-05 |
+| Nicht manuell | Zusatzschritte, OAuth, abgelaufener Link, geänderte Identität, Startfehler, Familienwechsel (#140) | G-05 |
 
 ## 7. Abnahme und Report
 
@@ -502,6 +503,7 @@ Quelle (Planversion 1.6 → 1.7): Lauf vom 28.10.2026 mit Build 1.2.1 (19) (macO
 | P-62 | A-05, A-08, D-01, E-09, B-23 | Ein Passwortfeld, Knopf ab 8 Zeichen aktiv; keine Passwortänderung | Kontrolleingabe: Knopf erst mit gleicher Wiederholung aktiv, neu A-08b; neuer Schritt B-23, setzt das Passwort von N1 zurück (#117, E-80) |
 | P-63 | D-02, D-02a, D-03 | Lauf 17: Kein Bild nach „Ablehnen“, keine Diagnose im Release; „App neu starten und für D-03 ‚Gründen‘ wählen“ ist in der Warteansicht nicht ausführbar | Neues Pflichtbild D-02e-G1, neuer Schritt D-02a (Diagnose, Regex-Prüfung), Hinweis auf das Zurückziehen, Nachtest in Anhang G (#116, #75, E-81) |
 | P-64 | F-05a | Kein Schritt zu temporären Dateien | Neuer Schritt vor der Kontolöschung: Temp-Ordner nach Speichern, Abbruch, Doppeltipp und zu großer Datei ohne Klartext (nur iOS auf echtem Gerät und Android) (#141, E-19) |
+| P-65 | G-04, G-05, Abdeckungsmatrix | Familienwechsel im selben Prozess nirgends abgedeckt | Unter G-05 als nicht manuell auslösbar mit den Tests genannt, gegen den Server in G-04; kein Handschritt: Die App bietet kein Verlassen der Familie, und der direkte Wechsel entsteht nur über die Kontodaten (#140, E-37) |
 
 ## Anhang F: Hilfsbefehle für Abschnitt H
 
@@ -638,5 +640,6 @@ Regel: Änderungen an Schritten, erwarteten Ergebnissen oder Reihenfolge erhöhe
 | 1.8 | 30.10.2026 | Basis `802eba1` | Neuer Abschnitt H „Verschlüsselung auf dem Gerät und Datenaustausch“ (H-01 bis H-19), Anhang F (Hilfsbefehle), Abdeckungsmatrix, Reihenfolge und Abnahme erweitert; A bis G unverändert |
 | 1.9 | 31.10.2026 | Basis `e627288` | Jeden Beitritt per Link bestätigt ein Moderator (#118, E-78): E-11 mit aktiver Bestätigung auf G1, D-02 mit neuem Wortlaut, Abdeckungsmatrix (P-60, Anhang E); Linkformat v4 ohne Familienname (#115, E-79): E-05 bis E-07 und H-14 (P-61, Anhang E); Kontrolleingabe und Passwort ändern (#117, E-80): A-05, A-08, A-08b, D-01, E-09, B-23, Abdeckungsmatrix (P-62, Anhang E); Erkennung der Ablehnung und Diagnose „Details“ (#116, #75, E-81): D-02, D-02a, D-03, Abdeckungsmatrix (P-63, Anhang E), neuer Anhang G |
 | 1.10 | 01.11.2026 | Basis `b24666d` | Neuer Schritt F-05a (iOS und Android): Temporäre Klartext-Dateien werden nach dem Speichern, Abbruch und zu großer Datei entfernt (#141, E-19), Abdeckungsmatrix (P-64, Anhang E) |
+| 1.11 | 01.11.2026 | Basis `3ccaf2c` | Familienwechsel im selben Prozess in G-05 und der Abdeckungsmatrix (P-65, Anhang E; #140, E-37); Erwartung an bestehende Schritte unverändert |
 
 **Zuordnung Issues zur Planversion:** #23 bis #27 (Lauf 1) beziehen sich auf v1.0 (`4abf400`), #28 bis #30 (Lauf 2) auf v1.2 (`d6cecbf`), #31 bis #40 (Lauf 3, Linux/Android) auf v1.0 (`4abf400`); die Plantexte dazu stehen seit v1.1, v1.3 bzw. v1.4 im Plan. Seit v1.5 beschreibt der Plan das Verhalten nach den Fixes aus PR #41 (#23 bereits durch PR #22). #75 bis #78 (Lauf mit Build 19) beziehen sich auf v1.6 (`f4c358c`); #43 bis #46 und #56 bis #69 beziehen sich auf v1.5 (`bb7f347` bzw. `423a3db`); seit v1.6 beschreibt der Plan das Verhalten nach den Fixes vom 28.10.2026.

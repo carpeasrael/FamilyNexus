@@ -28,14 +28,14 @@ import '../features/shopping/shopping_controller.dart';
 import '../features/tasks/tasks_controller.dart';
 import '../features/settings/settings_controller.dart';
 
-/// Erzeugt den Kalender für den angemeldeten Nutzer (inkl. lokaler Ablage).
-typedef CalendarBuilder = Future<CalendarController> Function(String userId);
+/// Erzeugt den Kalender für den angemeldeten Nutzer (inkl. lokaler Ablage) und dessen Familie [familyRoom].
+typedef CalendarBuilder = Future<CalendarController> Function(String userId, String? familyRoom);
 
-/// Erzeugt den Einkaufszettel für den angemeldeten Nutzer (inkl. lokaler Ablage).
-typedef ShoppingBuilder = Future<ShoppingController> Function(String userId);
+/// Erzeugt den Einkaufszettel für den angemeldeten Nutzer (inkl. lokaler Ablage) und dessen Familie [familyRoom].
+typedef ShoppingBuilder = Future<ShoppingController> Function(String userId, String? familyRoom);
 
-/// Erzeugt die Aufgabenlisten für den angemeldeten Nutzer (inkl. lokaler Ablage).
-typedef TasksBuilder = Future<TasksController> Function(String userId);
+/// Erzeugt die Aufgabenlisten für den angemeldeten Nutzer (inkl. lokaler Ablage) und dessen Familie [familyRoom].
+typedef TasksBuilder = Future<TasksController> Function(String userId, String? familyRoom);
 
 /// Gemeinsame Dienste der App; wird über [AppScope] bereitgestellt.
 class AppServices {
@@ -53,6 +53,7 @@ class AppServices {
     this.calendarBuilder,
     this.shoppingBuilder,
     this.tasksBuilder,
+    this.familyDataClaim,
     this.scheduler,
     this.mail = const SystemMailLauncher(),
     this.browser = const SystemBrowserLauncher(),
@@ -105,6 +106,10 @@ class AppServices {
   final CalendarBuilder? calendarBuilder;
   final ShoppingBuilder? shoppingBuilder;
   final TasksBuilder? tasksBuilder;
+
+  /// Beansprucht die lokalen Familiendaten für `<Nutzer>|<Raum>`, vor dem Aufbau der Dienste (#140);
+  /// siehe [claimFamilyData]. `null` in Widget-Tests ohne Datenbank.
+  final Future<void> Function(String owner)? familyDataClaim;
   final ReminderScheduler? scheduler;
 
   CalendarController? calendar;
@@ -114,24 +119,71 @@ class AppServices {
   ReminderCoordinator? reminders;
   String? _calendarUser;
 
-  /// Öffnet die Familiendienste des angemeldeten Nutzers (idempotent): Kalender samt
+  /// Familie, für die die Dienste offen sind oder gerade öffnen.
+  String? _calendarRoom;
+
+  /// Weicht dieser Raum von der aktuellen Familie ab, baut `AppRoot` die Dienste neu auf (#140).
+  String? get openFamilyRoom => _calendarRoom;
+
+  /// Wartet auf die Warteschlangen der geschlossenen Dienste: Danach schreibt keiner von ihnen mehr in die Ablage.
+  Future<void> _closing = Future<void>.value();
+
+  /// Kette der Ansprüche ([familyDataClaim]): Der nächste wartet auf den vorigen, ein Fehler bleibt beim Aufrufer.
+  Future<void> _claimRun = Future<void>.value();
+
+  /// Öffnet die Familiendienste des angemeldeten Nutzers (idempotent je Nutzer und Familie): Kalender samt
   /// Erinnerungen, Einkaufszettel und Online-Status.
+  ///
+  /// Der Raum wird vor dem ersten `await` gemerkt, Bindung und Ablage passen so zusammen, auch wenn die Familie
+  /// währenddessen wechselt (#140): Die Sync-Klassen sperren dann, `AppRoot` baut neu auf. Nur Anspruch und Abschluss
+  /// sind serialisiert: Ein hängender `build` hält keinen neuen Lauf auf (#153), denn Builder schreiben nicht in die
+  /// Ablage, und ein veralteter Lauf gibt nach jedem `await` auf.
   Future<void> openCalendar() async {
     final uid = gateway.userId;
     final build = calendarBuilder;
     if (uid == null || build == null) return;
-    if (calendar != null && _calendarUser == uid) return;
+    final room = gateway.family?.roomId;
+    if (calendar != null && _calendarUser == uid && _calendarRoom == room) return;
     closeCalendar();
-    final attempt = ++_openAttempt;
+    final attempt = _openAttempt;
+    _calendarRoom = room;
     try {
-      final c = await build(uid);
+      await _closing;
+      if (attempt != _openAttempt) return;
+      final claim = familyDataClaim;
+      if (claim != null) {
+        final owner = '$uid|${room ?? ''}';
+        final run = _claimRun.then((_) => claim(owner));
+        _claimRun = run.then<void>((_) {}, onError: (Object _) {});
+        await run;
+        if (attempt != _openAttempt) return;
+      }
+      final c = await build(uid, room);
+      if (attempt != _openAttempt) {
+        c.dispose();
+        return;
+      }
       calendar = c;
       _calendarUser = uid;
-      c.start();
+      c.start(familyRoom: room);
       final sb = shoppingBuilder;
-      if (sb != null) (shopping = await sb(uid)).start();
+      if (sb != null) {
+        final s = await sb(uid, room);
+        if (attempt != _openAttempt) {
+          s.dispose();
+          return;
+        }
+        (shopping = s).start(familyRoom: room);
+      }
       final tb = tasksBuilder;
-      if (tb != null) (tasks = await tb(uid)).start();
+      if (tb != null) {
+        final t = await tb(uid, room);
+        if (attempt != _openAttempt) {
+          t.dispose();
+          return;
+        }
+        (tasks = t).start(familyRoom: room);
+      }
       final p = PresenceSync(gateway: gateway, enabled: () => settings.settings.shareOnlineStatus);
       presence = p;
       settings.addListener(p.update);
@@ -147,6 +199,7 @@ class AppServices {
     }
   }
 
+  /// Zählt jedes Schließen: Ein Öffnungslauf, der das bemerkt, ist veraltet.
   int _openAttempt = 0;
 
   /// Meldet den Status als „offline“ und meldet dann ab.
@@ -206,6 +259,22 @@ class AppServices {
     await kv.delete(calendarOwnerKey);
   }
 
+  /// Beansprucht die lokalen Familiendaten für [owner]: Gehörten sie jemand anderem (Nutzer oder Familie), werden sie
+  /// vollständig entfernt, damit sich Daten verschiedener Familien nie vermischen (S7). [onWiped] entfernt das, was
+  /// zu den gelöschten Daten geplant war. Der Besitzer wird zuletzt geschrieben: Nach einem Fehler löscht der nächste
+  /// Aufruf erneut.
+  static Future<void> claimFamilyData(Database db, String owner, {Future<void> Function()? onWiped}) async {
+    final kv = SqlKeyValueStore(db);
+    final previous = (await kv.readAll())[calendarOwnerKey];
+    if (previous != null && previous != owner) {
+      await SqlEventStore(db).wipe();
+      await SqlShoppingStore(db).wipe();
+      await SqlTaskStore(db).wipe();
+      await onWiped?.call();
+    }
+    await kv.write(calendarOwnerKey, owner);
+  }
+
   /// Einstellungsschlüssel: Konto und Familie, denen die lokalen Familiendaten gehören.
   static const String calendarOwnerKey = 'calendarOwner';
 
@@ -214,7 +283,11 @@ class AppServices {
 
   /// Beendet Synchronisation und Planung. [cancelReminders]: nur bei Abmeldung/Löschung –
   /// beim bloßen Schließen der Oberfläche müssen geplante Erinnerungen bestehen bleiben.
+  ///
+  /// Ein laufender Öffnungslauf ist danach veraltet. Die Warteschlangen der Dienste laufen noch aus; [openCalendar]
+  /// wartet darauf. Weitere Aufrufe ohne offene Dienste ändern daran nichts: Ein Wechsel schließt bis zu dreimal.
   void closeCalendar({bool cancelReminders = false}) {
+    _openAttempt++;
     if (cancelReminders) scheduler?.cancelAll().ignore();
     reminders?.dispose();
     reminders = null;
@@ -224,6 +297,14 @@ class AppServices {
       p.dispose();
       presence = null;
     }
+    final idle = <Future<void>>[
+      if (shopping case final s?) s.sync.idle(),
+      if (tasks case final t?) t.sync.idle(),
+      if (calendar case final c?) c.sync.idle(),
+    ];
+    if (idle.isNotEmpty) {
+      _closing = Future.wait<void>(<Future<void>>[_closing, ...idle]).then<void>((_) {}, onError: (Object _) {});
+    }
     shopping?.dispose();
     shopping = null;
     tasks?.dispose();
@@ -231,6 +312,7 @@ class AppServices {
     calendar?.dispose();
     calendar = null;
     _calendarUser = null;
+    _calendarRoom = null;
   }
 }
 

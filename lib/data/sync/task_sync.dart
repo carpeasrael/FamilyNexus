@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
+
 import '../../core/app_log.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/task_store.dart';
@@ -43,6 +45,20 @@ class TaskSync {
 
   String get _me => service.myUserId;
 
+  /// Fehlerstand der Warteschlange (Tests).
+  @visibleForTesting
+  SendBackoff get backoff => _backoff;
+
+  /// Familie, zu der der lokale Bestand gehört (#140). Ohne Angabe beim Start: die erste bekannte.
+  String? _room;
+
+  /// `false`: Der Bestand gehört zu einer anderen Familie als der aktuellen. „Keine Familie“ ist kein Wechsel.
+  bool get _sameFamily {
+    final current = gateway.family?.roomId;
+    final room = _room ??= current;
+    return room == null || current == null || room == current;
+  }
+
   Future<void> _queue = Future<void>.value();
 
   void _enqueue(CalendarSignal s) {
@@ -54,7 +70,9 @@ class TaskSync {
   /// Wartet, bis alle bisher eingegangenen Signale verarbeitet sind (Tests).
   Future<void> idle() => _queue;
 
-  void start() {
+  /// [familyRoom]: Familie, für die `AppServices.openCalendar` den lokalen Bestand beansprucht hat.
+  void start({String? familyRoom}) {
+    _room ??= familyRoom;
     _sub ??= gateway.calendarSignals.listen(_enqueue);
     _timer ??= Timer.periodic(retryInterval, (_) => kick());
     _backoff.changed(_gatewayState()); // Ausgangszustand merken, erst spätere Wechsel heben das Fenster auf
@@ -84,6 +102,8 @@ class TaskSync {
   }
 
   Future<void> _onSignal(CalendarSignal s) async {
+    // Bleibt in der Historie des Gateways für die neuen Dienste (#140).
+    if (!_sameFamily) return;
     try {
       switch (s) {
         case TaskListSignal():
@@ -117,7 +137,7 @@ class TaskSync {
     }
   }
 
-  bool get _canPublish => gateway.session == SessionState.ready && gateway.initialSyncDone && gateway.family != null;
+  bool get _canPublish => gateway.session == SessionState.ready && gateway.initialSyncDone && gateway.family != null && _sameFamily;
 
   /// Sendet alle noch nicht gesendeten eigenen Änderungen. Läuft nie parallel.
   Future<void> publishPending() async {
@@ -133,6 +153,7 @@ class TaskSync {
         final lists = (await store.pendingLists()).where((l) => l.by == _me).toList()
           ..sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
         for (final l in lists) {
+          if (!_canPublish) return; // Abbruch (#140): zählt weder als Erfolg noch als Fehler
           try {
             await gateway.publishTaskList(l);
             await store.markListPublished(l.id, l.version);
@@ -148,6 +169,7 @@ class TaskSync {
           }
         }
         for (final e in (await store.pendingLog()).where((e) => e.by == _me)) {
+          if (!_canPublish) return;
           try {
             await gateway.publishTaskLog(e);
             await store.markLogPublished(e.id);
