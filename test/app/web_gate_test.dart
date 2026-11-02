@@ -225,6 +225,8 @@ void main() {
       await tester.pump();
       expect(find.widgetWithText(FilledButton, unlockBusy), findsOneWidget);
       expect(find.text(wipeBusy), findsNothing);
+      // Gesperrt wird über _busy, nicht über _wiping.
+      expect(tester.widget<FilledButton>(find.byType(FilledButton)).onPressed, isNull);
       gate.complete();
       await tester.pumpAndSettle();
       expect(find.text(unlockBusy), findsNothing);
