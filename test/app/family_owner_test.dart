@@ -1,5 +1,6 @@
 import 'package:family_nexus/app/app_services.dart';
 import 'package:family_nexus/data/db/app_database.dart';
+import 'package:family_nexus/features/reminders/reminder_coordinator.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -130,5 +131,15 @@ void main() {
     await AppServices.claimFamilyData(db, annaA);
     expect(await rows('events'), 0, reason: 'Daten von B gehören nicht zu A');
     expect(await owner(), annaA);
+  });
+
+  test('#218 bestätigte Erinnerungen: bei anderem Besitzer gelöscht, bei gleichem behalten', () async {
+    Future<bool> has() async => (await db.query('settings', where: 'key = ?', whereArgs: <Object>[ReminderCoordinator.acknowledgedKey])).isNotEmpty;
+    await own(annaA);
+    await db.insert('settings', <String, Object?>{'key': ReminderCoordinator.acknowledgedKey, 'value': '{"1":9999999999999}'});
+    await AppServices.claimFamilyData(db, annaA);
+    expect(await has(), isTrue);
+    await AppServices.claimFamilyData(db, annaB);
+    expect(await has(), isFalse);
   });
 }

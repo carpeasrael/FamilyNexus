@@ -455,6 +455,49 @@ class AppLocalizationsDe extends AppLocalizations {
   String get remindersOpenSettings => 'Einstellungen öffnen';
 
   @override
+  String get todayAllEvents => 'Alle Termine';
+
+  @override
+  String get remindersOverview => 'Übersicht';
+
+  @override
+  String remindersDueHeader(int count) {
+    return 'Fällig ($count)';
+  }
+
+  @override
+  String remindersPlannedHeader(int count) {
+    return 'Geplant ($count)';
+  }
+
+  @override
+  String remindersDueCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Erinnerungen fällig',
+      one: '1 Erinnerung fällig',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String remindersAcknowledge(String title) {
+    return 'Erinnerung an $title bestätigen';
+  }
+
+  @override
+  String get remindersAcknowledgeAll => 'Alle bestätigen';
+
+  @override
+  String get remindersEmpty => 'Keine Erinnerungen fällig oder geplant.';
+
+  @override
+  String remindersFiresAt(String time) {
+    return 'erinnert $time';
+  }
+
+  @override
   String remindersPlanned(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

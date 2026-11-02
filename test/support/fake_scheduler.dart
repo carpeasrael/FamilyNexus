@@ -47,6 +47,11 @@ class FakeReminderScheduler implements ReminderScheduler {
       ..addAll(<({String title, String body})>[for (final r in planned) (title: title, body: bodyFor(r.minutesBefore))]);
   }
 
+  final List<int> dismissed = <int>[];
+
+  @override
+  Future<void> dismiss(int id) async => dismissed.add(id);
+
   @override
   Future<void> cancelAll() async => cancelled++;
 }

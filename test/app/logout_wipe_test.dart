@@ -1,5 +1,6 @@
 import 'package:family_nexus/app/app_services.dart';
 import 'package:family_nexus/data/db/app_database.dart';
+import 'package:family_nexus/features/reminders/reminder_coordinator.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -49,5 +50,14 @@ void main() {
     await db.delete('settings', where: 'key = ?', whereArgs: <Object>[AppServices.calendarOwnerKey]);
     await AppServices.wipeAccountDataIn(db);
     expect(await rows('events'), 1);
+  });
+
+  test('#218 entfernt auch die bestätigten Erinnerungen', () async {
+    await fill();
+    await db.insert('settings', <String, Object?>{'key': ReminderCoordinator.acknowledgedKey, 'value': '{"1":9999999999999}'});
+    await AppServices.wipeAccountDataIn(db);
+    final keys = {for (final r in await db.query('settings')) r['key']};
+    expect(keys, isNot(contains(ReminderCoordinator.acknowledgedKey)));
+    expect(keys, contains('languageCode'));
   });
 }

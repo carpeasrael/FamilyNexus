@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
@@ -17,7 +18,10 @@ enum CalendarMode { day, week, month, agenda }
 
 /// Kalender mit Tag-, Wochen-, Monats- und Agenda-Ansicht sowie Personenfilter.
 class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({super.key});
+  const CalendarScreen({super.key, this.modeRequest});
+
+  /// Wunsch von außen, eine Ansicht ab heute zu zeigen (z. B. „Alle Termine“ auf „Heute“, #218).
+  final ValueListenable<CalendarMode?>? modeRequest;
 
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
@@ -33,6 +37,40 @@ class _CalendarScreenState extends State<CalendarScreen> {
         _persons,
         AppScope.of(context).gateway.family?.joined.map((m) => m.userId) ?? const <String>[],
       );
+
+  @override
+  void initState() {
+    super.initState();
+    widget.modeRequest?.addListener(_modeRequested);
+  }
+
+  @override
+  void didUpdateWidget(CalendarScreen old) {
+    super.didUpdateWidget(old);
+    if (old.modeRequest != widget.modeRequest) {
+      old.modeRequest?.removeListener(_modeRequested);
+      widget.modeRequest?.addListener(_modeRequested);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.modeRequest?.removeListener(_modeRequested);
+    super.dispose();
+  }
+
+  /// Die Agenda beginnt bei [_focus]; ohne Rücksetzen zeigte sie nach Tipp auf einen Tag oder Blättern
+  /// nicht die nächsten Termine.
+  void _modeRequested() {
+    final mode = widget.modeRequest?.value;
+    if (mode == null || !mounted) return;
+    final c = AppScope.read(context).calendar;
+    setState(() {
+      _mode = mode;
+      if (c != null) _focus = c.today;
+      _focusSet = true;
+    });
+  }
 
   @override
   void didChangeDependencies() {

@@ -199,6 +199,50 @@
   "remindersAllow": "Allow",
   "remindersPermissionSystem": "Notifications are switched off in the system settings. Allow them there for FamilyNexus, otherwise no reminders appear.",
   "remindersOpenSettings": "Open settings",
+  "todayAllEvents": "All events",
+  "remindersOverview": "Overview",
+  "remindersDueHeader": "Due ({count})",
+  "@remindersDueHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersPlannedHeader": "Scheduled ({count})",
+  "@remindersPlannedHeader": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersDueCount": "{count, plural, =1{1 reminder due} other{{count} reminders due}}",
+  "@remindersDueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersAcknowledge": "Acknowledge reminder for {title}",
+  "@remindersAcknowledge": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "remindersAcknowledgeAll": "Acknowledge all",
+  "remindersEmpty": "No reminders due or scheduled.",
+  "remindersFiresAt": "reminds {time}",
+  "@remindersFiresAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "remindersPlanned": "{count, plural, =0{No reminders scheduled} =1{1 reminder scheduled} other{{count} reminders scheduled}}",
   "@remindersPlanned": {
     "placeholders": {

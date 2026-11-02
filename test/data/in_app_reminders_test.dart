@@ -106,4 +106,22 @@ void main() {
     expect(shown.map((s) => s.$1), <int>[2]);
     failing.clear();
   });
+
+  test('#218 entfernt vor der Anzeige: weder Takt noch Ersetzen zeigen sie', () async {
+    replace(<PlannedReminder>[planned(1, base.add(const Duration(seconds: 5))), planned(2, base.add(const Duration(hours: 1)))]);
+    now = base.add(const Duration(seconds: 10)); // fällig, aber noch kein Takt
+    r.remove(1);
+    await r.fireDue();
+    replace(<PlannedReminder>[planned(2, base.add(const Duration(hours: 1)))]);
+    await Future<void>.delayed(Duration.zero);
+    expect(shown, isEmpty);
+  });
+
+  test('#218 entfernen des letzten Eintrags beendet den Takt', () {
+    replace(<PlannedReminder>[planned(1, base.add(const Duration(hours: 1)))]);
+    expect(r.tickActive, isTrue);
+    r.remove(1);
+    expect(r.tickActive, isFalse);
+    expect(r.isEmpty, isTrue);
+  });
 }
