@@ -126,7 +126,7 @@ class SettingsScreen extends StatelessWidget {
               ListTile(
                 leading: Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
                 title: Text(l.settingsDeleteData),
-                subtitle: Text(l.settingsDeleteDataHint),
+                subtitle: Text(deleteDataHint(l, web: PlatformInfo.isWeb)),
                 onTap: () => _confirmDelete(context),
               ),
               // Version und Build wie in App Store Connect (für Testberichte und Bildschirmaufnahmen, #14).
@@ -140,6 +140,11 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
+
+/// Untertitel von „Alle lokalen Daten löschen“: Im Browser gibt es keine Erinnerungen (E-53, #237).
+/// [web] ist ein Parameter, weil `kIsWeb` im Test konstant false ist.
+String deleteDataHint(AppLocalizations l, {required bool web}) =>
+    web ? l.settingsDeleteDataHintWeb : l.settingsDeleteDataHint;
 
 Future<void> _confirmDelete(BuildContext context) async {
   final l = AppLocalizations.of(context);

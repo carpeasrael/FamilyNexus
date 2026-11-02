@@ -520,6 +520,10 @@
   "settingsPrivacyPolicy": "Datenschutzerklärung",
   "settingsDeleteData": "Alle lokalen Daten löschen",
   "settingsDeleteDataHint": "Meldet dich ab und löscht Datenbank, Schlüssel und Erinnerungen auf diesem Gerät.",
+  "settingsDeleteDataHintWeb": "Meldet dich ab und löscht Datenbank und Schlüssel in diesem Browser.",
+  "@settingsDeleteDataHintWeb": {
+    "description": "Untertitel „Alle lokalen Daten löschen“ im Browser: dort gibt es keine Erinnerungen (E-53, #237)."
+  },
   "deleteDataTitle": "Alle lokalen Daten löschen?",
   "deleteDataBody": "Alle Daten dieser App auf diesem Gerät werden unwiderruflich gelöscht und du wirst abgemeldet. Nachrichten und geteilte Termine auf Geräten anderer Familienmitglieder lassen sich technisch nicht löschen. Dein Konto beim Server bleibt bestehen; löschen kannst du es unter Einstellungen → Konto → „Konto löschen“.",
   "deleteDataConfirm": "Endgültig löschen",

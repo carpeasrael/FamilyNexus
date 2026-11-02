@@ -1940,6 +1940,12 @@ abstract class AppLocalizations {
   /// **'Meldet dich ab und löscht Datenbank, Schlüssel und Erinnerungen auf diesem Gerät.'**
   String get settingsDeleteDataHint;
 
+  /// Untertitel „Alle lokalen Daten löschen“ im Browser: dort gibt es keine Erinnerungen (E-53, #237).
+  ///
+  /// In de, this message translates to:
+  /// **'Meldet dich ab und löscht Datenbank und Schlüssel in diesem Browser.'**
+  String get settingsDeleteDataHintWeb;
+
   /// No description provided for @deleteDataTitle.
   ///
   /// In de, this message translates to:
