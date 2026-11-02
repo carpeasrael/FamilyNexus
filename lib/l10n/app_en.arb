@@ -69,7 +69,7 @@
   "onbIntro": "Calendar and chat for your family – private and encrypted. No ads, no data collection.",
   "onbPoint1": "No telemetry, no ads, no analytics.",
   "onbPoint2": "Chat and shared events are end-to-end encrypted.",
-  "onbPoint3": "Private events never leave your own devices.",
+  "onbPoint3": "Only you see private events; they are synced encrypted between your own devices.",
   "serverUrlInvalid": "Please enter a valid https address.",
   "serverOperator": "Operator: {name}",
   "@serverOperator": {
@@ -295,7 +295,7 @@
   "todayOpenChat": "Open chat",
   "visibilityPrivate": "Private",
   "visibilityShared": "Shared",
-  "visibilityPrivateHint": "Only on your own devices. Never sent to the family.",
+  "visibilityPrivateHint": "Only for you, encrypted between your own devices. Never sent to the family.",
   "visibilitySharedHint": "Sent encrypted to the family. Members see the event and can accept or decline.",
   "visibilityChangeNote": "Content already sent to the family stays on their devices, even if you make the event private later.",
   "eventNew": "New event",

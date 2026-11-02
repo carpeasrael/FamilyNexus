@@ -69,7 +69,7 @@
   "onbIntro": "Kalender und Chat für deine Familie – privat und verschlüsselt. Keine Werbung, keine Datensammelei.",
   "onbPoint1": "Keine Telemetrie, keine Werbung, keine Analyse.",
   "onbPoint2": "Chat und geteilte Termine sind Ende-zu-Ende-verschlüsselt.",
-  "onbPoint3": "Private Termine verlassen nie deine eigenen Geräte.",
+  "onbPoint3": "Private Termine siehst nur du; zwischen deinen eigenen Geräten werden sie verschlüsselt abgeglichen.",
   "serverUrlInvalid": "Bitte eine gültige https-Adresse eingeben.",
   "serverOperator": "Betreiber: {name}",
   "@serverOperator": {
@@ -295,7 +295,7 @@
   "todayOpenChat": "Chat öffnen",
   "visibilityPrivate": "Privat",
   "visibilityShared": "Geteilt",
-  "visibilityPrivateHint": "Nur auf deinen eigenen Geräten. Wird nie an die Familie gesendet.",
+  "visibilityPrivateHint": "Nur für dich, verschlüsselt zwischen deinen eigenen Geräten. Wird nie an die Familie gesendet.",
   "visibilitySharedHint": "Verschlüsselt an die Familie gesendet. Mitglieder sehen den Termin und können zu- oder absagen.",
   "visibilityChangeNote": "Bereits an die Familie gesendete Inhalte bleiben auf deren Geräten, auch wenn du den Termin später privat machst.",
   "eventNew": "Neuer Termin",

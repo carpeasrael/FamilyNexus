@@ -2,7 +2,7 @@ FamilyNexus bringt Familienkalender, Messenger und Einkaufszettel in einer App z
 
 KALENDER
 • Tag-, Wochen-, Monats- und Agenda-Ansicht, Filter nach Person
-• Private Termine bleiben auf deinen eigenen Geräten, geteilte Termine sehen alle in der Familie
+• Private Termine siehst nur du (verschlüsselt zwischen deinen eigenen Geräten), geteilte Termine sehen alle in der Familie
 • Wiederholungen mit Ausnahmen, Zeitzonen, Zu- und Absagen
 • Lokale Erinnerungen – die Benachrichtigung verrät nie den Terminnamen
 
