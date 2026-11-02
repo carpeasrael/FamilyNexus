@@ -664,6 +664,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Folge:** Der Wiederholungsversuch der Einzelchats (`_dmRetryAfter`, 1 Minute) hängt nicht mehr an leeren Antworten, sondern am nächsten nichtleeren Sync oder Timeline-Rückruf.
 - **Grenze:** Presence-Heartbeats, Quittungen und Tipp-Anzeigen kommen in `rooms.join` und lösen weiter den vollen Abgleich aus. Die Kosten eines Abgleichs sind nicht gemessen.
 - **Ausgeschlossen (Folgeissue nur nach Messung):** Versionszähler je Zeitleiste, selektives Neumappen, `notifyListeners` nur bei Änderung.
+- **Nachtrag (2026-11-02, Issue #135):** Weil leere Syncs keinen Abgleich auslösen, braucht der Abruf der Mitgliederliste einen eigenen Neuversuch: Scheitert `requestParticipants` (Netz, 429, 5xx), versucht das Gateway es nach 1 Minute erneut, danach mit verdoppelter Wartezeit bis höchstens 15 Minuten (`participantsRetryAfter`, Exponent begrenzt). Bis dahin fehlen Einzelchats, Annahme von Einzelchat-Einladungen und Beitrittssignale wie bisher. Familienwechsel, Abmelden und Beenden brechen den Neuversuch ab; ein Fehler aus einer früheren Familie startet keinen.
 
 ## E-86 Reaktionen als eigener verschlüsselter Ereignistyp (2026-11-01, Issue #139) — ergänzt E-30, **schwer rückholbar** (Ereignisformat)
 

@@ -23,8 +23,8 @@ import '../support/memory_shopping_store.dart';
 import 'e2e_support.dart';
 
 /// Wie in der App: Anmeldung, dann Pflicht-Schlüsselsicherung (nur verifizierte Geräte erhalten Schlüssel).
-Future<SdkMatrixGateway> _login(String prefix) async {
-  final a = await E2e.loggedIn(prefix);
+Future<SdkMatrixGateway> _login(String prefix, {Duration participantsRetryBase = SdkMatrixGateway.participantsRetryDelay}) async {
+  final a = await E2e.loggedIn(prefix, participantsRetryBase: participantsRetryBase);
   await E2e.until(() => a.gateway.initialSyncDone, what: 'Sync $prefix');
   await a.gateway.setUpSecurity();
   await E2e.until(() => a.gateway.securityState == SecurityState.ready, what: 'Sicherung $prefix');
@@ -90,14 +90,15 @@ const String _idC = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
 void main() {
   group('Familienwechsel im selben Prozess (#140)', skip: E2e.enabled ? false : E2e.skipReason, () {
     /// Zwei Familien, dazu ein Konto, das zunächst nur in A ist.
-    Future<({SdkMatrixGateway modA, SdkMatrixGateway modB, SdkMatrixGateway user, String roomA, String roomB})> twoFamilies(String prefix) async {
+    Future<({SdkMatrixGateway modA, SdkMatrixGateway modB, SdkMatrixGateway user, String roomA, String roomB})> twoFamilies(String prefix,
+        {Duration participantsRetryBase = SdkMatrixGateway.participantsRetryDelay}) async {
       final modA = await _login('${prefix}moda');
       await modA.createFamily('Familie A');
       await E2e.until(() => modA.family != null);
       final modB = await _login('${prefix}modb');
       await modB.createFamily('Familie B');
       await E2e.until(() => modB.family != null);
-      final user = await _login('${prefix}user');
+      final user = await _login('${prefix}user', participantsRetryBase: participantsRetryBase);
       return (modA: modA, modB: modB, user: user, roomA: modA.family!.roomId, roomB: modB.family!.roomId);
     }
 
@@ -367,6 +368,31 @@ void main() {
       await t.modB.publishSharedEvent(_shared(t.modB, _idB, 'AUS-B'));
       await E2e.until(() => _sharedFrom(fresh, t.modB).isNotEmpty, what: 'Abgleich nach der Liste aus B');
       expect(fresh.whereType<MemberJoinedSignal>(), isEmpty);
+    });
+
+    test('#135: Fehler der Mitgliederliste aus A nach dem Wechsel startet keinen Neuversuch für B', () async {
+      final t = await twoFamilies('retrygen', participantsRetryBase: const Duration(seconds: 1));
+      final first = Completer<void>();
+      var calls = 0;
+      t.user.debugBeforeParticipantsLoaded = () {
+        calls++;
+        return calls == 1 ? first.future : Future<void>.value();
+      };
+      addTearDown(() {
+        if (!first.isCompleted) first.complete();
+      });
+      await _join(t.modA, t.user);
+      await E2e.until(() => calls == 1, what: 'Liste aus A wartet');
+      await _rawJoin(t.modB, t.user);
+      await _pointFamilyTo(t.user, t.roomB);
+      await E2e.until(() => t.user.family?.roomId == t.roomB && t.user.debugParticipantsLoaded, what: 'Liste aus B');
+      expect(calls, 2);
+
+      first.completeError(StateError('Abruf aus A gescheitert'));
+      await Future<void>.delayed(const Duration(milliseconds: 2500));
+      expect(t.user.debugParticipantsRetryPending, isFalse, reason: 'der Fehler gehört zu A');
+      expect(calls, 2, reason: 'kein neuer Abruf');
+      expect(t.user.debugParticipantsLoaded, isTrue);
     });
 
     test('vor dem ersten Abgleich nach dem Kontodaten-Wechsel geht nichts in den neuen Raum', () async {
@@ -697,6 +723,43 @@ void main() {
       await e1.declineInvitation(e1.invitations.single.roomId);
       await E2e.until(() => e1.invitations.isEmpty, what: 'Einladung abgelehnt');
       expect(e1.family, isNull);
+    });
+  });
+  group('Mitgliederliste: Neuversuch nach Fehler (#135)', skip: E2e.enabled ? false : E2e.skipReason, () {
+    test('ein gescheiterter Abruf wird nach der Wartezeit wiederholt', () async {
+      final mod = await _login('retrymod');
+      await mod.createFamily('Familie Neuversuch');
+      await E2e.until(() => mod.family != null);
+      final user = await _login('retryuser', participantsRetryBase: const Duration(seconds: 1));
+      var calls = 0;
+      // Läuft im selben `then` wie der Abruf: Ein Wurf landet im selben `catchError` wie ein Netzfehler.
+      user.debugBeforeParticipantsLoaded = () async {
+        calls++;
+        if (calls == 1) throw StateError('/members gescheitert');
+      };
+      await _join(mod, user);
+      await E2e.until(() => user.debugParticipantsLoaded, what: 'Liste nach dem Neuversuch');
+      expect(calls, greaterThanOrEqualTo(2));
+      expect(user.debugParticipantsRetryPending, isFalse);
+    });
+
+    test('nach dispose wartet kein Neuversuch mehr', () async {
+      final mod = await _login('retrydispmod');
+      await mod.createFamily('Familie Ende');
+      await E2e.until(() => mod.family != null);
+      final user = await _login('retrydispuser', participantsRetryBase: const Duration(seconds: 2));
+      var calls = 0;
+      user.debugBeforeParticipantsLoaded = () async {
+        calls++;
+        throw StateError('/members gescheitert');
+      };
+      await _join(mod, user);
+      await E2e.until(() => calls == 1 && user.debugParticipantsRetryPending, what: 'Neuversuch geplant');
+      user.dispose();
+      expect(user.debugParticipantsRetryPending, isFalse);
+      await Future<void>.delayed(const Duration(seconds: 4));
+      expect(calls, 1, reason: 'kein Abruf nach dispose');
+      expect(user.debugParticipantsRetryPending, isFalse);
     });
   });
 }

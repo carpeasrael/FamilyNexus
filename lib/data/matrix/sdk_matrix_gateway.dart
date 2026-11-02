@@ -74,7 +74,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     @visibleForTesting http.Client? httpClient,
     @visibleForTesting this._joinOpTimeout = roomOpTimeout,
     @visibleForTesting this._joinPollInterval = rejectionPollInterval,
-  })  : _probe = probe ?? ServerProbe(),
+    @visibleForTesting this._participantsRetryBase = participantsRetryDelay,
+  })  : assert(_participantsRetryBase > Duration.zero),
+        _probe = probe ?? ServerProbe(),
         _http = HttpsOnlyClient(httpClient);
 
   final Future<sql.Database> Function(String path, String key)? _databaseOpener;
@@ -139,6 +141,37 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void>? _creatingPrivateRoom;
   bool _participantsRequested = false;
   bool _participantsLoaded = false;
+
+  /// Neuer Versuch, wenn der Abruf der Mitgliederliste gescheitert ist (#135). Leere Syncs lösen seit E-85 keinen
+  /// Abgleich aus, der Neuversuch braucht deshalb einen eigenen Timer.
+  final Duration _participantsRetryBase;
+  Timer? _participantsRetry;
+  int _participantsFailures = 0;
+  bool _disposed = false;
+
+  static const Duration participantsRetryDelay = Duration(minutes: 1);
+  static const Duration participantsRetryMax = Duration(minutes: 15);
+
+  /// Wartezeit vor dem [failures]-ten Neuversuch: [base], dann verdoppelt bis [max]. Der Exponent ist begrenzt,
+  /// damit auch nach beliebig vielen Fehlversuchen nichts überläuft (#135).
+  @visibleForTesting
+  static Duration participantsRetryAfter(int failures,
+      {Duration base = participantsRetryDelay, Duration max = participantsRetryMax}) {
+    if (failures <= 1) return base < max ? base : max;
+    final exponent = (failures - 1).clamp(0, 10);
+    final micros = base.inMicroseconds * (1 << exponent);
+    return micros >= max.inMicroseconds ? max : Duration(microseconds: micros);
+  }
+
+  /// Nur für Tests: Wartet gerade ein Neuversuch für die Mitgliederliste?
+  @visibleForTesting
+  bool get debugParticipantsRetryPending => _participantsRetry != null;
+
+  void _cancelParticipantsRetry() {
+    _participantsRetry?.cancel();
+    _participantsRetry = null;
+    _participantsFailures = 0;
+  }
   bool _syncedOnce = false;
   Family? _family;
 
@@ -1098,6 +1131,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _pinBook.clear();
     _participantsLoaded = false;
     _participantsRequested = false;
+    _cancelParticipantsRetry();
     _scope.clear();
     _syncedOnce = false;
     _family = null;
@@ -1121,6 +1155,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _knownJoined = null;
     _participantsLoaded = false;
     _participantsRequested = false;
+    _cancelParticipantsRetry();
     _resetDirectChats();
   }
 
@@ -2752,6 +2787,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       _timeline = null;
       _timelineRoomId = null;
       _participantsRequested = false;
+      _cancelParticipantsRetry();
       _family = null;
       _messages = const <ChatMessage>[];
       _resetDirectChats();
@@ -2766,17 +2802,27 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       notifyListeners();
       return;
     }
-    if (!_participantsRequested) {
+    if (!_participantsRequested && _participantsRetry == null) {
       _participantsRequested = true;
       final generation = _scope.generation;
       room.requestParticipants().then((_) async {
         await debugBeforeParticipantsLoaded?.call();
         // Die Liste einer früheren Familie ist keine Basis für die jetzige.
-        if (generation != _scope.generation) return;
+        if (_disposed || generation != _scope.generation) return;
         _participantsLoaded = true;
+        _participantsFailures = 0;
         _scheduleRefresh();
       }).catchError((Object e) {
         AppLog.e('gateway', 'Mitglieder konnten nicht geladen werden', e);
+        // Neuer Versuch nur für die aktuelle Familie und ein lebendes Gateway (#135).
+        if (_disposed || generation != _scope.generation) return;
+        _participantsRequested = false;
+        _participantsFailures++;
+        _participantsRetry?.cancel();
+        _participantsRetry = Timer(participantsRetryAfter(_participantsFailures, base: _participantsRetryBase), () {
+          _participantsRetry = null;
+          if (!_disposed) _scheduleRefresh();
+        });
       }).ignore();
     }
     if (_timelineRoomId != room.id) {
@@ -3669,6 +3715,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   @override
   void dispose() {
+    _disposed = true;
+    _participantsRetry?.cancel();
+    _participantsRetry = null;
     _debounce?.cancel();
     _stopWatchingJoinRequest();
     _joinRequestGeneration++;
