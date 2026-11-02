@@ -43,7 +43,7 @@ Two roles govern the family: members use calendar and chat, moderators additiona
 ### Appointments
 
 - **Fields:** title, start and end, all-day, location, note, recurrence, participants, color, visibility.
-- **Private:** The appointment stays on the user's own devices only, is never sent to Matrix and is not visible to others.
+- **Private:** Only the user sees the appointment; it is never sent to the family and is synchronized end-to-end encrypted between the user's own devices via a private room known only to the own account (E-09).
 - **Shared:** The appointment is sent encrypted to the family room; members see it and can respond (accept, decline, maybe).
 - **Recurrences:** daily, weekly, monthly, yearly, each with exceptions.
 - **Views:** day, week, month, agenda; filter by person.
@@ -94,7 +94,7 @@ Local database and Matrix layer live on each device; the homeserver forwards enc
 | Online status | Encrypted device message (Olm) `de.inneso.familynexus.presence` to the devices of joined members; in memory only, valid for 5 minutes, can be turned off |
 | Shopping list | Dedicated encrypted event type `de.inneso.familynexus.shopping` in the family room with item ID, version, timestamp and deletion marker; stored encrypted locally |
 | Shared appointment | Dedicated encrypted event type in the room with appointment ID, version and response status |
-| Private appointment | Stored locally only; synchronized between own devices via a private room known only to the own account |
+| Private appointment | Stored locally and synchronized end-to-end encrypted between own devices via a private room known only to the own account |
 | Roles | Matrix power levels: member 0, moderator 50; the right to change roles is also at 50 |
 | Invitations | Matrix invitation, additionally link or QR code with expiry time |
 | Conflicts | Version counter per appointment; on concurrent changes the newer version wins, the older one stays in the history |

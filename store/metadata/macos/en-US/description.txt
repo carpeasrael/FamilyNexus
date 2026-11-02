@@ -2,7 +2,7 @@ FamilyNexus combines a family calendar, a messenger and a shared shopping list i
 
 CALENDAR
 • Day, week, month and agenda views, filter by person
-• Private events stay on your own devices, shared events are visible to the whole family
+• Only you see private events (encrypted between your own devices), shared events are visible to the whole family
 • Recurring events with exceptions, time zones, accept and decline
 • Local reminders – the notification never reveals the event title
 

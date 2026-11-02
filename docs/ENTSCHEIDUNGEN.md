@@ -48,6 +48,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Gewählt:** Ja, Synchronisation zwischen eigenen Geräten über einen privaten, verschlüsselten Raum, in dem nur das eigene Konto ist (Auffindung per Account-Data-Schlüssel `de.inneso.familynexus.private_room`). Der Familienraum erhält private Termine nie.
 - **Verworfen:** Nur lokal ohne Sync (Datenverlust bei Gerätewechsel).
 - **Begründung:** Wie vom Konzept angenommen. Durchsetzung: Typ `SharedEventPayload` lässt sich nur aus Terminen mit Sichtbarkeit „shared“ erzeugen; Gateway hat getrennte Sendewege; Test belegt es.
+- **Nachtrag (2026-11-02, Issue #143):** Texte sagen „nur für dich, verschlüsselt zwischen deinen eigenen Geräten“ statt „verlassen nie deine Geräte“ (Willkommensseite `onbPoint3`, Hinweis im Termin-Editor `visibilityPrivateHint`, Store-Beschreibungen, README, Concept). Private Termine liegen Ende-zu-Ende-verschlüsselt im privaten Raum auf dem Server; `test/l10n/private_events_claim_test.dart` verhindert die alte Zusage.
 
 ## E-10 Moderatorenrechte (offene Frage „Moderatorenrechte“)
 - **Gewählt:** Moderatoren dürfen Mitglieder einladen/entfernen, zum Moderator ernennen, Familienname ändern. Sie dürfen **keine** geteilten Termine anderer ändern oder löschen. Termine gehören ihrem Ersteller; Änderungen anderer Absender werden verworfen. Moderatoren können andere Moderatoren nicht herabstufen oder entfernen (Matrix-Regel: gleiche Stufe).

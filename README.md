@@ -38,7 +38,7 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
   automatically at the period boundary in the list's time zone. Only the assigned person ticks items off (optional comment); date and time are logged in a history that is kept
   across resets. Transmitted and stored encrypted, offline-capable.
 - **Calendar** with day/week/month/agenda views, person filter, recurrences (including exceptions, daylight saving
-  time), time zones, **private** (own devices only) and **shared** events (encrypted in the family room), accept/decline,
+  time), time zones, **private** (only you, synced end-to-end encrypted between your own devices) and **shared** events (encrypted in the family room), accept/decline,
   share events as a card in the chat.
 - **Local reminders** without the event name in the notification.
 - **Family and roles:** member/moderator; invite via link (share by email, QR code or copy; single-use, time-limited) or

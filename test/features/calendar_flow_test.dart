@@ -61,7 +61,7 @@ void main() {
       expect(find.text('Neuer Termin'), findsWidgets);
       await tester.enterText(find.widgetWithText(TextFormField, 'Titel'), 'Elternabend');
       // Standard ist privat; Teilen ist eine bewusste Entscheidung.
-      expect(find.text('Nur auf deinen eigenen Geräten. Wird nie an die Familie gesendet.'), findsOneWidget);
+      expect(find.text('Nur für dich, verschlüsselt zwischen deinen eigenen Geräten. Wird nie an die Familie gesendet.'), findsOneWidget);
       await tester.tap(find.text('Geteilt'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Speichern'));
@@ -84,7 +84,7 @@ void main() {
       await tester.tap(find.byTooltip('Neuer Termin'));
       await tester.pumpAndSettle();
       await tester.enterText(find.widgetWithText(TextFormField, 'Titel'), 'Arzt');
-      expect(find.text('Nur auf deinen eigenen Geräten. Wird nie an die Familie gesendet.'), findsOneWidget);
+      expect(find.text('Nur für dich, verschlüsselt zwischen deinen eigenen Geräten. Wird nie an die Familie gesendet.'), findsOneWidget);
       await tester.tap(find.text('Speichern'));
       await tester.pumpAndSettle();
       await app.services.calendar!.sync.publishPending();

@@ -407,7 +407,7 @@ abstract class AppLocalizations {
   /// No description provided for @onbPoint3.
   ///
   /// In de, this message translates to:
-  /// **'Private Termine verlassen nie deine eigenen Geräte.'**
+  /// **'Private Termine siehst nur du; zwischen deinen eigenen Geräten werden sie verschlüsselt abgeglichen.'**
   String get onbPoint3;
 
   /// No description provided for @serverUrlInvalid.
@@ -1049,7 +1049,7 @@ abstract class AppLocalizations {
   /// No description provided for @visibilityPrivateHint.
   ///
   /// In de, this message translates to:
-  /// **'Nur auf deinen eigenen Geräten. Wird nie an die Familie gesendet.'**
+  /// **'Nur für dich, verschlüsselt zwischen deinen eigenen Geräten. Wird nie an die Familie gesendet.'**
   String get visibilityPrivateHint;
 
   /// No description provided for @visibilitySharedHint.

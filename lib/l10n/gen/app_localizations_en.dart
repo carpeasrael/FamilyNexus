@@ -172,7 +172,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onbPoint2 => 'Chat and shared events are end-to-end encrypted.';
 
   @override
-  String get onbPoint3 => 'Private events never leave your own devices.';
+  String get onbPoint3 =>
+      'Only you see private events; they are synced encrypted between your own devices.';
 
   @override
   String get serverUrlInvalid => 'Please enter a valid https address.';
@@ -588,7 +589,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get visibilityPrivateHint =>
-      'Only on your own devices. Never sent to the family.';
+      'Only for you, encrypted between your own devices. Never sent to the family.';
 
   @override
   String get visibilitySharedHint =>

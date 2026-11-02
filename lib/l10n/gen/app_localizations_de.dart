@@ -175,7 +175,8 @@ class AppLocalizationsDe extends AppLocalizations {
       'Chat und geteilte Termine sind Ende-zu-Ende-verschlüsselt.';
 
   @override
-  String get onbPoint3 => 'Private Termine verlassen nie deine eigenen Geräte.';
+  String get onbPoint3 =>
+      'Private Termine siehst nur du; zwischen deinen eigenen Geräten werden sie verschlüsselt abgeglichen.';
 
   @override
   String get serverUrlInvalid => 'Bitte eine gültige https-Adresse eingeben.';
@@ -596,7 +597,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get visibilityPrivateHint =>
-      'Nur auf deinen eigenen Geräten. Wird nie an die Familie gesendet.';
+      'Nur für dich, verschlüsselt zwischen deinen eigenen Geräten. Wird nie an die Familie gesendet.';
 
   @override
   String get visibilitySharedHint =>
