@@ -21,7 +21,8 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
   provider and then to a join card that names the inviting person and their provider (not the family, E-79). The mandatory key backup is the **emergency key** (copy with
   auto-clearing clipboard, or save as a printable file).
 - **Family chat and direct chats** (encrypted): messages, replies, reactions, attachments (validated, never opened
-  automatically), offline queue. Direct chats exist for every pair of joined members ("Send message" in the family view
+  automatically); unsent messages are retried while the app is running (after a restart they are shown as “not sent”
+  and have to be written again, E-33/#138). Direct chats exist for every pair of joined members ("Send message" in the family view
   or via the conversation bar in the chat); invitations from strangers are ignored.
 - **Report and block:** report a message to the operator of your homeserver (reason + optional text; the encrypted content is
   never sent) and block members locally on your device (messages and direct chat are hidden, undo under *Settings → Blocked
