@@ -5,7 +5,7 @@ New in 1.2.2:
 • Settings → Account → “Change password”. New accounts ask for the password twice.
 • Security: reactions are sent encrypted; unencrypted events in the family room are no longer trusted; after switching families no data of the old family reaches the new one; servers in the home network are only used with consent, also when signing in via the browser.
 • Reliability: an error while restoring the sign-in no longer deletes family data; failed messages are resent with a pause; loaded images stay with their message; cancelled saving no longer reports “Saved”.
-• Times follow the device's 12/24-hour setting everywhere. Combined emojis are allowed in events, shopping and tasks, and input fields count emojis correctly.
+• Times follow the device's 12/24-hour setting everywhere. Combined emojis such as 👨‍👩‍👧 are allowed in shopping and tasks, still not in events; input fields and chat count emojis correctly.
 • The privacy policy in the app names key storage, permissions and backups matching the platform.
 • Further fixes and speed-ups, among others when loading the calendar, sending photos and syncing.
 • Mac: the app states the AGPL licence instead of “All rights reserved”.

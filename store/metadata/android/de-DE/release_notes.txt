@@ -5,5 +5,5 @@ Neu in 1.2.2:
 • Passwort ändern in den Einstellungen.
 • Reaktionen werden verschlüsselt gesendet.
 • Mehr Schutz bei Familienwechsel und Heimnetz-Servern.
-• Uhrzeiten folgen der Geräteeinstellung; Emojis überall erlaubt.
+• Uhrzeiten folgen der Geräteeinstellung; zusammengesetzte Emojis in Einkauf und Aufgaben.
 • Viele Korrekturen.

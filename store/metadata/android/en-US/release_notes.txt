@@ -5,5 +5,5 @@ New in 1.2.2:
 • Change your password in the settings.
 • Reactions are sent encrypted.
 • Better protection when switching families and for home-network servers.
-• Times follow the device setting; emojis allowed everywhere.
+• Times follow the device setting; combined emojis in shopping and tasks.
 • Many fixes.
