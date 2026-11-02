@@ -175,13 +175,22 @@ class ServerProbe {
     final issuer = _httpsUri(meta['issuer']);
     const required = <String>['authorization_endpoint', 'registration_endpoint', 'token_endpoint', 'revocation_endpoint'];
     if (issuer == null || !required.every((k) => _httpsUri(meta[k]) != null)) return null;
-    // Ein öffentlicher Anbieter darf keine Endpunkte im Heimnetz nennen (E-59, #158).
-    if (!base.isLocal && [issuer, ...required.map((k) => _httpsUri(meta[k])!)].any((u) => ServerUrl.isLocalHost(u.host.toLowerCase()))) {
+    if (!oauthEndpointsAcceptable(localServer: base.isLocal, endpoints: [issuer, ...required.map((k) => _httpsUri(meta[k])!)])) {
       AppLog.w('probe', 'Anmeldedienst verweist ins Heimnetz – verworfen');
       return null;
     }
     return issuer;
   }
+
+  /// Gemeinsame Regel für OAuth-Endpunkte (E-59, #158, #222): alle https mit Host und ohne Zugangsdaten;
+  /// ein öffentlicher Server ([localServer] falsch) darf keine Endpunkte im Heimnetz nennen.
+  static bool oauthEndpointsAcceptable({required bool localServer, required Iterable<Uri> endpoints}) => endpoints.every(
+        (u) =>
+            u.scheme == 'https' &&
+            u.host.isNotEmpty &&
+            u.userInfo.isEmpty &&
+            (localServer || !ServerUrl.isLocalHost(u.host.toLowerCase())),
+      );
 
   /// Wie bei [url] ein Konto angelegt wird (E-55). Fragt erst den OAuth-Dienst ab, sonst die
   /// Registrierungsabläufe (`POST /register` ohne Anmeldedaten liefert nur die Abläufe, legt nichts an).

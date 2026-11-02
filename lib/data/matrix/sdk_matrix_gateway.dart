@@ -110,7 +110,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Alle Verbindungen des SDK laufen über diesen Client: nur https, keine Weiterleitungen.
   final HttpsOnlyClient _http;
 
-  Client? _client;
+  _AppClient? _client;
   StreamSubscription<Object?>? _syncSub;
   StreamSubscription<Object?>? _loginSub;
   StreamSubscription<Object?>? _verificationSub;
@@ -273,7 +273,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     };
   }
 
-  Future<Client> _ensureClient() async {
+  Future<_AppClient> _ensureClient() async {
     final existing = _client;
     if (existing != null) return existing;
     _hardenSdkLogging();
@@ -294,7 +294,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       await db.close().catchError((Object _) {});
       rethrow;
     }
-    final client = Client(
+    final client = _AppClient(
       'FamilyNexus',
       database: database,
       httpClient: _http,
@@ -423,15 +423,20 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   /// Setzt den Homeserver des SDK auf die geprüfte Adresse. Das SDK darf keine eigene
   /// `.well-known`-Abfrage machen (ungeprüfte Ziele, Weiterleitungen, Zwischenspeicherung).
-  Future<void> _useHomeserver(Client client, ServerUrl server, {bool oauth = false}) async {
+  /// Mit [oauth] liefert es die dabei abgerufenen OAuth-Metadaten (`null`, wenn keine abrufbar waren).
+  Future<GetAuthMetadataResponse?> _useHomeserver(Client client, ServerUrl server, {bool oauth = false}) async {
+    // Passwort-Anmeldung und Registrierung beenden eine offene Browser-Anmeldung samt festgehaltener
+    // Metadaten (#222) – vor `checkHomeserver`, das ab Matrix v1.15 auch hier `getAuthMetadata` ruft.
+    if (!oauth) _dropOAuth();
     final base = _confirmedBase[server] ?? await _probe.resolveBase(server);
     // Die OAuth-Metadaten nur für die Browser-Anmeldung abfragen: Fehlerseiten von Proxys würden
     // sonst auch die Passwort-Anmeldung verhindern.
-    await client.checkHomeserver(base.uri, checkWellKnown: false, fetchAuthMetadata: oauth ? true : null);
+    final (_, _, _, meta) = await client.checkHomeserver(base.uri, checkWellKnown: false, fetchAuthMetadata: oauth ? true : null);
     if (client.homeserver?.scheme != 'https') {
       client.homeserver = null;
       throw const GatewayException(GatewayError.serverUnsupported);
     }
+    return oauth ? meta : null;
   }
 
   @override
@@ -475,6 +480,13 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   _RegistrationSession? _registration;
   OidcLoginSession? _oauth;
+
+  /// Beendet eine offene Browser-Anmeldung samt der dafür festgehaltenen Metadaten (#222): beide
+  /// werden immer gemeinsam aufgehoben.
+  void _dropOAuth() {
+    _oauth = null;
+    _client?.pinnedAuthMetadata = null;
+  }
 
   /// Öffentliche Projektseite; die Rücksprungadresse auf Mobilgeräten ist deren umgekehrter
   /// Domainname (MSC2966: eigenes Schema muss zur `client_uri` passen).
@@ -687,22 +699,29 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final loopback = redirectUri.scheme == 'http' && redirectUri.host == '127.0.0.1';
     if (!loopback && redirectUri.scheme != oauthScheme) throw const GatewayException(GatewayError.invalidInput);
     cancelRegistration();
+    // Eine ältere, nicht abgeschlossene Anmeldung ist damit verworfen; ihr Rücksprung ergibt `oauthCancelled`.
+    _dropOAuth();
     try {
       final client = await _ensureClient();
-      await _useHomeserver(client, server, oauth: true);
-      // Alle Endpunkte, über die Code, Verifier und Tokens laufen, müssen https sein – geprüft an genau
-      // den Metadaten, die das SDK anschließend verwendet.
-      final meta = await client.getAuthMetadata();
-      final endpoints = <Uri>[
-        meta.issuer,
-        meta.authorizationEndpoint,
-        meta.tokenEndpoint,
-        meta.registrationEndpoint,
-        meta.revocationEndpoint,
-      ];
-      if (endpoints.any((u) => u.scheme != 'https' || u.host.isEmpty || u.userInfo.isNotEmpty)) {
-        throw const GatewayException(GatewayError.serverUnsupported);
-      }
+      // Die Metadaten aus der Serverprüfung, ohne zweiten Abruf. Fehler beim Abruf fängt
+      // `checkHomeserver` ab; ohne Metadaten gibt es keine Browser-Anmeldung (#222).
+      final meta = await _useHomeserver(client, server, oauth: true);
+      if (meta == null) throw const GatewayException(GatewayError.serverUnsupported);
+      // Alle Endpunkte, über die Code, Verifier und Tokens laufen: https, ohne Zugangsdaten und bei einem
+      // öffentlichen Server nicht im Heimnetz (E-59). Danach festgehalten: Das SDK ruft `getAuthMetadata`
+      // in `registerOidcClient`, `initOidcLoginSession` und `oidcLogin` selbst und erhält genau diese.
+      final acceptable = ServerProbe.oauthEndpointsAcceptable(
+        localServer: ServerUrl.isLocalHost(client.homeserver!.host.toLowerCase()),
+        endpoints: <Uri>[
+          meta.issuer,
+          meta.authorizationEndpoint,
+          meta.tokenEndpoint,
+          meta.registrationEndpoint,
+          meta.revocationEndpoint,
+        ],
+      );
+      if (!acceptable) throw const GatewayException(GatewayError.serverUnsupported);
+      client.pinnedAuthMetadata = meta;
       final data = await client.registerOidcClient(
         redirectUris: <Uri>[redirectUri],
         applicationType: OidcApplicationType.native,
@@ -723,8 +742,10 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       _oauth = session;
       return session.authenticationUri;
     } on GatewayException {
+      _dropOAuth();
       rethrow;
     } catch (e) {
+      _dropOAuth();
       AppLog.e('gateway', 'Anmeldung im Browser nicht vorbereitet', e);
       throw _map(e);
     }
@@ -745,13 +766,17 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     };
     final code = params['code'];
     final state = params['state'];
-    // Fremder Rücksprung (anderer Prozess, alte Anmeldung): verwerfen, die eigene läuft weiter.
+    // Fremder Rücksprung (anderer Prozess, alte Anmeldung): verwerfen, die eigene läuft weiter – samt
+    // der festgehaltenen Metadaten (#222).
     if (state != session.state) throw const GatewayException(GatewayError.oauthStateMismatch);
     if (params.containsKey('error') || code == null) {
-      _oauth = null;
+      _dropOAuth();
       throw const GatewayException(GatewayError.oauthCancelled);
     }
     _oauth = null;
+    // Code und Verifier gehen nur an den beim Start geprüften Token-Endpunkt (doppelte Sicherung).
+    final pinned = client.pinnedAuthMetadata;
+    if (pinned == null) throw const GatewayException(GatewayError.oauthCancelled);
     try {
       await client.oidcLogin(session: session, code: code, state: session.state);
       await _refresh();
@@ -759,6 +784,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       AppLog.e('gateway', 'Anmeldung im Browser fehlgeschlagen', e);
       if (e is OidcException) throw const GatewayException(GatewayError.oauthCancelled);
       throw _map(e, forLogin: true);
+    } finally {
+      // Token-Erneuerung und -Widerruf nutzen danach wieder die Metadaten des SDK (E-59, #222).
+      if (identical(client.pinnedAuthMetadata, pinned)) client.pinnedAuthMetadata = null;
     }
   }
 
@@ -792,6 +820,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       t.cancelSubscriptions();
     }
     _dmTimelines.clear();
+    _dropOAuth();
     final c = _client;
     _client = null;
     _stopWatchingJoinRequest();
@@ -805,7 +834,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<void> logout() async {
     cancelRegistration();
-    _oauth = null;
+    _dropOAuth();
     final client = _client;
     if (client == null) return;
     try {
@@ -1027,7 +1056,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Das Konto ist beim Anbieter gelöscht: Sitzung nur noch lokal beenden (der Server kennt sie nicht mehr).
   Future<void> _endDeletedSession(Client c) async {
     cancelRegistration();
-    _oauth = null;
+    _dropOAuth();
     try {
       await c.clear();
     } catch (e) {
@@ -3726,6 +3755,37 @@ class _JoinDiagnostic {
       'Timer aktiv: ${timerActive ? 'ja' : 'nein'}',
       'Angezeigt: ${_time(now)}',
     ].join('\n');
+  }
+}
+
+/// SDK-Client, der während einer Browser-Anmeldung die beim Start geprüften OAuth-Metadaten festhält
+/// (#222). Die OAuth-Erweiterungen des SDK rufen `getAuthMetadata` am Objekt und laden ohne Anmeldung
+/// sonst jedes Mal neu; der Server könnte dann nach der Prüfung andere Endpunkte nennen.
+class _AppClient extends Client {
+  _AppClient(
+    super.clientName, {
+    required super.database,
+    super.httpClient,
+    super.supportedLoginTypes,
+    super.verificationMethods,
+    super.receiptsPublicByDefault,
+    super.shareKeysWith,
+    super.logLevel,
+    super.requestHistoryOnLimitedTimeline,
+    super.customImageResizer,
+  });
+
+  /// Gesetzt nur zwischen geprüftem Start und Abschluss/Abbruch der Browser-Anmeldung.
+  GetAuthMetadataResponse? pinnedAuthMetadata;
+
+  @override
+  Future<GetAuthMetadataResponse> getAuthMetadata({
+    Duration cacheLifetime = const Duration(days: 3),
+    bool throwOnUpdateFailure = false,
+  }) {
+    final pinned = pinnedAuthMetadata;
+    if (pinned != null) return Future<GetAuthMetadataResponse>.value(pinned);
+    return super.getAuthMetadata(cacheLifetime: cacheLifetime, throwOnUpdateFailure: throwOnUpdateFailure);
   }
 }
 
