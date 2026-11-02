@@ -1,11 +1,12 @@
 Neu in 1.2.2:
-• Einkauf: Einträge lassen sich einer Gruppe zuordnen, zum Beispiel einem Geschäft. Die Liste zeigt die offenen Einträge nach Gruppen, „Ohne Gruppe“ am Ende. Ältere App-Versionen zeigen die Einträge weiter, nur ohne Gruppe.
+• Bitte alle Geräte der Familie aktualisieren. Ältere App-Versionen zeigen Gruppen, Einträge mit zusammengesetzten Emojis und neue Reaktionen nicht; ändert oder hakt jemand dort einen Eintrag ab, geht dessen Gruppe für alle verloren.
+• Einkauf: Einträge lassen sich einer Gruppe zuordnen, zum Beispiel einem Geschäft. Die Liste zeigt die offenen Einträge nach Gruppen, „Ohne Gruppe“ am Ende.
 • Heute: höchstens drei Termine mit „Alle Termine“; die Karte „Erinnerungen“ öffnet eine Übersicht, in der sich fällige Erinnerungen bestätigen lassen.
 • Jeden Beitritt per Einladungslink bestätigt jetzt ein Moderator. Einladungslinks zeigen Namen und Server nicht mehr lesbar an und enthalten den Familiennamen nicht mehr; behandle den Link weiter wie einen Schlüssel. Ältere App-Versionen lesen neue Links nicht: Bitte alle Moderatoren aktualisieren.
 • Einstellungen → Konto → „Passwort ändern“. Neue Konten fragen das Passwort zur Kontrolle zweimal ab.
 • Sicherheit: Reaktionen werden verschlüsselt gesendet; unverschlüsselte Ereignisse im Familienraum gelten nicht mehr als echt; nach einem Familienwechsel gelangen keine Daten der alten Familie in die neue; Server im Heimnetz werden auch bei der Anmeldung im Browser nur nach Zustimmung genutzt.
 • Zuverlässigkeit: Ein Fehler beim Wiederherstellen der Anmeldung löscht keine Familiendaten mehr; gescheiterte Nachrichten werden mit Pause erneut gesendet; geladene Bilder bleiben an ihrer Nachricht; abgebrochenes Speichern meldet nicht mehr „Gespeichert“.
-• Uhrzeiten folgen überall der 12-/24-Stunden-Einstellung des Geräts. Zusammengesetzte Emojis sind in Terminen, Einkauf und Aufgaben erlaubt, Eingabefelder zählen Emojis richtig.
+• Uhrzeiten folgen überall der 12-/24-Stunden-Einstellung des Geräts. Zusammengesetzte Emojis wie 👨‍👩‍👧 sind in Einkauf und Aufgaben erlaubt, in Terminen weiterhin nicht; Eingabefelder und Chat zählen Emojis richtig.
 • Die Datenschutzerklärung in der App nennt Schlüsselablage, Berechtigungen und Sicherungen passend zur Plattform.
 • Weitere Korrekturen und Beschleunigungen, unter anderem beim Laden des Kalenders, beim Senden von Fotos und bei der Synchronisierung.
 • iOS: Notfall-Schlüssel und Anhänge bleiben nach dem Speichern nicht mehr unverschlüsselt im temporären Ordner.

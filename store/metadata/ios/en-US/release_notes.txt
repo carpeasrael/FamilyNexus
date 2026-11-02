@@ -1,11 +1,12 @@
 New in 1.2.2:
-• Shopping: items can be assigned to a group, for example a shop. The list shows open items by group, “No group” at the end. Older app versions still show the items, just without a group.
+• Please update all devices of your family. Older app versions do not show groups, items with combined emojis or new reactions; if someone edits or ticks off an item there, its group is lost for everyone.
+• Shopping: items can be assigned to a group, for example a shop. The list shows open items by group, “No group” at the end.
 • Today: at most three events with “All events”; the “Reminders” card opens an overview where due reminders can be confirmed.
 • A moderator now confirms every join via invitation link. Invitation links no longer show names and server in readable form and no longer contain the family name; still treat the link like a key. Older app versions cannot read new links: please update all moderators.
 • Settings → Account → “Change password”. New accounts ask for the password twice.
 • Security: reactions are sent encrypted; unencrypted events in the family room are no longer trusted; after switching families no data of the old family reaches the new one; servers in the home network are only used with consent, also when signing in via the browser.
 • Reliability: an error while restoring the sign-in no longer deletes family data; failed messages are resent with a pause; loaded images stay with their message; cancelled saving no longer reports “Saved”.
-• Times follow the device's 12/24-hour setting everywhere. Combined emojis are allowed in events, shopping and tasks, and input fields count emojis correctly.
+• Times follow the device's 12/24-hour setting everywhere. Combined emojis such as 👨‍👩‍👧 are allowed in shopping and tasks, still not in events; input fields and chat count emojis correctly.
 • The privacy policy in the app names key storage, permissions and backups matching the platform.
 • Further fixes and speed-ups, among others when loading the calendar, sending photos and syncing.
 • iOS: the emergency key and attachments no longer remain unencrypted in the temporary folder after saving.
