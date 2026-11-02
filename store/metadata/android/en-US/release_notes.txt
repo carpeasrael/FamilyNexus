@@ -1,8 +1,9 @@
-New in 1.2.1:
-• A moderator now confirms every join.
-• Invitation links no longer show names; old apps cannot read them. Moderators should update.
-• matrix.org stays the default provider, even after signing in or being invited on another server.
-• About the app: storage locations and reports of all data stored locally and online.
-• Delete your account in the settings.
-• Create a new emergency key; a new account now always shows it.
-• Change your password; new accounts enter it twice.
+New in 1.2.2:
+• Shopping: group items, e.g. by shop.
+• Today: view and confirm reminders.
+• A moderator confirms every join; invitation links no longer show names. Moderators should update.
+• Change your password in the settings.
+• Reactions are sent encrypted.
+• Better protection when switching families and for home-network servers.
+• Times follow the device setting; emojis allowed everywhere.
+• Many fixes.

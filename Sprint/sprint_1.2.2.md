@@ -32,7 +32,7 @@ Nicht im Sprint:
 | Nr. | Frage | Annahme dieses Plans | Stand |
 |---|---|---|---|
 | E1 | Wie weit geht #211? | Freie Gruppennamen je Eintrag, alphabetisch sortiert, „Ohne Gruppe“ am Ende, Erledigtes ungruppiert | offen |
-| E2 | Welche Version bekommt dieser Release? | 1.2.2+24, wenn 1.2.1 mit Build 23 erscheint | offen |
+| E2 | Welche Version bekommt dieser Release? | 1.2.2+24, wenn 1.2.1 mit Build 23 erscheint | entschieden (02.11.2026): **1.2.2+23**; 1.2.1 bekommt keinen weiteren Build, die Arbeit läuft unter 1.2.2 (Milestone „Release v1.2.2“) |
 
 ## Technischer Ansatz
 
