@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../app/app_services.dart';
 import '../../core/platform_info.dart';
@@ -6,6 +7,7 @@ import '../../domain/shopping.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
+import '../../ui/widgets/length_limit.dart';
 import '../common/error_text.dart';
 import '../chat/sender_name.dart';
 import 'shopping_controller.dart';
@@ -146,6 +148,7 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
                               controller: _title,
                               focusNode: _titleFocus,
                               maxLength: ShoppingItem.maxTitle,
+                              inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(ShoppingItem.maxTitle, LengthMeasure.codePoints)],
                               buildCounter: _noCounter,
                               enableIMEPersonalizedLearning: false,
                               textCapitalization: TextCapitalization.sentences,
@@ -161,6 +164,7 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
                             child: TextField(
                               controller: _qty,
                               maxLength: ShoppingItem.maxQuantity,
+                              inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(ShoppingItem.maxQuantity, LengthMeasure.codePoints)],
                               buildCounter: _noCounter,
                               enableIMEPersonalizedLearning: false,
                               textInputAction: TextInputAction.next,
@@ -241,7 +245,9 @@ class _GroupTextField extends StatelessWidget {
         controller: controller,
         focusNode: focusNode,
         maxLength: ShoppingItem.maxGroup,
-        buildCounter: buildCounter,
+        inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(ShoppingItem.maxGroup, LengthMeasure.codePoints)],
+        // Ohne eigenen Zähler (Eingabezeile: keiner) zählt er wie die Prüfung (#221).
+        buildCounter: buildCounter ?? measuredCounter(controller, ShoppingItem.maxGroup, LengthMeasure.codePoints),
         enableIMEPersonalizedLearning: false,
         textCapitalization: TextCapitalization.sentences,
         textInputAction: TextInputAction.done,
@@ -406,6 +412,8 @@ class _EditDialogState extends State<_EditDialog> {
             controller: _title,
             autofocus: true,
             maxLength: ShoppingItem.maxTitle,
+            inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(ShoppingItem.maxTitle, LengthMeasure.codePoints)],
+            buildCounter: measuredCounter(_title, ShoppingItem.maxTitle, LengthMeasure.codePoints),
             enableIMEPersonalizedLearning: false,
             decoration: InputDecoration(labelText: l.shoppingHintItem),
             // Desktop: Enter speichert (#68); mobil springt „Weiter“ zur Menge.
@@ -415,6 +423,8 @@ class _EditDialogState extends State<_EditDialog> {
           TextField(
             controller: _qty,
             maxLength: ShoppingItem.maxQuantity,
+            inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(ShoppingItem.maxQuantity, LengthMeasure.codePoints)],
+            buildCounter: measuredCounter(_qty, ShoppingItem.maxQuantity, LengthMeasure.codePoints),
             enableIMEPersonalizedLearning: false,
             decoration: InputDecoration(labelText: l.shoppingHintQuantity),
             textInputAction: TextInputAction.next,

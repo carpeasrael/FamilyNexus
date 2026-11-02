@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../app/app_services.dart';
@@ -9,6 +10,7 @@ import '../../domain/recurrence.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
+import '../../ui/widgets/length_limit.dart';
 import '../reminders/reminder_coordinator.dart';
 import 'calendar_controller.dart';
 import 'formatting.dart';
@@ -336,6 +338,8 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
                 TextFormField(
                   controller: _title,
                   maxLength: CalendarEvent.maxTitle,
+                  inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(CalendarEvent.maxTitle, LengthMeasure.utf16)],
+                  buildCounter: measuredCounter(_title, CalendarEvent.maxTitle, LengthMeasure.utf16),
                   textCapitalization: TextCapitalization.sentences,
                   enableIMEPersonalizedLearning: false,
                   decoration: InputDecoration(labelText: l.eventTitle),
@@ -379,8 +383,24 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
             const SizedBox(height: 12),
             GlassCard(
               child: Column(children: <Widget>[
-                TextFormField(controller: _location, maxLength: CalendarEvent.maxLocation, enableIMEPersonalizedLearning: false, decoration: InputDecoration(labelText: l.eventLocation)),
-                TextFormField(controller: _note, maxLength: CalendarEvent.maxNote, maxLines: 4, minLines: 2, enableIMEPersonalizedLearning: false, decoration: InputDecoration(labelText: l.eventNote)),
+                TextFormField(
+                  controller: _location,
+                  maxLength: CalendarEvent.maxLocation,
+                  inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(CalendarEvent.maxLocation, LengthMeasure.utf16)],
+                  buildCounter: measuredCounter(_location, CalendarEvent.maxLocation, LengthMeasure.utf16),
+                  enableIMEPersonalizedLearning: false,
+                  decoration: InputDecoration(labelText: l.eventLocation),
+                ),
+                TextFormField(
+                  controller: _note,
+                  maxLength: CalendarEvent.maxNote,
+                  inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(CalendarEvent.maxNote, LengthMeasure.utf16)],
+                  buildCounter: measuredCounter(_note, CalendarEvent.maxNote, LengthMeasure.utf16),
+                  maxLines: 4,
+                  minLines: 2,
+                  enableIMEPersonalizedLearning: false,
+                  decoration: InputDecoration(labelText: l.eventNote),
+                ),
               ]),
             ),
             const SizedBox(height: 12),
