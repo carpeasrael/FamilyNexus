@@ -25,4 +25,22 @@ void main() {
       expect(screenProtection.hasMatch(File(f).readAsStringSync()), isTrue);
     });
   }
+
+  // #167: Die Beschreibungen nennen die Aufgabenlisten (E-51, E-58) und bleiben unter der Store-Grenze von 4000 Zeichen.
+  for (final f in [
+    'store/metadata/ios/de-DE/description.txt',
+    'store/metadata/ios/en-US/description.txt',
+    'store/metadata/macos/de-DE/description.txt',
+    'store/metadata/macos/en-US/description.txt',
+    'store/metadata/android/de-DE/full_description.txt',
+    'store/metadata/android/en-US/full_description.txt',
+  ]) {
+    test('$f: Aufgabenlisten genannt, höchstens 4000 Zeichen', () {
+      final text = File(f).readAsStringSync();
+      final de = f.contains('/de-DE/');
+      expect(text, contains(de ? '\nAUFGABEN\n' : '\nTASKS\n'));
+      expect(text, contains(de ? 'Montag bis Freitag' : 'Monday to Friday'));
+      expect(text.runes.length, lessThanOrEqualTo(4000));
+    });
+  }
 }
