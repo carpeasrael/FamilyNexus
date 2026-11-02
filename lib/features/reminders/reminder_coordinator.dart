@@ -8,6 +8,7 @@ import '../../data/platform/reminder_scheduler.dart';
 import '../../domain/key_value_store.dart';
 import '../../domain/reminder_planner.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../domain/app_settings.dart';
 import '../../domain/calendar_event.dart';
 import '../calendar/calendar_controller.dart';
 import '../settings/settings_controller.dart';
@@ -38,7 +39,6 @@ class ReminderCoordinator extends ChangeNotifier {
 
   Timer? _debounce;
   ReminderPermission _permission = ReminderPermission.granted;
-  int _plannedCount = 0;
 
   ReminderPermission get permission => _permission;
 
@@ -48,7 +48,9 @@ class ReminderCoordinator extends ChangeNotifier {
   bool get needsSystemSettings =>
       _askedWithoutSuccess && _permission == ReminderPermission.notificationsDenied && scheduler.canOpenSettings;
   bool _askedWithoutSuccess = false;
-  int get plannedCount => _plannedCount;
+
+  /// Zahl der geplanten Erinnerungen, wie „Geplant (n)“ der Übersicht (#223, E-87).
+  int get plannedCount => planned().length;
 
   /// Bestätigte Erinnerungen: ID → Ende des Vorkommens (ms). Nur IDs und Zeiten, kein Inhalt; zählt zu den
   /// Familiendaten und fällt mit Abmelden und Familienwechsel (E-87).
@@ -63,6 +65,8 @@ class ReminderCoordinator extends ChangeNotifier {
     _loading = _load();
     calendar.addListener(_schedule);
     settings.addListener(_schedule);
+    calendar.addListener(_invalidate);
+    settings.addListener(_invalidate);
     _schedule();
   }
 
@@ -72,6 +76,9 @@ class ReminderCoordinator extends ChangeNotifier {
     _debounce?.cancel();
     calendar.removeListener(_schedule);
     settings.removeListener(_schedule);
+    calendar.removeListener(_invalidate);
+    settings.removeListener(_invalidate);
+    _snapshot = null;
     super.dispose();
   }
 
@@ -95,42 +102,75 @@ class ReminderCoordinator extends ChangeNotifier {
     } catch (e) {
       AppLog.e('reminders', 'Bestätigte Erinnerungen nicht lesbar', e);
     }
+    _invalidate();
     if (!_disposed) notifyListeners();
   }
 
-  ({List<CalendarEvent> events, Map<String, List<int>> personal, List<int> defaults, Set<String> skip}) _input() => (
-        events: calendar.events,
-        personal: calendar.reminders,
-        defaults: settings.settings.defaultReminderMinutes,
-        skip: calendar.declinedEventIds,
-      );
+  /// Zwischenspeicher für Fällig und Geplant (#220): Die Seite „Heute“ fragt bei jedem Neuaufbau, gerechnet
+  /// wird nur nach Datenänderung oder wenn die Zeit die Listen ändert (siehe [_Snapshot.validUntil]).
+  _Snapshot? _snapshot;
 
-  /// Ausgelöste, nicht bestätigte Erinnerungen, deren Termin noch nicht vorbei ist (#218).
-  List<ReminderEntry> due() {
-    final i = _input();
-    return ReminderPlanner.due(
-      events: i.events,
-      personal: i.personal,
-      defaults: i.defaults,
-      now: _clock(),
+  void _invalidate() => _snapshot = null;
+
+  _Snapshot _current() {
+    final now = _clock().toUtc();
+    final events = calendar.events;
+    final personal = calendar.reminders;
+    final appSettings = settings.settings;
+    final s = _snapshot;
+    if (s != null &&
+        identical(s.events, events) &&
+        identical(s.personal, personal) &&
+        identical(s.settings, appSettings) &&
+        !now.isBefore(s.computedAt) &&
+        now.isBefore(s.validUntil)) {
+      return s;
+    }
+    final skip = calendar.declinedEventIds;
+    final due = List<ReminderEntry>.unmodifiable(ReminderPlanner.due(
+      events: events,
+      personal: personal,
+      defaults: appSettings.defaultReminderMinutes,
+      now: now,
       acknowledged: _acknowledged.keys.toSet(),
-      skip: i.skip,
+      skip: skip,
       viewer: calendar.zone,
+    ));
+    final planned = List<ReminderEntry>.unmodifiable(ReminderPlanner.upcoming(
+      events: events,
+      personal: personal,
+      defaults: appSettings.defaultReminderMinutes,
+      now: now,
+      skip: skip,
+      viewer: calendar.zone,
+    ));
+    // Gültig bis zur nächsten vollen Minute (neue Einträge am Rand des Fensters), bis die nächste geplante
+    // Erinnerung auslöst oder bis das erste fällige Vorkommen endet, je nachdem, was zuerst kommt.
+    var validUntil = DateTime.utc(now.year, now.month, now.day, now.hour, now.minute).add(const Duration(minutes: 1));
+    for (final e in planned) {
+      final t = e.reminder.fireAt.toUtc();
+      if (t.isBefore(validUntil)) validUntil = t;
+    }
+    for (final e in due) {
+      final t = e.occurrence.end.toUtc();
+      if (t.isBefore(validUntil)) validUntil = t;
+    }
+    return _snapshot = _Snapshot(
+      events: events,
+      personal: personal,
+      settings: appSettings,
+      computedAt: now,
+      validUntil: validUntil,
+      due: due,
+      planned: planned,
     );
   }
 
-  /// Geplante Erinnerungen mit ihrem Termin, wie sie [reschedule] plant.
-  List<ReminderEntry> planned() {
-    final i = _input();
-    return ReminderPlanner.upcoming(
-      events: i.events,
-      personal: i.personal,
-      defaults: i.defaults,
-      now: _clock(),
-      skip: i.skip,
-      viewer: calendar.zone,
-    );
-  }
+  /// Ausgelöste, nicht bestätigte Erinnerungen, deren Termin noch nicht vorbei ist (#218). Unveränderlich.
+  List<ReminderEntry> due() => _current().due;
+
+  /// Geplante Erinnerungen mit ihrem Termin, wie sie [reschedule] plant. Unveränderlich.
+  List<ReminderEntry> planned() => _current().planned;
 
   int get dueCount => due().length;
 
@@ -143,6 +183,7 @@ class ReminderCoordinator extends ChangeNotifier {
       _acknowledged[e.reminder.id] = e.occurrence.end.millisecondsSinceEpoch;
     }
     _prune();
+    _invalidate();
     notifyListeners();
     for (final e in list) {
       await scheduler.dismiss(e.reminder.id);
@@ -153,6 +194,7 @@ class ReminderCoordinator extends ChangeNotifier {
 
   void _prune() {
     final now = _clock().toUtc().millisecondsSinceEpoch;
+    final before = _acknowledged.length;
     _acknowledged.removeWhere((_, end) => end <= now);
     if (_acknowledged.length > maxAcknowledged) {
       final byEnd = _acknowledged.entries.toList()..sort((a, b) => a.value.compareTo(b.value));
@@ -160,6 +202,7 @@ class ReminderCoordinator extends ChangeNotifier {
         _acknowledged.remove(e.key);
       }
     }
+    if (_acknowledged.length != before) _invalidate();
   }
 
   Future<void> _persist() {
@@ -229,7 +272,6 @@ class ReminderCoordinator extends ChangeNotifier {
       skip: calendar.declinedEventIds,
       viewer: calendar.zone,
     );
-    _plannedCount = plan.length;
     final l = _l10n();
     await scheduler.replaceAll(
       plan,
@@ -246,4 +288,26 @@ class ReminderCoordinator extends ChangeNotifier {
     if (minutes % 60 == 0) return l.durationHours(minutes ~/ 60);
     return l.durationMinutes(minutes);
   }
+}
+
+/// Fällig und Geplant für bestimmte Eingaben, gültig bis [validUntil] (UTC, #220).
+class _Snapshot {
+  _Snapshot({
+    required this.events,
+    required this.personal,
+    required this.settings,
+    required this.computedAt,
+    required this.validUntil,
+    required this.due,
+    required this.planned,
+  });
+
+  /// Eingaben, per `identical` verglichen: Kalender und Einstellungen ersetzen ihre Objekte bei Änderungen.
+  final List<CalendarEvent> events;
+  final Map<String, List<int>> personal;
+  final AppSettings settings;
+  final DateTime computedAt;
+  final DateTime validUntil;
+  final List<ReminderEntry> due;
+  final List<ReminderEntry> planned;
 }

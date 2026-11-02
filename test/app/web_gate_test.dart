@@ -15,6 +15,9 @@ class _Vault implements VaultBackend {
   Object? createError;
   Object? unlockError;
   Object? loadError;
+
+  /// Hält `unlock` offen, bis der Test es freigibt (#227).
+  Future<void>? unlockGate;
   final Map<String, String> data = <String, String>{};
 
   @override
@@ -25,6 +28,7 @@ class _Vault implements VaultBackend {
 
   @override
   Future<void> unlock(String password) async {
+    await unlockGate;
     if (unlockError != null) throw unlockError!;
   }
 
@@ -89,6 +93,9 @@ void main() {
     final forgot = de ? 'Passwort vergessen? Alle lokalen Daten löschen' : 'Forgot the password? Delete all local data';
     final delete = de ? 'Löschen' : 'Delete';
     final createAction = de ? 'Tresor anlegen' : 'Create vault';
+    final unlockAction = de ? 'Entsperren' : 'Unlock';
+    final unlockBusy = de ? 'Wird entsperrt …' : 'Unlocking …';
+    final wipeBusy = de ? 'Wird gelöscht …' : 'Deleting …';
 
     testWidgets('$lang: Anlegen scheitert – Meldung, Knopf wieder aktiv, nicht entsperrt', (tester) async {
       final calls = await pump(tester, _Vault()..createError = StateError('crypto.subtle fehlt'), lang);
@@ -178,6 +185,51 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text(createAction), findsOneWidget);
       expect(tester.widget<FilledButton>(find.byType(FilledButton)).onPressed, isNotNull);
+    });
+
+    testWidgets('$lang: Während des Löschens steht „Wird gelöscht …“ auf dem Knopf, nicht „Wird entsperrt …“ (#227)', (tester) async {
+      final gate = Completer<void>();
+      await pump(tester, _Vault(exists: true), lang, wipeGate: gate.future);
+      await tester.tap(find.text(forgot));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, delete));
+      await tester.pump();
+      expect(find.widgetWithText(FilledButton, wipeBusy), findsOneWidget);
+      expect(find.text(unlockBusy), findsNothing);
+      gate.complete();
+      await tester.pumpAndSettle();
+      expect(find.text(wipeBusy), findsNothing);
+      expect(find.widgetWithText(FilledButton, createAction), findsOneWidget);
+    });
+
+    testWidgets('$lang: Löschen scheitert – Knopf zeigt wieder „Entsperren“ (#227)', (tester) async {
+      final gate = Completer<void>();
+      await pump(tester, _Vault(exists: true), lang, wipeGate: gate.future, wipeError: StateError('blockiert'));
+      await tester.tap(find.text(forgot));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, delete));
+      await tester.pump();
+      expect(find.widgetWithText(FilledButton, wipeBusy), findsOneWidget);
+      gate.complete();
+      await tester.pumpAndSettle();
+      expect(find.textContaining(wipeFailed), findsOneWidget);
+      expect(find.text(wipeBusy), findsNothing);
+      expect(find.widgetWithText(FilledButton, unlockAction), findsOneWidget);
+    });
+
+    testWidgets('$lang: Entsperren zeigt weiter „Wird entsperrt …“ (#227)', (tester) async {
+      final gate = Completer<void>();
+      await pump(tester, _Vault(exists: true)..unlockGate = gate.future, lang);
+      await enter(tester);
+      await tester.tap(find.byType(FilledButton));
+      await tester.pump();
+      expect(find.widgetWithText(FilledButton, unlockBusy), findsOneWidget);
+      expect(find.text(wipeBusy), findsNothing);
+      // Gesperrt wird über _busy, nicht über _wiping.
+      expect(tester.widget<FilledButton>(find.byType(FilledButton)).onPressed, isNull);
+      gate.complete();
+      await tester.pumpAndSettle();
+      expect(find.text(unlockBusy), findsNothing);
     });
 
     testWidgets('$lang: Fehler im Rückruf nach dem Entsperren erscheint nicht als Tresorfehler', (tester) async {

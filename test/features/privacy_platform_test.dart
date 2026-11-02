@@ -86,7 +86,27 @@ void main() {
       // Der gemeinsame Rest (Löschen, Notfall-Schlüssel, Zwischenablage) steht überall.
       for (final p in PrivacyPlatform.values) {
         expect(s7(p), contains(l.privacy7Rest));
+        expect(s7(p), contains(l.privacy7Save));
       }
+      // Nativ unverändert: Speichern, Löschen samt Erinnerungen und Rest in dieser Folge (#225).
+      for (final p in PrivacyPlatform.values.where((p) => !p.isWeb)) {
+        expect(s7(p), contains('${l.privacy7Save} ${l.privacy7Wipe} ${l.privacy7Rest}'), reason: '$p');
+      }
+    });
+
+    test('$lang: Browser nennt SQLite3MultipleCiphers und keine Erinnerungen (#225)', () {
+      String s2(PrivacyPlatform p) => section(l, p, l.privacy2Title);
+      String s7(PrivacyPlatform p) => section(l, p, l.privacy7Title);
+      final remind = RegExp('Erinnerung|reminder', caseSensitive: false);
+      expect(s2(PrivacyPlatform.web), contains('SQLite3MultipleCiphers'));
+      expect(s2(PrivacyPlatform.web), isNot(contains('SQLCipher')));
+      for (final p in PrivacyPlatform.values.where((p) => !p.isWeb)) {
+        expect(s2(p), contains('SQLCipher'), reason: '$p');
+        expect(s2(p), isNot(contains('SQLite3MultipleCiphers')), reason: '$p');
+        expect(remind.hasMatch(s7(p)), isTrue, reason: '$p: nativ gibt es Erinnerungen');
+      }
+      expect(remind.hasMatch(s7(PrivacyPlatform.web)), isFalse, reason: s7(PrivacyPlatform.web));
+      expect(s7(PrivacyPlatform.web), contains(de ? 'aus diesem Browser' : 'from this browser'));
     });
 
     test('$lang: jede Plattform liefert alle Abschnitte ohne leere Texte', () {

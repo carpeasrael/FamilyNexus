@@ -527,11 +527,15 @@
   "privacy1Title": "Who processes your data?",
   "privacy1Body": "FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. Responsible for processing on the server is the operator of the provider you chose (Matrix server); it is shown during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that sign you in via the browser (e.g. matrix.org) you enter these details directly on their page.",
   "privacy2Title": "What data exists?",
-  "privacy2Body": "Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted (SQLCipher) on your device. The key is held here: {keyStore} – not in the database file.",
+  "privacy2Body": "Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted ({cipher}) on your device. The key is held here: {keyStore} – not in the database file.",
   "@privacy2Body": {
     "placeholders": {
       "keyStore": {
         "type": "String"
+      },
+      "cipher": {
+        "type": "String",
+        "description": "Name der Verschlüsselungsbibliothek: SQLCipher, im Browser SQLite3MultipleCiphers (#225)."
       }
     }
   },
@@ -554,7 +558,13 @@
   "privacy7BackupIos": "The app's data is excluded from backups.",
   "privacy7BackupMacos": "The app's data is excluded from backups (e.g. Time Machine).",
   "privacy7BackupOther": "The app does not create a backup of your data itself.",
-  "privacy7Rest": "If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose. “Delete all local data” removes all data, keys and reminders from this device. “Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.",
+  "privacy7Save": "If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose.",
+  "privacy7Wipe": "“Delete all local data” removes all data, keys and reminders from this device.",
+  "privacy7WipeWeb": "“Delete all local data” removes all data and keys from this browser.",
+  "@privacy7WipeWeb": {
+    "description": "Abschnitt 7 im Browser: dort gibt es keine Erinnerungen (E-53, #225)."
+  },
+  "privacy7Rest": "“Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.",
   "privacy8Title": "Children",
   "privacy8Body": "Children can be family members. This requires the consent of their legal guardians; accounts of minors go through invitation and confirmation by a moderator.",
   "privacy9Title": "Your rights",
@@ -1053,6 +1063,10 @@
   "webUnlockAction": "Unlock",
   "webCreateAction": "Create vault",
   "webUnlockBusy": "Unlocking …",
+  "webWipeBusy": "Deleting …",
+  "@webWipeBusy": {
+    "description": "Beschriftung des Hauptknopfs im Browser, während „Alle lokalen Daten löschen“ läuft (#227)."
+  },
   "webForgotPassword": "Forgot the password? Delete all local data",
   "webTabBusyTitle": "FamilyNexus is already open",
   "webTabBusyBody": "The app is already running in another tab or window of this browser. Two tabs at the same time would corrupt the local data. Close the other tab and try again.",

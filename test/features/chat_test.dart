@@ -123,6 +123,39 @@ void main() {
     });
   });
 
+  group('#224: Reaktionen nur auf gesendete Nachrichten', () {
+    for (final state in <({MessageStatus status, bool retryable, String label})>[
+      (status: MessageStatus.failed, retryable: false, label: 'nicht gesendet'),
+      (status: MessageStatus.failed, retryable: true, label: 'gescheitert, wiederholbar'),
+      (status: MessageStatus.sending, retryable: false, label: 'wird gesendet'),
+    ]) {
+      testWidgets('${state.label}: Menü ohne Reaktionsleiste, „Antworten“ bleibt', (tester) async {
+        final app = await buildTestApp();
+        await app.gateway.sendMessage('Hallo');
+        app.gateway.sendStates[app.gateway.messages.single.id] = (status: state.status, retryable: state.retryable);
+        await _openChat(tester, app);
+
+        await tester.longPress(find.text('Hallo'));
+        await tester.pumpAndSettle();
+        expect(find.text('Antworten'), findsOneWidget, reason: 'Menü ist offen');
+        expect(find.bySemanticsLabel(RegExp('^Reagieren ')), findsNothing);
+        expect(find.text('👍'), findsNothing);
+      });
+    }
+
+    testWidgets('gesendet: Reaktionsleiste ist da', (tester) async {
+      final app = await buildTestApp();
+      await app.gateway.sendMessage('Hallo');
+      await _openChat(tester, app);
+
+      await tester.longPress(find.text('Hallo'));
+      await tester.pumpAndSettle();
+      expect(find.text('Antworten'), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp('^Reagieren ')), findsWidgets);
+      expect(find.text('👍'), findsOneWidget);
+    });
+  });
+
   testWidgets('#138: Nicht Entschlüsseltes bietet „Antworten“ nicht an', (tester) async {
     final app = await buildTestApp();
     await app.gateway.sendMessage('Lesbar');
