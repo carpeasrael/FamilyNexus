@@ -87,6 +87,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Blocks screenshots and hides the app in the app switcher.';
 
   @override
+  String get settingsSecureScreenHintIos =>
+      'Hides the app in the app switcher and during screen recordings. Individual screenshots cannot be prevented on iOS.';
+
+  @override
+  String get settingsSecureScreenHintWindows =>
+      'Excludes the app from screenshots, screen recordings and screen sharing.';
+
+  @override
   String get settingsLicense => 'License: AGPL-3.0-or-later';
 
   @override
