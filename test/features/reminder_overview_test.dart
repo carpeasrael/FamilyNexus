@@ -137,6 +137,7 @@ void main() {
     await Future<void>.delayed(Duration.zero);
     await c.acknowledge(c.due());
     final keys = stored(store).keys;
+    expect(ReminderCoordinator.maxAcknowledged, 500, reason: 'Grenze aus E-87');
     expect(keys, hasLength(ReminderCoordinator.maxAcknowledged));
     expect(keys, isNot(contains('0')));
   });

@@ -67,6 +67,14 @@ void main() {
       final seg = tester.widget<SegmentedButton<CalendarMode>>(find.byType(SegmentedButton<CalendarMode>));
       expect(seg.selected, <CalendarMode>{CalendarMode.agenda});
       expect(find.text('Bald'), findsOneWidget);
+
+      // Zweites Mal: nach Wechsel in den Monat wirkt der Knopf erneut.
+      await tester.tap(find.text('Monat'));
+      await tester.pumpAndSettle();
+      await tab(tester, 'Heute');
+      await tester.tap(find.widgetWithText(TextButton, 'Alle Termine'));
+      await tester.pumpAndSettle();
+      expect(tester.widget<SegmentedButton<CalendarMode>>(find.byType(SegmentedButton<CalendarMode>)).selected, <CalendarMode>{CalendarMode.agenda});
     });
   });
 
@@ -137,6 +145,17 @@ void main() {
       now = DateTime.utc(2026, 3, 20, 10, 11);
       await tester.pump(const Duration(seconds: 31));
       expect(find.text('1 Erinnerung fällig'), findsOneWidget);
+    });
+
+    testWidgets('die offene Übersicht wird mit der Zeit aktualisiert', (tester) async {
+      final app = await open(tester);
+      await make(tester, app, 'Arzt', DateTime.utc(2026, 3, 20, 10, 20));
+      await overview(tester);
+      expect(find.text('Geplant (1)'), findsOneWidget);
+      now = DateTime.utc(2026, 3, 20, 10, 11);
+      await tester.pump(const Duration(seconds: 31));
+      expect(find.text('Fällig (1)'), findsOneWidget);
+      expect(find.text('Geplant (1)'), findsNothing);
     });
 
     testWidgets('im Browser keine Erinnerungskarte, „Alle Termine“ bleibt', (tester) async {
