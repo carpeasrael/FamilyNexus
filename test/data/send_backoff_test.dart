@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:family_nexus/data/matrix/local_sends.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/data/sync/calendar_sync.dart';
 import 'package:family_nexus/data/sync/send_backoff.dart';
@@ -62,8 +65,8 @@ void main() {
   });
 
   group('automatisches Wiederholen im Gateway', () {
-    RetryDecision d({String type = EventTypes.Message, String sender = '@a:x', bool error = false, bool sent = false}) =>
-        SdkMatrixGateway.retryDecision(type: type, senderId: sender, me: '@a:x', isError: error, isSent: sent);
+    RetryDecision d({String type = EventTypes.Message, String sender = '@a:x', bool error = false, bool canRetry = true}) =>
+        SdkMatrixGateway.retryDecision(type: type, senderId: sender, me: '@a:x', isError: error, canRetry: canRetry);
 
     test('nur eigene Chat-Nachrichten im Fehlerzustand werden wiederholt', () {
       expect(d(error: true), RetryDecision.retry);
@@ -76,10 +79,78 @@ void main() {
       }
     });
 
-    test('der Zähler bleibt während „wird gesendet“ und wird erst bei „gesendet“ gelöscht', () {
-      expect(d(), RetryDecision.skip, reason: 'sending: weder wiederholen noch Zähler löschen');
-      expect(d(sent: true), RetryDecision.forget);
-      expect(d(type: 'de.inneso.familynexus.event', sent: true), RetryDecision.skip);
+    test('ohne Fehlerzustand kein Versuch, auch nicht während „wird gesendet“', () {
+      expect(d(), RetryDecision.skip);
+    });
+
+    test('#138: ein gefälschtes Fehler-Ereignis ohne passende offene Sendung wird nicht wiederholt', () {
+      expect(d(error: true, canRetry: false), RetryDecision.skip);
+    });
+  });
+
+  /// Die Zähler-Fälle aus #132. Der Zähler lag bis #138 im Gateway und wurde über die Zeitleiste gelöscht.
+  group('Obergrenze des automatischen Wiederholens (LocalSends)', () {
+    const txid = 'txn1';
+    late LocalSends sends;
+    late int attempts;
+    String? answer;
+
+    Future<String?> send() async {
+      attempts++;
+      return answer;
+    }
+
+    setUp(() async {
+      sends = LocalSends(maxRetries: SdkMatrixGateway.maxRetriesPerEvent);
+      attempts = 0;
+      answer = null;
+      await sends.run(txid: txid, threadId: 'family', roomId: '!r:x', tail: 'Hallo', send: send);
+    });
+
+    /// So viele Versuche, wie das Gateway nach Syncs auslösen würde.
+    Future<int> drain() async {
+      var n = 0;
+      while (n < 100 && sends.canRetry(txid, 'family', '!r:x') && sends.takeAutoRetry(txid)) {
+        await sends.retry(txid, 'family', '!r:x');
+        n++;
+      }
+      return n;
+    }
+
+    test('höchstens maxRetriesPerEvent Versuche, danach keiner mehr', () async {
+      expect(await drain(), SdkMatrixGateway.maxRetriesPerEvent);
+      expect(attempts, 1 + SdkMatrixGateway.maxRetriesPerEvent);
+      expect(sends.takeAutoRetry(txid), isFalse);
+      expect(sends.canRetry(txid, 'family', '!r:x'), isTrue, reason: 'von Hand bleibt die Sendung wiederholbar');
+    });
+
+    test('der Zähler bleibt während „wird gesendet“ und endet erst mit der Antwort des Servers', () async {
+      expect(sends.takeAutoRetry(txid), isTrue);
+      await sends.retry(txid, 'family', '!r:x'); // wieder gescheitert: läuft dazwischen, Zähler bleibt
+      expect(await drain(), SdkMatrixGateway.maxRetriesPerEvent - 1);
+
+      answer = r'$server';
+      await sends.retry(txid, 'family', '!r:x');
+      expect(sends.isOpen(txid), isFalse, reason: 'erledigt');
+      expect(sends.takeAutoRetry(txid), isFalse);
+    });
+
+    test('Ereignisse der Zeitleiste setzen den Zähler nie zurück: es gibt keinen Weg von dort zu LocalSends', () async {
+      await drain();
+      // Was der Server vortäuschen kann, kommt nur als Abfrage an; die ändert nichts.
+      expect(sends.sentMatches(txid, 'Hallo'), isFalse);
+      expect(sends.isRunning(txid), isFalse);
+      expect(sends.takeAutoRetry(txid), isFalse);
+    });
+
+    test('nie parallel: während eines Versuchs kein Wiederholen', () async {
+      final gate = Completer<String?>();
+      final other = LocalSends(maxRetries: 2);
+      unawaited(other.run(txid: txid, threadId: 'family', roomId: '!r:x', tail: 'x', send: () => gate.future));
+      expect(other.canRetry(txid, 'family', '!r:x'), isFalse);
+      gate.complete(null);
+      await Future<void>.delayed(Duration.zero);
+      expect(other.canRetry(txid, 'family', '!r:x'), isTrue);
     });
   });
 

@@ -220,7 +220,8 @@ abstract class MatrixGateway implements Listenable {
   /// Ereignis-ID und der Grundtext aus [ReportRequest.reason], nie der Nachrichteninhalt.
   Future<void> reportMessage(ReportRequest request);
 
-  /// Wiederholt das Senden einer fehlgeschlagenen Nachricht.
+  /// Wiederholt das Senden einer fehlgeschlagenen Nachricht aus dem ursprünglichen Aufruf. Ohne offene Sendung in
+  /// diesem Thread und Raum, etwa nach einem Neustart: `notFound` ([ChatMessage.retryable]).
   Future<void> retryMessage(String messageId, {String threadId = ChatThread.familyId});
 
   // --------------------------------------------- Sicherheit und Verifizierung

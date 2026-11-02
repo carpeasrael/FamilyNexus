@@ -301,6 +301,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatRetry => 'Sending failed – tap to retry';
 
   @override
+  String get chatNotSent => 'Not sent. Please write it again.';
+
+  @override
   String get chatSending => 'Sending …';
 
   @override
