@@ -6,7 +6,8 @@ import 'package:web/web.dart' as web;
 
 /// Sperrt den Browser-Speicher für diesen Tab (Web Locks API). Zwei Tabs würden dieselbe IndexedDB-Datenbank
 /// und die Matrix-Schlüssel gleichzeitig verändern. `false`, wenn ein anderer Tab die Sperre hält; die Sperre
-/// bleibt bis zum Schließen des Tabs. Ohne Web Locks (sehr alte Browser) gilt sie als frei.
+/// bleibt bis zum Schließen des Tabs. Ohne Web Locks (sehr alte Browser) gilt sie als frei. Nicht direkt aufrufen:
+/// Wiederholte Anfragen im selben Tab laufen über `TabLockGuard` in `tab_lock.dart` (#137).
 Future<bool> acquireWebTabLock() async {
   final locks = web.window.navigator.getProperty<JSAny?>('locks'.toJS);
   if (locks == null || !locks.isA<JSObject>()) return true;
