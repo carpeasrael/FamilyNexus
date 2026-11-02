@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/app_services.dart';
@@ -9,6 +10,7 @@ import '../../domain/time_zones.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
+import '../../ui/widgets/length_limit.dart';
 import '../calendar/formatting.dart';
 import '../common/error_text.dart';
 import '../chat/sender_name.dart';
@@ -380,6 +382,8 @@ class _CommentDialogState extends State<_CommentDialog> {
         controller: _comment,
         autofocus: true,
         maxLength: TaskLogEntry.maxComment,
+        inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(TaskLogEntry.maxComment, LengthMeasure.codePoints)],
+        buildCounter: measuredCounter(_comment, TaskLogEntry.maxComment, LengthMeasure.codePoints),
         enableIMEPersonalizedLearning: false,
         textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(labelText: l.tasksCommentHint),
@@ -455,8 +459,8 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
       _toast(context, l.tasksInvalid);
       return;
     }
-    // Das Eingabefeld zählt Zeichen, wie man sie sieht; gespeichert wird nach Unicode-Zeichen begrenzt
-    // (Emoji mit Hautfarbe zählen doppelt). Eigene Meldung statt „Titel, Person und Punkte angeben“.
+    // Das Eingabefeld begrenzt seit #221 schon nach Unicode-Zeichen wie die Prüfung; das hier bleibt als
+    // Absicherung. Eigene Meldung statt „Titel, Person und Punkte angeben“.
     if (_description.text.trim().runes.length > TaskList.maxDescription) {
       _toast(context, l.tasksDescriptionTooLong);
       return;
@@ -571,6 +575,8 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
           TextField(
             controller: _title,
             maxLength: TaskList.maxTitle,
+            inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(TaskList.maxTitle, LengthMeasure.codePoints)],
+            buildCounter: measuredCounter(_title, TaskList.maxTitle, LengthMeasure.codePoints),
             enableIMEPersonalizedLearning: false,
             textCapitalization: TextCapitalization.sentences,
             decoration: InputDecoration(labelText: l.tasksFieldTitle),
@@ -580,6 +586,8 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
             minLines: 2,
             maxLines: 6,
             maxLength: TaskList.maxDescription,
+            inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(TaskList.maxDescription, LengthMeasure.codePoints)],
+            buildCounter: measuredCounter(_description, TaskList.maxDescription, LengthMeasure.codePoints),
             enableIMEPersonalizedLearning: false,
             textCapitalization: TextCapitalization.sentences,
             keyboardType: TextInputType.multiline,
