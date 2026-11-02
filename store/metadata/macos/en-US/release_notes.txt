@@ -1,5 +1,6 @@
 New in 1.2.2:
-• Shopping: items can be assigned to a group, for example a shop. The list shows open items by group, “No group” at the end. Older app versions still show the items, just without a group.
+• Please update all devices of your family. Older app versions do not show groups, items with combined emojis or new reactions; if someone edits or ticks off an item there, its group is lost for everyone.
+• Shopping: items can be assigned to a group, for example a shop. The list shows open items by group, “No group” at the end.
 • Today: at most three events with “All events”; the “Reminders” card opens an overview where due reminders can be confirmed.
 • A moderator now confirms every join via invitation link. Invitation links no longer show names and server in readable form and no longer contain the family name; still treat the link like a key. Older app versions cannot read new links: please update all moderators.
 • Settings → Account → “Change password”. New accounts ask for the password twice.

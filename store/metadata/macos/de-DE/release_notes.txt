@@ -1,5 +1,6 @@
 Neu in 1.2.2:
-• Einkauf: Einträge lassen sich einer Gruppe zuordnen, zum Beispiel einem Geschäft. Die Liste zeigt die offenen Einträge nach Gruppen, „Ohne Gruppe“ am Ende. Ältere App-Versionen zeigen die Einträge weiter, nur ohne Gruppe.
+• Bitte alle Geräte der Familie aktualisieren. Ältere App-Versionen zeigen Gruppen, Einträge mit zusammengesetzten Emojis und neue Reaktionen nicht; ändert oder hakt jemand dort einen Eintrag ab, geht dessen Gruppe für alle verloren.
+• Einkauf: Einträge lassen sich einer Gruppe zuordnen, zum Beispiel einem Geschäft. Die Liste zeigt die offenen Einträge nach Gruppen, „Ohne Gruppe“ am Ende.
 • Heute: höchstens drei Termine mit „Alle Termine“; die Karte „Erinnerungen“ öffnet eine Übersicht, in der sich fällige Erinnerungen bestätigen lassen.
 • Jeden Beitritt per Einladungslink bestätigt jetzt ein Moderator. Einladungslinks zeigen Namen und Server nicht mehr lesbar an und enthalten den Familiennamen nicht mehr; behandle den Link weiter wie einen Schlüssel. Ältere App-Versionen lesen neue Links nicht: Bitte alle Moderatoren aktualisieren.
 • Einstellungen → Konto → „Passwort ändern“. Neue Konten fragen das Passwort zur Kontrolle zweimal ab.
