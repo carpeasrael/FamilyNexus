@@ -98,7 +98,7 @@ Local database and Matrix layer live on each device; the homeserver forwards enc
 | Roles | Matrix power levels: member 0, moderator 50; the right to change roles is also at 50 |
 | Invitations | Matrix invitation, additionally link or QR code with expiry time |
 | Conflicts | Version counter per appointment; on concurrent changes the newer version wins, the older one stays in the history |
-| Offline | Local queue, sent as soon as a connection exists |
+| Offline | Calendar, shopping list and tasks: local queue, sent as soon as a connection exists. Chat messages: retried only while the app is running; after a restart an unsent message is shown as “not sent” and has to be written again (decision E-33, addendum #138) |
 
 ### Server Choice
 
