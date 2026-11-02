@@ -28,6 +28,7 @@ import '../../domain/moderation.dart';
 import '../../domain/password_change.dart';
 import '../../domain/permissions.dart';
 import '../../domain/presence.dart';
+import '../../domain/reaction_codec.dart';
 import '../../domain/registration.dart';
 import '../../domain/username_suggestion.dart';
 import '../../domain/security.dart';
@@ -60,6 +61,7 @@ import 'sync_relevance.dart';
 /// * Nachrichten werden ohne Markdown-Parsing und ohne Slash-Befehle gesendet.
 /// * Lesebestätigungen sind privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
+/// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
 class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
@@ -168,6 +170,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Offene Chat-Sendungen. Nur hier liegt, was wiederholt werden darf (#138).
   final LocalSends _localSends = LocalSends(maxRetries: maxRetriesPerEvent);
   final EchoRepair _echoRepair = EchoRepair();
+
+  /// Laufende Reaktionen je Thread, Ziel und Emoji, gegen parallele Aufrufe.
+  final Set<String> _reactionInFlight = <String>{};
   final BoundedIdSet _plaintextWarned = BoundedIdSet(maxPlaintextWarnings);
 
   /// Bei der Serverprüfung bestätigte Basisadresse je Eingabe: Der Login nutzt
@@ -1069,6 +1074,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _family = null;
     _messages = const <ChatMessage>[];
     _localSends.clear();
+    _reactionInFlight.clear();
     _echoRepair.clear();
     _plaintextWarned.clear();
     _confirmedBase.clear();
@@ -2418,13 +2424,24 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> sendReaction(String messageId, String emoji, {String threadId = ChatThread.familyId}) async {
     if (!TextSanitizer.isReactionKey(emoji)) throw const GatewayException(GatewayError.invalidInput);
     final room = _requireEncryptedRoom(threadId);
+    final target = _findEvent(messageId, threadId);
+    if (target == null || !target.status.isSent || !ReactionCodec.isTarget(messageId)) {
+      throw const GatewayException(GatewayError.notFound);
+    }
+    // Im Chiffretext erkennt der Server Duplikate nicht. Bis zum `add` läuft alles ohne `await`.
+    final me = room.client.userID!;
+    final flight = '$threadId\n$messageId\n$emoji';
+    if (_reactionInFlight.contains(flight) || ChatMapper.hasOwnReaction(_timelineFor(threadId)!, target, emoji, me)) {
+      return;
+    }
+    _reactionInFlight.add(flight);
     try {
-      await room.sendReaction(messageId, emoji);
+      await _sendCalendar(room, ReactionCodec.type, ReactionCodec.encode(target: messageId, key: emoji, sender: me));
     } catch (e) {
-      // Doppelte Reaktion: der Server lehnt sie ab; das ist kein Fehler für den Nutzer.
-      if (e is MatrixException && e.errcode == 'M_DUPLICATE_ANNOTATION') return;
       AppLog.e('gateway', 'Reaktion konnte nicht gesendet werden', e);
       throw _map(e);
+    } finally {
+      _reactionInFlight.remove(flight);
     }
   }
 

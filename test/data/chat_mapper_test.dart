@@ -4,11 +4,37 @@ import 'package:family_nexus/data/matrix/chat_mapper.dart';
 import 'package:family_nexus/data/matrix/local_sends.dart';
 import 'package:family_nexus/domain/attachment_policy.dart';
 import 'package:family_nexus/domain/chat.dart';
+import 'package:family_nexus/domain/reaction_codec.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart';
 // ignore: implementation_imports
 import 'package:matrix/src/models/timeline_chunk.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+/// Ereignis, dessen Inhalt nach dem Aufbau der Zeitleiste beim Lesen wirft.
+class _ThrowingEvent extends Event {
+  _ThrowingEvent(Room room)
+      : super(
+          content: <String, Object?>{},
+          type: ReactionCodec.type,
+          eventId: r'$wirft',
+          senderId: '@ben:fake.test',
+          originServerTs: DateTime.fromMillisecondsSinceEpoch(3),
+          room: room,
+          originalSource: MatrixEvent(
+            type: 'm.room.encrypted',
+            content: <String, Object?>{},
+            senderId: '@ben:fake.test',
+            eventId: r'$wirft',
+            originServerTs: DateTime.fromMillisecondsSinceEpoch(3),
+          ),
+        );
+
+  bool armed = false;
+
+  @override
+  Map<String, Object?> get content => armed ? throw StateError('kaputt') : super.content;
+}
 
 /// Prüft die Übersetzung mit echten SDK-Objekten (Client/Room/Timeline/Event)
 /// gegen feindselige Eingaben anderer Teilnehmer.
@@ -193,6 +219,162 @@ void main() {
       }
       expect(map(events).single.reactions.length, ChatMapper.maxReactionKeys);
     });
+
+    group('eigener verschlüsselter Typ (#139)', () {
+      const me = '@ida:fake.test';
+      const ben = '@ben:fake.test';
+
+      Event neu(
+        String id,
+        String key, {
+        String sender = ben,
+        String? claimed,
+        String target = r'$a',
+        EventStatus? status,
+        bool encrypted = true,
+        Map<String, Object?>? unsigned,
+      }) =>
+          ev(
+            id,
+            ReactionCodec.encode(target: target, key: key, sender: claimed ?? sender),
+            type: ReactionCodec.type,
+            sender: sender,
+            ts: 5,
+            status: status?.intValue,
+            encrypted: encrypted,
+            unsigned: unsigned,
+          );
+
+      ChatMessage withMessage(List<Event> reactions) =>
+          map(<Event>[ev(r'$a', text('Hi'), ts: 1), ...reactions], me: me).single;
+
+      Map<String, Object?> redactedBecause() => <String, Object?>{
+            'redacted_because': <String, Object?>{
+              'type': 'm.room.redaction',
+              'event_id': r'$weg',
+              'sender': ben,
+              'origin_server_ts': 9,
+              'content': <String, Object?>{},
+            },
+          };
+
+      test('verschlüsselt angekommen: erscheint, Absender ist der des Ereignisses', () {
+        final m = withMessage(<Event>[neu(r'$r1', '👍'), neu(r'$r2', '👍', sender: '@cara:fake.test')]);
+        expect(m.reactions['👍'], <String>{ben, '@cara:fake.test'});
+      });
+
+      test('Klartext vom neuen Typ wird verworfen, auch mit eigenem Absender', () {
+        final m = withMessage(<Event>[
+          neu(r'$r1', '👍', encrypted: false),
+          neu(r'$r2', '🎉', sender: me, encrypted: false),
+          neu(r'$r3', '😀', sender: me, encrypted: false, status: EventStatus.synced),
+        ]);
+        expect(m.reactions, isEmpty);
+      });
+
+      test('eigene Reaktion ist in sending und sent ohne Quelle sichtbar, fremde nicht', () {
+        final m = withMessage(<Event>[
+          neu('txn1', '👍', sender: me, encrypted: false, status: EventStatus.sending),
+          neu(r'$r2', '🎉', sender: me, encrypted: false, status: EventStatus.sent),
+          neu('txn3', '😀', encrypted: false, status: EventStatus.sending),
+          neu(r'$r4', '😎', encrypted: false, status: EventStatus.sent),
+        ]);
+        expect(m.reactions.keys, unorderedEquals(<String>['👍', '🎉']));
+        expect(m.reactions['👍'], <String>{me});
+      });
+
+      test('gefälschter sender im Inhalt wird ignoriert', () {
+        final m = withMessage(<Event>[
+          neu(r'$r1', '👍', claimed: '@cara:fake.test'),
+          neu('txn2', '🎉', sender: me, claimed: ben, encrypted: false, status: EventStatus.sending),
+        ]);
+        expect(m.reactions, isEmpty);
+      });
+
+      test('Fehler und Redaktionen zählen nicht', () {
+        final m = withMessage(<Event>[
+          neu('txn1', '👍', sender: me, encrypted: false, status: EventStatus.error),
+          neu('txn2', '😀', sender: me, status: EventStatus.error),
+          neu(r'$r3', '🎉', unsigned: redactedBecause()),
+        ]);
+        expect(m.reactions, isEmpty);
+      });
+
+      test('alte und neue Reaktion desselben Mitglieds zählen einmal, verschiedene Mitglieder je einmal', () {
+        final m = withMessage(<Event>[
+          react(r'$alt', '👍'),
+          neu(r'$r1', '👍'),
+          neu(r'$r2', '👍'),
+          neu(r'$r3', '👍', sender: '@cara:fake.test'),
+          react(r'$alt2', '🎉'),
+        ]);
+        expect(m.reactions['👍'], <String>{ben, '@cara:fake.test'});
+        expect(m.reactions['🎉'], <String>{ben});
+      });
+
+      test('maxReactionKeys gilt für die Summe aus alten und neuen', () {
+        final events = <Event>[
+          for (var i = 0; i < 8; i++) react('\$alt$i', String.fromCharCode(0x1F600 + i)),
+          for (var i = 8; i < 30; i++) neu('\$neu$i', String.fromCharCode(0x1F600 + i)),
+        ];
+        expect(withMessage(events).reactions.length, ChatMapper.maxReactionKeys);
+      });
+
+      test('Ziel in einer anderen Zeitleiste zählt nicht', () {
+        expect(withMessage(<Event>[neu(r'$r1', '👍', target: r'$anderswo')]).reactions, isEmpty);
+      });
+
+      test('die Reaktion selbst erscheint nicht als Nachricht', () {
+        expect(map(<Event>[neu(r'$r1', '👍')], me: me), isEmpty);
+      });
+
+      test('ein Wurf in der Sammelschleife leert den Chat nicht', () {
+        final bad = _ThrowingEvent(room);
+        final t = timeline(<Event>[neu(r'$r1', '👍'), bad, ev(r'$a', text('Hi'), ts: 1)]);
+        bad.armed = true;
+        final m = ChatMapper.messages(t, threadId: 'family', sends: sends, myUserId: me);
+        expect(m.single.body, 'Hi');
+        expect(m.single.reactions.keys, <String>['👍']);
+      });
+
+      group('Doppelprüfung vor dem Senden', () {
+        Event target() => ev(r'$a', text('Hi'), ts: 1);
+
+        bool has(List<Event> reactions, {String key = '👍'}) {
+          final e = target();
+          return ChatMapper.hasOwnReaction(timeline(<Event>[...reactions.reversed, e]), e, key, me);
+        }
+
+        test('jedes eigene Ereignis zählt, unabhängig von Status und Quelle', () {
+          expect(has(<Event>[neu(r'$r', '👍', sender: me)]), isTrue, reason: 'verschlüsselt angekommen');
+          for (final s in <EventStatus>[EventStatus.sending, EventStatus.sent, EventStatus.synced]) {
+            expect(has(<Event>[neu(r'$r', '👍', sender: me, encrypted: false, status: s)]), isTrue, reason: '$s');
+          }
+        });
+
+        test('Fehler, Redaktion, anderes Ziel, anderes Emoji und fremder Absender zählen nicht', () {
+          expect(has(<Event>[]), isFalse);
+          expect(has(<Event>[neu('txn', '👍', sender: me, encrypted: false, status: EventStatus.error)]), isFalse);
+          expect(has(<Event>[neu(r'$r', '👍', sender: me, unsigned: redactedBecause())]), isFalse);
+          expect(has(<Event>[neu(r'$r', '👍', sender: me, target: r'$b')]), isFalse);
+          expect(has(<Event>[neu(r'$r', '👍', sender: me)], key: '🎉'), isFalse);
+          expect(has(<Event>[neu(r'$r', '👍')]), isFalse);
+          expect(has(<Event>[neu(r'$r', '👍', claimed: me)]), isFalse);
+        });
+
+        Event alt({int? status, Map<String, Object?>? unsigned, String sender = me}) => ev(r'$alt', <String, Object?>{
+              'm.relates_to': <String, Object?>{'rel_type': 'm.annotation', 'event_id': r'$a', 'key': '👍'},
+            }, type: 'm.reaction', sender: sender, ts: 5, status: status, unsigned: unsigned);
+
+        test('alte m.reaction: eigene zählt, gescheiterte, redigierte und fremde nicht', () {
+          expect(has(<Event>[alt()]), isTrue);
+          expect(has(<Event>[alt()], key: '🎉'), isFalse);
+          expect(has(<Event>[alt(status: EventStatus.error.intValue)]), isFalse);
+          expect(has(<Event>[alt(unsigned: redactedBecause())]), isFalse);
+          expect(has(<Event>[alt(sender: ben)]), isFalse);
+        });
+      });
+    });
   });
 
   test('#29: Verifizierungsanfrage als Raumnachricht erscheint nicht als Chat-Text', () {
@@ -240,9 +422,37 @@ void main() {
       expect(m.map((e) => e.id), <String>[ChatMapper.beforeJoinId, r'$t', r'$e4']);
     });
 
+    test('#139: Lesbare Reaktion bleibt unsichtbar, nicht entschlüsselbare geht in den Hinweis', () {
+      final m = mapAs(<Event>[
+        ev(r'$r', ReactionCodec.encode(target: r'$t', key: '👍', sender: '@ben:fake.test'), type: ReactionCodec.type, ts: 10),
+        encrypted(r'$e1', 20),
+        member(r'$j', 'join', prev: 'invite', ts: 30),
+        ev(r'$t', text('Willkommen!'), ts: 40),
+      ]);
+      expect(m.map((e) => e.id), <String>[ChatMapper.beforeJoinId, r'$t']);
+      expect(m.last.reactions.keys, <String>['👍']);
+    });
+
     group('#65: Zähler ungelesener Nachrichten', () {
       int unread(List<Event> chronological, int server) =>
           ChatMapper.unreadReadable(timeline(chronological.reversed.toList()), serverCount: server, myUserId: me);
+
+      test('#139: Reaktionen zählen nicht, eine eigene stoppt die Zählung nicht', () {
+        Event reaction(String id, String sender, int ts) => ev(
+              id,
+              ReactionCodec.encode(target: r'$a', key: '👍', sender: sender),
+              type: ReactionCodec.type,
+              sender: sender,
+              ts: ts,
+            );
+        final events = <Event>[
+          ev(r'$a', text('eins'), ts: 10),
+          reaction(r'$r1', me, 20),
+          ev(r'$b', text('zwei'), ts: 30),
+          reaction(r'$r2', '@ben:fake.test', 40),
+        ];
+        expect(unread(events, 9), 2);
+      });
 
       test('nicht lesbare Ereignisse und App-Daten zählen nicht, nur die lesbare Nachricht', () {
         final events = <Event>[

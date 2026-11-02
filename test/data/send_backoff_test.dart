@@ -7,6 +7,7 @@ import 'package:family_nexus/data/sync/send_backoff.dart';
 import 'package:family_nexus/data/sync/shopping_sync.dart';
 import 'package:family_nexus/data/sync/task_sync.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
+import 'package:family_nexus/domain/reaction_codec.dart';
 import 'package:family_nexus/domain/tasks.dart';
 import 'package:family_nexus/domain/time_zones.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -74,7 +75,7 @@ void main() {
     });
 
     test('andere Ereignistypen werden nicht wiederholt (Kalender, Einkauf, Aufgaben, Reaktionen)', () {
-      for (final t in <String>['de.inneso.familynexus.event', 'de.inneso.familynexus.shopping', 'de.inneso.familynexus.task.list', EventTypes.Reaction]) {
+      for (final t in <String>['de.inneso.familynexus.event', 'de.inneso.familynexus.shopping', 'de.inneso.familynexus.task.list', EventTypes.Reaction, ReactionCodec.type]) {
         expect(d(type: t, error: true), RetryDecision.skip, reason: t);
       }
     });

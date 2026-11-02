@@ -71,6 +71,19 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
   - **Antwort verloren:** Kommt erst das Sync-Echo und dann der Fehler aus der Zeitüberschreitung, ersetzt das SDK den Eintrag durch einen mit `id = txid` ohne Quelle; die Nachricht fehlt bis zum Neustart.
   - **Nach einem Neustart:** Fehlgeschlagene Nachrichten werden nicht mehr wiederholt, sie bleiben mit „Nicht gesendet. Bitte erneut schreiben.“ sichtbar; Verwerfen gibt es weiterhin nicht. Anhänge gescheiterter Sendungen bleiben als `cache://`-Datei in der SDK-Datenbank liegen.
 
+- **Verschlüsselte Reaktionen (E-86, #139):**
+  - **Alte Reaktionen:** Vorhandene und von älteren App-Versionen gesendete `m.reaction` bleiben auf dem Server im Klartext. Für neue Reaktionen stimmt die Aussage der Datenschutzerklärungen, für diese nicht. Eine Bereinigung wäre eine Redaktion je Ereignis und ist nicht vorgesehen.
+  - **Andere Versionen:** Ältere App-Versionen und andere Matrix-Clients zeigen neue Reaktionen nicht.
+  - **Gefälschte Reaktionen:** Da `m.reaction` lesbar bleibt, kann der Server weiter Klartext-Reaktionen im Namen eines Mitglieds zeigen (nur Emoji, kein Inhalt). Über die Restrisiken aus #138 (Herkunft der Sitzung) gilt das auch für den neuen Typ.
+  - **Metadaten:** Der Server sieht weiter Absender, Zeitpunkt und Größe. Kurze Ereignisse in zeitlicher Nähe zu einer Nachricht lassen vermuten, dass es Reaktionen sind.
+  - **Nicht entschlüsselbar:** Solche Reaktionen erscheinen als „nicht entschlüsselbar“ oder im Sammelhinweis (#35); bei Reaktionen ist das häufiger als bei Terminen.
+  - **Hängende Sendung:** Eine durch App-Abbruch hängende Reaktion im Zustand `sending` zählt als gültig und blockiert die Wiederholung, bis das SDK sie beim nächsten Neustart nach Ablauf einer Minute auf Fehler setzt.
+  - **Störung der Doppelprüfung:** Der eigene Homeserver kann mit gefälschtem Klartext die Doppelprüfung auslösen, sodass die echte Reaktion nicht gesendet wird. Das stört nur das eigene Gerät.
+  - **Doppelsendungen:** Zwei Geräte desselben Kontos, eine Lücke nach einem `limited`-Sync und ein nicht entschlüsselbares eigenes Ereignis können zu einem zweiten Ereignis führen. Die Anzeige zählt es einmal.
+  - **Ungelesen:** Reaktionen laufen unter den Regeln für verschlüsselte Ereignisse, `notificationCount` steigt. `unreadReadable` begrenzt die Anzeige, Push gibt es nicht (E-16); bei einer Änderung von E-16 ist das zu beachten.
+  - **Verlauf:** Reaktionen auf Nachrichten außerhalb des geladenen Verlaufs erscheinen erst, wenn beide geladen sind.
+  - **Zurücknehmen:** Eine Reaktion zurücknehmen geht weiterhin nicht.
+
 - **Einrichtung (E-55–E-57):** Zusatzschritte „Bedingungen“ und „kein Roboter“ (reCAPTCHA) sind nur gegen den Fake geprüft;
   der lokale Test-Synapse verlangt sie nicht. Die OAuth-Anmeldung (matrix.org) ist automatisch nur gegen den Fake geprüft,
   gegen den echten Anbieter manuell (Testplan TP-OAUTH-M1); der OAuth-Rücksprung braucht die Projektseite als `client_uri`.

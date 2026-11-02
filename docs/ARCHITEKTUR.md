@@ -56,6 +56,9 @@ geteilt: Familienraum, privat: nur privater Raum des eigenen Kontos (Geräte-Syn
 - **Einkaufszettel:** `ShoppingService` (Regeln, Versionen, Grenzen) → `ShoppingStore` (SQLCipher) → `ShoppingSync`
   → Familienraum (`de.inneso.familynexus.shopping`, E2EE); eingehend: `ShoppingCodec` (Format v1, `by` = Absender)
   → `ShoppingMerge`. Resync: der letzte Bearbeiter sendet seine aktiven Einträge bei neuen Mitgliedern erneut.
+- **Reaktionen (E-86):** `MatrixGateway.sendReaction` → Familien- oder Einzelchat-Raum
+  (`de.inneso.familynexus.reaction`, E2EE, ohne `m.relates_to`); eingehend: `ReactionCodec` (Format v1, `sender` = Absender)
+  → `ChatMapper`, zusammen mit lesbaren alten `m.reaction`.
 - **Aufgabenlisten (E-51):** `TaskService` (Rechte, Versionen, Grenzen) → `TaskStore` (SQLCipher: Listen + anfügendes Protokoll) → `TaskSync` → Familienraum (`tasklist`, `taskdone`). Der Reset ist abgeleitet: `TaskPeriod` bildet Periodenschlüssel in der Zeitzone der Liste, `TaskProgress` wertet das Protokoll für die laufende Periode aus. Oberfläche: `TasksController`, `TasksScreen`.
 
 ## Einrichtung und Kontoanlage (E-55–E-57)
