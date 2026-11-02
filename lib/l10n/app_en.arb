@@ -25,6 +25,14 @@
   "settingsReduceEffectsHint": "Less blur and glow, more opaque surfaces.",
   "settingsSecureScreen": "Screen protection",
   "settingsSecureScreenHint": "Blocks screenshots and hides the app in the app switcher.",
+  "settingsSecureScreenHintIos": "Hides the app in the app switcher and during screen recordings. Individual screenshots cannot be prevented on iOS.",
+  "@settingsSecureScreenHintIos": {
+    "description": "Screen protection hint on iOS: screenshots cannot be prevented there (SA-5, E-43, #144)."
+  },
+  "settingsSecureScreenHintWindows": "Excludes the app from screenshots, screen recordings and screen sharing.",
+  "@settingsSecureScreenHintWindows": {
+    "description": "Screen protection hint on Windows: only what SetWindowDisplayAffinity provides (#144)."
+  },
   "settingsLicense": "License: AGPL-3.0-or-later",
   "settingsNoTelemetry": "No telemetry, no ads, no analytics.",
   "loading": "Loading …",

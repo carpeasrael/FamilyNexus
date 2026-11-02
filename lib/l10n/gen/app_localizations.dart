@@ -248,6 +248,18 @@ abstract class AppLocalizations {
   /// **'Blockiert Screenshots und verbirgt die App in der Übersicht.'**
   String get settingsSecureScreenHint;
 
+  /// Hinweis zum Bildschirmschutz unter iOS: Screenshots lassen sich dort nicht verhindern (SA-5, E-43, #144).
+  ///
+  /// In de, this message translates to:
+  /// **'Verdeckt die App im App-Umschalter und bei Bildschirmaufnahmen. Einzelne Screenshots lassen sich unter iOS nicht verhindern.'**
+  String get settingsSecureScreenHintIos;
+
+  /// Hinweis zum Bildschirmschutz unter Windows: nur, was SetWindowDisplayAffinity leistet (#144).
+  ///
+  /// In de, this message translates to:
+  /// **'Nimmt die App von Screenshots, Bildschirmaufnahmen und Bildschirmfreigaben aus.'**
+  String get settingsSecureScreenHintWindows;
+
   /// No description provided for @settingsLicense.
   ///
   /// In de, this message translates to:

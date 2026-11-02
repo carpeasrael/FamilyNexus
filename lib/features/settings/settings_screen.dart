@@ -96,7 +96,8 @@ class SettingsScreen extends StatelessWidget {
               if (!PlatformInfo.hasNoScreenProtection)
                 SwitchListTile(
                   title: Text(l.settingsSecureScreen),
-                  subtitle: Text(l.settingsSecureScreenHint),
+                  subtitle: Text(secureScreenHint(
+                      l, secureScreenPlatform(ios: PlatformInfo.isIOS, windows: PlatformInfo.isWindows))),
                   value: s.secureScreen,
                   onChanged: (v) => controller.update((c) => c.copyWith(secureScreen: v)),
                 ),
@@ -140,6 +141,22 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
+
+/// Plattformen mit Schalter „Bildschirmschutz“ (alle außer `PlatformInfo.hasNoScreenProtection`).
+enum SecureScreenPlatform { android, ios, windows }
+
+/// Plattformauswahl für [secureScreenHint]; Parameter statt Abfrage, weil `Platform.isIOS` im Test false ist.
+SecureScreenPlatform secureScreenPlatform({required bool ios, required bool windows}) =>
+    ios ? SecureScreenPlatform.ios : (windows ? SecureScreenPlatform.windows : SecureScreenPlatform.android);
+
+/// Hinweis zum Bildschirmschutz je Plattform (#144): Android sperrt Screenshots und verbirgt die App in der Übersicht
+/// (`FLAG_SECURE`). iOS verdeckt nur App-Umschalter und Bildschirmaufnahme (SA-5, E-43). Windows nimmt das Fenster
+/// von Aufnahmen aus (`SetWindowDisplayAffinity`); ob es in Alt-Tab verborgen ist, ist nicht belegt.
+String secureScreenHint(AppLocalizations l, SecureScreenPlatform p) => switch (p) {
+      SecureScreenPlatform.android => l.settingsSecureScreenHint,
+      SecureScreenPlatform.ios => l.settingsSecureScreenHintIos,
+      SecureScreenPlatform.windows => l.settingsSecureScreenHintWindows,
+    };
 
 /// Untertitel von „Alle lokalen Daten löschen“: Im Browser gibt es keine Erinnerungen (E-53, #237).
 /// [web] ist ein Parameter, weil `kIsWeb` im Test konstant false ist.

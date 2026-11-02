@@ -88,6 +88,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Blockiert Screenshots und verbirgt die App in der Übersicht.';
 
   @override
+  String get settingsSecureScreenHintIos =>
+      'Verdeckt die App im App-Umschalter und bei Bildschirmaufnahmen. Einzelne Screenshots lassen sich unter iOS nicht verhindern.';
+
+  @override
+  String get settingsSecureScreenHintWindows =>
+      'Nimmt die App von Screenshots, Bildschirmaufnahmen und Bildschirmfreigaben aus.';
+
+  @override
   String get settingsLicense => 'Lizenz: AGPL-3.0-or-later';
 
   @override
