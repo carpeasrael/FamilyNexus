@@ -97,7 +97,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   static const int backfillPages = 20;
   static const int dmBackfillPages = 3;
-  static const int maxMessageLength = 8000;
+  static const int maxMessageLength = ChatMessage.maxBody;
   static const int maxFamilyNameLength = 60;
   static const int maxRetriesPerEvent = 5;
   static const int maxPlaintextWarnings = 2000;

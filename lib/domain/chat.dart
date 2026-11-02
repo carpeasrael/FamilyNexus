@@ -27,6 +27,9 @@ class ChatMessage {
     this.beforeJoin = false,
   });
 
+  /// Höchstlänge eines Nachrichtentexts in UTF-16-Einheiten, wie `sendMessage` im Gateway prüft (#236).
+  static const int maxBody = 8000;
+
   final String id;
   final String senderId;
   /// Leer, wenn das Konto gelöscht und kein früherer Name bekannt ist (Anzeige „Ehemaliges Mitglied“, #60).

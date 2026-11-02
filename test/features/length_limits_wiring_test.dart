@@ -1,5 +1,7 @@
 import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
+import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/shopping.dart';
 import 'package:family_nexus/domain/tasks.dart';
 import 'package:family_nexus/ui/widgets/length_limit.dart';
@@ -115,5 +117,10 @@ void main() {
     await tester.pump();
     expect(find.bySemanticsLabel(RegExp('${CalendarEvent.maxLocation - 2}')), findsWidgets);
     handle.dispose();
+  });
+  testWidgets('Chat: Eingabe zählt UTF-16-Einheiten wie sendMessage (#236)', (tester) async {
+    await _start(tester, tab: 'Chat');
+    _expectMeasured(tester, find.widgetWithText(TextField, 'Nachricht schreiben'), ChatMessage.maxBody, LengthMeasure.utf16);
+    expect(SdkMatrixGateway.maxMessageLength, ChatMessage.maxBody, reason: 'Feld und Prüfung nutzen dieselbe Grenze');
   });
 }

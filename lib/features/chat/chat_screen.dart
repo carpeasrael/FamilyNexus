@@ -14,6 +14,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
+import '../../ui/widgets/length_limit.dart';
 import '../calendar/event_detail_screen.dart' show RsvpButtons;
 import '../calendar/formatting.dart';
 import '../common/error_text.dart';
@@ -329,7 +330,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   controller: _ctrl,
                   minLines: 1,
                   maxLines: 5,
-                  maxLength: 8000,
+                  // Zählt wie die Prüfung im Gateway in UTF-16-Einheiten, nicht nach Graphemen (#236, E-40).
+                  inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(ChatMessage.maxBody, LengthMeasure.utf16)],
+                  maxLength: ChatMessage.maxBody,
                   buildCounter: (_, {required currentLength, required isFocused, maxLength}) => null,
                   enableIMEPersonalizedLearning: false,
                   textCapitalization: TextCapitalization.sentences,
