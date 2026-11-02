@@ -663,6 +663,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Alte Reaktionen:** `m.reaction` bleibt lesbar, damit vorhandene Reaktionen und solche von älteren Apps sichtbar bleiben. Die App sendet sie nicht mehr.
 - **Kontakträume:** `docs/KONTAKTE.md:91` schließt eigene Ereignistypen in Kontakträumen aus, `docs/KONTAKTE.md:187` nennt, dass es dort keine App-Ereignisse gibt, die den Ungelesen-Zähler verfälschen. Einzelchats der Familie nutzen den neuen Typ. Kommt das Kontakte-Konzept, ist beides neu zu bewerten.
 - **Verworfen:** `m.reaction` beibehalten (Klartext); Patch des SDK; alte Reaktionen redigieren (eine Redaktion je Ereignis).
+- **Nachtrag #224 (2026-11-02):** Das Aktionsmenü im Chat bietet Reaktionen nur für Nachrichten im Zustand `MessageStatus.sent` an (entspricht `status.isSent` im Gateway). Bei „wird gesendet“ und „Nicht gesendet“ fehlt die Reaktionsleiste, statt dass jede Reaktion mit „Nicht gefunden.“ scheitert.
 - **Folge für ältere App-Versionen und andere Matrix-Clients:** Sie zeigen neue Reaktionen nicht. In die Release-Notes: alle Geräte aktualisieren (vgl. E-58). Offene Punkte stehen in `docs/OFFEN.md`.
 
 ## E-87 Erinnerungs-Übersicht und Bestätigen (2026-11-02, Issue #218) — ergänzt E-15 und E-82

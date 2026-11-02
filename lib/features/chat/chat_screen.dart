@@ -155,28 +155,30 @@ class _ChatScreenState extends State<ChatScreen> {
                 setState(() => _replyTo = m);
               },
             ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Wrap(spacing: 8, children: <Widget>[
-              for (final e in _quickReactions)
-                Semantics(
-                  label: '${l.chatReact} $e',
-                  button: true,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(24),
-                    onTap: () async {
-                      Navigator.pop(c);
-                      try {
-                        await g.sendReaction(m.id, e, threadId: _threadId);
-                      } catch (err) {
-                        _toast(errorText(l, err));
-                      }
-                    },
-                    child: Padding(padding: const EdgeInsets.all(10), child: Text(e, style: const TextStyle(fontSize: 24))),
+          // Ungesendetes ist kein Reaktionsziel, das Gateway wiese es ab (E-86, #224).
+          if (m.status == MessageStatus.sent)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Wrap(spacing: 8, children: <Widget>[
+                for (final e in _quickReactions)
+                  Semantics(
+                    label: '${l.chatReact} $e',
+                    button: true,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(24),
+                      onTap: () async {
+                        Navigator.pop(c);
+                        try {
+                          await g.sendReaction(m.id, e, threadId: _threadId);
+                        } catch (err) {
+                          _toast(errorText(l, err));
+                        }
+                      },
+                      child: Padding(padding: const EdgeInsets.all(10), child: Text(e, style: const TextStyle(fontSize: 24))),
+                    ),
                   ),
-                ),
-            ]),
-          ),
+              ]),
+            ),
           if (foreign) ...<Widget>[
             ListTile(
               leading: const Icon(Icons.flag_outlined),
