@@ -8,7 +8,7 @@ import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:matrix/matrix.dart' show SyncUpdate;
+import 'package:matrix/matrix.dart' show Client, Event, EventStatus, EventStatusExtension, MatrixSdkDatabase, Room, SyncUpdate;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../support/memory_stores.dart';
@@ -168,6 +168,16 @@ void main() {
       _famB: <Map<String, Object?>>[_event(r'$b1', 'm.room.encrypted', 50), _event(r'$b2', 'de.inneso.familynexus.shopping', 60)],
     }, family: _famB));
     await _until(() => g.liveSince == _t(60), what: 'Grundlinie gehoben');
+    // Auch beim Familienwechsel gilt die Obergrenze: Zeitstempel weit in der Zukunft.
+    final future = DateTime.now().toUtc().add(const Duration(hours: 3));
+    await _sync(g, _rooms(<String, List<Map<String, Object?>>>{
+      _famA: <Map<String, Object?>>[
+        <String, Object?>{..._event(r'$a9', 'm.room.encrypted', 0), 'origin_server_ts': future.millisecondsSinceEpoch},
+      ],
+    }, family: _famA));
+    await _until(() => g.family?.roomId == _famA, what: 'zurück zu A');
+    await _until(() => g.liveSince != _t(60), what: 'Grundlinie erneut gehoben');
+    expect(g.liveSince!.isAfter(DateTime.now().toUtc().add(SdkMatrixGateway.liveSkew)), isFalse);
   });
 
   test('Abmelden setzt zurück; Wiederherstellen: Start zählt nicht als Familienwechsel, leere Antwort nimmt den Startwert',
@@ -220,8 +230,23 @@ void main() {
     final before = DateTime.now().toUtc();
     await g.login(server: ServerUrl.tryParse('hs.example')!, username: 'n1', password: 'geheim123');
     await _until(() => g.liveSince != null, what: 'liveSince gesetzt');
+    expect(SdkMatrixGateway.liveSkew, const Duration(minutes: 5), reason: 'Zusage in E-88');
     final limit = DateTime.now().toUtc().add(SdkMatrixGateway.liveSkew);
     expect(g.liveSince!.isAfter(limit), isFalse);
     expect(g.liveSince!.isAfter(before.add(SdkMatrixGateway.liveSkew).subtract(const Duration(seconds: 5))), isTrue);
+  });
+
+  test('Startwert zählt nur vom Server bestätigte Ereignisse (SENDING trägt Gerätezeit)', () async {
+    final db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+    final client = Client('seed', database: await MatrixSdkDatabase.init('seed', database: db));
+    addTearDown(db.close);
+    final room = Room(id: _famA, client: client);
+    Event e(String id, int ts, EventStatus status) => Event.fromJson(<String, Object?>{
+          ..._event(id, 'm.room.encrypted', ts),
+          'status': status.intValue,
+        }, room);
+    expect(SdkMatrixGateway.latestSynced(<Event>[e(r'$s', 900, EventStatus.sending), e(r'$a', 20, EventStatus.synced)]), _t(20));
+    expect(SdkMatrixGateway.latestSynced(<Event>[e(r'$f', 900, EventStatus.error), e(r'$x', 900, EventStatus.sent)]), isNull);
+    expect(SdkMatrixGateway.latestSynced(const <Event>[]), isNull);
   });
 }

@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('#254: Zahl am App-Symbol', () {
-    test('entprellt, nur der letzte Wert; gleiche Werte nicht doppelt; clear setzt sofort 0', () async {
+    test('entprellt, nur der letzte Wert; gleiche Werte nicht doppelt; nie negativ', () async {
       final sent = <int>[];
       final b = PlatformAppBadge(
         debounce: const Duration(milliseconds: 20),
@@ -26,17 +26,12 @@ void main() {
       b.update(-4);
       await Future<void>.delayed(const Duration(milliseconds: 60));
       expect(sent, <int>[3, 0], reason: 'nie negativ');
-      b.update(5);
-      await b.clear();
-      await Future<void>.delayed(const Duration(milliseconds: 60));
-      expect(sent, <int>[3, 0], reason: 'clear bricht den ausstehenden Wert ab und bleibt bei 0');
     });
 
     test('nicht unterstützt (Android, Browser): nichts', () async {
       final sent = <int>[];
       final b = PlatformAppBadge(debounce: Duration.zero, supportedOverride: false, sink: (c) async => sent.add(c));
       b.update(4);
-      await b.clear();
       await Future<void>.delayed(const Duration(milliseconds: 20));
       expect(sent, isEmpty);
     });

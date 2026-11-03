@@ -249,10 +249,17 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final db = client.database;
     DateTime? best;
     for (final room in client.rooms.where((r) => r.membership == Membership.join)) {
-      final events = await db.getEventList(room, limit: 1);
-      for (final e in events.where((e) => e.status.isSynced)) {
-        best = _later(best, e.originServerTs.toUtc());
-      }
+      best = _later(best, latestSynced(await db.getEventList(room, limit: 1)));
+    }
+    return best;
+  }
+
+  /// Jüngster Server-Zeitstempel unter [events], nur vom Server bestätigte (SENDING/Fehler tragen Gerätezeit).
+  @visibleForTesting
+  static DateTime? latestSynced(Iterable<Event> events) {
+    DateTime? best;
+    for (final e in events.where((e) => e.status.isSynced)) {
+      best = _later(best, e.originServerTs.toUtc());
     }
     return best;
   }

@@ -41,12 +41,6 @@ class PlatformAppBadge implements AppBadge {
     _timer = Timer(debounce, () => _apply(count < 0 ? 0 : count).ignore());
   }
 
-  /// Sofort auf 0 (Abmelden, lokale Löschung).
-  Future<void> clear() async {
-    _timer?.cancel();
-    if (supported) await _apply(0);
-  }
-
   Future<void> _apply(int count) async {
     if (count == _applied) return;
     try {
