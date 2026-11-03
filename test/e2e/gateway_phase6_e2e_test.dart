@@ -115,6 +115,8 @@ void main() {
         await b.sendMessage(t);
       }
       await E2e.until(() => a.unreadIn(ChatThread.familyId) == 3, what: 'drei ungelesen');
+      // `messages` wird entprellt neu aufgebaut (150 ms), `unreadIn` liest die Zeitleiste direkt.
+      await E2e.until(() => a.messages.any((m) => m.body == 'neu 1'), what: 'A bildet die Nachrichten ab');
       final first = a.messages.firstWhere((m) => m.body == 'neu 1');
       expect(a.firstUnreadIdIn(ChatThread.familyId), first.id);
 

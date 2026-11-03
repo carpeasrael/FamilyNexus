@@ -401,7 +401,9 @@ void main() {
       final semantics = tester.ensureSemantics();
       final app = await buildTestApp();
       final ben = await _joinBen(app);
-      await ben.sendMessage('alt'); // 21.10.2026 (Fake)
+      // Ortszeit Mittag: Der Tag hängt nicht von der Zeitzone des Rechners ab.
+      app.server.nextTime = DateTime(2026, 10, 21, 12).toUtc();
+      await ben.sendMessage('alt');
       app.server.nextTime = DateTime.now().toUtc();
       await ben.sendMessage('neu');
       await _openChat(tester, app);
@@ -418,6 +420,7 @@ void main() {
     testWidgets('englisch: „Today“ und Datum nach Sprache', (tester) async {
       final app = await buildTestApp(lang: 'en');
       final ben = await _joinBen(app);
+      app.server.nextTime = DateTime(2026, 10, 21, 12).toUtc();
       await ben.sendMessage('old');
       app.server.nextTime = DateTime.now().toUtc().subtract(const Duration(days: 1));
       await ben.sendMessage('yesterday');
@@ -559,7 +562,7 @@ void main() {
         }
       });
 
-      testWidgets('Tastatur: Enter klappt auf, Fokuswechsel klappt zu', (tester) async {
+      testWidgets('Tastatur: Enter und Leertaste schalten um, Fokuswechsel klappt zu', (tester) async {
         final app = await buildTestApp();
         await setUpReply(tester, app, long);
         final node = tester
@@ -571,6 +574,16 @@ void main() {
         await tester.pumpAndSettle();
         expect(quote(tester).maxLines, isNull);
         node.nextFocus();
+        await tester.pumpAndSettle();
+        expect(quote(tester).maxLines, 4);
+
+        // Leertaste schaltet ebenso um.
+        node.requestFocus();
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.space);
+        await tester.pumpAndSettle();
+        expect(quote(tester).maxLines, isNull);
+        await tester.sendKeyEvent(LogicalKeyboardKey.space);
         await tester.pumpAndSettle();
         expect(quote(tester).maxLines, 4);
       });
