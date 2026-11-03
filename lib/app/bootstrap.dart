@@ -28,6 +28,8 @@ import '../data/platform/file_access.dart';
 import '../data/platform/key_store.dart';
 import '../data/platform/link_source.dart';
 import '../data/platform/oauth_redirect.dart';
+import '../data/platform/activity_notifications.dart';
+import '../data/platform/app_badge.dart';
 import '../data/platform/reminder_scheduler.dart';
 import '../data/platform/screen_protection.dart';
 import '../data/platform/vault_key_store.dart';
@@ -134,9 +136,29 @@ Future<AppServices> bootstrap({
   final lang = settings.settings.languageCode ?? WidgetsBinding.instance.platformDispatcher.locale.languageCode;
   final l10n = lookupAppLocalizations(Locale(lang == 'de' ? 'de' : 'en'));
   await scheduler?.initialize(channelName: l10n.reminderChannelName, channelDescription: l10n.reminderChannelDescription);
+  // Meldungen zu Chat und Einkauf (#254, E-88): dasselbe Plugin, Texte in der aktuellen App-Sprache.
+  AppLocalizations activityL10n() {
+    final code = settings.settings.languageCode ?? WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    return lookupAppLocalizations(Locale(code == 'de' ? 'de' : 'en'));
+  }
+
+  final activity = scheduler == null
+      ? null
+      : LocalActivityNotifications(scheduler, () {
+          final l = activityL10n();
+          return (
+            title: l.appName,
+            chatBody: l.activityChatBody,
+            shoppingBody: l.activityShoppingBody,
+            channelName: l.activityChannelName,
+            channelDescription: l.activityChannelDescription,
+          );
+        });
   return AppServices(
     keepAccountData: keepAccountData,
     scheduler: scheduler,
+    activityPlatform: activity,
+    badge: PlatformInfo.isWeb ? null : PlatformAppBadge(),
     familyDataClaim: (owner) => AppServices.claimFamilyData(database.db, owner, onWiped: scheduler?.cancelAll),
     calendarBuilder: (userId, familyRoom) async {
       final store = SqlEventStore(database.db);

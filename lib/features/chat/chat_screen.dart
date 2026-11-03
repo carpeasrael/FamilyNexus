@@ -64,6 +64,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   /// Klappt aufgeklappte Zitate zu (Tab verlassen, Hintergrund; #254).
   final ValueNotifier<int> _collapseQuotes = ValueNotifier<int>(0);
 
+  /// Vordergrund (`resumed`, `inactive`): Nur dann gilt das Gespräch als gelesen und als sichtbar (#254, E-88).
+  bool _foreground = true;
+
+  static bool _isForeground(AppLifecycleState? s) =>
+      s == null || s == AppLifecycleState.resumed || s == AppLifecycleState.inactive;
+
   void _resetMarker() {
     _markerThread = null;
     _unreadFrom = null;
@@ -76,6 +82,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     _services = AppScope.read(context);
     _services.chatRequest.addListener(_openRequested);
     WidgetsBinding.instance.addObserver(this);
+    _foreground = _isForeground(WidgetsBinding.instance.lifecycleState);
     // Die Anforderung kann gestellt worden sein, bevor dieser Bildschirm entstand.
     final pending = _services.chatRequest.value;
     if (pending != null) {
@@ -104,11 +111,14 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     if (oldWidget.active && !widget.active) {
       _resetMarker();
       _collapseQuotes.value++;
+      _services.visibleChatThread = null;
     }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    final foreground = _isForeground(state);
+    if (foreground != _foreground && mounted) setState(() => _foreground = foreground);
     if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
       // Rückkehr gilt wie Öffnen: Was im Hintergrund kam, bekommt eine neue Marke.
       _resetMarker();
@@ -139,6 +149,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     _waitTimer?.cancel();
     _services.chatRequest.removeListener(_openRequested);
     WidgetsBinding.instance.removeObserver(this);
+    _services.visibleChatThread = null;
     _collapseQuotes.dispose();
     _scroll.dispose();
     _ctrl.dispose();
@@ -268,6 +279,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
           });
         }
         if (waiting) {
+          if (widget.active) services.visibleChatThread = null;
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -289,7 +301,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
           _unreadFrom = unread > 0 ? g.firstUnreadIdIn(threadId) : null;
           _scrolledToMarker = false;
         }
-        if (widget.active && unread > 0) {
+        // Sichtbar heißt wie bei den Meldungen: Chat-Tab, dieses Gespräch, Vordergrund (#254). Im Hintergrund wird
+        // nichts gelesen markiert; die Rückkehr baut neu und markiert dann.
+        if (widget.active) services.visibleChatThread = threadId;
+        if (widget.active && _foreground && unread > 0) {
           WidgetsBinding.instance.addPostFrameCallback((_) => g.markChatRead(threadId: threadId).ignore());
         }
         final byId = <String, ChatMessage>{for (final m in msgs) m.id: m};

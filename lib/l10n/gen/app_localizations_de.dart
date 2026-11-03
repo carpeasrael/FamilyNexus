@@ -407,6 +407,36 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get activityChatBody => 'Neue Nachrichten';
+
+  @override
+  String get activityShoppingBody => 'Neue Einträge auf dem Einkaufszettel';
+
+  @override
+  String get activityChannelName => 'Nachrichten und Einkauf';
+
+  @override
+  String get activityChannelDescription =>
+      'Meldungen zu neuen Nachrichten und Einkaufseinträgen. Sie zeigen keine Inhalte an.';
+
+  @override
+  String get settingsActivity => 'Benachrichtigungen';
+
+  @override
+  String get settingsNotifyChat => 'Neue Chat-Nachrichten';
+
+  @override
+  String get settingsNotifyShopping => 'Neue Einträge auf dem Einkaufszettel';
+
+  @override
+  String get settingsActivityHint =>
+      'Meldungen ohne Inhalt, nur solange die App läuft. Ist die App beendet, kommt keine Meldung (es gibt keinen Push-Dienst).';
+
+  @override
+  String get settingsActivityBadgeApple =>
+      'Die Zahl am App-Symbol erlaubst du in den Systemeinstellungen unter Mitteilungen → FamilyNexus → Kennzeichen.';
+
+  @override
   String get reminderChannelName => 'Erinnerungen';
 
   @override
@@ -1185,7 +1215,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy5Body =>
-      'Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“. Es gibt keinen Push-Dienst eines Dritten.';
+      'Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“. Bei neuen Nachrichten und Einkaufseinträgen meldet die App nur „Neue Nachrichten“ bzw. „Neue Einträge auf dem Einkaufszettel“, ohne Absender oder Inhalt und nur, solange sie läuft; die Zahl ungelesener Nachrichten kann am App-Symbol erscheinen. Es gibt keinen Push-Dienst eines Dritten.';
 
   @override
   String get privacy6Title => 'Berechtigungen';
@@ -1195,14 +1225,15 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy6NotifAndroid =>
-      'Benachrichtigungen und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen)';
+      'Benachrichtigungen (Erinnerungen, neue Nachrichten und Einkaufseinträge) und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen)';
 
   @override
-  String get privacy6NotifApple => 'Benachrichtigungen (Erinnerungen)';
+  String get privacy6NotifApple =>
+      'Benachrichtigungen und Kennzeichen am App-Symbol (Erinnerungen, neue Nachrichten und Einkaufseinträge)';
 
   @override
   String get privacy6DesktopNote =>
-      'Erinnerungen erscheinen nur, solange die App läuft; dafür fragt die App keine Berechtigung an.';
+      'Erinnerungen und Meldungen zu neuen Nachrichten und Einkaufseinträgen erscheinen nur, solange die App läuft; dafür fragt die App keine Berechtigung an.';
 
   @override
   String get privacy6Lock => 'Geräteanmeldung (App-Sperre)';

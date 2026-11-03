@@ -351,26 +351,36 @@ class ShoppingService {
 
   /// Nimmt einen empfangenen (bereits dekodierten und geprüften) Eintrag an.
   /// `true`, wenn sich der lokale Bestand geändert hat.
-  Future<bool> applyIncoming(ShoppingItem incoming) => _serial(() async {
+  Future<bool> applyIncoming(ShoppingItem incoming) async => (await applyIncomingResult(incoming)) != ApplyResult.none;
+
+  /// Wie [applyIncoming], unterscheidet aber neu angelegte Einträge (#254: Meldung „Neue Einträge“). [ApplyResult.created]
+  /// gilt nur für einen bisher unbekannten, weder gelöschten noch abgehakten Eintrag: Nach einer Neuanmeldung wäre
+  /// das Abhaken eines alten Eintrags sonst „neu“.
+  Future<ApplyResult> applyIncomingResult(ShoppingItem incoming) => _serial(() async {
         final current = await store.get(incoming.id);
         if (current == null) {
-          if (incoming.version > ShoppingItem.maxFirstVersion) return false;
+          if (incoming.version > ShoppingItem.maxFirstVersion) return ApplyResult.none;
           var c = await store.counts();
           if (c.total >= ShoppingItem.maxTotal) {
             await store.pruneTombstones(keep: ShoppingItem.keepTombstones);
             c = await store.counts();
           }
-          if (c.total >= ShoppingItem.maxTotal || (!incoming.deleted && c.active >= ShoppingItem.maxActive)) return false;
+          if (c.total >= ShoppingItem.maxTotal || (!incoming.deleted && c.active >= ShoppingItem.maxActive)) {
+            return ApplyResult.none;
+          }
         } else if (incoming.version > current.version + ShoppingItem.maxVersionJump) {
           // Kein Hochsetzen der Version, das den Eintrag für alle unveränderbar machte.
-          return false;
+          return ApplyResult.none;
         }
-        if (!ShoppingMerge.incomingWins(current, incoming)) return false;
+        if (!ShoppingMerge.incomingWins(current, incoming)) return ApplyResult.none;
         await store.put(incoming, publishedVersion: incoming.version);
-        return true;
+        return current == null && !incoming.deleted && !incoming.checked ? ApplyResult.created : ApplyResult.updated;
       });
 
   void _check(ShoppingItem i) {
     if (i.validate().isNotEmpty) throw const ShoppingException(ShoppingError.invalid);
   }
 }
+
+/// Ergebnis von [ShoppingService.applyIncomingResult].
+enum ApplyResult { none, created, updated }

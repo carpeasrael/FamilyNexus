@@ -59,6 +59,12 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
     }
   }
 
+  /// Wechselt den Tab. Der Einkaufszettel räumt dabei seine Meldung ab (#254).
+  void _go(int i) {
+    setState(() => _index = i);
+    if (i == _shoppingTab) _services.activity?.clearShopping();
+  }
+
   /// Ein Gespräch soll geöffnet werden (z. B. „Nachricht schreiben“): zum Chat wechseln.
   void _chatRequested() {
     if (_services.chatRequest.value != null && mounted) setState(() => _index = _chatTab);
@@ -124,7 +130,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
         final pages = <Widget>[
           TodayScreen(
             onOpenChat: () => setState(() => _index = _chatTab),
-            onOpenShopping: () => setState(() => _index = _shoppingTab),
+            onOpenShopping: () => _go(_shoppingTab),
             onOpenAgenda: _openAgenda,
           ),
           CalendarScreen(modeRequest: _calendarMode),
@@ -150,7 +156,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
           body: SafeArea(child: IndexedStack(index: _index, children: pages)),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _index,
-            onDestinationSelected: (i) => setState(() => _index = i),
+            onDestinationSelected: _go,
             destinations: <NavigationDestination>[
               NavigationDestination(icon: const Icon(Icons.today_outlined), label: l.tabToday),
               NavigationDestination(icon: const Icon(Icons.calendar_month_outlined), label: l.tabCalendar),

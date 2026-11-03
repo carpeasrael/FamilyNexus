@@ -673,4 +673,50 @@ void main() {
       });
     });
   });
+
+  group('#254 Teil B: Sichtbarkeit und Gelesen-Markieren', () {
+    testWidgets('Chat meldet das sichtbare Gespräch; Tab verlassen gibt es frei', (tester) async {
+      final app = await buildTestApp();
+      await _openChat(tester, app);
+      expect(app.services.visibleChatThread, ChatThread.familyId);
+      expect(app.services.chatThreadVisible(ChatThread.familyId), isTrue);
+      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Einkauf')));
+      await tester.pumpAndSettle();
+      expect(app.services.visibleChatThread, isNull);
+      expect(app.services.chatThreadVisible(ChatThread.familyId), isFalse);
+    });
+
+    testWidgets('im Hintergrund wird nichts gelesen markiert, nach der Rückkehr schon', (tester) async {
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      await _openChat(tester, app);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      await tester.pump();
+      expect(app.services.chatThreadVisible(ChatThread.familyId), isFalse);
+      await ben.sendMessage('im Hintergrund');
+      await tester.pump();
+      await tester.pump();
+      expect(app.gateway.unreadIn(ChatThread.familyId), 1, reason: 'nicht gelesen markiert');
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pumpAndSettle();
+      expect(app.gateway.unreadIn(ChatThread.familyId), 0);
+      expect(find.text('Neue Nachrichten'), findsOneWidget);
+    });
+
+    testWidgets('inaktiv (unfokussiertes Fenster) gilt als sichtbar und markiert gelesen', (tester) async {
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      await _openChat(tester, app);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      await ben.sendMessage('Fenster ohne Fokus');
+      await tester.pumpAndSettle();
+      expect(app.gateway.unreadIn(ChatThread.familyId), 0);
+      expect(app.services.chatThreadVisible(ChatThread.familyId), isTrue);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    });
+  });
 }

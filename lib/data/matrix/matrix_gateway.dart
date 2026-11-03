@@ -114,6 +114,10 @@ abstract class MatrixGateway implements Listenable {
   /// (#254: Marke „Neue Nachrichten“). Vor [markChatRead] abzufragen.
   String? firstUnreadIdIn(String threadId);
 
+  /// Server-Zeitstempel, ab dem Nachrichten und Signale als neu gelten (Meldungen, #254, E-88). `null` bis zum ersten
+  /// echten Sync der Sitzung und nach dem Abmelden; Ereignisse mit Zeitstempel ≤ diesem Wert werden nie gemeldet.
+  DateTime? get liveSince;
+
   /// Markiert ein Gespräch bis zur letzten Nachricht als gelesen (private Lesebestätigung).
   Future<void> markChatRead({String threadId = ChatThread.familyId});
 

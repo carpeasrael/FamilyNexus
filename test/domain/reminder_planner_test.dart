@@ -174,4 +174,18 @@ void main() {
       expect(up.first.occurrence.event.id, events.first.id);
     });
   });
+
+  group('#254: reservierte IDs für feste Meldungen', () {
+    test('reserveLow verschiebt 0..15 nach oben, lässt den Rest', () {
+      expect(<int>[for (final h in <int>[0, 1, 2, 15, 16, 17, 0x7fffffff]) ReminderPlanner.reserveLow(h)],
+          <int>[16, 17, 18, 31, 16, 17, 0x7fffffff]);
+    });
+
+    test('stableId liefert nie eine reservierte ID (Eingabe mit FNV-Hash 8)', () {
+      // Vorab gesucht: FNV-1a von „e112225994|1793000000000|10“ & 0x7fffffff = 8.
+      final id = ReminderPlanner.stableId('e112225994', DateTime.fromMillisecondsSinceEpoch(1793000000000, isUtc: true), 10);
+      expect(id, 8 + ReminderPlanner.reservedIds);
+      expect(id, greaterThanOrEqualTo(ReminderPlanner.reservedIds));
+    });
+  });
 }

@@ -1,5 +1,7 @@
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
+import 'package:family_nexus/data/sync/activity_notifier.dart';
+import 'package:family_nexus/domain/app_settings.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/family.dart';
@@ -123,6 +125,72 @@ void main() {
       await a.markChatRead();
       await E2e.until(() => a.unreadIn(ChatThread.familyId) == 0, what: 'wieder gelesen');
       expect(a.firstUnreadIdIn(ChatThread.familyId), isNull);
+    });
+
+    test('#254 Teil B: Neustart – Rückstand bei geschlossener App meldet nichts, Neues schon', () async {
+      await E2e.init();
+      final device = await E2e.newDevice();
+      final acc = await E2e.registerUser('p6r');
+      final a = await E2e.newGateway(device: device);
+      await a.restore();
+      await a.login(server: E2e.server, username: acc.user, password: acc.password);
+      await E2e.until(() => a.initialSyncDone, what: 'Sync A');
+      await a.setUpSecurity();
+      await E2e.until(() => a.securityState == SecurityState.ready, what: 'Sicherung A');
+      await a.createFamily('Melde-Familie');
+      await E2e.until(() => a.family != null);
+      final b = await _login('p6s');
+      await _join(a, b);
+      await E2e.until(() => a.liveSince != null, what: 'Grundlinie A');
+      await b.sendMessage('vor dem Neustart');
+      await E2e.until(() => a.messages.any((m) => m.body == 'vor dem Neustart'), what: 'A entschlüsselt');
+      await a.close();
+
+      // Bei geschlossener App: drei Nachrichten und ein Einkaufseintrag.
+      for (final t in <String>['zu 1', 'zu 2', 'zu 3']) {
+        await b.sendMessage(t);
+      }
+      await b.publishShoppingItem(ShoppingItem(
+        id: '00000000-0000-4000-8000-000000000254',
+        title: 'Milch',
+        by: b.userId!,
+        version: 1,
+        updatedAt: DateTime.now().toUtc(),
+      ));
+      await Future<void>.delayed(const Duration(seconds: 1));
+
+      // Neustart: gleiche Datenbank, Notifier läuft ab dem Wiederherstellen.
+      final a2 = await E2e.newGateway(device: device);
+      final shown = <ActivityKind>[];
+      final shopping = <ShoppingSignal>[];
+      final sub = a2.calendarSignals.listen((s) {
+        if (s is ShoppingSignal) shopping.add(s);
+      });
+      addTearDown(sub.cancel);
+      await a2.restore();
+      final notifier = ActivityNotifier(
+        gateway: a2,
+        platform: _RecordingPlatform(shown),
+        settings: () => const AppSettings(),
+        isThreadVisible: (_) => false,
+      )..start();
+      addTearDown(notifier.dispose);
+      await E2e.until(() => a2.liveSince != null, what: 'Grundlinie nach Neustart');
+      await E2e.until(() => a2.messages.any((m) => m.body == 'zu 3'), what: 'Rückstand entschlüsselt');
+      await E2e.until(() => shopping.isNotEmpty, what: 'Einkaufssignal');
+      final since = a2.liveSince!;
+      for (final m in a2.messages.where((m) => m.body.startsWith('zu '))) {
+        expect(m.time.isAfter(since), isFalse, reason: '${m.body} ist Rückstand');
+      }
+      expect(shopping.every((s) => !s.timestamp.isAfter(since)), isTrue, reason: 'Einkauf bei geschlossener App');
+      await Future<void>.delayed(const Duration(seconds: 2));
+      expect(shown, isEmpty, reason: 'kein Rückstand gemeldet');
+
+      await b.sendMessage('nach dem Neustart');
+      await E2e.until(() => a2.messages.any((m) => m.body == 'nach dem Neustart'), what: 'neue Nachricht');
+      await E2e.until(() => shown.isNotEmpty, what: 'Meldung');
+      expect(shown, <ActivityKind>[ActivityKind.chat]);
+      expect(a2.messages.firstWhere((m) => m.body == 'nach dem Neustart').time.isAfter(since), isTrue);
     });
 
     test('Online-Status: verschlüsselt zugestellt, Anfrage wird beantwortet, Fremde und Klartext werden ignoriert', () async {
@@ -362,4 +430,15 @@ void main() {
       expect(raw.chunk.where((e) => e.type == TaskCodec.listType || e.type == TaskCodec.logType), isEmpty);
     });
   });
+}
+
+class _RecordingPlatform implements ActivityPlatform {
+  _RecordingPlatform(this.shown);
+  final List<ActivityKind> shown;
+
+  @override
+  Future<void> show(ActivityKind kind, {required bool alert, int count = 0}) async => shown.add(kind);
+
+  @override
+  Future<void> cancel(ActivityKind kind) async {}
 }

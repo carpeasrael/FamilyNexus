@@ -6,7 +6,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 
 | Punkt | Grund / Hinweis |
 |---|---|
-| Push-Benachrichtigungen für Chat (UnifiedPush/FCM) | Würde Dritt-Infrastruktur oder Telemetrie-SDKs verlangen; „Später denkbar“ im Konzept. Chat wird beim Öffnen/Sync aktualisiert, Erinnerungen laufen lokal. |
+| Push-Benachrichtigungen für Chat (UnifiedPush/FCM) | Würde Dritt-Infrastruktur oder Telemetrie-SDKs verlangen; „Später denkbar“ im Konzept. Seit E-88 (#254) gibt es lokale, generische Meldungen zu Chat und Einkauf, aber nur, solange die App läuft; bei beendeter App kommt nichts. |
 | In-App-QR-Scanner | `mobile_scanner`/ML Kit kann Daten an Google senden (E-34). Scan mit der Kamera-App öffnet den Deep Link. Alternative auf ZXing-Basis ohne Google-Dienste prüfen. |
 | ICS-/Archiv-Export | Ein Export wäre unverschlüsselt gespeichert – verstößt gegen „nie unverschlüsselt speichern“. Möglich nur als verschlüsseltes Archiv. |
 | Geräte sperren / fremde Sitzungen abmelden | Benötigt Server-Passwortbestätigung (UIA) für Geräteverwaltung; Verifizierungsstatus wird angezeigt. |
@@ -27,7 +27,6 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 | Familie selbst verlassen | Mitglieder werden nur durch Moderatoren entfernt; Austritt (`leave`) fehlt in der Oberfläche. Das Recht auf Löschung wird über die lokale Löschung und „Konto löschen“ (E-73) wahrgenommen. |
 | Server durch Moderator ändern | Der Server ist in den Einstellungen nur lesbar; Wechsel = neue Familie/neue Anmeldung. |
 | Löschmarken beim „Alle lokalen Daten löschen“ | Geteilte Termine bleiben bei den anderen Geräten bestehen; vor dem Löschen sollten sie einzeln gelöscht werden. |
-| Chat-Benachrichtigungen (auch lokal) | Keine; siehe E-16. |
 | Familienspeicher auf Nextcloud (E-74) | Abgestimmt und beschrieben (`docs/NEXTCLOUD_FAMILIENSPEICHER.md`), Umsetzung in den Phasen S1–S5 offen. Bekannte Grenzen nach Umsetzung: gemeinsames Konto (SA-9), Web-Version nur mit CORS-Freigabe am Nextcloud-Server, früher geöffnete Dateien bleiben bei entfernten Mitgliedern lesbar. |
 
 ## Bekannte Einschränkungen
@@ -80,7 +79,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
   - **Hängende Sendung:** Eine durch App-Abbruch hängende Reaktion im Zustand `sending` zählt als gültig und blockiert die Wiederholung, bis das SDK sie beim nächsten Neustart nach Ablauf einer Minute auf Fehler setzt.
   - **Störung der Doppelprüfung:** Der eigene Homeserver kann mit gefälschtem Klartext die Doppelprüfung auslösen, sodass die echte Reaktion nicht gesendet wird. Das stört nur das eigene Gerät.
   - **Doppelsendungen:** Zwei Geräte desselben Kontos, eine Lücke nach einem `limited`-Sync und ein nicht entschlüsselbares eigenes Ereignis können zu einem zweiten Ereignis führen. Die Anzeige zählt es einmal.
-  - **Ungelesen:** Reaktionen laufen unter den Regeln für verschlüsselte Ereignisse, `notificationCount` steigt. `unreadReadable` begrenzt die Anzeige, Push gibt es nicht (E-16); bei einer Änderung von E-16 ist das zu beachten.
+  - **Ungelesen:** Reaktionen laufen unter den Regeln für verschlüsselte Ereignisse, `notificationCount` steigt. `unreadReadable` begrenzt die Anzeige. Die lokalen Meldungen (E-88) zählen nur neue sichtbare **Nachrichten**, Reaktionen lösen keine aus.
   - **Verlauf:** Reaktionen auf Nachrichten außerhalb des geladenen Verlaufs erscheinen erst, wenn beide geladen sind.
   - **Zurücknehmen:** Eine Reaktion zurücknehmen geht weiterhin nicht.
 

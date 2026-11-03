@@ -46,6 +46,11 @@ class MainFlutterWindow: NSWindow {
         pb.setString(text, forType: .string)
         pb.setString("", forType: concealed)
         result(nil)
+      } else if call.method == "setBadge" {
+        // Zahl ungelesener Nachrichten am Dock-Symbol (#254), ohne Berechtigung.
+        let count = max(0, (call.arguments as? Int) ?? 0)
+        NSApp.dockTile.badgeLabel = count == 0 ? nil : (count > 99 ? "99+" : String(count))
+        result(nil)
       } else {
         result(FlutterMethodNotImplemented)
       }

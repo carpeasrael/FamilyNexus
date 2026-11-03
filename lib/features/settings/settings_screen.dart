@@ -76,6 +76,11 @@ class SettingsScreen extends StatelessWidget {
               _RemindersSection(),
               const SizedBox(height: 16),
             ],
+            // Meldungen zu Chat und Einkauf gibt es nur mit Plattform-Meldungen (nicht im Browser, #254).
+            if (AppScope.of(context).activityPlatform != null) ...<Widget>[
+              _ActivitySection(),
+              const SizedBox(height: 16),
+            ],
             _Section(title: l.settingsSectionPrivacy, children: <Widget>[
               // Ohne Geräteanmeldung (Linux, Browser) lässt sich die App-Sperre nicht einschalten: Schalter ausgeblendet (#67).
               if (AppScope.of(context).lock.auth.supported) _LockTiles(),
@@ -381,6 +386,51 @@ class _RemindersSection extends StatelessWidget {
                 ]),
               );
             }),
+        ]);
+      },
+    );
+  }
+}
+
+/// Schalter für die Meldungen zu Chat und Einkauf (#254, E-88). Beim Einschalten wird nur die
+/// Benachrichtigungsberechtigung angefragt (ohne genaue Alarme).
+class _ActivitySection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final services = AppScope.of(context);
+    final controller = services.settings;
+    Future<void> enable(AppSettings Function(AppSettings) change, bool on) async {
+      await controller.update(change);
+      if (!on) return;
+      await services.scheduler?.requestNotifications();
+      await services.reminders?.reschedule();
+    }
+
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) {
+        final s = controller.settings;
+        return _Section(title: l.settingsActivity, children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(l.settingsActivityHint, style: Theme.of(context).textTheme.bodySmall),
+          ),
+          SwitchListTile(
+            title: Text(l.settingsNotifyChat),
+            value: s.notifyChat,
+            onChanged: (v) => enable((c) => c.copyWith(notifyChat: v), v),
+          ),
+          SwitchListTile(
+            title: Text(l.settingsNotifyShopping),
+            value: s.notifyShopping,
+            onChanged: (v) => enable((c) => c.copyWith(notifyShopping: v), v),
+          ),
+          if (PlatformInfo.isIOS || PlatformInfo.isMacOS)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+              child: Text(l.settingsActivityBadgeApple, style: Theme.of(context).textTheme.bodySmall),
+            ),
         ]);
       },
     );

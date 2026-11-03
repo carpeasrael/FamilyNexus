@@ -39,8 +39,15 @@ class ReminderPlanner {
       h ^= u;
       h = (h * 0x01000193) & 0xffffffff;
     }
-    return h & 0x7fffffff;
+    return reserveLow(h & 0x7fffffff);
   }
+
+  /// IDs unter diesem Wert sind für feste Meldungen reserviert (Chat 1, Einkauf 2; #254, E-88).
+  static const int reservedIds = 16;
+
+  /// Verschiebt Hashes aus dem reservierten Bereich nach oben, damit keine Erinnerung eine feste Meldung ersetzt
+  /// oder `dismiss` sie entfernt. Betrifft 16 von 2³¹ Werten.
+  static int reserveLow(int h) => h < reservedIds ? h + reservedIds : h;
 
   /// Uhrzeit, auf die sich Erinnerungen ganztägiger Termine beziehen (lokal).
   static const int allDayHour = 9;

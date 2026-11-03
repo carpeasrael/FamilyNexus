@@ -34,6 +34,15 @@ class ShoppingSync {
   /// Wird nach jeder Änderung des lokalen Bestands aufgerufen.
   void Function()? onChanged;
 
+  /// Ein anderes Mitglied hat einen neuen Eintrag angelegt, nach der Grundlinie [MatrixGateway.liveSince] (#254).
+  /// Verlauf, Wiedergabe der Historie und Neuanmeldung lösen nichts aus, auch wenn sie erst später verarbeitet werden:
+  /// Entscheidend ist der Server-Zeitstempel des Ereignisses, nicht der Zeitpunkt der Verarbeitung.
+  void Function()? onIncomingNew;
+
+  /// Blockierte Mitglieder (Einstellungen); deren Einträge lösen keine Meldung aus.
+  Set<String> Function() blocked = _none;
+  static Set<String> _none() => const <String>{};
+
   /// Verworfene (ungültige oder unberechtigte) Ereignisse.
   int rejected = 0;
 
@@ -115,7 +124,10 @@ class ShoppingSync {
             AppLog.w('shopping', 'Ungültigen Einkaufseintrag verworfen');
             return;
           }
-          if (await service.applyIncoming(item)) onChanged?.call();
+          final result = await service.applyIncomingResult(item);
+          if (result == ApplyResult.none) return;
+          onChanged?.call();
+          if (result == ApplyResult.created && _isNewFromOther(s)) onIncomingNew?.call();
         case MemberJoinedSignal():
           // Zuverlässig: erneut zum Senden vormerken; die Warteschlange erledigt den Rest.
           await store.requeueLastEditedBy(_me);
@@ -126,6 +138,11 @@ class ShoppingSync {
     } catch (e) {
       AppLog.e('shopping', 'Einkaufseintrag konnte nicht verarbeitet werden', e);
     }
+  }
+
+  bool _isNewFromOther(CalendarSignal s) {
+    final since = gateway.liveSince;
+    return since != null && s.timestamp.isAfter(since) && s.sender != _me && !blocked().contains(s.sender);
   }
 
   bool get _canPublish => gateway.session == SessionState.ready && gateway.initialSyncDone && gateway.family != null && _sameFamily;

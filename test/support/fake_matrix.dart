@@ -439,6 +439,10 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return n;
   }
 
+  /// Test: Grundlinie für Meldungen (#254); `null` = noch kein echter Sync.
+  @override
+  DateTime? liveSince;
+
   @override
   String? firstUnreadIdIn(String threadId) {
     final list = messagesIn(threadId);

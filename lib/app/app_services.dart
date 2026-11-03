@@ -18,6 +18,7 @@ import '../data/platform/mail_launcher.dart';
 import '../data/platform/oauth_redirect.dart';
 import '../data/platform/reminder_scheduler.dart';
 import '../data/platform/screen_protection.dart';
+import '../data/sync/activity_notifier.dart';
 import '../data/sync/presence_sync.dart';
 import '../domain/data_inventory.dart';
 import '../domain/invite_link.dart';
@@ -55,6 +56,8 @@ class AppServices {
     this.tasksBuilder,
     this.familyDataClaim,
     this.scheduler,
+    this.activityPlatform,
+    this.badge,
     this.mail = const SystemMailLauncher(),
     this.browser = const SystemBrowserLauncher(),
     this.element = const SystemElementLauncher(),
@@ -112,11 +115,29 @@ class AppServices {
   final Future<void> Function(String owner)? familyDataClaim;
   final ReminderScheduler? scheduler;
 
+  /// Meldungen zu Chat und Einkauf (#254, E-88); `null` im Browser und in Widget-Tests.
+  final ActivityPlatform? activityPlatform;
+
+  /// Zahl am App-Symbol (#254); `null` im Browser und in Widget-Tests.
+  final AppBadge? badge;
+
+  /// Gesprächskennung, die der Chat gerade zeigt (Chat-Tab aktiv), sonst `null`. Setzt nur der Chat.
+  String? visibleChatThread;
+
+  /// Ist das Gespräch für die Person sichtbar? Dieselbe Bedingung, unter der der Chat es gelesen markiert:
+  /// Vordergrund (`resumed` oder `inactive`), nicht gesperrt, Chat-Tab mit diesem Gespräch (#254).
+  bool chatThreadVisible(String threadId) {
+    final state = WidgetsBinding.instance.lifecycleState;
+    final foreground = state == null || state == AppLifecycleState.resumed || state == AppLifecycleState.inactive;
+    return foreground && !lock.locked && visibleChatThread == threadId;
+  }
+
   CalendarController? calendar;
   ShoppingController? shopping;
   TasksController? tasks;
   PresenceSync? presence;
   ReminderCoordinator? reminders;
+  ActivityNotifier? activity;
   String? _calendarUser;
 
   /// Familie, für die die Dienste offen sind oder gerade öffnen.
@@ -166,12 +187,27 @@ class AppServices {
       calendar = c;
       _calendarUser = uid;
       c.start(familyRoom: room);
+      final ap = activityPlatform;
+      final a = ap == null
+          ? null
+          : (activity = ActivityNotifier(
+              gateway: gateway,
+              platform: ap,
+              badge: badge,
+              settings: () => settings.settings,
+              isThreadVisible: chatThreadVisible,
+            )..start());
       final sb = shoppingBuilder;
       if (sb != null) {
         final s = await sb(uid, room);
         if (attempt != _openAttempt) {
           s.dispose();
           return;
+        }
+        if (a != null) {
+          s.sync
+            ..onIncomingNew = a.shoppingArrived
+            ..blocked = () => settings.settings.blockedUsers.toSet();
         }
         (shopping = s).start(familyRoom: room);
       }
@@ -299,7 +335,13 @@ class AppServices {
   /// wartet darauf. Weitere Aufrufe ohne offene Dienste ändern daran nichts: Ein Wechsel schließt bis zu dreimal.
   void closeCalendar({bool cancelReminders = false}) {
     _openAttempt++;
-    if (cancelReminders) scheduler?.cancelAll().ignore();
+    // `cancelAll` entfernt auch die Meldungen zu Chat und Einkauf (gewollt, E-88).
+    if (cancelReminders) {
+      scheduler?.cancelAll().ignore();
+      badge?.update(0);
+    }
+    activity?.dispose();
+    activity = null;
     reminders?.dispose();
     reminders = null;
     final p = presence;

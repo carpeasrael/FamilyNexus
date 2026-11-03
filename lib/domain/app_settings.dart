@@ -20,6 +20,8 @@ class AppSettings {
     this.lockEnabled = false,
     this.lockTimeoutSeconds = 60,
     this.shareOnlineStatus = true,
+    this.notifyChat = true,
+    this.notifyShopping = true,
     this.accent = AccentChoice.teal,
     this.defaultReminderMinutes = const <int>[10],
     this.blockedUsers = const <String>[],
@@ -41,6 +43,12 @@ class AppSettings {
 
   /// Online-Status an die Familie melden (E-38).
   final bool shareOnlineStatus;
+
+  /// Meldung „Neue Nachrichten“ ohne Inhalt, solange die App läuft (#254, E-88).
+  final bool notifyChat;
+
+  /// Meldung „Neue Einträge auf dem Einkaufszettel“ ohne Inhalt, solange die App läuft (#254, E-88).
+  final bool notifyShopping;
 
   /// Neon-Akzentfarbe (Standard: Teal der AURORA-Palette).
   final AccentChoice accent;
@@ -64,6 +72,8 @@ class AppSettings {
     bool? lockEnabled,
     int? lockTimeoutSeconds,
     bool? shareOnlineStatus,
+    bool? notifyChat,
+    bool? notifyShopping,
     AccentChoice? accent,
     List<int>? defaultReminderMinutes,
     List<String>? blockedUsers,
@@ -80,6 +90,8 @@ class AppSettings {
         lockEnabled: lockEnabled ?? this.lockEnabled,
         lockTimeoutSeconds: (lockTimeoutSeconds ?? this.lockTimeoutSeconds).clamp(0, 3600),
         shareOnlineStatus: shareOnlineStatus ?? this.shareOnlineStatus,
+        notifyChat: notifyChat ?? this.notifyChat,
+        notifyShopping: notifyShopping ?? this.notifyShopping,
         accent: accent ?? this.accent,
         defaultReminderMinutes: defaultReminderMinutes ?? this.defaultReminderMinutes,
         blockedUsers: blockedUsers ?? this.blockedUsers,
@@ -98,6 +110,8 @@ class AppSettings {
         'lockEnabled': '$lockEnabled',
         'lockTimeout': '$lockTimeoutSeconds',
         'shareOnlineStatus': '$shareOnlineStatus',
+        'notifyChat': '$notifyChat',
+        'notifyShopping': '$notifyShopping',
         'accent': accent.name,
         'defaultReminders': defaultReminderMinutes.join(','),
         if (blockedUsers.isNotEmpty) 'blockedUsers': BlockedUsers.encode(blockedUsers),
@@ -129,6 +143,8 @@ class AppSettings {
       lockEnabled: m['lockEnabled'] == 'true',
       lockTimeoutSeconds: (timeout != null && timeout >= 0 && timeout <= 3600) ? timeout : d.lockTimeoutSeconds,
       shareOnlineStatus: m['shareOnlineStatus'] != 'false',
+      notifyChat: m['notifyChat'] != 'false',
+      notifyShopping: m['notifyShopping'] != 'false',
       accent: AccentChoice.values.firstWhere((e) => e.name == m['accent'], orElse: () => d.accent),
       defaultReminderMinutes: m.containsKey('defaultReminders') ? reminders : d.defaultReminderMinutes,
       blockedUsers: BlockedUsers.parse(m['blockedUsers']),

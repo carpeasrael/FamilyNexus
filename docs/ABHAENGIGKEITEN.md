@@ -49,7 +49,7 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `cross_file` | transitive | 0.3.5+5 | 2026-08-25 | bsd-3-clause | 160 | neuer: 0.4.0 |
 | `crypto` | transitive | 3.0.7 | 2025-11-04 | bsd-3-clause | 160 | ok |
 | `csslib` | transitive | 1.0.2 | 2024-10-29 | bsd-3-clause | 160 | ok |
-| `dbus` | transitive | 0.8.0 | 2026-09-16 | mpl-2.0 | 160 | ok |
+| `dbus` | direct main | 0.8.0 | 2026-09-16 | mpl-2.0 | 160 | ok (Zahl am Starter-Symbol unter Linux, #254) |
 | `equatable` | transitive | 3.0.0 | 2026-09-15 | mit | 160 | ok |
 | `fake_async` | transitive | 1.3.3 | 2025-01-28 | apache-2.0 | 150 | ok |
 | `ffi` | transitive | 2.2.0 | 2026-02-11 | bsd-3-clause | 160 | ok |

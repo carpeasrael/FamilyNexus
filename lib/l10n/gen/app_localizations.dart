@@ -812,6 +812,60 @@ abstract class AppLocalizations {
   /// **'Termin in {duration}'**
   String reminderBody(String duration);
 
+  /// No description provided for @activityChatBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Nachrichten'**
+  String get activityChatBody;
+
+  /// No description provided for @activityShoppingBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Einträge auf dem Einkaufszettel'**
+  String get activityShoppingBody;
+
+  /// No description provided for @activityChannelName.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachrichten und Einkauf'**
+  String get activityChannelName;
+
+  /// No description provided for @activityChannelDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Meldungen zu neuen Nachrichten und Einkaufseinträgen. Sie zeigen keine Inhalte an.'**
+  String get activityChannelDescription;
+
+  /// No description provided for @settingsActivity.
+  ///
+  /// In de, this message translates to:
+  /// **'Benachrichtigungen'**
+  String get settingsActivity;
+
+  /// No description provided for @settingsNotifyChat.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Chat-Nachrichten'**
+  String get settingsNotifyChat;
+
+  /// No description provided for @settingsNotifyShopping.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Einträge auf dem Einkaufszettel'**
+  String get settingsNotifyShopping;
+
+  /// No description provided for @settingsActivityHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Meldungen ohne Inhalt, nur solange die App läuft. Ist die App beendet, kommt keine Meldung (es gibt keinen Push-Dienst).'**
+  String get settingsActivityHint;
+
+  /// No description provided for @settingsActivityBadgeApple.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Zahl am App-Symbol erlaubst du in den Systemeinstellungen unter Mitteilungen → FamilyNexus → Kennzeichen.'**
+  String get settingsActivityBadgeApple;
+
   /// No description provided for @reminderChannelName.
   ///
   /// In de, this message translates to:
@@ -2075,7 +2129,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy5Body.
   ///
   /// In de, this message translates to:
-  /// **'Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“. Es gibt keinen Push-Dienst eines Dritten.'**
+  /// **'Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“. Bei neuen Nachrichten und Einkaufseinträgen meldet die App nur „Neue Nachrichten“ bzw. „Neue Einträge auf dem Einkaufszettel“, ohne Absender oder Inhalt und nur, solange sie läuft; die Zahl ungelesener Nachrichten kann am App-Symbol erscheinen. Es gibt keinen Push-Dienst eines Dritten.'**
   String get privacy5Body;
 
   /// No description provided for @privacy6Title.
@@ -2093,19 +2147,19 @@ abstract class AppLocalizations {
   /// No description provided for @privacy6NotifAndroid.
   ///
   /// In de, this message translates to:
-  /// **'Benachrichtigungen und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen)'**
+  /// **'Benachrichtigungen (Erinnerungen, neue Nachrichten und Einkaufseinträge) und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen)'**
   String get privacy6NotifAndroid;
 
   /// No description provided for @privacy6NotifApple.
   ///
   /// In de, this message translates to:
-  /// **'Benachrichtigungen (Erinnerungen)'**
+  /// **'Benachrichtigungen und Kennzeichen am App-Symbol (Erinnerungen, neue Nachrichten und Einkaufseinträge)'**
   String get privacy6NotifApple;
 
   /// No description provided for @privacy6DesktopNote.
   ///
   /// In de, this message translates to:
-  /// **'Erinnerungen erscheinen nur, solange die App läuft; dafür fragt die App keine Berechtigung an.'**
+  /// **'Erinnerungen und Meldungen zu neuen Nachrichten und Einkaufseinträgen erscheinen nur, solange die App läuft; dafür fragt die App keine Berechtigung an.'**
   String get privacy6DesktopNote;
 
   /// No description provided for @privacy6Lock.

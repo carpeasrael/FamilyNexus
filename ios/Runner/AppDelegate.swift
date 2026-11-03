@@ -61,6 +61,15 @@ import UserNotifications
           options: [.localOnly: true, .expirationDate: Date().addingTimeInterval(60)]
         )
         result(nil)
+      } else if call.method == "setBadge" {
+        // Zahl ungelesener Nachrichten am App-Symbol (#254); zeigt iOS nur mit Freigabe „Kennzeichen“.
+        let count = max(0, (call.arguments as? Int) ?? 0)
+        if #available(iOS 16.0, *) {
+          UNUserNotificationCenter.current().setBadgeCount(count) { _ in }
+        } else {
+          UIApplication.shared.applicationIconBadgeNumber = count
+        }
+        result(nil)
       } else {
         result(FlutterMethodNotImplemented)
       }
