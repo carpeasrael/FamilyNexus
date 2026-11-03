@@ -12,8 +12,8 @@ finish-args:
   - --device=dri
   - --share=network
   - --talk-name=org.freedesktop.Notifications
-  # Zahl am Starter-Symbol (Unity-LauncherEntry, KDE/Ubuntu-Dock; #254). Nur dieser Name, kein Zugriff auf andere Dienste.
-  - --talk-name=com.canonical.Unity
+  # Kein --talk-name=com.canonical.Unity: Die Zahl am Starter-Symbol (#254) ist ein Broadcast-Signal, das der
+  # D-Bus-Proxy auch ohne Freigabe durchlässt (gemessen 03.11.2026, E-88).
   # Kein --talk-name=org.freedesktop.secrets: libsecret legt die Schlüssel in der Sandbox über das
   # Secret-Portal ab (data/keyrings); die Freigabe gäbe Zugriff auf den ganzen Schlüsselbund des Nutzers (F-03).
 cleanup:
