@@ -494,6 +494,39 @@ void main() {
         ];
         expect(unread(withOwn, 3), 1, reason: 'Bearbeitung zählt nicht extra');
       });
+
+      test('#254: Marke = älteste gezählte Nachricht, gleiche Grenzen wie der Zähler', () {
+        String? first(List<Event> chronological, int server) => ChatMapper.firstUnreadReadable(
+            timeline(chronological.reversed.toList()), serverCount: server, myUserId: me);
+        room.roomAccountData['m.fully_read'] =
+            BasicEvent(type: 'm.fully_read', content: <String, Object?>{'event_id': r'$b'});
+        final events = <Event>[
+          ev(r'$a', text('alt'), ts: 1),
+          ev(r'$b', text('gelesen'), ts: 2),
+          encrypted(r'$x', 3), // nicht lesbar: zählt nicht und ist keine Marke
+          ev(r'$c', text('neu 1'), ts: 4),
+          ev(r'$cal', <String, Object?>{'id': 'x'}, type: 'de.inneso.familynexus.event', ts: 5),
+          ev(r'$d', text('neu 2'), ts: 6),
+          ev(r'$edit', text('* neu 2', extra: <String, Object?>{
+            'm.relates_to': <String, Object?>{'rel_type': 'm.replace', 'event_id': r'$d'},
+            'm.new_content': <String, Object?>{'msgtype': 'm.text', 'body': 'neu 2'},
+          }), ts: 7),
+        ];
+        expect(first(events, 9), r'$c');
+        expect(unread(events, 9), 2, reason: 'ab der Marke genau die lesbaren fremden Nachrichten');
+        room.roomAccountData.remove('m.fully_read');
+
+        final withOwn = <Event>[
+          ev(r'$a', text('alt'), ts: 1),
+          ev(r'$own', text('meine Antwort'), sender: me, ts: 2),
+          ev(r'$c', text('neu'), ts: 3),
+          ev(r'$d', text('neuer'), ts: 4),
+        ];
+        expect(first(withOwn, 9), r'$c', reason: 'die eigene Nachricht beendet die Suche');
+        expect(first(withOwn, 1), r'$d', reason: 'der Server bleibt die Obergrenze');
+        expect(first(withOwn, 0), isNull);
+        expect(first(<Event>[ev(r'$own', text('nur meins'), sender: me, ts: 1)], 3), isNull);
+      });
     });
 
     test('Namensänderung nach dem Beitritt zählt nicht als Beitritt', () {
@@ -750,6 +783,20 @@ void main() {
           }), ts: 2),
         ];
         expect(unread(events, 5), 2);
+      });
+
+      test('#254: Marke folgt denselben Regeln – Klartext und angeblich Eigenes werden übersprungen', () {
+        String? first(List<Event> chronological, int server) => ChatMapper.firstUnreadReadable(
+            timeline(chronological.reversed.toList()), serverCount: server, myUserId: me);
+        final events = <Event>[
+          ev(r'$own', text('meins'), sender: me, ts: 1),
+          ev(r'$lock', text('Lock'), encrypted: false, ts: 2),
+          ev(r'$fake', text('gefälscht'), sender: me, encrypted: false, ts: 3),
+          ev(r'$a', text('eins'), ts: 4),
+          ev(r'$b', text('zwei'), ts: 5),
+        ];
+        expect(first(events, 9), r'$a', reason: 'Klartext zählt nicht, gefälschtes Eigenes stoppt nicht');
+        expect(unread(events, 9), 2);
       });
     });
   });

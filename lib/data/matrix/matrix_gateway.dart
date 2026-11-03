@@ -110,6 +110,10 @@ abstract class MatrixGateway implements Listenable {
   /// Ungelesene Nachrichten eines Gesprächs.
   int unreadIn(String threadId);
 
+  /// Älteste ungelesene Nachricht eines Gesprächs nach denselben Regeln wie [unreadIn], sonst `null`
+  /// (#254: Marke „Neue Nachrichten“). Vor [markChatRead] abzufragen.
+  String? firstUnreadIdIn(String threadId);
+
   /// Markiert ein Gespräch bis zur letzten Nachricht als gelesen (private Lesebestätigung).
   Future<void> markChatRead({String threadId = ChatThread.familyId});
 

@@ -102,6 +102,29 @@ void main() {
       await _expectEncryptedReactions(a, b, id, id);
     });
 
+    test('#254: Marke „Neue Nachrichten“ folgt Lesemarke und Zähler', () async {
+      final (a, b) = await _family('Marken-Familie');
+      await b.sendMessage('vorher');
+      await E2e.until(() => a.messages.any((m) => m.body == 'vorher'), what: 'A entschlüsselt');
+      await E2e.until(() => a.unreadIn(ChatThread.familyId) > 0, what: 'A hat Ungelesenes');
+      await a.markChatRead();
+      await E2e.until(() => a.unreadIn(ChatThread.familyId) == 0, what: 'gelesen');
+      expect(a.firstUnreadIdIn(ChatThread.familyId), isNull);
+
+      for (final t in <String>['neu 1', 'neu 2', 'neu 3']) {
+        await b.sendMessage(t);
+      }
+      await E2e.until(() => a.unreadIn(ChatThread.familyId) == 3, what: 'drei ungelesen');
+      // `messages` wird entprellt neu aufgebaut (150 ms), `unreadIn` liest die Zeitleiste direkt.
+      await E2e.until(() => a.messages.any((m) => m.body == 'neu 1'), what: 'A bildet die Nachrichten ab');
+      final first = a.messages.firstWhere((m) => m.body == 'neu 1');
+      expect(a.firstUnreadIdIn(ChatThread.familyId), first.id);
+
+      await a.markChatRead();
+      await E2e.until(() => a.unreadIn(ChatThread.familyId) == 0, what: 'wieder gelesen');
+      expect(a.firstUnreadIdIn(ChatThread.familyId), isNull);
+    });
+
     test('Online-Status: verschlüsselt zugestellt, Anfrage wird beantwortet, Fremde und Klartext werden ignoriert', () async {
       final (a, b) = await _family('Status-Familie');
       final asks = <String>[];

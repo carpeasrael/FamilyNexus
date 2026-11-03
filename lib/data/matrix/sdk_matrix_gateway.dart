@@ -275,6 +275,15 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return t == null ? room.notificationCount : ChatMapper.unreadReadable(t, serverCount: room.notificationCount);
   }
 
+  /// Ohne geladene Zeitleiste gibt es keine Marke (der Serverzähler nennt keine Nachricht).
+  @override
+  String? firstUnreadIdIn(String threadId) {
+    final room = _roomForThread(threadId);
+    final t = _timelineFor(threadId);
+    if (room == null || t == null) return null;
+    return ChatMapper.firstUnreadReadable(t, serverCount: room.notificationCount);
+  }
+
   @override
   Future<void> markChatRead({String threadId = ChatThread.familyId}) async {
     final room = _roomForThread(threadId);

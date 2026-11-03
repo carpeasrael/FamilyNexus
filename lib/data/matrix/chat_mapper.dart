@@ -114,13 +114,22 @@ class ChatMapper {
   /// Aufgabenänderungen. Gezählt wird deshalb in der geladenen Zeitleiste, neueste zuerst, bis zur eigenen
   /// Lesemarke, eigenen Nachricht oder zum eigenen Beitritt. Der Server bleibt die Obergrenze; meldet er 0,
   /// ist alles gelesen.
-  static int unreadReadable(Timeline timeline, {required int serverCount, String? myUserId}) {
-    if (serverCount <= 0) return 0;
+  static int unreadReadable(Timeline timeline, {required int serverCount, String? myUserId}) =>
+      _unreadReadableIds(timeline, serverCount: serverCount, myUserId: myUserId).length;
+
+  /// Älteste der Nachrichten, die [unreadReadable] zählt, oder `null` (#254: Marke „Neue Nachrichten“).
+  /// Dieselbe Schleife wie der Zähler, damit Marke und Zahl nie auseinanderlaufen.
+  static String? firstUnreadReadable(Timeline timeline, {required int serverCount, String? myUserId}) =>
+      _unreadReadableIds(timeline, serverCount: serverCount, myUserId: myUserId).lastOrNull;
+
+  /// IDs der ungelesenen lesbaren Nachrichten anderer, neueste zuerst, höchstens [serverCount].
+  static List<String> _unreadReadableIds(Timeline timeline, {required int serverCount, String? myUserId}) {
+    if (serverCount <= 0) return const <String>[];
     final room = timeline.room;
     final me = myUserId ?? room.client.userID;
     final marker = room.fullyRead;
     final readAt = room.receiptState.global.latestOwnReceipt?.ts ?? 0;
-    var n = 0;
+    final ids = <String>[];
     for (final e in timeline.events) {
       if (marker.isNotEmpty && e.eventId == marker) break;
       if (e.originServerTs.millisecondsSinceEpoch <= readAt) break;
@@ -131,9 +140,10 @@ class ChatMapper {
       }
       if (e.type != EventTypes.Message || !arrivedEncrypted(e) || _isEdit(e) || e.redacted) continue;
       if (e.messageType.startsWith('m.key.verification.')) continue;
-      if (++n >= serverCount) break;
+      ids.add(e.eventId);
+      if (ids.length >= serverCount) break;
     }
-    return n;
+    return ids;
   }
 
   /// Zeitpunkt des letzten eigenen Beitritts, sofern er in der geladenen Zeitleiste liegt.

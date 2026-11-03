@@ -1,12 +1,13 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/server.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 
@@ -389,6 +390,287 @@ void main() {
       expect(find.text('einmal'), findsOneWidget);
       expect(find.text('danach'), findsOneWidget);
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('#254: Datum, Ungelesen-Marke, Zitat', () {
+    Finder inHistory(Finder f) => find.descendant(of: find.byType(ListView).last, matching: f);
+    Finder composer() => find.widgetWithText(TextField, 'Nachricht schreiben');
+
+    testWidgets('Datumszeile „Heute“ bzw. ausgeschrieben, volles Datum für den Screenreader', (tester) async {
+      final semantics = tester.ensureSemantics();
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      // Ortszeit Mittag: Der Tag hängt nicht von der Zeitzone des Rechners ab.
+      app.server.nextTime = DateTime(2026, 10, 21, 12).toUtc();
+      await ben.sendMessage('alt');
+      app.server.nextTime = DateTime.now().toUtc();
+      await ben.sendMessage('neu');
+      await _openChat(tester, app);
+
+      expect(inHistory(find.text('Mittwoch, 21. Oktober 2026')), findsOneWidget);
+      expect(inHistory(find.text('Heute')), findsOneWidget);
+      double y(String text) => tester.getCenter(inHistory(find.text(text))).dy;
+      expect(y('Mittwoch, 21. Oktober 2026') < y('alt'), isTrue);
+      expect(y('alt') < y('Heute') && y('Heute') < y('neu'), isTrue);
+      expect(find.bySemanticsLabel(RegExp(r'Mittwoch, 21\. Oktober 2026, \d\d:\d\d')), findsOneWidget);
+      semantics.dispose();
+    });
+
+    testWidgets('englisch: „Today“ und Datum nach Sprache', (tester) async {
+      final app = await buildTestApp(lang: 'en');
+      final ben = await _joinBen(app);
+      app.server.nextTime = DateTime(2026, 10, 21, 12).toUtc();
+      await ben.sendMessage('old');
+      app.server.nextTime = DateTime.now().toUtc().subtract(const Duration(days: 1));
+      await ben.sendMessage('yesterday');
+      await _openChatEn(tester, app, use24h: true);
+      expect(inHistory(find.text('Wednesday, October 21, 2026')), findsOneWidget);
+      // Je nach Uhrzeit fällt „gestern minus 24 h“ auf gestern; nie auf heute.
+      expect(inHistory(find.text('Yesterday')), findsOneWidget);
+    });
+
+    testWidgets('Marke steht über der ersten ungelesenen Nachricht und bleibt nach dem Gelesen-Markieren', (tester) async {
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      await ben.sendMessage('gelesen');
+      await app.gateway.markChatRead();
+      await ben.sendMessage('neu eins');
+      await ben.sendMessage('neu zwei');
+      await _openChat(tester, app);
+
+      expect(app.gateway.unreadIn(ChatThread.familyId), 0, reason: 'Öffnen markiert gelesen');
+      expect(find.text('Neue Nachrichten'), findsOneWidget);
+      double y(String text) => tester.getCenter(find.text(text)).dy;
+      expect(y('gelesen') < y('Neue Nachrichten') && y('Neue Nachrichten') < y('neu eins'), isTrue);
+
+      // Neue Nachricht bei offenem Gespräch: keine zweite Marke, die alte bleibt.
+      await ben.sendMessage('neu drei');
+      await tester.pumpAndSettle();
+      expect(find.text('Neue Nachrichten'), findsOneWidget);
+      expect(y('Neue Nachrichten') < y('neu eins'), isTrue);
+
+      // Tab verlassen und zurück: alles gelesen, keine Marke mehr.
+      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Einkauf')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+      await tester.pumpAndSettle();
+      expect(find.text('Neue Nachrichten'), findsNothing);
+    });
+
+    testWidgets('Gesprächswechsel gibt die Marke frei', (tester) async {
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      final dm = await app.gateway.startDirectChat(ben.userId!);
+      await ben.sendMessage('gelesen');
+      await app.gateway.markChatRead();
+      await ben.sendMessage('neu');
+      await _openChat(tester, app);
+      expect(find.text('Neue Nachrichten'), findsOneWidget);
+
+      await tester.tap(find.descendant(of: find.byType(ChoiceChip), matching: find.text('Ben')));
+      await tester.pumpAndSettle();
+      expect(find.text('Neue Nachrichten'), findsNothing, reason: 'Einzelchat ohne Ungelesenes');
+      expect(app.gateway.unreadIn(dm), 0);
+
+      await tester.tap(find.byType(ChoiceChip).first);
+      await tester.pumpAndSettle();
+      expect(find.text('neu'), findsOneWidget);
+      expect(find.text('Neue Nachrichten'), findsNothing, reason: 'beim ersten Öffnen gelesen, keine neue Marke');
+    });
+
+    testWidgets('ohne Ungelesenes keine Marke, auch nicht für Nachrichten bei offenem Gespräch', (tester) async {
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      await ben.sendMessage('eins');
+      await app.gateway.markChatRead();
+      await _openChat(tester, app);
+      expect(find.text('Neue Nachrichten'), findsNothing);
+      await ben.sendMessage('zwei');
+      await tester.pumpAndSettle();
+      expect(find.text('zwei'), findsOneWidget);
+      expect(find.text('Neue Nachrichten'), findsNothing);
+    });
+
+    testWidgets('Rückkehr aus dem Hintergrund setzt eine neue Marke', (tester) async {
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      await ben.sendMessage('eins');
+      await app.gateway.markChatRead();
+      await _openChat(tester, app);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      await ben.sendMessage('im Hintergrund');
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pumpAndSettle();
+      expect(find.text('Neue Nachrichten'), findsOneWidget);
+      expect(tester.getCenter(find.text('Neue Nachrichten')).dy < tester.getCenter(find.text('im Hintergrund')).dy, isTrue);
+    });
+
+    group('Zitat', () {
+      const long = 'Zeile 1\nZeile 2\nZeile 3\nZeile 4\nZeile 5\nZeile 6';
+      // Das Zitat ist das private Widget `_Quote` in der Antwort; die Originalnachricht steht außerhalb.
+      Text quote(WidgetTester tester) => tester.widget<Text>(find.descendant(
+          of: find.byWidgetPredicate((w) => w.runtimeType.toString() == '_Quote'), matching: find.text(long)));
+
+      Future<FakeMatrixGateway> setUpReply(WidgetTester tester, TestApp app, String quoted) async {
+        final ben = await _joinBen(app);
+        await ben.sendMessage(quoted);
+        await app.gateway.sendMessage('ok', replyToId: app.gateway.messages.first.id);
+        await app.gateway.markChatRead();
+        await _openChat(tester, app);
+        return ben;
+      }
+
+      testWidgets('ab 4 Zeilen eingeklappt; Tippen klappt auf und zu; Tippen ins Eingabefeld klappt zu', (tester) async {
+        final app = await buildTestApp();
+        await setUpReply(tester, app, long);
+        expect(quote(tester).maxLines, 4);
+        expect(find.text('Mehr anzeigen'), findsOneWidget);
+        expect(find.text('Du'), findsNothing);
+
+        await tester.tap(find.text('Mehr anzeigen'));
+        await tester.pumpAndSettle();
+        expect(quote(tester).maxLines, isNull);
+        expect(find.text('Weniger anzeigen'), findsOneWidget);
+
+        await tester.tap(find.text('Weniger anzeigen'));
+        await tester.pumpAndSettle();
+        expect(quote(tester).maxLines, 4);
+
+        await tester.tap(find.text('Mehr anzeigen'));
+        await tester.pumpAndSettle();
+        await tester.tap(composer());
+        await tester.pumpAndSettle();
+        expect(quote(tester).maxLines, 4, reason: 'Tippen außerhalb klappt zu');
+      });
+
+      testWidgets('Tippen aufs Zitat lässt dem Eingabefeld den Fokus (Finger und Maus)', (tester) async {
+        final app = await buildTestApp();
+        await setUpReply(tester, app, long);
+        bool composerFocused() => tester.widget<EditableText>(find.byType(EditableText)).focusNode.hasFocus;
+        for (final kind in <PointerDeviceKind>[PointerDeviceKind.touch, PointerDeviceKind.mouse]) {
+          await tester.tap(composer());
+          await tester.pumpAndSettle();
+          expect(composerFocused(), isTrue, reason: 'vorher $kind');
+          await tester.tap(find.text(quote(tester).maxLines == null ? 'Weniger anzeigen' : 'Mehr anzeigen'), kind: kind);
+          await tester.pumpAndSettle();
+          expect(composerFocused(), isTrue, reason: '$kind');
+        }
+      });
+
+      testWidgets('Tastatur: Enter und Leertaste schalten um, Fokuswechsel klappt zu', (tester) async {
+        final app = await buildTestApp();
+        await setUpReply(tester, app, long);
+        final node = tester
+            .widget<Focus>(find.byWidgetPredicate((w) => w is Focus && w.focusNode?.debugLabel == 'quote'))
+            .focusNode!;
+        node.requestFocus();
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pumpAndSettle();
+        expect(quote(tester).maxLines, isNull);
+        node.nextFocus();
+        await tester.pumpAndSettle();
+        expect(quote(tester).maxLines, 4);
+
+        // Leertaste schaltet ebenso um.
+        node.requestFocus();
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.space);
+        await tester.pumpAndSettle();
+        expect(quote(tester).maxLines, isNull);
+        await tester.sendKeyEvent(LogicalKeyboardKey.space);
+        await tester.pumpAndSettle();
+        expect(quote(tester).maxLines, 4);
+      });
+
+      testWidgets('Tab verlassen klappt zu', (tester) async {
+        final app = await buildTestApp();
+        await setUpReply(tester, app, long);
+        await tester.tap(find.text('Mehr anzeigen'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Einkauf')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+        await tester.pumpAndSettle();
+        expect(quote(tester).maxLines, 4);
+      });
+
+      testWidgets('kurzes Zitat: ganz sichtbar, ohne Knopf; Absender wird genannt', (tester) async {
+        final app = await buildTestApp();
+        await setUpReply(tester, app, 'Zeile 1\nZeile 2\nZeile 3');
+        expect(find.text('Zeile 1\nZeile 2\nZeile 3'), findsNWidgets(2));
+        expect(find.text('Mehr anzeigen'), findsNothing);
+        expect(find.byWidgetPredicate((w) => w is Focus && w.focusNode?.debugLabel == 'quote'), findsNothing);
+        expect(find.text('Ben'), findsNWidgets(2), reason: 'Absender der Nachricht und des Zitats');
+      });
+
+      testWidgets('Ziel von einem blockierten Mitglied: neutraler Hinweis, kein Zitattext', (tester) async {
+        final app = await buildTestApp();
+        final ben = await _joinBen(app);
+        await ben.sendMessage('Geheimes Original');
+        await app.gateway.sendMessage('ok', replyToId: app.gateway.messages.first.id);
+        await app.services.settings.update((s) => s.copyWith(blockedUsers: <String>[ben.userId!]));
+        await _openChat(tester, app);
+        expect(find.text('ok'), findsOneWidget);
+        expect(find.text('Geheimes Original'), findsNothing);
+        expect(find.text('Antwort auf eine Nachricht, die hier nicht angezeigt wird'), findsOneWidget);
+      });
+
+      testWidgets('große Schrift (2.0): Messung folgt der Textgröße', (tester) async {
+        // Drei Zeilen à 38 Zeichen (Testschrift: Zeichen so breit wie die Schriftgröße): bei 1.0 drei Zeilen ohne Knopf,
+        // bei 2.0 umbrochen auf mehr als vier.
+        final text = List<String>.generate(3, (i) => 'Zeile ${i + 1} ${'abcdefghij' * 3}').join('\n');
+        for (final scale in <double>[1.0, 2.0]) {
+          final app = await buildTestApp();
+          final ben = await _joinBen(app);
+          await ben.sendMessage(text);
+          await app.gateway.sendMessage('ok', replyToId: app.gateway.messages.first.id);
+          await tester.pumpWidget(MediaQuery(
+            data: MediaQueryData.fromView(tester.view).copyWith(textScaler: TextScaler.linear(scale)),
+            child: FamilyNexusApp(services: app.services),
+          ));
+          await tester.pumpAndSettle();
+          await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+          await tester.pumpAndSettle();
+          expect(find.text('Mehr anzeigen'), scale == 1.0 ? findsNothing : findsOneWidget, reason: 'Textfaktor $scale');
+          await tester.pumpWidget(const SizedBox());
+        }
+      });
+
+      testWidgets('Ziel nicht sichtbar: neutraler Hinweis statt nichts', (tester) async {
+        final app = await buildTestApp();
+        await _joinBen(app);
+        await app.gateway.sendMessage('ok', replyToId: r'$unbekannt');
+        await _openChat(tester, app);
+        expect(find.text('Antwort auf eine Nachricht, die hier nicht angezeigt wird'), findsOneWidget);
+      });
+
+      testWidgets('englisch: „Show more“', (tester) async {
+        final app = await buildTestApp(lang: 'en');
+        final ben = await _joinBen(app);
+        await ben.sendMessage(long);
+        await app.gateway.sendMessage('ok', replyToId: app.gateway.messages.first.id);
+        await _openChatEn(tester, app, use24h: true);
+        expect(find.text('Show more'), findsOneWidget);
+      });
+
+      testWidgets('Antwortleiste zeigt das Zitat einzeilig', (tester) async {
+        final app = await buildTestApp();
+        final ben = await _joinBen(app);
+        await ben.sendMessage(long);
+        await _openChat(tester, app);
+        await tester.longPress(find.text(long));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Antworten'));
+        await tester.pumpAndSettle();
+        final preview = tester.widgetList<Text>(find.text(long)).where((t) => t.maxLines == 1);
+        expect(preview, hasLength(1));
+      });
     });
   });
 }

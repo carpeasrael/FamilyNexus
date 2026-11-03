@@ -692,6 +692,42 @@ abstract class AppLocalizations {
   /// **'Nachricht von {name}'**
   String chatMessageFrom(String name);
 
+  /// No description provided for @chatToday.
+  ///
+  /// In de, this message translates to:
+  /// **'Heute'**
+  String get chatToday;
+
+  /// No description provided for @chatYesterday.
+  ///
+  /// In de, this message translates to:
+  /// **'Gestern'**
+  String get chatYesterday;
+
+  /// No description provided for @chatNewMessages.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Nachrichten'**
+  String get chatNewMessages;
+
+  /// No description provided for @chatQuoteMore.
+  ///
+  /// In de, this message translates to:
+  /// **'Mehr anzeigen'**
+  String get chatQuoteMore;
+
+  /// No description provided for @chatQuoteLess.
+  ///
+  /// In de, this message translates to:
+  /// **'Weniger anzeigen'**
+  String get chatQuoteLess;
+
+  /// No description provided for @chatReplyUnavailable.
+  ///
+  /// In de, this message translates to:
+  /// **'Antwort auf eine Nachricht, die hier nicht angezeigt wird'**
+  String get chatReplyUnavailable;
+
   /// No description provided for @chatYou.
   ///
   /// In de, this message translates to:
