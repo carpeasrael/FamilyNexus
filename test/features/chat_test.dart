@@ -455,6 +455,27 @@ void main() {
       expect(find.text('Neue Nachrichten'), findsNothing);
     });
 
+    testWidgets('Gesprächswechsel gibt die Marke frei', (tester) async {
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      final dm = await app.gateway.startDirectChat(ben.userId!);
+      await ben.sendMessage('gelesen');
+      await app.gateway.markChatRead();
+      await ben.sendMessage('neu');
+      await _openChat(tester, app);
+      expect(find.text('Neue Nachrichten'), findsOneWidget);
+
+      await tester.tap(find.descendant(of: find.byType(ChoiceChip), matching: find.text('Ben')));
+      await tester.pumpAndSettle();
+      expect(find.text('Neue Nachrichten'), findsNothing, reason: 'Einzelchat ohne Ungelesenes');
+      expect(app.gateway.unreadIn(dm), 0);
+
+      await tester.tap(find.byType(ChoiceChip).first);
+      await tester.pumpAndSettle();
+      expect(find.text('neu'), findsOneWidget);
+      expect(find.text('Neue Nachrichten'), findsNothing, reason: 'beim ersten Öffnen gelesen, keine neue Marke');
+    });
+
     testWidgets('ohne Ungelesenes keine Marke, auch nicht für Nachrichten bei offenem Gespräch', (tester) async {
       final app = await buildTestApp();
       final ben = await _joinBen(app);
@@ -573,6 +594,39 @@ void main() {
         expect(find.text('Mehr anzeigen'), findsNothing);
         expect(find.byWidgetPredicate((w) => w is Focus && w.focusNode?.debugLabel == 'quote'), findsNothing);
         expect(find.text('Ben'), findsNWidgets(2), reason: 'Absender der Nachricht und des Zitats');
+      });
+
+      testWidgets('Ziel von einem blockierten Mitglied: neutraler Hinweis, kein Zitattext', (tester) async {
+        final app = await buildTestApp();
+        final ben = await _joinBen(app);
+        await ben.sendMessage('Geheimes Original');
+        await app.gateway.sendMessage('ok', replyToId: app.gateway.messages.first.id);
+        await app.services.settings.update((s) => s.copyWith(blockedUsers: <String>[ben.userId!]));
+        await _openChat(tester, app);
+        expect(find.text('ok'), findsOneWidget);
+        expect(find.text('Geheimes Original'), findsNothing);
+        expect(find.text('Antwort auf eine Nachricht, die hier nicht angezeigt wird'), findsOneWidget);
+      });
+
+      testWidgets('große Schrift (2.0): Messung folgt der Textgröße', (tester) async {
+        // Drei Zeilen à 38 Zeichen (Testschrift: Zeichen so breit wie die Schriftgröße): bei 1.0 drei Zeilen ohne Knopf,
+        // bei 2.0 umbrochen auf mehr als vier.
+        final text = List<String>.generate(3, (i) => 'Zeile ${i + 1} ${'abcdefghij' * 3}').join('\n');
+        for (final scale in <double>[1.0, 2.0]) {
+          final app = await buildTestApp();
+          final ben = await _joinBen(app);
+          await ben.sendMessage(text);
+          await app.gateway.sendMessage('ok', replyToId: app.gateway.messages.first.id);
+          await tester.pumpWidget(MediaQuery(
+            data: MediaQueryData.fromView(tester.view).copyWith(textScaler: TextScaler.linear(scale)),
+            child: FamilyNexusApp(services: app.services),
+          ));
+          await tester.pumpAndSettle();
+          await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+          await tester.pumpAndSettle();
+          expect(find.text('Mehr anzeigen'), scale == 1.0 ? findsNothing : findsOneWidget, reason: 'Textfaktor $scale');
+          await tester.pumpWidget(const SizedBox());
+        }
       });
 
       testWidgets('Ziel nicht sichtbar: neutraler Hinweis statt nichts', (tester) async {
