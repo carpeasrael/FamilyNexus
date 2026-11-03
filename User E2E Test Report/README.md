@@ -29,6 +29,7 @@ Im Ordner: `Testreport.md` (Kurzfassung), PDFs als `Testreport_<Ordner>_DE.pdf` 
 | 15 | `2026-10-30_15_macOS-iOS_Build22` | 30.10.2026, Nachtest #103 (Teilplan V-04, A-03) | TP-FN-001 v1.7 | 1.2.1 (22) | macOS / iPhone-17-Simulator (iOS 27.0) |
 | 16 | `2026-10-30_16_macOS-iOS_Build22` | 30.10.2026, 17:35–19:25, vollständiger Plan (V, A–H); 108 ✅, 6 ⚠️, 7 ⏳, 2 n/a | TP-FN-001 v1.8 @ `dddf22d` | 1.2.1 (22) | macOS / iPhone-17-Simulator (iOS 27.0) |
 | 17 | `2026-10-30_17_iOS-macOS_Build22` | 30.10.2026, 20:40–22:35, vollständiger Plan (V, A–H), Rollen getauscht; 107 ✅, 7 ⚠️, 1 ❌ (D-02), 7 ⏳, 1 n/a | TP-FN-001 v1.8 @ `dddf22d` | 1.2.1 (22) | iPhone-17-Simulator (iOS 27.0) / macOS |
+| 18 | `2026-11-03_18_Windows-nur-G1_Build23` | 03.11.2026, ca. 21:15-22:02 (nur G1-Schritte) | TP-FN-001 v1.20 @ `48e9299` | 1.2.2 (23), lokaler Build mit Bildschirmschutz-Voreinstellung aus | Windows 11 / - (G2 nicht verfuegbar) |
 
 Die Läufe 04 und 05 liefen parallel; die Nummer folgt dem Beginn. Die Bezeichnungen „Lauf 1/2/3“ im Testplan (Anhang E, Issue-Zuordnung) entsprechen den Nummern 03, 05 und 04.
 
