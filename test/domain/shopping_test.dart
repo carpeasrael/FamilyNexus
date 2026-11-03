@@ -203,6 +203,25 @@ void main() {
       expect(await service.applyIncoming(_item(id: known, title: 'neu', by: _ben, version: 2)), isTrue);
     });
 
+    test('#254: applyIncomingResult unterscheidet neu, geändert, nichts', () async {
+      expect(await service.applyIncomingResult(_item(by: _ben, title: 'Äpfel')), ApplyResult.created);
+      expect(await service.applyIncomingResult(_item(by: _ben, title: 'Äpfel')), ApplyResult.none);
+      expect(await service.applyIncomingResult(_item(by: _ben, title: 'Birnen', version: 2)), ApplyResult.updated);
+      expect(await service.applyIncomingResult(_item(by: _ben, title: 'Alt', version: 1)), ApplyResult.none);
+      // Unbekannt, aber abgehakt oder gelöscht: kein „neuer Eintrag“ (Neuanmeldung, alter Verlauf).
+      expect(await service.applyIncomingResult(_item(id: '00000000-0000-4000-8000-0000000000c1', by: _ben, checked: true)),
+          ApplyResult.updated);
+      expect(
+          await service.applyIncomingResult(
+              _item(id: '00000000-0000-4000-8000-0000000000c2', by: _ben, title: '', deleted: true)),
+          ApplyResult.updated);
+      // Über der Grenze für erste Versionen: verworfen.
+      expect(
+          await service.applyIncomingResult(
+              _item(id: '00000000-0000-4000-8000-0000000000c3', by: _ben, version: ShoppingItem.maxFirstVersion + 1)),
+          ApplyResult.none);
+    });
+
     test('Eingehendes: neuer Eintrag, Aktualisierung, veraltet, Duplikat', () async {
       expect(await service.applyIncoming(_item(by: _ben, title: 'Äpfel')), isTrue);
       expect((await store.pendingPublish()), isEmpty, reason: 'Empfangenes wird nicht zurückgesendet');

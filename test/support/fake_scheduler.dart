@@ -29,6 +29,16 @@ class FakeReminderScheduler implements ReminderScheduler {
     return current;
   }
 
+  /// Aufrufe von [requestNotifications] (#254: nur Benachrichtigungen, ohne genaue Alarme).
+  int notificationsRequested = 0;
+
+  @override
+  Future<ReminderPermission> requestNotifications() async {
+    notificationsRequested++;
+    if (grantOnRequest) current = ReminderPermission.granted;
+    return current;
+  }
+
   @override
   bool get canOpenSettings => settingsAvailable;
 

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:family_nexus/app/app_services.dart';
+import 'package:family_nexus/data/sync/activity_notifier.dart';
 import 'package:family_nexus/app/calendar_factory.dart';
 import 'package:family_nexus/data/sync/shopping_sync.dart';
 import 'package:family_nexus/features/calendar/calendar_controller.dart';
@@ -104,6 +105,9 @@ Future<TestApp> buildTestApp({
   MemoryEventStore? eventStore,
   MemoryShoppingStore? shoppingItems,
   MemoryTaskStore? taskItems,
+  // Test: Meldungen zu Chat und Einkauf und Zahl am App-Symbol (#254). Ohne Angabe wie im Browser: keine.
+  ActivityPlatform? activity,
+  AppBadge? badge,
 }) async {
   final store = MemoryKeyValueStore();
   if (lang != null) store.data['language'] = lang;
@@ -148,6 +152,8 @@ Future<TestApp> buildTestApp({
     links: links,
     lock: AppLockController(settings: settingsController, auth: auth),
     scheduler: withReminders ? scheduler : null,
+    activityPlatform: activity,
+    badge: badge,
     mail: mail,
     browser: browser,
     element: element,

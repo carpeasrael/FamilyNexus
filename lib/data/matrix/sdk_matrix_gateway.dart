@@ -175,6 +175,95 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   bool _syncedOnce = false;
   Family? _family;
 
+  // ------------------------------------------------- Grundlinie für Meldungen (#254, E-88)
+
+  /// Server-Zeitstempel, ab dem Ereignisse als „neu“ gelten. `null` bis zum ersten echten Sync dieser Sitzung.
+  DateTime? _liveSince;
+
+  /// Höchster `originServerTs` aller Timeline-Ereignisse aus echten Syncs dieser Sitzung (jeder Typ).
+  DateTime? _maxServerTs;
+
+  /// Sitzung (`Nutzer|Gerät`), zu der [_liveSince] gehört; ein Wechsel beginnt neu.
+  String? _liveKey;
+
+  /// Zählt Sitzungswechsel: Eine verspätete Fortsetzung der alten Sitzung schreibt nichts mehr.
+  int _liveGeneration = 0;
+
+  /// Startwert aus der Datenbank (nur beim Wiederherstellen), bis zum ersten echten Sync abgeholt.
+  Future<DateTime?>? _pendingSeed;
+
+  /// Obergrenze: Eine vorgehende Server- oder Geräteuhr unterdrückt Meldungen höchstens so lange.
+  static const Duration liveSkew = Duration(minutes: 5);
+
+  @override
+  DateTime? get liveSince => _liveSince;
+
+  static DateTime? _later(DateTime? a, DateTime? b) => a == null ? b : (b == null || !b.isAfter(a) ? a : b);
+
+  static DateTime _capLive(DateTime t) {
+    final cap = DateTime.now().toUtc().add(liveSkew);
+    return t.isAfter(cap) ? cap : t;
+  }
+
+  void _resetLive() {
+    _liveGeneration++;
+    _liveSince = null;
+    _maxServerTs = null;
+    _liveKey = null;
+    _liveFirstPending = false;
+  }
+
+  /// Wertet einen Sync für [liveSince] aus. Künstliche Syncs des SDK (Verlauf, Sendezustände) haben ein leeres
+  /// `nextBatch` und zählen nicht; `room.lastEvent` scheidet aus, weil es App-Ereignisse nicht kennt.
+  void _trackLive(Client client, SyncUpdate update) {
+    if (update.nextBatch.isEmpty) return;
+    final key = '${client.userID}|${client.deviceID}';
+    if (key != _liveKey) {
+      _resetLive();
+      _liveKey = key;
+    }
+    final seen = _liveSince != null || _liveFirstPending;
+    for (final room in update.rooms?.join?.values ?? const <JoinedRoomUpdate>[]) {
+      for (final e in room.timeline?.events ?? const <MatrixEvent>[]) {
+        _maxServerTs = _later(_maxServerTs, e.originServerTs.toUtc());
+      }
+    }
+    if (seen) return;
+    _liveFirstPending = true;
+    final generation = _liveGeneration;
+    final seed = _pendingSeed ?? Future<DateTime?>.value();
+    _pendingSeed = null;
+    seed.catchError((Object _) => null).then((value) {
+      if (generation != _liveGeneration) return;
+      _liveFirstPending = false;
+      _liveSince = _capLive(_later(value, _maxServerTs) ?? DateTime.now().toUtc());
+      notifyListeners();
+    });
+  }
+
+  bool _liveFirstPending = false;
+
+  /// Jüngstes gespeichertes, vom Server bestätigtes Ereignis aller beigetretenen Räume (Startwert beim
+  /// Wiederherstellen). SENDING-Einträge stehen in `getEventList` vorn und werden übersprungen.
+  static Future<DateTime?> _readLiveSeed(Client client) async {
+    final db = client.database;
+    DateTime? best;
+    for (final room in client.rooms.where((r) => r.membership == Membership.join)) {
+      best = _later(best, latestSynced(await db.getEventList(room, limit: 1)));
+    }
+    return best;
+  }
+
+  /// Jüngster Server-Zeitstempel unter [events], nur vom Server bestätigte (SENDING/Fehler tragen Gerätezeit).
+  @visibleForTesting
+  static DateTime? latestSynced(Iterable<Event> events) {
+    DateTime? best;
+    for (final e in events.where((e) => e.status.isSynced)) {
+      best = _later(best, e.originServerTs.toUtc());
+    }
+    return best;
+  }
+
   /// Zu welchem Familienraum die Zustände dieses Gateways gehören (#140).
   final FamilyScope _scope = FamilyScope();
 
@@ -357,6 +446,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     );
     _client = client;
     _syncSub = client.onSync.stream.listen((update) {
+      _trackLive(client, update);
       if (!_syncedOnce) {
         // „Abgeglichen“ gilt erst, wenn Familie und Sicherheitsstatus aus den ersten Daten berechnet
         // sind; sonst sähe ein bestehendes Mitglied kurz „keine Familie“ und könnte eine zweite gründen.
@@ -421,12 +511,18 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         throw const SessionRestoreException(sessionLost: false);
       }
       if (!client.isLogged()) {
+        // Der Startwert wird erst nach `init` lesbar; der erste echte Sync wartet darauf (#254).
+        final seed = Completer<DateTime?>();
+        _pendingSeed = seed.future;
         try {
           await client.init(waitForFirstSync: false);
+          seed.complete(_readLiveSeed(client).catchError((Object _) => null));
         } on ClientInitPreconditionError catch (e) {
+          if (!seed.isCompleted) seed.complete(null);
           AppLog.e('gateway', 'Sitzung konnte nicht geladen werden', e);
           throw const SessionRestoreException(sessionLost: false);
         } catch (e) {
+          if (!seed.isCompleted) seed.complete(null);
           // Bei jedem anderen Fehler kann das SDK die Sitzung bereits gelöscht haben (`clear(initFailed)`).
           AppLog.e('gateway', 'Sitzung konnte nicht geladen werden', e);
           throw const SessionRestoreException(sessionLost: true);
@@ -1111,6 +1207,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Gemeinsamer Rücksetzpfad für Abmelden und erzwungene Abmeldung
   /// (ungültiges Token): sonst blieben Timeline-Abonnements und Zustände hängen.
   void _resetLocal() {
+    _resetLive();
     _timeline?.cancelSubscriptions();
     _timeline = null;
     _timelineRoomId = null;
@@ -2790,7 +2887,12 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       return;
     }
     final room = _familyRoom();
-    if (_scope.enter(room?.id)) _leaveFamilyScope();
+    if (_scope.enter(room?.id)) {
+      _leaveFamilyScope();
+      // Verlauf der neuen Familie ist nicht neu (#254, E-88). Vor dem ersten echten Sync (Start: „keine → A“) nichts.
+      final live = _liveSince;
+      if (live != null) _liveSince = _capLive(_later(live, _maxServerTs)!);
+    }
     if (room == null) {
       _timeline?.cancelSubscriptions();
       _timeline = null;

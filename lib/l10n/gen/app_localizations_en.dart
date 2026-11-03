@@ -399,6 +399,36 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get activityChatBody => 'New messages';
+
+  @override
+  String get activityShoppingBody => 'New items on the shopping list';
+
+  @override
+  String get activityChannelName => 'Messages and shopping';
+
+  @override
+  String get activityChannelDescription =>
+      'Notifications about new messages and shopping items. They never show any content.';
+
+  @override
+  String get settingsActivity => 'Notifications';
+
+  @override
+  String get settingsNotifyChat => 'New chat messages';
+
+  @override
+  String get settingsNotifyShopping => 'New items on the shopping list';
+
+  @override
+  String get settingsActivityHint =>
+      'Notifications without content, only while the app is running. When the app is closed, nothing arrives (there is no push service).';
+
+  @override
+  String get settingsActivityBadgeApple =>
+      'Allow the number on the app icon in System Settings under Notifications → FamilyNexus → Badges.';
+
+  @override
   String get reminderChannelName => 'Reminders';
 
   @override
@@ -1175,7 +1205,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy5Body =>
-      'Reminders are local notifications. They never show title, location or note, only “Event in …”. There is no third-party push service.';
+      'Reminders are local notifications. They never show title, location or note, only “Event in …”. For new messages and shopping items the app only shows “New messages” or “New items on the shopping list”, without sender or content and only while it is running; the number of unread messages may appear on the app icon. There is no third-party push service.';
 
   @override
   String get privacy6Title => 'Permissions';
@@ -1185,14 +1215,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy6NotifAndroid =>
-      'notifications and exact alarms (reminders), boot notification (re-schedule reminders)';
+      'notifications (reminders, new messages and shopping items) and exact alarms (reminders), boot notification (re-schedule reminders)';
 
   @override
-  String get privacy6NotifApple => 'notifications (reminders)';
+  String get privacy6NotifApple =>
+      'notifications and badges on the app icon (reminders, new messages and shopping items)';
 
   @override
   String get privacy6DesktopNote =>
-      'Reminders only appear while the app is running; the app asks for no permission for this.';
+      'Reminders and notifications about new messages and shopping items only appear while the app is running; the app asks for no permission for this.';
 
   @override
   String get privacy6Lock => 'device credentials (app lock)';

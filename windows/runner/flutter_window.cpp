@@ -5,6 +5,7 @@
 
 #include "flutter/generated_plugin_registrant.h"
 #include "link_handler.h"
+#include "taskbar_badge.h"
 
 // Ab Windows 10 Version 2004; ältere SDKs kennen die Konstante nicht.
 #ifndef WDA_EXCLUDEFROMCAPTURE
@@ -81,6 +82,19 @@ bool FlutterWindow::OnCreate() {
             result->Success();
           } else {
             result->Error("affinity", "SetWindowDisplayAffinity failed");
+          }
+        } else if (call.method_name() == "setBadge") {
+          // Zahl ungelesener Nachrichten am Taskleisten-Symbol (#254).
+          int count = 0;
+          if (const auto* value = std::get_if<int32_t>(call.arguments())) {
+            count = *value;
+          } else if (const auto* value64 = std::get_if<int64_t>(call.arguments())) {
+            count = static_cast<int>(*value64);
+          }
+          if (SetTaskbarBadge(GetHandle(), count)) {
+            result->Success();
+          } else {
+            result->Error("badge", "SetOverlayIcon failed");
           }
         } else {
           result->NotImplemented();

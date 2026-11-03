@@ -72,4 +72,16 @@ void main() {
     expect(AppSettings.fromMap(const <String, String>{'accent': 'knallpink'}).accent, AccentChoice.teal);
     expect(AppSettings.fromMap(const <String, String>{}).accent, AccentChoice.teal);
   });
+
+  test('#254: Meldungen zu Chat und Einkauf standardmäßig an, Abschalten bleibt erhalten', () {
+    const d = AppSettings();
+    expect(d.notifyChat, isTrue);
+    expect(d.notifyShopping, isTrue);
+    final off = d.copyWith(notifyChat: false, notifyShopping: false);
+    final back = AppSettings.fromMap(off.toMap());
+    expect(back.notifyChat, isFalse);
+    expect(back.notifyShopping, isFalse);
+    expect(AppSettings.fromMap(const <String, String>{}).notifyChat, isTrue);
+    expect(AppSettings.fromMap(const <String, String>{'notifyShopping': 'kaputt'}).notifyShopping, isTrue);
+  });
 }

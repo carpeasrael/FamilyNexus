@@ -9,6 +9,7 @@ project(runner LANGUAGES CXX)
 add_executable(${BINARY_NAME} WIN32
   "flutter_window.cpp"
   "link_handler.cpp"
+  "taskbar_badge.cpp"
   "main.cpp"
   "utils.cpp"
   "win32_window.cpp"

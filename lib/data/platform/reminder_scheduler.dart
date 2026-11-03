@@ -30,6 +30,10 @@ abstract class ReminderScheduler {
   /// Fragt die Berechtigungen beim Nutzer an.
   Future<ReminderPermission> request();
 
+  /// Fragt nur die Benachrichtigungsberechtigung an (mit Abzeichen auf Apple-Geräten), ohne genaue Alarme:
+  /// für Meldungen zu Chat und Einkauf (#254).
+  Future<ReminderPermission> requestNotifications();
+
   /// Öffnet die Benachrichtigungs-Einstellungen des Systems für die App. `false`, wenn die Plattform das
   /// nicht bietet. Nötig, wenn das System nach einer Ablehnung keinen Dialog mehr zeigt (#57).
   Future<bool> openSettings();
@@ -125,6 +129,13 @@ class LocalReminderScheduler implements ReminderScheduler {
     _ready = true;
   }
 
+  /// Das Plugin ist initialisiert. Die Meldungen zu Chat und Einkauf (#254) nutzen dieselbe Instanz und initialisieren
+  /// nicht selbst: `initialize` läuft genau einmal beim Start (`bootstrap`).
+  bool get ready => _ready;
+
+  /// Gemeinsame Plugin-Instanz für die Meldungen zu Chat und Einkauf.
+  FlutterLocalNotificationsPlugin get plugin => _plugin;
+
   @override
   Future<ReminderPermission> permission() async {
     final ios = _ios;
@@ -147,9 +158,9 @@ class LocalReminderScheduler implements ReminderScheduler {
     final mac = _mac;
     if (ios != null || mac != null) {
       if (ios != null) {
-        await ios.requestPermissions(alert: true, badge: false, sound: true);
+        await ios.requestPermissions(alert: true, badge: true, sound: true);
       } else {
-        await mac!.requestPermissions(alert: true, badge: false, sound: true);
+        await mac!.requestPermissions(alert: true, badge: true, sound: true);
       }
       return permission();
     }
@@ -159,6 +170,24 @@ class LocalReminderScheduler implements ReminderScheduler {
     if (!(await android.canScheduleExactNotifications() ?? false)) {
       await android.requestExactAlarmsPermission();
     }
+    return permission();
+  }
+
+  @override
+  Future<ReminderPermission> requestNotifications() async {
+    final ios = _ios;
+    final mac = _mac;
+    if (ios != null) {
+      await ios.requestPermissions(alert: true, badge: true, sound: true);
+      return permission();
+    }
+    if (mac != null) {
+      await mac.requestPermissions(alert: true, badge: true, sound: true);
+      return permission();
+    }
+    final android = _android;
+    if (android == null) return ReminderPermission.granted;
+    await android.requestNotificationsPermission();
     return permission();
   }
 
