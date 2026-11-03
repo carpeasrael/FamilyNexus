@@ -1,0 +1,21 @@
+# V-01 02.11.2026 20:59
+## main...origin/main
+48e92996b4e7688a3d12b4e49487270befd9ee5b Merge pull request #253 from carpeasrael/docs/release-review-1.2.2-23-lauf2
+version: 1.2.2+23
+# V-02 G1
+         Version: 1.2.2
+          Commit: 98a9183b6de952a1ee2aa2b2a419dbe4027b2491959f4e47aefc805579edd…
+{"app_name":"family_nexus","version":"1.2.2","build_number":"23","package_name":"family_nexus"}
+# V-02 G2
+    versionCode=23 minSdk=26 targetSdk=36
+    versionName=1.2.2
+# V-03 Builds
+c4ef037bc1017e9d21aa71eff06ead4e0a905f49c78b01ec783856a8d89ee805  FamilyNexus-v1.2.2+23-debugsigned.apk
+c9199155ace6ac03bf5194b8a992629a47bf9118f91b97876c665cde190b8a60  FamilyNexus-v1.2.2+23.flatpak
+Signer #1 certificate SHA-256 digest: e45d0f2eb8552b174a938758a999c540be9f20c95a918fef4b139aa06af9e099
+# V-07 G2
+
+16
+sdk_gphone64_x86_64
+PIN gesetzt (locksettings set-pin)
+3

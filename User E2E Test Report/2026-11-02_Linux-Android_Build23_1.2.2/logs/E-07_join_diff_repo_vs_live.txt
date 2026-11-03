@@ -1,0 +1,17 @@
+3,4d2
+< // Ab Version 4 stehen die Felder kodiert in `d` (E-79). Die Seite dekodiert sie nicht und erkennt abgeschnittene Links
+< // deshalb nicht, das tut erst die App.
+8c6
+<   var KEYS = ['v', 'room', 'via', 'srv', 'inv', 'exp', 'n', 'f', 'by', 'd'];
+---
+>   var KEYS = ['v', 'room', 'via', 'srv', 'inv', 'exp', 'n', 'f', 'by'];
+11d8
+<   var PAYLOAD = /^d=[A-Za-z0-9_\-]+$/;
+14d10
+<   // Zwei Formen schließen einander aus: genau `v` und `d` (ab Version 4) oder die einzelnen Felder (Version 1 bis 3).
+23d18
+<       if (key === 'd' && !PAYLOAD.test(parts[i])) return null;
+26c21
+<     if (!seen.v || (seen.d ? parts.length !== 2 : !seen.room || !seen.n)) return null;
+---
+>     if (!seen.v || !seen.room || !seen.n) return null;

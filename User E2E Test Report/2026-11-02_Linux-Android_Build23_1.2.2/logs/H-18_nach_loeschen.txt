@@ -1,0 +1,17 @@
+# H-18 nach F-04
+insgesamt 292
+drwx------ 1 carpeasrael carpeasrael     78  2. Nov 23:30 .
+drwx------ 1 carpeasrael carpeasrael     18  2. Nov 20:57 ..
+-rw------- 1 carpeasrael carpeasrael  81920  2. Nov 23:30 familynexus_app.db
+-rw------- 1 carpeasrael carpeasrael 217088  2. Nov 23:30 familynexus_matrix.db
+insgesamt 8
+drwxr-xr-x 1 carpeasrael carpeasrael 102  2. Nov 23:30 .
+drwxr-xr-x 1 carpeasrael carpeasrael  58  2. Nov 20:57 ..
+-rw------- 1 carpeasrael carpeasrael 422  2. Nov 23:30 default.keyring
+-rw------- 1 carpeasrael carpeasrael 358  2. Nov 23:30 default.keyring~
+-rw------- 1 carpeasrael carpeasrael   0  2. Nov 20:57 default.keyring.lock
+Testfamilie 1102: 0 Dateien
+Hallo von Nutzer 1: 0 Dateien
+Test geteilt 2: 0 Dateien
+Nur fuer dich: 0 Dateien
+FN-ANHANG-733611: 0 Dateien

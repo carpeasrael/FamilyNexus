@@ -1,0 +1,10 @@
+# H-09 Protokoll 19756 Zeichen
+fnt-1102-n1 0
+fnt-1102-n1-neu 0
+KN1-1102 0
+KN1b-1102 0
+KN1c-1102 0
+Token-Muster 0
+['Außerdem gespeichert, aber aus Sicherheitsgründen nicht angezeigt: Zugangstoken der Sitzung, Geräteschlüssel und Schlüssel der verschlüsselten Gespräche.']
+['Nie gespeichert, nur im Arbeitsspeicher: Online-Status der Familienmitglieder.']
+['Geplante Erinnerungen liegen zusätzlich beim Betriebssystem.']

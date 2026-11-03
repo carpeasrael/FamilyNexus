@@ -1,0 +1,39 @@
+# H-03
+== familynexus_app.db
+00000000: ee4a 4053 70cf 0805 809e 6796 9343 6936  .J@Sp.....g..Ci6
+data
+Error: in prepare, file is not a database (26)
+== familynexus_matrix.db
+00000000: ba8b 5dd8 52e9 1684 204b 89c6 da86 363b  ..].R... K....6;
+data
+Error: in prepare, file is not a database (26)
+# H-04 Zählung (strings -n 6 | grep -c)
+familynexus_app.db | Testfamilie 1102: 0
+familynexus_app.db | Test geteilt 2: 0
+familynexus_app.db | Hallo von Nutzer 1: 0
+familynexus_app.db | Nur fuer dich: 0
+familynexus_app.db | Test N1: 0
+familynexus_app.db | FN-ANHANG-: 0
+familynexus_app.db | FN-ANHANG-733611: 0
+familynexus_app.db | Vollkornbrot: 0
+familynexus_app.db | Bad putzen: 0
+familynexus_matrix.db | Testfamilie 1102: 0
+familynexus_matrix.db | Test geteilt 2: 0
+familynexus_matrix.db | Hallo von Nutzer 1: 0
+familynexus_matrix.db | Nur fuer dich: 0
+familynexus_matrix.db | Test N1: 0
+familynexus_matrix.db | FN-ANHANG-: 0
+familynexus_matrix.db | FN-ANHANG-733611: 0
+familynexus_matrix.db | Vollkornbrot: 0
+familynexus_matrix.db | Bad putzen: 0
+# gesamter App-Datenordner (grep -rIlaF)
+Testfamilie 1102: 0 Dateien
+Hallo von Nutzer 1: 0 Dateien
+Test geteilt 2: 0 Dateien
+Nur fuer dich: 0 Dateien
+FN-ANHANG-733611: 0 Dateien
+# Gegenprobe im lokalen Protokoll (B-21)
+Testfamilie 1102: 1
+Test geteilt 2: 1
+Vollkornbrot: 1
+Bad putzen: 1

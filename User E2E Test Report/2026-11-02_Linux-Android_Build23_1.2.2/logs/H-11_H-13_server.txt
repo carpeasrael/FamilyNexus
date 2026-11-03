@@ -1,0 +1,27 @@
+login 200
+Räume: 3
+- Raum !dtD…nal.de: Name='Testfamilie 1102 neu', Mitglieder beigetreten=1, join_rule=knock, Verschlüsselung=m.megolm.v1.aes-sha2, history_visibility=shared
+    Ereignistypen: {'m.room.member': 8, 'm.room.encrypted': 40, 'm.room.power_levels': 1, 'm.room.name': 1}; encrypted-Algorithmen: {'m.megolm.v1.aes-sha2': 40}; ciphertext+session_id in allen: True
+- Raum !drW…nal.de: Name='FamilyNexus', Mitglieder beigetreten=1, join_rule=invite, Verschlüsselung=m.megolm.v1.aes-sha2, history_visibility=shared
+    Ereignistypen: {'m.room.encrypted': 7, 'm.room.name': 1, 'm.room.history_visibility': 1, 'm.room.encryption': 1, 'm.room.guest_access': 1, 'm.room.join_rules': 1, 'm.room.power_levels': 1, 'm.room.member': 1, 'm.room.create': 1}; encrypted-Algorithmen: {'m.megolm.v1.aes-sha2': 7}; ciphertext+session_id in allen: True
+- Raum !XQY…G_Fyl8: Name='–', Mitglieder beigetreten=1, join_rule=invite, Verschlüsselung=m.megolm.v1.aes-sha2, history_visibility=shared
+    Ereignistypen: {'m.room.member': 4, 'm.room.encrypted': 11, 'm.room.encryption': 1, 'm.room.history_visibility': 1, 'm.room.guest_access': 1, 'm.room.join_rules': 1, 'm.room.power_levels': 1, 'm.room.create': 1}; encrypted-Algorithmen: {'m.megolm.v1.aes-sha2': 11}; ciphertext+session_id in allen: True
+Summe Typen: {'m.room.member': 13, 'm.room.encrypted': 58, 'm.room.power_levels': 3, 'm.room.name': 2, 'm.room.history_visibility': 2, 'm.room.encryption': 2, 'm.room.guest_access': 2, 'm.room.join_rules': 2, 'm.room.create': 2}
+m.room.message (Klartext): 0 | m.reaction: 0
+Suchbegriff 'Testfamilie 1102 neu': 1
+Suchbegriff 'Test geteilt 2': 0
+Suchbegriff 'Hallo von Nutzer 1': 0
+Suchbegriff 'Hallo zurueck': 0
+Suchbegriff 'Nur fuer dich': 0
+Suchbegriff 'FN-ANHANG-': 0
+Suchbegriff 'FN-ANHANG-733611': 0
+Suchbegriff 'Vollkornbrot': 0
+Suchbegriff 'Kaese': 0
+Suchbegriff 'Müll rausbringen': 0
+Suchbegriff 'Bad putzen': 0
+Suchbegriff 'Küche': 0
+Suchbegriff 'Testnotiz': 0
+Klartext-"body"-Felder: 0
+Geräte des Kontos: ['FamilyNexus Linux', 'Testwerkzeug']
+Profil: {'displayname': 'Test N1'}
+logout 200

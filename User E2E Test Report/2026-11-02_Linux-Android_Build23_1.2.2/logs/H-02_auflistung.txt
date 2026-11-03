@@ -1,0 +1,5 @@
+insgesamt 636
+drwx------ 1 carpeasrael carpeasrael     78  2. Nov 23:17 .
+drwx------ 1 carpeasrael carpeasrael     18  2. Nov 20:57 ..
+-rw------- 1 carpeasrael carpeasrael  81920  2. Nov 23:09 familynexus_app.db
+-rw------- 1 carpeasrael carpeasrael 569344  2. Nov 23:17 familynexus_matrix.db

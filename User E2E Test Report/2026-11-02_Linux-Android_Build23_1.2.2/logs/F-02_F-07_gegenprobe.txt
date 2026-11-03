@@ -1,0 +1,10 @@
+fnt-1102-n12 fnt-1102-n12 -> 403 M_FORBIDDEN
+# F-07 23:33:58
+fnt-1102-n1 fnt-1102-n1 -> 403 M_FORBIDDEN
+fnt-1102-i2 fnt-1102-i2 -> 403 M_FORBIDDEN
+# B-23 Nachtrag: neues Passwort N1 vor der Löschung abgelehnt?
+# F-08 register/available
+fnt-1102-n1: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1102-n12: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1102-i2: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1102-n9: {"available":true}

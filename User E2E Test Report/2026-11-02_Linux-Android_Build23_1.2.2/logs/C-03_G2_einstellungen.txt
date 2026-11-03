@@ -1,0 +1,18 @@
+(  74, 206) Back
+( 292, 205) Settings
+( 540, 732) Emergency key and devices / Devices of your account
+( 540, 461) This device is verified.
+( 540, 642) Create new emergency key / In case you lost it. In the app, only the new one counts afterwards.
+( 540, 910) FamilyNexus Linux / Verified
+( 540,1078) FamilyNexus Android (This device) / Verified
+( 540,1730) Reminders / Reminders are local notifications on this device. They never show title or location. / Default reminder
+( 239,1601) At start time
+( 604,1601) 5 minutes before
+( 316,1737) 10 minutes before
+( 769,1737) 15 minutes before
+( 289,1874) 30 minutes before
+( 672,1874) 1 hour before
+( 256,2010) 2 hours before
+( 599,2010) 1 day before
+( 248,2147) 2 days before
+( 540,2306) Privacy / Blocked members / Messages from blocked members are hidden.

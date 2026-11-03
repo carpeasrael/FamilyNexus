@@ -30,6 +30,7 @@ Im Ordner: `Testreport.md` (Kurzfassung), PDFs als `Testreport_<Ordner>_DE.pdf` 
 | 16 | `2026-10-30_16_macOS-iOS_Build22` | 30.10.2026, 17:35–19:25, vollständiger Plan (V, A–H); 108 ✅, 6 ⚠️, 7 ⏳, 2 n/a | TP-FN-001 v1.8 @ `dddf22d` | 1.2.1 (22) | macOS / iPhone-17-Simulator (iOS 27.0) |
 | 17 | `2026-10-30_17_iOS-macOS_Build22` | 30.10.2026, 20:40–22:35, vollständiger Plan (V, A–H), Rollen getauscht; 107 ✅, 7 ⚠️, 1 ❌ (D-02), 7 ⏳, 1 n/a | TP-FN-001 v1.8 @ `dddf22d` | 1.2.1 (22) | iPhone-17-Simulator (iOS 27.0) / macOS |
 | 18 | `2026-11-03_18_Windows-nur-G1_Build23` | 03.11.2026, ca. 21:15-22:02 (nur G1-Schritte) | TP-FN-001 v1.20 @ `48e9299` | 1.2.2 (23), lokaler Build mit Bildschirmschutz-Voreinstellung aus | Windows 11 / - (G2 nicht verfuegbar) |
+| 19 | `2026-11-02_Linux-Android_Build23_1.2.2` (Name nach Vorgabe des Nutzers; AURORA-Bericht als `.html`/`.pdf` daneben) | 02.11.2026, 20:56–23:35, vollständiger Plan (V, A–H), begann vor Lauf 18 und wurde später eingetragen; 116 ✅, 6 ⚠️, 0 ❌, 4 ⏳, 5 n/a | TP-FN-001 v1.20 @ `48e9299` | 1.2.2 (23), lokal gebaut | Linux-Flatpak / Android-Emulator (API 36) |
 
 Die Läufe 04 und 05 liefen parallel; die Nummer folgt dem Beginn. Die Bezeichnungen „Lauf 1/2/3“ im Testplan (Anhang E, Issue-Zuordnung) entsprechen den Nummern 03, 05 und 04.
 
