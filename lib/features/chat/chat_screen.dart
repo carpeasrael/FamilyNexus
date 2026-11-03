@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../../app/app_services.dart';
 import '../../core/platform_info.dart';
@@ -20,6 +21,7 @@ import '../calendar/formatting.dart';
 import '../common/error_text.dart';
 import '../moderation/moderation_actions.dart';
 import '../presence/presence_view.dart';
+import 'chat_layout.dart';
 import 'sender_name.dart';
 
 const List<String> _quickReactions = <String>['👍', '❤️', '😂', '🎉', '😮', '🙏'];
@@ -34,7 +36,7 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final TextEditingController _ctrl = TextEditingController();
   final ScrollController _scroll = ScrollController();
   ChatMessage? _replyTo;
@@ -51,11 +53,29 @@ class _ChatScreenState extends State<ChatScreen> {
   /// So lange wird höchstens auf ein angefordertes Gespräch gewartet.
   static const Duration openTimeout = Duration(seconds: 20);
 
+  /// Marke „Neue Nachrichten“ (#254): Gespräch, für das sie beim Öffnen bestimmt wurde, und ihre Nachricht.
+  /// Bestimmt wird einmal je Öffnen, vor dem Gelesen-Markieren; neue Nachrichten bei offenem Gespräch setzen
+  /// keine neue Marke. Gesprächswechsel, Verlassen des Tabs und Hintergrund geben sie frei.
+  String? _markerThread;
+  String? _unreadFrom;
+  bool _scrolledToMarker = false;
+  final GlobalKey _markerKey = GlobalKey(debugLabel: 'unread-marker');
+
+  /// Klappt aufgeklappte Zitate zu (Tab verlassen, Hintergrund; #254).
+  final ValueNotifier<int> _collapseQuotes = ValueNotifier<int>(0);
+
+  void _resetMarker() {
+    _markerThread = null;
+    _unreadFrom = null;
+    _scrolledToMarker = false;
+  }
+
   @override
   void initState() {
     super.initState();
     _services = AppScope.read(context);
     _services.chatRequest.addListener(_openRequested);
+    WidgetsBinding.instance.addObserver(this);
     // Die Anforderung kann gestellt worden sein, bevor dieser Bildschirm entstand.
     final pending = _services.chatRequest.value;
     if (pending != null) {
@@ -78,9 +98,28 @@ class _ChatScreenState extends State<ChatScreen> {
     if (mounted && id != _threadId) setState(() => _select(id));
   }
 
+  @override
+  void didUpdateWidget(ChatScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.active && !widget.active) {
+      _resetMarker();
+      _collapseQuotes.value++;
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+      // Rückkehr gilt wie Öffnen: Was im Hintergrund kam, bekommt eine neue Marke.
+      _resetMarker();
+      _collapseQuotes.value++;
+    }
+  }
+
   void _select(String id) {
     _threadId = id;
     _replyTo = null;
+    _resetMarker();
     _waitTimer?.cancel();
     _waitingFor = null;
     if (id == ChatThread.familyId) return;
@@ -99,6 +138,8 @@ class _ChatScreenState extends State<ChatScreen> {
   void dispose() {
     _waitTimer?.cancel();
     _services.chatRequest.removeListener(_openRequested);
+    WidgetsBinding.instance.removeObserver(this);
+    _collapseQuotes.dispose();
     _scroll.dispose();
     _ctrl.dispose();
     super.dispose();
@@ -239,12 +280,29 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         }
         final threadId = current?.id ?? ChatThread.familyId;
-        final msgs = _uniqueById(visibleMessages(g.messagesIn(threadId), blocked, myUserId: g.userId));
-        if (widget.active && g.unreadIn(threadId) > 0) {
+        final all = g.messagesIn(threadId);
+        final msgs = _uniqueById(visibleMessages(all, blocked, myUserId: g.userId));
+        final unread = g.unreadIn(threadId);
+        if (widget.active && _markerThread != threadId) {
+          // Vor dem Gelesen-Markieren: danach gäbe es keine ungelesene Nachricht mehr.
+          _markerThread = threadId;
+          _unreadFrom = unread > 0 ? g.firstUnreadIdIn(threadId) : null;
+          _scrolledToMarker = false;
+        }
+        if (widget.active && unread > 0) {
           WidgetsBinding.instance.addPostFrameCallback((_) => g.markChatRead(threadId: threadId).ignore());
         }
         final byId = <String, ChatMessage>{for (final m in msgs) m.id: m};
-        final positionById = <String, int>{for (var i = 0; i < msgs.length; i++) msgs[i].id: i};
+        final entries = chatEntries(msgs, unreadFromId: _unreadFrom, allIds: <String>[for (final m in all) m.id]);
+        final positionByKey = <String, int>{for (var i = 0; i < entries.length; i++) entries[i].key: i};
+        if (!_scrolledToMarker && entries.any((e) => e is UnreadMarkerEntry)) {
+          _scrolledToMarker = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            // Nur wenn die Marke gebaut ist (Sichtbereich + Vorlauf); weiter oben liegende Marken bleiben, wo sie sind.
+            final ctx = _markerKey.currentContext;
+            if (ctx != null && ctx.mounted) Scrollable.ensureVisible(ctx, alignment: 0.5).ignore();
+          });
+        }
         return Column(children: <Widget>[
           if (threads.length > 1)
             _ThreadBar(
@@ -276,26 +334,36 @@ class _ChatScreenState extends State<ChatScreen> {
                     controller: _scroll,
                     reverse: true,
                     padding: const EdgeInsets.all(12),
-                    itemCount: msgs.length,
+                    itemCount: entries.length,
                     // Der State einer Blase (geladener Anhang) bleibt an seiner Nachricht, auch wenn neue
-                    // Nachrichten alle Indizes verschieben (#130).
+                    // Nachrichten alle Indizes verschieben (#130). Datumszeilen und Marke haben eigene Schlüssel.
                     findChildIndexCallback: (key) {
-                      final position = positionById[(key as ValueKey<String>).value];
-                      return position == null ? null : msgs.length - 1 - position;
+                      final position = positionByKey[(key as ValueKey<String>).value];
+                      return position == null ? null : entries.length - 1 - position;
                     },
                     itemBuilder: (context, i) {
-                      final m = msgs[msgs.length - 1 - i];
-                      if (m.beforeJoin) return KeyedSubtree(key: ValueKey<String>(m.id), child: const _BeforeJoinNote());
-                      return _Bubble(
-                        key: ValueKey<String>(m.id),
-                        message: m,
-                        mine: m.senderId == g.userId,
-                        replied: m.replyToId == null ? null : byId[m.replyToId],
-                        gateway: g,
-                        services: services,
-                        threadId: threadId,
-                        onLongPress: () => _actions(g, m),
-                      );
+                      final entry = entries[entries.length - 1 - i];
+                      final key = ValueKey<String>(entry.key);
+                      switch (entry) {
+                        case DayEntry(:final day):
+                          return KeyedSubtree(key: key, child: _DayLine(day: day));
+                        case UnreadMarkerEntry():
+                          return KeyedSubtree(key: key, child: _UnreadLine(key: _markerKey));
+                        case MessageEntry(message: final m):
+                          if (m.beforeJoin) return KeyedSubtree(key: key, child: const _BeforeJoinNote());
+                          return _Bubble(
+                            key: key,
+                            message: m,
+                            mine: m.senderId == g.userId,
+                            replied: m.replyToId == null ? null : byId[m.replyToId],
+                            myUserId: g.userId,
+                            collapseQuotes: _collapseQuotes,
+                            gateway: g,
+                            services: services,
+                            threadId: threadId,
+                            onLongPress: () => _actions(g, m),
+                          );
+                      }
                     },
                   ),
           ),
@@ -305,7 +373,18 @@ class _ChatScreenState extends State<ChatScreen> {
               child: GlassCard(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 child: Row(children: <Widget>[
-                  Expanded(child: Text(l.chatReplyingTo(_replyTo!.senderLabel(l)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: <Widget>[
+                      Text(l.chatReplyingTo(_replyTo!.senderLabel(l)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      // Vorschau des Zitats, einzeilig (#254).
+                      Text(
+                        _quoteText(_replyTo!),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ]),
+                  ),
                   IconButton(
                     tooltip: l.chatCancelReply,
                     icon: const Icon(Icons.close),
@@ -364,12 +443,24 @@ List<ChatMessage> _uniqueById(List<ChatMessage> messages) {
   ];
 }
 
+/// Text eines Zitats: Nachricht oder Name des Anhangs.
+String _quoteText(ChatMessage m) => m.body.isEmpty ? (m.attachment?.name ?? '') : m.body;
+
+/// Datum und Uhrzeit in Ortszeit, ausgeschrieben (Tooltip, Screenreader; #254).
+String _fullDateTime(BuildContext context, DateTime t) {
+  final lt = t.toLocal();
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  return '${DateFormat.yMMMMEEEEd(locale).format(lt)}, ${formatClock(context, lt.hour, lt.minute)}';
+}
+
 class _Bubble extends StatelessWidget {
   const _Bubble({
     super.key,
     required this.message,
     required this.mine,
     required this.replied,
+    required this.myUserId,
+    required this.collapseQuotes,
     required this.gateway,
     required this.services,
     required this.threadId,
@@ -379,6 +470,8 @@ class _Bubble extends StatelessWidget {
   final ChatMessage message;
   final bool mine;
   final ChatMessage? replied;
+  final String? myUserId;
+  final Listenable collapseQuotes;
   final MatrixGateway gateway;
   final AppServices services;
   final String threadId;
@@ -411,18 +504,7 @@ class _Bubble extends StatelessWidget {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
                   if (!mine)
                     Text(m.senderLabel(l), style: Theme.of(context).textTheme.labelMedium?.copyWith(color: t.primary)),
-                  if (replied != null)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 4),
-                      padding: const EdgeInsets.only(left: 8),
-                      decoration: BoxDecoration(border: Border(left: BorderSide(color: t.magenta, width: 2))),
-                      child: Text(
-                        replied!.body.isEmpty ? (replied!.attachment?.name ?? '') : replied!.body,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ),
+                  if (m.replyToId != null) _Quote(replied: replied, myUserId: myUserId, collapse: collapseQuotes),
                   if (m.blockedAttachment)
                     Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
                       const Icon(Icons.block, size: 16),
@@ -448,7 +530,15 @@ class _Bubble extends StatelessWidget {
                     ),
                   const SizedBox(height: 2),
                   Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                    Text(_time(context, m.time), style: monoStyle(context, size: 11, color: t.textSecondary)),
+                    Tooltip(
+                      message: _fullDateTime(context, m.time),
+                      excludeFromSemantics: true,
+                      child: Text(
+                        _time(context, m.time),
+                        semanticsLabel: _fullDateTime(context, m.time),
+                        style: monoStyle(context, size: 11, color: t.textSecondary),
+                      ),
+                    ),
                     if (m.status == MessageStatus.sending) ...<Widget>[
                       const SizedBox(width: 6),
                       Icon(Icons.schedule, size: 12, semanticLabel: l.chatSending),
@@ -679,7 +769,8 @@ class _ThreadBar extends StatelessWidget {
                   onSelected: (_) => onSelect(t.id),
                   avatar: t.isFamily ? const Icon(Icons.groups_outlined, size: 18) : PresenceDot(online: online),
                   label: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                    Text(t.title),
+                    // Ungelesenes zusätzlich fett, nicht nur über das Abzeichen (#254).
+                    Text(t.title, style: unread > 0 ? const TextStyle(fontWeight: FontWeight.w700) : null),
                     if (unread > 0) ...<Widget>[const SizedBox(width: 6), Badge(label: Text('$unread'))],
                   ]),
                 ),
@@ -689,5 +780,189 @@ class _ThreadBar extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Datumszeile vor der ersten Nachricht eines Tages (#254).
+class _DayLine extends StatelessWidget {
+  const _DayLine({required this.day});
+  final DateTime day;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = AuroraTokens.of(context);
+    final label = switch (chatDayOf(day, DateTime.now())) {
+      ChatDay.today => l.chatToday,
+      ChatDay.yesterday => l.chatYesterday,
+      ChatDay.other => DateFormat.yMMMMEEEEd(Localizations.localeOf(context).toLanguageTag()).format(day),
+    };
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Center(
+        child: Semantics(
+          header: true,
+          child: Text(label, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: t.textSecondary)),
+        ),
+      ),
+    );
+  }
+}
+
+/// Marke über der ersten ungelesenen Nachricht: Linie **und** Text, nicht nur Farbe (#254).
+class _UnreadLine extends StatelessWidget {
+  const _UnreadLine({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = AuroraTokens.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(children: <Widget>[
+        Expanded(child: Divider(color: t.primary, thickness: 1)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Text(
+            l.chatNewMessages,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(color: t.primary, fontWeight: FontWeight.w700),
+          ),
+        ),
+        Expanded(child: Divider(color: t.primary, thickness: 1)),
+      ]),
+    );
+  }
+}
+
+/// Zitat einer Antwort (#254): Absender und Text, ab 4 Zeilen eingeklappt. Tippen klappt auf und zu, ohne dem
+/// Eingabefeld den Fokus zu nehmen; jedes Tippen außerhalb (auch ins Eingabefeld oder zum Scrollen), Fokusverlust,
+/// Verlassen des Tabs und Hintergrund klappen zu. Der Zustand wird nicht gespeichert.
+///
+/// Ist das Ziel nicht sichtbar (nicht geladen, blockiert, gelöscht, nicht verschlüsselt angekommen), erscheint ein
+/// neutraler Hinweis. Den Zitattext aus der Antwort selbst zeigen wir nie: Den setzt der Absender frei (E-30, #138).
+class _Quote extends StatefulWidget {
+  const _Quote({required this.replied, required this.myUserId, required this.collapse});
+  final ChatMessage? replied;
+  final String? myUserId;
+  final Listenable collapse;
+
+  /// Ab so vielen Zeilen wird eingeklappt.
+  static const int maxLines = 4;
+
+  @override
+  State<_Quote> createState() => _QuoteState();
+}
+
+class _QuoteState extends State<_Quote> {
+  bool _expanded = false;
+  final FocusNode _focus = FocusNode(debugLabel: 'quote');
+
+  @override
+  void initState() {
+    super.initState();
+    widget.collapse.addListener(_collapseNow);
+    _focus.addListener(_onFocus);
+  }
+
+  @override
+  void didUpdateWidget(_Quote oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.collapse, widget.collapse)) {
+      oldWidget.collapse.removeListener(_collapseNow);
+      widget.collapse.addListener(_collapseNow);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.collapse.removeListener(_collapseNow);
+    _focus.dispose();
+    super.dispose();
+  }
+
+  void _onFocus() {
+    if (!_focus.hasFocus) _collapseNow();
+  }
+
+  void _collapseNow() {
+    if (mounted && _expanded) setState(() => _expanded = false);
+  }
+
+  void _toggle() => setState(() => _expanded = !_expanded);
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = AuroraTokens.of(context);
+    final style = Theme.of(context).textTheme.bodySmall;
+    final decoration = BoxDecoration(border: Border(left: BorderSide(color: t.magenta, width: 2)));
+    const margin = EdgeInsets.only(bottom: 4);
+    const padding = EdgeInsets.only(left: 8);
+    final r = widget.replied;
+    if (r == null) {
+      return Container(
+        margin: margin,
+        padding: padding,
+        decoration: decoration,
+        child: Text(l.chatReplyUnavailable, style: style?.copyWith(fontStyle: FontStyle.italic)),
+      );
+    }
+    final text = _quoteText(r);
+    final sender = r.senderId == widget.myUserId ? l.chatYou : r.senderLabel(l);
+    return LayoutBuilder(builder: (context, constraints) {
+      final painter = TextPainter(
+        text: TextSpan(text: text, style: style),
+        maxLines: _Quote.maxLines,
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+        locale: Localizations.localeOf(context),
+      )..layout(maxWidth: (constraints.maxWidth - padding.horizontal - 2).clamp(0, double.infinity));
+      final long = painter.didExceedMaxLines;
+      painter.dispose();
+      final collapsed = long && !_expanded;
+      final box = Container(
+        margin: margin,
+        padding: padding,
+        decoration: decoration,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: <Widget>[
+          Text(sender, style: Theme.of(context).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700)),
+          Text(
+            text,
+            maxLines: collapsed ? _Quote.maxLines : null,
+            overflow: collapsed ? TextOverflow.ellipsis : null,
+            style: style,
+          ),
+          if (long)
+            Text(
+              _expanded ? l.chatQuoteLess : l.chatQuoteMore,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: t.primary, fontWeight: FontWeight.w600),
+            ),
+        ]),
+      );
+      if (!long) return box;
+      return TapRegion(
+        onTapOutside: (_) => _collapseNow(),
+        // Gehört zum Eingabefeld: Tippen aufs Zitat nimmt ihm den Fokus nicht (auch nicht mit der Maus).
+        child: TextFieldTapRegion(
+          child: Focus(
+            focusNode: _focus,
+            onKeyEvent: (node, event) {
+              if (event is KeyDownEvent &&
+                  (event.logicalKey == LogicalKeyboardKey.enter || event.logicalKey == LogicalKeyboardKey.space)) {
+                _toggle();
+                return KeyEventResult.handled;
+              }
+              return KeyEventResult.ignored;
+            },
+            child: Semantics(
+              button: true,
+              expanded: _expanded,
+              onTap: _toggle,
+              child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: _toggle, child: box),
+            ),
+          ),
+        ),
+      );
+    });
   }
 }

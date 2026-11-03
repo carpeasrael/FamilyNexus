@@ -248,8 +248,13 @@ class FakeMatrixServer {
     }
   }
 
+  /// Test: Zeitstempel des nächsten Ereignisses (einmalig), sonst fortlaufend ab 21.10.2026 12:00 UTC.
+  DateTime? nextTime;
+
   FakeEvent post(FakeRoom room, String sender, String type, Map<String, Object?> content) {
-    final e = FakeEvent(nextId(r'$ev'), room.id, sender, type, content, DateTime.utc(2026, 10, 21, 12).add(Duration(seconds: _seq)));
+    final at = nextTime ?? DateTime.utc(2026, 10, 21, 12).add(Duration(seconds: _seq));
+    nextTime = null;
+    final e = FakeEvent(nextId(r'$ev'), room.id, sender, type, content, at);
     room.events.add(e);
     log.add(e);
     _dispatch(room, e);
@@ -432,6 +437,15 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       if (list[i].senderId != _userId) n++;
     }
     return n;
+  }
+
+  @override
+  String? firstUnreadIdIn(String threadId) {
+    final list = messagesIn(threadId);
+    for (var i = _read[threadId] ?? 0; i < list.length; i++) {
+      if (list[i].senderId != _userId) return list[i].id;
+    }
+    return null;
   }
 
   @override

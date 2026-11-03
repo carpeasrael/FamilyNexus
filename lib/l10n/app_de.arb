@@ -136,6 +136,12 @@
       }
     }
   },
+  "chatToday": "Heute",
+  "chatYesterday": "Gestern",
+  "chatNewMessages": "Neue Nachrichten",
+  "chatQuoteMore": "Mehr anzeigen",
+  "chatQuoteLess": "Weniger anzeigen",
+  "chatReplyUnavailable": "Antwort auf eine Nachricht, die hier nicht angezeigt wird",
   "chatYou": "Du",
   "chatFormerMember": "Ehemaliges Mitglied",
   "logout": "Abmelden",

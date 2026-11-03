@@ -339,6 +339,25 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get chatToday => 'Heute';
+
+  @override
+  String get chatYesterday => 'Gestern';
+
+  @override
+  String get chatNewMessages => 'Neue Nachrichten';
+
+  @override
+  String get chatQuoteMore => 'Mehr anzeigen';
+
+  @override
+  String get chatQuoteLess => 'Weniger anzeigen';
+
+  @override
+  String get chatReplyUnavailable =>
+      'Antwort auf eine Nachricht, die hier nicht angezeigt wird';
+
+  @override
   String get chatYou => 'Du';
 
   @override
