@@ -196,4 +196,32 @@ void main() {
     await g2.logout();
     expect(g2.liveSince, isNull);
   });
+
+  test('Obergrenze: Zeitstempel weit in der Zukunft unterdrückt Meldungen höchstens 5 Minuten', () async {
+    final future = DateTime.now().toUtc().add(const Duration(hours: 2));
+    final hs = _Hs(<String, Object?>{
+      'rooms': <String, Object?>{
+        'join': <String, Object?>{
+          _famA: <String, Object?>{
+            'timeline': <String, Object?>{
+              'events': <Object?>[
+                <String, Object?>{
+                  ..._event(r'$zukunft', 'm.room.encrypted', 0),
+                  'origin_server_ts': future.millisecondsSinceEpoch,
+                },
+              ],
+            },
+          },
+        },
+      },
+    });
+    final g = await _gateway(hs, dir, MemoryKeyStore());
+    await g.restore();
+    final before = DateTime.now().toUtc();
+    await g.login(server: ServerUrl.tryParse('hs.example')!, username: 'n1', password: 'geheim123');
+    await _until(() => g.liveSince != null, what: 'liveSince gesetzt');
+    final limit = DateTime.now().toUtc().add(SdkMatrixGateway.liveSkew);
+    expect(g.liveSince!.isAfter(limit), isFalse);
+    expect(g.liveSince!.isAfter(before.add(SdkMatrixGateway.liveSkew).subtract(const Duration(seconds: 5))), isTrue);
+  });
 }

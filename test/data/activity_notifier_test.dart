@@ -49,7 +49,7 @@ Future<_Setup> _setUp() async {
 }
 
 /// Setzt die Grundlinie wie der erste echte Sync und meldet die Änderung.
-void _live(TestApp app, DateTime since) {
+void _live(TestApp app, DateTime? since) {
   app.gateway.liveSince = since;
   app.server.notifyAll();
 }
@@ -86,6 +86,18 @@ void main() {
       _live(s.app, _t(5));
       s.app.server.notifyAll();
       expect(s.platform.shown, isEmpty);
+    });
+
+    test('Grundlinie fällt weg (Abmelden): gemerkte Nachrichten werden vergessen', () async {
+      final s = await _setUp();
+      _live(s.app, _t(0));
+      s.app.server.nextTime = _t(10);
+      await s.ben.sendMessage('einmal');
+      expect(s.platform.shown, hasLength(1));
+      _live(s.app, null);
+      // Neue Sitzung mit früherer Grundlinie: Ohne Vergessen bliebe die Nachricht still.
+      _live(s.app, _t(5));
+      expect(s.platform.shown, hasLength(2));
     });
 
     test('nachgeladener älterer Verlauf meldet nichts', () async {
