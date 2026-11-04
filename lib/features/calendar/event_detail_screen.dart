@@ -12,6 +12,7 @@ import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
 import '../reminders/reminder_coordinator.dart';
 import '../chat/sender_name.dart';
+import '../../ui/layout/adaptive.dart';
 import 'calendar_controller.dart';
 import 'event_editor_screen.dart';
 import 'event_tile.dart';
@@ -160,7 +161,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             ],
           ),
           body: SafeArea(
-            child: ListView(padding: const EdgeInsets.all(16), children: <Widget>[
+            child: ContentWidth(child: ListView(padding: const EdgeInsets.all(16), children: <Widget>[
               GlassCard(
                 glow: AuroraTokens.personColors[c.displayColorIndex(e) % AuroraTokens.personColors.length],
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
@@ -257,7 +258,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 ),
               ],
               _History(controller: c, event: e),
-            ]),
+            ])),
           ),
         );
       },

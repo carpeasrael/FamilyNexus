@@ -4,6 +4,7 @@ import '../../core/platform_info.dart';
 import '../../domain/data_inventory.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/widgets/glass.dart';
+import '../../ui/layout/adaptive.dart';
 import 'data_report.dart';
 
 /// Plattform für den Datenschutztext (#160): Schlüsselspeicher, Berechtigungen und Backups unterscheiden sich.
@@ -101,7 +102,7 @@ class PrivacyScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l.privacyTitle)),
       body: SafeArea(
-        child: ListView(
+        child: ContentWidth(child: ListView(
           padding: const EdgeInsets.all(16),
           children: <Widget>[
             for (final s in sections)
@@ -125,7 +126,7 @@ class PrivacyScreen extends StatelessWidget {
                 ),
               ),
           ],
-        ),
+        )),
       ),
     );
   }

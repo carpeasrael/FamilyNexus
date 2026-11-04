@@ -10,6 +10,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
 import '../security/security_panel.dart' show clearClipboardLater;
+import '../../ui/layout/adaptive.dart';
 import 'data_report.dart';
 
 enum DataReportKind { local, online }
@@ -95,7 +96,7 @@ class _DataReportScreenState extends State<DataReportScreen> {
             ],
           ),
           body: SafeArea(
-            child: switch (snap.connectionState) {
+            child: ContentWidth(child: switch (snap.connectionState) {
               ConnectionState.done when snap.hasError => Center(
                   child: Padding(padding: const EdgeInsets.all(16), child: Text(errorText(l, snap.error!))),
                 ),
@@ -113,7 +114,7 @@ class _DataReportScreenState extends State<DataReportScreen> {
                   ),
                 ]),
               _ => Center(child: Semantics(label: l.loading, child: const CircularProgressIndicator())),
-            },
+            }),
           ),
         );
       },

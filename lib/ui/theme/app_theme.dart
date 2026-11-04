@@ -127,6 +127,14 @@ ThemeData buildTheme(Brightness brightness, {bool reduceEffects = false, AccentC
       labelTextStyle: WidgetStatePropertyAll<TextStyle>(body(12, FontWeight.w500)),
       iconTheme: WidgetStatePropertyAll<IconThemeData>(IconThemeData(color: t.textPrimary)),
     ),
+    navigationRailTheme: NavigationRailThemeData(
+      backgroundColor: t.bgSurface.withValues(alpha: 0.9),
+      indicatorColor: t.primary.withValues(alpha: 0.22),
+      selectedLabelTextStyle: body(12, FontWeight.w600).copyWith(color: t.textPrimary),
+      unselectedLabelTextStyle: body(12, FontWeight.w500).copyWith(color: t.textPrimary),
+      selectedIconTheme: IconThemeData(color: t.textPrimary),
+      unselectedIconTheme: IconThemeData(color: t.textPrimary),
+    ),
     dividerColor: t.glassBorder,
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStatePropertyAll<Color>(t.textPrimary),

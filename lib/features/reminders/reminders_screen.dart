@@ -11,6 +11,7 @@ import '../calendar/calendar_controller.dart';
 import '../calendar/calendar_screen.dart' show SectionCard;
 import '../calendar/event_detail_screen.dart';
 import '../calendar/formatting.dart';
+import '../../ui/layout/adaptive.dart';
 import 'permission_hint.dart';
 import 'reminder_coordinator.dart';
 
@@ -31,7 +32,7 @@ class RemindersScreen extends StatelessWidget {
     final l = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l.remindersTitle)),
-      body: ListenableBuilder(
+      body: ContentWidth(child: ListenableBuilder(
         listenable: Listenable.merge(<Listenable>[reminders, calendar]),
         builder: (context, _) => ClockTick(builder: (context) {
           final due = reminders.due();
@@ -73,7 +74,7 @@ class RemindersScreen extends StatelessWidget {
               ),
           ]);
         }),
-      ),
+      )),
     );
   }
 }
