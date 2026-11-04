@@ -56,12 +56,19 @@ class _Server {
   /// Hält Sync-Anfragen an, bis der Test sie freigibt (#259: Wettlauf mit dem Kontoanlage-Schritt).
   Completer<void>? syncGate;
 
+  /// Meldet jede Sync-Anfrage, die am noch geschlossenen [syncGate] wartet.
+  void Function()? onSyncHeld;
+
   http.Client get client => MockClient((req) async {
         final path = req.url.path;
         requests.add(req.url);
         Map<String, Object?> jsonBody() =>
             req.body.isEmpty ? <String, Object?>{} : json.decode(req.body) as Map<String, Object?>;
-        if (path == '/_matrix/client/v3/sync') await syncGate?.future;
+        if (path == '/_matrix/client/v3/sync') {
+          final gate = syncGate;
+          if (gate != null && !gate.isCompleted) onSyncHeld?.call();
+          await gate?.future;
+        }
         (int, Object) r;
         if (path == '/.well-known/matrix/client' && wellKnown.containsKey(req.url.host)) {
           r = (200, <String, Object?>{
@@ -109,7 +116,8 @@ final ServerUrl _provider = ServerUrl.tryParse('provider.example')!;
 
 /// [_Server] mit Umleitung von `provider.example` auf `hs.example` und Antworten für eine stehende Sitzung (#259):
 /// whoami mit Gerät (für `oidcLogin` → `init`), Schlüssel-Upload mit passender Zahl der Einmalschlüssel (vodozemac),
-/// Sync scheitert (das SDK wiederholt nach Pause), alles Übrige 200.
+/// Sync-Filter mit Kennung (sonst scheitert der erste Sync schon vor der Sync-Anfrage), Sync scheitert (das SDK
+/// wiederholt nach Pause), alles Übrige 200.
 _Server _redirecting({String version = 'v1.11', Map<String, Object?>? meta, String user = '@emil:hs.example'}) {
   final s = _Server(version: version, meta: meta)..wellKnown['provider.example'] = 'https://hs.example';
   s.afterLogin = (req, b) {
@@ -121,36 +129,30 @@ _Server _redirecting({String version = 'v1.11', Map<String, Object?>? meta, Stri
         'one_time_key_counts': <String, Object?>{'signed_curve25519': keys is Map ? keys.length : 0},
       });
     }
+    if (path.endsWith('/filter') && req.method == 'POST') return (200, <String, Object?>{'filter_id': 'f1'});
     if (path == '/_matrix/client/v3/sync') return (500, <String, Object?>{'errcode': 'M_UNKNOWN', 'error': 'Test'});
     return (200, <String, Object?>{});
   };
   return s;
 }
 
-Future<void> _until(bool Function() cond, {String? what}) async {
-  final end = DateTime.now().add(const Duration(seconds: 10));
-  while (!cond()) {
-    if (DateTime.now().isAfter(end)) fail('Bedingung nicht erreicht: $what');
-    await Future<void>.delayed(const Duration(milliseconds: 10));
-  }
-}
-
 /// Wie der Kontoanlage-Schritt: Sobald das Gateway „angemeldet“ meldet, wechselt die Oberfläche und `dispose` ruft
-/// `cancelRegistration()`, noch bevor `register`/`oidcLogin` zurückkehren (erster Sync angehalten).
-/// Liefert eine Abfrage, ob das wirklich vor der Rückkehr geschah.
-bool Function() _cancelOnReady(SdkMatrixGateway g, bool Function() returned) {
-  var cancelledBeforeReturn = false;
-  var done = false;
+/// `cancelRegistration()`. Der erste Sync wartet am [gate]; `register`/`oidcLogin` des SDK warten in `init` auf ihn
+/// (`waitForFirstSync`), kehren also erst nach der Freigabe zurück. Der Test gibt das Tor erst frei, wenn der Zuhörer
+/// verworfen hat (Rückgabewert); [log] hält die Reihenfolge fest.
+Future<void> _cancelOnReady(SdkMatrixGateway g, _Server s, Completer<void> gate, List<String> log) {
+  final cancelled = Completer<void>();
+  s.onSyncHeld = () => log.add('sync angehalten');
   void listener() {
-    if (done || g.session != SessionState.ready) return;
-    done = true;
-    cancelledBeforeReturn = !returned();
+    if (cancelled.isCompleted || g.session != SessionState.ready) return;
+    log.add(gate.isCompleted ? 'cancel nach Freigabe' : 'cancel');
     g.cancelRegistration();
+    cancelled.complete();
   }
 
   g.addListener(listener);
   addTearDown(() => g.removeListener(listener));
-  return () => cancelledBeforeReturn;
+  return cancelled.future;
 }
 
 Map<String, Object?> _uia(List<List<String>> flows, {List<String> completed = const <String>[], Map<String, Object?>? params, String? errcode}) =>
@@ -536,16 +538,18 @@ void main() {
       final s = _redirecting()..syncGate = gate;
       s.register = (req, b) => (200, <String, Object?>{'user_id': '@emil:hs.example', 'access_token': 'tok', 'device_id': 'DEV1'});
       final g = await _gateway(s);
-      var returned = false;
-      final cancelledFirst = _cancelOnReady(g, () => returned);
+      final log = <String>[];
+      final cancelled = _cancelOnReady(g, s, gate, log);
       final run = g
           .register(server: _provider, username: 'emil', password: 'sicher-genug', displayName: 'Emil')
           .then<void>((_) {}, onError: (Object _) {})
-          .whenComplete(() => returned = true);
-      await _until(cancelledFirst, what: 'cancelRegistration vor der Rückkehr von register');
+          .whenComplete(() => log.add('zurück'));
+      await cancelled.timeout(const Duration(seconds: 5));
+      log.add('sync frei');
       gate.complete();
       await run;
-      expect(cancelledFirst(), isTrue);
+      // Verworfen, während der erste Sync noch hing: `client.register` (und damit das `finally`) war noch nicht zurück.
+      expect(log, <String>['sync angehalten', 'cancel', 'sync frei', 'zurück']);
       expect(g.session, SessionState.ready);
       expect(g.server?.host, 'provider.example');
     });
@@ -660,16 +664,18 @@ void main() {
       s.token = (req, b) => (200, <String, Object?>{'access_token': 'tok', 'token_type': 'Bearer'});
       final g = await _gateway(s);
       final state = (await g.startOAuth(server: _provider, redirectUri: redirect, create: true)).queryParameters['state']!;
-      var returned = false;
-      final cancelledFirst = _cancelOnReady(g, () => returned);
+      final log = <String>[];
+      final cancelled = _cancelOnReady(g, s, gate, log);
       final run = g
           .completeOAuth(Uri.parse('$redirect?code=echt&state=$state'))
           .then<void>((_) {}, onError: (Object _) {})
-          .whenComplete(() => returned = true);
-      await _until(cancelledFirst, what: 'cancelRegistration vor der Rückkehr von oidcLogin');
+          .whenComplete(() => log.add('zurück'));
+      await cancelled.timeout(const Duration(seconds: 5));
+      log.add('sync frei');
       gate.complete();
       await run;
-      expect(cancelledFirst(), isTrue);
+      // Verworfen, während der erste Sync noch hing: `oidcLogin` (und damit das `finally`) war noch nicht zurück.
+      expect(log, <String>['sync angehalten', 'cancel', 'sync frei', 'zurück']);
       expect(g.session, SessionState.ready);
       expect(g.server?.host, 'provider.example');
     });
