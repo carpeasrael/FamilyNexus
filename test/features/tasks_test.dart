@@ -259,6 +259,58 @@ void main() {
     expect(find.textContaining(RegExp(r', 02:00$')), findsOneWidget, reason: 'Verlaufszeile');
   });
 
+  testWidgets('#260: „Erledigt am …“ und Verlaufszeile zeigen einstellige Tage/Monate mit führender Null', (tester) async {
+    _tall(tester);
+    final now = DateTime.utc(2026, 11, 3, 20, 43); // 21:43 am 03.11. in Berlin (MEZ)
+    final app = await buildTestApp(clock: () => now);
+    await app.services.openCalendar();
+    await _open(tester, app);
+    await app.services.tasks!.service.createList(
+        title: 'Hausliste', assignee: app.gateway.userId!, interval: TaskInterval.daily, timeZone: 'Europe/Berlin', items: ['Müll raus']);
+    await app.services.tasks!.load();
+    await tester.pumpAndSettle();
+    await _openTasks(tester);
+    await tester.tap(find.text('Hausliste'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(Checkbox).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Erledigt'));
+    await tester.pumpAndSettle();
+
+    expect((await app.taskStore.log()).single.doneOn, '2026-11-03');
+    expect(find.text('Erledigt am 03.11.2026 um 21:43'), findsOneWidget);
+    expect(find.text('Du · 03.11.2026, 21:43'), findsOneWidget, reason: 'Verlaufszeile');
+  });
+
+  testWidgets('#260: englisch MM/TT/JJJJ mit führender Null', (tester) async {
+    _tall(tester);
+    final now = DateTime.utc(2026, 11, 2, 12); // 02:00 am 03.11. auf Kiritimati
+    final app = await buildTestApp(clock: () => now, lang: 'en');
+    await app.services.openCalendar();
+    await tester.pumpWidget(MediaQuery(
+      data: MediaQueryData.fromView(tester.view).copyWith(alwaysUse24HourFormat: true),
+      child: FamilyNexusApp(services: app.services),
+    ));
+    await tester.pumpAndSettle();
+    await app.services.tasks!.service.createList(
+        title: 'Far list', assignee: app.gateway.userId!, interval: TaskInterval.daily, timeZone: 'Pacific/Kiritimati', items: ['Bins']);
+    await app.services.tasks!.load();
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Open menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Tasks'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Far list'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(Checkbox).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Done'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Done on 11/03/2026 at 02:00'), findsOneWidget);
+    expect(find.textContaining(RegExp(r'· 11/03/2026, 02:00$')), findsOneWidget, reason: 'Verlaufszeile');
+  });
+
   testWidgets('Mitglied ohne Moderatorenrecht: kein Anlegen; zugewiesene Liste kann abgehakt werden, fremde nicht', (tester) async {
     _tall(tester);
     final now = DateTime.utc(2026, 10, 22, 8);

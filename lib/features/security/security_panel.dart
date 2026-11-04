@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
@@ -12,6 +11,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
+import '../calendar/formatting.dart';
 import '../common/error_text.dart';
 import '../common/prompt_dialog.dart';
 import '../common/syncing_view.dart';
@@ -59,8 +59,9 @@ void clearClipboardLater(String secret, {Duration delay = const Duration(seconds
 /// Überspringen: Ohne Verifizierung erhält ein Gerät keine Raumschlüssel (SA-1).
 ///
 /// Mit [renew] ersetzt das Panel auf einem verifizierten Gerät den Schlüssel durch einen neuen (#11).
-/// Datum der Schlüsseldatei in der Schreibweise der App-Sprache, z. B. `31.10.2026` bzw. `10/31/2026` (#162).
-String keyFileDate(DateTime d, String locale) => DateFormat.yMd(locale).format(d);
+/// Datum der Schlüsseldatei in der Schreibweise der App-Sprache, z. B. `03.11.2026` bzw. `11/03/2026`
+/// (#162, #260).
+String keyFileDate(DateTime d, String locale) => formatDateNumeric(d, locale);
 
 class SecurityPanel extends StatefulWidget {
   const SecurityPanel({super.key, this.onReady, this.renew = false, this.onDone});
