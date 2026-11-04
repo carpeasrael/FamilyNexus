@@ -1,0 +1,11 @@
+== N2 per API loeschen (Abweichung: nie in der App angemeldet)
+{"id_server_unbind_result":"success"}
+== Login fnt-1103-n1
+{"errcode":"M_FORBIDDEN","error":"Invalid username or password"} HTTP 403
+== Login fnt-1103-n12
+{"errcode":"M_FORBIDDEN","error":"Invalid username or password"} HTTP 403
+== Login fnt-1103-i2
+{"errcode":"M_FORBIDDEN","error":"Invalid username or password"} HTTP 403
+== available fnt-1103-n1: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+== available fnt-1103-n12: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+== available fnt-1103-i2: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}

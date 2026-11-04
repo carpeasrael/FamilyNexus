@@ -1,0 +1,70 @@
+V-01	✅	Soll 1.2.2+23 (main = origin/main)
+V-02	✅	Ist 1.2.2 (23) im iPhone-17-Simulator, iOS 27.2 (simctl listapps)
+V-03	✅	Build aus main per flutter build ios --simulator --debug, installiert
+V-04	✅	Erststart zeigt Willkommen
+V-05	✅	versions-JSON, register liefert m.login.dummy
+V-06	⚠️	fnt-1103-* vergeben, Lauf mit Praefix 1103b (alle frei)
+A-01	✅	Willkommen, drei Wege, Hinweise, Sprachwahl
+A-02	✅	English -> Deutsch wechselt sofort
+A-03	✅	Konto erstellen, Schritt 1 von 3, matrix.org-Text
+A-04	✅	"nicht-vorhanden.invalid ist gerade nicht erreichbar. Pruefe deine Internetverbindung." + Erneut versuchen
+A-05	✅	Konto bei matrix-synapse-...; Betreiber matrix.chaostribunal.de, Kontakt nicht angegeben (nur Teil des Plantexts geprueft)
+A-05a	⏳	Nur mit praeparierten Testserver (well-known), nicht ausgefuehrt
+A-06	⚠️	joerg.muessig frei; Variante mit Umlauten nicht tippbar (Anhang D)
+A-07	⏳	Nicht ausgefuehrt (Grossbuchstaben im Simulator unzuverlaessig, Anhang D)
+A-08	⚠️	Teil: Name Test N1, Benutzername fnt-1103b-n1 frei, Konto erstellen erst aktiv bei gleicher Wiederholung; Fehlerfaelle 7 Zeichen/Abweichung nicht einzeln geprueft
+A-08b	⏳	Keine Hardware-Tastatur-Enter-Pruefung
+A-09	✅	N1 angelegt, kein Zusatzschritt, Notfall-Schluessel Schritt 2 von 3; Konto serverseitig vorhanden (M_USER_IN_USE)
+A-10	⚠️	Schluessel bleibt stehen, Kopiert-Hinweis mit Zwischenablage-Text, Weiter erst nach Haekchen; Als Datei speichern nicht geprueft (Systemdialog)
+A-11	✅	Fertig! "Testfamilie 1103b" ist eingerichtet, Spaeter / Jetzt einladen
+A-12	✅	Hauptansicht Heute
+B-01	✅	Heute mit Kacheln und Tab-Leiste (B-01-G1); Wiederholung nach B-06 nicht gemacht
+B-02	✅	Systemdialog "Mitteilungen senden", Erlauben getippt (B-02a/b); Hinweis danach nicht gesondert geprueft; Signatur nicht geprueft (Debug-Build)
+B-03	✅	Test geteilt 4.11. 10:00-11:00, Geteilt, Kueche, Testnotiz; Farbe nicht geaendert; Zeit per Ziffernblatt
+B-04	⚠️	Nur "Bitte einen Titel eingeben." geprueft; Ende vor/gleich Beginn nicht geprueft
+B-05	⚠️	Test privat 21:00-22:00 privat, Ende wanderte mit; Tastatureingabe des Zeitwaehlers (#64) nicht geprueft, Ziffernblatt benutzt
+B-06	⚠️	Test Serie ganztaegig, woechentlich, 3x (5./6., 12./13., 19./20.11.); Ende stand beim Anlegen auf Folgetag (zweitaegig) - mit Plan abgleichen
+B-07	✅	Tag, Woche, Monat, Agenda; Heute springt zurueck
+B-08	✅	Titel und 10:30-11:30 sofort sichtbar, Von dir, Verlauf (1) "Test geteilt Version 1"
+B-09	✅	Zusaetzliche Erinnerungen gewaehlt, mit Standard verwenden zurueckgesetzt
+B-13	✅	Karte Termin "Test geteilt 2" im Chat
+B-12	⚠️	Hallo Testfamilie 22:55 gesendet, Ende-zu-Ende-Hinweis; Umschalt+Enter nicht geprueft
+B-14	⚠️	Milch 2 l, Brot, abhaken, bearbeiten zu Vollkornbrot (Enter springt auf Folgefeld, Speichern per Knopf), leerer Eintrag ohne Wirkung; Gruppen-Teil (#211) und Querformat nicht geprueft
+B-15	✅	Aufgabenliste Bad putzen woechentlich Montag, Waschbecken erledigt mit Kommentar, Verlauf mit 3.11.2026, 22:57; leeres Speichern: "Bitte Titel, Person und mindestens einen Punkt angeben."; "Heute"-Kachel nicht geprueft
+B-16	⚠️	Akzentfarbe Magenta und Design Hell wirken sofort, danach Dunkel/Tuerkis zurueck; Sprache und "Effekte reduzieren" sowie Neustart nicht geprueft
+B-21	⚠️	Speicherorte (Schluesselbund des Geraets nicht in iCloud), lokales Protokoll mit App-Version 1.2.2 (23), Warnhinweis, "Protokoll kopiert. ... nach einer Minute zu leeren"; Online-Protokoll nicht geprueft
+B-22	⚠️	Menue und Einstellungen zeigen "Version 1.2.2 (23)"; Konto zeigt Server "matrix.chaostribunal.de" statt der Anbieter-Adresse matrix-synapse-3ues..., Benutzername @fnt-1103b-n1:matrix.chaostribunal.de (Plan erwartet Server = Anbieter-Adresse) - klaeren
+B-10	⏳	Nicht ausgefuehrt (12 Minuten Wartezeit mit Systembenachrichtigung)
+B-11	⏳	Nicht ausgefuehrt
+B-12a	⏳	Netz trennen im Simulator nicht ausgefuehrt
+B-17	⏳	App-Sperre: Gerätesperre im Simulator nicht eingerichtet (V-07 offen)
+B-18	⏳	Nicht ausgefuehrt
+B-19	⏳	Nicht ausgefuehrt
+B-20	⏳	Nicht ausgefuehrt
+B-23	⏳	Nicht ausgefuehrt
+B-24	⏳	Nicht ausgefuehrt
+B-11	⚠️	"Nur dieses": nur Vorkommen 5.11. weg, uebrige bleiben; Dialog "Alle Vorkommen oder nur dieses loeschen?"; "Test Erinnerung" nicht angelegt
+B-18	⚠️	Bildschirmschutz standardmaessig an, iOS-Hinweistext wie erwartet; App-Umschalter/Screenshot nicht geprueft
+B-19	⚠️	Online-Status teilen an, "Du hast niemanden blockiert."; Datenschutzerklaerung nicht geoeffnet (Tap verfehlt)
+B-20	✅	Standard-Erinnerung 30 gewaehlt, 10 abgewaehlt (Mehrfachauswahl), danach auf 10 zurueck
+B-21	✅	zusaetzlich Online-Protokoll: Konto, Server https://matrix.chaostribunal.de, Geraet FamilyNexus iOS verifiziert, Verschluesselung
+B-23	⚠️	(b) "Das aktuelle Passwort stimmt nicht." Dialog bleibt offen; (a),(c),(d),(e) und Gegenprobe nicht ausgefuehrt (Passwort bleibt unveraendert)
+B-10	⏳	nicht ausgefuehrt (Wartezeit/Systembenachrichtigung)
+B-12a	⏳	Netz im Simulator nicht getrennt
+B-17	⏳	keine Geraete-PIN im Simulator
+B-24	⏳	nicht ausgefuehrt (Emoji-Grenzfaelle)
+C	⏳	C-01 bis C-xx brauchen G2 (nur G1 vorhanden)
+D	⏳	braucht G2
+E	⏳	braucht G2 (E-xx Zusammenspiel), I2 nicht angelegt
+F-01	⏳	N2 nicht angelegt (G2)
+F-02	⏳	N2 nicht angelegt
+F-03	✅	Alle lokalen Daten loeschen: Willkommen direkt danach
+F-04	✅	Neustart: Willkommen (Anmelden mit matrix.org-Voreinstellung, Server wird nicht gemerkt)
+F-05	✅	Anmeldung fnt-1103b-n1 + Notfall-Schluessel KN1 (Eingabe per Tasten, Zwischenablage-Einsetzen ohne Wirkung): Termine inkl. privater, Chat-Eintraege, Einkauf, Aufgaben wieder da
+F-06	✅	Konto loeschen: Dialog ohne Moderator-Hinweis, richtiges Passwort, danach Willkommen
+F-07	✅	Login 403 M_FORBIDDEN, register/available M_USER_IN_USE (curl, logs/F-07_gegenprobe.txt)
+F-08	⚠️	N1 geloescht; N2 und I2 nie angelegt
+H-02	✅	Beide DBs ohne SQLite-Kopf (Zufallsbytes), sqlite3: "file is not a database" (logs/H-02_bis_H-04.txt)
+H-03	✅	siehe H-02
+H-04	✅	Keine Treffer fuer Chat-, Termin-, Einkaufs-, Aufgabentexte und Anzeigenamen in beiden DBs
+H	⏳	uebrige H-Schritte (H-01 Gegencheck, H-05 bis H-20) nicht ausgefuehrt bzw. brauchen G2/Server-Token

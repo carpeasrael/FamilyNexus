@@ -1,0 +1,26 @@
+total 1040
+-rw-r--r--@ 1 carpeasrael  wheel   81920 Nov  3 23:09 familynexus_app.db
+-rw-r--r--@ 1 carpeasrael  wheel  450560 Nov  3 23:09 familynexus_matrix.db
+== familynexus_app.db
+00000000: d626 8265 b803 a20a 5b7a 7f01 e0ac 859a  .&.e....[z......
+/private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/db8567a4-001c-4f17-9d0e-90e0c42621ac/scratchpad/h/familynexus_app.db: data
+Error: in prepare, file is not a database (26)
+== familynexus_matrix.db
+00000000: 9326 b979 3a3e ae4c bd55 fdc7 c213 1bd5  .&.y:>.L.U......
+/private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/db8567a4-001c-4f17-9d0e-90e0c42621ac/scratchpad/h/familynexus_matrix.db: data
+Error: in prepare, file is not a database (26)
+'Hallo Testfamilie': 
+'Test geteilt': 
+'Test N1': 
+'Vollkornbrot': 
+'Bad putzen': 
+'Waschbecken': 
+'Kueche': 
+'Küche': 
+rekursiv:
+'Hallo Testfamilie': 0
+'Test geteilt': 0
+'Test N1': 0
+'Vollkornbrot': 0
+'Bad putzen': 0
+'Waschbecken': 0

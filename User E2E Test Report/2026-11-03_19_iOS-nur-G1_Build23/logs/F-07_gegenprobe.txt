@@ -1,0 +1,4 @@
+F-07 Login fnt-1103b-n1 nach Loeschung:
+HTTP 403
+{"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
+{"errcode":"M_USER_IN_USE","error":"User ID already taken."}

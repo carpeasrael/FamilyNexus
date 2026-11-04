@@ -1,0 +1,1 @@
+fnt-1103b-n1: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
