@@ -14,6 +14,14 @@ String formatClock(BuildContext context, int hour, int minute) {
   return f.format(DateTime(2000, 1, 1, hour, minute));
 }
 
+/// Numerisches Datum in der Schreibweise der App-Sprache, Tag und Monat immer zweistellig: `03.11.2026`
+/// (de) bzw. `11/03/2026` (en) – die eine Stelle für alle numerisch angezeigten Daten (#38, #162, #260).
+/// Die App kennt nur de und en; jede andere Sprache bekäme das US-Format.
+String formatDateNumeric(DateTime d, String locale) {
+  final pattern = Intl.shortLocale(locale) == 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy';
+  return DateFormat(pattern, locale).format(d);
+}
+
 /// Formatierung von Terminzeiten in der Zeitzone des Betrachters.
 class Fmt {
   Fmt(this.context, this.zone)
