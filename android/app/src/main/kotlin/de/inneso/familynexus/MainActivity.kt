@@ -9,8 +9,12 @@ import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.ActivityNotFoundException
+import android.net.Uri
 import android.os.Build
 import android.os.PersistableBundle
+import androidx.browser.customtabs.CustomTabsClient
+import androidx.browser.customtabs.CustomTabsIntent
 
 /**
  * Android-Adapter. Enthält nur Plattformbrücken; keine Fachlogik.
@@ -21,8 +25,8 @@ class MainActivity : FlutterFragmentActivity() {
     private var initialLink: String? = null
 
     /**
-     * Nur familynexus://join-Links und der Rücksprung der Browser-Anmeldung (OAuth) mit begrenzter
-     * Länge werden an Dart weitergereicht.
+     * Nur familynexus://join-Links und der Rücksprung der Anmeldung beim Anbieter (OAuth; zugestellt über
+     * OAuthRedirectActivity, E-91) mit begrenzter Länge werden an Dart weitergereicht.
      */
     private fun linkFrom(intent: Intent?): String? {
         if (intent?.action != Intent.ACTION_VIEW) return null
@@ -32,6 +36,26 @@ class MainActivity : FlutterFragmentActivity() {
         if (!invite && !oauth) return null
         val text = data.toString()
         return if (text.length <= 2048) text else null
+    }
+
+    /**
+     * Anbieterseite im Custom Tab des Standardbrowsers (#268, E-91). Nur https und nur, wenn der Standardbrowser
+     * Custom Tabs anbietet (`getPackageName` prüft allein ihn); sonst `false`, Dart öffnet dann extern.
+     * Keine eingebettete Browseransicht (E-55).
+     */
+    private fun openCustomTab(url: String?): Boolean {
+        if (url == null) return false
+        val uri = Uri.parse(url)
+        if (uri.scheme != "https" || uri.host.isNullOrEmpty()) return false
+        val pkg = CustomTabsClient.getPackageName(this, null) ?: return false
+        val tab = CustomTabsIntent.Builder().build()
+        tab.intent.setPackage(pkg)
+        return try {
+            tab.launchUrl(this, uri)
+            true
+        } catch (e: ActivityNotFoundException) {
+            false
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -59,6 +83,7 @@ class MainActivity : FlutterFragmentActivity() {
                         result.success(initialLink)
                         initialLink = null
                     }
+                    "openCustomTab" -> result.success(openCustomTab(call.argument<String>("url")))
                     else -> result.notImplemented()
                 }
             }

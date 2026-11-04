@@ -2,6 +2,8 @@
 
 **Planversion: 1.0** (28.10.2026) · Dokument-ID `TP-FN-VR-121` · Reports nennen Planversion und Git-Commit (z. B. „TP-FN-VR-121 v1.0 @ 0281d70“).
 
+> **Hinweis (04.11.2026, #268/E-91):** Dieser Plan bleibt als Nachweis für 1.2.1 unverändert; er beschreibt die Anmeldung noch im Browser. Ab #268 laufen Anmeldung, Kontoanlage und Kontoseiten in der App (iOS/macOS: Anmeldefenster des Anbieters, Android: Custom Tab). Für die erneute Einreichung gelten die aktuellen Review-Notizen (`store/metadata/ios/review_notes.txt`, `store/metadata/macos/review_notes.txt`).
+
 Bezug: Anfrage von App Review (sechs Punkte und „Prevent Common Issues“, Wortlaut in Anhang C), `../Massnahmenplan_App_Store_Review.md` (Maßnahmen 1 bis 11), Gesamtplan `../Testplan_FamilyNexus.md` (TP-FN-001 v1.6), Review-Notizen `store/metadata/ios/review_notes.txt` bzw. `store/metadata/macos/review_notes.txt`, `docs/STORE.md` (Abschnitt 4), `docs/export-compliance/`, Issue #15.
 Soll-Version: `version:` in `pubspec.yaml` auf aktuellem `main` (beim Schreiben **1.2.1+22** = „1.2.1 (22)“). Maßgeblich ist der Build, der in App Store Connect zur Prüfung eingereicht ist bzw. wird.
 

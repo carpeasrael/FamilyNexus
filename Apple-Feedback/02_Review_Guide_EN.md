@@ -16,7 +16,7 @@ Use R1, the moderator account in App Store Connect's **Sign-in information**. It
 
 1. Launch FamilyNexus and select **I already have an account**.
 2. Leave the provider at **matrix.org** and select **Sign in at matrix.org**.
-3. Complete sign-in in the browser with the selected review account. If another account is already selected, sign out of that browser session first.
+3. Complete sign-in in the provider's sign-in sheet within the app with the selected review account.
 4. Return to FamilyNexus. On **Unlock this device**, enter the emergency key for that account and select **Unlock**.
 5. Wait for synchronization. The account should open the existing sample family, with the tabs **Today**, **Calendar**, **Chat**, **Shopping** and **Family**. Tasks are in the top-right menu.
 
@@ -45,9 +45,9 @@ The publisher should prepare at least one upcoming shared event, one recurring e
 
 ## Registration
 
-On a clean app session, select **Start a new family**, enter a display name, and select **Create account at matrix.org**. Complete the provider's account creation in the browser, including any email verification, terms or CAPTCHA it requests. Return to the app, select **Create emergency key**, securely store the key, check **I have stored the emergency key safely.**, and select **Next**. Enter the family name and select **Create family**. Invitations can be added immediately or later through **Family**.
+On a clean app session, select **Start a new family**, enter a display name, and select **Create account at matrix.org**. Complete the provider's account creation in the provider's sign-in sheet within the app, including any email verification, terms or CAPTCHA it requests. Return to the app, select **Create emergency key**, securely store the key, check **I have stored the emergency key safely.**, and select **Next**. Enter the family name and select **Create family**. Invitations can be added immediately or later through **Family**.
 
-Provider-controlled browser labels and verification steps can change. The publisher must verify this exact path on the submitted build before supplying the recording.
+Provider-controlled labels on the sign-in page and verification steps can change. The publisher must verify this exact path on the submitted build before supplying the recording.
 
 ## User-generated content: reporting and blocking
 
@@ -67,7 +67,7 @@ Use a disposable account for this test so the permanent review accounts remain a
 
 1. Menu → **Settings → Account → Delete account**.
 2. Review the warning. If the account is the only moderator of a family with other members, assign another moderator first to preserve family administration.
-3. With matrix.org browser authentication, select **Open deletion page**, complete deletion on the provider's account page, then return to FamilyNexus. Select **Check deletion** if the app has not yet completed the check automatically.
+3. With matrix.org (provider sign-in), select **Open deletion page**; the provider's account page opens within the app. Complete deletion there, close the page with **Cancel**, then return to FamilyNexus. Select **Check deletion** if the app has not yet completed the check automatically.
 4. After the provider session is no longer accepted, the app clears local data and returns to the welcome screen. Separately verify that the deleted account can no longer sign in at the provider; merely invalidating a session is not sufficient evidence of deletion.
 
 On supported password-based Matrix servers, the app instead asks for the password and offers **Delete account permanently**, using the server's account-deactivation API with its erase option. OAuth providers must expose a supported account-management page; an arbitrary provider is not guaranteed to support deletion through this app.

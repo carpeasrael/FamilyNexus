@@ -194,11 +194,11 @@ abstract class MatrixGateway implements Listenable {
   /// Bricht eine laufende Registrierung ab und vergisst das Passwort.
   void cancelRegistration();
 
-  /// Bereitet die Anmeldung bzw. Kontoanlage ([create]) beim Anbieter im Browser vor (OAuth) und
+  /// Bereitet die Anmeldung bzw. Kontoanlage ([create]) auf der Seite des Anbieters vor (OAuth) und
   /// liefert die zu öffnende Adresse. [redirectUri] ist die Rücksprungadresse der App.
   Future<Uri> startOAuth({required ServerUrl server, required Uri redirectUri, required bool create});
 
-  /// Schließt die Anmeldung mit der Rücksprungadresse ab, die der Browser geöffnet hat.
+  /// Schließt die Anmeldung mit der Rücksprungadresse ab, zu der die Seite des Anbieters zurückgesprungen ist.
   /// Fremder `state`: `oauthStateMismatch` (die Anmeldung bleibt offen); Abbruch beim Anbieter oder
   /// fehlender Code: `oauthCancelled`.
   Future<void> completeOAuth(Uri callback);

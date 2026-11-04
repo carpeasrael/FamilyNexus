@@ -145,7 +145,8 @@ void main() {
     await tester.tap(find.text('Zur Löschseite'));
     await tester.pumpAndSettle();
     expect(app.browser.opened.single.toString(), 'https://fake.test/account?action=org.matrix.account_deactivate');
-    expect(find.textContaining('kehre dann hierher zurück'), findsOneWidget);
+    expect(app.browser.inApp.single, isTrue, reason: 'Löschseite öffnet in der App (E-91)');
+    expect(find.textContaining('schließe sie (auf iPhone und Mac über „Abbrechen“) und kehre dann hierher zurück'), findsOneWidget);
 
     // Noch nicht beim Anbieter bestätigt.
     await tester.tap(find.text('Löschung prüfen'));
@@ -181,7 +182,7 @@ void main() {
     await _openDeletion(tester);
     await tester.tap(find.text('Zur Löschseite'));
     await tester.pumpAndSettle();
-    expect(find.text('Der Browser konnte nicht geöffnet werden.'), findsOneWidget);
+    expect(find.text('Die Seite des Anbieters konnte nicht geöffnet werden.'), findsOneWidget);
     expect(app.services.accountDeletionPending, isFalse);
   });
 

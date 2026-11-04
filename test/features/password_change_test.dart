@@ -329,15 +329,16 @@ void main() {
     testWidgets('TP-PW-10 Browser-Anmeldung: Kontoseite ohne Löschaktion, ohne Felder', (tester) async {
       final app = await _oauthApp(tester);
       expect(find.byType(TextField), findsNothing);
-      expect(find.text('Dein Passwort liegt bei deinem Anbieter. Du änderst es auf seiner Kontoseite im Browser.'), findsOneWidget);
+      expect(find.text('Dein Passwort liegt bei deinem Anbieter. Du änderst es auf seiner Kontoseite.'), findsOneWidget);
       app.browser.available = false;
       await tester.tap(find.widgetWithText(FilledButton, 'Kontoseite öffnen'));
       await tester.pumpAndSettle();
-      expect(find.text('Der Browser konnte nicht geöffnet werden.'), findsOneWidget);
+      expect(find.text('Die Seite des Anbieters konnte nicht geöffnet werden.'), findsOneWidget);
       app.browser.available = true;
       await tester.tap(find.widgetWithText(FilledButton, 'Kontoseite öffnen'));
       await tester.pumpAndSettle();
       expect(app.browser.opened, <Uri>[app.server.accountManagementPage!]);
+      expect(app.browser.inApp, <bool>[true], reason: 'Kontoseite öffnet in der App (E-91)');
       expect(find.byType(AlertDialog), findsNothing);
     });
 

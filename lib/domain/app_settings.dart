@@ -58,8 +58,8 @@ class AppSettings {
   final List<String> blockedUsers;
 
   /// Einladungslink, der vor der Anmeldung geöffnet wurde (E-56). Bleibt erhalten, falls das System
-  /// die App beendet, während die Person im Browser ihr Konto anlegt. Rohtext, wird beim Lesen erneut
-  /// streng geprüft (`InviteLink.check`).
+  /// die App beendet, während die Person auf der Seite des Anbieters ihr Konto anlegt. Rohtext, wird
+  /// beim Lesen erneut streng geprüft (`InviteLink.check`).
   final String? pendingInvite;
 
   AppSettings copyWith({

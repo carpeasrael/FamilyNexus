@@ -12,6 +12,7 @@ import 'package:family_nexus/domain/permissions.dart';
 import 'package:family_nexus/domain/tasks.dart';
 import 'package:family_nexus/features/tasks/tasks_controller.dart';
 import 'package:family_nexus/data/platform/file_access.dart';
+import 'package:family_nexus/data/platform/oauth_redirect.dart';
 import 'package:family_nexus/features/lock/app_lock_controller.dart';
 import 'package:family_nexus/data/platform/screen_protection.dart';
 import 'package:family_nexus/domain/data_inventory.dart';
@@ -46,6 +47,7 @@ class TestApp {
     required this.browser,
     required this.element,
     required this.oauth,
+    required this.oauthRedirect,
     required this.calendarRooms,
     required this.shoppingRooms,
     required this.taskRooms,
@@ -69,6 +71,9 @@ class TestApp {
   final FakeBrowser browser;
   final FakeElement element;
   final FakeOAuthRedirect oauth;
+
+  /// Tatsächlich an `AppServices` übergebener Rücksprung (Standard: [oauth]).
+  final OAuthRedirect oauthRedirect;
 
   /// Räume, die `AppServices` den Buildern übergeben hat, je Aufruf (#140).
   final List<String?> calendarRooms;
@@ -108,6 +113,8 @@ Future<TestApp> buildTestApp({
   // Test: Meldungen zu Chat und Einkauf und Zahl am App-Symbol (#254). Ohne Angabe wie im Browser: keine.
   ActivityPlatform? activity,
   AppBadge? badge,
+  // Test: eigener Rücksprung statt des Fakes (z. B. `SessionOAuthRedirect`, #268). `TestApp.oauth` bleibt der Fake.
+  OAuthRedirect? oauthRedirect,
 }) async {
   final store = MemoryKeyValueStore();
   if (lang != null) store.data['language'] = lang;
@@ -135,7 +142,7 @@ Future<TestApp> buildTestApp({
   final mail = FakeMailLauncher();
   final browser = FakeBrowser();
   final element = FakeElement();
-  final oauth = FakeOAuthRedirect();
+  final oauth = FakeOAuthRedirect(browser);
   final settingsController = await SettingsController.load(store);
   final calendarRooms = <String?>[];
   final shoppingRooms = <String?>[];
@@ -157,7 +164,7 @@ Future<TestApp> buildTestApp({
     mail: mail,
     browser: browser,
     element: element,
-    oauthRedirect: oauth,
+    oauthRedirect: oauthRedirect ?? oauth,
     // Standard-Anbieter ist im Test der Fake-Server (statt matrix.org), außer ein Test will den echten Standard.
     defaultProvider: matrixOrgDefault ? null : ServerUrl.tryParse(defaultProvider ?? fake.host),
     familyDataClaim: familyDataClaim,
@@ -224,6 +231,7 @@ Future<TestApp> buildTestApp({
     browser: browser,
     element: element,
     oauth: oauth,
+    oauthRedirect: oauthRedirect ?? oauth,
     calendarRooms: calendarRooms,
     shoppingRooms: shoppingRooms,
     taskRooms: taskRooms,

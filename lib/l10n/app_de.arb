@@ -552,7 +552,7 @@
   "deleteDataConfirm": "Endgültig löschen",
   "privacyTitle": "Datenschutzerklärung",
   "privacy1Title": "Wer verarbeitet deine Daten?",
-  "privacy1Body": "FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Verantwortlich für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server); er steht bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.",
+  "privacy1Body": "FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Verantwortlich für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server); er steht bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.",
   "privacy2Title": "Welche Daten gibt es?",
   "privacy2Body": "Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.",
   "@privacy2Body": {
@@ -591,7 +591,7 @@
   "@privacy7WipeWeb": {
     "description": "Abschnitt 7 im Browser: dort gibt es keine Erinnerungen (E-53, #225)."
   },
-  "privacy7Rest": "Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.",
+  "privacy7Rest": "Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.",
   "privacy8Title": "Kinder",
   "privacy8Body": "Kinder können Familienmitglieder sein. Dafür ist die Einwilligung der Sorgeberechtigten nötig; Konten Minderjähriger laufen über die Einladung und Bestätigung eines Moderators.",
   "privacy9Title": "Deine Rechte",
@@ -1154,7 +1154,7 @@
   "passwordChangeWrongCurrent": "Das aktuelle Passwort stimmt nicht.",
   "passwordChangeUncertain": "Keine Antwort vom Server. Wiederhole den Versuch. Meldet die App dann, das aktuelle Passwort stimme nicht, gilt dein neues Passwort bereits.",
   "passwordChangeUnavailable": "Dein Anbieter erlaubt keine Änderung des Passworts in der App.",
-  "passwordChangeBrowserBody": "Dein Passwort liegt bei deinem Anbieter. Du änderst es auf seiner Kontoseite im Browser.",
+  "passwordChangeBrowserBody": "Dein Passwort liegt bei deinem Anbieter. Du änderst es auf seiner Kontoseite.",
   "passwordChangeBrowserOpen": "Kontoseite öffnen",
   "passwordChanged": "Passwort geändert.",
   "regCreate": "Konto erstellen",
@@ -1180,10 +1180,14 @@
   "regTokenBody": "Dieser Anbieter gibt Konten nur mit einem Zugangscode frei. Du bekommst ihn vom Anbieter (nicht der Einladungslink der Familie).",
   "regTokenLabel": "Zugangscode des Anbieters",
   "regTokenWrong": "Der Code passt nicht. Bitte prüfe ihn.",
-  "regCaptchaBody": "Bitte bestätige im Browser kurz, dass du kein Roboter bist. Danach geht es hier automatisch weiter.",
-  "regCaptchaOpen": "Im Browser öffnen",
+  "regCaptchaBody": "Bitte bestätige auf der Seite des Anbieters kurz, dass du kein Roboter bist. Schließe die Seite danach (auf iPhone und Mac über „Abbrechen“); es geht hier automatisch weiter.",
+  "regCaptchaOpen": "Seite öffnen",
   "regCaptchaDone": "Ich bin fertig",
-  "regCaptchaNotYet": "Noch nicht abgeschlossen. Bitte beende die Bestätigung im Browser.",
+  "regCaptchaNotYet": "Noch nicht abgeschlossen. Bitte beende die Bestätigung auf der Seite des Anbieters.",
+  "regCaptchaNoPage": "Die Seite konnte nicht geöffnet werden. Bitte versuche es noch einmal.",
+  "@regCaptchaNoPage": {
+    "description": "Captcha bei der Kontoanlage: Die Seite des Anbieters ließ sich weder in der App noch extern öffnen (#268, E-91)."
+  },
   "regOAuthIntro": "Bei {host} legst du dein Konto auf der Seite des Anbieters an. Danach kommst du automatisch hierher zurück.",
   "@regOAuthIntro": {
     "placeholders": {
@@ -1248,8 +1252,9 @@
   "familyInviteServerHint": "Auf diesem Server legen Neulinge ihr Konto an und melden sich an. Leer lassen = dein Server. Der Familienraum bleibt, wo er ist.",
   "familyInviteServerApply": "Neuen Link erzeugen",
   "familyInviteServerInvalid": "Das ist keine gültige Server-Adresse.",
-  "oauthWaiting": "Bitte im Browser bei {host} fortfahren … Danach geht es hier automatisch weiter.",
+  "oauthWaiting": "Bitte auf der Seite von {host} fortfahren … Danach geht es hier automatisch weiter.",
   "@oauthWaiting": {
+    "description": "Während der Anmeldung auf der Seite des Anbieters (OAuth; in der App bzw. auf Linux/Windows im Browser, E-91).",
     "placeholders": {
       "host": {
         "type": "String"
@@ -1439,7 +1444,7 @@
   "errWeakPassword": "Das Passwort ist zu schwach. Bitte nimm ein sichereres Passwort.",
   "errRegistrationDisabled": "Bei diesem Anbieter kann die App kein Konto anlegen. Erstelle es auf seiner Webseite.",
   "errEmailInUse": "Diese E-Mail-Adresse wird schon für ein anderes Konto verwendet.",
-  "errOAuthCancelled": "Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal.",
+  "errOAuthCancelled": "Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.",
   "joinCardServerMismatch": "Achtung: Die Familie liegt bei {family}, die einladende Person aber bei {inviter}. Tritt nur bei, wenn du diese Einladung wirklich erwartet hast.",
   "@joinCardServerMismatch": {
     "placeholders": {
@@ -1754,13 +1759,13 @@
   "accountDeleteSoleModerator": "Du bist der einzige Moderator der Familie. Ernenne vorher ein anderes Mitglied zum Moderator, sonst kann niemand mehr die Familie verwalten.",
   "accountDeletePassword": "Passwort zur Bestätigung",
   "accountDeleteConfirm": "Konto endgültig löschen",
-  "accountDeleteBrowserIntro": "Die Löschung bestätigst du auf der Kontoseite deines Anbieters im Browser.",
-  "accountDeleteBrowserWait": "Bestätige die Löschung auf der Seite des Anbieters und kehre dann hierher zurück.",
+  "accountDeleteBrowserIntro": "Die Löschung bestätigst du auf der Kontoseite deines Anbieters.",
+  "accountDeleteBrowserWait": "Bestätige die Löschung auf der Seite des Anbieters, schließe sie (auf iPhone und Mac über „Abbrechen“) und kehre dann hierher zurück.",
   "accountDeleteOpen": "Zur Löschseite",
   "accountDeleteOpenAgain": "Seite erneut öffnen",
   "accountDeleteCheck": "Löschung prüfen",
   "accountDeleteStillActive": "Das Konto besteht noch. Schließe die Löschung auf der Seite des Anbieters ab.",
-  "accountDeleteNoBrowser": "Der Browser konnte nicht geöffnet werden.",
+  "accountDeleteNoBrowser": "Die Seite des Anbieters konnte nicht geöffnet werden.",
   "chatOpening": "Einzelchat wird geöffnet …",
   "chatOpenFailed": "Der Einzelchat konnte nicht geöffnet werden. Bitte versuche es erneut.",
   "chatBeforeJoin": "Ältere Nachrichten aus der Zeit vor deinem Beitritt sind nicht lesbar.",

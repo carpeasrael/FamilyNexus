@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:family_nexus/data/matrix/https_only_client.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/server_probe.dart';
+import 'package:family_nexus/data/platform/browser_launcher.dart';
 import 'package:family_nexus/data/platform/oauth_redirect.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -191,7 +192,7 @@ void main() {
 
   group('OAuth-Loopback-Empfänger (Desktop)', () {
     test('PT-N9: nur 127.0.0.1, nur GET /oauth, nach Abbruch geschlossen', () async {
-      final r = LoopbackOAuthRedirect();
+      final r = LoopbackOAuthRedirect(const SystemBrowserLauncher());
       final attempt = await r.prepare();
       final port = attempt.redirectUri.port;
       expect(attempt.redirectUri.host, '127.0.0.1');

@@ -15,8 +15,8 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
 
 - **Setup without technical terms** (E-55–E-57): three entry points – *start a new family*, *I was invited*, *I already
   have an account*. Accounts are created in the app (username suggested from your name, availability checked live; terms,
-  email confirmation, invitation codes and captchas are guided) or, on providers with browser sign-in such as matrix.org,
-  on the provider's page with an automatic return to the app. The provider is preselected and checked automatically;
+  email confirmation, invitation codes and captchas are guided) or, on providers with their own sign-in page such as
+  matrix.org, on the provider's page (on iOS, macOS and Android inside the app) with an automatic return to the app. The provider is preselected and checked automatically;
   changing it is under *Advanced*. An invitation link takes newcomers straight to *create account* at the inviter's
   provider and then to a join card that names the inviting person and their provider (not the family, E-79). The mandatory key backup is the **emergency key** (copy with
   auto-clearing clipboard, or save as a printable file).

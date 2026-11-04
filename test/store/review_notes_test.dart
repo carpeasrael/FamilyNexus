@@ -43,5 +43,15 @@ void main() {
       expect(notes, contains('Delete account'));
       expect(notes.length, lessThanOrEqualTo(4000));
     });
+
+    test('Review-Notizen $platform: Anmeldung in der App, kein Browser mehr (#268, E-91)', () {
+      final notes = File('store/metadata/$platform/review_notes.txt').readAsStringSync();
+      expect(notes.toLowerCase(), isNot(contains('browser')), reason: 'auch „→ browser →“ und „Browser öffnet sich“');
+      expect(notes, isNot(contains('sign out there first')));
+      expect(notes, isNot(contains('zuerst abmelden')));
+      expect(notes, contains('within the app'));
+      expect(notes, contains('in der App'));
+      if (platform == 'macos') expect(notes, isNot(contains('network.server')));
+    });
   }
 }

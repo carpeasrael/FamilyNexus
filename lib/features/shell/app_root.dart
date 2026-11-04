@@ -63,7 +63,7 @@ class _AppRootState extends State<AppRoot> {
 
   /// Einladungslink (Deep Link/QR): streng prüfen, nie automatisch handeln – nur vormerken.
   void _handleLink(AppServices services, String raw) {
-    // Rücksprung der Browser-Anmeldung: gehört dem wartenden OAuthRedirect, keine Einladung.
+    // Rücksprung der Anmeldung beim Anbieter (OAuth): gehört dem wartenden OAuthRedirect, keine Einladung.
     if (AppLinkOAuthRedirect.isCallback(raw)) return;
     final l = AppLocalizations.of(context);
     final ownHost = MatrixIds.serverName(services.gateway.userId ?? '');

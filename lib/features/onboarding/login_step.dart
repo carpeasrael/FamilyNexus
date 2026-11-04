@@ -11,8 +11,8 @@ import 'browser_sign_in.dart';
 import 'provider_controller.dart';
 import 'provider_section.dart';
 
-/// „Anmelden“ mit einem bestehenden Konto. Auf Anbietern mit Browser-Anmeldung (OAuth) öffnet sich
-/// deren Seite; sonst Benutzername und Passwort. Eine vollständige ID (`@anna:beispiel.de`) wählt den
+/// „Anmelden“ mit einem bestehenden Konto. Auf Anbietern mit Anmeldung beim Anbieter (OAuth) öffnet sich
+/// dessen Seite (in der App, E-91); sonst Benutzername und Passwort. Eine vollständige ID (`@anna:beispiel.de`) wählt den
 /// Anbieter selbst aus.
 class LoginStep extends StatefulWidget {
   const LoginStep({super.key, required this.provider, this.initialUsername, required this.onCreate});

@@ -47,9 +47,20 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="familynexus" android:host="join"/>
             </intent-filter>
-            <!-- Rücksprung der Anmeldung im Browser (OAuth, E-55). Nur Code und state; die App prüft
+        </activity>
+        <!-- Nimmt den OAuth-Rücksprung an und reicht ihn an MainActivity weiter (räumt den Custom Tab ab, E-91).
+             Ohne Oberfläche, nicht in den letzten Apps. -->
+        <activity
+            android:name=".OAuthRedirectActivity"
+            android:exported="true"
+            android:noHistory="true"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <!-- Rücksprung der Anmeldung beim Anbieter (OAuth, E-55, E-91). Nur Code und state; die App prüft
                  den state gegen die eigene, gerade begonnene Anmeldung. Ohne Host wertet Android den Pfad im
-                 Filter nicht aus; die Pfadprüfung macht MainActivity.linkFrom (nur /oauth erreicht Dart). -->
+                 Filter nicht aus; die Pfadprüfung machen OAuthRedirectActivity und MainActivity.linkFrom
+                 (nur /oauth erreicht Dart). -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -86,6 +97,11 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Browser mit Custom Tabs sichtbar machen (ab Android 11), damit Anbieterseiten im Custom Tab des
+             Standardbrowsers öffnen können (E-91). -->
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabsService"/>
         </intent>
     </queries>
 </manifest>

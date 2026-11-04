@@ -28,7 +28,7 @@ Alle Angaben in `[...]` im Antworttext sind Platzhalter. Die Datei ist ein **Ent
 | `STOREFRONTS` | Tatsächliche Länderfreigabe laut App Store Connect, insbesondere Entscheidung zu Frankreich |
 | `RIGHTS_AND_EXPORT_STATUS` | Bestätigter Stand der Lizenzprüfung und der Verschlüsselungsunterlagen; nur tatsächlich vorhandene Anlagen oder Vorgänge nennen |
 
-Die Vorlagen setzen wie der bestehende Verifikationsplan **matrix.org** für die Prüfkonten voraus. Bei einem anderen Anbieter Serveradresse, Anmeldeschritte, Registrierung, Löschung, Diensteübersicht und Video gemeinsam anpassen. Ein eigener Testserver mit Passwort-Anmeldung belegt den Browserablauf bei matrix.org nicht.
+Die Vorlagen setzen wie der bestehende Verifikationsplan **matrix.org** für die Prüfkonten voraus. Bei einem anderen Anbieter Serveradresse, Anmeldeschritte, Registrierung, Löschung, Diensteübersicht und Video gemeinsam anpassen. Ein eigener Testserver mit Passwort-Anmeldung belegt den Ablauf auf der Anbieterseite in der App (Anmeldefenster) bei matrix.org nicht.
 
 Ausgefüllte Kopien mit Zugangsdaten nur im bereits von Git ausgeschlossenen Verzeichnis `secure/` oder im Passwortmanager speichern. Keine echten Passwörter oder Notfall-Schlüssel in diese Dokumente committen. R1 und R2 müssen während der gesamten Review verfügbar bleiben; nur ein separates Wegwerfkonto im Video löschen.
 

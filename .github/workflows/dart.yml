@@ -127,3 +127,35 @@ jobs:
           if ($first.HasExited) { throw "Die erste Instanz wurde durch die zweite beendet" }
           Write-Host "Schema registriert, zweite Instanz übergibt den Link und beendet sich (Exit $($second.ExitCode))"
           $first.Kill()
+
+  # Übersetzt den Swift-Code von iOS und macOS (AppDelegate.swift, MainFlutterWindow.swift) schon im PR (#268, E-91).
+  # Kein Release: Debug-Builds ohne Signatur (macOS ad hoc, CODE_SIGN_IDENTITY "-"), kein Upload.
+  apple:
+    runs-on: macos-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.7"
+          channel: stable
+          cache: true
+
+      # vodozemac (cryptography) is built from source via Rust during the iOS and macOS builds.
+      - name: Install Rust toolchain
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup target add aarch64-apple-ios aarch64-apple-darwin x86_64-apple-darwin
+
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          flutter gen-l10n
+
+      - name: Build macOS debug app
+        run: flutter build macos --debug
+
+      - name: Build iOS debug app (no codesign)
+        run: flutter build ios --debug --no-codesign

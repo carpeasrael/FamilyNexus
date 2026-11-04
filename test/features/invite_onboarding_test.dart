@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
+import 'package:family_nexus/data/platform/oauth_redirect.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/registration.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/fake_browser.dart';
 import '../support/fake_matrix.dart';
 import '../support/registration_form.dart';
 import '../support/test_app.dart';
@@ -308,7 +310,7 @@ void main() {
       expect(find.widgetWithText(TextField, 'Passwort'), findsNothing, reason: 'Passwort nur beim Anbieter');
       await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), 'Greta');
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
-      expect(find.textContaining('Bitte im Browser bei fake.test fortfahren'), findsOneWidget);
+      expect(find.textContaining('Bitte auf der Seite von fake.test fortfahren'), findsOneWidget);
       final opened = app.browser.opened.single;
       expect(opened.queryParameters['prompt'], 'create');
       expect(opened.scheme, 'https');
@@ -331,7 +333,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
       expect(app.gateway.session, SessionState.loggedOut, reason: 'fremder Rücksprung meldet nie an');
-      expect(find.textContaining('Bitte im Browser bei fake.test fortfahren'), findsOneWidget, reason: 'weiter warten');
+      expect(find.textContaining('Bitte auf der Seite von fake.test fortfahren'), findsOneWidget, reason: 'weiter warten');
       app.oauth.deliver(app.gateway.oauthCallback('greta'));
       await tester.pumpAndSettle();
       expect(app.gateway.userId, '@greta:fake.test');
@@ -363,7 +365,7 @@ void main() {
       await _tap(tester, 'Neue Familie gründen');
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
       await _tap(tester, 'Abbrechen');
-      expect(find.text('Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal.'), findsOneWidget);
+      expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.'), findsOneWidget);
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
       app.oauth.deliver(app.gateway.oauthCallback('x', denied: true));
       await tester.pumpAndSettle();
@@ -378,7 +380,7 @@ void main() {
       await _pump(tester, app);
       await _tap(tester, 'Neue Familie gründen');
       await _tap(tester, 'Konto bei fake.test erstellen');
-      expect(find.text('Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal.'), findsOneWidget);
+      expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.'), findsOneWidget);
     });
 
     testWidgets('TP-OAUTH-05 Anmelden mit bestehendem Konto über den Browser (ohne prompt=create)', (tester) async {
@@ -394,6 +396,59 @@ void main() {
       expect(app.gateway.userId, '@anna:fake.test');
       expect(find.text('Familie „Familie Test“ gefunden – du bist bereits Mitglied. Die Einrichtung wird abgeschlossen.'), findsNothing,
           reason: 'Anna hat in diesem Test noch keine Familie');
+    });
+  });
+
+  group('Anmeldung in der Anmeldesitzung des Systems (iOS/macOS, #268, E-91)', () {
+    Future<(TestApp, FakeWebAuthSession)> sessionApp(WidgetTester tester) async {
+      final session = FakeWebAuthSession();
+      final app = await buildTestApp(loggedIn: false, oauthRedirect: SessionOAuthRedirect(session));
+      app.server.registrationMode = RegistrationMode.oauth;
+      await _pump(tester, app);
+      return (app, session);
+    }
+
+    testWidgets('Seite öffnet in der Sitzung (nicht im Browser), der Rücksprung meldet an', (tester) async {
+      final (app, session) = await sessionApp(tester);
+      await _tap(tester, 'Neue Familie gründen');
+      await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), 'Greta');
+      await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
+      expect(app.browser.opened, isEmpty, reason: 'kein externer Browser');
+      final start = session.starts.single;
+      expect(start.uri.queryParameters['prompt'], 'create');
+      expect(start.scheme, 'io.github.carpeasrael.familynexus');
+      expect(find.textContaining('Bitte auf der Seite von fake.test fortfahren'), findsOneWidget);
+      session.finish(app.gateway.oauthCallback('greta'));
+      await tester.pumpAndSettle();
+      expect(app.gateway.userId, '@greta:fake.test');
+      expect(find.text('Notfall-Schlüssel erstellen'), findsOneWidget);
+    });
+
+    testWidgets('„Abbrechen“ in der Sitzung → Meldung, erneut möglich', (tester) async {
+      final (app, session) = await sessionApp(tester);
+      await _tap(tester, 'Ich habe schon ein Konto');
+      await _tap(tester, 'Bei fake.test anmelden', settle: false);
+      session.finish(null);
+      await tester.pumpAndSettle();
+      expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.'), findsOneWidget);
+      expect(app.gateway.session, SessionState.loggedOut);
+      await _tap(tester, 'Bei fake.test anmelden', settle: false);
+      expect(session.starts, hasLength(2));
+      session.finish(app.gateway.oauthCallback('anna'));
+      await tester.pumpAndSettle();
+      expect(app.gateway.userId, '@anna:fake.test');
+    });
+
+    testWidgets('Rücksprung mit fremdem state beendet den Versuch sofort mit Meldung (kein Warten)', (tester) async {
+      final (app, session) = await sessionApp(tester);
+      await _tap(tester, 'Ich habe schon ein Konto');
+      await _tap(tester, 'Bei fake.test anmelden', settle: false);
+      session.finish(app.gateway.oauthCallback('mallory', state: 'gefälscht'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(app.gateway.session, SessionState.loggedOut, reason: 'fremder Rücksprung meldet nie an');
+      expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.'), findsOneWidget);
+      expect(find.textContaining('Bitte auf der Seite von fake.test fortfahren'), findsNothing);
     });
   });
 

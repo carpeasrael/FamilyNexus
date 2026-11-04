@@ -1176,7 +1176,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy1Body =>
-      'FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. Responsible for processing on the server is the operator of the provider you chose (Matrix server); it is shown during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that sign you in via the browser (e.g. matrix.org) you enter these details directly on their page.';
+      'FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. Responsible for processing on the server is the operator of the provider you chose (Matrix server); it is shown during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that have their own sign-in page (e.g. matrix.org) you enter these details directly on their page.';
 
   @override
   String get privacy2Title => 'What data exists?';
@@ -1267,7 +1267,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy7Rest =>
-      '“Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.';
+      '“Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that have their own sign-in page (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.';
 
   @override
   String get privacy8Title => 'Children';
@@ -2031,7 +2031,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordChangeBrowserBody =>
-      'Your password is held by your provider. You change it on their account page in the browser.';
+      'Your password is held by your provider. You change it on their account page.';
 
   @override
   String get passwordChangeBrowserOpen => 'Open account page';
@@ -2094,17 +2094,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regCaptchaBody =>
-      'Please confirm briefly in the browser that you are not a robot. Afterwards you continue here automatically.';
+      'Please confirm briefly on the provider\'s page that you are not a robot. Then close the page (on iPhone and Mac with “Cancel”); you continue here automatically.';
 
   @override
-  String get regCaptchaOpen => 'Open in browser';
+  String get regCaptchaOpen => 'Open page';
 
   @override
   String get regCaptchaDone => 'I am done';
 
   @override
   String get regCaptchaNotYet =>
-      'Not finished yet. Please complete the check in the browser.';
+      'Not finished yet. Please complete the check on the provider\'s page.';
+
+  @override
+  String get regCaptchaNoPage =>
+      'The page could not be opened. Please try again.';
 
   @override
   String regOAuthIntro(String host) {
@@ -2209,7 +2213,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String oauthWaiting(String host) {
-    return 'Please continue in the browser at $host … Afterwards you continue here automatically.';
+    return 'Please continue on the page of $host … Afterwards you continue here automatically.';
   }
 
   @override
@@ -2462,7 +2466,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errOAuthCancelled =>
-      'The sign-in in the browser was not completed. Please try again.';
+      'The sign-in at the provider was not completed. Please try again.';
 
   @override
   String joinCardServerMismatch(String family, String inviter) {
@@ -2946,11 +2950,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountDeleteBrowserIntro =>
-      'You confirm the deletion on your provider\'s account page in the browser.';
+      'You confirm the deletion on your provider\'s account page.';
 
   @override
   String get accountDeleteBrowserWait =>
-      'Confirm the deletion on the provider\'s page, then come back here.';
+      'Confirm the deletion on the provider\'s page, close it (on iPhone and Mac with “Cancel”) and then come back here.';
 
   @override
   String get accountDeleteOpen => 'Open deletion page';
@@ -2966,7 +2970,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'The account still exists. Finish the deletion on the provider\'s page.';
 
   @override
-  String get accountDeleteNoBrowser => 'The browser could not be opened.';
+  String get accountDeleteNoBrowser =>
+      'The provider\'s page could not be opened.';
 
   @override
   String get chatOpening => 'Opening direct chat …';

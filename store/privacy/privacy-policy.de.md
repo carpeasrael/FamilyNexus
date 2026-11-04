@@ -7,8 +7,8 @@
 FamilyNexus ist ein Familienkalender und Messenger mit gemeinsamer Einkaufs- und
 Aufgabenverwaltung. Diese Erklärung beschreibt die Verarbeitung personenbezogener
 Daten auf den genannten Plattformen. Unterschiede sind ausdrücklich angegeben.
-Browserseiten, die du aus einer nativen App heraus öffnest, werden in Abschnitt 8
-berücksichtigt.
+Anbieterseiten, die die App öffnet (Anmeldung, Kontoanlage, Kontoseiten), werden in
+Abschnitt 8 berücksichtigt.
 
 ## 1. Herausgeber, Verantwortlichkeit und Kontakt
 
@@ -41,7 +41,7 @@ teilen oder die dein Anbieter zur Synchronisierung bereitstellt.
 
 | Daten | Zweck und Verarbeitung |
 |---|---|
-| Benutzername, Matrix-Konto-ID, Anzeigename, Anbieteradresse; bei Registrierung gegebenenfalls E-Mail-Adresse, Passwort und Bestätigungsschritte | Konto anlegen und anmelden, Profil zuordnen und Zugang zum Anbieter herstellen. Bei Browseranmeldung werden die Angaben auf dessen Seite eingegeben. |
+| Benutzername, Matrix-Konto-ID, Anzeigename, Anbieteradresse; bei Registrierung gegebenenfalls E-Mail-Adresse, Passwort und Bestätigungsschritte | Konto anlegen und anmelden, Profil zuordnen und Zugang zum Anbieter herstellen. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) werden die Angaben direkt auf dessen Seite eingegeben. |
 | Gerätekennungen und -namen, Zugriffstoken, gegebenenfalls Aktualisierungstoken, Verifizierungsinformationen und kryptografische Schlüssel | Anmeldung aufrechterhalten, eigene Geräte verbinden, Inhalte ver- und entschlüsseln, Geräte überprüfen und Schlüssel wiederherstellen. |
 | Nachrichten, Antworten, Reaktionen und ausgewählte Dateianhänge einschließlich Dateinamen | Familienchat und Einzelchats zwischen Familienmitgliedern. |
 | Gemeinsame und private Termine, Titel, Orte, Notizen, Zeiten, Zeitzonen, Wiederholungen und Zu- oder Absagen | Kalender, Terminabstimmung und lokale Erinnerungen. Ein eingegebener Terminort ist keine Erfassung des Gerätestandorts. |
@@ -198,10 +198,16 @@ Auskunft über sämtliche Serverprotokolle oder Backups deines Anbieters.
 
 ## 8. Externe Seiten, Stores und weitere Anbieter
 
-Bei einer browsergestützten Anmeldung oder Kontolöschung öffnet die App die vom
-gewählten Anbieter bereitgestellte Seite. Dort können weitere Dienste für
-Anmeldung, E-Mail-Bestätigung oder CAPTCHA beteiligt sein. Diese Verarbeitung
-richtet sich nach den Hinweisen des jeweiligen Anbieters.
+Bei Anbietern mit eigener Anmeldeseite öffnet die App für Anmeldung, Kontoanlage,
+Kontolöschung und Passwortänderung die vom gewählten Anbieter bereitgestellte
+Seite. Auf iOS und macOS öffnet sie in einem Anmeldefenster des Systems
+(ASWebAuthenticationSession); bei dessen Standardausführung ohne gemeinsame
+Browserdaten. Auf Android öffnet sie in der Regel in einem Custom Tab des
+Standardbrowsers, wenn dieser Custom Tabs anbietet (mit den Cookies dieses
+Browsers), sonst im Standardbrowser selbst; auf Linux und Windows im Browser.
+Dort können weitere Dienste für Anmeldung, E-Mail-Bestätigung oder CAPTCHA
+beteiligt sein. Diese Verarbeitung richtet sich nach den Hinweisen des jeweiligen
+Anbieters.
 
 Einladungslinks können die GitHub-Pages-Seite
 `https://carpeasrael.github.io/FamilyNexus/join/` öffnen. Beim Seitenabruf werden
@@ -307,8 +313,8 @@ jeweilige Betreiber. Die App legt keine einheitliche Frist für fremde Server fe
 
 **Konto löschen:** Unter **Einstellungen → Konto → Konto löschen** kannst du die
 Löschung beim Anbieter anstoßen. Bei klassischer Matrix-Anmeldung fordert die App
-eine Kontodeaktivierung mit Löschwunsch (`erase`) an. Bei browsergestützter
-Kontoverwaltung erfolgt die Bestätigung auf der Anbieterseite. Nach bestätigtem
+eine Kontodeaktivierung mit Löschwunsch (`erase`) an. Bei Kontoverwaltung
+auf der Seite des Anbieters erfolgt die Bestätigung auf der Anbieterseite. Nach bestätigtem
 Abschluss werden die lokalen Kontodaten bereinigt. Welche Serverdaten tatsächlich
 gelöscht oder weiter aufbewahrt werden, richtet sich nach dem Anbieter und
 gegebenenfalls bestehenden gesetzlichen Pflichten.
