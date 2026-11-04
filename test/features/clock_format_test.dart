@@ -60,4 +60,13 @@ void main() {
     expect(keyFileDate(d, 'de'), '31.10.2026');
     expect(keyFileDate(d, 'en'), '10/31/2026');
   });
+
+  test('#260: numerische Daten mit führender Null bei einstelligem Tag/Monat', () {
+    final d = DateTime(2026, 11, 3);
+    expect(keyFileDate(d, 'de'), '03.11.2026');
+    expect(keyFileDate(d, 'en'), '11/03/2026');
+    expect(formatDateNumeric(DateTime(2026, 1, 5), 'de'), '05.01.2026');
+    expect(formatDateNumeric(DateTime(2026, 1, 5), 'en'), '01/05/2026');
+    expect(formatDateNumeric(DateTime(2026, 1, 5), 'de-DE'), '05.01.2026');
+  });
 }
