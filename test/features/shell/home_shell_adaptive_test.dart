@@ -134,6 +134,18 @@ void main() {
       });
     }
 
+    testWidgets('useCompactWidth: nur die Breite wird 400, die Höhe bleibt; untere Leiste statt Rail', (tester) async {
+      await _start(tester, const Size(900, 2400));
+      expect(find.byType(NavigationRail), findsOneWidget, reason: '900 breit ist medium');
+      await useCompactWidth(tester);
+      await tester.pumpAndSettle();
+      expect(tester.view.physicalSize, const Size(400, 2400));
+      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(find.byType(NavigationRail), findsNothing);
+      await _tab(tester, 'Chat');
+      expect(find.byType(ChatScreen), findsOneWidget);
+    });
+
     testWidgets('Touch-Ziele der Ziele sind mindestens 48 × 48 (Leiste und Rail)', (tester) async {
       for (final size in const <Size>[Size(390, 844), Size(800, 1280)]) {
         await _start(tester, size);
