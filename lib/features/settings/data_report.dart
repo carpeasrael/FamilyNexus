@@ -4,6 +4,7 @@ import '../../domain/data_inventory.dart';
 import '../../domain/event_codec.dart';
 import '../../domain/family.dart';
 import '../../domain/reaction_codec.dart';
+import '../../domain/server.dart';
 import '../../domain/shopping.dart';
 import '../../domain/tasks.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -196,8 +197,13 @@ class DataReport {
       ..writeln(l.reportOnlineNote);
 
     _heading(b, l.reportSectionAccount);
+    b.writeln('${l.settingsServer}: ${inventory.server}');
+    // Nur wenn die Anmeldung über `.well-known` auf einen anderen Homeserver umgeleitet wurde (#259).
+    final homeserver = inventory.homeserver;
+    if (homeserver != null && ServerUrl.tryParse(homeserver) != ServerUrl.tryParse(inventory.server)) {
+      b.writeln('${l.reportHomeserver}: $homeserver');
+    }
     b
-      ..writeln('${l.settingsServer}: ${inventory.server}')
       ..writeln('${l.accountUsername}: ${inventory.userId}')
       ..writeln('${l.reportDisplayName}: ${inventory.displayName ?? l.reportNotSet}')
       ..writeln('${l.reportAvatar}: ${inventory.hasAvatar ? l.reportYes : l.reportNo}');

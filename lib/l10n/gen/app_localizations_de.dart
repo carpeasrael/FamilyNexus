@@ -2818,6 +2818,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reportSectionAccount => 'Konto';
 
   @override
+  String get reportHomeserver => 'Homeserver (über .well-known ermittelt)';
+
+  @override
   String get reportDisplayName => 'Anzeigename';
 
   @override

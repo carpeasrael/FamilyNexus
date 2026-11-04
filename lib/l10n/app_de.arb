@@ -1678,6 +1678,7 @@
   "reportMemoryOnly": "Nie gespeichert, nur im Arbeitsspeicher: Online-Status der Familienmitglieder.",
   "reportOsReminders": "Geplante Erinnerungen liegen zusätzlich beim Betriebssystem.",
   "reportSectionAccount": "Konto",
+  "reportHomeserver": "Homeserver (über .well-known ermittelt)",
   "reportDisplayName": "Anzeigename",
   "reportAvatar": "Profilbild",
   "reportYes": "ja",

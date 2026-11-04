@@ -1669,6 +1669,7 @@
   "reportMemoryOnly": "Never stored, only kept in memory: family members' online status.",
   "reportOsReminders": "Scheduled reminders are additionally held by the operating system.",
   "reportSectionAccount": "Account",
+  "reportHomeserver": "Homeserver (resolved via .well-known)",
   "reportDisplayName": "Display name",
   "reportAvatar": "Profile picture",
   "reportYes": "yes",

@@ -31,6 +31,11 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 
 ## Bekannte Einschränkungen
 
+- **Adaptive Tablet-Nutzung (REQ-TABLET-01, erfasst 2026-11-04):** Automatische Anpassung an Tabletgröße sowie
+  Hoch- und Querformat ist als [Requirement mit Abnahmekriterien](PLAN.md#requirement-req-tablet-01--tablet-nutzung-in-hoch--und-querformat)
+  erfasst und noch umzusetzen bzw. abzunehmen. Die iOS-Konfiguration beschränkt die App derzeit auf iPhones
+  (`TARGETED_DEVICE_FAMILY = 1`); native iPad-Unterstützung gehört zum Umfang der Anforderung.
+
 - **Aufgabenlisten mit neuen Regeln oder Erklärung (E-58)** sind für App-Versionen vor dieser Änderung unsichtbar (Format v2); umgestellte Listen bleiben dort auf der letzten v1-Fassung stehen. Bearbeitet ein Moderator mit älterer App eine umgestellte Liste, gehen Regel und Erklärung verloren.
 
 - **Beitritt per Einladungslink (E-78):**

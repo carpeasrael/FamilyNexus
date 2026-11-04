@@ -22,6 +22,7 @@ import '../../domain/calendar_signal.dart';
 import '../../domain/data_inventory.dart';
 import '../../domain/event_codec.dart';
 import '../../domain/family_code.dart';
+import '../../domain/key_value_store.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/invite_ticket.dart';
 import '../../domain/moderation.dart';
@@ -75,6 +76,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     @visibleForTesting this._joinOpTimeout = roomOpTimeout,
     @visibleForTesting this._joinPollInterval = rejectionPollInterval,
     @visibleForTesting this._participantsRetryBase = participantsRetryDelay,
+    this._accountStore,
   })  : assert(_participantsRetryBase > Duration.zero),
         _probe = probe ?? ServerProbe(),
         _http = HttpsOnlyClient(httpClient);
@@ -107,6 +109,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   final KeyStore _keyStore;
   final ServerProbe _probe;
+
+  /// Ablage der eingegebenen Anbieter-Adresse in der App-Datenbank (#259, E-90); ohne Ablage nur im Speicher.
+  final KeyValueStore? _accountStore;
   final String? _dbDirectory;
 
   /// Alle Verbindungen des SDK laufen über diesen Client: nur https, keine Weiterleitungen.
@@ -308,10 +313,95 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   String? get userId => _client?.userID;
 
+  /// Die eingegebene Anbieter-Adresse, sofern sie zu Konto und aufgelöster Basis der Sitzung passt (#259, E-90);
+  /// sonst (Altsitzung, fremder Eintrag) der aufgelöste Homeserver. Technisch genutzt wird immer die Basis.
   @override
   ServerUrl? get server {
-    final hs = _client?.homeserver;
+    final c = _client;
+    final base = _baseOf(c);
+    final p = _provider;
+    if (c == null || base == null || p == null) return base;
+    return p.userId == c.userID && p.base == base ? p.entered : base;
+  }
+
+  // -------------------------------------------- Eingegebene Anbieter-Adresse (#259, E-90)
+
+  /// Schlüssel in der App-Datenbank (Tabelle settings) für Konto, eingegebene Adresse und aufgelöste Basis.
+  static const String accountProviderKey = 'accountProvider';
+
+  /// Gilt für die laufende Sitzung, solange Konto und Basis übereinstimmen (siehe [server]).
+  _Provider? _provider;
+
+  /// Ein Eintrag kann in der Ablage stehen (gesetzt, gelesen oder nicht lesbar): Ein Sitzungsende löscht ihn dann.
+  bool _providerMaybeStored = false;
+  StreamSubscription<SessionClearReason>? _clearedSub;
+
+  static ServerUrl? _baseOf(Client? c) {
+    final hs = c?.homeserver;
     return hs == null ? null : ServerUrl.tryParse(hs.toString());
+  }
+
+  /// Übernimmt das an einen Anmeldevorgang gebundene Paar, wenn die Sitzung steht und ihre Basis passt.
+  Future<void> _adoptProvider(Client client, _Entered? pair) async {
+    final user = client.userID;
+    if (pair == null || !client.isLogged() || user == null) return;
+    final base = _baseOf(client);
+    if (base == null || base != pair.base) return;
+    _provider = (userId: user, entered: pair.entered, base: base);
+    final store = _accountStore;
+    if (store == null) return;
+    _providerMaybeStored = true;
+    try {
+      await store.write(
+        accountProviderKey,
+        json.encode(<String, String>{'user_id': user, 'entered': pair.entered.toString(), 'base': base.toString()}),
+      );
+    } catch (e) {
+      AppLog.e('gateway', 'Anbieter-Adresse nicht gespeichert', e);
+    }
+  }
+
+  /// Liest den Eintrag beim Wiederherstellen; ein Lesefehler bricht den Start nicht ab (E-82).
+  Future<void> _loadProvider() async {
+    final store = _accountStore;
+    if (store == null) return;
+    try {
+      final raw = (await store.readAll())[accountProviderKey];
+      _providerMaybeStored = raw != null;
+      _provider = raw == null ? null : _decodeProvider(raw);
+    } catch (e) {
+      AppLog.e('gateway', 'Anbieter-Adresse nicht lesbar', e);
+      _providerMaybeStored = true;
+    }
+  }
+
+  static _Provider? _decodeProvider(String raw) {
+    try {
+      final m = json.decode(raw);
+      if (m is! Map<String, Object?>) return null;
+      final user = m['user_id'];
+      final entered = m['entered'];
+      final base = m['base'];
+      if (user is! String || entered is! String || base is! String) return null;
+      final e = ServerUrl.tryParse(entered);
+      final b = ServerUrl.tryParse(base);
+      return e == null || b == null ? null : (userId: user, entered: e, base: b);
+    } on FormatException {
+      return null;
+    }
+  }
+
+  /// Vergisst die Anbieter-Adresse (Sitzungsende): erst das Feld, dann die Ablage. Idempotent; Fehler nur im Log.
+  Future<void> _forgetProvider() async {
+    final had = _provider != null || _providerMaybeStored;
+    _provider = null;
+    if (!had) return;
+    _providerMaybeStored = false;
+    try {
+      await _accountStore?.delete(accountProviderKey);
+    } catch (e) {
+      AppLog.e('gateway', 'Anbieter-Adresse nicht gelöscht', e);
+    }
   }
 
   @override
@@ -464,6 +554,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     );
     _verificationSub = client.onKeyVerificationRequest.stream.listen(_onIncomingVerification);
     _toDeviceSub = client.onToDeviceEvent.stream.listen(_onToDevice);
+    // Jedes Sitzungsende im SDK (ungültiges Token, gescheitertes `init`, Abmelden …) endet in `clear()` (#259).
+    _clearedSub = client.onSessionCleared.stream.listen((_) => _forgetProvider());
     return client;
   }
 
@@ -510,6 +602,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         AppLog.e('gateway', 'Matrix-Datenbank nicht verfügbar', e);
         throw const SessionRestoreException(sessionLost: false);
       }
+      // Vor `init`: Schon der erste Abgleich zeigt die eingegebene Adresse; die Bindung prüft [server] (#259).
+      await _loadProvider();
       if (!client.isLogged()) {
         // Der Startwert wird erst nach `init` lesbar; der erste echte Sync wartet darauf (#254).
         final seed = Completer<DateTime?>();
@@ -517,6 +611,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         try {
           await client.init(waitForFirstSync: false);
           seed.complete(_readLiveSeed(client).catchError((Object _) => null));
+          // Keine gespeicherte Sitzung: Ein übrig gebliebener Eintrag gehört zu keinem Konto mehr.
+          if (!client.isLogged()) await _forgetProvider();
         } on ClientInitPreconditionError catch (e) {
           if (!seed.isCompleted) seed.complete(null);
           AppLog.e('gateway', 'Sitzung konnte nicht geladen werden', e);
@@ -561,8 +657,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   /// Setzt den Homeserver des SDK auf die geprüfte Adresse. Das SDK darf keine eigene
   /// `.well-known`-Abfrage machen (ungeprüfte Ziele, Weiterleitungen, Zwischenspeicherung).
-  /// Mit [oauth] liefert es die dabei abgerufenen OAuth-Metadaten (`null`, wenn keine abrufbar waren).
-  Future<GetAuthMetadataResponse?> _useHomeserver(Client client, ServerUrl server, {bool oauth = false}) async {
+  /// Mit [oauth] liefert es die dabei abgerufenen OAuth-Metadaten (`null`, wenn keine abrufbar waren), dazu immer
+  /// das Paar aus eingegebener Adresse und normalisierter Basis für den laufenden Vorgang (#259).
+  Future<(GetAuthMetadataResponse?, _Entered?)> _useHomeserver(Client client, ServerUrl server, {bool oauth = false}) async {
     // Passwort-Anmeldung und Registrierung beenden eine offene Browser-Anmeldung samt festgehaltener
     // Metadaten (#222) – vor `checkHomeserver`, das ab Matrix v1.15 auch hier `getAuthMetadata` ruft.
     if (!oauth) _dropOAuth();
@@ -574,7 +671,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       client.homeserver = null;
       throw const GatewayException(GatewayError.serverUnsupported);
     }
-    return oauth ? meta : null;
+    final resolved = _baseOf(client);
+    final _Entered? pair = resolved == null ? null : (entered: server, base: resolved);
+    return (oauth ? meta : null, pair);
   }
 
   @override
@@ -590,13 +689,18 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     cancelRegistration();
     try {
       final client = await _ensureClient();
-      await _useHomeserver(client, server);
-      await client.login(
-        LoginType.mLoginPassword,
-        identifier: AuthenticationUserIdentifier(user: user),
-        password: password,
-        initialDeviceDisplayName: PlatformInfo.deviceName,
-      );
+      final (_, pair) = await _useHomeserver(client, server);
+      try {
+        await client.login(
+          LoginType.mLoginPassword,
+          identifier: AuthenticationUserIdentifier(user: user),
+          password: password,
+          initialDeviceDisplayName: PlatformInfo.deviceName,
+        );
+      } finally {
+        // Auch wenn nach der Anmeldung ein Folgeschritt scheitert (#28): Die Sitzung steht.
+        await _adoptProvider(client, pair);
+      }
       await _refresh();
     } on GatewayException {
       rethrow;
@@ -619,10 +723,14 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   _RegistrationSession? _registration;
   OidcLoginSession? _oauth;
 
+  /// Eingegebene Adresse und Basis der offenen Browser-Anmeldung; lebt und endet mit [_oauth] (#259).
+  _Entered? _oauthPair;
+
   /// Beendet eine offene Browser-Anmeldung samt der dafür festgehaltenen Metadaten (#222): beide
   /// werden immer gemeinsam aufgehoben.
   void _dropOAuth() {
     _oauth = null;
+    _oauthPair = null;
     _client?.pinnedAuthMetadata = null;
   }
 
@@ -672,12 +780,13 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     cancelRegistration();
     try {
       final client = await _ensureClient();
-      await _useHomeserver(client, server);
+      final (_, pair) = await _useHomeserver(client, server);
       _registration = _RegistrationSession(
         username: username,
         password: password,
         displayName: TextSanitizer.clean(displayName, max: 64),
         language: language,
+        provider: pair,
       );
       return await _registerAttempt(null);
     } on GatewayException {
@@ -762,13 +871,19 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (depth > 5) throw const GatewayException(GatewayError.unknown);
     final tried = attempted ?? auth?.type;
     try {
-      await client.register(
-        kind: AccountKind.user,
-        username: r.username,
-        password: r.password,
-        auth: auth,
-        initialDeviceDisplayName: PlatformInfo.deviceName,
-      );
+      try {
+        await client.register(
+          kind: AccountKind.user,
+          username: r.username,
+          password: r.password,
+          auth: auth,
+          initialDeviceDisplayName: PlatformInfo.deviceName,
+        );
+      } finally {
+        // [r] ist lokal gehalten: Hat der Kontoanlage-Schritt die Registrierung inzwischen verworfen (er wechselt,
+        // sobald das SDK „angemeldet“ meldet), gilt das Paar trotzdem. Ohne Sitzung (weitere Schritte) wirkungslos.
+        await _adoptProvider(client, r.provider);
+      }
     } on MatrixException catch (e) {
       final flows = e.authenticationFlows;
       if (!e.requireAdditionalAuthentication || flows == null) throw _mapRegistration(e);
@@ -843,7 +958,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       final client = await _ensureClient();
       // Die Metadaten aus der Serverprüfung, ohne zweiten Abruf. Fehler beim Abruf fängt
       // `checkHomeserver` ab; ohne Metadaten gibt es keine Browser-Anmeldung (#222).
-      final meta = await _useHomeserver(client, server, oauth: true);
+      final (meta, pair) = await _useHomeserver(client, server, oauth: true);
       if (meta == null) throw const GatewayException(GatewayError.serverUnsupported);
       // Alle Endpunkte, über die Code, Verifier und Tokens laufen: https, ohne Zugangsdaten und bei einem
       // öffentlichen Server nicht im Heimnetz (E-59). Danach festgehalten: Das SDK ruft `getAuthMetadata`
@@ -878,6 +993,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       );
       if (session.authenticationUri.scheme != 'https') throw const GatewayException(GatewayError.serverUnsupported);
       _oauth = session;
+      _oauthPair = pair;
       return session.authenticationUri;
     } on GatewayException {
       _dropOAuth();
@@ -892,6 +1008,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<void> completeOAuth(Uri callback) async {
     final session = _oauth;
+    final pair = _oauthPair;
     final client = _client;
     if (session == null || client == null) throw const GatewayException(GatewayError.oauthCancelled);
     // Rücksprung nur an die eigene, gerade verwendete Adresse.
@@ -912,11 +1029,16 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       throw const GatewayException(GatewayError.oauthCancelled);
     }
     _oauth = null;
+    _oauthPair = null;
     // Code und Verifier gehen nur an den beim Start geprüften Token-Endpunkt (doppelte Sicherung).
     final pinned = client.pinnedAuthMetadata;
     if (pinned == null) throw const GatewayException(GatewayError.oauthCancelled);
     try {
-      await client.oidcLogin(session: session, code: code, state: session.state);
+      try {
+        await client.oidcLogin(session: session, code: code, state: session.state);
+      } finally {
+        await _adoptProvider(client, pair);
+      }
       await _refresh();
     } catch (e) {
       AppLog.e('gateway', 'Anmeldung im Browser fehlgeschlagen', e);
@@ -950,6 +1072,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     await _loginSub?.cancel();
     await _verificationSub?.cancel();
     await _toDeviceSub?.cancel();
+    // Schließen ist kein Sitzungsende: Der Eintrag zur Anbieter-Adresse bleibt (#259).
+    await _clearedSub?.cancel();
+    _clearedSub = null;
     _syncSub = null;
     _loginSub = null;
     _verificationSub = null;
@@ -985,6 +1110,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
         AppLog.e('gateway', 'Lokales Bereinigen fehlgeschlagen', e2);
       }
     }
+    await _forgetProvider();
     _resetLocal();
     notifyListeners();
   }
@@ -1200,6 +1326,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     } catch (e) {
       AppLog.e('gateway', 'Lokales Bereinigen fehlgeschlagen', e);
     }
+    await _forgetProvider();
     _resetLocal();
     notifyListeners();
   }
@@ -3841,7 +3968,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       ));
     }
     return OnlineInventory(
-      server: c.homeserver?.toString() ?? '',
+      server: server?.toString() ?? '',
+      homeserver: c.homeserver?.toString(),
       userId: me,
       deviceId: c.deviceID ?? '',
       displayName: displayName,
@@ -3870,6 +3998,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _privateTimeline?.cancelSubscriptions();
     _verificationSub?.cancel().ignore();
     _toDeviceSub?.cancel().ignore();
+    _clearedSub?.cancel().ignore();
     for (final t in _dmTimelines.values) {
       t.cancelSubscriptions();
     }
@@ -3982,9 +4111,18 @@ class _AppClient extends Client {
 
 /// Laufende klassische Registrierung. Das Passwort liegt nur hier und nur bis zum Ende.
 class _RegistrationSession {
-  _RegistrationSession({required this.username, required this.password, required this.displayName, required this.language});
+  _RegistrationSession({
+    required this.username,
+    required this.password,
+    required this.displayName,
+    required this.language,
+    this.provider,
+  });
 
   final String username;
+
+  /// Eingegebene Adresse und Basis dieser Registrierung (#259).
+  final _Entered? provider;
   String? password;
   final String displayName;
   final String language;
@@ -3996,6 +4134,12 @@ class _RegistrationSession {
   int sendAttempt = 0;
   String? sid;
 }
+
+/// Eingegebene Anbieter-Adresse und die dazu aufgelöste, normalisierte Basis eines Anmeldevorgangs (#259).
+typedef _Entered = ({ServerUrl entered, ServerUrl base});
+
+/// [_Entered], gebunden an das Konto der Sitzung (#259, E-90).
+typedef _Provider = ({String userId, ServerUrl entered, ServerUrl base});
 
 /// Ergebnis von [SdkMatrixGateway.retryDecision].
 enum RetryDecision { skip, retry }
