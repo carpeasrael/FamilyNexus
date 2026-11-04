@@ -1,0 +1,11 @@
+( 540, 810) Verification
+( 540, 966) Compare these symbols with the ones on the other device. They must match in the same order.
+( 224,1148) Cake
+( 362,1148) Cake
+( 500,1148) Bicycle
+( 638,1148) Train
+( 776,1148) Heart
+( 431,1308) Tree
+( 569,1308) Bell
+( 721,1501) They do not match
+( 741,1627) They match

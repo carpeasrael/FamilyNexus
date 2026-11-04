@@ -1,0 +1,11 @@
+Parameter im Fragment: ['d', 'v']
+  room = !dt…:matrix.chaostribunal.de
+  via = matrix.chaostribunal.de
+  srv = matrix-synapse-3ues.srv1348446.hstgr.cloud
+  inv = @fnt-1102-n1:matrix.chaostribunal.de
+  exp = 1793914409 (05.11.2026 22:33)
+  by = Test N1
+  n = <32 Hexzeichen, hex=True>
+Schlüssel: ['by', 'exp', 'inv', 'n', 'room', 'srv', 'via']
+Länge Link: 365
+Familienname enthalten: False

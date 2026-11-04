@@ -1,0 +1,88 @@
+Datenschutzerklärung
+Wer verarbeitet deine Daten?
+FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung
+oder Analyse. Verantwortlich für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-
+VV VELGENGILEL UCHIE DaLCN:
+Server); er steht bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort
+und - falls der Anbieter sie verlangt - deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit Anmeldung im Browser (z.
+B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.
+B. matrix.org) gibst du diese Angaßen direkt auf dessen Seite ein.
+Welche Daten gibt es?
+Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Familienmitglieder und deine Einstellungen.
+Termine und Nachrichten liegen verschlüsselt (SQLCipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: Geschützte Ablage
+der Flatpak-Sandbox (Secret-Portal) - nicht in der Datenbankdatei.
+der Flatpak-Sandbox (Secret-Portal) — nicht in der Datenbankdatei.
+Was sieht der Server?
+Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der
+Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften
+sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben
+sieht.
+Private Termine
+Private Termine werden nie an die Familie gesendet. Zwischen deinen eigenen Geräten werden sie über einen privaten,
+verschlüsselten Raum abgeglichen, dem nur dein Konto angehört.
+Erinnerungen und Benachrichtigungen
+Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in ...“. Es gibt keinen Push-Dienst
+eines Dritten.
+0005 U UU UE WE WE N
+Berechtigungen
+Internet (Verbindung zum Server). Erinnerungen erscheinen nur, solange die App läuft; dafür fragt die App keine Berechtigung
+an. Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt.
+Sicherung und Löschung
+Die App legt selbst keine Sicherung deiner Daten an. Speicherst du einen Anhang bewusst über „Speichern“, liegt die
+entschlüsselte Datei außerhalb der App in dem von dir gewählten Ordner. Mit „Alle lokalen Daten löschen“ entfernst du alle
+Drivata Tarmina
+EMNNNETUNSEN SINA LOKalE BENACNTICHNLISUNSGEN. SIE ZEIEEN NIE IITEL, UN Oder NOUZ, NUT „
+1erMIN IN .
+„ ES 8IDL KEINEN FUSN-DIENSLT
+eines Dritten
+an. Es werden keine Kontakte, kein Standort, keine Kamera und kein Mikrofon benötigt
+Pake! A DA I dr An i
+K Arla ı AI AL
+AA bnnn d ı L
+AL LLL
+DAl ln Da
+Daten, Schlüssel und Erinnerungen von diesem Gerät. Mit „Konto löschen“ (Einstellungen —> Konto) löschst du dein Konto
+dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org)
+bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen
+löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten - bewahre ihn sicher auf.
+UaUCMNMall DE ANDIELET UNU JaNaCch alle DValeNn aUT UIESECN CT aLl, DE ANDICLENN IL AMNMMCLOUNG IM DIOWSET (Z. D. INaLIA.OTE)
+Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der
+Schlüssel dort liegen bleiben - lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir
+gewählten Ort.
+Kinder
+Kinder können Familienmitglieder sein. Dafür ist die Einwilligung der Sorgeberechtigten nötig; Konten Minderjähriger laufen
+über die Einladung und Bestätigung eines Moderators.
+Kınder konnen Famılıenmitglieder seln. Datur Ist dıe Einwıllıgung der sorgeberechtigten nolıg; Konten Mınderjahriger lauten
+Deine Rechte
+Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App, dein Konto
+löschst du unter Einstellungen —> Konto — „Konto löschen“; weitere Serverdaten beim Betreiber deines Servers.
+Datan Schlificeal un Erinnarıngdan van rliacam Aarät Mit Kanta lÄäcrhan“ (Einetallıuıngdean —s Kanta) IÄäcromhet nrı rfain Kanta
+E°.p.i?r5t du ih-nl‚' versulclht„die Ap|p3‚ d'ie Zwis?henab}?g? 2aclj feinerl IV.|in-\'.lte zu leeren;„bl(jibst du niCh.t.ip delr-App‚l kann der„
+b — b - c
+b — !
+DEl UG CIHNAUUNS UU DESLAUSUNg CCS PIOUCIALUTDS.
+A A A A A A A a n E A A
+Online-Status, Einzelchats, Einkaufszettel
+Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte
+beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats
+in varanhiNneesalta DSa:nma zurnenhan znaral Pamibanmiteaililacdarn Rar Pinbanıfrsattal unrae ura gatallta Tarmina uareahin-salt Imm
+sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im
+Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht
+nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).
+HUL UG ILULET IS I HGE SICHELE LSICHE „VYaS SIGHE UG DEEVGTEE
+Melden und Blockieren
+Blockierte Mitglieder merkt sich die App nur auf diesem Gerät (verschlüsselte Datenbank); sie werden nicht übertragen. Meldest
+du eine Nachricht, erhält der Betreiber deines Servers die Kennung der Nachricht, den gewählten Grund und deinen optionalen
+Text. Den verschlüsselten Inhalt kann er nicht lesen.
+e l e M n
+en el b
+Aufgabenlisten
+Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine
+Endau7zı . Enrauvarcrchliiccalt im Eamilianraum JGhartradean ıun liacan varcmchliiiccalt aııf FSainam Aarät Alla Eamilianmitcliarlar
+Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder
+können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).
+aunnn E >
+ENISCHLUSSCLLE Valcı AaUKEINaALD UCI APP IN JM VON CIr SCWaNLLEN UVIUNECT. IL „ALUC LOKaLEN DValeNn LOSCHEN CHUCINSL UU allc
+Online-Status. Einzelchats. Einkaufszettel
+DEISEITELENET FAaMILENMISUECdET SESENCET UNG NIE SESPEICHETT; U KaNNST INN IN deN EINSLIELLUNgGEN aUSSCHALLEN. KEINZELICNALS
+AUTSADENUSLIEN UNG INF VEILaUT (WET Wa WELICNEN FUNKL EICUISL Nal, IHKL. OPUONAaLEIN ROMMMENLAT) WEITGEN WIE SCLEILE ICN

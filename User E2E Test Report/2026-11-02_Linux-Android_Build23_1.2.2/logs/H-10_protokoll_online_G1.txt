@@ -1,0 +1,96 @@
+FamilyNexus – Online gespeicherte Daten
+Erstellt: 2026-11-02 23:17 · App-Version 1.2.2 (23)
+
+Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.
+
+== Konto ==
+Server: https://matrix.chaostribunal.de
+Benutzername: @fnt-1102-n1:matrix.chaostribunal.de
+Anzeigename: Test N1
+Profilbild: nein
+
+== Geräte deines Kontos ==
+- FamilyNexus Linux (HFPSJNUCUX) – Verifiziert – Dieses Gerät
+
+== Verschlüsselung ==
+Cross-Signing-Schlüssel: eingerichtet
+Schlüssel-Backup (mit deinem Notfall-Schlüssel verschlüsselt): eingerichtet
+
+== Kontodaten (nur Arten, Inhalte werden nicht angezeigt) ==
+- de.inneso.familynexus.family
+- de.inneso.familynexus.identity_pins
+- de.inneso.familynexus.invites
+- de.inneso.familynexus.private_room
+- m.cross_signing.master
+- m.cross_signing.self_signing
+- m.cross_signing.user_signing
+- m.direct
+- m.megolm_backup.v1
+- m.push_rules
+- m.secret_storage.default_key
+- m.secret_storage.key.IuF7hhzcjydTAM2Pr1VFvA8k8g4o+m6l
+- m.secret_storage.key.MmutI482JTRUNKkwkMZ9Wa32Wet+XhZA
+
+== Mitglieder der Familie „Testfamilie 1102 neu“ ==
+- Test N1 (@fnt-1102-n1:matrix.chaostribunal.de) – Moderator – beigetreten
+
+== Räume ==
+
+- Familie „Testfamilie 1102 neu“ (!dtDllxqEQXmmysPXSw:matrix.chaostribunal.de)
+  Ende-zu-Ende-verschlüsselt: ja
+  Eigene Mitgliedschaft: beigetreten
+  Mitglieder: 1 beigetreten, 0 eingeladen
+  Ereignisse auf diesem Gerät: 73
+    Einkaufszettel (de.inneso.familynexus.shopping): 21
+    Nachrichten (m.room.message): 13
+    m.room.member: 9
+    Aufgabenlisten (de.inneso.familynexus.tasklist): 6
+    de.inneso.familynexus.invite: 5
+    Termine (geteilt) (de.inneso.familynexus.event): 5
+    Erledigte Aufgaben (de.inneso.familynexus.taskdone): 3
+    m.room.power_levels: 2
+    m.room.name: 2
+    Zu- und Absagen (de.inneso.familynexus.rsvp): 1
+    Reaktionen (de.inneso.familynexus.reaction): 1
+    m.room.join_rules: 1
+    m.room.history_visibility: 1
+    m.room.encryption: 1
+    m.room.guest_access: 1
+    m.room.create: 1
+  Anhänge: 5
+
+- Einzelchat (!XQY_QVMihzjhNXFqPNgk3aEDgtMT2-jzzQzeaG_Fyl8)
+  Ende-zu-Ende-verschlüsselt: ja
+  Eigene Mitgliedschaft: beigetreten
+  Mitglieder: 1 beigetreten, 0 eingeladen
+  Ereignisse auf diesem Gerät: 21
+    m.room.member: 4
+    m.key.verification.done: 2
+    m.key.verification.mac: 2
+    m.key.verification.key: 2
+    Nachrichten (m.room.message): 2
+    m.key.verification.accept: 1
+    m.key.verification.start: 1
+    m.key.verification.ready: 1
+    m.room.encryption: 1
+    m.room.history_visibility: 1
+    m.room.guest_access: 1
+    m.room.join_rules: 1
+    m.room.power_levels: 1
+    m.room.create: 1
+
+- Privater Raum (Abgleich privater Termine) „FamilyNexus“ (!drWsuFQzSRJZOuuIwv:matrix.chaostribunal.de)
+  Ende-zu-Ende-verschlüsselt: ja
+  Eigene Mitgliedschaft: beigetreten
+  Mitglieder: 1 beigetreten, 0 eingeladen
+  Ereignisse auf diesem Gerät: 15
+    Termine (privat) (de.inneso.familynexus.private_event): 7
+    m.room.name: 1
+    m.room.history_visibility: 1
+    m.room.encryption: 1
+    m.room.guest_access: 1
+    m.room.join_rules: 1
+    m.room.power_levels: 1
+    m.room.member: 1
+    m.room.create: 1
+

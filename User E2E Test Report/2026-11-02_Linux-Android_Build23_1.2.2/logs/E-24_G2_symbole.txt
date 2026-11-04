@@ -1,0 +1,11 @@
+( 540, 810) Verification
+( 540, 966) Compare these symbols with the ones on the other device. They must match in the same order.
+( 224,1148) Fish
+( 362,1148) Trophy
+( 500,1148) Mushroom
+( 638,1148) Bell
+( 776,1148) Bell
+( 431,1308) Elephant
+( 569,1308) Octopus
+( 721,1501) They do not match
+( 741,1627) They match

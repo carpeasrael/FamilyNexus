@@ -1,0 +1,5 @@
+test.zip: ( 540,2043) This attachment is not allowed (type or size).
+test.sh: ( 540,2043) This attachment is not allowed (type or size).
+test.exe: ( 540,2043) This attachment is not allowed (type or size).
+gross.txt: ( 540,2043) This attachment is not allowed (type or size).
+( 811,1774) Message from You / fast25.txt / 10:55 PM

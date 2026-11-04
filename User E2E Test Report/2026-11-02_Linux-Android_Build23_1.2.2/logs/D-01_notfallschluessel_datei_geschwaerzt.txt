@@ -1,0 +1,12 @@
+FamilyNexus – emergency key
+
+Account: @fnt-1102-n12:matrix.chaostribunal.de
+Provider: matrix.chaostribunal.de
+Created on: 11/2/2026
+
+Emergency key:
+<SCHLUESSEL GESCHWAERZT>
+
+How to use it: install FamilyNexus on the new device, choose “I already have an account”, sign in and enter the emergency key under “Unlock this device”.
+
+Keep this sheet safe and do not give it to anyone.

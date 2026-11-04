@@ -1,0 +1,12 @@
+# H-05
+insgesamt 8
+drwxr-xr-x 1 carpeasrael carpeasrael 102  2. Nov 20:57 .
+drwxr-xr-x 1 carpeasrael carpeasrael  58  2. Nov 20:57 ..
+-rw------- 1 carpeasrael carpeasrael 422  2. Nov 20:57 default.keyring
+-rw------- 1 carpeasrael carpeasrael 358  2. Nov 20:57 default.keyring~
+-rw------- 1 carpeasrael carpeasrael   0  2. Nov 20:57 default.keyring.lock
+00000000: 476e 6f6d 654b 6579 7269 6e67 0a0d 000a  GnomeKeyring....
+fn.key.db.app im Klartext: 0
+fn.key.db.matrix im Klartext: 0
+fn.key im Klartext: 0
+secret-tool (Host): 0

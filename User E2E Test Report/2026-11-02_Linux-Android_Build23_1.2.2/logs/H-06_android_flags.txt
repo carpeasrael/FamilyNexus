@@ -1,0 +1,2 @@
+    flags=0x0
+    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]
