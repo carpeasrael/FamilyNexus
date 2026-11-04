@@ -4718,6 +4718,12 @@ abstract class AppLocalizations {
   /// **'Konto'**
   String get reportSectionAccount;
 
+  /// No description provided for @reportHomeserver.
+  ///
+  /// In de, this message translates to:
+  /// **'Homeserver (über .well-known ermittelt)'**
+  String get reportHomeserver;
+
   /// No description provided for @reportDisplayName.
   ///
   /// In de, this message translates to:

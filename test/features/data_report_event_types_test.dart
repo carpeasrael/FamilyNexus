@@ -77,4 +77,40 @@ void main() {
     expect(localReport('en', null), contains('Display name: not set'));
     expect(localReport('de', 'Ida'), contains('Anzeigename: Ida'));
   });
+
+  test('#259: Online-Protokoll nennt den über .well-known ermittelten Homeserver nur, wenn er abweicht', () {
+    String online(String locale, {required String server, String? homeserver}) => DataReport.online(
+          l: lookupAppLocalizations(Locale(locale)),
+          now: DateTime(2026, 11, 4),
+          version: '1.2.2',
+          inventory: OnlineInventory(
+            server: server,
+            homeserver: homeserver,
+            userId: '@ida:chaostribunal.de',
+            deviceId: 'GERAET',
+            displayName: null,
+            hasAvatar: false,
+            devices: const [],
+            crossSigning: false,
+            keyBackup: false,
+            accountDataTypes: const <String>[],
+            rooms: const <InventoryRoom>[],
+          ),
+        );
+    final de = online('de', server: 'https://matrix-synapse.example', homeserver: 'https://matrix.chaostribunal.de');
+    expect(de, contains('Server: https://matrix-synapse.example\n'));
+    expect(de, contains('Homeserver (über .well-known ermittelt): https://matrix.chaostribunal.de\n'));
+    expect(de.indexOf('Server: '), lessThan(de.indexOf('Homeserver (')), reason: 'Zusatzzeile direkt nach „Server“');
+    expect(
+      online('en', server: 'https://matrix-synapse.example', homeserver: 'https://matrix.chaostribunal.de'),
+      contains('Homeserver (resolved via .well-known): https://matrix.chaostribunal.de'),
+    );
+    for (final (server, homeserver) in <(String, String?)>[
+      ('https://hs.example', 'https://hs.example'),
+      ('https://hs.example', 'https://hs.example/'),
+      ('https://hs.example', null),
+    ]) {
+      expect(online('de', server: server, homeserver: homeserver), isNot(contains('Homeserver')), reason: '$homeserver');
+    }
+  });
 }

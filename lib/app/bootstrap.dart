@@ -121,7 +121,7 @@ Future<AppServices> bootstrap({
   final kv = SqlKeyValueStore(database.db);
   final settings = await SettingsController.load(kv);
   await ensureCryptoInitialized();
-  final gateway = SdkMatrixGateway(keyStore: keys);
+  final gateway = SdkMatrixGateway(keyStore: keys, accountStore: kv);
   final bool keepAccountData;
   try {
     keepAccountData = await restoreSession(gateway, kv);

@@ -1,6 +1,7 @@
 // Echte Kontoanlage-Logik des SdkMatrixGateway (UIA-Schleife, OAuth-Rücksprung) gegen nachgestellte
 // Serverantworten (Review R7). Erfolgreiche Anmeldungen (mit Krypto-Initialisierung) prüfen die
 // E2E-Tests; hier geht es um Abläufe, Weitergabe von Sitzung/Schritten, Prüfungen und Fehlerzuordnung.
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -14,7 +15,7 @@ import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:matrix/matrix.dart' show MatrixException, MatrixSdkDatabase;
+import 'package:matrix/matrix.dart' show LoginState, MatrixException, MatrixSdkDatabase;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:vodozemac/vodozemac.dart' as vod;
 
@@ -49,13 +50,24 @@ class _Server {
   final List<Map<String, String>> tokenBodies = <Map<String, String>>[];
   int oidcRegistrations = 0;
 
+  /// `/.well-known/matrix/client` je Host (Host → `base_url`), nur auf Wunsch (#259); sonst 404 wie bisher.
+  final Map<String, String> wellKnown = <String, String>{};
+
+  /// Hält Sync-Anfragen an, bis der Test sie freigibt (#259: Wettlauf mit dem Kontoanlage-Schritt).
+  Completer<void>? syncGate;
+
   http.Client get client => MockClient((req) async {
         final path = req.url.path;
         requests.add(req.url);
         Map<String, Object?> jsonBody() =>
             req.body.isEmpty ? <String, Object?>{} : json.decode(req.body) as Map<String, Object?>;
+        if (path == '/_matrix/client/v3/sync') await syncGate?.future;
         (int, Object) r;
-        if (path == '/_matrix/client/versions') {
+        if (path == '/.well-known/matrix/client' && wellKnown.containsKey(req.url.host)) {
+          r = (200, <String, Object?>{
+            'm.homeserver': <String, Object?>{'base_url': wellKnown[req.url.host]},
+          });
+        } else if (path == '/_matrix/client/versions') {
           r = (200, <String, Object?>{'versions': <String>['v1.1', version]});
         } else if (path == '/_matrix/client/v3/login' && req.method == 'POST' && login != null) {
           r = login!(req, jsonBody());
@@ -75,12 +87,14 @@ class _Server {
           final b = jsonBody();
           registerBodies.add(b);
           r = register!(req, b);
+          loggedIn = r.$1 == 200;
         } else if (path == '/oauth2/registration') {
           oidcRegistrations++;
           r = (201, <String, Object?>{'client_id': 'cid', 'client_uri': 'https://carpeasrael.github.io/FamilyNexus/'});
         } else if (path == '/oauth2/token' && token != null) {
           tokenBodies.add(Uri.splitQueryString(req.body));
           r = token!(req, const <String, Object?>{});
+          loggedIn = r.$1 == 200;
         } else {
           r = (404, <String, Object?>{'errcode': 'M_UNRECOGNIZED', 'error': 'nicht vorhanden'});
         }
@@ -89,6 +103,55 @@ class _Server {
 }
 
 final ServerUrl _hs = ServerUrl.tryParse('hs.example')!;
+
+/// #259: eingegebene Anbieter-Adresse, die per `.well-known` auf `https://hs.example` umleitet.
+final ServerUrl _provider = ServerUrl.tryParse('provider.example')!;
+
+/// [_Server] mit Umleitung von `provider.example` auf `hs.example` und Antworten für eine stehende Sitzung (#259):
+/// whoami mit Gerät (für `oidcLogin` → `init`), Schlüssel-Upload mit passender Zahl der Einmalschlüssel (vodozemac),
+/// Sync scheitert (das SDK wiederholt nach Pause), alles Übrige 200.
+_Server _redirecting({String version = 'v1.11', Map<String, Object?>? meta, String user = '@emil:hs.example'}) {
+  final s = _Server(version: version, meta: meta)..wellKnown['provider.example'] = 'https://hs.example';
+  s.afterLogin = (req, b) {
+    final path = req.url.path;
+    if (path == '/_matrix/client/v3/account/whoami') return (200, <String, Object?>{'user_id': user, 'device_id': 'DEV1'});
+    if (path == '/_matrix/client/v3/keys/upload') {
+      final keys = (json.decode(req.body) as Map<String, Object?>)['one_time_keys'];
+      return (200, <String, Object?>{
+        'one_time_key_counts': <String, Object?>{'signed_curve25519': keys is Map ? keys.length : 0},
+      });
+    }
+    if (path == '/_matrix/client/v3/sync') return (500, <String, Object?>{'errcode': 'M_UNKNOWN', 'error': 'Test'});
+    return (200, <String, Object?>{});
+  };
+  return s;
+}
+
+Future<void> _until(bool Function() cond, {String? what}) async {
+  final end = DateTime.now().add(const Duration(seconds: 10));
+  while (!cond()) {
+    if (DateTime.now().isAfter(end)) fail('Bedingung nicht erreicht: $what');
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+  }
+}
+
+/// Wie der Kontoanlage-Schritt: Sobald das Gateway „angemeldet“ meldet, wechselt die Oberfläche und `dispose` ruft
+/// `cancelRegistration()`, noch bevor `register`/`oidcLogin` zurückkehren (erster Sync angehalten).
+/// Liefert eine Abfrage, ob das wirklich vor der Rückkehr geschah.
+bool Function() _cancelOnReady(SdkMatrixGateway g, bool Function() returned) {
+  var cancelledBeforeReturn = false;
+  var done = false;
+  void listener() {
+    if (done || g.session != SessionState.ready) return;
+    done = true;
+    cancelledBeforeReturn = !returned();
+    g.cancelRegistration();
+  }
+
+  g.addListener(listener);
+  addTearDown(() => g.removeListener(listener));
+  return () => cancelledBeforeReturn;
+}
 
 Map<String, Object?> _uia(List<List<String>> flows, {List<String> completed = const <String>[], Map<String, Object?>? params, String? errcode}) =>
     <String, Object?>{
@@ -449,6 +512,44 @@ void main() {
       await expectLater(g.continueRegistration(const AcceptTerms()), _error(GatewayError.notFound), reason: 'Anmelden beendet die Registrierung');
     });
 
+    test('#259 erfolgreiche Kontoanlage über .well-known: die App zeigt die eingegebene Adresse', () async {
+      final s = _redirecting();
+      s.register = (req, b) => (200, <String, Object?>{'user_id': '@emil:hs.example', 'access_token': 'tok', 'device_id': 'DEV1'});
+      final g = await _gateway(s);
+      try {
+        expect(await g.register(server: _provider, username: 'emil', password: 'sicher-genug', displayName: 'Emil'), isNull);
+      } on GatewayException {
+        // Kein #28-Zweig bei der Registrierung: Scheitert nur der Abgleich danach, steht die Sitzung trotzdem.
+      }
+      expect(g.session, SessionState.ready);
+      expect(g.userId, '@emil:hs.example');
+      expect(g.server?.host, 'provider.example', reason: 'bisher hs.example (aufgelöste Basis)');
+      expect(g.sdkClient!.homeserver!.host, 'hs.example');
+      expect(s.requests.where((u) => u.path == '/_matrix/client/v3/register').map((u) => u.host), everyElement('hs.example'));
+    });
+
+    test('#259 Wettlauf: Der Kontoanlage-Schritt verwirft die Registrierung, bevor `register` zurückkehrt', () async {
+      final gate = Completer<void>();
+      addTearDown(() {
+        if (!gate.isCompleted) gate.complete();
+      });
+      final s = _redirecting()..syncGate = gate;
+      s.register = (req, b) => (200, <String, Object?>{'user_id': '@emil:hs.example', 'access_token': 'tok', 'device_id': 'DEV1'});
+      final g = await _gateway(s);
+      var returned = false;
+      final cancelledFirst = _cancelOnReady(g, () => returned);
+      final run = g
+          .register(server: _provider, username: 'emil', password: 'sicher-genug', displayName: 'Emil')
+          .then<void>((_) {}, onError: (Object _) {})
+          .whenComplete(() => returned = true);
+      await _until(cancelledFirst, what: 'cancelRegistration vor der Rückkehr von register');
+      gate.complete();
+      await run;
+      expect(cancelledFirst(), isTrue);
+      expect(g.session, SessionState.ready);
+      expect(g.server?.host, 'provider.example');
+    });
+
     test('lokale Prüfungen vor jeder Anfrage', () async {
       final s = _Server();
       s.register = (req, b) => (401, _uia(<List<String>>[<String>['m.login.dummy']]));
@@ -527,6 +628,50 @@ void main() {
       final state = (await g.startOAuth(server: _hs, redirectUri: loop, create: false)).queryParameters['state']!;
       await expectLater(g.completeOAuth(Uri.parse('http://127.0.0.1:41234/oauth#code=f&state=$state')), _error(GatewayError.oauthCancelled));
       expect(s.tokenBodies.single['code'], 'f');
+    });
+
+    test('#259 erfolgreiche Browser-Anmeldung über .well-known: die App zeigt die eingegebene Adresse', () async {
+      final s = _redirecting(version: 'v1.15', meta: _meta);
+      s.token = (req, b) => (200, <String, Object?>{'access_token': 'tok', 'token_type': 'Bearer'});
+      final g = await _gateway(s);
+      final state = (await g.startOAuth(server: _provider, redirectUri: redirect, create: true)).queryParameters['state']!;
+      // Ein Abgleich ohne Sitzung (`_resetLocal`) zwischen Start und Rücksprung verliert die offene Anmeldung nicht.
+      g.sdkClient!.onLoginStateChanged.add(LoginState.loggedOut);
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      try {
+        await g.completeOAuth(Uri.parse('$redirect?code=echt&state=$state'));
+      } on GatewayException catch (e) {
+        // Kein #28-Zweig: Scheitert nur der Abgleich danach, steht die Sitzung trotzdem.
+        expect(e.error, isNot(GatewayError.oauthCancelled));
+      }
+      expect(s.tokenBodies.single['code'], 'echt');
+      expect(g.session, SessionState.ready);
+      expect(g.userId, '@emil:hs.example');
+      expect(g.server?.host, 'provider.example', reason: 'bisher hs.example (aufgelöste Basis)');
+      expect(g.sdkClient!.homeserver!.host, 'hs.example');
+    });
+
+    test('#259 Wettlauf: Kontoanlage über den Browser, der Schritt verwirft vor der Rückkehr von `oidcLogin`', () async {
+      final gate = Completer<void>();
+      addTearDown(() {
+        if (!gate.isCompleted) gate.complete();
+      });
+      final s = _redirecting(version: 'v1.15', meta: _meta)..syncGate = gate;
+      s.token = (req, b) => (200, <String, Object?>{'access_token': 'tok', 'token_type': 'Bearer'});
+      final g = await _gateway(s);
+      final state = (await g.startOAuth(server: _provider, redirectUri: redirect, create: true)).queryParameters['state']!;
+      var returned = false;
+      final cancelledFirst = _cancelOnReady(g, () => returned);
+      final run = g
+          .completeOAuth(Uri.parse('$redirect?code=echt&state=$state'))
+          .then<void>((_) {}, onError: (Object _) {})
+          .whenComplete(() => returned = true);
+      await _until(cancelledFirst, what: 'cancelRegistration vor der Rückkehr von oidcLogin');
+      gate.complete();
+      await run;
+      expect(cancelledFirst(), isTrue);
+      expect(g.session, SessionState.ready);
+      expect(g.server?.host, 'provider.example');
     });
 
     group('#222: Metadaten einmal prüfen und festhalten', () {

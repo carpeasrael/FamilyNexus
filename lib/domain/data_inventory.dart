@@ -118,9 +118,14 @@ class OnlineInventory {
     required this.accountDataTypes,
     required this.rooms,
     this.family,
+    this.homeserver,
   });
 
+  /// Angezeigte Anbieter-Adresse: die bei der Anmeldung eingegebene (#259, E-90), sonst der Homeserver.
   final String server;
+
+  /// Tatsächlich genutzter, ggf. über `.well-known` aufgelöster Homeserver (`null`: unbekannt).
+  final String? homeserver;
   final String userId;
   final String deviceId;
 
