@@ -4,6 +4,8 @@ import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/recurrence.dart';
 import 'package:family_nexus/domain/server.dart';
+import 'package:family_nexus/features/calendar/event_editor_screen.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -236,6 +238,108 @@ void main() {
         expect(await app.events.all(), isEmpty);
         expect(tester.getTopLeft(msg).dy, lessThan(tester.getTopLeft(find.text('Sichtbarkeit')).dy),
             reason: 'nicht erst am Formularende');
+      });
+    });
+
+    group('#263: Zeitwähler markiert beim Fokus den Wert (Desktop)', () {
+      final desktop = TargetPlatformVariant(<TargetPlatform>{TargetPlatform.windows, TargetPlatform.linux, TargetPlatform.macOS});
+
+      /// Editor öffnen, Zeitwähler für den Beginn (Vorschlag 12:00) in der Texteingabe; liefert die beiden Felder.
+      Future<Finder> openTimeInput(WidgetTester tester) async {
+        tester.platformDispatcher.alwaysUse24HourFormatTestValue = true;
+        addTearDown(tester.platformDispatcher.clearAlwaysUse24HourTestValue);
+        final app = await _app();
+        await _start(tester, app, tab: 'Kalender');
+        await tester.tap(find.byTooltip('Neuer Termin'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(OutlinedButton, '12:00'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.keyboard_outlined));
+        await tester.pumpAndSettle();
+        return find.descendant(of: find.byType(Dialog), matching: find.byType(TextField));
+      }
+
+      /// Das Eingabefeld mit dem Fokus, jedes Mal neu gesucht (nach dem Sprung ins Minutenfeld ist es ein anderes).
+      EditableText focused(WidgetTester tester) => tester.widget<EditableText>(
+          find.byWidgetPredicate((w) => w is EditableText && w.focusNode.hasPrimaryFocus));
+
+      /// Tippen wie über die Tastatur: ersetzt nur die Auswahl, die Eingabefilter des Felds greifen (anders als enterText).
+      Future<void> type(WidgetTester tester, String digits) async {
+        for (final d in digits.split('')) {
+          final v = focused(tester).controller.value;
+          final sel = v.selection;
+          tester.testTextInput.updateEditingValue(TextEditingValue(
+            text: sel.textBefore(v.text) + d + sel.textAfter(v.text),
+            selection: TextSelection.collapsed(offset: sel.start + d.length),
+          ));
+          await tester.pump();
+        }
+      }
+
+      bool allSelected(TextEditingValue v) =>
+          v.text.isNotEmpty && v.selection.start == 0 && v.selection.end == v.text.length;
+
+      String text(WidgetTester tester, Finder field) => tester.widget<TextField>(field).controller!.text;
+
+      testWidgets('Klick ins Stundenfeld markiert; 2,1 ergibt 21, Minuten 3,0 ergeben 30', (tester) async {
+        final fields = await openTimeInput(tester);
+        await tester.tap(fields.at(0), kind: PointerDeviceKind.mouse);
+        await tester.pump();
+        expect(allSelected(focused(tester).controller.value), isTrue, reason: 'Wert „12“ markiert');
+        await type(tester, '21');
+        expect(text(tester, fields.at(0)), '21');
+        // Nach zwei Ziffern springt der Fokus ins Minutenfeld; auch dort ist der Wert markiert.
+        final minute = focused(tester);
+        expect(minute.controller, same(tester.widget<TextField>(fields.at(1)).controller));
+        expect(allSelected(minute.controller.value), isTrue, reason: 'Wert „00“ markiert');
+        await type(tester, '30');
+        expect(text(tester, fields.at(1)), '30');
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+        expect(find.widgetWithText(OutlinedButton, '21:30'), findsOneWidget);
+        expect(find.widgetWithText(OutlinedButton, '22:30'), findsOneWidget, reason: 'Ende wandert mit');
+      }, variant: desktop);
+
+      testWidgets('Rückkehr ins Fenster markiert nicht', (tester) async {
+        final fields = await openTimeInput(tester);
+        await tester.tap(fields.at(0), kind: PointerDeviceKind.mouse);
+        await tester.pump();
+        await type(tester, '2');
+        expect(text(tester, fields.at(0)), '2');
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+        await tester.pump();
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+        await tester.pump();
+        final v = focused(tester).controller.value;
+        expect(v.selection, const TextSelection.collapsed(offset: 1), reason: 'Cursor hinter der 2, nicht markiert');
+        await type(tester, '1');
+        expect(text(tester, fields.at(0)), '21');
+      }, variant: desktop);
+
+      testWidgets('erneuter Klick ins schon aktive Feld markiert nicht', (tester) async {
+        final fields = await openTimeInput(tester);
+        await tester.tap(fields.at(0), kind: PointerDeviceKind.mouse);
+        await tester.pump();
+        expect(allSelected(focused(tester).controller.value), isTrue);
+        await tester.pump(const Duration(seconds: 1)); // kein Doppelklick
+        await tester.tap(fields.at(0), kind: PointerDeviceKind.mouse);
+        await tester.pump();
+        expect(allSelected(focused(tester).controller.value), isFalse, reason: 'kein Fokuswechsel');
+      }, variant: desktop);
+
+      testWidgets('Android: Fokus markiert nicht (bekannte Grenze, E-20)', (tester) async {
+        final fields = await openTimeInput(tester);
+        await tester.tap(fields.at(0));
+        await tester.pump();
+        expect(allSelected(focused(tester).controller.value), isFalse);
+      }, variant: TargetPlatformVariant.only(TargetPlatform.android));
+
+      test('Plattformwahl: nur Desktop, nicht im Web', () {
+        for (final p in TargetPlatform.values) {
+          final desktopPlatform = p == TargetPlatform.windows || p == TargetPlatform.linux || p == TargetPlatform.macOS;
+          expect(selectAllOnTimeFieldFocus(p, isWeb: false), desktopPlatform, reason: '$p');
+          expect(selectAllOnTimeFieldFocus(p, isWeb: true), isFalse, reason: 'Web: $p');
+        }
       });
     });
 
