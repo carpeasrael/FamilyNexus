@@ -223,24 +223,27 @@ class _DropdownTile<T> extends StatelessWidget {
   final ValueChanged<T> onChanged;
 
   @override
-  Widget build(BuildContext context) => ListTile(
-        title: Text(label),
-        trailing: Semantics(
-          label: label,
-          container: true,
-          child: DropdownButton<T>(
-            value: value,
-            underline: const SizedBox.shrink(),
-            items: <DropdownMenuItem<T>>[
-              for (final e in items.entries)
-                DropdownMenuItem<T>(value: e.key, child: Text(e.value)),
-            ],
-            onChanged: (v) {
-              if (v is T) onChanged(v);
-            },
-          ),
-        ),
-      );
+  Widget build(BuildContext context) {
+    // Bei großer Schrift ist neben dem Titel kein Platz: Die Auswahl rutscht unter den Titel (#274).
+    final large = MediaQuery.textScalerOf(context).scale(1) > 1.3;
+    final dropdown = Semantics(
+      label: label,
+      container: true,
+      child: DropdownButton<T>(
+        isExpanded: large,
+        value: value,
+        underline: const SizedBox.shrink(),
+        items: <DropdownMenuItem<T>>[
+          for (final e in items.entries)
+            DropdownMenuItem<T>(value: e.key, child: Text(e.value)),
+        ],
+        onChanged: (v) {
+          if (v is T) onChanged(v);
+        },
+      ),
+    );
+    return ListTile(title: Text(label), subtitle: large ? dropdown : null, trailing: large ? null : dropdown);
+  }
 }
 
 /// Speicherorte der lokalen Daten (Pfade zum Markieren und Kopieren) und der Online-Anbieter.
@@ -593,7 +596,7 @@ class _AccentPicker extends StatelessWidget {
                       child: a == selected ? Icon(Icons.check, size: 14, color: dark ? const Color(0xFF0B1120) : Colors.white) : null,
                     ),
                     const SizedBox(width: 8),
-                    Text(_name(l, a)),
+                    Flexible(child: Text(_name(l, a))),
                   ]),
                 ),
               ),

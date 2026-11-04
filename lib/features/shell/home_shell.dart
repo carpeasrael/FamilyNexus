@@ -172,7 +172,8 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
             child: Row(children: <Widget>[
               compact
                   ? const SizedBox.shrink()
-                  : NavigationRail(
+                  : FocusTraversalGroup(
+                      child: NavigationRail(
                       key: mainNavigationKey,
                       selectedIndex: _index,
                       onDestinationSelected: _go,
@@ -182,9 +183,11 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
                       destinations: <NavigationRailDestination>[
                         for (final d in destinations) NavigationRailDestination(icon: d.icon, label: Text(d.label)),
                       ],
-                    ),
+                    )),
+              // Eigene Fokusgruppe: Tab geht erst durch den Inhalt, nicht quer über die Rail (Lesereihenfolge nach Lage).
               Expanded(
-                child: LayoutBuilder(builder: (context, box) {
+                child: FocusTraversalGroup(
+                    child: LayoutBuilder(builder: (context, box) {
                   final panes = paneWidths(box.maxWidth);
                   Rect rect(int i) {
                     if (twoPane && i == _calendarTab) return Rect.fromLTWH(0, 0, panes.calendar, box.maxHeight);
@@ -216,7 +219,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
                       child: Offstage(offstage: !twoPane, child: const VerticalDivider(width: kPaneDivider, thickness: kPaneDivider)),
                     ),
                   ]);
-                }),
+                })),
               ),
             ]),
           ),
