@@ -44,8 +44,10 @@ run_page() {
   sleep 6
   kill $browser 2>/dev/null || true
   wait $browser 2>/dev/null || true
-  grep -E 'SELFTEST|^ok |FAIL ' "$log" | sed 's/^.*CONSOLE:[0-9]*\] //' | head -40
+  # Ohne Treffer liefert grep 1; unter `pipefail` bräche das Skript sonst stumm ab, ohne die Konsole zu zeigen.
+  grep -E 'SELFTEST|^ok |FAIL ' "$log" | sed 's/^.*CONSOLE:[0-9]*\] //' | head -40 || true
   if ! grep -q 'SELFTEST PASS' "$log"; then
+    grep -q 'SELFTEST' "$log" || echo "FAIL Phase $2: keine Ausgabe des Selbsttests nach 120 s (Seite hängt?)" >&2
     echo "--- Browser-Konsole ($1) ---" >&2
     grep -i -E 'CONSOLE|csp|content security|refused' "$log" | head -30 >&2 || true
     rm -rf "$profile"; exit 1
