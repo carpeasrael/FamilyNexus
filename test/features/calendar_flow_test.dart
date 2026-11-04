@@ -239,6 +239,102 @@ void main() {
         expect(tester.getTopLeft(msg).dy, lessThan(tester.getTopLeft(find.text('Sichtbarkeit')).dy),
             reason: 'nicht erst am Formularende');
       });
+
+      group('#264: Ganztägig nach 22 Uhr endet am selben Tag', () {
+        final DateTime late = DateTime.utc(2026, 3, 20, 21, 30); // 22:30 in Berlin
+
+        /// Neuer Termin um 22:30: Vorschlag 23:00–00:00 (Ende am Folgetag).
+        Future<TestApp> openLate(WidgetTester tester, String title) async {
+          use24h(tester);
+          final app = await buildTestApp(clock: () => late);
+          await _start(tester, app, tab: 'Kalender');
+          await tester.tap(find.byTooltip('Neuer Termin'));
+          await tester.pumpAndSettle();
+          await tester.enterText(find.widgetWithText(TextFormField, 'Titel'), title);
+          expect(find.widgetWithText(OutlinedButton, '23:00'), findsOneWidget);
+          expect(find.widgetWithText(OutlinedButton, '00:00'), findsOneWidget);
+          return app;
+        }
+
+        Future<void> toggleAllDay(WidgetTester tester) async {
+          await tester.tap(find.text('Ganztägig'));
+          await tester.pumpAndSettle();
+        }
+
+        Future<void> save(WidgetTester tester) async {
+          await tester.tap(find.text('Speichern'));
+          await tester.pumpAndSettle();
+        }
+
+        testWidgets('Ganztägig an: Beginn und Ende am selben Tag', (tester) async {
+          final app = await openLate(tester, 'Ausflug');
+          await toggleAllDay(tester);
+          await save(tester);
+          final e = (await app.events.all()).single;
+          expect(e.allDay, isTrue);
+          expect((e.start, e.end), (DateTime.utc(2026, 3, 20), DateTime.utc(2026, 3, 20)), reason: 'ein Tag, nicht zwei');
+        });
+
+        testWidgets('Ganztägig an und wieder aus: 23:00–00:00 bleibt gültig', (tester) async {
+          final app = await openLate(tester, 'Hin und her');
+          await toggleAllDay(tester);
+          await toggleAllDay(tester);
+          expect(find.widgetWithText(OutlinedButton, '23:00'), findsOneWidget);
+          expect(find.widgetWithText(OutlinedButton, '00:00'), findsOneWidget);
+          await save(tester);
+          expect(find.text('Das Ende muss nach dem Beginn liegen.'), findsNothing);
+          final e = (await app.events.all()).single;
+          expect(e.allDay, isFalse);
+          expect((e.start, e.end), (DateTime.utc(2026, 3, 20, 22), DateTime.utc(2026, 3, 20, 23)));
+        });
+
+        testWidgets('Ende selbst gewählt: Ganztägig behält das Enddatum', (tester) async {
+          final app = await openLate(tester, 'Bewusst bis morgen');
+          await pickTime(tester, '00:00', 0, 0); // Ende von Hand bestätigt
+          await toggleAllDay(tester);
+          await save(tester);
+          final e = (await app.events.all()).single;
+          expect((e.start, e.end), (DateTime.utc(2026, 3, 20), DateTime.utc(2026, 3, 21)));
+        });
+
+        testWidgets('bestehender mehrtägiger Termin wird durch Ganztägig nicht verkürzt', (tester) async {
+          use24h(tester);
+          final app = await buildTestApp(clock: () => late);
+          await _start(tester, app, tab: 'Kalender');
+          await app.services.calendar!.create(
+            title: 'Reise',
+            start: DateTime.utc(2026, 3, 20, 17),
+            end: DateTime.utc(2026, 3, 22, 9),
+            visibility: EventVisibility.private,
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Reise').first);
+          await tester.pumpAndSettle();
+          await tester.tap(find.byTooltip('Termin bearbeiten'));
+          await tester.pumpAndSettle();
+          await toggleAllDay(tester);
+          await save(tester);
+          final e = (await app.events.all()).single;
+          expect(e.allDay, isTrue);
+          expect((e.start, e.end), (DateTime.utc(2026, 3, 20), DateTime.utc(2026, 3, 22)));
+        });
+
+        testWidgets('Weg aus dem Issue: Beginn auf übermorgen, dann Ganztägig', (tester) async {
+          final app = await openLate(tester, 'Übermorgen');
+          // Erstes OutlinedButton im Formular ist das Datum des Beginns.
+          await tester.tap(find.byType(OutlinedButton).first);
+          await tester.pumpAndSettle();
+          await tester.tap(find.descendant(of: find.byType(Dialog), matching: find.text('22')));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('OK'));
+          await tester.pumpAndSettle();
+          await toggleAllDay(tester);
+          await save(tester);
+          final e = (await app.events.all()).single;
+          expect(e.allDay, isTrue);
+          expect((e.start, e.end), (DateTime.utc(2026, 3, 22), DateTime.utc(2026, 3, 22)), reason: 'ein Tag, nicht zwei');
+        });
+      });
     });
 
     group('#263: Zeitwähler markiert beim Fokus den Wert (Desktop)', () {

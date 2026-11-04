@@ -119,6 +119,9 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
   late Set<String> _attendees;
   late Set<int> _reminders;
   bool _reminderTouched = false;
+
+  /// Ende von Hand gewählt (oder gespeichert): dann ändert „Ganztägig“ es nicht (#264).
+  late bool _endTouched;
   bool _saving = false;
   String? _error;
 
@@ -138,6 +141,8 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
     _title = TextEditingController(text: e?.title ?? '');
     _location = TextEditingController(text: e?.location ?? '');
     _note = TextEditingController(text: e?.note ?? '');
+    // Beim Bearbeiten gilt das gespeicherte Ende als gewählt; mehrtägige Termine werden nie verkürzt (#264).
+    _endTouched = e != null;
     if (e != null) {
       _allDay = e.allDay;
       if (e.allDay) {
@@ -220,6 +225,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
         _moveStart(utc, _startTime);
       } else {
         _endDate = utc;
+        _endTouched = true;
       }
       _timeError = null;
     });
@@ -246,6 +252,20 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
     _endTime = TimeOfDay(hour: end.hour, minute: end.minute);
   }
 
+  /// Schaltet „Ganztägig“ um. Ohne eigene Endwahl endet ein ganztägiger Termin am Tag des Beginns,
+  /// auch wenn das Ende mit Uhrzeit auf 00:00 des Folgetags fiel (#264). Zurück zur Uhrzeit gilt
+  /// wieder Ende = Beginn + 1 h (#56); sonst stünde 23:00–00:00 am selben Tag („Ende vor Beginn“).
+  void _setAllDay(bool v) {
+    _allDay = v;
+    _timeError = null;
+    if (_endTouched) return;
+    if (v) {
+      _endDate = _startDate;
+    } else {
+      _moveStart(_startDate, _startTime);
+    }
+  }
+
   Future<void> _pickTime({required bool start}) async {
     // Flutter zeigt das Ziffernblatt im Format der App-Sprache (Deutsch: 24 h), prüft die Texteingabe
     // aber nach der Geräteeinstellung. Auf einem 12-h-Gerät lehnte sie deshalb 13–23 ab (#64).
@@ -265,6 +285,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
         _moveStart(_startDate, t);
       } else {
         _endTime = t;
+        _endTouched = true;
       }
       _timeError = null;
     });
@@ -410,7 +431,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
                   decoration: InputDecoration(labelText: l.eventTitle),
                   validator: (v) => (v == null || v.trim().isEmpty) ? l.eventTitleRequired : null,
                 ),
-                SwitchListTile(contentPadding: EdgeInsets.zero, title: Text(l.eventAllDay), value: _allDay, onChanged: (v) => setState(() => _allDay = v)),
+                SwitchListTile(contentPadding: EdgeInsets.zero, title: Text(l.eventAllDay), value: _allDay, onChanged: (v) => setState(() => _setAllDay(v))),
                 _dateRow(l.eventStart, sd(_startDate), _allDay ? null : st(_startTime), () => _pickDate(start: true), () => _pickTime(start: true)),
                 _dateRow(l.eventEnd, sd(_endDate), _allDay ? null : st(_endTime), () => _pickDate(start: false), () => _pickTime(start: false)),
                 if (_timeError != null)
