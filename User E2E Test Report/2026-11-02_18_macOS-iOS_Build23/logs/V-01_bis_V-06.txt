@@ -1,0 +1,29 @@
+V-01
+## main...origin/main
+?? Test-Apple/
+48e92996b4e7688a3d12b4e49487270befd9ee5b Merge pull request #253 from carpeasrael/docs/release-review-1.2.2-23-lauf2
+version: 1.2.2+23
+
+V-02 macOS
+1.2.2
+23
+Identifier=de.inneso.familynexus
+Authority=TestFlight Beta Distribution
+Authority=Apple Worldwide Developer Relations Certification Authority
+Authority=Apple Root CA
+TeamIdentifier=LWGTDX5B34
+V-02 iOS-Sim
+1.2.2
+23
+V-05/06
+{"session":"MLlIcRyXKCWAbDpIUUIKdxiN","flows":[{"stages":["m.login.dummy"]}],"params":{}}
+fnt-1102-n1: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1102-n12: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1102-i2: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1102-n9: {"available":true}
+fnt-1102b-n1: {"available":true}
+fnt-1102b-n12: {"available":true}
+fnt-1102b-i2: {"available":true}
+fnt-1102b-n9: {"available":true}
+V-07
+(    "de-DE")

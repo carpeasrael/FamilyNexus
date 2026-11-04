@@ -1,0 +1,3 @@
+I2 fnt-1102b-i2 deactivate: {"id_server_unbind_result":"success"}
+N2 fnt-1102b-n12 deactivate: {"id_server_unbind_result":"success"}
+N1 fnt-1102b-n1 deactivate: {"id_server_unbind_result":"success"}

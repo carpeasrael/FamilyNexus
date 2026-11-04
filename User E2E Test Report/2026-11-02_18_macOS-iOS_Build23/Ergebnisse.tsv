@@ -1,0 +1,113 @@
+A-01	✅	Willkommen mit drei Wegen, Hinweisen, Sprachwahl
+A-02	✅	English → Deutsch wechselt sofort
+A-03	✅	Konto erstellen, Schritt 1 von 3, matrix.org-Text
+A-04	✅	"nicht-vorhanden.invalid ist gerade nicht erreichbar…", Konto erstellen nicht nutzbar
+A-05	✅	Konto liegt bei matrix-synapse-…; Betreiber/Kontakt, Metadaten-Hinweis; Konto erstellen ausgegraut
+A-05a	⏳	Braucht Testserver mit präpariertem well-known (nicht verfügbar)
+A-06	✅	Joerg Muessig → joerg.muessig; Jörg Müßig → joerg.muessig, "Der Benutzername ist frei."
+A-07	✅	Alle sechs ungültigen Namen: Hinweis, Konto erstellen ausgegraut
+A-08	✅	Benutzername bleibt, Passwort-Regeln, Abweichung/Übereinstimmung, Auge, leerer Name ausgegraut
+A-08b	✅	Enter bei abweichender Wiederholung: Fehlermeldung, kein Konto
+A-09	✅	Konto angelegt, direkt Notfall-Schlüssel (Schritt 2 von 3), kein Zusatzschritt
+A-10	⚠️	Schlüssel bleibt stehen, Kopieren- und Speichern-Hinweis ok; Datei enthält Datum "2.11.2026" (erwartet TT.MM.JJJJ = 02.11.2026) und Anbieter matrix.chaostribunal.de (Servername statt Anbieter-Adresse)
+A-11	✅	Familie "Testfamilie 1102" gegründet
+A-12	✅	Später → Heute
+B-01	✅	Alle sechs Kacheln, Navigation, Neuer-Termin-Schaltfläche (Plus); Termin-Sortierung nach B-06 nachzuholen
+B-02	✅	iOS-Simulator (G2): Systemdialog für Mitteilungen erschien, erlaubt; Mac-Build ist TestFlight-signiert (Distribution)
+B-03	✅	Geteilt-Hinweis "Verschlüsselt an die Familie gesendet", Termin mit Geteilt
+B-04	✅	"Bitte einen Titel eingeben." und "Das Ende muss nach dem Beginn liegen." unter Beginn/Ende, nichts gespeichert
+B-05	✅	Privater Termin 21:00–22:00 (Tastatureingabe "2100" angenommen, Ende wandert mit), Hinweis zu eigenen Geräten
+B-06	✅	Drei wöchentliche Vorkommen (4., 11., 18.11.), Wiederholungssymbol
+B-07	✅	Tag, Woche, Monat, Agenda; Weiter/Zurück/Heute
+B-08	✅	Titel und 10:30–11:30 sofort aktuell; Verlauf (1) "Test geteilt – Version 1"
+B-09	✅	30 Minuten gewählt, "Standard verwenden" setzt auf 10 Minuten zurück
+B-10	⏳	Systembenachrichtigung nach 12 min nicht abgewartet (Zeitbudget), Erinnerungsübersicht nicht geprüft
+B-11	⏳	Noch nicht ausgeführt
+B-11	✅	"Alle Vorkommen oder nur dieses?" → Nur dieses: 4.11. entfällt, 11./18.11. bleiben
+B-12	✅	Nachricht mit Uhrzeit 23:32; Enter sendet
+B-12a	⏳	Netz trennen im Lauf nicht durchführbar
+B-13	✅	Terminkarte im Chat mit Zusagen/Vielleicht/Absagen
+B-14	✅	Einkauf: Zu besorgen, abhaken, Bearbeiten (Vollkornbrot), Gruppen Aldi/Ohne Gruppe; Teilschritte Vorschlag/Querformat nicht geprüft
+B-15	⚠️	Aufgabenliste, Verlauf, Erledigt-Zeit funktionieren; Datum "2.11.2026" statt "02.11.2026" (wie A-10)
+B-16	✅	Design Hell/Dunkel/Wie Gerät, Akzentfarbe Magenta/Türkis, Effekte reduzieren wirken sofort (Neustart nicht geprüft)
+B-17	⏳	App-Sperre am Mac braucht Passwort/Touch ID, nicht automatisierbar
+B-18	n/a	Bildschirmschutz gibt es auf macOS nicht (Schalter fehlt); iOS-Sim: nicht geprüft
+B-19	✅	Blockierte Mitglieder, Datenschutzerklärung mit Schlüsselbund, SQLCipher; Online-Status-Schalter vorhanden
+B-20	✅	Standard-Erinnerung als Mehrfachauswahl, Hinweis zu lokalen Benachrichtigungen
+B-21	✅	Speicherorte, lokales Protokoll (App-Version 1.2.2 (23), Warnhinweis), Online-Protokoll (Konto, Gerät, Räume)
+B-22	✅	Menü und Über-die-App "Version 1.2.2 (23)"; Konto: Server matrix.chaostribunal.de, @fnt-1102b-n1:matrix.chaostribunal.de
+B-23	⏳	Passwortänderung nicht ausgeführt
+B-24	⏳	Emoji-Grenzfälle nicht ausgeführt
+C-01	✅	G2: "Benutzername oder Passwort stimmen nicht."
+C-02	✅	G1 Anfrage, beide zeigen 7 gleiche Symbole (Wolke Tulpe Anker Kopfhörer Buch Ordner Glühbirne), beide "Verifiziert."
+C-03	✅	G2 "Dieses Gerät ist verifiziert", Geräteliste (macOS und iOS verifiziert)
+C-04	✅	Abmelden → direkt "Anmelden"
+C-05	✅	Neuer Schlüssel, Zurück-Wege gesperrt bis Häkchen/Weiter (Zurück-Pfeil per Esc geprüft), KN1b abgelegt
+C-06	✅	G2 mit altem Schlüssel KN1: "Der Notfall-Schlüssel passt nicht. Bitte prüfe ihn noch einmal."
+C-07	✅	KN1b schaltet frei, Hauptansicht mit Daten aus B
+C-08	✅	Abmelden → "Anmelden"
+D-01	✅	"Schon vergeben – wie wäre es mit fnt-1102b-n12?", Chip, "frei", Schlüssel bleibt stehen, Familienschritt
+D-02	⚠️	abc: "Das ist kein gültiger Familien-Code…"; echter Code: "Fast geschafft!"; G1: Anfrage mit Warnhinweis, Ablehnen; G2 "Deine Anfrage wurde abgelehnt" nach ca. 60 s (Messung grob: Fenster 5 s-Takt, ≤ 69 s) -> ⚠️ #75 Grenze 20 s nicht belegt
+D-02a	✅	Technische Angaben: Zustand leaveRejected, Timer aktiv: nein; 0 Treffer für MXID/fnt-/Servername/Anzeigename
+D-03	✅	Familie "Loeschtest 1102" angelegt (ae/oe-Schreibweise), Heute
+D-04	✅	Anmelden mit vorausgefülltem Benutzernamen fnt-1102b-n12
+D-05	✅	"Kein anderes Gerät gefunden. Nutze deinen Notfall-Schlüssel.", mit KN2 freigeschaltet
+D-06	⏳	Nicht ausgeführt (Zeit)
+D-07	⏳	Optional, braucht Serverzugang
+E-01	✅	Familie-Tab: Empfehlung zweiter Moderator, Familien-Code
+E-02	✅	Dialog „Familienname ändern“, Enter speichert (#68), „Name geändert.“, Tab Familie zeigt „Testfamilie 1103 neu“
+E-03	✅	abc: „Bitte eine gültige Benutzer-ID eingeben, z. B. @anna:beispiel.de.“; gültige ID: Rückfrage „… einladen? Eingeladene erhalten bereits vor der Annahme die Nachrichtenschlüssel …“; Test N2 steht mit „Eingeladen“ in der Liste
+E-04	✅	Rückfrage „Test N2 wirklich aus der Familie entfernen? Die Raumschlüssel werden erneuert …“; danach „Erledigt.“, N2 nicht mehr in der Liste
+E-05	✅	Einladungsdialog mit QR, Gültig für 1/3/7 Tage, Hinweis „Der Link ist 3 Tage gültig und nur einmal verwendbar …“; Konto-Server für Neue gesetzt, Link kopiert
+E-06	✅	abc: „Das ist kein Einladungslink. …“; gekürzter Link: „Der Link ist unvollständig oder beschädigt – …“
+E-07	✅	Vollständiger Link eingefügt: Kontoanlage „Schritt 2 von 4“
+E-08	✅	Anbieter: „Dein Konto liegt bei matrix-synapse-3ues.srv1348446.hstgr.cloud.“
+E-09	✅	I2 ohne Zusatzschritt angelegt, weiter zum Notfall-Schlüssel (Beobachtung: der Namensvorschlag test.nutzer.2 vor der Eingabe des Benutzernamens wurde beim Tippen angehängt, Feld musste geleert werden; Automatisierungsartefakt)
+E-10	✅	Schlüssel bleibt stehen, Beitrittskarte „Schritt 4 von 4“, nach „Beitritt anfragen“ „Fast geschafft! Test N1 muss dich noch bestätigen …“
+E-11	✅	G2 blieb 30 s auf „Fast geschafft“; G1: „Test Nutzer 2 möchte beitreten / Gültiger Einladungslink“, Rückfrage „… in die Familie aufnehmen? Der Einladungslink wird dabei verbraucht.“; G2 danach in der Hauptansicht (Dauer unter 40 s)
+E-12	⚠️	App-Teil ✅: Link über familynexus://join geöffnet → „Du bist bereits in einer Familie.“, nichts geändert. Die Web-Seite (simctl openurl mit https-Link) zeigte dagegen „Dieser Link ist unvollständig oder beschädigt“, obwohl der Link vollständig und für die App gültig war; Ursache nicht geklärt (Simulator-Übergabe des Fragments?), Nachtest auf echtem Gerät nötig
+E-13	✅	Beide Mitglieder in der Liste (Test N1 Moderator, Test Nutzer 2 Mitglied, „Nicht persönlich geprüft“); „Testfamilie 1103 neu“ auch bei I2
+E-14	✅	G2: „Nur Moderatoren verwalten die Familie.“, kein Namen ändern/Einladen/Familien-Code; Mitglieder-Menü nur „Verifizieren“ und „Test N1 blockieren“; Aufgaben: Hinweis „Nur Moderatoren legen Listen an“, keine Schaltfläche „Neue Aufgabenliste“
+E-15	✅	An: „Test N1 – Online“; Aus: G1 „Dein Status wird nicht geteilt“, G2 „Gerade ist sonst niemand online.“ und bei N1 „Zuletzt online gerade eben“; wieder an: G2 „Test N1 – Online“
+E-16	⚠️	Nachricht G1→G2, Antwort mit Bezug („Antwort an Test N1“, Bezugszeile bei G1), Reaktion 👍 bei beiden ✅; Offline-Fall (Flugmodus, #224) nicht geprüft (Netz des Testrechners nicht abgeschaltet)
+E-17	✅	Bild und Textdatei bei G2; Bild nach „Anhang laden“ sichtbar, „Speichern“ mit Warnung „Die Datei wird entschlüsselt und unverschlüsselt im gewählten Ordner gespeichert …“; beide Dateien im Zielordner, Inhalt byte-gleich mit dem Original
+E-18	✅	G1: Tab Familie → „Nachricht schreiben“ → oben „Nur zwischen dir und Test Nutzer 2, Ende-zu-Ende-verschlüsselt“ (vor dem Senden geprüft); G2: eigener Reiter „Test N1“ mit der Nachricht, nicht im Familienchat, kein Rohtext (Bezeichnung „Einzelchat mit Test N1“ im Plan: die App zeigt einen Reiter „Test N1“ und die Zeile „Nur zwischen dir und Test N1“)
+E-19	✅	G2 sieht „Test geteilt 2“ (1 Termin), „Test privat“ nicht; Filter „Test Nutzer 2“: „Keine Termine“; G1 sieht beide
+E-20	✅	G2: „Nur der Ersteller kann diesen Termin ändern.“, Zusagen/Vielleicht/Absagen; G1: „Test Nutzer 2 – Zugesagt“, „Im Chat teilen“
+E-21	✅	Termin I2 (geteilt) bei G1 mit „Von Test Nutzer 2“; Wechsel auf Privat zeigt „Bereits an die Familie gesendete Inhalte bleiben auf deren Geräten …“
+E-22	✅	Käse (Gruppe „aldi“) steht auf beiden unter „Aldi“ (#211), „zuletzt von Test Nutzer 2“; G1 hakt ab, „1 erledigte Einträge für die ganze Familie entfernen?“; Löschen von Vollkornbrot wirkt auf beiden
+E-23	⚠️	Liste „Muell rausbringen“ (Umlaut-Ersatz) Mo–Fr: Kürzel „Mo–Fr“ und „Montag bis Freitag“ (#76 ok); G2 Liste unter „Mir zugewiesen“, abgehakt mit Kommentar; G1 Checkbox ausgegraut, Verlauf „Tonne an die Strasse erledigt – Test Nutzer 2 · 3.11.2026, 20:45“; Datum ohne führende Null (Plan: TT.MM.JJJJ; wie A-10/B-15); „Bad putzen“ gelöscht. Nicht geprüft: Hinweis „Aufgaben für dich: 1 offen“ auf Heute
+E-24	✅	Beide zeigen dieselben 7 Symbole, „Sie stimmen überein“ → „Verifiziert.“, Mitgliederliste „Verifiziert“
+E-25	✅	Dialog „Nachricht melden“ mit Hinweis auf den Betreiber (matrix.chaostribunal.de) und vier Gründen; „Meldung gesendet.“ mit „Absender blockieren“, verschwindet nach etwa 9 s (Hinweis hell/dunkel: nur dunkel geprüft)
+E-26	✅	„Test Nutzer 2 blockieren?“ mit Erklärung; G1: Nachrichten und Reiter von I2 ausgeblendet, Mitglied „Blockiert“; G2 sendet „Noch da?“ ohne Fehlermeldung. Auffällig: Chat-Tab zeigt weiter Zähler „1“ (ungelesen) während I2 blockiert ist
+E-27	✅	Blockierte Mitglieder → „Blockierung aufheben“; „Noch da?“ und Reiter wieder sichtbar
+E-28	✅	G1 Menü „Version 1.2.2 (23)“, G2 Menü „Version 1.2.2 (23)“
+E-29	✅	Dialog „Konto löschen?“ mit rotem Hinweis „Du bist der einzige Moderator der Familie. Ernenne vorher ein anderes Mitglied zum Moderator …“; „Konto endgültig löschen“ ohne Passwort inaktiv; Abbrechen: unverändert
+E-30	✅	Rückfrage „Test Nutzer 2 zum Moderator ernennen? Moderatoren können einladen, ernennen und entfernen.“; G2 zeigt danach Familienname ändern/Einladen, die Empfehlung ist bei G1 verschwunden (Moderator-Badge bei I2 nicht einzeln bildlich belegt)
+E-31	✅	„Konto löschen?“ ohne Moderator-Hinweis; Abbrechen
+E-32	✅	G2: Dialog mit Konto und Server, nach Passwort „Willkommen“ (nicht „Anmelden“); G1: nur noch Test N1 in der Liste (Empfehlung zweiter Moderator wieder da), frühere Nachrichten sichtbar mit Namen „Test Nutzer 2“ (Chat vor Neuanmeldung), nie mit Matrix-ID
+F-01	⏳	Nicht ausgeführt: N2 wurde nie in der App angemeldet (Schlüssel KN2 gehörte zum gelöschten Lauf 1102b); N2 per API gelöscht
+F-02	✅	Gegenprobe N2 per curl: 403 M_FORBIDDEN
+F-03	✅	„Alle lokalen Daten löschen?“ → „Endgültig löschen“ → „Willkommen“
+F-04	✅	Nach App-Neustart „Willkommen“
+F-05	✅	Anmeldung N1 (Anbieter eingetragen) → Freischalten mit KN1 (1103): Termine (auch privat), Einkauf, Chat wiederhergestellt; Nachricht von I2 mit „Ehemaliges Mitglied“, keine Matrix-ID (#60). Aufgaben nicht einzeln angesehen
+F-05a	n/a	Nur iOS auf echtem Gerät und Android
+F-06	✅	N1 in der App gelöscht (Passwort), kein Moderator-Hinweis, danach „Willkommen“
+F-07	✅	Gegenprobe N1, N2, I2 per curl: je 403 M_FORBIDDEN
+F-08	✅	Zustand am Ende: fnt-1103-n1/n12/i2 gelöscht (M_USER_IN_USE); fnt-1102b-* aus Lauf 1 und Altkonten fnt-1102-* unberührt bzw. gelöscht wie dort vermerkt
+G-01	✅	flutter analyze: No issues found
+G-02	✅	flutter test: All tests passed (+1589, übersprungen 123)
+G-03	✅	review_notes_test.dart: 4 Tests, All tests passed
+G-04	⏳	Nicht ausgeführt (G-04 braucht Docker/Synapse, G-05 nur automatisiert, G-06 bis G-08 manuell bzw. Web)
+G-05	⏳	Nicht ausgeführt (G-04 braucht Docker/Synapse, G-05 nur automatisiert, G-06 bis G-08 manuell bzw. Web)
+G-06	⏳	Nicht ausgeführt (G-04 braucht Docker/Synapse, G-05 nur automatisiert, G-06 bis G-08 manuell bzw. Web)
+G-07	⏳	Nicht ausgeführt (G-04 braucht Docker/Synapse, G-05 nur automatisiert, G-06 bis G-08 manuell bzw. Web)
+G-08	⏳	Nicht ausgeführt (G-04 braucht Docker/Synapse, G-05 nur automatisiert, G-06 bis G-08 manuell bzw. Web)
+H-01..H-19	⏳	Nicht ausgeführt (Verschlüsselung auf dem Gerät)
+V-01	✅	Soll 1.2.2+23, main=origin/main @ 48e9299
+V-02	✅	macOS 1.2.2 (23), TestFlight-signiert (Team LWGTDX5B34); iOS-Sim 1.2.2 (23) aus main @ 48e9299
+V-03	✅	iOS-Simulator: flutter build ios --simulator --debug, simctl install (alte Version 0.1.0+1 vorher entfernt)
+V-04	✅	Beide Geräte zeigen "Willkommen" (iOS-Sim nach Neuinstallation, Mac ohne Altkonto)
+V-05	✅	Server erreichbar, Registrierung m.login.dummy
+V-06	✅	fnt-1102-n1/n12/i2 vergeben (Altkonten, nicht angefasst) → Datumsteil 1102b: alle vier Namen frei
+V-07	✅	Gerätesprache de-DE
