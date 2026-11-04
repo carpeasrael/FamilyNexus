@@ -46,5 +46,16 @@ out = ['# Abhängigkeiten (SBOM)', '', f'Stand: {datetime.date.today()} · erzeu
        '| Paket | Art | Version | Veröffentlicht | Lizenz | Pub-Punkte | Hinweis |', '|---|---|---|---|---|---|---|']
 for n, dep, src, ver, pub, lic, pts, note in rows:
     out.append(f'| `{n}` | {dep} | {ver} | {pub} | {lic} | {pts} | {note} |')
+
+# Native Abhängigkeiten der Android-App (#268): der dependencies-Block von android/app/build.gradle.kts.
+gradle = open('android/app/build.gradle.kts', encoding='utf-8').read()
+block = re.search(r'^dependencies \{\n(.*?)^\}', gradle, re.M | re.S)
+native = re.findall(r'^\s*(implementation|coreLibraryDesugaring)\("([^"]+):([^":]+)"\)', block.group(1) if block else '', re.M)
+if native:
+    out += ['', '## Native Abhängigkeiten (Android, `android/app/build.gradle.kts`)', '',
+            '| Artefakt | Art | Version |', '|---|---|---|']
+    for kind, artifact, version in native:
+        out.append(f'| `{artifact}` | {kind} | {version} |')
+
 open('docs/ABHAENGIGKEITEN.md', 'w', encoding='utf-8').write('\n'.join(out) + '\n')
-print(len(rows), 'Pakete')
+print(len(rows), 'Pakete,', len(native), 'native Android-Abhängigkeiten')

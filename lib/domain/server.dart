@@ -72,7 +72,7 @@ class ServerInfo {
   final String? contact;
   final String? supportPage;
 
-  /// Anmeldung und Kontoanlage laufen über die Seite des Anbieters im Browser (OAuth, E-55).
+  /// Anmeldung und Kontoanlage laufen über die Seite des Anbieters (OAuth, E-55, E-91).
   final bool usesOAuth;
 }
 

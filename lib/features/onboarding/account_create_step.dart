@@ -16,8 +16,8 @@ import 'provider_section.dart';
 import 'registration_stage_view.dart';
 
 /// „Konto erstellen“ (E-55): Name, Benutzername (vorgeschlagen und live geprüft) und Passwort. Je nach
-/// Anbieter wird das Konto direkt in der App, auf der Seite des Anbieters im Browser oder – falls die
-/// App es nicht kann – auf dessen Webseite angelegt.
+/// Anbieter wird das Konto direkt in der App, auf der Seite des Anbieters (in der App, E-91) oder – falls
+/// die App es nicht kann – auf dessen Webseite angelegt.
 /// Formularstelle, zu der ein Eingabegrund gehört; `provider` hat kein Feld.
 enum _Input { provider, name, user, pass, repeat }
 
@@ -357,7 +357,7 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
               if (page != null)
                 OutlinedButton.icon(
                   icon: const Icon(Icons.open_in_new, size: 18),
-                  onPressed: () => _s.browser.open(page),
+                  onPressed: () => _s.browser.open(page, inApp: true),
                   label: Text(l.regExternalOpen),
                 ),
               OutlinedButton(onPressed: _openElement, child: Text(l.regElementOpen)),

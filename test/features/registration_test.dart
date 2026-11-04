@@ -61,6 +61,7 @@ void main() {
     expect(find.text('Der Anbieter möchte, dass du seinen Bedingungen zustimmst.'), findsOneWidget);
     await _tap(tester, 'Nutzungsbedingungen');
     expect(app.browser.opened.single.toString(), 'https://fake.test/terms');
+    expect(app.browser.inApp.single, isTrue, reason: 'Bedingungen öffnen in der App (E-91)');
     expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Weiter')).onPressed, isNull);
     await tester.tap(find.byType(CheckboxListTile));
     await tester.pumpAndSettle();
@@ -134,14 +135,75 @@ void main() {
     ];
     await _pump(tester, app);
     await _fillAndSubmit(tester);
-    expect(find.textContaining('dass du kein Roboter bist'), findsOneWidget);
+    expect(find.textContaining('auf der Seite des Anbieters kurz, dass du kein Roboter bist'), findsOneWidget);
     await _tap(tester, 'Ich bin fertig');
-    expect(find.text('Noch nicht abgeschlossen. Bitte beende die Bestätigung im Browser.'), findsOneWidget);
+    expect(find.text('Noch nicht abgeschlossen. Bitte beende die Bestätigung auf der Seite des Anbieters.'), findsOneWidget);
 
-    await _tap(tester, 'Im Browser öffnen');
+    await _tap(tester, 'Seite öffnen');
     expect(app.browser.opened.last.host, 'fake.test');
     app.server.captchaSolved = true;
     // Rückkehr aus dem Browser: App wird wieder aktiv.
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+    expect(app.gateway.userId, '@emil:fake.test');
+  });
+
+  testWidgets('TP-REG-08c „Kein Roboter“ in der Sitzung (iOS/macOS): Ende der Sitzung prüft ohne resumed, resumed während der Sitzung nicht',
+      (tester) async {
+    final app = await buildTestApp(loggedIn: false);
+    app.server.registrationFlows = <List<String>>[
+      <String>[RegistrationFlows.recaptcha],
+    ];
+    app.browser.sessionWaits = true;
+    await _pump(tester, app);
+    await _fillAndSubmit(tester);
+    await _tap(tester, 'Seite öffnen');
+    expect(app.browser.inApp.last, isTrue, reason: 'Captcha öffnet in der App');
+    expect(app.browser.sessionOpen, isTrue);
+    app.server.captchaSolved = true;
+    // Face ID, Autofill oder das Erscheinen der Sitzung selbst: inactive → resumed bei offener Sitzung.
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+    expect(app.gateway.userId, isNull, reason: 'keine Prüfung, solange die Sitzung offen ist');
+    // „Abbrechen“ beendet die Sitzung: jetzt wird automatisch geprüft, ohne resumed.
+    app.browser.finishSession();
+    await tester.pumpAndSettle();
+    expect(app.gateway.userId, '@emil:fake.test');
+  });
+
+  testWidgets('TP-REG-08c Captcha-Seite öffnet nicht: Hinweis, resumed prüft nicht; erneutes Tippen bzw. Stufenwechsel entfernt ihn',
+      (tester) async {
+    const noPage = 'Die Seite konnte nicht geöffnet werden. Bitte versuche es noch einmal.';
+    final app = await buildTestApp(loggedIn: false);
+    app.server.registrationFlows = <List<String>>[
+      <String>[RegistrationFlows.recaptcha],
+    ];
+    await _pump(tester, app);
+    await _fillAndSubmit(tester);
+    app.browser.available = false;
+    await _tap(tester, 'Seite öffnen');
+    expect(find.text(noPage), findsOneWidget);
+    app.server.captchaSolved = true;
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+    expect(app.gateway.userId, isNull, reason: 'nichts geöffnet → keine Prüfung');
+
+    // Stufenwechsel („Ich bin fertig“, noch nicht gelöst) entfernt den Hinweis.
+    app.server.captchaSolved = false;
+    await _tap(tester, 'Ich bin fertig');
+    expect(find.text('Noch nicht abgeschlossen. Bitte beende die Bestätigung auf der Seite des Anbieters.'), findsOneWidget);
+    expect(find.text(noPage), findsNothing);
+
+    // Erneut nicht geöffnet, dann erneutes Tippen mit verfügbarer Seite: Hinweis weg, Rückkehr prüft.
+    await _tap(tester, 'Seite öffnen');
+    expect(find.text(noPage), findsOneWidget);
+    app.browser.available = true;
+    await _tap(tester, 'Seite öffnen');
+    expect(find.text(noPage), findsNothing);
+    app.server.captchaSolved = true;
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pumpAndSettle();
@@ -173,6 +235,7 @@ void main() {
     expect(find.widgetWithText(TextField, 'Wie heißt du?'), findsNothing);
     await _tap(tester, 'Webseite öffnen');
     expect(app.browser.opened.single.toString(), 'https://fake.test/signup');
+    expect(app.browser.inApp.single, isTrue, reason: 'Webseite des Anbieters öffnet in der App (E-91)');
     await _tap(tester, 'Ich habe ein Konto – anmelden');
     expect(find.widgetWithText(TextField, 'Benutzername'), findsOneWidget);
   });
@@ -190,6 +253,7 @@ void main() {
     expect(find.textContaining('nicht installiert'), findsOneWidget);
     await _tap(tester, 'Element laden');
     expect(app.browser.opened.last.toString(), 'https://element.io/download');
+    expect(app.browser.inApp.last, isFalse, reason: 'Download-Link bleibt extern');
   });
 
   testWidgets('TP-REG-09b nur nicht unterstützte Schritte (Telefonnummer): wie abgeschaltet', (tester) async {

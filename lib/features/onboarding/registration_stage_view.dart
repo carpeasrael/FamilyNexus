@@ -5,7 +5,7 @@ import '../../domain/registration.dart';
 import '../../l10n/gen/app_localizations.dart';
 
 /// Zusatzschritt, den der Anbieter bei der Kontoanlage verlangt (E-55): Bedingungen, E-Mail,
-/// Einladungscode oder „kein Roboter“ im Browser. Jede Antwort geht über [onInput] an das Gateway.
+/// Einladungscode oder „kein Roboter“ auf der Seite des Anbieters (in der App, E-91). Jede Antwort geht über [onInput] an das Gateway.
 class RegistrationStageView extends StatefulWidget {
   const RegistrationStageView({
     super.key,
@@ -29,6 +29,15 @@ class _RegistrationStageViewState extends State<RegistrationStageView> with Widg
   final TextEditingController _token = TextEditingController();
   bool _agreed = false;
   bool _captchaOpened = false;
+
+  /// Die Captcha-Seite ist offen und die Plattform meldet ihr Ende selbst (iOS/macOS): `resumed` zählt nicht.
+  bool _sessionWaiting = false;
+
+  /// Die Captcha-Seite ließ sich nicht öffnen (Hinweis unter dem Knopf).
+  bool _noPage = false;
+
+  /// Zählt die Öffnungen; nur die letzte darf die Prüfung auslösen.
+  int _captchaRun = 0;
   String? _localError;
 
   @override
@@ -45,16 +54,50 @@ class _RegistrationStageViewState extends State<RegistrationStageView> with Widg
     super.dispose();
   }
 
-  /// Zurück aus dem Browser: Captcha automatisch erneut prüfen (kein zusätzlicher Tipp nötig).
+  @override
+  void didUpdateWidget(RegistrationStageView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.stage != oldWidget.stage) _noPage = false;
+  }
+
+  /// Zurück von der Seite des Anbieters (Ende der Sitzung bzw. `resumed`): Captcha automatisch erneut
+  /// prüfen (kein zusätzlicher Tipp nötig). Solange die Sitzung offen ist, zählt `resumed` nicht (Face ID,
+  /// Autofill und das Erscheinen der Sitzung selbst lösen es aus).
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed && _captchaOpened && widget.stage is CaptchaStage && !widget.busy) {
+    if (state == AppLifecycleState.resumed && !_sessionWaiting) _checkCaptcha();
+  }
+
+  void _checkCaptcha() {
+    if (mounted && _captchaOpened && widget.stage is CaptchaStage && !widget.busy) {
       _captchaOpened = false;
       widget.onInput(const CaptchaDone());
     }
   }
 
-  Future<void> _open(Uri uri) => AppScope.read(context).browser.open(uri);
+  Future<void> _open(Uri uri) => AppScope.read(context).browser.open(uri, inApp: true);
+
+  Future<void> _openCaptcha(Uri page) async {
+    final run = ++_captchaRun;
+    setState(() => _noPage = false);
+    _captchaOpened = true;
+    _sessionWaiting = true;
+    final opening = await AppScope.read(context).browser.openInApp(page);
+    if (!mounted || run != _captchaRun) return;
+    if (!opening.opened) {
+      setState(() {
+        _sessionWaiting = false;
+        _captchaOpened = false;
+        _noPage = true;
+      });
+      return;
+    }
+    final ended = await opening.waited;
+    if (!mounted || run != _captchaRun) return;
+    _sessionWaiting = false;
+    // Ende gemeldet (iOS/macOS): jetzt prüfen. Sonst (Android, Desktop, externer Rückfall) prüft `resumed`.
+    if (ended) _checkCaptcha();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,14 +169,10 @@ class _RegistrationStageViewState extends State<RegistrationStageView> with Widg
           const SizedBox(height: 12),
           FilledButton.icon(
             icon: const Icon(Icons.open_in_new, size: 18),
-            onPressed: busy
-                ? null
-                : () {
-                    _captchaOpened = true;
-                    _open(page);
-                  },
+            onPressed: busy ? null : () => _openCaptcha(page),
             label: Text(l.regCaptchaOpen),
           ),
+          if (_noPage) ...<Widget>[const SizedBox(height: 8), Semantics(liveRegion: true, child: Text(l.regCaptchaNoPage, style: err))],
           const SizedBox(height: 8),
           OutlinedButton(onPressed: busy ? null : () => widget.onInput(const CaptchaDone()), child: Text(l.regCaptchaDone)),
         ],

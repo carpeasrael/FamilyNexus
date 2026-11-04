@@ -2081,7 +2081,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy1Body.
   ///
   /// In de, this message translates to:
-  /// **'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Verantwortlich für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server); er steht bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.'**
+  /// **'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Verantwortlich für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server); er steht bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.'**
   String get privacy1Body;
 
   /// No description provided for @privacy2Title.
@@ -2231,7 +2231,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy7Rest.
   ///
   /// In de, this message translates to:
-  /// **'Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit Anmeldung im Browser (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.'**
+  /// **'Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht erzwungen löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.'**
   String get privacy7Rest;
 
   /// No description provided for @privacy8Title.
@@ -3491,7 +3491,7 @@ abstract class AppLocalizations {
   /// No description provided for @passwordChangeBrowserBody.
   ///
   /// In de, this message translates to:
-  /// **'Dein Passwort liegt bei deinem Anbieter. Du änderst es auf seiner Kontoseite im Browser.'**
+  /// **'Dein Passwort liegt bei deinem Anbieter. Du änderst es auf seiner Kontoseite.'**
   String get passwordChangeBrowserBody;
 
   /// No description provided for @passwordChangeBrowserOpen.
@@ -3605,13 +3605,13 @@ abstract class AppLocalizations {
   /// No description provided for @regCaptchaBody.
   ///
   /// In de, this message translates to:
-  /// **'Bitte bestätige im Browser kurz, dass du kein Roboter bist. Danach geht es hier automatisch weiter.'**
+  /// **'Bitte bestätige auf der Seite des Anbieters kurz, dass du kein Roboter bist. Schließe die Seite danach (auf iPhone und Mac über „Abbrechen“); es geht hier automatisch weiter.'**
   String get regCaptchaBody;
 
   /// No description provided for @regCaptchaOpen.
   ///
   /// In de, this message translates to:
-  /// **'Im Browser öffnen'**
+  /// **'Seite öffnen'**
   String get regCaptchaOpen;
 
   /// No description provided for @regCaptchaDone.
@@ -3623,8 +3623,14 @@ abstract class AppLocalizations {
   /// No description provided for @regCaptchaNotYet.
   ///
   /// In de, this message translates to:
-  /// **'Noch nicht abgeschlossen. Bitte beende die Bestätigung im Browser.'**
+  /// **'Noch nicht abgeschlossen. Bitte beende die Bestätigung auf der Seite des Anbieters.'**
   String get regCaptchaNotYet;
+
+  /// Captcha bei der Kontoanlage: Die Seite des Anbieters ließ sich weder in der App noch extern öffnen (#268, E-91).
+  ///
+  /// In de, this message translates to:
+  /// **'Die Seite konnte nicht geöffnet werden. Bitte versuche es noch einmal.'**
+  String get regCaptchaNoPage;
 
   /// No description provided for @regOAuthIntro.
   ///
@@ -3794,10 +3800,10 @@ abstract class AppLocalizations {
   /// **'Das ist keine gültige Server-Adresse.'**
   String get familyInviteServerInvalid;
 
-  /// No description provided for @oauthWaiting.
+  /// Während der Anmeldung auf der Seite des Anbieters (OAuth; in der App bzw. auf Linux/Windows im Browser, E-91).
   ///
   /// In de, this message translates to:
-  /// **'Bitte im Browser bei {host} fortfahren … Danach geht es hier automatisch weiter.'**
+  /// **'Bitte auf der Seite von {host} fortfahren … Danach geht es hier automatisch weiter.'**
   String oauthWaiting(String host);
 
   /// No description provided for @loginOAuthIntro.
@@ -4205,7 +4211,7 @@ abstract class AppLocalizations {
   /// No description provided for @errOAuthCancelled.
   ///
   /// In de, this message translates to:
-  /// **'Die Anmeldung im Browser wurde nicht abgeschlossen. Bitte versuche es noch einmal.'**
+  /// **'Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.'**
   String get errOAuthCancelled;
 
   /// No description provided for @joinCardServerMismatch.
@@ -5003,13 +5009,13 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleteBrowserIntro.
   ///
   /// In de, this message translates to:
-  /// **'Die Löschung bestätigst du auf der Kontoseite deines Anbieters im Browser.'**
+  /// **'Die Löschung bestätigst du auf der Kontoseite deines Anbieters.'**
   String get accountDeleteBrowserIntro;
 
   /// No description provided for @accountDeleteBrowserWait.
   ///
   /// In de, this message translates to:
-  /// **'Bestätige die Löschung auf der Seite des Anbieters und kehre dann hierher zurück.'**
+  /// **'Bestätige die Löschung auf der Seite des Anbieters, schließe sie (auf iPhone und Mac über „Abbrechen“) und kehre dann hierher zurück.'**
   String get accountDeleteBrowserWait;
 
   /// No description provided for @accountDeleteOpen.
@@ -5039,7 +5045,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleteNoBrowser.
   ///
   /// In de, this message translates to:
-  /// **'Der Browser konnte nicht geöffnet werden.'**
+  /// **'Die Seite des Anbieters konnte nicht geöffnet werden.'**
   String get accountDeleteNoBrowser;
 
   /// No description provided for @chatOpening.

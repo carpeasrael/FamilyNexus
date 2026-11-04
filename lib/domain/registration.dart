@@ -15,7 +15,7 @@ enum RegistrationMode {
   /// Klassisch über `/register` direkt in der App (Benutzername + Passwort, ggf. Zusatzschritte).
   inApp,
 
-  /// Über die Anmeldeseite des Anbieters im Browser (OAuth, z. B. matrix.org).
+  /// Über die Anmeldeseite des Anbieters (OAuth, z. B. matrix.org; öffnet in der App, E-91).
   oauth,
 
   /// Keine Registrierung über die App möglich (abgeschaltet oder nur mit nicht unterstützten Schritten).
@@ -64,7 +64,7 @@ class TokenStage extends RegistrationStage {
   final bool wrong;
 }
 
-/// „Ich bin kein Roboter“ im Browser bestätigen ([page] ist die Seite des Servers).
+/// „Ich bin kein Roboter“ auf der Seite des Anbieters bestätigen ([page] ist die Seite des Servers).
 class CaptchaStage extends RegistrationStage {
   const CaptchaStage(this.page, {this.notDoneYet = false});
   final Uri page;

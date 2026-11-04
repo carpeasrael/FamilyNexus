@@ -63,6 +63,57 @@ void main() {
     expect(kotlin, contains('text.length <= 2048'));
   });
 
+  /// Ausgeschnittener `<activity>`-Block (Start-Tag bis `</activity>`) der Activity [name].
+  String activityBlock(String name) {
+    final m = RegExp('<activity\\s[^>]*android:name="\\.$name"[^>]*>.*?</activity>', dotAll: true).firstMatch(manifest);
+    expect(m, isNotNull, reason: name);
+    return m!.group(0)!;
+  }
+
+  test('OAuth-Rücksprung über OAuthRedirectActivity (#268, E-91), nicht direkt in MainActivity', () {
+    final redirect = activityBlock('OAuthRedirectActivity');
+    final main = activityBlock('MainActivity');
+    expect(redirect, contains('android:scheme="io.github.carpeasrael.familynexus"'));
+    expect(redirect, contains('android:path="/oauth"'));
+    expect(redirect, contains('android:exported="true"'));
+    expect(redirect, contains('android:noHistory="true"'));
+    expect(redirect, contains('android:taskAffinity=""'));
+    expect(redirect, contains('Rücksprung der Anmeldung beim Anbieter (OAuth, E-55, E-91)'));
+    expect(main, isNot(contains('io.github.carpeasrael.familynexus')), reason: 'MainActivity hat keinen OAuth-Filter mehr');
+    expect(main, contains('android:scheme="familynexus"'));
+
+    final kotlin = File('android/app/src/main/kotlin/de/inneso/familynexus/MainActivity.kt').readAsStringSync();
+    final receiver = File('android/app/src/main/kotlin/de/inneso/familynexus/OAuthRedirectActivity.kt').readAsStringSync();
+    expect(receiver, contains('data.scheme == "io.github.carpeasrael.familynexus" && data.path == "/oauth"'));
+    expect(receiver, contains('length <= 2048'));
+    expect(receiver, contains('Intent.ACTION_VIEW'));
+    expect(receiver, contains('FLAG_ACTIVITY_CLEAR_TOP'));
+    expect(receiver, contains(': android.app.Activity()'));
+    expect(receiver, isNot(contains('AppCompatActivity')));
+    for (final (name, src) in <(String, String)>[('MainActivity', kotlin), ('OAuthRedirectActivity', receiver)]) {
+      expect(src, isNot(contains('FLAG_ACTIVITY_NO_HISTORY')), reason: name);
+      expect(src, isNot(contains('WebView')), reason: name);
+    }
+    expect(kotlin, contains('setPackage('));
+    expect(kotlin, contains('CustomTabsClient.getPackageName(this, null)'));
+  });
+
+  test('Custom Tabs: Abfrage im Manifest, androidx.browser deklariert und in ABHAENGIGKEITEN.md (#268)', () {
+    final queries = RegExp('<queries>.*?</queries>', dotAll: true).firstMatch(manifest)!.group(0)!;
+    expect(queries, contains('android.support.customtabs.action.CustomTabsService'));
+    final gradle = File('android/app/build.gradle.kts').readAsStringSync();
+    expect(gradle, contains('implementation("androidx.browser:browser:1.9.0")'));
+    final deps = File('docs/ABHAENGIGKEITEN.md').readAsStringSync();
+    final declared = RegExp(r'(?:implementation|coreLibraryDesugaring)\("([^:"]+):([^:"]+):([^"]+)"\)').allMatches(gradle).toList();
+    expect(declared, isNotEmpty);
+    for (final m in declared) {
+      final artifact = '${m.group(1)}:${m.group(2)}';
+      final row = deps.split('\n').where((l) => l.contains('`$artifact`')).toList();
+      expect(row, hasLength(1), reason: '$artifact fehlt in docs/ABHAENGIGKEITEN.md');
+      expect(row.single, contains(m.group(3)), reason: '$artifact: Version ${m.group(3)}');
+    }
+  });
+
   test('Debug-/Profil-Manifeste fügen nur INTERNET hinzu (Entwicklung)', () {
     for (final v in <String>['debug', 'profile']) {
       final f = File('android/app/src/$v/AndroidManifest.xml');

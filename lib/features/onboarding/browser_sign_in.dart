@@ -2,11 +2,13 @@ import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/server.dart';
 
-/// Anmeldung bzw. Kontoanlage ([create]) auf der Seite des Anbieters (OAuth, E-55): Rücksprung
-/// vorbereiten, Seite im Browser öffnen, auf den passenden Rücksprung warten, Anmeldung abschließen.
+/// Anmeldung bzw. Kontoanlage ([create]) auf der Seite des Anbieters (OAuth, E-55, E-91): Rücksprung
+/// vorbereiten, Anbieterseite öffnen (iOS/macOS in der Anmeldesitzung des Systems, Android im Custom Tab,
+/// Linux/Windows im Browser), auf den passenden Rücksprung warten, Anmeldung abschließen.
 ///
-/// Rücksprünge mit fremdem `state` werden verworfen; es wird weiter gewartet. Wirft `oauthCancelled`,
-/// wenn kein Browser öffnet, die Person abbricht oder die Zeit abläuft.
+/// Rücksprünge mit fremdem `state` werden verworfen; auf Android, Linux und Windows wird weiter gewartet,
+/// auf iOS/macOS endet der Versuch (die Sitzung liefert nur eine Antwort). Wirft `oauthCancelled`, wenn
+/// keine Seite öffnet, die Person abbricht oder die Zeit abläuft.
 Future<void> signInWithBrowser(
   AppServices s,
   ServerUrl server, {
@@ -18,7 +20,7 @@ Future<void> signInWithBrowser(
   final attempt = await redirect.prepare();
   try {
     final uri = await s.gateway.startOAuth(server: server, redirectUri: attempt.redirectUri, create: create);
-    if (!await s.browser.open(uri)) throw const GatewayException(GatewayError.oauthCancelled);
+    if (!await attempt.open(uri)) throw const GatewayException(GatewayError.oauthCancelled);
     final deadline = DateTime.now().add(timeout);
     while (true) {
       final callback = await attempt.next(deadline: deadline);

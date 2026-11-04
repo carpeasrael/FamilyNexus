@@ -69,6 +69,8 @@ kotlin {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    // Custom Tab für Anbieterseiten (#268, E-91); gleiche Version wie in url_launcher_android.
+    implementation("androidx.browser:browser:1.9.0")
 }
 
 flutter {

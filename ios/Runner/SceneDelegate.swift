@@ -2,7 +2,8 @@ import Flutter
 import UIKit
 
 class SceneDelegate: FlutterSceneDelegate {
-  /// Einladungslinks und der Rücksprung der Browser-Anmeldung (OAuth, E-55).
+  /// Einladungslinks und Rücksprünge auf das App-Schema außerhalb einer Anmeldesitzung (die Sitzung liefert
+  /// ihren Rücksprung selbst, #268, E-91).
   private static let schemes: Set<String> = ["familynexus", "io.github.carpeasrael.familynexus"]
 
   override func scene(

@@ -7,8 +7,8 @@ import '../../domain/password_change.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../common/error_text.dart';
 
-/// Passwort ändern (#117, E-80): klassisch in der App, bei Anmeldung im Browser über die Kontoseite
-/// des Anbieters. Geht beides nicht, sagt der Dialog das.
+/// Passwort ändern (#117, E-80): klassisch in der App, bei Anmeldung beim Anbieter (OAuth) über dessen
+/// Kontoseite, die in der App öffnet (E-91). Geht beides nicht, sagt der Dialog das.
 Future<void> changePassword(BuildContext context) async {
   final l = AppLocalizations.of(context);
   final services = AppScope.read(context);
@@ -172,7 +172,7 @@ class _PasswordChangeDialogState extends State<PasswordChangeDialog> {
       _busy = true;
       _error = null;
     });
-    final opened = await s.browser.open(page);
+    final opened = await s.browser.open(page, inApp: true);
     if (!mounted) return;
     setState(() {
       _busy = false;

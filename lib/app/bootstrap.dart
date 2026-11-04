@@ -27,7 +27,7 @@ import '../data/platform/device_auth.dart';
 import '../data/platform/file_access.dart';
 import '../data/platform/key_store.dart';
 import '../data/platform/link_source.dart';
-import '../data/platform/oauth_redirect.dart';
+import '../data/platform/in_app_auth.dart';
 import '../data/platform/activity_notifications.dart';
 import '../data/platform/app_badge.dart';
 import '../data/platform/reminder_scheduler.dart';
@@ -131,6 +131,8 @@ Future<AppServices> bootstrap({
     rethrow;
   }
   final links = PlatformLinkSource();
+  // Anbieterseiten und Rücksprung der Anmeldung je Plattform (E-91): eine Sitzung für beide.
+  final auth = buildInAppAuth(links: links);
   // Browser: keine Erinnerungen (E-53); ohne Scheduler gibt es auch keinen Koordinator.
   final LocalReminderScheduler? scheduler = PlatformInfo.isWeb ? null : LocalReminderScheduler();
   final lang = settings.settings.languageCode ?? WidgetsBinding.instance.platformDispatcher.locale.languageCode;
@@ -193,7 +195,8 @@ Future<AppServices> bootstrap({
     gateway: gateway,
     files: fileAccess,
     links: links,
-    oauthRedirect: OAuthRedirect.forPlatform(links),
+    browser: auth.browser,
+    oauthRedirect: auth.oauthRedirect,
     lock: AppLockController(settings: settings, auth: PlatformInfo.hasNoDeviceAuth ? const UnavailableDeviceAuth() : LocalDeviceAuth()),
     screenProtection: PlatformScreenProtection(),
     database: database,

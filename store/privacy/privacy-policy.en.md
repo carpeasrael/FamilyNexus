@@ -9,7 +9,8 @@
 FamilyNexus is a family calendar and messenger with shared shopping list and
 task management. This policy describes the processing of personal
 data on the platforms named. Differences are stated expressly.
-Browser pages that you open from a native app are covered in section 8.
+Provider pages opened by the app (sign-in, account creation, account pages) are covered in
+section 8.
 
 ## 1. Publisher, responsibility and contact
 
@@ -42,7 +43,7 @@ share with you or that your provider supplies for synchronisation.
 
 | Data | Purpose and processing |
 |---|---|
-| Username, Matrix account ID, display name, provider address; when registering, where applicable email address, password and verification steps | Create an account and sign in, assign the profile and establish access to the provider. With browser sign-in, the details are entered on the provider's page. |
+| Username, Matrix account ID, display name, provider address; when registering, where applicable email address, password and verification steps | Create an account and sign in, assign the profile and establish access to the provider. With providers that have their own sign-in page (e.g. matrix.org), the details are entered directly on their page. |
 | Device identifiers and names, access token, where applicable refresh token, verification information and cryptographic keys | Keep the sign-in active, connect your own devices, encrypt and decrypt content, verify devices and restore keys. |
 | Messages, replies, reactions and selected file attachments including file names | Family chat and direct chats between family members. |
 | Shared and private events, titles, locations, notes, times, time zones, recurrences and acceptances or declines | Calendar, event coordination and local reminders. An event location you enter is not a capture of the device location. |
@@ -198,10 +199,16 @@ disclosure of all server logs or backups of your provider.
 
 ## 8. External pages, stores and other providers
 
-With a browser-based sign-in or account deletion, the app opens the page provided by the
-chosen provider. Further services for
-sign-in, email confirmation or CAPTCHA may be involved there. This processing
-is governed by the notices of the respective provider.
+With providers that have their own sign-in page, the app opens the page provided by the
+chosen provider for sign-in, account creation, account deletion and password change.
+On iOS and macOS it opens in a sign-in sheet of the system
+(ASWebAuthenticationSession); in its standard implementation without shared
+browser data. On Android it usually opens in a Custom Tab of the
+default browser if that browser offers Custom Tabs (with the cookies of this
+browser), otherwise in the default browser itself; on Linux and Windows in the browser.
+Further services for sign-in, email confirmation or CAPTCHA may be
+involved there. This processing is governed by the notices of the respective
+provider.
 
 Invitation links can open the GitHub Pages page
 `https://carpeasrael.github.io/FamilyNexus/join/`. When the page is retrieved,
@@ -307,8 +314,8 @@ respective operator. The app sets no uniform period for third-party servers.
 
 **Delete account:** Under **Settings → Account → Delete account** you can
 initiate deletion at the provider. With classic Matrix sign-in, the app
-requests an account deactivation with a deletion request (`erase`). With browser-based
-account management, confirmation takes place on the provider's page. After confirmed
+requests an account deactivation with a deletion request (`erase`). With account management
+on the provider's page, confirmation takes place on the provider's page. After confirmed
 completion, the local account data is cleaned up. Which server data is actually
 deleted or retained further depends on the provider and
 any statutory obligations.

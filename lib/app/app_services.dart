@@ -75,7 +75,7 @@ class AppServices {
   /// Öffnet das Mailprogramm für Einladungslinks (E-49).
   final MailLauncher mail;
 
-  /// Öffnet Seiten des Anbieters (Anmeldung, Bedingungen, Captcha; E-55).
+  /// Öffnet Seiten des Anbieters (Anmeldung, Bedingungen, Captcha, Kontoseiten; E-55, E-91).
   final BrowserLauncher browser;
 
   /// Startet Element, wenn der Server die Kontoanlage in der App nicht zulässt.
@@ -84,7 +84,8 @@ class AppServices {
   /// Standard-Anbieter der Einrichtung; `null` = `matrix.org` (nur Tests setzen ihn).
   final ServerUrl? defaultProvider;
 
-  /// Rücksprung der Anmeldung im Browser; `null` = auf dieser Plattform nicht verfügbar (Browser-App).
+  /// Rücksprung der Anmeldung auf der Anbieterseite (OAuth, E-91); `null` = auf dieser Plattform nicht
+  /// verfügbar (Browser-App).
   final OAuthRedirect? oauthRedirect;
 
   /// Wird vom Start-Widget gesetzt: löscht alle lokalen Daten und startet neu.

@@ -31,7 +31,7 @@ Die Aufnahme muss den tatsächlich eingereichten Build auf einem physischen Ger�
 1. **R1** als Moderator und **R2** als Mitglied derselben Beispielfamilie auf matrix.org einrichten. Beide Konten und ihre individuellen Notfall-Schlüssel auf einem frischen Gerät prüfen. Kein Ablauf darf vom Zugriff auf ein privates Entwicklergerät abhängig sein.
 2. Beispieldaten gemäß [Review Guide](02_Review_Guide_EN.md) anlegen. Als R2 eine Nachricht `Test message for App Review` für Melden/Blockieren vorbereiten. Danach R1 auf dem zweiten Gerät anmelden und verifizieren, damit es in Szene 09 die Freischaltung bestätigen kann. Vor Szene 11 auf dem zweiten Gerät wieder R2 anmelden.
 3. Ein separates **W1-Wegwerfkonto** zur Registrierung und späteren Löschung vorsehen, einschließlich erreichbarem Test-Postfach. W1 erst während der Aufnahme anlegen. R1/R2 nicht löschen.
-4. Aufnahmegerät auf Englisch stellen, private Benachrichtigungen unterdrücken, ausreichend Speicher/Akku sicherstellen. Browser bei matrix.org aus einer anderen Sitzung abmelden. App auf den Willkommenszustand bringen und beenden; dazu ausschließlich Testdaten verwenden.
+4. Aufnahmegerät auf Englisch stellen, private Benachrichtigungen unterdrücken, ausreichend Speicher/Akku sicherstellen. App auf den Willkommenszustand bringen und beenden; dazu ausschließlich Testdaten verwenden.
 5. Passwörter und Notfall-Schlüssel nicht in öffentlich zugänglichen Videos zeigen. **Das Notfall-Schlüssel-Feld ist im aktuellen Code nicht verdeckt.** Deshalb R1 in Szene 09 über ein bereits verifiziertes zweites Gerät freischalten (Emoji-Vergleich), ohne seinen Schlüssel einzublenden. Den für Apple dokumentierten Zugang mit Notfall-Schlüssel separat ohne Aufnahme prüfen. Vor Veröffentlichung die gesamte Aufnahme ansehen. W1-Schlüssel gehören nur zu dem anschließend gelöschten Wegwerfkonto.
 6. Die nachstehende Aufnahme ist als zusammenhängender, ungeschnittener Ablauf vorgesehen, entsprechend dem vorhandenen Projekt-Testplan. Das ist die gewählte Nachweisform; die bereitgestellte Apple-Anfrage selbst schreibt keine bestimmte Videolänge vor.
 
@@ -49,7 +49,7 @@ Videostellen erst nach der Aufnahme eintragen. Alle Ergebnisse beginnen mit „o
 | 06 Chat und Einkauf | Nachricht senden, Einkaufsartikel hinzufügen und abhaken | Nutzerinhalte und typischer Familienablauf | offen |
 | 07 Build | App-Menü mit Versions-/Buildanzeige zeigen | Übereinstimmung mit App Store Connect | offen |
 | 08 W1 löschen | Settings → Account → Delete account → Open deletion page → Löschung beim Anbieter bestätigen → zurück → gegebenenfalls Check deletion | Vollständiger Löschablauf und Rückkehr zu Welcome | offen |
-| 09 R1 anmelden | I already have an account → Sign in at matrix.org → Browser-Anmeldung → Unlock this device → Bestätigung mit zweitem R1-Gerät / Emoji-Vergleich | Anmeldung und Entschlüsselung; R1-Schlüssel bleibt außerhalb des Videos | offen |
+| 09 R1 anmelden | I already have an account → Sign in at matrix.org → Anmeldefenster des Anbieters in der App → Unlock this device → Bestätigung mit zweitem R1-Gerät / Emoji-Vergleich | Anmeldung und Entschlüsselung; R1-Schlüssel bleibt außerhalb des Videos | offen |
 | 10 Beispieldaten / Rollen | Today, Family, Kalender und Chat zeigen | R1 Moderator, R2 Mitglied; gemeinsame Inhalte vorhanden | offen |
 | 11 Aufgaben | Menü → Tasks; als R1 Liste R2 zuweisen, auf G2 als R2 abhaken; Synchronisation/Verlauf auf Aufnahmegerät zeigen | Rollenabhängige Hauptfunktion praktisch demonstriert | offen |
 | 12 Nachricht melden | R2-Nachricht lange drücken → Report message → Grund → Text `Review demo, please ignore` → Report | Erfolgsanzeige; tatsächliche Meldung an Serverbetreiber als Test gekennzeichnet | offen |
@@ -68,7 +68,7 @@ Nach Szene 08 zusätzlich mit W1 eine erneute Anmeldung beim Anbieter versuchen 
 | Prüfung | Erwartetes Ergebnis | Ergebnis / Beleg |
 |---|---|---|
 | Vollständiger TP-FN-001 auf den eingereichten Geräteplattformen | Tatsächlich eingereichter Build geprüft; offene Schritte und Fehler nachvollziehbar geklärt | offen |
-| Frische Installation, Start, Browser-Rückkehr, Entschlüsselung | Keine Abstürze oder Sackgassen; ohne manuelle Entwicklerhilfe nutzbar | offen |
+| Frische Installation, Start, Rückkehr aus dem Anmeldefenster, Entschlüsselung | Keine Abstürze oder Sackgassen; ohne manuelle Entwicklerhilfe nutzbar | offen |
 | Registrierung und Löschung bei matrix.org | Beide vollständig erfolgreich, einschließlich Anmeldung nach Löschung abgelehnt | offen |
 | Beide Rollen und Beispieldaten | R1/R2 mit bereitgestellten Zugangsdaten und Schlüsseln unabhängig nutzbar | offen |
 | Kalender, Chat/Anhänge, Einkauf, Aufgaben, Familie | Erstellung/Änderung und Synchronisation zwischen zwei Konten funktionieren | offen |

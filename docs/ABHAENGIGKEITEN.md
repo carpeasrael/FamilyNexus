@@ -145,3 +145,10 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `xdg_directories` | transitive | 1.1.0 | 2024-10-04 | bsd-3-clause | 160 | ok |
 | `xml` | transitive | 7.0.1 | 2026-04-25 | mit | 160 | neuer: 7.1.0 |
 | `yaml` | transitive | 3.1.4 | 2026-08-28 | mit | 160 | ok |
+
+## Native Abhängigkeiten (Android, `android/app/build.gradle.kts`)
+
+| Artefakt | Art | Version |
+|---|---|---|
+| `com.android.tools:desugar_jdk_libs` | coreLibraryDesugaring | 2.1.5 |
+| `androidx.browser:browser` | implementation | 1.9.0 |

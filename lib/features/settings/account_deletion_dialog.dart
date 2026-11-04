@@ -9,7 +9,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../common/error_text.dart';
 
 /// Kontolöschung aus der App heraus (#12, Apple 5.1.1(v)): klassisch mit Passwort in der App, bei
-/// Anmeldung im Browser über die Löschseite des Anbieters. Endet die Sitzung, löscht die App danach
+/// Anmeldung beim Anbieter (OAuth) über dessen Löschseite, die in der App öffnet (E-91). Endet die Sitzung, löscht die App danach
 /// alle lokalen Daten ([AppServices.accountDeletionPending]).
 Future<void> deleteAccount(BuildContext context) async {
   final l = AppLocalizations.of(context);
@@ -87,7 +87,7 @@ class _AccountDeletionDialogState extends State<AccountDeletionDialog> {
 
   Future<void> _openPage(Uri page) => _run((s, l) async {
         s.accountDeletionPending = true;
-        if (!await s.browser.open(page)) {
+        if (!await s.browser.open(page, inApp: true)) {
           s.accountDeletionPending = false;
           if (mounted) setState(() => _error = l.accountDeleteNoBrowser);
           return;

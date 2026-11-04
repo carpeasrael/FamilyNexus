@@ -552,7 +552,7 @@
   "deleteDataConfirm": "Delete permanently",
   "privacyTitle": "Privacy policy",
   "privacy1Title": "Who processes your data?",
-  "privacy1Body": "FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. Responsible for processing on the server is the operator of the provider you chose (Matrix server); it is shown during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that sign you in via the browser (e.g. matrix.org) you enter these details directly on their page.",
+  "privacy1Body": "FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. Responsible for processing on the server is the operator of the provider you chose (Matrix server); it is shown during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that have their own sign-in page (e.g. matrix.org) you enter these details directly on their page.",
   "privacy2Title": "What data exists?",
   "privacy2Body": "Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted ({cipher}) on your device. The key is held here: {keyStore} – not in the database file.",
   "@privacy2Body": {
@@ -591,7 +591,7 @@
   "@privacy7WipeWeb": {
     "description": "Abschnitt 7 im Browser: dort gibt es keine Erinnerungen (E-53, #225)."
   },
-  "privacy7Rest": "“Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that use browser sign-in (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.",
+  "privacy7Rest": "“Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that have their own sign-in page (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.",
   "privacy8Title": "Children",
   "privacy8Body": "Children can be family members. This requires the consent of their legal guardians; accounts of minors go through invitation and confirmation by a moderator.",
   "privacy9Title": "Your rights",
@@ -1154,7 +1154,7 @@
   "passwordChangeWrongCurrent": "The current password is not correct.",
   "passwordChangeUncertain": "No response from the server. Try again. If the app then says the current password is not correct, your new password already applies.",
   "passwordChangeUnavailable": "Your provider does not allow changing the password in the app.",
-  "passwordChangeBrowserBody": "Your password is held by your provider. You change it on their account page in the browser.",
+  "passwordChangeBrowserBody": "Your password is held by your provider. You change it on their account page.",
   "passwordChangeBrowserOpen": "Open account page",
   "passwordChanged": "Password changed.",
   "regCreate": "Create account",
@@ -1180,10 +1180,11 @@
   "regTokenBody": "This provider only activates accounts with an access code. You get it from the provider (it is not the family’s invitation link).",
   "regTokenLabel": "Provider access code",
   "regTokenWrong": "The code does not match. Please check it.",
-  "regCaptchaBody": "Please confirm briefly in the browser that you are not a robot. Afterwards you continue here automatically.",
-  "regCaptchaOpen": "Open in browser",
+  "regCaptchaBody": "Please confirm briefly on the provider's page that you are not a robot. Then close the page (on iPhone and Mac with “Cancel”); you continue here automatically.",
+  "regCaptchaOpen": "Open page",
   "regCaptchaDone": "I am done",
-  "regCaptchaNotYet": "Not finished yet. Please complete the check in the browser.",
+  "regCaptchaNotYet": "Not finished yet. Please complete the check on the provider's page.",
+  "regCaptchaNoPage": "The page could not be opened. Please try again.",
   "regOAuthIntro": "At {host} you create your account on the provider’s page. Afterwards you return here automatically.",
   "@regOAuthIntro": {
     "placeholders": {
@@ -1248,8 +1249,9 @@
   "familyInviteServerHint": "Newcomers create their account and sign in on this server. Leave empty to use your own server. The family room stays where it is.",
   "familyInviteServerApply": "Create new link",
   "familyInviteServerInvalid": "That is not a valid server address.",
-  "oauthWaiting": "Please continue in the browser at {host} … Afterwards you continue here automatically.",
+  "oauthWaiting": "Please continue on the page of {host} … Afterwards you continue here automatically.",
   "@oauthWaiting": {
+    "description": "Während der Anmeldung auf der Seite des Anbieters (OAuth; in der App bzw. auf Linux/Windows im Browser, E-91).",
     "placeholders": {
       "host": {
         "type": "String"
@@ -1433,7 +1435,7 @@
   "errWeakPassword": "The password is too weak. Please choose a stronger password.",
   "errRegistrationDisabled": "The app cannot create an account with this provider. Create it on their website.",
   "errEmailInUse": "This email address is already used by another account.",
-  "errOAuthCancelled": "The sign-in in the browser was not completed. Please try again.",
+  "errOAuthCancelled": "The sign-in at the provider was not completed. Please try again.",
   "joinCardServerMismatch": "Caution: the family is hosted at {family}, but the inviting person at {inviter}. Only join if you really expected this invitation.",
   "@joinCardServerMismatch": {
     "placeholders": {
@@ -1749,13 +1751,13 @@
   "accountDeleteSoleModerator": "You are the family's only moderator. Make another member a moderator first, otherwise nobody can manage the family any more.",
   "accountDeletePassword": "Password to confirm",
   "accountDeleteConfirm": "Delete account permanently",
-  "accountDeleteBrowserIntro": "You confirm the deletion on your provider's account page in the browser.",
-  "accountDeleteBrowserWait": "Confirm the deletion on the provider's page, then come back here.",
+  "accountDeleteBrowserIntro": "You confirm the deletion on your provider's account page.",
+  "accountDeleteBrowserWait": "Confirm the deletion on the provider's page, close it (on iPhone and Mac with “Cancel”) and then come back here.",
   "accountDeleteOpen": "Open deletion page",
   "accountDeleteOpenAgain": "Open page again",
   "accountDeleteCheck": "Check deletion",
   "accountDeleteStillActive": "The account still exists. Finish the deletion on the provider's page.",
-  "accountDeleteNoBrowser": "The browser could not be opened.",
+  "accountDeleteNoBrowser": "The provider's page could not be opened.",
   "chatOpening": "Opening direct chat …",
   "chatOpenFailed": "The direct chat could not be opened. Please try again.",
   "chatBeforeJoin": "Older messages from before you joined cannot be read.",

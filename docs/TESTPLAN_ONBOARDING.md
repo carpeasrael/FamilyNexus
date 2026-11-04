@@ -23,7 +23,7 @@ ist Pflicht.
 | **S** | lokaler Synapse in Docker (`tool/synapse/up.sh`), echtes Gateway, echte Kryptografie | Kontoanlage, Einladung, Beitritt gegen einen echten Server | `tool/e2e.sh` |
 | **B** | Bildschirmfotos (Fake-Matrix, echte Schriften, 390 × 844 dp) | Verständlichkeit, Layout, Fachbegriffe | `tool/onboarding_screens.sh` → `build/onboarding_tour/` |
 | **A** | Android-Emulator (Pixel 8, API 36), Debug-APK | Deep Links (Einladung, OAuth-Rücksprung), echte Anbietererkennung | manuell mit `adb` |
-| **M** | echter Anbieter matrix.org mit Browser | Kontoanlage über die Anbieterseite (OAuth) | manuell durch eine Person |
+| **M** | echter Anbieter matrix.org mit Anmeldefenster in der App | Kontoanlage über die Anbieterseite (OAuth) | manuell durch eine Person |
 
 Konventionen: Testnamen in den Testdateien beginnen mit der ID (z. B. `TP-REG-03 …`), damit Plan und Code verknüpft sind.
 Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht durchgeführt).
@@ -50,11 +50,11 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-REG-03b | Name wird zwischen Prüfung und Absenden vergeben | absenden | „Dieser Benutzername ist schon vergeben.“, nicht angemeldet | F `registration_test.dart`, S TP-E2E-01 | ✅ |
 | TP-REG-04 | – | Passwort mit 4 Zeichen | „Konto erstellen“ gesperrt, Hinweis „Mindestens 8 Zeichen“, keine Anfrage an den Server | F, S TP-E2E-02 | ✅ |
 | TP-REG-04b | – | Passwortfeld prüfen, Auge antippen | verdeckt, ohne Tastatur-Lernen; Auge zeigt es an | F | ✅ |
-| TP-REG-05 | Anbieter verlangt Bedingungen | absenden | „Noch ein kurzer Schritt“, Link öffnet die Bedingungen im Browser (nur https), „Weiter“ erst nach Häkchen | F, U `registration_flows_test.dart`, B 06 | ✅ |
+| TP-REG-05 | Anbieter verlangt Bedingungen | absenden | „Noch ein kurzer Schritt“, Link öffnet die Bedingungen in der App (iOS/macOS: Anmeldesitzung, Android: Custom Tab; Linux/Windows im Browser; nur https), „Weiter“ erst nach Häkchen | F, U `registration_flows_test.dart`, B 06 | ✅ |
 | TP-REG-06 | Anbieter verlangt E-Mail | ungültige, dann gültige Adresse; „Ich habe bestätigt“ vor/nach Bestätigung; erneut senden | Fehlermeldung bei ungültiger Adresse; „Noch nicht bestätigt“; nach Bestätigung angelegt; Hinweis „geht nur an den Anbieter“ | F | ✅ |
 | TP-REG-06b | Adresse bereits vergeben | senden | verständliche Meldung, Schritt bleibt offen | F | ✅ |
 | TP-REG-07 | Anbieter verlangt Einladungscode | falschen, dann richtigen Code | „Der Code passt nicht“, dann angelegt | F | ✅ |
-| TP-REG-08 | Anbieter verlangt „kein Roboter“ | „Ich bin fertig“ zu früh; „Im Browser öffnen“, lösen, zur App zurück | Hinweis „Noch nicht abgeschlossen“; nach Rückkehr automatisch angelegt | F, B 07 | ✅ |
+| TP-REG-08 | Anbieter verlangt „kein Roboter“ | „Ich bin fertig“ zu früh; „Seite öffnen“, lösen, zur App zurück | Hinweis „Noch nicht abgeschlossen“; nach Rückkehr automatisch angelegt; auf iOS/macOS prüft die App nach „Abbrechen“ der Sitzung automatisch, `resumed` während der Sitzung zählt nicht (TP-REG-08c); öffnet keine Seite, Hinweis unter dem Knopf | F, B 07 | ✅ |
 | TP-REG-08b | Bedingungen **und** Captcha | beide nacheinander | beide Schritte, dann angelegt | F | ✅ |
 | TP-REG-09 | Registrierung abgeschaltet bzw. nur Telefon | „Neue Familie gründen“ | „kann die App kein Konto anlegen“, „Webseite öffnen“ (Hilfeseite), „Ich habe ein Konto – anmelden“ | F, U `server_probe_test.dart` | ✅ |
 | TP-REG-10 | Zusatzschritt offen | „Abbrechen“ | Registrierung samt Passwort verworfen, Passwort nirgends gespeichert | F, S TP-E2E-05 | ✅ |
@@ -77,21 +77,23 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-SRV-03 | – | `http://…` eingeben | „Bitte eine gültige https-Adresse eingeben.“ | F | ✅ |
 | TP-SRV-04 | Anbieter offline | Seite öffnen, dann „Erneut versuchen“ | „… ist gerade nicht erreichbar. Prüfe deine Internetverbindung.“ ohne Rohtext; danach erreichbar | F | ✅ |
 
-### 3.4 Anmeldung und Kontoanlage im Browser (OAuth, z. B. matrix.org)
+### 3.4 Anmeldung und Kontoanlage auf der Anbieterseite in der App (OAuth, z. B. matrix.org; E-91)
 
 | ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
 |---|---|---|---|---|---|
 | TP-OAUTH-01 | Anbieter mit Anmeldedienst | Serverprüfung | als OAuth erkannt, kein Registrierungsversuch | U, A (echtes matrix.org) | ✅ |
-| TP-OAUTH-02 | OAuth-Anbieter | Name, „Konto bei … erstellen“, Rücksprung | Browser öffnet https-Seite mit `prompt=create`; Rücksprung meldet an; Name gesetzt; weiter zum Notfall-Schlüssel | F `invite_onboarding_test.dart`, B 22–23 | ✅ |
-| TP-OAUTH-03 | Anmeldung läuft | Rücksprung mit fremdem `state`, danach der echte | fremder wird verworfen, es wird weiter gewartet; der echte meldet an | F, U `sdk_registration_test.dart` | ✅ |
+| TP-OAUTH-02 | OAuth-Anbieter | Name, „Konto bei … erstellen“, Rücksprung | Anbieterseite öffnet (in der App bzw. auf Linux/Windows im Browser) als https-Seite mit `prompt=create`; Rücksprung meldet an; Name gesetzt; weiter zum Notfall-Schlüssel | F `invite_onboarding_test.dart`, B 22–23 | ✅ |
+| TP-OAUTH-03 | Anmeldung läuft | Rücksprung mit fremdem `state`, danach der echte | Android/Linux/Windows: fremder wird verworfen, es wird weiter gewartet; der echte meldet an. iOS/macOS: die Sitzung liefert nur eine Antwort, ein fremder `state` beendet den Versuch sofort mit Meldung (neuer Versuch nötig) | F `invite_onboarding_test.dart`, U `sdk_registration_test.dart`, `oauth_redirect_test.dart` | ✅ |
 | TP-OAUTH-08 | Anmeldung läuft | „Zurück“, dann neuer Versuch | Versuch beendet; neuer Versuch funktioniert; ein alter Versuch stört den neuen nicht | F, U `oauth_redirect_test.dart` | ✅ |
 | TP-OAUTH-09 | Anbieter mit `http`-Token-Endpunkt | „Konto erstellen“ | Abbruch, bevor sich die App beim Anbieter anmeldet | U `sdk_registration_test.dart` | ✅ |
 | TP-OAUTH-10 | echtes Gateway | Start und Abschluss | PKCE S256, `state`, `prompt=create`, Rücksprung nur an eigene Adresse; Token-Anfrage mit Code, Verifier, Rücksprungadresse | U `sdk_registration_test.dart` (mit vodozemac, läuft in `tool/e2e.sh`) | ✅ |
-| TP-OAUTH-04 | Anmeldung läuft | „Abbrechen“ bzw. Ablehnung beim Anbieter; kein Browser vorhanden | verständliche Meldung, erneuter Versuch möglich, kein Hängen | F | ✅ |
+| TP-OAUTH-04 | Anmeldung läuft | „Abbrechen“ bzw. Ablehnung beim Anbieter; keine Seite öffnet (auch der externe Rückfall nicht) | verständliche Meldung, erneuter Versuch möglich, kein Hängen | F | ✅ |
 | TP-OAUTH-05 | Konto existiert | „Ich habe schon ein Konto“ → „Bei … anmelden“ | ohne `prompt=create`, angemeldet | F | ✅ |
-| TP-OAUTH-06 | Desktop | Rücksprung-Empfänger | nur `127.0.0.1`, zufälliger Port, nur `GET /oauth`, Seite enthält keinen Code, danach geschlossen | U `oauth_redirect_test.dart` | ✅ |
-| TP-OAUTH-07 | Android | `io.github.carpeasrael.familynexus:/oauth?…` per Intent | erreicht die App; kein Hinweis „ungültiger Link“; andere Pfade erreichen Dart nicht | A, U `manifest_test.dart` | ✅ |
-| TP-OAUTH-M1 | echtes matrix.org, Android-Gerät | Konto über „Konto bei matrix.org erstellen“ anlegen, zurück in die App, Notfall-Schlüssel, Familie gründen | Konto angelegt und angemeldet; Schlüsselsicherung gelingt | M | ⏳ (legt ein echtes Konto an – nur durch eine Person) |
+| TP-OAUTH-06 | Linux, Windows | Rücksprung-Empfänger | nur `127.0.0.1`, zufälliger Port, nur `GET /oauth`, Seite enthält keinen Code, danach geschlossen | U `oauth_redirect_test.dart` | ✅ |
+| TP-OAUTH-07 | Android | `io.github.carpeasrael.familynexus:/oauth?…` per Intent | über `OAuthRedirectActivity` an `MainActivity` (räumt den Custom Tab ab); kein Hinweis „ungültiger Link“; andere Pfade erreichen Dart nicht | A, U `manifest_test.dart` | ✅ |
+| TP-OAUTH-M1 | echtes matrix.org, iPhone, Mac und Android-Gerät | Konto über „Konto bei matrix.org erstellen“ anlegen, zurück in die App, Notfall-Schlüssel, Familie gründen | Konto angelegt und angemeldet; Schlüsselsicherung gelingt | M | ⏳ (legt ein echtes Konto an – nur durch eine Person) |
+| TP-OAUTH-11 | iPhone bzw. Mac, OAuth-Anbieter | Anmeldung, Kontoanlage und Löschseite öffnen; „Abbrechen“; Sichtschutz (iPhone) | Anbieterseite im Anmeldefenster der App (ASWebAuthenticationSession, ohne Safari-Cookies); Rücksprung meldet an; „Abbrechen“ → Meldung; Sichtschutz deckt das Anmeldeblatt nicht ab und gilt danach wieder; macOS ohne `network.server` | M (Gerät), Swift übersetzt im CI-Job `apple` | ⏳ (nur am Gerät) |
+| TP-OAUTH-12 | Android-Emulator, Chrome als Standardbrowser | `integration_test/custom_tab_device_test.dart`; bei offenem Tab `adb shell am start` mit `…:/oauth?code=x&state=y`; Negativfälle `/evil` und > 2048 Zeichen | Custom Tab im Task der App, keine WebView; Rücksprung über `OAuthRedirectActivity` → `MainActivity` vorn, Tab abgeräumt; Negativfälle starten `MainActivity` nicht | A (Emulator) | ⏳ |
 
 ### 3.5 Einladen und Beitreten
 
@@ -181,7 +183,7 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-PW-04, 05 | – | erfolgreich ändern, mit und ohne Schalter | Autofill-Abschluss vor dem Leeren, Dialog schließt, „Passwort geändert.“, Schalter wird übergeben | F | ✅ |
 | TP-PW-06…07b | – | falsches Passwort, schwaches Passwort, keine Antwort, sonstiger Fehler | Grund, Fokus aufs passende Feld, Text markiert; Felder bleiben gefüllt | F | ✅ |
 | TP-PW-08…09 | – | Esc, Barriere und Enter während des Absendens; Esc und Abbrechen im Leerlauf | während des Absendens wirkungslos, sonst schließt der Dialog ohne Autofill-Commit | F | ✅ |
-| TP-PW-10 | Anmeldung im Browser | Dialog öffnen, Kontoseite öffnen, ohne Browser | Text ohne Felder, Kontoseite, Meldung ohne Browser | F | ✅ |
+| TP-PW-10 | Anmeldung beim Anbieter (OAuth) | Dialog öffnen, Kontoseite öffnen, keine Seite öffnet | Text ohne Felder, Kontoseite in der App (E-91), Meldung „Die Seite des Anbieters konnte nicht geöffnet werden.“ | F | ✅ |
 | TP-PW-11, 11b | Änderung nicht möglich | von vornherein bzw. nach dem Absenden | Text ohne Felder, Knopf „Schließen“; nach dem Absenden Felder geleert, Fokus und Hinweis auf dem Knopf | F | ✅ |
 | TP-PW-12, 13 | – | Weg nicht ermittelbar; Hinweistexte | SnackBar statt Dialog; Geltung und Folgen genannt | F | ✅ |
 | TP-PW-20…26 | echtes Gateway, MockClient | UIA-Ablauf, lokale Prüfungen, alle Serverantworten | altes Passwort nur an die Passwort-Stufe, `logout_devices` immer gesendet, feste Fehlerzuordnung, Kontoseite ohne `action` | U `sdk_registration_test.dart` | ✅ |
