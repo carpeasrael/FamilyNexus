@@ -35,7 +35,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Nachtrag (2026-11-01, Issue #151):** `CalendarController.occurrences` speichert die Vorkommen je Fenster und Personenauswahl zwischen (höchstens 6, unveränderliche Listen, in `load()` geleert). `upcoming` beginnt sein Fenster zur vollen Minute und filtert mit der genauen Uhrzeit; das Ergebnis ist unverändert. Die Ansichten hängen weiter am Gateway (Umbau auf die Familie ausgeschlossen); Wirkung unter etwa 1000 Terminen nicht spürbar, auf dem Gerät nicht gemessen.
 
 ## E-07 Matrix-Server (offene Frage „Standardserver“)
-- **Gewählt:** Voreingestellt `https://matrix.org`; frei änderbar. Nur `https://` zulässig. Betreiberanzeige aus `/.well-known/matrix/support`, sonst „nicht angegeben“.
+- **Gewählt:** Voreingestellt `https://matrix.org`; frei änderbar. Nur `https://` zulässig. Betreiberanzeige aus `/.well-known/matrix/support`, sonst „nicht angegeben“ (auch wenn der Abruf scheitert, E-25, #271).
 - **Verworfen:** Anderer öffentlicher Server; http (auch für lokale Tests).
 - **Begründung:** Bekanntester Server mit voller Unterstützung für E2EE. Hinweis in der Einrichtung auf Ratenbegrenzung und Metadaten. TLS-Pflicht ist Sicherheitsvorgabe.
 
@@ -131,6 +131,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 
 ## E-25 Betreiberanzeige
 - **Gewählt:** „Betreiber“ = Host des Servers; Kontakt aus `/.well-known/matrix/support` getrennt (Admin bevorzugt). Grund: Der erste Eintrag ist bei matrix.org die Abuse-Adresse und wäre als „Betreiber“ irreführend.
+- **Nachtrag (#271, 04.11.2026):** Die Support-Angaben sind optional. Netz-, CORS- und Zeitfehler beim Abruf von `/.well-known/matrix/support` gelten wie 404 als „nicht angegeben“ (nur protokolliert), in der Serverprüfung und bei der Kontoanlage. Grund: Im Browser scheitert der Abruf ohne CORS-Kopfzeilen mit einem Netzfehler, nativ liefert derselbe Server 404; sonst galt ein funktionierender Server im Web als „nicht erreichbar“. Pflicht bleiben `.well-known/matrix/client`, `versions`, `v3/login`, `POST v3/register` und die OAuth-Metadaten (`v1/auth_metadata`): Ein als „kein OAuth“ gewerteter Netzfehler würde bei einem OAuth-Anbieter das Passwortformular zeigen bzw. die Registrierung als abgeschaltet melden. Kontakt und Hilfeseite sind rein informativ (E-07).
 
 ## E-26 TLS-Pflicht in Dart durchgesetzt
 - Die Android-Netzwerkkonfiguration (`cleartextTrafficPermitted=false`) gilt nur für den Java-Stack, **nicht** für `dart:io`. Daher laufen SDK, Serverprüfung und Anhang-Downloads über `HttpsOnlyClient` (nur `https`, keine Weiterleitungen). Das SDK macht keine eigene `.well-known`-Abfrage (`checkWellKnown:false`); die bei der Prüfung bestätigte Basisadresse wird beim Login wiederverwendet (kein Wechsel dazwischen).

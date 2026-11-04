@@ -136,10 +136,18 @@ class ServerProbe {
   }
 
   /// Kontakt und Hilfeseite aus `/.well-known/matrix/support` (bereinigt; nur https-Seiten).
+  /// Optional: Netz-, CORS- und Zeitfehler gelten als nicht vorhanden (#271, E-25). Im Browser
+  /// scheitert der Abruf ohne CORS-Kopfzeilen, nativ liefert derselbe Server nur 404.
   Future<(String?, String?)> _support(ServerUrl url) async {
     String? contact;
     String? supportPage;
-    final support = await _getJson(url.uri.replace(path: '/.well-known/matrix/support'));
+    final Map<String, Object?>? support;
+    try {
+      support = await _getJson(url.uri.replace(path: '/.well-known/matrix/support'));
+    } on GatewayException {
+      AppLog.w('probe', 'Support-Angaben nicht abrufbar – ignoriert');
+      return (null, null);
+    }
     if (support != null) {
       final contacts = support['contacts'];
       if (contacts is List<Object?>) {
