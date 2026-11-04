@@ -173,7 +173,7 @@ Recommendation: Flutter with the Matrix library of the Matrix Dart SDK, because 
 - **iOS/iPadOS/macOS:** Distribution via the App Store; observe background limits.
 - **Android:** Reliable reminders via exact alarms; consider manufacturers' battery optimization.
 - **Windows/Linux:** Packaging as MSIX or Flatpak/AppImage; tray icon for reminders.
-- **iPad and large displays:** Adaptive two-column view (calendar plus chat).
+- **iPad and large displays:** Adaptive two-column view (calendar plus chat). Android tablets and iPads must support portrait and landscape, automatically adapting to the available window size while preserving navigation and unsaved input. Planned requirement and acceptance criteria: [REQ-TABLET-01](docs/PLAN.md#requirement-req-tablet-01--tablet-nutzung-in-hoch--und-querformat); implementation and acceptance are still pending.
 
 ## UX & Design
 

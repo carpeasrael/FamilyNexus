@@ -159,6 +159,63 @@ Abnahme 8:
 - [x] Kontoanlage, Link v2, Anfrage, Bestätigung und Beitritt gegen echten Synapse (E2E)
 - [x] `flutter analyze` sauber, alle Tests grün, Testplan durchgeführt und protokolliert
 
+## Requirement REQ-TABLET-01 – Tablet-Nutzung in Hoch- und Querformat
+
+Erfasst: 2026-11-04. **Status: offen, noch nicht umgesetzt oder abgenommen.**
+
+**Anforderung:** FamilyNexus muss auf Android-Tablets und iPads in Hoch- und Querformat vollständig bedienbar sein.
+Die App muss beim Start und bei jeder Änderung der Fenstergröße oder Ausrichtung automatisch die verfügbare
+Anzeigefläche erkennen und das Layout daran anpassen. Eine manuelle Auswahl von Tabletgröße oder Darstellungsmodus
+darf nicht erforderlich sein.
+
+**Nutzergeschichte:** Als Familienmitglied möchte ich die App auf unterschiedlich großen Tablets halten und drehen
+können, damit ich Kalender, Chat und Listen in jeder Ausrichtung bequem nutzen kann, ohne Eingaben zu verlieren.
+
+### Verbindliches Verhalten
+
+- Maßgeblich sind die nutzbare Fensterbreite und -höhe in logischen Pixeln, einschließlich der vom System gemeldeten
+  sicheren Randbereiche. Physische Zollgröße, Modellname oder eine feste Geräteliste dürfen keine Voraussetzung sein.
+  Auch geteilte oder frei vergrößerbare App-Fenster auf Tablets müssen automatisch berücksichtigt werden.
+- Schmale Fenster erhalten eine einspaltige Darstellung. Bei ausreichend Platz werden zusammengehörige Inhalte
+  nebeneinander angezeigt, beispielsweise Kalender und Chat gemäß `Concept.md`. Layoutgrenzen und Mindestbreiten
+  der Spalten sind bei der Umsetzung zentral festzulegen und zu dokumentieren; die Ausrichtung allein entscheidet
+  nicht über die Anzahl der Spalten. Inhalte dürfen nicht lediglich proportional vergrößert werden.
+- Alle bestehenden Ansichten und Abläufe sind eingeschlossen: Einrichtung und Anmeldung, Heute, Kalender und
+  Terminbearbeitung, Familien- und Einzelchat, Einkauf, Aufgabenlisten, Familienverwaltung, Einstellungen sowie
+  Dialoge, Einladungen und Geräteverifizierung.
+- Ein Wechsel zwischen Hoch- und Querformat passt die Darstellung ohne App-Neustart oder erneute Anmeldung an.
+  Geöffnete Ansicht, ausgewählter Termin bzw. Chat, Kalenderdatum, ungespeicherte Formulareingaben,
+  Nachrichtenentwürfe und die inhaltliche Scrollposition bleiben erhalten. Die Anpassung löst keine zusätzliche
+  Speicher- oder Sendeaktion aus.
+- Texte, Bedienelemente und Dialoge dürfen sich nicht überlagern oder unzugänglich abgeschnitten werden.
+  Navigation und Formulare benötigen kein horizontales Scrollen; fachlich vorgesehene horizontale Navigation
+  im Kalender bleibt zulässig. Bei eingeblendeter Bildschirmtastatur sind aktives Eingabefeld und zugehörige
+  Aktionen sichtbar oder durch Scrollen erreichbar.
+- Deutsche und englische Texte, helles und dunkles Design sowie Systemschriftgrößen bis 200 % bleiben nutzbar.
+  Touch-Ziele sind mindestens 48 × 48 logische Pixel groß. Eine systemseitige Rotationssperre wird respektiert;
+  die App erzwingt selbst keine einzelne Ausrichtung.
+- Die Plattformkonfiguration muss Android-Tablets und native iPad-Nutzung einschließlich beider Ausrichtungen
+  unterstützen. Aktuell ist iOS über `TARGETED_DEVICE_FAMILY = 1` auf iPhones beschränkt; diese Einschränkung ist
+  bei der Umsetzung aufzuheben. Die bestehende Smartphone-Bedienung muss erhalten bleiben.
+
+### Abnahmekriterien
+
+- [ ] Automatisierte Layoutprüfungen decken mindestens 600 × 960, 800 × 1280 und 1024 × 1366 logische Pixel sowie
+  jeweils die vertauschten Maße ab. Jede oben genannte Ansicht bleibt ohne Layoutüberlauf bedienbar.
+- [ ] Direkt unter, auf und über jeder dokumentierten Layoutgrenze wird das vorgesehene Layout angezeigt.
+  Eine Verkleinerung des Tablet-Fensters bis auf 360 logische Pixel Breite schaltet ohne manuellen Eingriff auf
+  eine bedienbare einspaltige Ansicht um; beim Vergrößern wird wieder zusätzlicher Platz genutzt.
+- [ ] Während eines ungespeicherten Terminformulars, eines Chatentwurfs und eines geöffneten Dialogs wird jeweils
+  von Hoch- nach Querformat und zurück gewechselt. Eingaben, Auswahl und Navigationszustand bleiben erhalten;
+  es entsteht weder Datenverlust noch eine doppelte Speicher- oder Sendeaktion.
+- [ ] Beide Sprachen und Designs werden in beiden Ausrichtungen geprüft, zusätzlich mit 200 % Schriftgröße
+  und geöffneter Bildschirmtastatur. Eingabefelder, Navigation und Bestätigungsaktionen bleiben erreichbar.
+- [ ] Auf mindestens einem echten Android-Tablet und einem echten iPad werden Start in beiden Ausrichtungen,
+  wiederholtes Drehen, Rotationssperre und Fenstergrößenänderungen soweit vom System unterstützt geprüft.
+  Gerät, Betriebssystem, App-Version und Ergebnis werden im Testbericht festgehalten; nicht ausgeführte
+  Geräteprüfungen bleiben ausdrücklich offen.
+- [ ] Eine Smartphone-Regressionsprüfung bestätigt die Bedienbarkeit bei 360 und 390 logischen Pixeln Breite.
+
 ## Risiken
 
 | Risiko | Gegenmaßnahme |
