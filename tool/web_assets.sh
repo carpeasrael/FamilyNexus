@@ -10,8 +10,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.cargo/bin:$PATH"
 
-sqlite3_version=3.5.2   # = Version des Pakets `sqlite3` in pubspec.lock
-mc_sha256=62a34ec725631c0438e4255ce0c6059099bf8e7fb331e7d4d91a38e075f43a19
+sqlite3_version=3.8.0   # = Version des Pakets `sqlite3` in pubspec.lock
+mc_sha256=ae9072d27891dc29b3c5fa565f46e725fa6b72917e18e66abb5c775355f8e9a7
 vodozemac_version=0.9.0 # = Version des Pakets `vodozemac` in pubspec.lock
 
 grep -q "version: \"$sqlite3_version\"" <(grep -A8 '^  sqlite3:' pubspec.lock) || { echo "sqlite3 in pubspec.lock ist nicht $sqlite3_version" >&2; exit 1; }
