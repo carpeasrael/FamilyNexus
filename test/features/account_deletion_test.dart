@@ -1,8 +1,10 @@
 import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/app/bootstrap.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/domain/registration.dart';
 import 'package:family_nexus/domain/server.dart';
+import 'package:family_nexus/features/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -73,6 +75,31 @@ void main() {
     expect(app.server.rooms.values.single.membership.containsKey('@anna:fake.test'), isFalse, reason: 'Familie verlassen');
     expect(app.gateway.session, SessionState.loggedOut);
     expect(resets, 1, reason: 'lokale Daten werden wie bei „Alle lokalen Daten löschen“ entfernt');
+    expect(find.text('Konto löschen?'), findsNothing);
+  });
+
+  testWidgets('#272 Konto löschen: bis zum Neustart keine Anmeldung und keine Anbieterprüfung', (tester) async {
+    _tallView(tester);
+    final app = await buildTestApp(lang: 'de', matrixOrgDefault: true);
+    var wipes = 0;
+    app.services.onFullReset = () => fullLocalReset(app.services, wipe: () async => wipes++);
+    await tester.pumpWidget(FamilyNexusApp(services: app.services));
+    await tester.pumpAndSettle();
+    await _openDeletion(tester);
+    await tester.enterText(find.byType(TextField), 'geheim123');
+    await tester.pump();
+    app.gateway.probeCalls = 0;
+    await tester.tap(find.widgetWithText(FilledButton, 'Konto endgültig löschen'));
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(find.byType(OnboardingScreen), findsNothing, reason: 'keine Anmeldung während des Löschens (Pump $i)');
+      expect(app.gateway.probeCalls, 0, reason: 'keine Prüfung des Standard-Anbieters (Pump $i)');
+    }
+    expect(app.server.deactivated, <String>['@anna:fake.test']);
+    expect(app.gateway.session, SessionState.loggedOut);
+    expect(app.services.accountDeletionPending, isFalse);
+    expect(app.services.resetting.value, isTrue);
+    expect(wipes, 1, reason: 'lokale Daten werden genau einmal gelöscht');
     expect(find.text('Konto löschen?'), findsNothing);
   });
 

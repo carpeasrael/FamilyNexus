@@ -907,8 +907,12 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<void> restore() async {}
 
+  /// Anzahl der Anbieterprüfungen (#272: nach „Alle lokalen Daten löschen“ keine).
+  int probeCalls = 0;
+
   @override
   Future<ServerInfo> probeServer(ServerUrl url) async {
+    probeCalls++;
     _require();
     if (url.host != fake.host) throw const GatewayException(GatewayError.serverUnreachable);
     return ServerInfo(

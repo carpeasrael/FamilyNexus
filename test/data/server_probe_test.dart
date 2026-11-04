@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -344,6 +345,60 @@ void main() {
         '/_matrix/client/v1/auth_metadata': (200, <String, Object>{...meta, 'token_endpoint': 'https://account.example.org/t'}),
       }));
       expect(await ok.oauthIssuer(_url), isNotNull);
+    });
+  });
+
+  group('Support-Angaben optional (#271, E-25)', () {
+    const supportPath = '/.well-known/matrix/support';
+    const metaPath = '/_matrix/client/v1/auth_metadata';
+    final routes = <String, (int, Object)>{
+      '/_matrix/client/versions': (200, <String, Object>{'versions': <String>['v1.1']}),
+      '/_matrix/client/v3/login': (200, <String, Object>{'flows': <Object>[<String, Object>{'type': 'm.login.password'}]}),
+      '/_matrix/client/v3/register': (401, <String, Object>{
+        'session': 's',
+        'flows': <Object>[<String, Object>{'stages': <String>['m.login.dummy']}],
+      }),
+    };
+
+    /// Wie [_client], aber [failing] scheitert wie ein Browser bei fehlenden CORS-Kopfzeilen;
+    /// mit [hang] antwortet der Pfad nie (Zeitüberschreitung).
+    MockClient failingClient(String failing, {bool hang = false}) => MockClient.streaming((req, body) async {
+          if (req.url.path == failing) {
+            if (hang) return Completer<http.StreamedResponse>().future;
+            throw http.ClientException('Failed to fetch', req.url);
+          }
+          final r = routes[req.url.path];
+          if (r == null) return http.StreamedResponse(Stream<List<int>>.value(<int>[]), 404);
+          return http.StreamedResponse(Stream<List<int>>.value(utf8.encode(json.encode(r.$2))), r.$1);
+        });
+
+    test('#271 Support-Angaben nicht abrufbar (CORS/ClientException): Prüfung und Registrierungswege gelingen ohne Kontakt',
+        () async {
+      final probe = ServerProbe(client: failingClient(supportPath));
+      final info = await probe.probe(_url);
+      expect(info.contact, isNull);
+      expect(info.supportPage, isNull);
+      expect(info.supportsPasswordLogin, isTrue);
+      expect(info.usesOAuth, isFalse);
+      final options = await probe.registrationOptions(_url);
+      expect(options.mode, RegistrationMode.inApp);
+      expect(options.webPage, isNull);
+    });
+
+    test('#271 Support-Endpunkt antwortet nicht (Zeitüberschreitung): Prüfung und Registrierungswege gelingen', () async {
+      final probe = ServerProbe(client: failingClient(supportPath, hang: true), timeout: const Duration(milliseconds: 50));
+      final info = await probe.probe(_url);
+      expect(info.contact, isNull);
+      expect(info.supportPage, isNull);
+      expect(info.supportsPasswordLogin, isTrue);
+      expect((await probe.registrationOptions(_url)).mode, RegistrationMode.inApp);
+    });
+
+    test('#271 OAuth-Metadaten nicht abrufbar bleiben „nicht erreichbar“', () async {
+      final probe = ServerProbe(client: failingClient(metaPath));
+      final unreachable = throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.serverUnreachable));
+      await expectLater(probe.probe(_url), unreachable);
+      await expectLater(probe.registrationOptions(_url), unreachable);
     });
   });
 }
