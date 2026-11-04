@@ -1132,6 +1132,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final room = familyRoom;
     return OnlineInventory(
       server: 'https://${fake.host}',
+      homeserver: 'https://${fake.host}',
       userId: uid,
       deviceId: deviceId,
       displayName: fake.displayNameOf(uid),
