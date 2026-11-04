@@ -27,6 +27,9 @@ class _AppRootState extends State<AppRoot> {
   StreamSubscription<String>? _linkSub;
   bool _wasReady = false;
 
+  /// Post-Frame der vollständigen Löschung ist eingeplant (einmal je Übergang, #272).
+  bool _resetScheduled = false;
+
   @override
   void initState() {
     super.initState();
@@ -85,7 +88,7 @@ class _AppRootState extends State<AppRoot> {
   Widget build(BuildContext context) {
     final services = AppScope.of(context);
     return ListenableBuilder(
-      listenable: Listenable.merge(<Listenable>[services.settings, services.gateway]),
+      listenable: Listenable.merge(<Listenable>[services.settings, services.gateway, services.resetting]),
       builder: (context, _) {
         final session = services.gateway.session == SessionState.ready;
         if (session && services.keepAccountData) {
@@ -102,6 +105,28 @@ class _AppRootState extends State<AppRoot> {
         if (session && services.settings.settings.onboardingDone && services.gateway.securityState == SecurityState.unknown) {
           return Scaffold(body: Center(child: Semantics(label: AppLocalizations.of(context).loading, child: const CircularProgressIndicator())));
         }
+        // Vollständige lokale Löschung (#272): „Alle lokalen Daten löschen“ oder Konto gelöscht. Bis zum
+        // Neustart neutral laden, keine Einrichtung (sie prüfte sofort den Standard-Anbieter).
+        if (services.resetting.value || (!session && services.accountDeletionPending)) {
+          _wasReady = false;
+          if (!_resetScheduled) {
+            _resetScheduled = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
+              // Konto gelöscht: auch die lokalen Daten des Kontos entfernen (wie „Alle lokalen Daten löschen“).
+              if (services.accountDeletionPending) {
+                services.accountDeletionPending = false;
+                final f = services.onFullReset?.call();
+                // Bleibt der Baum (kein Neustart), danach wie gewohnt weiter aufbauen.
+                (f ?? Future<void>.value()).whenComplete(() {
+                  _resetScheduled = false;
+                  if (mounted) setState(() {});
+                }).ignore();
+              }
+            });
+          }
+          return Scaffold(body: Center(child: Semantics(label: AppLocalizations.of(context).loading, child: const CircularProgressIndicator())));
+        }
         if (!ready) {
           // Nicht bereit: Synchronisation stoppen. Geplante Erinnerungen werden nur bei Abmeldung
           // entfernt, nicht bei vorübergehenden Zuständen (z. B. Kaltstart offline).
@@ -111,11 +136,6 @@ class _AppRootState extends State<AppRoot> {
             // Sitzung beendet (Abmelden, Konto wechseln, auf einem anderen Gerät entfernt): Familiendaten vom Gerät.
             if (!session && !services.accountDeletionPending) {
               services.wipeAccountData().catchError((Object e) => AppLog.e('app', 'Lokale Familiendaten nicht gelöscht', e)).ignore();
-            }
-            // Konto gelöscht: auch die lokalen Daten des Kontos entfernen (wie „Alle lokalen Daten löschen“).
-            if (!session && services.accountDeletionPending) {
-              services.accountDeletionPending = false;
-              services.onFullReset?.call().ignore();
             }
             // Beim Verlassen der Hauptansicht geöffnete Seiten (z. B. Einstellungen) schließen, sonst
             // blieben sie über der Einrichtung stehen. Dialoge der Einrichtung bleiben unberührt.
