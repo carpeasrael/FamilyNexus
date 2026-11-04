@@ -22,7 +22,7 @@ dependencies:
   sqflite_common: 2.5.14
   sqflite_common_ffi_web: 1.2.0
   # Browser: SQLite3MultipleCiphers über package:sqlite3 (WebAssembly), siehe E-53.
-  sqlite3: 3.5.2
+  sqlite3: 3.8.0
   flutter_secure_storage: 11.2.0
   path: 1.9.1
   http: 1.6.0

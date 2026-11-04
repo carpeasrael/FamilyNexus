@@ -23,7 +23,7 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `sqflite_common_ffi` | direct main | 2.4.4 | 2026-10-13 | bsd-2-clause | 160 | ok |
 | `sqflite_common_ffi_web` | direct main | 1.2.0 | — | bsd-2-clause | — | nur Browser (E-53) |
 | `sqflite_sqlcipher` | direct main | 3.4.1 | 2026-08-04 | mit | 150 | ok |
-| `sqlite3` | direct main | 3.5.2 | — | mit | — | Browser: WebAssembly-Anbindung (E-53), vorher nur transitiv |
+| `sqlite3` | direct main | 3.8.0 | — | mit | — | Browser: WebAssembly-Anbindung (E-53), vorher nur transitiv; 3.8.0 wegen Speicherfehler im Browser (#266) |
 | `timezone` | direct main | 0.11.2 | 2026-10-12 | bsd-2-clause | 160 | ok |
 | `url_launcher` | direct main | 6.3.3 | 2026-10-02 | bsd-3-clause | 160 | ok |
 | `uuid` | direct main | 4.6.0 | 2026-07-15 | mit | 160 | ok |
@@ -75,7 +75,7 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `flutter_web_plugins` | transitive | 0.0.0 | — | — | — | SDK/lokal |
 | `fuchsia_remote_debug_protocol` | transitive | 0.0.0 | — | — | — | SDK/lokal |
 | `glob` | transitive | 2.2.0 | 2026-08-28 | bsd-3-clause | 150 | ok |
-| `hooks` | transitive | 2.0.2 | 2026-06-02 | bsd-3-clause | 160 | neuer: 2.2.0 |
+| `hooks` | transitive | 2.2.0 | 2026-08-18 | bsd-3-clause | 160 | ok (mit `sqlite3` 3.8.0, #266) |
 | `html` | transitive | 0.15.7 | 2026-08-28 | unknown | 150 | ok |
 | `html_unescape` | transitive | 2.0.0 | 2021-03-22 | bsd-3-clause | 160 | ok |
 | `http_parser` | transitive | 4.1.2 | 2025-01-02 | bsd-3-clause | 160 | ok |
@@ -95,7 +95,7 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `markdown` | transitive | 7.3.1 | 2026-03-18 | bsd-3-clause | 160 | ok |
 | `matcher` | transitive | 0.12.20 | 2026-04-27 | bsd-3-clause | 150 | ok |
 | `material_color_utilities` | transitive | 0.13.0 | 2025-06-04 | apache-2.0 | 150 | neuer: 0.13.1 |
-| `meta` | transitive | 1.18.3 | 2026-06-04 | bsd-3-clause | 150 | neuer: 1.19.0 |
+| `meta` | transitive | 1.19.0 | 2026-07-09 | bsd-3-clause | 150 | ok (mit `sqlite3` 3.8.0, #266) |
 | `mime` | transitive | 2.1.0 | 2026-08-28 | bsd-3-clause | 160 | ok |
 | `native_toolchain_c` | transitive | 0.19.2 | 2026-06-29 | bsd-3-clause | 150 | neuer: 0.19.5 |
 | `objective_c` | transitive | 9.5.0 | 2026-07-27 | bsd-3-clause | 150 | neuer: 9.6.2 |
@@ -112,13 +112,13 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `process` | transitive | 5.0.6 | 2026-08-28 | bsd-3-clause | 150 | ok |
 | `pub_semver` | transitive | 2.2.1 | 2026-08-28 | bsd-3-clause | 160 | ok |
 | `random_string` | transitive | 2.3.1 | 2021-07-16 | bsd-3-clause | 160 | ok |
-| `record_use` | transitive | 0.6.0 | 2026-03-25 | bsd-3-clause | 160 | neuer: 1.1.1 |
+| `record_use` | transitive | 1.1.1 | 2026-08-18 | bsd-3-clause | 160 | ok (mit `sqlite3` 3.8.0, #266) |
 | `sdp_transform` | transitive | 0.3.2 | 2021-09-04 | mit | 120 | neuer: 0.4.0 |
 | `sky_engine` | transitive | 0.0.0 | — | — | — | SDK/lokal |
 | `slugify` | transitive | 2.0.0 | 2021-03-28 | mit | 135 | ok |
 | `source_span` | transitive | 1.10.2 | 2026-02-05 | bsd-3-clause | 160 | ok |
 | `sqflite_common` | transitive | 2.5.14 | 2026-10-13 | bsd-2-clause | 160 | ok |
-| `sqlite3` | transitive | 3.5.2 | 2026-08-19 | mit | 150 | neuer: 3.7.1 |
+| `sqlite3` | transitive | 3.8.0 | 2026-10-23 | mit | 150 | ok (#266) |
 | `stack_trace` | transitive | 1.12.2 | 2026-08-28 | bsd-3-clause | 160 | ok |
 | `stream_channel` | transitive | 2.1.4 | 2025-01-07 | bsd-3-clause | 140 | ok |
 | `string_scanner` | transitive | 1.4.1 | 2024-12-17 | bsd-3-clause | 150 | ok |

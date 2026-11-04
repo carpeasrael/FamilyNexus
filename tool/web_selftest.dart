@@ -3,8 +3,9 @@
 // Das Ergebnis steht als `SELFTEST PASS`/`SELFTEST FAIL …` im Seitentext und in der Konsole.
 import 'dart:convert';
 
-import 'package:family_nexus/app/bootstrap.dart' show ensureCryptoInitialized;
+import 'package:family_nexus/app/bootstrap.dart' show bootstrap, ensureCryptoInitialized;
 import 'package:family_nexus/data/db/encrypted_db.dart';
+import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/data/platform/vault_key_store.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vodozemac/vodozemac.dart' as vodozemac;
@@ -55,8 +56,28 @@ Future<void> _persistence(String phase) async {
   }
 }
 
+/// Erster Seitenaufruf auf frischem Profil (`?phase=boot`): Tresor anlegen und `bootstrap` wie in `main.dart` (#266).
+/// Bewusst ohne vorherigen Datenbankzugriff: Der Speicherfehler in `sqlite3` 3.5.2 trat nur auf, wenn App- und
+/// Matrix-Datenbank die ersten Zugriffe im WebAssembly-Modul waren; anderer Verkehr davor verdeckte ihn.
+Future<void> _boot() async {
+  await _step('Start wie die App: Tresor, App- und Matrix-Datenbank (#266)', () async {
+    final backend = createWebVaultBackend()!;
+    await backend.destroy();
+    await backend.create('boot-passwort-0123456789');
+    final keys = await VaultKeyStore.open(backend);
+    await bootstrap(keyStore: keys);
+    // Dieselbe, noch offene Verbindung des SDK (sqflite `singleInstance`): Der Matrix-Speicher liegt in der
+    // verschlüsselten Datei. Ohne SDK-Patch (tool/web_matrix_patch.sh) nähme das SDK IndexedDB, die Tabelle fehlte.
+    final matrix = await EncryptedDb.open(SdkMatrixGateway.matrixDbFileName,
+        password: (await keys.readKey(SdkMatrixGateway.matrixDbKeyName))!, version: 1);
+    final rows = await matrix.rawQuery("SELECT name FROM sqlite_master WHERE name = 'box_client'");
+    if (rows.isEmpty) throw StateError('Matrix-Speicher nicht in der verschlüsselten Datenbank (SDK-Patch fehlt?)');
+  });
+}
+
 Future<void> _run() async {
   final phase = Uri.base.queryParameters['phase'];
+  if (phase == 'boot') return _boot();
   if (phase == 'write' || phase == 'read') return _persistence(phase!);
   const path = 'selftest.db';
   const key = 'correct-horse-battery-staple-0123456789';
