@@ -47,23 +47,13 @@ class _BootstrapperState extends State<_Bootstrapper> {
         _future = _webKeys == null ? null : bootstrap(keyStore: _webKeys);
       });
 
-  /// Vollständige lokale Löschung: abmelden, Datenbanken schließen und löschen, Schlüssel entfernen.
+  /// Vollständige lokale Löschung (#272: [fullLocalReset]); danach neu starten, auch wenn das Löschen scheitert.
   Future<void> _fullReset(AppServices services) async {
     try {
-      await services.presence?.goOffline();
-    } catch (_) {
-      // best effort
+      await fullLocalReset(services);
+    } finally {
+      if (mounted) _retry(relock: true);
     }
-    services.closeCalendar(cancelReminders: true);
-    try {
-      await services.gateway.logout();
-    } catch (_) {
-      // Server nicht erreichbar: lokal wird trotzdem vollständig gelöscht.
-    }
-    await services.gateway.close();
-    await services.database?.close();
-    await resetLocalData(keyStore: services.keyStore);
-    if (mounted) _retry(relock: true);
   }
 
   Future<void> _reset() async {
