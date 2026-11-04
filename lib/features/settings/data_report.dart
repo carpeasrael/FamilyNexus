@@ -168,6 +168,7 @@ class DataReport {
       b.writeln(l.reportMatrixUnavailable);
     } else {
       b.writeln('${l.accountUsername}: ${matrix.userId} (${matrix.deviceId})');
+      b.writeln('${l.reportDisplayName}: ${matrix.displayName ?? l.reportNotSet}');
       b.writeln('${l.reportSectionAccountData}: ${matrix.accountDataTypes.isEmpty ? l.reportNone : matrix.accountDataTypes.join(', ')}');
       _rooms(b, l, matrix.rooms, withMembers: false);
       b

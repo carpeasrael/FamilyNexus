@@ -225,6 +225,28 @@ Future<void> resetLocalData({
   await (keyStore ?? SecureKeyStore()).deleteAll();
 }
 
+/// Vollständige lokale Löschung aus der laufenden App: abmelden, Datenbanken schließen und löschen,
+/// Schlüssel entfernen. Setzt zuerst [AppServices.resetting], damit die Oberfläche bis zum Neustart
+/// einen neutralen Ladezustand zeigt statt der Anmeldung (#272). [wipe] ersetzt im Test [resetLocalData].
+Future<void> fullLocalReset(AppServices s, {@visibleForTesting Future<void> Function()? wipe}) async {
+  s.resetting.value = true;
+  try {
+    await s.presence?.goOffline();
+  } catch (_) {
+    // best effort
+  }
+  s.closeCalendar(cancelReminders: true);
+  try {
+    await s.gateway.logout();
+  } catch (_) {
+    // Server nicht erreichbar: lokal wird trotzdem vollständig gelöscht.
+  }
+  await s.gateway.close();
+  await s.database?.close();
+  if (wipe != null) return wipe();
+  await resetLocalData(keyStore: s.keyStore, files: s.files);
+}
+
 /// Browser: löscht Tresor und beide Datenbanken, ohne sie entsperrt zu haben (Passwort vergessen).
 Future<void> wipeWebData(VaultBackend vault) async {
   await AppDatabase.destroy();

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -17,6 +18,70 @@ import 'formatting.dart';
 
 /// Reminder-Auswahl (Minuten vor Beginn).
 const List<int> kReminderChoices = <int>[0, 5, 10, 15, 30, 60, 120, 1440, 2880];
+
+/// Ob der Zeitwähler beim Fokus ins Stunden- oder Minutenfeld den Wert markiert (#263).
+///
+/// Nur auf dem Desktop: Dort setzt ein Klick den Cursor ohne Markierung, und das volle Feld
+/// (zwei Ziffern) verwirft getippte Ziffern. Im Web markiert Flutter selbst; auf Mobilgeräten
+/// ist Alles-Markieren beim Fokus nicht Plattform-Standard (bekannte Grenze, E-20).
+bool selectAllOnTimeFieldFocus(TargetPlatform platform, {required bool isWeb}) {
+  if (isWeb) return false;
+  return switch (platform) {
+    TargetPlatform.windows || TargetPlatform.linux || TargetPlatform.macOS => true,
+    TargetPlatform.android || TargetPlatform.iOS || TargetPlatform.fuchsia => false,
+  };
+}
+
+/// Markiert den Inhalt eines Textfelds im eigenen Teilbaum, sobald es den Fokus bekommt (#263).
+///
+/// Hört auf den [FocusManager]; dessen Listener laufen nach den Listenern der Fokusknoten und
+/// nach dem Setzen des Cursors durch den Klick, die Markierung bleibt also stehen. Nicht markiert
+/// wird bei der Rückkehr ins Fenster (der Fokus kommt dann von `rootScope` zurück) und beim
+/// erneuten Klick in ein Feld, das schon den Fokus hat (kein Fokuswechsel).
+class _SelectAllOnFocus extends StatefulWidget {
+  const _SelectAllOnFocus({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_SelectAllOnFocus> createState() => _SelectAllOnFocusState();
+}
+
+class _SelectAllOnFocusState extends State<_SelectAllOnFocus> {
+  FocusNode? _previous;
+
+  @override
+  void initState() {
+    super.initState();
+    _previous = FocusManager.instance.primaryFocus;
+    FocusManager.instance.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    FocusManager.instance.removeListener(_onFocusChange);
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    final previous = _previous;
+    final focus = FocusManager.instance.primaryFocus;
+    _previous = focus;
+    if (focus == null || identical(focus, previous)) return;
+    if (!selectAllOnTimeFieldFocus(defaultTargetPlatform, isWeb: kIsWeb)) return;
+    // Rückkehr ins Fenster: Der Desktop-FocusManager parkt den Fokus beim inaktiven Fenster
+    // auf rootScope und holt ihn danach zurück. Dann bleibt die Auswahl, wie sie war.
+    if (previous == null || identical(previous, FocusManager.instance.rootScope)) return;
+    final ctx = focus.context;
+    if (ctx == null || !ctx.mounted) return;
+    if (ctx.findAncestorStateOfType<_SelectAllOnFocusState>() != this) return;
+    if (ctx.findAncestorWidgetOfExactType<EditableText>() == null) return;
+    Actions.maybeInvoke(ctx, const SelectAllTextIntent(SelectionChangedCause.keyboard));
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
 
 /// Anlegen und Bearbeiten eines Termins.
 class EventEditorScreen extends StatefulWidget {
@@ -54,6 +119,9 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
   late Set<String> _attendees;
   late Set<int> _reminders;
   bool _reminderTouched = false;
+
+  /// Ende von Hand gewählt (oder gespeichert): dann ändert „Ganztägig“ es nicht (#264).
+  late bool _endTouched;
   bool _saving = false;
   String? _error;
 
@@ -73,6 +141,8 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
     _title = TextEditingController(text: e?.title ?? '');
     _location = TextEditingController(text: e?.location ?? '');
     _note = TextEditingController(text: e?.note ?? '');
+    // Beim Bearbeiten gilt das gespeicherte Ende als gewählt; mehrtägige Termine werden nie verkürzt (#264).
+    _endTouched = e != null;
     if (e != null) {
       _allDay = e.allDay;
       if (e.allDay) {
@@ -155,6 +225,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
         _moveStart(utc, _startTime);
       } else {
         _endDate = utc;
+        _endTouched = true;
       }
       _timeError = null;
     });
@@ -181,6 +252,20 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
     _endTime = TimeOfDay(hour: end.hour, minute: end.minute);
   }
 
+  /// Schaltet „Ganztägig“ um. Ohne eigene Endwahl endet ein ganztägiger Termin am Tag des Beginns,
+  /// auch wenn das Ende mit Uhrzeit auf 00:00 des Folgetags fiel (#264). Zurück zur Uhrzeit gilt
+  /// wieder Ende = Beginn + 1 h (#56); sonst stünde 23:00–00:00 am selben Tag („Ende vor Beginn“).
+  void _setAllDay(bool v) {
+    _allDay = v;
+    _timeError = null;
+    if (_endTouched) return;
+    if (v) {
+      _endDate = _startDate;
+    } else {
+      _moveStart(_startDate, _startTime);
+    }
+  }
+
   Future<void> _pickTime({required bool start}) async {
     // Flutter zeigt das Ziffernblatt im Format der App-Sprache (Deutsch: 24 h), prüft die Texteingabe
     // aber nach der Geräteeinstellung. Auf einem 12-h-Gerät lehnte sie deshalb 13–23 ab (#64).
@@ -191,7 +276,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
       initialTime: start ? _startTime : _endTime,
       builder: (ctx, child) => MediaQuery(
         data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: use24h),
-        child: child!,
+        child: _SelectAllOnFocus(child: child!),
       ),
     );
     if (t == null) return;
@@ -200,6 +285,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
         _moveStart(_startDate, t);
       } else {
         _endTime = t;
+        _endTouched = true;
       }
       _timeError = null;
     });
@@ -345,7 +431,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
                   decoration: InputDecoration(labelText: l.eventTitle),
                   validator: (v) => (v == null || v.trim().isEmpty) ? l.eventTitleRequired : null,
                 ),
-                SwitchListTile(contentPadding: EdgeInsets.zero, title: Text(l.eventAllDay), value: _allDay, onChanged: (v) => setState(() => _allDay = v)),
+                SwitchListTile(contentPadding: EdgeInsets.zero, title: Text(l.eventAllDay), value: _allDay, onChanged: (v) => setState(() => _setAllDay(v))),
                 _dateRow(l.eventStart, sd(_startDate), _allDay ? null : st(_startTime), () => _pickDate(start: true), () => _pickTime(start: true)),
                 _dateRow(l.eventEnd, sd(_endDate), _allDay ? null : st(_endTime), () => _pickDate(start: false), () => _pickTime(start: false)),
                 if (_timeError != null)

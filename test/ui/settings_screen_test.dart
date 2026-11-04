@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/app/app_services.dart';
 import 'package:family_nexus/app/app_version.dart';
+import 'package:family_nexus/app/bootstrap.dart';
+import 'package:family_nexus/data/matrix/matrix_gateway.dart';
+import 'package:family_nexus/features/onboarding/onboarding_screen.dart';
 import '../support/memory_stores.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
@@ -159,6 +162,35 @@ void main() {
     expect(resets, 1);
   });
 
+  testWidgets('#272 Alle lokalen Daten löschen zeigt keine Anmeldung und prüft keinen Anbieter', (tester) async {
+    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final app = await buildTestApp(lang: 'de', matrixOrgDefault: true);
+    var wipes = 0;
+    app.services.onFullReset = () => fullLocalReset(app.services, wipe: () async => wipes++);
+    await tester.pumpWidget(FamilyNexusApp(services: app.services));
+    await tester.pumpAndSettle();
+    await openSettings(tester);
+    await tester.ensureVisible(find.text('Alle lokalen Daten löschen'));
+    await tester.tap(find.text('Alle lokalen Daten löschen'));
+    await tester.pumpAndSettle();
+    app.gateway.probeCalls = 0;
+    await tester.tap(find.text('Endgültig löschen'));
+    // Kein pumpAndSettle: Bis zum Neustart (im Test keiner) läuft der Ladekreis.
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(find.byType(OnboardingScreen), findsNothing, reason: 'keine Anmeldung während des Löschens (Pump $i)');
+      expect(find.text('Anmelden'), findsNothing);
+      expect(app.gateway.probeCalls, 0, reason: 'keine Prüfung des Standard-Anbieters (Pump $i)');
+    }
+    expect(wipes, 1);
+    expect(app.gateway.session, SessionState.loggedOut);
+    expect(app.services.resetting.value, isTrue);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('Endgültig löschen'), findsNothing, reason: 'Einstellungen und Dialog geschlossen');
+  });
+
   testWidgets('Burger-Menü: Einstellungen und Datenschutz öffnen als eigene Seiten mit Zurück', (tester) async {
     final (services, _) = await _services(lang: 'de');
     await tester.pumpWidget(FamilyNexusApp(services: services));
@@ -228,6 +260,7 @@ void main() {
     expect(report, contains('db.app: vorhanden (Wert wird nicht angezeigt)'));
     expect(report, contains('@anna:fake.test'), reason: 'Matrix-Zwischenspeicher des angemeldeten Kontos');
     expect(report, contains('Familie „Familie Test“'));
+    expect(report, contains('Anzeigename: Anna'), reason: '#261: eigener Anzeigename aus dem Matrix-Zwischenspeicher');
 
     await tester.tap(find.byTooltip('Als Datei speichern'));
     await tester.pumpAndSettle();

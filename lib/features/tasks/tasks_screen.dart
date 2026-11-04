@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 import '../../app/app_services.dart';
 import '../../domain/family.dart';
@@ -76,11 +75,11 @@ String _resetLabel(AppLocalizations l, TaskRule r) {
   };
 }
 
-/// Erledigt-Datum (`yyyy-MM-dd`) in der Schreibweise der App-Sprache, z. B. „26.10.2026“ (#38).
+/// Erledigt-Datum (`yyyy-MM-dd`) in der Schreibweise der App-Sprache, z. B. „03.11.2026“ (#38, #260).
 String _date(BuildContext context, String doneOn) {
   final p = TaskPeriod.parseDate(doneOn);
   if (p == null) return doneOn;
-  return DateFormat.yMd(Localizations.localeOf(context).toLanguageTag()).format(DateTime(p.y, p.m, p.d));
+  return formatDateNumeric(DateTime(p.y, p.m, p.d), Localizations.localeOf(context).toLanguageTag());
 }
 
 /// Uhrzeit der Erledigung in der Zeitzone der Liste – dieselbe Zone, aus der das Datum stammt (E-51, #163).

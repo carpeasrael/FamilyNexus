@@ -1,0 +1,67 @@
+V-01	✅	Soll 1.2.2+23, Commit 4b931a2 (Branch docs/testreports-build23)
+V-02	✅	Ist 1.2.2 (23) im iPad-Air-13-Simulator (M4), iPadOS 27.2 (simctl listapps)
+V-03	✅	flutter build ios --simulator --debug, installiert
+V-04	✅	Erststart zeigt Willkommen (V-04-G1.png zeigt die Ansicht quer gedreht, vor Rotation)
+V-05	✅	versions-JSON; register liefert m.login.dummy
+V-06	✅	fnt-1104-n1, -n12, -i2, -n9 alle frei
+A-01	✅	Willkommen, drei Wege, Sprachwahl; App laeuft als schmales Fenster in der iPad-Fensteransicht (Beobachtung)
+A-02	✅	English/Deutsch (Bilder A-02a/b)
+A-03	✅	Konto erstellen, Schritt 1 von 3, matrix.org
+A-04	✅	nicht-vorhanden.invalid nicht erreichbar, Erneut versuchen
+A-05	✅	Konto liegt bei matrix-synapse-3ues...; Betreiber matrix.chaostribunal.de, Kontakt nicht angegeben
+A-05a	⏳	nur mit praepariertem Testserver
+A-06	✅	Jörg Müßig -> joerg.muessig, frei
+A-07	✅	alle sechs Eingaben (a-f) zeigen die Meldung, Konto erstellen ausgegraut (Anna mit Grossbuchstabe geprueft)
+A-08	⚠️	Ausgegraut bei kurzem Passwort, Abweichung zeigt Meldung, aktiv bei Gleichheit; Passwort ipuf1104x7 (Tastenereignisse verlieren Zeichen, Werkzeug-Grenze)
+A-08b	⚠️	Enter bei leerer Wiederholung: keine sichtbare Meldung (Eingabe unsicher, nachpruefen)
+A-09	✅	N1 fnt-1104-n1 angelegt (M_USER_IN_USE), Notfall-Schluessel Schritt 2 von 3
+A-10	✅	Schluessel bleibt stehen, Kopiert-Hinweis, Datei gespeichert (Gespeichert. Bewahre ...), Schluessel in den Bildern geschwaerzt
+A-11	✅	Familie Testfamilie 1104 eingerichtet (Später / Jetzt einladen)
+A-12	✅	Hauptansicht Heute
+B-01	✅	Kacheln und Tab-Leiste; Termine chronologisch (Bilder B-01, B-01b, B-01c)
+B-02	⚠️	Hinweis Erlauben -> Systemdialog erschien, Hinweis danach weg (Bilder B-02a/b); Dialogbedienung nicht einzeln belegt
+B-03	✅	Test geteilt, Geteilt, Ort Küche, Notiz, Farbe
+B-04	✅	Titel fehlt, Ende vor Beginn, Ende gleich Beginn: Meldungen (Bilder B-04a-c)
+B-05	✅	Test privat 21:00-22:00 (Ziffernblatt, per AppleScript 21 getippt)
+B-06	⚠️	Test Serie ganztägig, wöchentlich, 3 Vorkommen; Dauer je Vorkommen wie in Lauf 19 (Kenntnisstand: Randfall 22 Uhr, kein neuer Befund geprüft)
+B-07	✅	Tag, Woche, Monat, Agenda, Zurück/Weiter/Heute
+B-08	✅	Titel Test geteilt 2, 10:30-11:30 sofort sichtbar, Verlauf zeigt Version 1
+B-09	✅	Zusätzliche Erinnerung gewählt und Standard wiederhergestellt
+B-10	⏳	12 Minuten Wartezeit und Systembenachrichtigung nicht automatisiert beobachtet
+B-11	✅	Nur dieses Vorkommen von Test Serie gelöscht; Test Erinnerung nicht angelegt (B-10 offen)
+B-12	✅	Chat Hallo Testfamilie gesendet (Bild B-12); Umschalt+Enter nicht geprüft (mobil)
+B-12a	⏳	Netz im Simulator nicht getrennt
+B-13	✅	Im Chat geteilt, Termin-Karte im Chat
+B-14	✅	Milch, Brot, Abhaken, Bearbeiten (Vollkornbrot), Gruppe Aldi mit Eier/Mehl/Salz; Querformat und Vorschlags-Tipp nicht geprüft
+B-15	⚠️	Liste Bad putzen mit zwei Punkten, ein Punkt mit Kommentar erledigt; erster Versuch mit zusammengelaufenem Punkt (Zeilenumbruch per Tastenereignis nicht übernommen, Werkzeug-Grenze); Verlauf und Datumsformat nicht einzeln gesichtet
+B-16	✅	Sprache English/Deutsch, Design Hell/Dunkel, Akzent Magenta/Türkis, Effekte reduzieren; Neustart-Persistenz nicht einzeln geprüft
+B-17	⏳	iPad-Code des Simulators unbekannt, Entsperren nicht möglich; Schalter blieb aus (Bild B-17-G1)
+B-18	⚠️	Hinweistext iOS wie erwartet, Schalter an/aus; App-Umschalter und Screenshot-Verhalten nicht geprüft
+B-19	✅	Blockierte Mitglieder: Du hast niemanden blockiert; Datenschutzerklärung vollständig (Bilder B-19, B-19c)
+B-20	✅	30 Minuten gewählt, 10 abgewählt, danach zurückgesetzt
+B-21	✅	Speicherorte, lokales Protokoll (Version 1.2.2 (23), Test N1), Protokoll kopiert; Online-Protokoll mit Konto, Geräten, Räumen
+B-22	⚠️	Version 1.2.2 (23); Server zeigt matrix.chaostribunal.de (wie Lauf 19, Plantext veraltet)
+B-23	⏳	(a) leere Felder und (b) falsches aktuelles Passwort belegt (Bilder B-23a/b); (c) bis (e) nicht ausgeführt
+B-24	⏳	Emoji-Grenzen nicht ausgeführt (Emoji-Eingabe nicht automatisierbar)
+C	⏳	braucht G2 (nicht genutzt)
+D	⏳	braucht G2 (nicht genutzt)
+E	⏳	braucht G2 (nicht genutzt)
+F-01	⏳	N2 fehlt (G2)
+F-02	⏳	N2 fehlt (G2)
+F-03	✅	Rückfrage und Willkommen (Bilder F-03a, F-03)
+F-04	✅	Nach Neustart Willkommen
+F-05	✅	Anmeldung, Notfall-Schlüssel (Zeichen für Zeichen getippt, Einfügen kam nicht an), Termine inkl. privat, Chat, Einkauf wiederhergestellt
+F-06	✅	Dialog ohne Moderator-Hinweis, danach Willkommen
+F-07	✅	Login fnt-1104-n1: 403 M_FORBIDDEN; I2 nie angelegt
+F-08	⚠️	fnt-1104-n1 vergeben; n12 und i2 frei (nie angelegt); Registrierung offen gelassen
+G-01	✅	flutter analyze: No issues found
+G-02	⚠️	1657 bestanden, 125 übersprungen, 1 fehlgeschlagen: test/data/app_badge_test.dart (#254, Linux D-Bus, Timeout nach 30 s auf macOS-Host)
+G-03	✅	review_notes_test: All tests passed
+G-04	⏳	tool/e2e.sh nicht ausgeführt (Docker/Synapse)
+G-06	⏳	nicht ausgeführt
+G-07	⏳	braucht Testperson
+H-01	✅	Speicherorte inkl. Schlüsselbund des Geräts (nicht in iCloud)
+H-02	✅	genau familynexus_app.db (80 KB) und familynexus_matrix.db (292 KB), keine weiteren Dateien
+H-03	✅	Kopf Zufallsbytes, file: data, sqlite3: file is not a database
+H-04	✅	0 Treffer für acht Suchbegriffe in beiden DBs und im Container; Protokoll enthält Begriffe
+H-05..H-20	⏳	iPadOS-Simulator: Schlüsselspeicher nicht einsehbar (n/a) bzw. G2 oder weitere Werkzeuge nötig; nicht ausgeführt
