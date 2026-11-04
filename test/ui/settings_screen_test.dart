@@ -14,6 +14,7 @@ import 'package:family_nexus/domain/app_settings.dart';
 import 'package:family_nexus/ui/theme/tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../helpers/shell_finders.dart';
 
 Future<(AppServices, NoopScreenProtection)> _services({String? lang}) async {
   final app = await buildTestApp(lang: lang);
@@ -26,9 +27,9 @@ void main() {
     await tester.pumpWidget(FamilyNexusApp(services: services));
     await tester.pumpAndSettle();
     for (final t in <String>['Heute', 'Kalender', 'Chat', 'Einkauf', 'Familie']) {
-      expect(find.descendant(of: find.byType(NavigationBar), matching: find.text(t)), findsOneWidget, reason: t);
+      expect(navTab(t), findsOneWidget, reason: t);
     }
-    expect(find.descendant(of: find.byType(NavigationBar), matching: find.text('Einstellungen')), findsNothing, reason: 'Einstellungen liegen im Menü oben rechts');
+    expect(navTab('Einstellungen'), findsNothing, reason: 'Einstellungen liegen im Menü oben rechts');
     expect(find.byTooltip('Menü öffnen'), findsOneWidget);
   });
 
@@ -208,7 +209,7 @@ void main() {
     expect(find.text('Sprache'), findsOneWidget);
     await tester.tap(find.byTooltip('Zurück'));
     await tester.pumpAndSettle();
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(findNavigation(), findsOneWidget);
   });
 
   testWidgets('Akzentfarbe wählbar: Standard Türkis, Wechsel färbt die Oberfläche und bleibt gespeichert', (tester) async {

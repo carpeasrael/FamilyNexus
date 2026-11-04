@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 import '../../test/support/test_app.dart';
+import '../../test/helpers/shell_finders.dart';
 
 Future<void> _hold(WidgetTester t, [int s = 7]) async {
   await t.pumpAndSettle();
@@ -25,7 +26,7 @@ Future<void> _back(WidgetTester t) async {
 }
 
 Future<void> _tab(WidgetTester t, String name) async {
-  await t.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(name)));
+  await t.tap(navTab(name));
   await t.pumpAndSettle();
 }
 

@@ -10,6 +10,7 @@ import '../support/fake_device_auth.dart';
 import '../support/memory_stores.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 Future<(AppLockController, FakeDeviceAuth, SettingsController, DateTime Function())> _make({
   bool enabled = true,
@@ -163,12 +164,12 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('FamilyNexus ist gesperrt'), findsOneWidget);
       expect(svc.auth.reasons, isNotEmpty, reason: 'Abfrage beim Erscheinen');
-      expect(find.byType(NavigationBar).hitTestable(), findsNothing, reason: 'Inhalt nicht bedienbar');
+      expect(findNavigation().hitTestable(), findsNothing, reason: 'Inhalt nicht bedienbar');
       svc.auth.succeed = true;
       await tester.tap(find.text('Entsperren'));
       await tester.pumpAndSettle();
       expect(find.text('FamilyNexus ist gesperrt'), findsNothing);
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(findNavigation(), findsOneWidget);
     });
   });
 

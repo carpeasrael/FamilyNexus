@@ -8,6 +8,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 /// #218: „Heute“ zeigt höchstens drei Termine; Erinnerungen in einer Übersicht ansehen und bestätigen.
 void main() {
@@ -32,7 +33,7 @@ void main() {
   }
 
   Future<void> tab(WidgetTester tester, String label) async {
-    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(label)));
+    await tester.tap(navTab(label));
     await tester.pumpAndSettle();
   }
 

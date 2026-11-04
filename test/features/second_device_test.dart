@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 Future<void> _tapText(WidgetTester tester, String text) async {
   var finder = find.widgetWithText(FilledButton, text);
@@ -39,7 +40,7 @@ void main() {
     // Die Familie besteht bereits: nichts gründen, die Einrichtung schließt sich ab.
     expect(second.services.settings.settings.onboardingDone, isTrue);
     expect(second.gateway.family?.name, 'Familie Test');
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(findNavigation(), findsOneWidget);
     expect(find.text('Familie gründen'), findsNothing);
   });
 

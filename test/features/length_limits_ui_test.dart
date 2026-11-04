@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 /// #221: Die Eingabefelder zählen wie die Prüfung der Domäne (Einkauf und Aufgaben Codepunkte,
 /// Termine UTF-16-Einheiten), nicht sichtbare Zeichen.
@@ -23,7 +24,7 @@ Future<TestApp> _start(WidgetTester tester, {String? tab}) async {
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
   if (tab != null) {
-    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(tab)));
+    await tester.tap(navTab(tab));
     await tester.pumpAndSettle();
   }
   return app;

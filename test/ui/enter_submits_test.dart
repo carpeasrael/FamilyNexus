@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/nav.dart';
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 /// #37: Auf dem Desktop schickt Enter ab (Chat senden, Einkauf hinzufügen); Umschalt+Enter macht im
 /// Chat keinen Versand. Mobil bleibt die Tastatur-Aktion unverändert.
@@ -15,7 +16,7 @@ Future<TestApp> _open(WidgetTester tester, String tab) async {
   final app = await buildTestApp();
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
-  await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(tab)));
+  await tester.tap(navTab(tab));
   await tester.pumpAndSettle();
   return app;
 }
@@ -199,7 +200,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(app.shoppingStore.items, isEmpty);
 
-    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+    await tester.tap(navTab('Chat'));
     await tester.pumpAndSettle();
     await _type(tester, find.byType(TextField), 'Hallo');
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);

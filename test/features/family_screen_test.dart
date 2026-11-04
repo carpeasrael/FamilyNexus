@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 Future<void> _openFamily(WidgetTester tester, TestApp app) async {
   tester.view.physicalSize = const Size(900, 3000);
@@ -16,7 +17,7 @@ Future<void> _openFamily(WidgetTester tester, TestApp app) async {
   addTearDown(tester.view.reset);
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
-  await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Familie')));
+  await tester.tap(navTab('Familie'));
   await tester.pumpAndSettle();
 }
 

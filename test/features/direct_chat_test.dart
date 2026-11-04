@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 Future<FakeMatrixGateway> _joinBen(TestApp app) async {
   final ben = app.server.newDevice();
@@ -18,7 +19,7 @@ Future<FakeMatrixGateway> _joinBen(TestApp app) async {
 }
 
 Future<void> _tab(WidgetTester tester, String label) async {
-  await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(label)));
+  await tester.tap(navTab(label));
   await tester.pumpAndSettle();
 }
 

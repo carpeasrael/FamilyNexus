@@ -13,6 +13,7 @@ import '../support/fake_matrix.dart';
 import '../support/invite_links.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
   tester.view.physicalSize = const Size(900, 3000);
@@ -75,7 +76,7 @@ void main() {
       // Die eigene, bestätigte Anfrage wird ohne weiteren Tipp angenommen (E-49).
       expect(s.ben.gateway.family!.myRole, Role.member);
       expect(s.ben.store.data['onboardingDone'], 'true');
-      expect(find.byType(NavigationBar), findsOneWidget, reason: 'Hauptansicht');
+      expect(findNavigation(), findsOneWidget, reason: 'Hauptansicht');
     });
 
     testWidgets('Familien-Code statt Link: Anfrage wartet, Moderator bestätigt ausdrücklich, Beitritt', (tester) async {
@@ -165,10 +166,10 @@ void main() {
       await ben.gateway.setUpSecurity();
       await ben.gateway.requestToJoin(InviteLink.tryParse(link, now: DateTime.now(), ownHost: 'fake.test')!);
       await _pump(tester, annaApp);
-      expect(find.descendant(of: find.byType(NavigationBar), matching: find.text('1')), findsOneWidget);
+      expect(navTab('1'), findsOneWidget);
       await annaApp.gateway.rejectRequest('@ben:fake.test');
       await tester.pumpAndSettle();
-      expect(find.descendant(of: find.byType(NavigationBar), matching: find.text('1')), findsNothing);
+      expect(navTab('1'), findsNothing);
     });
 
     testWidgets('E-79: Link der Version 3 zeigt die Karte weiter mit Familienname', (tester) async {
@@ -266,7 +267,7 @@ void main() {
       await _tap(tester, '„Familie Test“ beitreten');
       expect(s.ben.gateway.family!.myRole, Role.member);
       expect(s.ben.store.data['onboardingDone'], 'true');
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(findNavigation(), findsOneWidget);
     });
 
     testWidgets('Trotz Einladung: „andere Familie gründen oder beitreten“ zeigt die Auswahl', (tester) async {
@@ -467,7 +468,7 @@ void main() {
     expect(second.gateway.family, isNotNull);
     expect(services.gateway.session.name, 'loggedOut');
     await _pump(tester, second);
-    expect(find.byType(NavigationBar), findsNothing);
+    expect(findNavigation(), findsNothing);
     expect(find.text('Dieses Gerät freischalten'), findsWidgets);
   });
 }

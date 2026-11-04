@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 /// #211: Gruppen im Einkaufszettel, mit Fokus, Tastatur, Überlauf und Screenreader.
 Finder get _groupField => find.byType(TextField).at(2);
@@ -24,7 +25,7 @@ Future<TestApp> _open(WidgetTester tester, {Size size = const Size(900, 2400)}) 
   final app = await buildTestApp();
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
-  await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Einkauf')));
+  await tester.tap(navTab('Einkauf'));
   await tester.pumpAndSettle();
   return app;
 }
@@ -272,7 +273,7 @@ void main() {
       final app = await buildTestApp();
       await tester.pumpWidget(FamilyNexusApp(services: app.services));
       await tester.pumpAndSettle();
-      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Einkauf')));
+      await tester.tap(navTab('Einkauf'));
       await tester.pumpAndSettle();
       await _seed(tester, app, <String, String>{for (var i = 0; i < 8; i++) 'Ding $i': 'Laden mit langem Namen $i'});
       expect(tester.takeException(), isNull);

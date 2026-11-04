@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/nav.dart';
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 /// #140: Die Familie wechselt, ohne dass die Oberfläche „keine Familie“ sieht (Join B, Leave A und Kontodaten in einer
 /// Sync-Antwort). Die Dienste der alten Familie schließen, die der neuen öffnen genau einmal.
@@ -38,7 +39,7 @@ void main() {
     expect(app.services.calendar, isNot(same(old)));
     expect(app.services.calendar!.sync.sameFamily, isTrue);
     expect(find.byType(HomeShell), findsOneWidget);
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(findNavigation(), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
   });
 
@@ -47,12 +48,12 @@ void main() {
     final roomB = app.server.addFamilyRoom('Familie B', '@anna:fake.test').id;
     await start(tester, app);
     await openSettings(tester);
-    expect(find.byType(NavigationBar), findsNothing);
+    expect(findNavigation(), findsNothing);
 
     app.gateway.attachFamilyRoom(roomB);
     await tester.pumpAndSettle();
 
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(findNavigation(), findsOneWidget);
     expect(app.services.openFamilyRoom, roomB);
   });
 
@@ -69,7 +70,7 @@ void main() {
 
     expect(app.calendarRooms, <String>[roomA, roomB, roomA]);
     expect(app.services.openFamilyRoom, roomA);
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(findNavigation(), findsOneWidget);
   });
 
   testWidgets('A → keine Familie → B: Dienste schließen, Anspruch und Neuaufbau für B', (tester) async {
@@ -89,7 +90,7 @@ void main() {
     expect(app.calendarRooms, <String>[roomA, roomB]);
     expect(owners, <String>['@anna:fake.test|$roomA', '@anna:fake.test|$roomB']);
     expect(app.services.calendar!.sync.sameFamily, isTrue);
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(findNavigation(), findsOneWidget);
   });
 
   for (final phase in <String>['Kalender', 'Einkauf', 'Aufgaben']) {
@@ -115,7 +116,7 @@ void main() {
       expect(app.services.openFamilyRoom, roomB);
       expect(app.services.calendar, isNotNull);
       expect(app.services.calendar!.sync.sameFamily, isTrue);
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(findNavigation(), findsOneWidget);
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
   }

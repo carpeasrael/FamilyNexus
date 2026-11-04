@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/nav.dart';
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 /// #145: Im Browser gibt es keine Erinnerungen (E-53, `services.reminders == null`). Dann bietet die App sie
 /// auch nicht an: weder in den Einstellungen noch im Termin-Editor, in der Detailansicht oder auf „Heute“.
@@ -23,7 +24,7 @@ void main() {
   }
 
   Future<void> tab(WidgetTester tester, String name) async {
-    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(name)));
+    await tester.tap(navTab(name));
     await tester.pumpAndSettle();
   }
 

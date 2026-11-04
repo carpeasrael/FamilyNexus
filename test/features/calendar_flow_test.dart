@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 final DateTime _now = DateTime.utc(2026, 3, 20, 10); // 11:00 in Berlin
 
@@ -23,7 +24,7 @@ Future<void> _start(WidgetTester tester, TestApp app, {String? tab}) async {
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
   if (tab != null) {
-    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(tab)));
+    await tester.tap(navTab(tab));
     await tester.pumpAndSettle();
   }
 }
@@ -695,7 +696,7 @@ void main() {
         visibility: EventVisibility.shared,
       );
       await cal.shareInChat(e);
-      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+      await tester.tap(navTab('Chat'));
       await tester.pumpAndSettle();
       expect(find.text('Pizzaabend'), findsWidgets);
       await tester.tap(find.text('Absagen').last);
