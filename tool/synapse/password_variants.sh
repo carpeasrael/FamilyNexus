@@ -36,11 +36,8 @@ password_config: $password_config
 YAML
   docker run --rm -v "$data":/data --entrypoint sh "$IMAGE" -c 'chmod -R a+rwX /data' >/dev/null
   docker run -d --name "$name" --network "$NET" -p "127.0.0.1:$port:8008" -v "$data":/data "$IMAGE" >/dev/null
-  for _ in $(seq 1 60); do
-    if curl -s "http://127.0.0.1:$port/_matrix/client/versions" >/dev/null 2>&1; then echo "$name bereit: http://127.0.0.1:$port"; return 0; fi
-    sleep 2
-  done
-  echo "$name nicht erreichbar"; docker logs "$name" | tail -20; exit 1
+  if "$(dirname "$0")/wait_ready.sh" "http://127.0.0.1:$port" "$name"; then return 0; fi
+  docker logs "$name" | tail -20; exit 1
 }
 
 case "${1:-}" in
