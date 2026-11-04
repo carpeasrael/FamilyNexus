@@ -1,0 +1,6 @@
+01:32 +1656 ~125 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/join_rejection_test.dart: Leere Syncs lösen keinen Abgleich aus (#150) leere Antwort: kein Abgleich; Raum-Update: Abgleich (Kontrollfall)
+01:33 +1657 ~125 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/join_rejection_test.dart: (tearDownAll)
+01:33 +1657 ~125 -1: Some tests failed.
+
+Failing tests:
+  /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/app_badge_test.dart: #254: Linux sendet LauncherEntry.Update mit Desktop-ID, Zahl und Sichtbarkeit
