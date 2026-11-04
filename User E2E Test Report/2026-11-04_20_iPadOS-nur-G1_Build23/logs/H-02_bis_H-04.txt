@@ -1,0 +1,24 @@
+== H-02: Dateien in Documents (Name, Groesse) ==
+ 
+81920 familynexus_app.db
+299008 familynexus_matrix.db
+== H-03: erste 16 Byte, file, sqlite3 ==
+-- familynexus_app.db
+00000000: 50c0 9f6f 6e38 1396 4198 f4a0 7737 2922  P..on8..A...w7)"
+/private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/8cd66d8e-b0d0-4eab-8437-2455479e2a9f/scratchpad/dbcopy/Documents/familynexus_app.db: data
+Error: in prepare, file is not a database (26)
+-- familynexus_matrix.db
+00000000: 08c4 0a3a a411 6dc9 4d68 b1a1 910a 400f  ...:..m.Mh....@.
+/private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/8cd66d8e-b0d0-4eab-8437-2455479e2a9f/scratchpad/dbcopy/Documents/familynexus_matrix.db: data
+Error: in prepare, file is not a database (26)
+== H-04: Treffer je Begriff in Datenbanken (strings) und im ganzen Container (grep -rIlaF) ==
+Testfamilie 1104: app.db=0 matrix.db=0 Container-Dateien=0
+Test geteilt: app.db=0 matrix.db=0 Container-Dateien=0
+Hallo Testfamilie: app.db=0 matrix.db=0 Container-Dateien=0
+Test N1: app.db=0 matrix.db=0 Container-Dateien=0
+Vollkornbrot: app.db=0 matrix.db=0 Container-Dateien=0
+Bad putzen: app.db=0 matrix.db=0 Container-Dateien=0
+Test privat: app.db=0 matrix.db=0 Container-Dateien=0
+Waschbecken: app.db=0 matrix.db=0 Container-Dateien=0
+== Gegenprobe (Protokoll der App enthaelt Begriffe) ==
+Protokoll (online) aus Bild B-21d: Familie Testfamilie 1104, Test N1 sichtbar (Treffer > 0)
