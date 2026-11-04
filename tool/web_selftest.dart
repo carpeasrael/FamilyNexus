@@ -65,7 +65,9 @@ Future<void> _boot() async {
     await backend.destroy();
     await backend.create('boot-passwort-0123456789');
     final keys = await VaultKeyStore.open(backend);
-    await bootstrap(keyStore: keys);
+    // Hängt der Start (etwa ohne SDK-Patch), soll der Schritt mit Meldung scheitern statt stumm zu warten.
+    await bootstrap(keyStore: keys).timeout(const Duration(seconds: 60),
+        onTimeout: () => throw StateError('Start hängt nach 60 s (SDK-Patch fehlt?)'));
     // Dieselbe, noch offene Verbindung des SDK (sqflite `singleInstance`): Der Matrix-Speicher liegt in der
     // verschlüsselten Datei. Ohne SDK-Patch (tool/web_matrix_patch.sh) nähme das SDK IndexedDB, die Tabelle fehlte.
     final matrix = await EncryptedDb.open(SdkMatrixGateway.matrixDbFileName,
