@@ -108,6 +108,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 - **Verworfen:** Nur UTC (Wiederholungen driften über Sommerzeit); RRULE-Bibliothek (Abhängigkeit, wir brauchen nur ein Teilset).
 - **Begründung:** Korrekte Wanduhrsemantik, voll testbar. Eigener Code nur für Kalenderlogik, nicht für Kryptografie.
 - **Anzeige von Uhrzeiten (#162):** Jede angezeigte Uhrzeit läuft über `formatClock` (`features/calendar/formatting.dart`): Format nach der 12/24-Stunden-Einstellung des Geräts und der App-Sprache; die Zone wählt der Aufrufer (Termine: Zone des Betrachters, Aufgaben: Zone der Liste, E-51, Chat: Gerätezeit). Das Datum der Notfall-Schlüssel-Datei folgt der App-Sprache (`31.10.2026` / `10/31/2026`). Technische Exporte (Datenprotokoll) bleiben ISO.
+- **Numerische Daten (#260):** Jedes numerisch angezeigte Datum (Notfall-Schlüssel-Datei, „Erledigt am …“ und Verlauf der Aufgaben) läuft über `formatDateNumeric` (`features/calendar/formatting.dart`): Tag und Monat immer zweistellig, `dd.MM.yyyy` für Deutsch (`03.11.2026`), `MM/dd/yyyy` sonst (`11/03/2026`). Nicht `DateFormat.yMd`, das einstellige Werte ohne führende Null ausgibt. Formate mit Monatsnamen (`Fmt`) bleiben unverändert; der Datumswähler des Termin-Editors folgt Material.
 
 ## E-21 Schriften und Netzwerk
 - **Gewählt:** Schriften (Space Grotesk, IBM Plex Sans/Mono, OFL) im App-Paket gebündelt.
