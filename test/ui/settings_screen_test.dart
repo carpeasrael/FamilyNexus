@@ -260,6 +260,7 @@ void main() {
     expect(report, contains('db.app: vorhanden (Wert wird nicht angezeigt)'));
     expect(report, contains('@anna:fake.test'), reason: 'Matrix-Zwischenspeicher des angemeldeten Kontos');
     expect(report, contains('Familie „Familie Test“'));
+    expect(report, contains('Anzeigename: Anna'), reason: '#261: eigener Anzeigename aus dem Matrix-Zwischenspeicher');
 
     await tester.tap(find.byTooltip('Als Datei speichern'));
     await tester.pumpAndSettle();

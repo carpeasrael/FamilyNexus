@@ -3756,6 +3756,35 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   static const Duration inventoryTimeout = Duration(seconds: 10);
 
+  /// Eigener Anzeigename für das lokale Protokoll (#261): nur aus dem, was lokal liegt, ohne Netzabfrage und ohne
+  /// Zustandsänderung am Raum. Reihenfolge: eigenes `m.room.member` im beigetretenen Familienraum, dann im privaten
+  /// Raum (erst Speicher, dann Datenbank), zuletzt der Profil-Zwischenspeicher des SDK. Der Name im
+  /// `m.room.member` kann ein raumbezogener Name sein (E-89).
+  Future<String?> _localDisplayName(Client c, String me) async {
+    String? clean(String? raw) {
+      final name = TextSanitizer.clean(raw ?? '', max: 80);
+      return name.isEmpty ? null : name;
+    }
+
+    for (final room in [_familyRoom(), _privateRoom()]) {
+      if (room == null) continue;
+      try {
+        final fromState = clean(room.getState(EventTypes.RoomMember, me)?.asUser(room).displayName);
+        if (fromState != null) return fromState;
+        final fromDb = clean((await c.database.getUser(me, room))?.displayName);
+        if (fromDb != null) return fromDb;
+      } catch (e) {
+        AppLog.e('gateway', 'Anzeigename für das lokale Protokoll nicht lesbar', e);
+      }
+    }
+    try {
+      return clean((await c.database.getUserProfile(me))?.displayname);
+    } catch (e) {
+      AppLog.e('gateway', 'Profil-Zwischenspeicher für das lokale Protokoll nicht lesbar', e);
+      return null;
+    }
+  }
+
   @override
   Future<OnlineInventory> dataInventory({bool refresh = true}) async {
     final c = _client;
@@ -3778,6 +3807,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       } catch (e) {
         AppLog.e('gateway', 'Geräteliste für das Datenprotokoll nicht abrufbar', e);
       }
+    } else {
+      displayName = await _localDisplayName(c, me);
     }
     final familyId = _familyRoomAnyState()?.id;
     final privateId = _privateRoom()?.id;
