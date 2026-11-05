@@ -48,10 +48,14 @@ class _LockGateState extends State<LockGate> with WidgetsBindingObserver {
     return ListenableBuilder(
       listenable: lock,
       builder: (context, _) => Stack(children: <Widget>[
-        // Inhalt bleibt erhalten (Zustand), ist aber für Bedienung und Bedienhilfen gesperrt.
+        // Inhalt bleibt erhalten (Zustand), ist aber für Bedienung, Bedienhilfen und Tastatur gesperrt (#298):
+        // ExcludeFocus entzieht beim Sperren den Fokus; Tab, Enter und Texteingabe erreichen ihn nicht mehr.
         ExcludeSemantics(
           excluding: lock.locked,
-          child: IgnorePointer(ignoring: lock.locked, child: widget.child),
+          child: ExcludeFocus(
+            excluding: lock.locked,
+            child: IgnorePointer(ignoring: lock.locked, child: widget.child),
+          ),
         ),
         if (lock.locked) const Positioned.fill(child: LockScreen()),
       ]),
@@ -89,7 +93,8 @@ class _LockScreenState extends State<LockScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    return Material(
+    // Eigener Fokusbereich: Tab bleibt auf dem Sperrbildschirm, Enter und Leertaste lösen nur das Entsperren aus (#298).
+    return FocusScope(child: Material(
       color: Theme.of(context).colorScheme.surface,
       child: AuroraBackground(
         child: SafeArea(
@@ -108,7 +113,7 @@ class _LockScreenState extends State<LockScreen> {
                       const SizedBox(height: 8),
                       Text(l.lockHint, textAlign: TextAlign.center),
                       const SizedBox(height: 16),
-                      FilledButton(onPressed: _unlock, child: Text(l.lockUnlock)),
+                      FilledButton(autofocus: true, onPressed: _unlock, child: Text(l.lockUnlock)),
                     ]),
                   ),
                 ),
@@ -117,6 +122,6 @@ class _LockScreenState extends State<LockScreen> {
           ),
         ),
       ),
-    );
+    ));
   }
 }

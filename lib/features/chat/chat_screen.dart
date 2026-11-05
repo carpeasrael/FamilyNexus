@@ -262,7 +262,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     final g = services.gateway;
     final l = AppLocalizations.of(context);
     return ListenableBuilder(
-      listenable: Listenable.merge(<Listenable>[g, services.settings]),
+      listenable: Listenable.merge(<Listenable>[g, services.settings, services.lock]),
       builder: (context, _) {
         final blocked = services.settings.settings.blockedUsers;
         final threads = visibleThreads(g.threads, blocked);
@@ -296,7 +296,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         final all = g.messagesIn(threadId);
         final msgs = _uniqueById(visibleMessages(all, blocked, myUserId: g.userId));
         final unread = g.unreadIn(threadId);
-        if (widget.active && _markerThread != threadId) {
+        // Gesperrt gilt nichts als gesehen (E-88, #294): Marke zurücksetzen, beim Entsperren entsteht sie neu (E-42).
+        final locked = services.lock.locked;
+        if (locked) _resetMarker();
+        if (widget.active && !locked && _markerThread != threadId) {
           // Vor dem Gelesen-Markieren: danach gäbe es keine ungelesene Nachricht mehr.
           _markerThread = threadId;
           _unreadFrom = unread > 0 ? g.firstUnreadIdIn(threadId) : null;
@@ -305,8 +308,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         // Sichtbar heißt wie bei den Meldungen: Chat-Tab, dieses Gespräch, Vordergrund (#254). Im Hintergrund wird
         // nichts gelesen markiert; die Rückkehr baut neu und markiert dann.
         if (widget.active) services.visibleChatThread = threadId;
-        if (widget.active && _foreground && unread > 0) {
-          WidgetsBinding.instance.addPostFrameCallback((_) => g.markChatRead(threadId: threadId).ignore());
+        if (widget.active && _foreground && !locked && unread > 0) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!services.lock.locked) g.markChatRead(threadId: threadId).ignore();
+          });
         }
         final byId = <String, ChatMessage>{for (final m in msgs) m.id: m};
         final entries = chatEntries(msgs, unreadFromId: _unreadFrom, allIds: <String>[for (final m in all) m.id]);

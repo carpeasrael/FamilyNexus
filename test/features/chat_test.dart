@@ -719,5 +719,23 @@ void main() {
       expect(app.services.chatThreadVisible(ChatThread.familyId), isTrue);
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     });
+
+    testWidgets('#294: bei aktiver App-Sperre wird nichts gelesen markiert; Entsperren markiert und setzt die Marke', (tester) async {
+      final app = await buildTestApp(lockEnabled: true);
+      final ben = await _joinBen(app);
+      await _openChat(tester, app);
+      expect(app.services.lock.locked, isFalse);
+      app.auth.succeed = false;
+      app.services.lock.lockNow();
+      await tester.pumpAndSettle();
+      await ben.sendMessage('während der Sperre');
+      await tester.pumpAndSettle();
+      expect(app.gateway.unreadIn(ChatThread.familyId), 1, reason: 'gesperrt: nicht gelesen markiert');
+      app.auth.succeed = true;
+      await tester.tap(find.text('Entsperren'));
+      await tester.pumpAndSettle();
+      expect(app.gateway.unreadIn(ChatThread.familyId), 0, reason: 'Entsperren markiert gelesen');
+      expect(find.text('Neue Nachrichten'), findsOneWidget, reason: 'Marke entsteht beim Entsperren (E-42)');
+    });
   });
 }
