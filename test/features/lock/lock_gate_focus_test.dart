@@ -41,6 +41,18 @@ void main() {
     expect(field.controller?.text ?? '', isEmpty);
   });
 
+  testWidgets('ExcludeFocus allein: das verdeckte Feld kann den Fokus nicht anfordern', (tester) async {
+    final app = await _open(tester);
+    final input = tester.state<EditableTextState>(find.byType(EditableText).last).widget.focusNode;
+    app.auth.succeed = false;
+    app.services.lock.lockNow();
+    await tester.pumpAndSettle();
+    input.requestFocus();
+    await tester.pumpAndSettle();
+    expect(input.hasFocus, isFalse, reason: 'gesperrter Inhalt nimmt keinen Fokus an');
+    expect(FocusManager.instance.primaryFocus?.context?.findAncestorWidgetOfExactType<TextField>(), isNull);
+  });
+
   testWidgets('Tab bleibt auf dem Sperrbildschirm, Entsperren stellt den Inhalt wieder her', (tester) async {
     final app = await _open(tester);
     app.auth.succeed = false;
