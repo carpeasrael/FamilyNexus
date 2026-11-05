@@ -41,8 +41,5 @@ docker run --rm -v "$DATA":/data --entrypoint sh matrixdotorg/synapse:latest -c 
 docker run -d --name fn-synapse --network "$NET" -v "$DATA":/data matrixdotorg/synapse:latest >/dev/null
 docker run -d --name fn-synapse-tls --network "$NET" -p 127.0.0.1:18448:18448 caddy:2 \
   caddy reverse-proxy --from https://localhost:18448 --to http://fn-synapse:8008 >/dev/null
-for i in $(seq 1 60); do
-  if curl -sk https://localhost:18448/_matrix/client/versions >/dev/null 2>&1; then echo "Synapse bereit: https://localhost:18448"; exit 0; fi
-  sleep 2
-done
-echo "Synapse nicht erreichbar"; docker logs fn-synapse | tail -20; exit 1
+if "$(dirname "$0")/wait_ready.sh" https://localhost:18448 "Synapse"; then exit 0; fi
+docker logs fn-synapse | tail -20; exit 1
