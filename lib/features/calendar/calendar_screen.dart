@@ -374,13 +374,17 @@ class SectionCard extends StatelessWidget {
         child: GlassCard(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
             // Wrap statt Row: Bei 200 % Schrift und schmalem Inhalt rutscht die Aktion unter den Titel, statt hinauszuragen (#274).
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: <Widget>[
-                Semantics(header: true, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
-                ?trailing,
-              ],
+            // Volle Breite, sonst schrumpft der Wrap in der Column und die Aktion klebt am Titel.
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  Semantics(header: true, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
+                  ?trailing,
+                ],
+              ),
             ),
             const SizedBox(height: 8),
             child,
