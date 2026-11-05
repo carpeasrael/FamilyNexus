@@ -467,16 +467,17 @@ jobs:
       - name: Collect App Store packages
         if: steps.key.outputs.signed == 'true'
         run: |
-          mkdir -p store
-          cp build/ios/ipa/*.ipa "store/FamilyNexus-${TAG}-ios.ipa"
-          cp build/macos/export/FamilyNexus.pkg "store/FamilyNexus-${TAG}-macos-appstore.pkg"
-          (cd store && for f in *; do shasum -a 256 "$f" > "$f.sha256"; done)
+          # Eigener Ordner: `store/` gehört dem Repository (Store-Grafiken).
+          mkdir -p appstore-out
+          cp build/ios/ipa/*.ipa "appstore-out/FamilyNexus-${TAG}-ios.ipa"
+          cp build/macos/export/FamilyNexus.pkg "appstore-out/FamilyNexus-${TAG}-macos-appstore.pkg"
+          (cd appstore-out && for f in *; do shasum -a 256 "$f" > "$f.sha256"; done)
 
       - uses: actions/upload-artifact@v7
         if: steps.key.outputs.signed == 'true'
         with:
           name: appstore-${{ env.TAG }}-run${{ github.run_number }}
-          path: store/
+          path: appstore-out/
           retention-days: 90
 
       - uses: actions/upload-artifact@v7
