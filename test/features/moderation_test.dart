@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/fake_matrix.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 Future<FakeMatrixGateway> _joinBen(TestApp app) async {
   final ben = app.server.newDevice();
@@ -29,7 +30,7 @@ Future<void> _openChat(WidgetTester tester, TestApp app) async {
   _tallView(tester);
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
-  await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+  await tester.tap(navTab('Chat'));
   await tester.pumpAndSettle();
 }
 
@@ -126,7 +127,7 @@ void main() {
     _tallView(tester);
     await tester.pumpWidget(FamilyNexusApp(services: app.services));
     await tester.pumpAndSettle();
-    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Familie')));
+    await tester.tap(navTab('Familie'));
     await tester.pumpAndSettle();
 
     expect(find.byTooltip('Nachricht schreiben: Ben'), findsOneWidget);

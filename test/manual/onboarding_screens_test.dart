@@ -15,6 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 final bool _enabled = Platform.environment['FN_SCREENSHOTS'] == '1';
 final Directory _out = Directory(Platform.environment['FN_SCREENSHOTS_DIR'] ?? 'build/onboarding_tour');
@@ -135,7 +136,7 @@ void main() {
       await _tap(tester, 'Jetzt einladen');
       await _snap(tester, 'einladen-dialog');
       await _tap(tester, 'Schließen');
-      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Familie')));
+      await tester.tap(navTab('Familie'));
       await _snap(tester, 'familie-ansicht');
     });
 
@@ -164,7 +165,7 @@ void main() {
       // Sicht der Moderatorin: Anfrage mit Namen.
       await tester.pumpWidget(const SizedBox());
       await _start(tester, anna);
-      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Familie')));
+      await tester.tap(navTab('Familie'));
       await _snap(tester, 'moderatorin-anfrage');
       await anna.gateway.approveRequest(guest.gateway.userId!);
       expect(anna.gateway.family!.member(guest.gateway.userId!)!.status, MemberStatus.invited);

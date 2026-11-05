@@ -31,10 +31,12 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 
 ## Bekannte Einschränkungen
 
-- **Adaptive Tablet-Nutzung (REQ-TABLET-01, erfasst 2026-11-04):** Automatische Anpassung an Tabletgröße sowie
-  Hoch- und Querformat ist als [Requirement mit Abnahmekriterien](PLAN.md#requirement-req-tablet-01--tablet-nutzung-in-hoch--und-querformat)
-  erfasst und noch umzusetzen bzw. abzunehmen. Die iOS-Konfiguration beschränkt die App derzeit auf iPhones
-  (`TARGETED_DEVICE_FAMILY = 1`); native iPad-Unterstützung gehört zum Umfang der Anforderung.
+- **Adaptive Tablet-Nutzung (REQ-TABLET-01, #274, E-92):** Umgesetzt und in Widget-Tests geprüft (Rail ab 600 dp, Zweispalter
+  Kalender und Chat ab 1000 dp, iPad-Familie `1,2`, Android `resizeableActivity`). **Offen, nur am Zielgerät prüfbar:**
+  echtes Android-Tablet und echtes iPad (Start in beiden Ausrichtungen, wiederholtes Drehen, Rotationssperre, Split View und
+  Fenstergrößen), Bildschirmtastatur auf echten Geräten, Desktop-Fenster unter macOS, Windows und Linux. Für den App Store werden
+  **iPad-Screenshots Pflicht**, sobald die App als iPad-fähig eingereicht wird (`docs/STORE.md` und `store/` sind noch iPhone-only und
+  unverändert). Der Nachtest steht als Schritt B-25 im Testplan.
 
 - **Aufgabenlisten mit neuen Regeln oder Erklärung (E-58)** sind für App-Versionen vor dieser Änderung unsichtbar (Format v2); umgestellte Listen bleiben dort auf der letzten v1-Fassung stehen. Bearbeitet ein Moderator mit älterer App eine umgestellte Liste, gehen Regel und Erklärung verloren.
 

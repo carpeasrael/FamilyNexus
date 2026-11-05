@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 /// #153: Scheitert das Öffnen der Familiendienste, zeigt die Hauptansicht eine Meldung mit „Erneut versuchen“
 /// und das Menü statt eines dauerhaften Ladekreises; es bleibt kein Teilzustand zurück.
@@ -50,7 +51,7 @@ void main() {
       broken = false;
       await tester.tap(find.text(retry));
       await tester.pumpAndSettle();
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(findNavigation(), findsOneWidget);
       expect(find.textContaining(failed), findsNothing);
       expect(app.services.calendar, isNotNull);
     });
@@ -74,7 +75,7 @@ void main() {
       broken = false;
       await tester.tap(find.text(retry));
       await tester.pumpAndSettle();
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(findNavigation(), findsOneWidget);
       expect(app.services.calendar, isNotNull);
       expect(app.services.tasks, isNotNull);
       expect(app.services.presence, isNotNull);

@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 
 import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 /// Kleinstes gültiges PNG (1 × 1 Pixel).
 const _png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
@@ -30,7 +31,7 @@ Future<FakeMatrixGateway> _joinBen(TestApp app) async {
 Future<void> _openChat(WidgetTester tester, TestApp app) async {
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
-  await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+  await tester.tap(navTab('Chat'));
   await tester.pumpAndSettle();
 }
 
@@ -41,7 +42,7 @@ Future<void> _openChatEn(WidgetTester tester, TestApp app, {required bool use24h
     child: FamilyNexusApp(services: app.services),
   ));
   await tester.pumpAndSettle();
-  await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+  await tester.tap(navTab('Chat'));
   await tester.pumpAndSettle();
 }
 
@@ -451,9 +452,9 @@ void main() {
       expect(y('Neue Nachrichten') < y('neu eins'), isTrue);
 
       // Tab verlassen und zurück: alles gelesen, keine Marke mehr.
-      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Einkauf')));
+      await tester.tap(navTab('Einkauf'));
       await tester.pumpAndSettle();
-      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+      await tester.tap(navTab('Chat'));
       await tester.pumpAndSettle();
       expect(find.text('Neue Nachrichten'), findsNothing);
     });
@@ -593,9 +594,9 @@ void main() {
         await setUpReply(tester, app, long);
         await tester.tap(find.text('Mehr anzeigen'));
         await tester.pumpAndSettle();
-        await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Einkauf')));
+        await tester.tap(navTab('Einkauf'));
         await tester.pumpAndSettle();
-        await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+        await tester.tap(navTab('Chat'));
         await tester.pumpAndSettle();
         expect(quote(tester).maxLines, 4);
       });
@@ -635,7 +636,7 @@ void main() {
             child: FamilyNexusApp(services: app.services),
           ));
           await tester.pumpAndSettle();
-          await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+          await tester.tap(navTab('Chat'));
           await tester.pumpAndSettle();
           expect(find.text('Mehr anzeigen'), scale == 1.0 ? findsNothing : findsOneWidget, reason: 'Textfaktor $scale');
           await tester.pumpWidget(const SizedBox());
@@ -680,7 +681,7 @@ void main() {
       await _openChat(tester, app);
       expect(app.services.visibleChatThread, ChatThread.familyId);
       expect(app.services.chatThreadVisible(ChatThread.familyId), isTrue);
-      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Einkauf')));
+      await tester.tap(navTab('Einkauf'));
       await tester.pumpAndSettle();
       expect(app.services.visibleChatThread, isNull);
       expect(app.services.chatThreadVisible(ChatThread.familyId), isFalse);

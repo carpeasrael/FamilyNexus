@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../ui/layout/adaptive.dart';
 import '../../ui/widgets/glass.dart';
 
 /// Verdeckt die App, solange sie gesperrt ist, und reagiert auf Wechsel in den Hintergrund.
@@ -93,18 +94,24 @@ class _LockScreenState extends State<LockScreen> {
       child: AuroraBackground(
         child: SafeArea(
           child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: GlassCard(
-                child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                  Icon(Icons.lock_outline, size: 48, color: Theme.of(context).colorScheme.primary),
-                  const SizedBox(height: 12),
-                  Semantics(header: true, child: Text(l.lockTitle, style: Theme.of(context).textTheme.headlineSmall)),
-                  const SizedBox(height: 8),
-                  Text(l.lockHint, textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  FilledButton(onPressed: _unlock, child: Text(l.lockUnlock)),
-                ]),
+            // Scrollbar, wenn der Inhalt bei großer Schrift oder im flachen Querformat nicht passt (#274).
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: GlassCard(
+                    child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                      Icon(Icons.lock_outline, size: 48, color: Theme.of(context).colorScheme.primary),
+                      const SizedBox(height: 12),
+                      Semantics(header: true, child: Text(l.lockTitle, style: Theme.of(context).textTheme.headlineSmall)),
+                      const SizedBox(height: 8),
+                      Text(l.lockHint, textAlign: TextAlign.center),
+                      const SizedBox(height: 16),
+                      FilledButton(onPressed: _unlock, child: Text(l.lockUnlock)),
+                    ]),
+                  ),
+                ),
               ),
             ),
           ),

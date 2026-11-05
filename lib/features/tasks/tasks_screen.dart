@@ -13,6 +13,7 @@ import '../../ui/widgets/length_limit.dart';
 import '../calendar/formatting.dart';
 import '../common/error_text.dart';
 import '../chat/sender_name.dart';
+import '../../ui/layout/adaptive.dart';
 import 'tasks_controller.dart';
 
 /// Kurzlabel für die Kachel (Täglich, Mo–Fr, Wöchentlich, Monatlich).
@@ -125,7 +126,7 @@ class TasksScreen extends StatelessWidget {
                 )
               : null,
           body: SafeArea(
-            child: ListView(padding: const EdgeInsets.fromLTRB(12, 8, 12, 96), children: <Widget>[
+            child: ContentWidth(child: ListView(padding: const EdgeInsets.fromLTRB(12, 8, 12, 96), children: <Widget>[
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
@@ -144,7 +145,7 @@ class TasksScreen extends StatelessWidget {
                 _Header(l.tasksSectionOthers),
                 for (final t in others) _ListTile(list: t, controller: c, services: services),
               ],
-            ]),
+            ])),
           ),
         );
       },
@@ -271,7 +272,7 @@ class TaskDetailScreen extends StatelessWidget {
             ],
           ]),
           body: SafeArea(
-            child: ListView(padding: const EdgeInsets.fromLTRB(12, 8, 12, 24), children: <Widget>[
+            child: ContentWidth(child: ListView(padding: const EdgeInsets.fromLTRB(12, 8, 12, 24), children: <Widget>[
               Text(l.tasksAssignedTo(_nameOf(services, c, l, list.assignee)), style: Theme.of(context).textTheme.titleSmall),
               Text('${_ruleLabel(l, list.rule)} · ${_resetLabel(l, list.rule)}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary)),
@@ -346,7 +347,7 @@ class TaskDetailScreen extends StatelessWidget {
                     if (e.comment.isNotEmpty) e.comment,
                   ].join('\n')),
                 ),
-            ]),
+            ])),
           ),
         );
       },
@@ -570,7 +571,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.existing == null ? l.tasksNew : l.tasksEditTitle)),
       body: SafeArea(
-        child: ListView(padding: const EdgeInsets.all(16), children: <Widget>[
+        child: ContentWidth(child: ListView(padding: const EdgeInsets.all(16), children: <Widget>[
           TextField(
             controller: _title,
             maxLength: TaskList.maxTitle,
@@ -616,7 +617,7 @@ class _TaskEditorScreenState extends State<TaskEditorScreen> {
           ),
           const SizedBox(height: 16),
           FilledButton(onPressed: _busy ? null : _save, child: Text(l.save)),
-        ]),
+        ])),
       ),
     );
   }

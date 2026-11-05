@@ -12,6 +12,7 @@ import '../../domain/chat.dart';
 import '../../domain/moderation.dart';
 import '../../domain/presence.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../ui/layout/adaptive.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
@@ -345,40 +346,47 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
           Expanded(
             child: msgs.isEmpty
                 ? Center(child: Text(l.emptyChat))
-                : ListView.builder(
-                    controller: _scroll,
-                    reverse: true,
-                    padding: const EdgeInsets.all(12),
-                    itemCount: entries.length,
-                    // Der State einer Blase (geladener Anhang) bleibt an seiner Nachricht, auch wenn neue
-                    // Nachrichten alle Indizes verschieben (#130). Datumszeilen und Marke haben eigene Schlüssel.
-                    findChildIndexCallback: (key) {
-                      final position = positionByKey[(key as ValueKey<String>).value];
-                      return position == null ? null : entries.length - 1 - position;
-                    },
-                    itemBuilder: (context, i) {
-                      final entry = entries[entries.length - 1 - i];
-                      final key = ValueKey<String>(entry.key);
-                      switch (entry) {
-                        case DayEntry(:final day):
-                          return KeyedSubtree(key: key, child: _DayLine(day: day));
-                        case UnreadMarkerEntry():
-                          return KeyedSubtree(key: key, child: _UnreadLine(key: _markerKey));
-                        case MessageEntry(message: final m):
-                          if (m.beforeJoin) return KeyedSubtree(key: key, child: const _BeforeJoinNote());
-                          return _Bubble(
-                            key: key,
-                            message: m,
-                            mine: m.senderId == g.userId,
-                            replied: m.replyToId == null ? null : byId[m.replyToId],
-                            myUserId: g.userId,
-                            collapseQuotes: _collapseQuotes,
-                            gateway: g,
-                            services: services,
-                            threadId: threadId,
-                            onLongPress: () => _actions(g, m),
-                          );
-                      }
+                : LayoutBuilder(
+                    // Spaltenbreite einmal je Build der Liste, nicht je Blase (#274): Im Zweispalter ist der Chat schmaler als das Fenster.
+                    builder: (context, box) {
+                      final bubbleWidth = bubbleMaxWidth(box.maxWidth);
+                      return ListView.builder(
+                        controller: _scroll,
+                        reverse: true,
+                        padding: const EdgeInsets.all(12),
+                        itemCount: entries.length,
+                        // Der State einer Blase (geladener Anhang) bleibt an seiner Nachricht, auch wenn neue
+                        // Nachrichten alle Indizes verschieben (#130). Datumszeilen und Marke haben eigene Schlüssel.
+                        findChildIndexCallback: (key) {
+                          final position = positionByKey[(key as ValueKey<String>).value];
+                          return position == null ? null : entries.length - 1 - position;
+                        },
+                        itemBuilder: (context, i) {
+                          final entry = entries[entries.length - 1 - i];
+                          final key = ValueKey<String>(entry.key);
+                          switch (entry) {
+                            case DayEntry(:final day):
+                              return KeyedSubtree(key: key, child: _DayLine(day: day));
+                            case UnreadMarkerEntry():
+                              return KeyedSubtree(key: key, child: _UnreadLine(key: _markerKey));
+                            case MessageEntry(message: final m):
+                              if (m.beforeJoin) return KeyedSubtree(key: key, child: const _BeforeJoinNote());
+                              return _Bubble(
+                                key: key,
+                                message: m,
+                                mine: m.senderId == g.userId,
+                                replied: m.replyToId == null ? null : byId[m.replyToId],
+                                myUserId: g.userId,
+                                maxWidth: bubbleWidth,
+                                collapseQuotes: _collapseQuotes,
+                                gateway: g,
+                                services: services,
+                                threadId: threadId,
+                                onLongPress: () => _actions(g, m),
+                              );
+                          }
+                        },
+                      );
                     },
                   ),
           ),
@@ -475,6 +483,7 @@ class _Bubble extends StatelessWidget {
     required this.mine,
     required this.replied,
     required this.myUserId,
+    required this.maxWidth,
     required this.collapseQuotes,
     required this.gateway,
     required this.services,
@@ -486,6 +495,8 @@ class _Bubble extends StatelessWidget {
   final bool mine;
   final ChatMessage? replied;
   final String? myUserId;
+  /// Höchste Breite der Blase (Spaltenbreite, nicht Fensterbreite).
+  final double maxWidth;
   final Listenable collapseQuotes;
   final MatrixGateway gateway;
   final AppServices services;
@@ -505,7 +516,7 @@ class _Bubble extends StatelessWidget {
     return Align(
       alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.82),
+        constraints: BoxConstraints(maxWidth: maxWidth),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Semantics(

@@ -8,6 +8,7 @@ import '../../domain/server.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/widgets/glass.dart';
 import '../security/security_panel.dart';
+import '../../ui/layout/adaptive.dart';
 import 'account_create_step.dart';
 import 'family_step.dart';
 import 'invite_link_step.dart';
@@ -212,7 +213,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           automaticallyImplyLeading: false,
         ),
         body: SafeArea(
-          child: ListView(
+          child: ContentWidth(child: ListView(
             padding: const EdgeInsets.all(16),
             children: <Widget>[
               if (_step != _Step.welcome) ...<Widget>[
@@ -226,7 +227,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ],
               GlassCard(child: _buildStep(l)),
             ],
-          ),
+          )),
         ),
       ),
     );

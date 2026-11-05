@@ -122,6 +122,12 @@ abstract class AppLocalizations {
   /// **'Chat'**
   String get tabChat;
 
+  /// No description provided for @tabCalendarAndChat.
+  ///
+  /// In de, this message translates to:
+  /// **'Kalender und Chat'**
+  String get tabCalendarAndChat;
+
   /// No description provided for @tabFamily.
   ///
   /// In de, this message translates to:

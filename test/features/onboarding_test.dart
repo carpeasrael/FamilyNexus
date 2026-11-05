@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/fake_matrix.dart';
 import '../support/registration_form.dart';
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
   tester.view.physicalSize = const Size(900, 3000);
@@ -122,7 +123,7 @@ void main() {
     expect(app.services.settings.settings.onboardingDone, isTrue);
     expect(app.gateway.family?.name, 'Familie Groß');
     expect(app.gateway.family!.myRole, Role.moderator);
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(findNavigation(), findsOneWidget);
   });
 
   testWidgets('TP-REG-03 vergebener Benutzername schlägt eine freie Alternative vor', (tester) async {
@@ -292,7 +293,7 @@ void main() {
     expect(find.text('Schritt 2 von 3'), findsOneWidget);
     expect(find.text('Notfall-Schlüssel erstellen'), findsOneWidget);
     expect(find.widgetWithText(FilledButton, 'Weiter'), findsNothing, reason: 'kein Überspringen');
-    expect(find.byType(NavigationBar), findsNothing);
+    expect(findNavigation(), findsNothing);
   });
 
   testWidgets('TP-START-03b nach dem Abmelden: direkt „Anmelden“ statt Startseite', (tester) async {

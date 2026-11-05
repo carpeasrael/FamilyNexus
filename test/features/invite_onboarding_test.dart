@@ -16,6 +16,7 @@ import '../support/fake_browser.dart';
 import '../support/fake_matrix.dart';
 import '../support/registration_form.dart';
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
   tester.view.physicalSize = const Size(900, 3000);
@@ -97,7 +98,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(s.guest.gateway.family!.myRole, Role.member);
       expect(s.guest.services.settings.settings.onboardingDone, isTrue);
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(findNavigation(), findsOneWidget);
     });
 
     testWidgets('TP-JOIN-02 Link überlebt einen Neustart der App (z. B. während der Browser offen war)', (tester) async {

@@ -22,6 +22,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tabChat => 'Chat';
 
   @override
+  String get tabCalendarAndChat => 'Kalender und Chat';
+
+  @override
   String get tabFamily => 'Familie';
 
   @override

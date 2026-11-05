@@ -13,6 +13,7 @@ import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../../ui/widgets/length_limit.dart';
 import '../reminders/reminder_coordinator.dart';
+import '../../ui/layout/adaptive.dart';
 import 'calendar_controller.dart';
 import 'formatting.dart';
 
@@ -416,7 +417,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
         ],
       ),
       body: SafeArea(
-        child: Form(
+        child: ContentWidth(child: Form(
           key: _formKey,
           child: ListView(padding: const EdgeInsets.all(16), children: <Widget>[
             GlassCard(
@@ -568,7 +569,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
               ),
             const SizedBox(height: 24),
           ]),
-        ),
+        )),
       ),
     );
   }

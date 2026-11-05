@@ -1,9 +1,9 @@
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/data/sync/activity_notifier.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 class _Platform implements ActivityPlatform {
   final List<ActivityKind> shown = <ActivityKind>[];
@@ -27,11 +27,11 @@ void main() {
     activity.shoppingArrived();
     expect(platform.shown, <ActivityKind>[ActivityKind.shopping]);
 
-    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+    await tester.tap(navTab('Chat'));
     await tester.pumpAndSettle();
     expect(platform.cancelled, isEmpty);
 
-    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Einkauf')));
+    await tester.tap(navTab('Einkauf'));
     await tester.pumpAndSettle();
     expect(platform.cancelled, <ActivityKind>[ActivityKind.shopping]);
   });

@@ -4,6 +4,7 @@
   "tabToday": "Today",
   "tabCalendar": "Calendar",
   "tabChat": "Chat",
+  "tabCalendarAndChat": "Calendar and chat",
   "tabFamily": "Family",
   "tabSettings": "Settings",
   "emptyToday": "No events yet. Upcoming events will show up here.",

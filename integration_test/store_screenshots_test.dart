@@ -14,6 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 import '../tool/preview/preview_data.dart';
+import '../test/helpers/shell_finders.dart';
 
 // Sprache der Aufnahmen: --dart-define=SHOTS_LANG=en (Standard de); die Dateien landen dann in .../fn_store_shots_<sprache>.
 const _lang = String.fromEnvironment('SHOTS_LANG', defaultValue: 'de');
@@ -65,7 +66,7 @@ void main() {
     }
 
     Future<void> tab(String label) async {
-      await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(label)));
+      await tester.tap(navTab(label));
       await tester.pumpAndSettle();
     }
 

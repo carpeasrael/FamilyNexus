@@ -161,7 +161,7 @@ Abnahme 8:
 
 ## Requirement REQ-TABLET-01 – Tablet-Nutzung in Hoch- und Querformat
 
-Erfasst: 2026-11-04. **Status: offen, noch nicht umgesetzt oder abgenommen.**
+Erfasst: 2026-11-04. **Status: umgesetzt (E-92, Issue #274, in Tests belegt); Abnahme auf echten Geräten offen** (Android-Tablet, iPad, Rotationssperre, Split View; siehe OFFEN.md und Testplan B-25).
 
 **Anforderung:** FamilyNexus muss auf Android-Tablets und iPads in Hoch- und Querformat vollständig bedienbar sein.
 Die App muss beim Start und bei jeder Änderung der Fenstergröße oder Ausrichtung automatisch die verfügbare
@@ -195,26 +195,26 @@ können, damit ich Kalender, Chat und Listen in jeder Ausrichtung bequem nutzen 
   Touch-Ziele sind mindestens 48 × 48 logische Pixel groß. Eine systemseitige Rotationssperre wird respektiert;
   die App erzwingt selbst keine einzelne Ausrichtung.
 - Die Plattformkonfiguration muss Android-Tablets und native iPad-Nutzung einschließlich beider Ausrichtungen
-  unterstützen. Aktuell ist iOS über `TARGETED_DEVICE_FAMILY = 1` auf iPhones beschränkt; diese Einschränkung ist
-  bei der Umsetzung aufzuheben. Die bestehende Smartphone-Bedienung muss erhalten bleiben.
+  unterstützen. Bis dahin war iOS über `TARGETED_DEVICE_FAMILY = 1` auf iPhones beschränkt; diese Einschränkung ist
+  aufgehoben (`1,2`, E-92). Die bestehende Smartphone-Bedienung muss erhalten bleiben.
 
 ### Abnahmekriterien
 
-- [ ] Automatisierte Layoutprüfungen decken mindestens 600 × 960, 800 × 1280 und 1024 × 1366 logische Pixel sowie
+- [x] Automatisierte Layoutprüfungen decken mindestens 600 × 960, 800 × 1280 und 1024 × 1366 logische Pixel sowie
   jeweils die vertauschten Maße ab. Jede oben genannte Ansicht bleibt ohne Layoutüberlauf bedienbar.
-- [ ] Direkt unter, auf und über jeder dokumentierten Layoutgrenze wird das vorgesehene Layout angezeigt.
+- [x] Direkt unter, auf und über jeder dokumentierten Layoutgrenze wird das vorgesehene Layout angezeigt.
   Eine Verkleinerung des Tablet-Fensters bis auf 360 logische Pixel Breite schaltet ohne manuellen Eingriff auf
   eine bedienbare einspaltige Ansicht um; beim Vergrößern wird wieder zusätzlicher Platz genutzt.
-- [ ] Während eines ungespeicherten Terminformulars, eines Chatentwurfs und eines geöffneten Dialogs wird jeweils
+- [x] Während eines ungespeicherten Terminformulars, eines Chatentwurfs und eines geöffneten Dialogs wird jeweils
   von Hoch- nach Querformat und zurück gewechselt. Eingaben, Auswahl und Navigationszustand bleiben erhalten;
   es entsteht weder Datenverlust noch eine doppelte Speicher- oder Sendeaktion.
-- [ ] Beide Sprachen und Designs werden in beiden Ausrichtungen geprüft, zusätzlich mit 200 % Schriftgröße
+- [x] (Widget-Tests; Bildschirmtastatur am Gerät offen) Beide Sprachen und Designs werden in beiden Ausrichtungen geprüft, zusätzlich mit 200 % Schriftgröße
   und geöffneter Bildschirmtastatur. Eingabefelder, Navigation und Bestätigungsaktionen bleiben erreichbar.
 - [ ] Auf mindestens einem echten Android-Tablet und einem echten iPad werden Start in beiden Ausrichtungen,
   wiederholtes Drehen, Rotationssperre und Fenstergrößenänderungen soweit vom System unterstützt geprüft.
   Gerät, Betriebssystem, App-Version und Ergebnis werden im Testbericht festgehalten; nicht ausgeführte
-  Geräteprüfungen bleiben ausdrücklich offen.
-- [ ] Eine Smartphone-Regressionsprüfung bestätigt die Bedienbarkeit bei 360 und 390 logischen Pixeln Breite.
+  Geräteprüfungen bleiben ausdrücklich offen. **Offen** (hier nicht ausführbar; Nachtest B-25).
+- [x] Eine Smartphone-Regressionsprüfung bestätigt die Bedienbarkeit bei 360 und 390 logischen Pixeln Breite.
 
 ## Risiken
 

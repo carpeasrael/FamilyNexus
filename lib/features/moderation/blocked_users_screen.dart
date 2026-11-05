@@ -6,6 +6,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
+import '../../ui/layout/adaptive.dart';
 import 'moderation_actions.dart';
 
 /// Liste der lokal blockierten Mitglieder mit „Blockierung aufheben“ (E-48).
@@ -20,7 +21,7 @@ class BlockedUsersScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l.settingsBlockedUsers)),
       body: SafeArea(
-        child: ListenableBuilder(
+        child: ContentWidth(child: ListenableBuilder(
           listenable: Listenable.merge(<Listenable>[services.settings, services.gateway]),
           builder: (context, _) {
             final blocked = services.settings.settings.blockedUsers;
@@ -49,7 +50,7 @@ class BlockedUsersScreen extends StatelessWidget {
                 ),
             ]);
           },
-        ),
+        )),
       ),
     );
   }

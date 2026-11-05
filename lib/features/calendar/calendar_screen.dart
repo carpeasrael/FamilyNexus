@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 
@@ -295,7 +297,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
         crossAxisCount: 7,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        childAspectRatio: 0.95,
+        // Bei großer Schrift werden die Felder höher (Zahl und Punkte brauchen mehr Platz), #274.
+        childAspectRatio: 0.95 / math.max(1.0, 1 + (MediaQuery.textScalerOf(context).scale(14) / 14 - 1) * 0.5),
         children: <Widget>[
           for (final d in grid)
             _dayCell(c, l, t, d, CalendarView.forDay(occ, c.zone, d), inMonth: d.month == _focus.month, selected: d == _focus),
@@ -333,21 +336,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
             boxShadow: today && !t.reduceEffects ? <BoxShadow>[BoxShadow(color: t.primary.withValues(alpha: 0.4), blurRadius: 8)] : null,
           ),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            Text(
-              '${d.day}',
-              style: monoStyle(context, size: 14, color: inMonth ? t.textPrimary : t.textMuted),
-            ),
-            const SizedBox(height: 3),
-            SizedBox(
-              height: 8,
-              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-                for (final col in colors)
-                  Container(margin: const EdgeInsets.symmetric(horizontal: 1.5), width: 6, height: 6, decoration: BoxDecoration(color: col, shape: BoxShape.circle)),
-                if (list.length > 3) Text('+', style: TextStyle(fontSize: 9, color: t.textSecondary)),
-              ]),
-            ),
-          ]),
+          // FittedBox: Reicht das Feld bei 200 % Schrift nicht, schrumpft der Inhalt, statt hinauszuragen (#274).
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+              Text(
+                '${d.day}',
+                style: monoStyle(context, size: 14, color: inMonth ? t.textPrimary : t.textMuted),
+              ),
+              const SizedBox(height: 3),
+              SizedBox(
+                height: 8,
+                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                  for (final col in colors)
+                    Container(margin: const EdgeInsets.symmetric(horizontal: 1.5), width: 6, height: 6, decoration: BoxDecoration(color: col, shape: BoxShape.circle)),
+                  if (list.length > 3) Text('+', style: TextStyle(fontSize: 9, color: t.textSecondary)),
+                ]),
+              ),
+            ]),
+          ),
         ),
       ),
     );
@@ -366,10 +373,19 @@ class SectionCard extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 12),
         child: GlassCard(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-            Row(children: <Widget>[
-              Expanded(child: Semantics(header: true, child: Text(title, style: Theme.of(context).textTheme.titleLarge))),
-              ?trailing,
-            ]),
+            // Wrap statt Row: Bei 200 % Schrift und schmalem Inhalt rutscht die Aktion unter den Titel, statt hinauszuragen (#274).
+            // Volle Breite, sonst schrumpft der Wrap in der Column und die Aktion klebt am Titel.
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  Semantics(header: true, child: Text(title, style: Theme.of(context).textTheme.titleLarge)),
+                  ?trailing,
+                ],
+              ),
+            ),
             const SizedBox(height: 8),
             child,
           ]),

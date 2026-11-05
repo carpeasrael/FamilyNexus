@@ -4,6 +4,7 @@ import '../../app/app_services.dart';
 import '../../app/app_version.dart';
 import '../../domain/permissions.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../ui/layout/adaptive.dart';
 import '../calendar/calendar_screen.dart';
 import '../chat/chat_screen.dart';
 import '../family/family_screen.dart';
@@ -12,6 +13,9 @@ import '../settings/settings_screen.dart';
 import '../shopping/shopping_screen.dart';
 import '../tasks/tasks_screen.dart';
 import '../today/today_screen.dart';
+
+/// Schlüssel der Hauptnavigation (untere Leiste oder seitliche Rail), für Tests und Bedienhilfen (#274).
+const Key mainNavigationKey = ValueKey<String>('main-navigation');
 
 /// Hauptgerüst mit fünf Bereichen; Einstellungen liegen im Menü oben rechts.
 class HomeShell extends StatefulWidget {
@@ -127,6 +131,13 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
         if (snap.connectionState != ConnectionState.done || services.calendar == null) {
           return Scaffold(body: Center(child: Semantics(label: l.loading, child: const CircularProgressIndicator())));
         }
+        // Nutzbare Fläche = Fenster minus sichere Ränder, ohne Tastatur: einmal hier, oberhalb von Scaffold,
+        // Leiste und AppBar. So hängt die Klasse nicht vom Tippen ab und kippt nicht zurück (E-92).
+        final cls = windowClassIn(context);
+        final compact = cls == WindowClass.compact;
+        final twoPane = cls == WindowClass.expanded;
+        // Chat sichtbar = gelesen (E-88, #254): im Zweispalter bei Tab Kalender und Chat, sonst nur bei Tab Chat.
+        final chatVisible = _index == _chatTab || (twoPane && _index == _calendarTab);
         final pages = <Widget>[
           TodayScreen(
             onOpenChat: () => setState(() => _index = _chatTab),
@@ -134,13 +145,15 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
             onOpenAgenda: _openAgenda,
           ),
           CalendarScreen(modeRequest: _calendarMode),
-          ChatScreen(active: _index == _chatTab),
+          ChatScreen(active: chatVisible),
           const ShoppingScreen(),
           const FamilyScreen(),
         ];
+        final destinations = _destinations(l, services);
+        final listWidth = compact ? double.infinity : kContentMaxWidth;
         return Scaffold(
           appBar: AppBar(
-            title: Text(titles[_index]),
+            title: Text(twoPane && (_index == _calendarTab || _index == _chatTab) ? l.tabCalendarAndChat : titles[_index]),
             actions: <Widget>[
               // Burger-Menü rechts oben: Einstellungen und Datenschutz.
               Builder(
@@ -153,47 +166,111 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
             ],
           ),
           endDrawer: const _MenuDrawer(),
-          body: SafeArea(child: IndexedStack(index: _index, children: pages)),
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: _index,
-            onDestinationSelected: _go,
-            destinations: <NavigationDestination>[
-              NavigationDestination(icon: const Icon(Icons.today_outlined), label: l.tabToday),
-              NavigationDestination(icon: const Icon(Icons.calendar_month_outlined), label: l.tabCalendar),
-              NavigationDestination(
-                icon: ListenableBuilder(
-                  listenable: services.gateway,
-                  builder: (context, _) => Badge(
-                    isLabelVisible: services.gateway.unreadCount > 0,
-                    label: Text('${services.gateway.unreadCount}'),
-                    child: const Icon(Icons.chat_bubble_outline),
-                  ),
-                ),
-                label: l.tabChat,
+          // Ein Gerüst für alle Klassen. Der Elementbaum unter [Expanded] bleibt bei jedem Klassenwechsel gleich;
+          // nur der Platz links (Leiste oder nichts) und die Rechtecke der Seiten ändern sich.
+          body: SafeArea(
+            child: Row(children: <Widget>[
+              compact
+                  ? const SizedBox.shrink()
+                  : FocusTraversalGroup(
+                      child: NavigationRail(
+                      key: mainNavigationKey,
+                      selectedIndex: _index,
+                      onDestinationSelected: _go,
+                      labelType: NavigationRailLabelType.all,
+                      scrollable: true,
+                      minWidth: kRailWidth,
+                      destinations: <NavigationRailDestination>[
+                        for (final d in destinations) NavigationRailDestination(icon: d.icon, label: Text(d.label)),
+                      ],
+                    )),
+              // Eigene Fokusgruppe: Tab geht erst durch den Inhalt, nicht quer über die Rail (Lesereihenfolge nach Lage).
+              Expanded(
+                child: FocusTraversalGroup(
+                    child: LayoutBuilder(builder: (context, box) {
+                  final panes = paneWidths(box.maxWidth);
+                  Rect rect(int i) {
+                    if (twoPane && i == _calendarTab) return Rect.fromLTWH(0, 0, panes.calendar, box.maxHeight);
+                    if (twoPane && i == _chatTab) {
+                      return Rect.fromLTWH(panes.calendar + kPaneDivider, 0, panes.chat, box.maxHeight);
+                    }
+                    return Rect.fromLTWH(0, 0, box.maxWidth, box.maxHeight);
+                  }
+
+                  bool visible(int i) => i == _index || (twoPane && (_index == _calendarTab || _index == _chatTab) && (i == _calendarTab || i == _chatTab));
+                  // Ein Stack, feste Reihenfolge, keine GlobalKeys: je Seite ändern sich nur Rechteck und Sichtbarkeit.
+                  return Stack(fit: StackFit.expand, children: <Widget>[
+                    for (var i = 0; i < pages.length; i++)
+                      Positioned.fromRect(
+                        rect: rect(i),
+                        child: Offstage(
+                          offstage: !visible(i),
+                          child: ExcludeFocus(
+                            excluding: !visible(i),
+                            child: (i == _calendarTab || i == _chatTab) ? pages[i] : ContentWidth(maxWidth: listWidth, child: pages[i]),
+                          ),
+                        ),
+                      ),
+                    Positioned(
+                      left: panes.calendar,
+                      top: 0,
+                      bottom: 0,
+                      width: kPaneDivider,
+                      child: Offstage(offstage: !twoPane, child: const VerticalDivider(width: kPaneDivider, thickness: kPaneDivider)),
+                    ),
+                  ]);
+                })),
               ),
-              NavigationDestination(icon: const Icon(Icons.shopping_cart_outlined), label: l.tabShopping),
-              NavigationDestination(
-                icon: ListenableBuilder(
-                  listenable: services.gateway,
-                  builder: (context, _) {
-                    // Offene Beitrittsanfragen: nur Moderatoren können sie entscheiden.
-                    final f = services.gateway.family;
-                    final open = f != null && Permissions.isModerator(f) ? f.requests.length : 0;
-                    return Badge(
-                      isLabelVisible: open > 0,
-                      label: Text('$open'),
-                      child: Semantics(label: open > 0 ? l.tabFamilyRequests(open) : null, child: const Icon(Icons.groups_outlined)),
-                    );
-                  },
-                ),
-                label: l.tabFamily,
-              ),
-            ],
+            ]),
           ),
+          bottomNavigationBar: compact
+              ? NavigationBar(
+                  key: mainNavigationKey,
+                  selectedIndex: _index,
+                  onDestinationSelected: _go,
+                  destinations: <NavigationDestination>[
+                    for (final d in destinations) NavigationDestination(icon: d.icon, label: d.label),
+                  ],
+                )
+              : null,
         );
       },
     );
   }
+
+  /// Die fünf Ziele; Leiste und Rail zeigen dieselben, mit denselben Meldungen (Badges).
+  List<({Widget icon, String label})> _destinations(AppLocalizations l, AppServices services) => <({Widget icon, String label})>[
+        (icon: const Icon(Icons.today_outlined), label: l.tabToday),
+        (icon: const Icon(Icons.calendar_month_outlined), label: l.tabCalendar),
+        (
+          icon: ListenableBuilder(
+            listenable: services.gateway,
+            builder: (context, _) => Badge(
+              isLabelVisible: services.gateway.unreadCount > 0,
+              label: Text('${services.gateway.unreadCount}'),
+              child: const Icon(Icons.chat_bubble_outline),
+            ),
+          ),
+          label: l.tabChat,
+        ),
+        (icon: const Icon(Icons.shopping_cart_outlined), label: l.tabShopping),
+        (
+          icon: ListenableBuilder(
+            listenable: services.gateway,
+            builder: (context, _) {
+              // Offene Beitrittsanfragen: nur Moderatoren können sie entscheiden.
+              final f = services.gateway.family;
+              final open = f != null && Permissions.isModerator(f) ? f.requests.length : 0;
+              return Badge(
+                isLabelVisible: open > 0,
+                label: Text('$open'),
+                child: Semantics(label: open > 0 ? l.tabFamilyRequests(open) : null, child: const Icon(Icons.groups_outlined)),
+              );
+            },
+          ),
+          label: l.tabFamily,
+        ),
+      ];
 }
 
 /// Seitenmenü (Burger-Menü rechts oben).
@@ -257,6 +334,6 @@ class _SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(title: Text(AppLocalizations.of(context).tabSettings)),
-        body: const SafeArea(child: SettingsScreen()),
+        body: const SafeArea(child: ContentWidth(child: SettingsScreen())),
       );
 }

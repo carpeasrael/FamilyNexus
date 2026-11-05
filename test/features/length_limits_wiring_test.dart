@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 /// #221: Jedes betroffene Feld begrenzt mit dem Maß der Prüfung; Flutters Begrenzung bleibt auf dem
 /// Standard, damit Screenreader die Höchstlänge weiter erfahren.
@@ -28,7 +29,7 @@ Future<TestApp> _start(WidgetTester tester, {String? tab}) async {
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
   if (tab != null) {
-    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(tab)));
+    await tester.tap(navTab(tab));
     await tester.pumpAndSettle();
   }
   return app;

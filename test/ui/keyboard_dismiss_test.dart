@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/test_app.dart';
+import '../helpers/shell_finders.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
   tester.view.physicalSize = const Size(900, 2000);
@@ -37,7 +38,7 @@ void main() {
       await app.gateway.sendMessage('Nachricht $i');
     }
     await _pump(tester, app);
-    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Chat')));
+    await tester.tap(navTab('Chat'));
     await tester.pumpAndSettle();
     await tester.tap(find.byType(TextField).last);
     await tester.pump();

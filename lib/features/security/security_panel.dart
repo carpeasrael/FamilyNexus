@@ -16,6 +16,7 @@ import '../common/error_text.dart';
 import '../common/prompt_dialog.dart';
 import '../common/syncing_view.dart';
 import '../../data/platform/secret_clipboard.dart';
+import '../../ui/layout/adaptive.dart';
 
 /// Leert die Zwischenablage nach [delay], falls sie noch [secret] enthält (E-57). Bewusst nicht an ein
 /// Widget gebunden: Der Schlüssel darf nicht liegen bleiben, nur weil die Einrichtung weitergeht.
@@ -355,9 +356,9 @@ class RecoveryKeyRenewScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l.keyRenewTitle)),
       body: SafeArea(
-        child: ListView(padding: const EdgeInsets.all(16), children: <Widget>[
+        child: ContentWidth(child: ListView(padding: const EdgeInsets.all(16), children: <Widget>[
           GlassCard(child: SecurityPanel(renew: true, onDone: () => Navigator.of(context).pop())),
-        ]),
+        ])),
       ),
     );
   }
