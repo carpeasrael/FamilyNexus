@@ -420,7 +420,11 @@ jobs:
           flutter gen-l10n
 
       # Each build writes its own obfuscation symbols; they are moved aside so the next build does not mix them.
+      # Das DMG (Developer ID) ist nicht für TestFlight nötig: Ohne Developer-ID-Zertifikat (Cloud-Signatur nur mit
+      # passender Rolle) bricht es ab, die Store-Pakete sollen trotzdem entstehen.
       - name: Build DMG (Developer ID, notarized)
+        id: dmg
+        continue-on-error: true
         if: steps.key.outputs.signed == 'true'
         env:
           ASC_KEY_PATH: ${{ runner.temp }}/asc_key.p8
@@ -429,6 +433,10 @@ jobs:
         run: |
           tool/build_macos_dmg.sh
           mkdir -p symbols && mv debug-info symbols/macos-dmg
+
+      - name: Warn if the signed DMG failed
+        if: steps.dmg.outcome == 'failure'
+        run: echo "::warning::Signed DMG failed (Developer ID certificate or API key role?); App Store packages are built anyway, no DMG is attached"
 
       - name: Build unsigned DMG (test only)
         if: steps.key.outputs.signed != 'true'
@@ -444,7 +452,7 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
         run: |
           tool/build_macos_release.sh
-          mv debug-info symbols/macos-store
+          mkdir -p symbols && mv debug-info symbols/macos-store
 
       - name: Build iOS App Store package
         if: steps.key.outputs.signed == 'true'
@@ -492,7 +500,11 @@ jobs:
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             gh release create "$TAG" --title "FamilyNexus ${TAG#v}" --generate-notes --verify-tag
           fi
-          gh release upload "$TAG" build/macos/dmg/* --clobber
+          if ls build/macos/dmg/* >/dev/null 2>&1; then
+            gh release upload "$TAG" build/macos/dmg/* --clobber
+          else
+            echo "::warning::No DMG built, nothing attached to the release"
+          fi
 
       - name: Remove API key
         if: always()
