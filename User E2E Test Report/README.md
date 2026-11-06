@@ -32,6 +32,7 @@ Im Ordner: `Testreport.md` (Kurzfassung), PDFs als `Testreport_<Ordner>_DE.pdf` 
 | 18 | `2026-11-03_18_Windows-nur-G1_Build23` | 03.11.2026, ca. 21:15-22:02 (nur G1-Schritte) | TP-FN-001 v1.20 @ `48e9299` | 1.2.2 (23), lokaler Build mit Bildschirmschutz-Voreinstellung aus | Windows 11 / - (G2 nicht verfuegbar) |
 | 19 | `2026-11-02_Linux-Android_Build23_1.2.2` (Name nach Vorgabe des Nutzers; AURORA-Bericht als `.html`/`.pdf` daneben) | 02.11.2026, 20:56–23:35, vollständiger Plan (V, A–H), begann vor Lauf 18 und wurde später eingetragen; 116 ✅, 6 ⚠️, 0 ❌, 4 ⏳, 5 n/a | TP-FN-001 v1.20 @ `48e9299` | 1.2.2 (23), lokal gebaut | Linux-Flatpak / Android-Emulator (API 36) |
 | 20 | `2026-11-04_20_iPadOS-nur-G1_Build23` | 04.11.2026, ca. 19:00–20:00 (nur G1-Schritte, G2 nicht genutzt); 43 ✅, 9 ⚠️, 0 ❌, 15 ⏳ (nach `Ergebnisse.tsv`) | TP-FN-001 v1.23 @ `4b931a2` | 1.2.2 (23), `flutter build ios --simulator --debug` | iPad-Air-13-Simulator (iPadOS 27.2) / - (G2 nicht genutzt) |
+| 21 | `2026-11-06_21_Release-1.2.2_iPad-Air-nur-G1_Build24` | 06.11.2026, ca. 01:00–01:40 (Release-Test 1.2.2, nur G1, G2 nicht genutzt); 38 ✅, 12 ⚠️, 0 ❌, 48 ⏳, 27 n/a (nach `Ergebnisse.tsv`) | TP-FN-REL-122 v01 @ `079faa1` | 1.2.2 (24), `flutter build ios --simulator --debug` | iPad-Air-13-Simulator (iPadOS 27.2) / - (G2 nicht genutzt) |
 
 Die Läufe 04 und 05 liefen parallel; die Nummer folgt dem Beginn. Die Bezeichnungen „Lauf 1/2/3“ im Testplan (Anhang E, Issue-Zuordnung) entsprechen den Nummern 03, 05 und 04.
 
