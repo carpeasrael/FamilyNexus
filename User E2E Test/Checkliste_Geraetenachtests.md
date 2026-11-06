@@ -1,4 +1,4 @@
-# Checkliste Gerätenachtests (Stand main a0da560, 05.11.2026)
+# Checkliste Gerätenachtests (Stand main 86f379c + #309, 06.11.2026)
 
 Quelle: letzte Kommentare der offenen Issues. Jeder Punkt schließt nur dann ein Issue, wenn er bestanden ist; Ergebnis jeweils im Issue vermerken. Issues schließen sich beim Merge, nicht von Hand (bei diesen Issues ist der Code bereits gemergt, das Schließen entscheidest du nach dem Nachtest).
 
@@ -6,7 +6,7 @@ Quelle: letzte Kommentare der offenen Issues. Jeder Punkt schließt nur dann ein
 - [ ] **#263 Zeitwähler:** Termin-Editor, Beginn, Zeitwähler, Tastatur-Symbol. Klick ins Feld „Stunde“, `21` tippen, dann Minuten `30`. Erwartet: Stunde 21, Minuten 30. Zusätzlich beobachten: Klick aktiviert das Fenster direkt im Feld (Restfall).
 - [ ] **#144 Screenshot-Hinweis (Testplan B-18):** Hinweis lautet „Nimmt die App von Screenshots, Bildschirmaufnahmen und Bildschirmfreigaben aus.“. Screenshot und Aufnahme müssen leer sein. Alt-Tab beobachten und notieren (nur beobachten, nicht belegt).
 - [ ] **#254 E-16b:** Meldungen und Zahl als Overlay-Symbol in der Taskleiste (neuer nativer Code `taskbar_badge.cpp`).
-- [ ] **#274 (Desktop-Fenster):** Fenster auf 599/600/1000 dp-Breite ziehen: Leiste ↔ Rail ↔ Zweispalter, kein Zustandsverlust, Tab-Reihenfolge Inhalt vor Rail.
+- [ ] **#274 (Desktop-Fenster):** Fenster auf 599/600/1000 dp-Breite ziehen: Leiste ↔ Rail ↔ Zweispalter, kein Zustandsverlust, Tab-Reihenfolge Inhalt vor Rail. Ab 1000 dp kein senkrechter Strich auf Heute, Einkauf und Familie (#309).
 
 ## iPhone (echt)
 - [ ] **#144 (B-18):** Hinweis lautet „Verdeckt die App im App-Umschalter und bei Bildschirmaufnahmen. Einzelne Screenshots lassen sich unter iOS nicht verhindern.“. Screenshot gelingt, App-Umschalter verdeckt die App.
@@ -19,12 +19,12 @@ Quelle: letzte Kommentare der offenen Issues. Jeder Punkt schließt nur dann ein
 - [ ] **#274 (Desktop-Fenster):** wie bei Windows.
 
 ## iPad (echt oder Simulator)
-- [ ] **#274 (Testplan B-25):** Alle vier Ausrichtungen, Split View, Slide Over, Stage Manager. Rail ab 600 dp, Zweispalter Kalender/Chat ab 1000 dp. Bildschirmtastatur im Chat: Layout kippt nicht. Schrift 200 %.
+- [ ] **#274 (Testplan B-25):** Alle vier Ausrichtungen, Split View, Slide Over, Stage Manager. Rail ab 600 dp, Zweispalter Kalender/Chat ab 1000 dp. Bildschirmtastatur im Chat: Layout kippt nicht. Schrift 200 %. Ab 1000 dp kein senkrechter Strich auf Heute, Einkauf und Familie (#309).
 - [ ] **#274 Store:** iPad-Screenshots für den App Store anfertigen (siehe `docs/OFFEN.md`).
 - [ ] **Lauf 20 offene Schritte (nur Simulator möglich, soweit nicht G2/Gerät nötig):** B-10, B-12a, B-17 (Geräte-PIN), B-23 (c–e), B-24, A-05a, G-04/06/07.
 
 ## Android-Tablet (echt oder Emulator Tablet-Profil)
-- [ ] **#274 (B-25):** Drehen mit und ohne Rotationssperre, Multi-Window, Bildschirmtastatur (`adjustResize`: Klasse darf beim Tippen nicht wechseln), 200 % Schrift.
+- [ ] **#274 (B-25):** Drehen mit und ohne Rotationssperre, Multi-Window, Bildschirmtastatur (`adjustResize`: Klasse darf beim Tippen nicht wechseln), 200 % Schrift. Ab 1000 dp kein senkrechter Strich auf Heute, Einkauf und Familie (#309).
 - [ ] **#268 (TP-OAUTH-12):** Custom Tab auf frischem AVD oder nach Deinstallation (auf dem vorhandenen AVD ist FamilyNexus mit anderem Zertifikat installiert). Außerdem Geräte mit anderem oder ohne Standardbrowser.
 - [ ] **#254 E-16b Hintergrund:** Meldungen im Hintergrund schlagen fehl, siehe **#273** (Entscheidung a/b/c nötig, bevor ein Nachtest sinnvoll ist).
 

@@ -136,6 +136,8 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
         final cls = windowClassIn(context);
         final compact = cls == WindowClass.compact;
         final twoPane = cls == WindowClass.expanded;
+        // Kalender und Chat stehen nebeneinander: Zweispalter und Tab Kalender oder Chat. Nur dann Trenner (#309).
+        final split = twoPane && (_index == _calendarTab || _index == _chatTab);
         // Chat sichtbar = gelesen (E-88, #254): im Zweispalter bei Tab Kalender und Chat, sonst nur bei Tab Chat.
         final chatVisible = _index == _chatTab || (twoPane && _index == _calendarTab);
         final pages = <Widget>[
@@ -153,7 +155,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
         final listWidth = compact ? double.infinity : kContentMaxWidth;
         return Scaffold(
           appBar: AppBar(
-            title: Text(twoPane && (_index == _calendarTab || _index == _chatTab) ? l.tabCalendarAndChat : titles[_index]),
+            title: Text(split ? l.tabCalendarAndChat : titles[_index]),
             actions: <Widget>[
               // Burger-Menü rechts oben: Einstellungen und Datenschutz.
               Builder(
@@ -197,7 +199,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
                     return Rect.fromLTWH(0, 0, box.maxWidth, box.maxHeight);
                   }
 
-                  bool visible(int i) => i == _index || (twoPane && (_index == _calendarTab || _index == _chatTab) && (i == _calendarTab || i == _chatTab));
+                  bool visible(int i) => i == _index || (split && (i == _calendarTab || i == _chatTab));
                   // Ein Stack, feste Reihenfolge, keine GlobalKeys: je Seite ändern sich nur Rechteck und Sichtbarkeit.
                   return Stack(fit: StackFit.expand, children: <Widget>[
                     for (var i = 0; i < pages.length; i++)
@@ -216,7 +218,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
                       top: 0,
                       bottom: 0,
                       width: kPaneDivider,
-                      child: Offstage(offstage: !twoPane, child: const VerticalDivider(width: kPaneDivider, thickness: kPaneDivider)),
+                      child: Offstage(offstage: !split, child: const VerticalDivider(width: kPaneDivider, thickness: kPaneDivider)),
                     ),
                   ]);
                 })),

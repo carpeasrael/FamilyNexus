@@ -7,6 +7,7 @@ import 'package:family_nexus/domain/time_zones.dart';
 import 'package:family_nexus/features/calendar/calendar_screen.dart';
 import 'package:family_nexus/features/chat/chat_screen.dart';
 import 'package:family_nexus/features/family/family_screen.dart';
+import 'package:family_nexus/features/shell/home_shell.dart';
 import 'package:family_nexus/features/shopping/shopping_screen.dart';
 import 'package:family_nexus/features/today/today_screen.dart';
 import 'package:family_nexus/ui/layout/adaptive.dart';
@@ -201,6 +202,27 @@ void main() {
       await _resize(tester, const Size(800, 1280));
       await _tab(tester, 'Kalender');
       expect(title('Kalender'), findsOneWidget, reason: 'einspaltig: Name des Ziels');
+    });
+
+    testWidgets('Trenner nur bei zwei sichtbaren Spalten: kein Strich über Heute, Einkauf und Familie (#309)', (tester) async {
+      await _start(tester, const Size(1280, 800));
+      final divider = find.descendant(of: find.byType(HomeShell), matching: find.byType(VerticalDivider));
+      for (final t in <String>['Heute', 'Einkauf', 'Familie']) {
+        await _tab(tester, t);
+        expect(divider, findsNothing, reason: '$t ist einspaltig, der Trenner darf nicht über dem Inhalt liegen');
+      }
+      for (final t in <String>['Kalender', 'Chat']) {
+        await _tab(tester, t);
+        expect(divider, findsOneWidget, reason: '$t: Kalender und Chat nebeneinander');
+        final d = tester.getRect(divider);
+        expect(d.left, greaterThanOrEqualTo(tester.getRect(find.byType(CalendarScreen)).right));
+        expect(d.right, lessThanOrEqualTo(tester.getRect(find.byType(ChatScreen)).left));
+      }
+      await _resize(tester, const Size(800, 800));
+      expect(divider, findsNothing, reason: 'einspaltig (medium) bei Tab Chat');
+      await _resize(tester, const Size(1280, 800));
+      expect(divider, findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
   });
 
