@@ -1,0 +1,2 @@
+Synapse bereit: https://localhost:18448
+curl 200

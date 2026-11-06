@@ -1,0 +1,126 @@
+Schritt	Ergebnis	Beobachtung
+RT-V-01	✅	pubspec 1.2.2+24, Stand 079faa1 (RT-V-01_pubspec.txt)
+RT-V-02	✅	Menue-Fuss: 'Version 1.2.2 (24)' (passt zu RT-V-01)
+RT-V-03	⏳	in diesem Lauf nicht ausgefuehrt
+RT-A-01	✅	Milch mit Gruppe Supermarkt erscheint unter 'Supermarkt'
+RT-A-02	✅	Abschnitte 'Baumarkt (1)', 'Supermarkt (2)', 'Ohne Gruppe (1)' am Ende; Reihenfolge der benannten Gruppen alphabetisch (Plan nennt Supermarkt zuerst, kein Mangel)
+RT-A-03	✅	Vorschlags-Chip 'Supermarkt' uebernimmt den Namen ins Feld Gruppe; Chip der schon getippten Gruppe verschwindet, 'Baumarkt' bleibt
+RT-A-04	✅	Brot abgehakt: steht unter 'Erledigt (1)', 'Supermarkt (1)' zeigt nur Milch
+RT-A-05	✅	Schrauben nach Gruppenwechsel unter 'Supermarkt (2)', Abschnitt Baumarkt entfaellt
+RT-A-06	⏳	G2 nicht vorhanden (nur ein Simulator)
+RT-B-01	✅	Heute: 4 Termine angelegt, Karte zeigt genau 3 (vier, drei, eins) plus 'Alle Termine'; Karte Erinnerungen: '4 Erinnerungen geplant, 1 Erinnerung faellig'
+RT-B-02	✅	'Alle Termine' oeffnet Kalender in der Agenda mit allen 4 Terminen (Zweispalter Kalender/Chat)
+RT-B-03	⚠️	Uebersicht 'Erinnerungen': 'Faellig (1)' und 'Geplant (4)' mit Zeiten wie erwartet. Der erwartete Hinweis 'Erinnerungen sind lokale Benachrichtigungen dieses Geraets. Sie zeigen nie Titel oder Ort.' steht nicht in der Uebersicht, sondern in Einstellungen und Termin-Editor (remindersHint) -> Planerwartung ungenau
+RT-B-04	✅	App im Hintergrund, 01:12: Systemmeldung 'Erinnerung / Termin in 0 Minuten' (Zur Startzeit) ohne Titel und Ort (RT-B-04_iPad.png)
+RT-B-05	✅	Faellig (2) mit 'Alle bestaetigen'; Einzelbestaetigung leert je einen Eintrag (Faellig 1, dann Abschnitt weg); Geplant (3) bleibt. (Alle bestaetigen nur angezeigt, nicht angetippt)
+RT-B-06	✅	App hart beendet (simctl terminate) und neu gestartet: Faellig (2) bleiben (Termin fuenf/sechs, Zur Startzeit), Geplant (3) = 3 kuenftige Erinnerungen (eins/zwei/drei 01:50)
+RT-B-07	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-B-08	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-C-01	⚠️	Nur eigene Nachricht (kein G2): Datumstrennzeile 'Heute', Uhrzeit 01:28 an der Nachricht; volles Datum per Langdruck und Empfang von G2 nicht geprueft
+RT-C-02	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-C-03	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-C-04	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-C-05	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-C-06	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-C-07	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-C-08	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-C-09	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-C-10	⚠️	Chat-Limit im Code 8000 Zeichen (ChatMessage.maxBody), Plan nennt 4000. Gesendet: 4190 'a' + Familien-Emoji (ZWJ-Sequenz) ohne Fehlermeldung, Emoji vollstaendig am Ende. 8100 'b' eingefuegt und gesendet ohne Fehlermeldung; ob auf 8000 begrenzt wurde, ist am Bild nicht nachweisbar (Zeichenzahl nicht belegt)
+RT-D-01	✅	Einstellungen > Benachrichtigungen: Schalter 'Neue Chat-Nachrichten' und 'Neue Eintraege auf dem Einkaufszettel' (Standard an), Hinweis 'Meldungen ohne Inhalt, nur solange die App laeuft. Ist die App beendet, kommt keine Meldung (es gibt keinen Push-Dienst).'
+RT-D-02	⏳	Simulator: Benachrichtigungs-Berechtigung fuer de.inneso.familynexus aus frueherem Lauf bereits entschieden, Schalter aus/an ohne Systemdialog (simctl privacy reset aendert das nicht). Nur mit zurueckgesetztem Geraet oder echtem iPhone pruefbar
+RT-D-03	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-D-04	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-D-05	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-D-06	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-D-07	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-D-08	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-D-09	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-E-01	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-E-02	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-E-03	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-E-04	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-E-05	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-E-06	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-E-07	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-F-01	✅	'Die Passwoerter stimmen nicht ueberein.', Konto erstellen ausgegraut
+RT-F-02	✅	Bei 3 Zeichen Knopf ausgegraut; nach Enter 'Das Passwort braucht mindestens 8 Zeichen.', Fokus im Passwortfeld
+RT-F-03	✅	Augensymbol zeigt/verbirgt beide Felder, Konto angelegt, danach 'Dein Notfall-Schluessel' Schritt 2 von 3
+RT-F-04	✅	Dialog 'Passwort aendern': Aktuelles Passwort, Neues Passwort, Passwort wiederholen, Schalter 'Andere Geraete abmelden'
+RT-F-05	✅	'Das aktuelle Passwort stimmt nicht.' am Feld und unter dem Formular
+RT-F-06	✅	'Das neue Passwort muss sich vom aktuellen unterscheiden.' direkt am Feld 'Neues Passwort'
+RT-F-07	✅	Gueltige Aenderung mit 'Andere Geraete abmelden' an: Hinweis 'Passwort geaendert.'; Anmeldung auf G2 nicht pruefbar (kein G2) -> Teil G2 ⏳
+RT-F-08	⏳	in diesem Lauf nicht ausgefuehrt
+RT-F-09	⏳	in diesem Lauf nicht ausgefuehrt
+RT-F-10	⏳	matrix.org, nur mit ausdruecklicher Freigabe und eigenem Konto
+RT-F-11	⏳	matrix.org, nur mit ausdruecklicher Freigabe und eigenem Konto
+RT-F-12	⏳	matrix.org, nur mit ausdruecklicher Freigabe und eigenem Konto
+RT-F-13	⏳	matrix.org, nur mit ausdruecklicher Freigabe und eigenem Konto
+RT-G-01	✅	Konto > Server: matrix-synapse-3ues.srv1348446.hstgr.cloud (Anbieter-Adresse); Benutzername @fnt-1106-n1:matrix.chaostribunal.de
+RT-G-02	✅	Ueber die App > 'Online beim Matrix-Anbieter: https://matrix-synapse-3ues.srv1348446.hstgr.cloud' (eingegebene Adresse)
+RT-G-03	✅	Dialog 'Konto loeschen?': 'Dein Konto @fnt-1106-n1:matrix.chaostribunal.de wird bei matrix-synapse-3ues.srv1348446.hstgr.cloud dauerhaft geloescht' (eingegebene Adresse)
+RT-G-04	✅	Lokales Protokoll: 'Anzeigename: Test N1' (Matrix-Datenbank), Benutzername @fnt-1106-n1:matrix.chaostribunal.de; accountProvider entered=https://matrix-synapse-3ues... base=https://matrix.chaostribunal.de (aufgeloester Homeserver nur hier)
+RT-G-05	⏳	in diesem Lauf nicht ausgefuehrt
+RT-G-06	⚠️	Nach 'Konto loeschen' sofort Willkommensseite, keine aufblitzende Anmeldeseite sichtbar (Screenshot nach 10 s); Netzverkehr nicht mitgeschnitten; 'Alle lokalen Daten loeschen' nicht separat ausgefuehrt
+RT-H-01	⚠️	Termin-Editor am 3.11.: Datum '3. Nov. 2026' (gekuerzter Monatsname, keine fuehrende Null). Das numerische Datum mit Null (03.11.2026, #260) betrifft die Schluesseldatei (nicht pruefbar, Speichern-Dialog nicht bedienbar) -> Planerwartung fuer Editor/Detailansicht ungenau
+RT-H-02	⏳	in diesem Lauf nicht ausgefuehrt
+RT-H-03	⏳	in diesem Lauf nicht ausgefuehrt
+RT-H-04	⏳	in diesem Lauf nicht ausgefuehrt
+RT-H-05	✅	Beginn 23:00 -> Ende 7. Nov. 00:00; nach 'Ganztaegig' Beginn und Ende beide 6. Nov. 2026 (gleicher Tag, keine Zwei-Tage-Spanne)
+RT-H-06	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-H-07	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-H-08	⚠️	iPad (Hardware-Tastatur): Antippen markiert den Wert nicht (nur Fokus-Hervorhebung). Bei vollem Zwei-Ziffern-Feld werden getippte Ziffern verworfen; nach Loeschen (2x Rueckschritt) nimmt das Feld Ziffern an (01:12). Entspricht der dokumentierten Grenze E-20, Plan-Erwartung 'Eingabe nimmt die Ziffern an' ungenau
+RT-I-01	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-I-02	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-I-03	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-I-04	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-I-05	⏳	braucht ein zweites Geraet (G2) oder eine unterbrochene Netzumgebung; G2 nicht genutzt
+RT-I-06	⏳	in diesem Lauf nicht ausgefuehrt
+RT-J-01	✅	Willkommenstext: 'Private Termine siehst nur du; zwischen deinen eigenen Geraeten werden sie verschluesselt abgeglichen.' (kein 'verlassen nie')
+RT-J-02	⚠️	Hinweistext stimmt woertlich ('Verdeckt die App im App-Umschalter und bei Bildschirmaufnahmen. Einzelne Screenshots lassen sich unter iOS nicht verhindern.'); Simulator-Screenshot per simctl gelingt. Teil 'App-Umschalter zeigt App verdeckt' im Simulator nicht geprueft (Device Hub)
+RT-J-03	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-J-04	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-J-05	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-J-06	⏳	in diesem Lauf nicht ausgefuehrt
+RT-J-07	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-J-08	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-J-09	⏳	in diesem Lauf nicht ausgefuehrt
+RT-J-10	✅	Hinweis: 'Protokoll kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Loesche sie im Zweifel selbst.'
+RT-K-01	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-K-02	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-K-03	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-K-04	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-K-05	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-K-06	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-K-07	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-K-08	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-L-01	⚠️	Hochformat 1032x1376: Rail links, Inhalt ca. 720 breit, App fuellt Bildschirm (nach gruenem Fensterknopf; vorher schmales Stagemanager-Fenster). BEFUND: senkrechter Trenner (home_shell.dart:219) steht im expanded-Layout auch auf Heute/anderen Tabs, kreuzt die Karten
+RT-L-02	✅	Querformat 1366x1024: Rail links, Zweispalter Kalender links / Chat rechts mit Trenner (Kalender-Tab zeigt 'Kalender und Chat')
+RT-L-03	⚠️	Alle vier Ausrichtungen (Hochformat, Querformat, Kopfstand, Querformat 2) folgen dem Layout: Rail + Zweispalter, gewaehlter Tag und 6 Termine bleiben erhalten. Chat-Entwurf beim Drehen nicht geprueft
+RT-L-04	⏳	Split View/Slide Over/Stage Manager im Device Hub nicht bedienbar
+RT-L-05	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-L-06	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-L-07	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-L-08	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-L-09	✅	Hochformat 1032 breit, Zweispalter, Bildschirmtastatur ein (Device > Keyboard > Toggle Software Keyboard): Layout bleibt Zweispalter, Eingabezeile ueber der Tastatur sichtbar
+RT-L-10	⚠️	Systemschrift 'Bedienungshilfen gross' (simctl accessibility-large, nicht exakt 200%): Heute, Kalender, Einstellungen ohne Ueberlauf-Streifen; Einstellungs-Auswahlfelder (Sprache, Design) stehen unter dem Titel. Kosmetisch: 'Agenda' im Kalender-Umschalter bricht zu 'Agend/a' um, 'Datenschutzerklaerung' im Menue bricht um. Sperrbildschirm nicht pruefbar (Geraete-PIN fehlt, B-17)
+RT-L-11	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-L-12	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-L-13	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-L-14	⏳	Store-Screenshots (6 je Format) nicht Teil dieses Laufs; eigener Auftrag mit sauberen Daten (docs/OFFEN.md)
+RT-M-01	✅	Einkauf: 'Familie 👨‍👩‍👧' gespeichert, Emoji vollstaendig sichtbar (Eingabe per Zwischenablage 'Send Clipboard' + Einsetzen)
+RT-M-02	✅	Aufgabenliste 'Putzliste' mit Punkt 'Putzen 👩‍👩‍👦' gespeichert ('0 von 1 erledigt'); Eingabe per Zwischenablage
+RT-M-03	⚠️	Termin 'Feier 👨‍👩‍👧' wird abgelehnt (E-33: Termine bewusst strenger, ZWJ gesperrt), aber nur mit der allgemeinen Meldung 'Der Termin konnte nicht gespeichert werden.' (eventSaveError), ohne Hinweis auf das Emoji; Planerwartung 'mit Hinweis' nur teilweise erfuellt. Zaehler zeigt 14/200 fuer 'Feier ' + Familien-Emoji
+RT-M-04	⏳	in diesem Lauf nicht ausgefuehrt
+RT-M-05	⏳	in diesem Lauf nicht ausgefuehrt
+RT-N-01	⏳	iOS-Simulator-Temp-Ordner nicht ausgefuehrt (Zeit)
+RT-N-02	⏳	iOS-Simulator-Temp-Ordner nicht ausgefuehrt (Zeit)
+RT-N-03	n/a	Plattform nicht iPad (Schritt gilt fuer Web, Android, Desktop oder Telefon)
+RT-O-01	✅	Konto loeschen mit Passwort: Dialog ohne Moderator-Hinweis, danach direkt 'Willkommen bei FamilyNexus' (keine Anmeldeseite dazwischen, RT-G-06)
+RT-O-02	✅	API-Login mit geloeschtem Konto: 403 M_FORBIDDEN 'Invalid username or password' (RT-O-02_login.txt)
+RT-O-03	✅	Nach Kontoloeschung direkt Willkommensseite; Neustart nicht gesondert geprueft
+RT-T-01	✅	flutter analyze: No issues found (logs/RT-T-01.txt)
+RT-T-02	⚠️	flutter test auf Stand 079faa1: 1853 bestanden, 127 uebersprungen, 1 fehlgeschlagen = bekannter Umgebungsfehler test/data/app_badge_test.dart (D-Bus-Socket auf macOS) (logs/RT-T-02.txt)
+RT-T-03	✅	Synapse bereit, curl /_matrix/client/versions: 200 (logs/RT-T-03.txt)
+RT-T-04	✅	tool/e2e.sh: 104 bestanden, All tests passed (logs/RT-T-04.txt)
+RT-T-05	✅	wait_ready_test.sh: Alle Faelle bestanden (logs/RT-T-05.txt)
+RT-T-06	⏳	Bericht fuer 1.2.2+24 liegt vor (docs/release-reviews/1.2.2+24.md, Lauf 1 und 2); Plan nennt 1.2.2+23, daher nicht abgehakt
