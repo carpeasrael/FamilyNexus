@@ -1,6 +1,6 @@
 # Datenschutzerklärung für FamilyNexus
 
-**Stand: 2. November 2026**
+**Stand: 7. November 2026**
 
 **Plattform: native Apps für iOS, macOS, Windows, Linux, Flatpak und Android sowie Web-App.**
 
@@ -49,7 +49,7 @@ teilen oder die dein Anbieter zur Synchronisierung bereitstellt.
 | Aufgabenlisten, Zuordnungen, Wiederholungsregeln, Erledigungen, Zeitpunkte und freiwillige Kommentare | Aufgaben verteilen und den Erledigungsverlauf anzeigen. Der Verlauf bleibt auch nach einem periodischen Neustart der Liste erhalten. |
 | Familien- und Raumnamen, Mitgliedschaften, Rollen, Einladungen und Beitrittsanfragen | Familie verwalten und den Zugriff auf gemeinsame Inhalte steuern. |
 | Online-/Offline-Status mit Zeitpunkt | Optional anderen Familienmitgliedern die Erreichbarkeit anzeigen. |
-| Sprache, Darstellung, Erinnerungs- und Sicherheitseinstellungen, lokal blockierte Konten und vorgemerkte Einladungen | App konfigurieren und begonnene Abläufe fortsetzen. |
+| Sprache, Darstellung, Erinnerungs-, Meldungs- und Sicherheitseinstellungen, lokal blockierte Konten und vorgemerkte Einladungen | App konfigurieren und begonnene Abläufe fortsetzen. |
 | IP-Adresse, Verbindungszeitpunkte, Konto-, Raum- und Gerätekennungen sowie technische Übertragungsdaten | Verbindung, Zustellung und Betrieb beim jeweils angesprochenen Server; dessen Protokollierung richtet sich nach seinen Datenschutzhinweisen. |
 
 Du entscheidest, welche Inhalte du eingibst und teilst. Freitexte und Dateien können
@@ -143,7 +143,7 @@ Meldedaten sind für den Betreiber lesbar. Die App übermittelt dabei keine
 entschlüsselte Kopie der gemeldeten Nachricht. Zitierst du Inhalte selbst im
 Meldetext, werden diese Bestandteil der lesbaren Meldung.
 
-## 6. Berechtigungen und lokale Erinnerungen
+## 6. Berechtigungen, lokale Erinnerungen und Meldungen
 
 Die App benötigt Netzwerkzugriff für Kontofunktionen, Serverprüfung und
 Synchronisierung. Bereits lokal vorhandene Inhalte lassen sich auch offline
@@ -151,20 +151,26 @@ nutzen; ausstehende Änderungen werden bei wiederhergestellter Verbindung
 übertragen.
 
 Erinnerungen werden lokal geplant und enthalten keinen Termintitel, Ort oder
-Notiztext, sondern einen allgemeinen Hinweis wie „Termin in …“. FamilyNexus
+Notiztext, sondern einen allgemeinen Hinweis wie „Termin in …“. Bei neuen
+Chat-Nachrichten und neuen Einträgen auf dem Einkaufszettel zeigt die App eine
+allgemeine Meldung („Neue Nachrichten“ bzw. „Neue Einträge auf dem
+Einkaufszettel“) ohne Absender, Gespräch oder Inhalt, und nur, solange die App läuft;
+beide Meldungen lassen sich in den Einstellungen abschalten. Die Zahl ungelesener
+Nachrichten kann am App-Symbol erscheinen; sie wird auf dem Gerät aus den bereits
+abgerufenen Daten berechnet. FamilyNexus
 bindet keinen eigenen Remote-Pushdienst und keine Chat-Pushübertragung über
 Firebase Cloud Messaging oder Apple Push Notification Service ein.
 
 | Zugriff | Verwendung |
 |---|---|
-| Benachrichtigungen | Lokale Terminerinnerungen; je nach Betriebssystem mit vorheriger Freigabe. |
+| Benachrichtigungen | Lokale Erinnerungen an Termine sowie allgemeine Meldungen zu neuen Nachrichten und Einkaufseinträgen; je nach Betriebssystem mit vorheriger Freigabe. Auf Apple-Geräten fragt die App dabei auch die Freigabe für die Zahl am App-Symbol („Kennzeichen“) an. |
 | Genaue Alarme und Neustart-Ereignisse unter Android | Erinnerungen zeitgerecht auslösen und nach einem Geräteneustart neu planen. |
 | Geräteauthentifizierung auf unterstützten Plattformen | Freigabe der optionalen App-Sperre. |
 | Systemdialoge für Dateien | Von dir ausgewählte Dateien einlesen oder von dir veranlasste Exporte speichern. |
 | Zwischenablage | Von dir ausgelöstes Kopieren, etwa von Einladungen, Datenprotokollen oder dem Notfall-Schlüssel. |
 
-Unter Windows, Linux und im Flatpak werden Erinnerungen über Zeitgeber der laufenden
-App ausgelöst. Die Web-App bietet keine Erinnerungen und Benachrichtigungen. Die App
+Unter Windows, Linux und im Flatpak werden Erinnerungen und Meldungen über die laufende
+App ausgelöst; dafür fragt die App keine Berechtigung an. Die Web-App bietet keine Erinnerungen und Benachrichtigungen. Die App
 verlangt keinen Zugriff auf Kontakte, Gerätestandort, Kamera oder Mikrofon. Ein
 QR-Code kann mit einer externen Kamera-App gelesen werden; dadurch erhält FamilyNexus
 keinen Kamerazugriff. Berechtigungen kannst du, soweit das System dies unterstützt,
@@ -296,11 +302,12 @@ Aufgabenverläufe. In der Web-App kann der Browser Website-Daten auch von sich a
 löschen, etwa bei Speichermangel; bei vergessenem Browser-Passwort lassen sich die
 lokalen Daten nur noch löschen. Unter **Einstellungen → Datenschutz → Alle lokalen
 Daten löschen** werden die App- und Matrix-Datenbanken, die zugehörigen lokal
-abgelegten Schlüssel und die durch die App verwalteten Erinnerungen entfernt.
+abgelegten Schlüssel und die durch die App verwalteten Erinnerungen und Meldungen entfernt.
 
 **Abmelden:** Beim Abmelden unter **Einstellungen → Konto → Abmelden** entfernt die
 App die Termine (auch private), Einkaufslisten und Aufgaben dieses Kontos vom Gerät
-und bricht geplante Erinnerungen ab. Das gilt auch, wenn die Sitzung auf andere
+und bricht geplante Erinnerungen ab, entfernt Meldungen und setzt die Zahl am App-Symbol
+zurück. Das gilt auch, wenn die Sitzung auf andere
 Weise endet, etwa weil das Gerät von einem anderen Gerät aus abgemeldet wurde.
 App-Einstellungen wie Sprache und Darstellung bleiben erhalten. Bereits gesendete
 Inhalte werden nach der nächsten Anmeldung wieder synchronisiert; noch nicht

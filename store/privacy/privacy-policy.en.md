@@ -2,7 +2,7 @@
 
 **This is a translation of the German original (`privacy-policy.de.md`). If the two versions differ, the German version prevails.**
 
-**Last updated: 2 November 2026**
+**Last updated: 7 November 2026**
 
 **Platform: native apps for iOS, macOS, Windows, Linux, Flatpak and Android as well as web app.**
 
@@ -51,7 +51,7 @@ share with you or that your provider supplies for synchronisation.
 | Task lists, assignments, recurrence rules, completions, times and voluntary comments | Distribute tasks and display the completion history. The history is retained even after a periodic reset of the list. |
 | Family and room names, memberships, roles, invitations and join requests | Manage the family and control access to shared content. |
 | Online/offline status with time | Optionally show other family members your availability. |
-| Language, appearance, reminder and security settings, locally blocked accounts and pending invitations | Configure the app and continue processes already begun. |
+| Language, appearance, reminder, notification and security settings, locally blocked accounts and pending invitations | Configure the app and continue processes already begun. |
 | IP address, connection times, account, room and device identifiers as well as technical transmission data | Connection, delivery and operation at the server being contacted; its logging is governed by its privacy notices. |
 
 You decide which content you enter and share. Free text and files can
@@ -145,7 +145,7 @@ report data is readable by the operator. The app does not transmit a
 decrypted copy of the reported message. If you yourself quote content in the
 report text, it becomes part of the readable report.
 
-## 6. Permissions and local reminders
+## 6. Permissions, local reminders and notifications
 
 The app requires network access for account functions, server checks and
 synchronisation. Content already available locally can also be used
@@ -153,20 +153,25 @@ offline; pending changes are transmitted when the connection is
 restored.
 
 Reminders are scheduled locally and contain no event title, location or
-note text, but a general notice such as "Event in …". FamilyNexus
+note text, but a general notice such as "Event in …". For new chat
+messages and new items on the shopping list, the app shows a general notification
+("New messages" or "New items on the shopping list") without sender, conversation or
+content, and only while the app is running; both notifications can be switched off in the
+settings. The number of unread messages may appear on the app icon; it is calculated
+on the device from data already retrieved. FamilyNexus
 does not integrate its own remote push service and no chat push transmission via
 Firebase Cloud Messaging or Apple Push Notification Service.
 
 | Access | Use |
 |---|---|
-| Notifications | Local event reminders; depending on the operating system with prior approval. |
+| Notifications | Local event reminders and general notifications about new messages and shopping items; depending on the operating system with prior approval. On Apple devices the app also requests approval for the number on the app icon ("badge"). |
 | Exact alarms and reboot events on Android | Trigger reminders on time and reschedule them after a device restart. |
 | Device authentication on supported platforms | Approval of the optional app lock. |
 | System dialogs for files | Read in files you have selected or save exports you have initiated. |
 | Clipboard | Copying triggered by you, for example of invitations, data logs or the emergency key. |
 
-On Windows, Linux and in Flatpak, reminders are triggered via timers of the running
-app. The web app offers no reminders and notifications. The app
+On Windows, Linux and in Flatpak, reminders and notifications are triggered by the running
+app; the app asks for no permission for this. The web app offers no reminders and notifications. The app
 does not request access to contacts, device location, camera or microphone. A
 QR code can be read with an external camera app; this does not give FamilyNexus
 camera access. You can revoke permissions there, as far as the system supports it;
@@ -297,11 +302,12 @@ task histories. In the web app, the browser may also delete website data on its 
 for example when storage is short; if the browser password is forgotten, the
 local data can only be deleted. Under **Settings → Privacy → Delete all local
 data**, the app and Matrix databases, the associated locally
-stored keys and the reminders managed by the app are removed.
+stored keys and the reminders and notifications managed by the app are removed.
 
 **Signing out:** When you sign out under **Settings → Account → Sign out**, the
 app removes the events (including private ones), shopping lists and tasks of this account from the device
-and cancels scheduled reminders. This also applies if the session ends in another
+and cancels scheduled reminders, removes notifications and resets the number on the app icon.
+This also applies if the session ends in another
 way, for example because the device was signed out from another device.
 App settings such as language and appearance are retained. Content already sent
 is synchronised again after the next sign-in; changes not yet
