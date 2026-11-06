@@ -18,13 +18,17 @@ class MessageEntry extends ChatEntry {
 }
 
 class DayEntry extends ChatEntry {
-  const DayEntry(this.day);
+  const DayEntry(this.day, {this.repeat = 0});
 
   /// Kalendertag in Ortszeit (00:00).
   final DateTime day;
 
+  /// Wievielte weitere Datumszeile desselben Tages (0 = die erste). Die Zeitleiste ist nicht nach Zeit sortiert
+  /// (Nachrichten verschiedener Homeserver um Mitternacht), derselbe Tag kann also mehrfach beginnen (#295).
+  final int repeat;
+
   @override
-  String get key => '~fn-day-${day.year}-${day.month}-${day.day}';
+  String get key => '~fn-day-${day.year}-${day.month}-${day.day}${repeat == 0 ? '' : '-r$repeat'}';
 }
 
 class UnreadMarkerEntry extends ChatEntry {
@@ -57,11 +61,14 @@ List<ChatEntry> chatEntries(List<ChatMessage> messages, {String? unreadFromId, L
   final markerAt = _markerTarget(messages, unreadFromId, allIds);
   final entries = <ChatEntry>[];
   DateTime? lastDay;
+  final linesPerDay = <DateTime, int>{};
   for (final m in messages) {
     final t = m.time.toLocal();
     final day = DateTime(t.year, t.month, t.day);
     if (lastDay == null || day != lastDay) {
-      entries.add(DayEntry(day));
+      final before = linesPerDay[day] ?? 0;
+      linesPerDay[day] = before + 1;
+      entries.add(DayEntry(day, repeat: before));
       lastDay = day;
     }
     if (m.id == markerAt) entries.add(const UnreadMarkerEntry());
