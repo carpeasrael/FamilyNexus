@@ -84,7 +84,7 @@ void main() {
   test('Kopf: Hinweis auf die Übersetzung, Stand, keine Platzhalter und keine Altaussagen', () {
     expect(en, contains('translation of the German original'));
     expect(en, contains('prevails'));
-    expect(en, contains('2 November 2026'));
+    expect(en, contains('7 November 2026'));
     expect(en, isNot(contains('<NAME')));
     expect(RegExp(r'^<[A-ZÄÖÜ]', multiLine: true).hasMatch(en), isFalse);
     expect(en.toLowerCase(), isNot(contains('recovery key')));
