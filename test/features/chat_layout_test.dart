@@ -34,6 +34,36 @@ void main() {
       expect((entries.first as DayEntry).day, DateTime(local.year, local.month, local.day));
     });
 
+    test('#295: nicht zeitgeordnete Zeitleiste (N, N+1, N): jede Datumszeile hat einen eigenen Schlüssel', () {
+      final entries = chatEntries(<ChatMessage>[
+        msg(r'$a', DateTime(2026, 11, 2, 23, 59, 58)),
+        msg(r'$b', DateTime(2026, 11, 3, 0, 0, 1)),
+        msg(r'$c', DateTime(2026, 11, 2, 23, 59, 59)),
+      ]);
+      expect(keys(entries), <String>[
+        '~fn-day-2026-11-2', r'$a', '~fn-day-2026-11-3', r'$b', '~fn-day-2026-11-2-r1', r'$c',
+      ]);
+      expect(entries.whereType<DayEntry>().map((e) => e.day), <DateTime>[
+        DateTime(2026, 11, 2), DateTime(2026, 11, 3), DateTime(2026, 11, 2),
+      ]);
+    });
+
+    test('#295: mehrfacher Wechsel und Marke dazwischen: alle Schlüssel eindeutig', () {
+      final entries = chatEntries(<ChatMessage>[
+        msg(r'$a', DateTime(2026, 11, 2, 23, 59)),
+        msg(r'$b', DateTime(2026, 11, 3, 0, 1)),
+        msg(r'$c', DateTime(2026, 11, 2, 23, 58)),
+        msg(r'$d', DateTime(2026, 11, 3, 0, 2)),
+        msg(r'$e', DateTime(2026, 11, 2, 23, 57)),
+      ], unreadFromId: r'$c');
+      final all = keys(entries);
+      expect(all.toSet().length, all.length);
+      expect(all.where((k) => k.startsWith('~fn-day-2026-11-2')), <String>[
+        '~fn-day-2026-11-2', '~fn-day-2026-11-2-r1', '~fn-day-2026-11-2-r2',
+      ]);
+      expect(all.where((k) => k.startsWith('~fn-day-2026-11-3')), <String>['~fn-day-2026-11-3', '~fn-day-2026-11-3-r1']);
+    });
+
     test('Heute, Gestern, sonst Datum – nach Kalendertagen', () {
       final now = DateTime(2026, 11, 3, 0, 5);
       expect(chatDayOf(DateTime(2026, 11, 3), now), ChatDay.today);

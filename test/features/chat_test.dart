@@ -398,6 +398,31 @@ void main() {
     Finder inHistory(Finder f) => find.descendant(of: find.byType(ListView).last, matching: f);
     Finder composer() => find.widgetWithText(TextField, 'Nachricht schreiben');
 
+    testWidgets('#295: nicht zeitgeordnete Zeitleiste (Tag N, N+1, N): Datumszeilen ohne Schlüsselkonflikt', (tester) async {
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      app.server.nextTime = DateTime(2026, 10, 21, 23, 59, 58).toUtc();
+      await ben.sendMessage('eins');
+      app.server.nextTime = DateTime(2026, 10, 22, 0, 0, 1).toUtc();
+      await ben.sendMessage('zwei');
+      app.server.nextTime = DateTime(2026, 10, 21, 23, 59, 59).toUtc();
+      await ben.sendMessage('drei');
+      await _openChat(tester, app);
+
+      // Neue Nachrichten verschieben alle Indizes: findChildIndexCallback sucht die Datumszeilen über ihren Schlüssel.
+      app.server.nextTime = DateTime(2026, 10, 22, 0, 0, 5).toUtc();
+      await ben.sendMessage('vier');
+      await tester.pumpAndSettle();
+      app.server.nextTime = DateTime(2026, 10, 21, 23, 59, 59).toUtc();
+      await ben.sendMessage('fuenf');
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(inHistory(find.text('Mittwoch, 21. Oktober 2026')), findsWidgets);
+      expect(inHistory(find.text('Donnerstag, 22. Oktober 2026')), findsWidgets);
+      expect(inHistory(find.text('fuenf')), findsOneWidget);
+    });
+
     testWidgets('Datumszeile „Heute“ bzw. ausgeschrieben, volles Datum für den Screenreader', (tester) async {
       final semantics = tester.ensureSemantics();
       final app = await buildTestApp();
