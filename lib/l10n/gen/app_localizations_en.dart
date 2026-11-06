@@ -2097,7 +2097,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regCaptchaBody =>
-      'Please confirm briefly on the provider\'s page that you are not a robot. Then close the page (on iPhone and Mac with “Cancel”); you continue here automatically.';
+      'Please confirm briefly on the provider\'s page that you are not a robot. Then close the page (on iPhone, iPad and Mac with “Cancel”); you continue here automatically.';
 
   @override
   String get regCaptchaOpen => 'Open page';
@@ -2960,7 +2960,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountDeleteBrowserWait =>
-      'Confirm the deletion on the provider\'s page, close it (on iPhone and Mac with “Cancel”) and then come back here.';
+      'Confirm the deletion on the provider\'s page, close it (on iPhone, iPad and Mac with “Cancel”) and then come back here.';
 
   @override
   String get accountDeleteOpen => 'Open deletion page';
