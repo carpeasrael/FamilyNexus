@@ -547,6 +547,7 @@ Quelle (Planversion 1.6 → 1.7): Lauf vom 28.10.2026 mit Build 1.2.1 (19) (macO
 | P-90 | B-01, B-25, Abdeckungsmatrix, Anhang D | Die App kannte nur eine einspaltige Oberfläche mit Leiste unten; iOS war iPhone-only (Kompatibilitätsmodus auf dem iPad), Tablets zeigten gedehnte Inhalte (#274) | B-01 nennt Leiste unten (unter 600 Punkten) bzw. links (ab 600); neuer Schritt B-25 für Tablet, Drehen, Zweispalter ab 1000 Punkten, Tastatur und 200 % Schrift; Anhang D weist auf die Leiste links im Desktop-Fenster hin (#274, E-92) |
 | P-91 | B-25, Anhang B | Die Hinweise zum Schließen der Anbieterseite nannten nur iPhone und Mac, das iPad (E-92) fehlte (#297) | iPad in B-25 (Erwartung) und im Hinweis zum Prüfkonto ergänzt; App-Texte `regCaptchaBody`, `accountDeleteBrowserWait` nennen „iPhone, iPad und Mac“ (#297, E-91) |
 | P-92 | B-25 | Im breiten Fenster (ab 1000) lag der Trenner des Zweispalters auch über Heute, Einkauf und Familie als senkrechter Strich (#309) | Erwartung in B-25 ergänzt: kein Trenner auf Heute, Einkauf und Familie; App zeigt den Trenner nur, wenn Kalender und Chat nebeneinander stehen (#309, E-92) |
+| P-93 | B-19 | Die Store-Datenschutzerklärung nannte nur Terminerinnerungen, die In-App-Fassung seit E-88 auch Meldungen zu Chat und Einkauf und die Zahl am App-Symbol (#296) | Erwartung in B-19 ergänzt; Store-Fassung (de, en) Abschnitt 3, 6, Löschen und Abmelden angeglichen, Test `privacy_policy_notifications_test.dart` (#296, E-88) |
 
 ## Anhang F: Hilfsbefehle für Abschnitt H
 
@@ -708,6 +709,6 @@ Regel: Änderungen an Schritten, erwarteten Ergebnissen oder Reihenfolge erhöhe
 | 1.33 | 04.11.2026 | Basis `ac25faf` + #274 | B-01: Navigation unten oder links je Fensterbreite; neuer Schritt B-25 (Tablet und große Fenster); Abdeckungsmatrix, Anhang D (Desktop-Fenster) (P-90, Anhang E; #274, E-92) |
 | 1.34 | 06.11.2026 | Basis `d0637a8` + #297 | B-25 und Anhang B: iPad in den Hinweisen zum Schließen der Anbieterseite (P-91, Anhang E; #297) |
 | 1.35 | 06.11.2026 | Basis `86f379c` + #309 | B-25: kein Trenner auf Heute, Einkauf und Familie (P-92, Anhang E; #309, E-92) |
-| 1.36 | 07.11.2026 | Basis `7f15e8b` + #296 | B-19: Abschnitt 6 der Datenschutzerklärung nennt Meldungen und die Zahl am App-Symbol; Store-Fassung angeglichen (E-88, #296) |
+| 1.36 | 07.11.2026 | Basis `7f15e8b` + #296 | B-19: Abschnitt 6 der Datenschutzerklärung nennt Meldungen und die Zahl am App-Symbol; Store-Fassung angeglichen (P-93, Anhang E; E-88, #296) |
 
 **Zuordnung Issues zur Planversion:** #23 bis #27 (Lauf 1) beziehen sich auf v1.0 (`4abf400`), #28 bis #30 (Lauf 2) auf v1.2 (`d6cecbf`), #31 bis #40 (Lauf 3, Linux/Android) auf v1.0 (`4abf400`); die Plantexte dazu stehen seit v1.1, v1.3 bzw. v1.4 im Plan. Seit v1.5 beschreibt der Plan das Verhalten nach den Fixes aus PR #41 (#23 bereits durch PR #22). #75 bis #78 (Lauf mit Build 19) beziehen sich auf v1.6 (`f4c358c`); #43 bis #46 und #56 bis #69 beziehen sich auf v1.5 (`bb7f347` bzw. `423a3db`); seit v1.6 beschreibt der Plan das Verhalten nach den Fixes vom 28.10.2026.

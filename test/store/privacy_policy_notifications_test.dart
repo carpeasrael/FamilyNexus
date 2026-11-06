@@ -12,8 +12,9 @@ void main() {
 
   /// Text von `## 6.` bis vor `## 7.`.
   String section6(String text) {
-    final start = RegExp(r'^## 6\.', multiLine: true).firstMatch(text)!.start;
-    final end = RegExp(r'^## 7\.', multiLine: true).firstMatch(text)!.start;
+    final start = RegExp(r'^## 6\.', multiLine: true).firstMatch(text)?.start;
+    final end = RegExp(r'^## 7\.', multiLine: true).firstMatch(text)?.start;
+    if (start == null || end == null) fail('Überschrift „## 6.“ oder „## 7.“ fehlt');
     return text.substring(start, end);
   }
 
@@ -40,6 +41,9 @@ void main() {
       'row': 'Einkaufseinträge',
       'signout': '**Abmelden:**',
       'signoutWord': 'Meldungen',
+      'delete': 'Erinnerungen und Meldungen entfernt',
+      'push': 'keine Chat-Pushübertragung',
+      'settingsRow': 'Erinnerungs-, Meldungs- und Sicherheitseinstellungen',
     },
     'en': {
       'file': 'store/privacy/privacy-policy.en.md',
@@ -50,6 +54,9 @@ void main() {
       'row': 'shopping items',
       'signout': '**Signing out:**',
       'signoutWord': 'notifications',
+      'delete': 'reminders and notifications managed by the app are removed',
+      'push': 'no chat push transmission',
+      'settingsRow': 'reminder, notification and security settings',
     },
   };
 
@@ -77,6 +84,18 @@ void main() {
 
       test('Tabellenzeile „Benachrichtigungen“ nennt Einkaufseinträge, nicht nur Terminerinnerungen', () {
         expect(tableRow(s6, cfg['cell']! as String), contains(cfg['row']! as String));
+      });
+
+      test('Abschnitt 6 hält fest: kein Push-Dienst (Aussage nicht umgekehrt)', () {
+        expect(s6.replaceAll('\n', ' '), contains(cfg['push']! as String));
+      });
+
+      test('Abschnitt 3 nennt die Meldungs-Einstellungen', () {
+        expect(text.replaceAll('\n', ' '), contains(cfg['settingsRow']! as String));
+      });
+
+      test('„Alle lokalen Daten löschen“ nennt auch die Meldungen', () {
+        expect(text.replaceAll('\n', ' '), contains(cfg['delete']! as String));
       });
 
       test('Abmelden-Absatz nennt auch die Meldungen', () {
