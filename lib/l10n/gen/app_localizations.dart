@@ -3611,7 +3611,7 @@ abstract class AppLocalizations {
   /// No description provided for @regCaptchaBody.
   ///
   /// In de, this message translates to:
-  /// **'Bitte bestätige auf der Seite des Anbieters kurz, dass du kein Roboter bist. Schließe die Seite danach (auf iPhone und Mac über „Abbrechen“); es geht hier automatisch weiter.'**
+  /// **'Bitte bestätige auf der Seite des Anbieters kurz, dass du kein Roboter bist. Schließe die Seite danach (auf iPhone, iPad und Mac über „Abbrechen“); es geht hier automatisch weiter.'**
   String get regCaptchaBody;
 
   /// No description provided for @regCaptchaOpen.
@@ -5021,7 +5021,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleteBrowserWait.
   ///
   /// In de, this message translates to:
-  /// **'Bestätige die Löschung auf der Seite des Anbieters, schließe sie (auf iPhone und Mac über „Abbrechen“) und kehre dann hierher zurück.'**
+  /// **'Bestätige die Löschung auf der Seite des Anbieters, schließe sie (auf iPhone, iPad und Mac über „Abbrechen“) und kehre dann hierher zurück.'**
   String get accountDeleteBrowserWait;
 
   /// No description provided for @accountDeleteOpen.

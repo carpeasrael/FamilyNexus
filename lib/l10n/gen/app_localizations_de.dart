@@ -2114,7 +2114,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get regCaptchaBody =>
-      'Bitte bestätige auf der Seite des Anbieters kurz, dass du kein Roboter bist. Schließe die Seite danach (auf iPhone und Mac über „Abbrechen“); es geht hier automatisch weiter.';
+      'Bitte bestätige auf der Seite des Anbieters kurz, dass du kein Roboter bist. Schließe die Seite danach (auf iPhone, iPad und Mac über „Abbrechen“); es geht hier automatisch weiter.';
 
   @override
   String get regCaptchaOpen => 'Seite öffnen';
@@ -2982,7 +2982,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get accountDeleteBrowserWait =>
-      'Bestätige die Löschung auf der Seite des Anbieters, schließe sie (auf iPhone und Mac über „Abbrechen“) und kehre dann hierher zurück.';
+      'Bestätige die Löschung auf der Seite des Anbieters, schließe sie (auf iPhone, iPad und Mac über „Abbrechen“) und kehre dann hierher zurück.';
 
   @override
   String get accountDeleteOpen => 'Zur Löschseite';

@@ -38,7 +38,7 @@ class FakeBrowser implements BrowserLauncher {
     return (opened: true, waited: s.future);
   }
 
-  /// Beendet die offene Sitzung (wie „Abbrechen“ auf iPhone und Mac).
+  /// Beendet die offene Sitzung (wie „Abbrechen“ auf iPhone, iPad und Mac).
   void finishSession() {
     final s = _session;
     if (s != null && !s.isCompleted) s.complete(true);

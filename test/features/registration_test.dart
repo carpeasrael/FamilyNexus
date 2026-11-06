@@ -136,6 +136,7 @@ void main() {
     await _pump(tester, app);
     await _fillAndSubmit(tester);
     expect(find.textContaining('auf der Seite des Anbieters kurz, dass du kein Roboter bist'), findsOneWidget);
+    expect(find.textContaining('(auf iPhone, iPad und Mac über „Abbrechen“)'), findsOneWidget, reason: 'iPad nennen (#297, E-92)');
     await _tap(tester, 'Ich bin fertig');
     expect(find.text('Noch nicht abgeschlossen. Bitte beende die Bestätigung auf der Seite des Anbieters.'), findsOneWidget);
 
