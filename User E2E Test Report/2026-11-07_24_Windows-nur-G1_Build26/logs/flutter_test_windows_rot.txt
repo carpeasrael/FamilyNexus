@@ -1,0 +1,38 @@
+00:12 +1 -1: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/app/family_owner_test.dart: (setUpAll) [E]
+00:15 +27 -2: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/app/logout_wipe_test.dart: (setUpAll) [E]
+00:18 +43 -3: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/architecture_test.dart: Android-spezifische Dart-Brücken liegen nur in data/platform [E]
+00:23 +108 -4: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/account_provider_test.dart: (setUpAll) [E]
+00:32 +199 -5: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/chat_mapper_test.dart: (setUpAll) [E]
+00:33 +199 -6: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/event_trust_test.dart: (setUpAll) [E]
+00:38 +284 -7: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/join_rejection_test.dart: (setUpAll) [E]
+00:39 +291 -8: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/live_since_test.dart: (setUpAll) [E]
+00:39 +291 -9: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/local_display_name_test.dart: (setUpAll) [E]
+00:44 +353 -10: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/sdk_registration_test.dart: (setUpAll) [E]
+00:48 +408 -11: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/sql_data_inventory_test.dart: (setUpAll) [E]
+00:49 +410 -12: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/sql_event_store_rsvp_test.dart: (setUpAll) [E]
+00:50 +410 -13: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/sql_shopping_store_test.dart: (setUpAll) [E]
+00:51 +411 -14: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/sql_task_store_test.dart: (setUpAll) [E]
+00:57 +457 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/app_badge_test.dart: #254: Linux sendet LauncherEntry.Update mit Desktop-ID, Zahl und Sichtbarkeit [E]
+00:59 +496 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/data/send_backoff_test.dart: (tearDownAll)
+00:59 +509 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/domain/calendar_view_test.dart: (tearDownAll)
+00:59 +517 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/domain/conflict_test.dart: (tearDownAll)
+01:00 +545 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/domain/event_codec_test.dart: (tearDownAll)
+01:04 +745 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/domain/occurrence_test.dart: (tearDownAll)
+01:06 +795 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/domain/reminder_planner_test.dart: (tearDownAll)
+01:07 +866 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/domain/tasks_test.dart: (tearDownAll)
+01:07 +884 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/domain/task_list_rules_test.dart: (tearDownAll)
+01:08 +893 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/domain/task_period_test.dart: (tearDownAll)
+01:09 +911 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/domain/task_rule_test.dart: (tearDownAll)
+01:10 +916 ~16 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart: (tearDownAll)
+01:13 +916 ~104 -15: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: (tearDownAll)
+04:25 +1520 ~108 -16: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/store/description_test.dart: store/metadata/ios/de-DE/description.txt: Aufgabenlisten genannt, höchstens 4000 Zeichen [E]
+04:25 +1520 ~108 -17: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/store/description_test.dart: store/metadata/ios/en-US/description.txt: Aufgabenlisten genannt, höchstens 4000 Zeichen [E]
+04:25 +1520 ~108 -18: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/store/description_test.dart: store/metadata/macos/de-DE/description.txt: Aufgabenlisten genannt, höchstens 4000 Zeichen [E]
+04:25 +1520 ~108 -19: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/store/description_test.dart: store/metadata/macos/en-US/description.txt: Aufgabenlisten genannt, höchstens 4000 Zeichen [E]
+04:25 +1520 ~108 -20: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/store/description_test.dart: store/metadata/android/de-DE/full_description.txt: Aufgabenlisten genannt, höchstens 4000 Zeichen [E]
+04:25 +1520 ~108 -21: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/store/description_test.dart: store/metadata/android/en-US/full_description.txt: Aufgabenlisten genannt, höchstens 4000 Zeichen [E]
+04:26 +1567 ~108 -22: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/store/release_notes_test.dart: store/metadata/android/de-DE/release_notes.txt: höchstens 500 Zeichen (Google Play) [E]
+04:26 +1579 ~108 -22: C:/Users/necro_2/WebstormProjects/FamilyNexus/test/security/penetration_test.dart: (tearDownAll)
+04:57 +1657 ~108 -22: Some tests failed.
+  ... and 18 more
+EXIT 1
