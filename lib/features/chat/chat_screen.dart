@@ -526,7 +526,8 @@ class _Bubble extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Semantics(
             container: true,
-            label: l.chatMessageFrom(mine ? l.chatYou : m.senderLabel(l)),
+            // Eigene Nachricht: „von dir“ (Dativ), nicht „von Du“ (#332).
+            label: mine ? l.chatMessageFromYou : l.chatMessageFrom(m.senderLabel(l)),
             child: GestureDetector(
               onLongPress: onLongPress,
               child: GlassCard(

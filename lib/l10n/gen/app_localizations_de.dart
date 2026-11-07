@@ -342,6 +342,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get chatMessageFromYou => 'Nachricht von dir';
+
+  @override
   String get chatToday => 'Heute';
 
   @override

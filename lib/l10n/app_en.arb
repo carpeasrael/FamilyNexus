@@ -137,6 +137,7 @@
       }
     }
   },
+  "chatMessageFromYou": "Message from you",
   "chatToday": "Today",
   "chatYesterday": "Yesterday",
   "chatNewMessages": "New messages",

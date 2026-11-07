@@ -137,6 +137,7 @@
       }
     }
   },
+  "chatMessageFromYou": "Nachricht von dir",
   "chatToday": "Heute",
   "chatYesterday": "Gestern",
   "chatNewMessages": "Neue Nachrichten",
