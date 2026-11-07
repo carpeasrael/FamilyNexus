@@ -1,0 +1,9 @@
+$ date
+2026-11-06 23:09:20 CET
+$ python3 sandbox/mailcode.py wait <T0> app_test@inneso.de <Code-Datei>   # IMAP nur lesend, INBOX + Spam, Absender matrix.org/element.io
+Ordner: INBOX
+Von: "Matrix.org account" <support@matrix.org>
+An: fnx-e2e-261106-n1-3996 <app_test@inneso.de>
+Betreff: Your email verification code is: ******
+Datum: Fri, 6 Nov 2026 22:09:07 +0000
+Code: ****** (gefunden, in Datei mit Rechten 600)

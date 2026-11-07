@@ -1,0 +1,402 @@
+{
+  "run": {
+    "date": "2026-11-06",
+    "plan_version": "v03",
+    "tester": "Claude-Agent (Tester) mit Nutzer für Captcha/E-Mail",
+    "commit": "`7f15e8b` (main, Arbeitsbaum nur mit Testplan-Dateien)",
+    "build": "1.2.2 (26)",
+    "start": "2026-11-06 22:53",
+    "end": "2026-11-06 23:20 (gestoppt)",
+    "matrix_org_release": "Ja, durch den Nutzer am 06.11.2026 um 22:53 für diesen Lauf",
+    "accounts": "N1 `@fnx-e2e-261106-n1-3996:matrix.org`: angelegt 23:09, **gelöscht 23:14** (Anmeldung 23:17 abgewiesen: „Account deleted“). I2 `@fnx-e2e-261106-i2-3996:matrix.org`: nie angelegt (Profil 404).",
+    "g1": {
+      "platform": "And",
+      "device": "Sandbox-AVD `FN_E2E_G1` (pixel_8), `emulator-5560`",
+      "os": "Android 16 (API 36)",
+      "operation": "Agent in der Sandbox (`ui.py`, `cdp.py`); reCAPTCHA durch den Nutzer",
+      "install": "Release-APK aus `7f15e8b` (gebaut 22:21), Debug-Signatur (Sandbox)",
+      "app_version": "1.2.2 (26) laut `dumpsys package`",
+      "screenshot_method": "`sandbox.sh shot` (Emulator-Konsole bei FLAG_SECURE)"
+    },
+    "g2": {
+      "platform": "AndT",
+      "device": "Sandbox-AVD `FN_E2E_G2` (pixel_tablet), `emulator-5562`",
+      "os": "Android 16 (API 36)",
+      "operation": "Agent in der Sandbox",
+      "install": "wie G1",
+      "app_version": "1.2.2 (26)",
+      "screenshot_method": "wie G1"
+    },
+    "notes": [
+      "**Lauf um 23:12 auf Wunsch des Nutzers gestoppt**, nachdem DT-A-04 (Rückkehr in die App) fehlschlug. Danach auf Anweisung des Nutzers N1 gelöscht und die Sandbox abgebaut.",
+      "N1 ist gelöscht (matrix.org „Account deleted“, neue Anmeldung mit richtigem Passwort abgewiesen); I2 wurde nie angelegt. Kein Konto dieses Laufs besteht mehr.",
+      "Sandbox: zwei frische Emulatoren, nach dem Lauf beendet und deren Nutzerdaten gelöscht; Arbeitsordner gelöscht. Nutzerumgebung unberührt.",
+      "Das Passwort von N1 erschien vor der Kontoanlage einmal in der Werkzeugausgabe (L23-3); es wurde ersetzt, bevor das Konto entstand.",
+      "`secure/Test-Email.md` ist für alle Benutzer lesbar (644); `chmod 600` empfohlen."
+    ]
+  },
+  "steps": {
+    "DT-V-01": {
+      "status": "passed",
+      "time": "22:54",
+      "observed": "`versions` liefert `200`. `auth_metadata`: `issuer` = `https://account.matrix.org/`, `registration_endpoint` = `https://account.matrix.org/oauth2/registration`, `account_management_uri` = `https://account.matrix.org/account/`.",
+      "comparison": "HTTP 200, issuer, registration_endpoint und account_management_uri genannt: erfüllt.",
+      "evidence": [
+        "screenshots/DT-V-01-CLI.png"
+      ]
+    },
+    "DT-V-05": {
+      "status": "passed",
+      "time": "22:54",
+      "observed": "IMAP-Anmeldung `app_test@inneso.de` → `OK`; Ordner `Entwürfe`, `Gesendete Objekte`, `INBOX`, `Papierkorb`, `Spam`; INBOX: 1 Nachricht. Kein Passwort in der Ausgabe.",
+      "comparison": "Anmeldung OK, Anzahl angezeigt, kein Passwort im Beleg: erfüllt.",
+      "evidence": [
+        "screenshots/DT-V-05-CLI.png"
+      ]
+    },
+    "DT-V-02": {
+      "status": "passed",
+      "time": "22:55",
+      "observed": "G1 (Telefon): „Willkommen bei FamilyNexus“ mit „Neue Familie gründen“, „Ich wurde eingeladen“, „Ich habe schon ein Konto“; Sprache „Deutsch“ gewählt. Kein Fehler, keine Sitzung (Sandbox frisch).",
+      "comparison": "Alle Einträge vorhanden, kein Fehler: erfüllt.",
+      "comment": "Bild über die Emulator-Konsole (FLAG_SECURE).",
+      "evidence": [
+        "screenshots/DT-V-02-G1.png"
+      ]
+    },
+    "DT-V-03": {
+      "status": "passed",
+      "time": "22:55",
+      "observed": "G2 (Tablet, Querformat): „Willkommen bei FamilyNexus“ mit den drei Einträgen; Sprache „Deutsch“ gewählt. Kein Fehler, keine Sitzung.",
+      "comparison": "Wie DT-V-02 auf G2: erfüllt.",
+      "comment": "Bild über die Emulator-Konsole (FLAG_SECURE).",
+      "evidence": [
+        "screenshots/DT-V-03-G2.png"
+      ]
+    },
+    "DT-A-01": {
+      "status": "passed",
+      "time": "22:56",
+      "observed": "„Konto erstellen“, „Schritt 1 von 3“; „Bei matrix.org legst du dein Konto auf der Seite des Anbieters an. Danach kommst du automatisch hierher zurück.“; Name `Test N1`; Schaltfläche „Konto bei matrix.org erstellen“; „Dein Konto liegt bei matrix.org.“; unter „Erweitert“ ist „matrix.org (empfohlen)“ gewählt.",
+      "comparison": "Anbieter, Hinweistext und Schaltfläche wie erwartet: erfüllt.",
+      "evidence": [
+        "screenshots/DT-A-01-G1.png"
+      ]
+    },
+    "DT-A-02": {
+      "status": "passed",
+      "time": "22:56",
+      "observed": "Custom Tab mit `account.matrix.org` öffnet sich direkt auf „Create an account“ (Formular „Username“, „Continue with email address“). Nach dem Verschwinden des Tabs zeigt die App „Bitte auf der Seite von matrix.org fortfahren … Danach geht es hier automatisch weiter.“ mit „Abbrechen“.",
+      "comparison": "Anbieter-Seite im Custom Tab: erfüllt; Wartemeldung der App: erfüllt.",
+      "comment": "Die Wartemeldung ist unter Android nur sichtbar, wenn der Custom Tab nicht im Vordergrund ist (hier nach Beenden von Chrome, siehe DT-A-03).",
+      "evidence": [
+        "screenshots/DT-A-02a-G1.png",
+        "screenshots/DT-A-02b-G1.png"
+      ]
+    },
+    "DT-A-03": {
+      "status": "passed_with_issue",
+      "time": "23:09",
+      "observed": "Username `fnx-e2e-261106-n1-3996` („This username is available“), E-Mail `app_test@inneso.de`, Passwort „Very strong password“, „Passwords match!“, Bedingungen angehakt, reCAPTCHA „I'm not a robot“ (sichtbar, durch den Nutzer gelöst). Danach „Verify your email – Enter the 6-digit code sent to: app_test@inneso.de“. Mail von „Matrix.org account“ <support@matrix.org>, Betreff „Your email verification code is: ******“, Eingang 23:09:07; Code per IMAP gelesen und angenommen. Anzeigename `Test N1` gesetzt. Zustimmungsseite „Continue to FamilyNexus? This will set up FamilyNexus (carpeasrael.github.io) with your matrix.org account.“ mit `Test N1`, `@fnx-e2e-261106-n1-3996:matrix.org`.",
+      "comparison": "Konto angelegt, Mail binnen Sekunden, Code angenommen, Zustimmungsseite erschienen: erfüllt. Rückleitung zur App nach „Continue“: **nicht erfüllt** (DT-A-04).",
+      "comment": "Erster Versuch: Chrome im Emulator nach dem Captcha beendet (vermutlich Speicher, 2,5 GB), App zeigte nach „Abbrechen“ korrekt „Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.“ Zweiter Versuch: Captcha erneut durch den Nutzer. Absenden per Skript-Klick wirkungslos, erst `form.requestSubmit()` schickte ab.",
+      "evidence": [
+        "screenshots/DT-A-03a-G1.png",
+        "screenshots/DT-A-03b-G1.png",
+        "screenshots/DT-A-03c-CLI.png",
+        "screenshots/DT-A-03d-G1.png"
+      ]
+    },
+    "DT-A-04": {
+      "status": "failed",
+      "time": "23:12",
+      "observed": "Nach „Continue“ auf der Zustimmungsseite (einmal per Skript, einmal per Fingertipp auf die Schaltfläche) blieb der Custom Tab auf `https://account.matrix.org/consent/…` stehen; die App kehrte binnen 60 s nicht zurück, „Dein Notfall-Schlüssel“ erschien nicht.",
+      "comparison": "Rückkehr ohne Zutun: nicht erfüllt.",
+      "comment": "Ursache offen: App-Rücksprung (Custom-Tab-Schema) oder Sandbox (Chrome-Debug-Modus, Speicher). Lauf danach auf Wunsch des Nutzers gestoppt.",
+      "evidence": [
+        "screenshots/DT-A-04-G1.png"
+      ]
+    },
+    "DT-F-08": {
+      "status": "pending",
+      "time": "23:14",
+      "observed": "Aufräumen nach Abbruch, nicht über die App: Kontoseite `account.matrix.org/account/` → „Delete account“ → Dialog „Delete this account?“ (u. a. „You will not be able to reactivate your account“, „No one will be able to reuse your username (MXID), including you“), Passwort eingegeben, „Delete account“ → „Account deleted – This account (@fnx-e2e-261106-n1-3996:matrix.org) has been deleted.“",
+      "comparison": "Der App-Weg („Konto löschen“ → „Zur Löschseite“) wurde nicht geprüft.",
+      "comment": "Nicht als Testschritt durchgeführt: Lauf abgebrochen; N1 wurde zum Aufräumen direkt auf der Kontoseite gelöscht. Erster Versuch per Skript ohne Wirkung, zweiter per Fingertipp erfolgreich.",
+      "evidence": [
+        "screenshots/DT-F-08a-G1.png",
+        "screenshots/DT-F-08b-G1.png",
+        "screenshots/DT-F-08c-G1.png"
+      ]
+    },
+    "DT-N-01": {
+      "status": "passed_with_issue",
+      "time": "23:17",
+      "observed": "Neue Anmeldung auf `account.matrix.org/login` (Cookies der Sandbox gelöscht) mit `fnx-e2e-261106-n1-3996` und dem richtigen Passwort → „Account deleted – This account (@fnx-e2e-261106-n1-3996:matrix.org) has been deleted.“, keine Sitzung.",
+      "comparison": "Anmeldung verweigert: erfüllt. Weg über die App („Bei matrix.org anmelden“) und deren Meldung: nicht geprüft.",
+      "comment": "Direkt im Browser der Sandbox statt über die App, weil die App nach DT-A-04 nicht mehr nutzbar war.",
+      "evidence": [
+        "screenshots/DT-N-01a-G1.png"
+      ]
+    },
+    "DT-N-03": {
+      "status": "failed",
+      "time": "23:17",
+      "observed": "N1 (gelöscht): `200` `{\"displayname\":\"Test N1\"}` (unverändert bis 23:17, also 3 Minuten nach der Löschung). I2 (nie angelegt): `404` `{\"errcode\":\"M_UNKNOWN\",\"error\":\"No row found (profiles)\"}`.",
+      "comparison": "Erwartet 404 oder leeres Profil: für N1 nicht erfüllt.",
+      "comment": "Verhalten von matrix.org, kein App-Befund: Das Profil eines gelöschten Kontos bleibt lesbar. Planfehler: Die Profilabfrage taugt nicht als Löschnachweis; maßgeblich ist DT-N-01.",
+      "evidence": [
+        "screenshots/DT-N-03-CLI.png"
+      ]
+    },
+    "DT-V-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-A-05": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-A-06": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-A-07": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-B-01": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-B-02": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-B-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-B-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-B-05": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-B-06": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-B-07": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-B-08": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-B-09": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-B-10": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-C-01": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-C-02": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-C-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-C-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-C-05": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-C-06": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-D-01": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-D-02": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-D-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-D-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-E-01": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-E-02": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-E-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-E-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-E-05": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-E-06": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12).",
+      "evidence": []
+    },
+    "DT-F-01": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-F-02": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-F-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-F-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-F-05": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-F-06": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-F-07": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-N-02": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-N-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-N-05": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    },
+    "DT-N-06": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf nach DT-A-04 auf Wunsch des Nutzers gestoppt (23:12). I2 wurde nie angelegt.",
+      "evidence": []
+    }
+  },
+  "findings": [
+    {
+      "id": "L23-1",
+      "step": "DT-A-04",
+      "severity": "hoch (Ursache offen)",
+      "text": "Nach der Zustimmung „Continue to FamilyNexus?“ kehrt die App nicht zurück; der Custom Tab bleibt auf der Zustimmungsseite. Vor einem Issue auf einem echten Android-Gerät bzw. ohne Chrome-Debug-Modus nachstellen.",
+      "issue": "–"
+    },
+    {
+      "id": "L23-2",
+      "step": "DT-A-03",
+      "severity": "gering (Umgebung)",
+      "text": "Chrome im Sandbox-Emulator (2,5 GB RAM) wurde nach dem Captcha beendet. Sandbox-AVDs mit mehr Speicher anlegen (`hw.ramSize`).",
+      "issue": "–"
+    },
+    {
+      "id": "L23-3",
+      "step": "DT-A-03",
+      "severity": "mittel (Werkzeug, behoben)",
+      "text": "`sandbox/cdp.py fields` gab den Wert von Passwortfeldern aus. Behoben (Passwort- und versteckte Felder nur „<gesetzt, verborgen>“); das betroffene Passwort wurde vor der Kontoanlage ersetzt.",
+      "issue": "–"
+    },
+    {
+      "id": "L23-4",
+      "step": "DT-V-02",
+      "severity": "gering (Werkzeug, behoben)",
+      "text": "`sandbox.sh shot`: Die Emulator-Konsole verträgt keine Leerzeichen im Pfad; Bilder waren schwarz. Behoben über eine Zwischendatei.",
+      "issue": "–"
+    },
+    {
+      "id": "L23-5",
+      "step": "DT-A-03",
+      "severity": "gering (Werkzeug)",
+      "text": "Skript-Klicks (`element.click()`) auf Schaltflächen von matrix.org schicken Formulare nicht ab; `form.requestSubmit()` bzw. Fingertipp nötig. In `cdp.py` und Anweisung nachziehen.",
+      "issue": "–"
+    },
+    {
+      "id": "L23-6",
+      "step": "DT-N-03",
+      "severity": "gering (Planfehler)",
+      "text": "Das Profil eines gelöschten matrix.org-Kontos bleibt lesbar (`200`, Anzeigename). Erwartung von DT-N-03 anpassen; Nachweis über DT-N-01/02.",
+      "issue": "–"
+    }
+  ]
+}
