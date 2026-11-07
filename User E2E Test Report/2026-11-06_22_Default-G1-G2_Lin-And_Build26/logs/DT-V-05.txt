@@ -1,0 +1,6 @@
+$ date
+2026-11-06 22:20:22 CET
+$ python3 mailcode.py check   # IMAP imap.ionos.de:993 SSL, Passwort aus secure/Test-Email.md (nicht ausgegeben), INBOX nur lesend
+Login app_test@inneso.de -> OK
+Ordner: Entw&APw-rfe, Gesendete Objekte, INBOX, Papierkorb, Spam
+INBOX: OK 1 Nachrichten

@@ -1,0 +1,10 @@
+$ date
+2026-11-06 23:17:45 CET
+$ curl -s -w '
+%{http_code}' https://matrix-client.matrix.org/_matrix/client/v3/profile/@fnx-e2e-261106-n1-3996:matrix.org
+{"displayname":"Test N1"}
+200
+$ curl -s -w '
+%{http_code}' https://matrix-client.matrix.org/_matrix/client/v3/profile/@fnx-e2e-261106-i2-3996:matrix.org
+{"errcode":"M_UNKNOWN","error":"No row found (profiles)"}
+404

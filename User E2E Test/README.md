@@ -8,6 +8,7 @@
 | `Nachtest_Build18.md` | Nachtest der Fixes aus PR #52 (A-07, E-21, E-25, D-02) | Build 1.2.1 (18) |
 | `G-07_Testperson/` | Schritt G-07: Durchlauf mit einer Person ohne Vorwissen (Durchführung, Anleitung, Beobachtungsbogen) | TP-FN-001 v1.5 |
 | `Release-Test_1.2.2_v01.md` | Release-Test 1.2.2 (TP-FN-REL-122): nur die neuen Funktionen, auf Geräten und Emulatoren, je Schritt Erwartetes Ergebnis und Screenshot | v01, 05.11.2026 |
+| `Default_test_G1-G2/` | TP-FN-DEF-G1G2: Agent führt den Test **selbstständig in einer Sandbox** aus (zwei eigene Android-Emulatoren, frisch je Lauf), legt zwei Konten bei matrix.org selbst an (E-Mail-Code per IMAP, Nutzer nur bei sichtbarem Captcha), Familie, Einladung, Termin, Chat, Aufgabe, Löschung und Nachweis; fragt zuerst G1/G2; AURORA-PDF über `make_report.py`, Ablage nach `../User E2E Test Report/README.md` | v03, 06.11.2026 |
 | `Checkliste_Geraetenachtests.md` | Offene Gerätenachtests der Issues #144, #150, #254, #259, #263, #266, #268, #274, #281 nach Gerät sortiert, mit Soll-Werten | 05.11.2026, main a0da560 |
 | `Massnahmenplan_App_Store_Review.md` | Maßnahmen zur Apple App Review (Bezug des Gesamtplans) | 25.10.2026 |
 | `../docs/TESTPLAN_ONBOARDING.md` | Entwickler-Testplan Registrierung, Familie, Einladung und Beitritt (Phase 8, automatische Tests) | 24.10.2026 |

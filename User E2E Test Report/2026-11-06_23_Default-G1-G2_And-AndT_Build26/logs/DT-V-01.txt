@@ -1,0 +1,16 @@
+$ date
+2026-11-06 22:54:49 CET
+
+$ curl -s -o /dev/null -w '%{http_code}' https://matrix-client.matrix.org/_matrix/client/versions
+200
+
+$ curl -s https://matrix-client.matrix.org/_matrix/client/v1/auth_metadata | python3 (Auszug)
+{
+  "issuer": "https://account.matrix.org/",
+  "registration_endpoint": "https://account.matrix.org/oauth2/registration",
+  "account_management_uri": "https://account.matrix.org/account/",
+  "prompt_values_supported": [
+    "login",
+    "create"
+  ]
+}

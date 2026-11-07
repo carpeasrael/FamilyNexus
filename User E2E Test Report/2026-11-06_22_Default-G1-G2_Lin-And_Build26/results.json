@@ -1,0 +1,322 @@
+{
+  "run": {
+    "date": "2026-11-06",
+    "tester": "Claude-Agent (Tester) mit Nutzer für Captcha/E-Mail",
+    "commit": "`7f15e8b` (main)",
+    "build": "1.2.2 (26)",
+    "start": "2026-11-06 22:19",
+    "end": "2026-11-06 22:31 (abgebrochen)",
+    "matrix_org_release": "Ja, durch den Nutzer am 06.11.2026 ca. 22:19 für diesen Lauf",
+    "accounts": "Geplant `@fnx-e2e-261106-n1-4794:matrix.org`, `@fnx-e2e-261106-i2-4794:matrix.org`; **keines angelegt** (Profilabfrage 22:32: 404 „No row found (profiles)“, keine Bestätigungsmail)",
+    "g1": {
+      "platform": "Lin",
+      "device": "Linux-Flatpak auf Xvfb :99 (1000×1100)",
+      "os": "Manjaro Linux, Kernel 6.18.55",
+      "operation": "Agent per XTEST; Anbieter-Seite im Desktop-Browser durch Nutzer",
+      "install": "Flatpak `de.inneso.familynexus` vom 06.11.2026 19:40 UTC",
+      "app_version": "1.2.2 (26) laut `version.json`",
+      "screenshot_method": "XGetImage des Xvfb-Bildschirms"
+    },
+    "g2": {
+      "platform": "And",
+      "device": "Android-Emulator `Pixel_8_API_36` (emulator-5556)",
+      "os": "Android 16 (API 36)",
+      "operation": "Agent per adb (nicht mehr erreicht)",
+      "install": "APK 1.2.2 (26) lokal aus `main` gebaut, nicht mehr installiert",
+      "app_version": "–",
+      "screenshot_method": "–"
+    },
+    "notes": [
+      "**Lauf auf Wunsch des Nutzers um ca. 22:30 abgebrochen**, während DT-A-03 (Kontoanlage auf der matrix.org-Seite) lief.",
+      "Bis 22:28 kam keine Bestätigungsmail von matrix.org an `app_test@inneso.de` (INBOX und Spam per IMAP, nur lesend). Bestandsprüfung 22:32: Profil beider geplanter Matrix-IDs 404 „No row found (profiles)“ → **kein Konto bei matrix.org angelegt, nichts zu löschen.**",
+      "Aufräumen: App und Xvfb beendet, Testsitzung nach `~/.var/app/de.inneso.familynexus.testlauf-20261106` verschoben, Nutzersitzung zurückgelegt, Emulator beendet.",
+      "Nutzerhinweis: Code soll per Webmail geholt werden; der Agent nutzte IMAP desselben Postfachs (gleicher Inhalt), Webmail nicht genutzt."
+    ],
+    "plan_version": "v02"
+  },
+  "steps": {
+    "DT-V-01": {
+      "status": "passed",
+      "time": "22:20",
+      "observed": "`versions` liefert `200`. `auth_metadata`: `issuer` = `https://account.matrix.org/`, `registration_endpoint` = `https://account.matrix.org/oauth2/registration`, `account_management_uri` = `https://account.matrix.org/account/`, `prompt_values_supported` = `login`, `create`.",
+      "comparison": "HTTP 200 erfüllt; issuer, registration_endpoint und account_management_uri genannt: erfüllt.",
+      "evidence": [
+        "screenshots/DT-V-01-CLI.png"
+      ]
+    },
+    "DT-V-02": {
+      "status": "passed",
+      "time": "22:21",
+      "observed": "Willkommensseite „Willkommen bei FamilyNexus“ mit „Neue Familie gründen“, „Ich wurde eingeladen“, „Ich habe schon ein Konto“; Sprache „Deutsch“ gewählt (markiert). Kein Fehler, keine Sitzung.",
+      "comparison": "Alle drei Einträge vorhanden, kein Fehler: erfüllt.",
+      "comment": "G1 frisch: Nutzersitzung nach `~/.var/app/de.inneso.familynexus.bak-261106` verschoben; App auf eigenem X-Server (Xvfb :99, 1000×1100).",
+      "evidence": [
+        "screenshots/DT-V-02-G1.png"
+      ]
+    },
+    "DT-V-05": {
+      "status": "passed",
+      "time": "22:20",
+      "observed": "IMAP-Anmeldung `app_test@inneso.de` → `OK`; Ordner `Entwürfe`, `Gesendete Objekte`, `INBOX`, `Papierkorb`, `Spam`; INBOX: 1 Nachricht. Kein Passwort in der Ausgabe.",
+      "comparison": "Anmeldung OK und Anzahl angezeigt, kein Passwort im Beleg: erfüllt.",
+      "evidence": [
+        "screenshots/DT-V-05-CLI.png"
+      ]
+    },
+    "DT-A-01": {
+      "status": "passed",
+      "time": "22:21",
+      "observed": "„Konto erstellen“, „Schritt 1 von 3“; Text „Bei matrix.org legst du dein Konto auf der Seite des Anbieters an. Danach kommst du automatisch hierher zurück.“; Schaltfläche „Konto bei matrix.org erstellen“; „Dein Konto liegt bei matrix.org.“; unter „Erweitert“ ist „matrix.org (empfohlen)“ gewählt. Name `Test N1` eingetragen.",
+      "comparison": "Anbieter matrix.org (empfohlen), Hinweistext und Schaltfläche wie erwartet: erfüllt.",
+      "evidence": [
+        "screenshots/DT-A-01-G1.png"
+      ]
+    },
+    "DT-A-02": {
+      "status": "passed_with_issue",
+      "time": "22:22",
+      "observed": "App zeigt „Bitte auf der Seite von matrix.org fortfahren … Danach geht es hier automatisch weiter.“ mit „Abbrechen“. Die Anbieter-Seite öffnete laut Plan im Browser des Desktops; ein Bild davon liegt nicht vor.",
+      "comparison": "App-Teil erfüllt; Öffnen der Anbieter-Seite nicht belegt (DT-A-02b fehlt).",
+      "comment": "Lauf um 22:30 auf Wunsch des Nutzers abgebrochen, bevor das Bild der Anbieter-Seite vorlag.",
+      "evidence": [
+        "screenshots/DT-A-02a-G1.png"
+      ]
+    },
+    "DT-V-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-V-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-A-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-A-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-A-05": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-A-06": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-A-07": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-B-01": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-B-02": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-B-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-B-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-B-05": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-B-06": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-B-07": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-B-08": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-B-09": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-B-10": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-C-01": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-C-02": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-C-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-C-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-C-05": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-C-06": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-D-01": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-D-02": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-D-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-D-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-E-01": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-E-02": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-E-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-E-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-E-05": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-E-06": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen.",
+      "evidence": []
+    },
+    "DT-F-01": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-F-02": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-F-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-F-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-F-05": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-F-06": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-F-07": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-F-08": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-N-01": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-N-02": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-N-03": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-N-04": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-N-05": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    },
+    "DT-N-06": {
+      "status": "pending",
+      "comment": "Nicht durchgeführt: Lauf um 22:30 auf Wunsch des Nutzers abgebrochen. F/N entfallen, da kein Konto angelegt wurde.",
+      "evidence": []
+    }
+  },
+  "findings": []
+}

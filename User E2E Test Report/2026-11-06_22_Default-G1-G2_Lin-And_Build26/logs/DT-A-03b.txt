@@ -1,0 +1,4 @@
+$ date
+2026-11-06 22:27:46 CET
+$ python3 mailcode.py wait <22:22:00> app_test@inneso.de   # IMAP nur lesend, INBOX + Spam, Absender matrix.org/element.io
+Keine passende Mail binnen 300 s
