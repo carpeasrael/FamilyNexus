@@ -9,6 +9,7 @@ import 'app.dart';
 import 'app_services.dart';
 import 'bootstrap.dart';
 import 'startup_failure.dart';
+import 'startup_loading.dart';
 import 'web_gate.dart';
 
 /// Baut die Dienste auf und zeigt währenddessen, bei Fehlern oder nach dem Start die passende Oberfläche.
@@ -75,7 +76,8 @@ class _BootstrapperState extends State<Bootstrapper> {
     return FutureBuilder<AppServices>(
         future: _future,
         builder: (context, snap) {
-          if (snap.hasError) {
+          // Beim Neustart behält der FutureBuilder den alten Fehler; dann gilt das Ladebild.
+          if (snap.hasError && snap.connectionState != ConnectionState.waiting) {
             AppLog.e('startup', 'Start fehlgeschlagen', snap.error);
             final error = snap.error;
             return StartupFailureApp(
@@ -85,7 +87,7 @@ class _BootstrapperState extends State<Bootstrapper> {
             );
           }
           final services = snap.data;
-          if (services == null) return const SizedBox.shrink();
+          if (services == null) return const StartupLoadingApp();
           services.onFullReset ??= () => _fullReset(services);
           return FamilyNexusApp(services: services);
         },
