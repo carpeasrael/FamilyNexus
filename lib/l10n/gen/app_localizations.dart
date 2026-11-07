@@ -926,6 +926,12 @@ abstract class AppLocalizations {
   /// **'Erinnerungen'**
   String get remindersTitle;
 
+  /// No description provided for @remindersPermissionTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Berechtigung fehlt'**
+  String get remindersPermissionTitle;
+
   /// No description provided for @remindersHint.
   ///
   /// In de, this message translates to:

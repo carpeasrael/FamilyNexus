@@ -486,6 +486,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remindersTitle => 'Reminders';
 
   @override
+  String get remindersPermissionTitle => 'Permission missing';
+
+  @override
   String get remindersHint =>
       'Reminders are local notifications on this device. They never show title or location.';
 

@@ -217,6 +217,7 @@
   },
   "reminderAtStart": "At start time",
   "remindersTitle": "Reminders",
+  "remindersPermissionTitle": "Permission missing",
   "remindersHint": "Reminders are local notifications on this device. They never show title or location.",
   "remindersPermissionNotifications": "Notifications are blocked. Without them no reminders appear.",
   "remindersPermissionExact": "Exact alarms are not allowed. Reminders may be late.",

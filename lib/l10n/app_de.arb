@@ -217,6 +217,7 @@
   },
   "reminderAtStart": "Zur Startzeit",
   "remindersTitle": "Erinnerungen",
+  "remindersPermissionTitle": "Berechtigung fehlt",
   "remindersHint": "Erinnerungen sind lokale Benachrichtigungen dieses Geräts. Sie zeigen nie Titel oder Ort.",
   "remindersPermissionNotifications": "Benachrichtigungen sind blockiert. Ohne sie erscheinen keine Erinnerungen.",
   "remindersPermissionExact": "Genaue Alarme sind nicht erlaubt. Erinnerungen können sich verspäten.",
