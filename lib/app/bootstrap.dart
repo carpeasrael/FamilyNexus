@@ -105,6 +105,16 @@ Future<void> _closeAfterFailedStart(SdkMatrixGateway gateway, AppDatabase databa
   }
 }
 
+/// Führt [step] aus und loggt Schrittname und Dauer in Millisekunden (#316); sonst nichts (keine Daten, keine Fehlertexte).
+Future<T> timedStep<T>(String name, Future<T> Function() step) async {
+  final watch = Stopwatch()..start();
+  try {
+    return await step();
+  } finally {
+    AppLog.d('startup', 'schritt=$name ms=${watch.elapsedMilliseconds}');
+  }
+}
+
 /// Öffnet Schlüsselspeicher und Datenbank und baut die Dienste auf.
 ///
 /// Räumt zuerst temporäre Klartext-Dateien auf, die ein beendeter Prozess hinterlassen hat, damit das auch bei einem
@@ -116,15 +126,15 @@ Future<AppServices> bootstrap({
 }) async {
   final keys = keyStore ?? SecureKeyStore();
   final fileAccess = files ?? SystemFileAccess();
-  await fileAccess.clearTemporary();
-  final database = await (openDatabase?.call(keys) ?? AppDatabase.open(keyStore: keys));
+  await timedStep('clearTemporary', fileAccess.clearTemporary);
+  final database = await timedStep('openDatabase', () async => await (openDatabase?.call(keys) ?? AppDatabase.open(keyStore: keys)));
   final kv = SqlKeyValueStore(database.db);
-  final settings = await SettingsController.load(kv);
-  await ensureCryptoInitialized();
+  final settings = await timedStep('loadSettings', () => SettingsController.load(kv));
+  await timedStep('cryptoInit', ensureCryptoInitialized);
   final gateway = SdkMatrixGateway(keyStore: keys, accountStore: kv);
   final bool keepAccountData;
   try {
-    keepAccountData = await restoreSession(gateway, kv);
+    keepAccountData = await timedStep('restoreSession', () => restoreSession(gateway, kv));
   } catch (_) {
     // Sonst liefe bei stehender Sitzung der Sync weiter, und „Erneut versuchen“ öffnete alles ein zweites Mal.
     await _closeAfterFailedStart(gateway, database);
@@ -137,7 +147,7 @@ Future<AppServices> bootstrap({
   final LocalReminderScheduler? scheduler = PlatformInfo.isWeb ? null : LocalReminderScheduler();
   final lang = settings.settings.languageCode ?? WidgetsBinding.instance.platformDispatcher.locale.languageCode;
   final l10n = lookupAppLocalizations(Locale(lang == 'de' ? 'de' : 'en'));
-  await scheduler?.initialize(channelName: l10n.reminderChannelName, channelDescription: l10n.reminderChannelDescription);
+  await timedStep('schedulerInit', () async => await scheduler?.initialize(channelName: l10n.reminderChannelName, channelDescription: l10n.reminderChannelDescription));
   // Meldungen zu Chat und Einkauf (#254, E-88): dasselbe Plugin, Texte in der aktuellen App-Sprache.
   AppLocalizations activityL10n() {
     final code = settings.settings.languageCode ?? WidgetsBinding.instance.platformDispatcher.locale.languageCode;

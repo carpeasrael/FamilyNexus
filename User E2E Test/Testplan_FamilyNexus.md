@@ -1,6 +1,6 @@
 # Testplan FamilyNexus (Gesamtplan)
 
-**Planversion: 1.36** (07.11.2026) · Dokument-ID `TP-FN-001` · Änderungen siehe „Versionshistorie“ am Ende und Anhang E. Reports und Issues nennen Planversion und Git-Commit (z. B. „TP-FN-001 v1.0 @ 4abf400“).
+**Planversion: 1.37** (07.11.2026) · Dokument-ID `TP-FN-001` · Änderungen siehe „Versionshistorie“ am Ende und Anhang E. Reports und Issues nennen Planversion und Git-Commit (z. B. „TP-FN-001 v1.0 @ 4abf400“).
 
 Ersetzt: `Testplan_Nutzeranlage.md`, `Testplan_Pruefanleitung.md`, `Testplan_Einladung_Zweiter_Nutzer.md`, `Testdaten_Stammdaten.md` (Zuordnung der alten IDs: Anhang C)
 Bezug: `Massnahmenplan_App_Store_Review.md` (Maßnahme 6), Issues #10–#14, Nachtest #15
@@ -116,7 +116,7 @@ Passwörter erzeugt der Tester beim Anlegen (mind. 8 Zeichen, Passwortmanager). 
 
 | ID | Gerät | Schritt | Erwartetes Ergebnis | Beobachtetes Ergebnis | Screenshot | Erg. |
 |---|---|---|---|---|---|---|
-| A-01 | G1 | Startseite ansehen | „Willkommen bei FamilyNexus“ mit „Neue Familie gründen“, „Ich wurde eingeladen“, „Ich habe schon ein Konto“; Hinweise (keine Telemetrie, Ende-zu-Ende-Verschlüsselung, private Termine siehst nur du, verschlüsselt zwischen deinen Geräten abgeglichen, #143); unten „Sprache“ mit „Gerätesprache“, „Deutsch“, „English“; kein eigener Sprach- oder Server-Schritt | | A-01-G1; Windows: Foto oder n/a bis zum Ausschalten (Abschnitt 2) | |
+| A-01 | G1 | Startseite ansehen; beim Kaltstart (App beenden, neu öffnen, hell und dunkel) das Startbild beachten und die Zeit bis zur Anzeige notieren (#316, E-94) | Zuerst eine einfarbige Fläche in der Farbe der App (hell `#F6F7FB`, dunkel `#0B1120`), dann „Lädt …“ mit Ladeanzeige, kein weißer oder schwarzer Bildschirm; danach: „Willkommen bei FamilyNexus“ mit „Neue Familie gründen“, „Ich wurde eingeladen“, „Ich habe schon ein Konto“; Hinweise (keine Telemetrie, Ende-zu-Ende-Verschlüsselung, private Termine siehst nur du, verschlüsselt zwischen deinen Geräten abgeglichen, #143); unten „Sprache“ mit „Gerätesprache“, „Deutsch“, „English“; kein eigener Sprach- oder Server-Schritt | | A-01-G1; Windows: Foto oder n/a bis zum Ausschalten (Abschnitt 2) | |
 | A-02 | G1 | „English“ antippen, danach „Deutsch“ | Texte wechseln sofort in die gewählte Sprache, ohne Neustart; danach Deutsch | | A-02a-G1, A-02b-G1 | |
 | A-03 | G1 | „Neue Familie gründen“, Anbieter nicht ändern | „Konto erstellen“, „Schritt 1 von 3“; „Bei matrix.org legst du dein Konto auf der Seite des Anbieters an. …“, Feld „Wie heißt du?“, „Konto bei matrix.org erstellen“ (**nicht antippen**); „Dein Konto liegt bei matrix.org.“ | | A-03-G1 | |
 | A-04 | G1 | „Erweitert“ → „Anderen Anbieter verwenden“ → „Adresse des Anbieters“: `nicht-vorhanden.invalid` | Fehlermeldung, z. B. „nicht-vorhanden.invalid ist gerade nicht erreichbar. Prüfe deine Internetverbindung.“; „Konto erstellen“ nicht nutzbar | | A-04-G1 | |
@@ -710,5 +710,6 @@ Regel: Änderungen an Schritten, erwarteten Ergebnissen oder Reihenfolge erhöhe
 | 1.34 | 06.11.2026 | Basis `d0637a8` + #297 | B-25 und Anhang B: iPad in den Hinweisen zum Schließen der Anbieterseite (P-91, Anhang E; #297) |
 | 1.35 | 06.11.2026 | Basis `86f379c` + #309 | B-25: kein Trenner auf Heute, Einkauf und Familie (P-92, Anhang E; #309, E-92) |
 | 1.36 | 07.11.2026 | Basis `7f15e8b` + #296 | B-19: Abschnitt 6 der Datenschutzerklärung nennt Meldungen und die Zahl am App-Symbol; Store-Fassung angeglichen (P-93, Anhang E; E-88, #296) |
+| 1.37 | 07.11.2026 | Basis `main` + #316 | A-01: Startbild und Ladeanzeige beim Kaltstart (E-94, #316) |
 
 **Zuordnung Issues zur Planversion:** #23 bis #27 (Lauf 1) beziehen sich auf v1.0 (`4abf400`), #28 bis #30 (Lauf 2) auf v1.2 (`d6cecbf`), #31 bis #40 (Lauf 3, Linux/Android) auf v1.0 (`4abf400`); die Plantexte dazu stehen seit v1.1, v1.3 bzw. v1.4 im Plan. Seit v1.5 beschreibt der Plan das Verhalten nach den Fixes aus PR #41 (#23 bereits durch PR #22). #75 bis #78 (Lauf mit Build 19) beziehen sich auf v1.6 (`f4c358c`); #43 bis #46 und #56 bis #69 beziehen sich auf v1.5 (`bb7f347` bzw. `423a3db`); seit v1.6 beschreibt der Plan das Verhalten nach den Fixes vom 28.10.2026.
