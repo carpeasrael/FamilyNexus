@@ -1,0 +1,643 @@
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.3 available)
+  archive 4.5.2 (4.6.0 available)
+  code_assets 1.2.1 (2.2.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  dev_build 1.1.15 (1.2.1+1 available)
+  file_picker 13.1.0 (13.3.2 available)
+  file_picker_darwin 2.3.2 (2.4.2 available)
+  file_picker_linux 2.0.2 (2.0.3 available)
+  flutter_local_notifications 22.3.2 (22.3.3 available)
+  jni 1.1.0 (1.1.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  matrix 14.2.0 (16.0.1 available)
+  native_toolchain_c 0.19.2 (0.19.6 available)
+  objective_c 9.5.0 (9.6.3 available)
+  petitparser 7.0.2 (7.1.0 available)
+  posix 6.5.2 (6.5.4 available)
+  process_run 1.4.1 (1.4.2 available)
+  qr 4.0.0 (4.0.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common 2.5.14 (2.5.15 available)
+  sqflite_common_ffi 2.4.4 (2.4.5 available)
+  sqlite3 3.8.0 (3.9.0 available)
+  synchronized 3.5.0 (3.6.1 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.4 available)
+  web 1.1.1 (1.1.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+28 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+The following plugins do not support Swift Package Manager for macos:
+  - sqflite_sqlcipher
+This will become an error in a future version of Flutter. Please contact the plugin maintainers to request Swift Package Manager adoption.
+Running pod install...                                             495ms
+Building macOS application...                                   
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:109187:31: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+ 109187 | void sqlcipher_init_memmethods() {
+        |                               ^
+        |                                void
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:109206:27: warning: implicit conversion loses integer precision: 'sqlite_uint64' (aka 'unsigned long long') to 'int' [-Wshorten-64-to-32]
+ 109206 |   xoshiro_randomness(ptr, sz);
+        |   ~~~~~~~~~~~~~~~~~~      ^~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:109218:24: warning: implicit conversion loses integer precision: 'sqlite_uint64' (aka 'unsigned long long') to 'int' [-Wshorten-64-to-32]
+ 109218 |   ptr = sqlite3_malloc(sz);
+        |         ~~~~~~~~~~~~~~ ^~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:109253:42: warning: implicit conversion loses integer precision: 'sqlite3_uint64' (aka 'unsigned long long') to 'u32' (aka 'unsigned int') [-Wshorten-64-to-32]
+ 109253 |         split->size = block->size - size - sizeof(private_block);
+        |                     ~ ~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:109262:23: warning: implicit conversion loses integer precision: 'sqlite3_uint64' (aka 'unsigned long long') to 'u32' (aka 'unsigned int') [-Wshorten-64-to-32]
+ 109262 |         block->size = size;
+        |                     ~ ^~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:109407:43: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+ 109407 | sqlcipher_provider* sqlcipher_get_provider() {
+        |                                           ^
+        |                                            void
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:112020:27: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 112020 |   int saved_nChange = db->nChange;      /* Saved value of db->nChange */
+        |       ~~~~~~~~~~~~~   ~~~~^~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:112021:32: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 112021 |   int saved_nTotalChange = db->nTotalChange; /* Saved value of db->nTotalChange */
+        |       ~~~~~~~~~~~~~~~~~~   ~~~~^~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:126835:18: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 126835 |   pParse->nTab = MAX(pParse->nTab, iTab);
+        |                  ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:133267:15: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 133267 |   int nCopy = MIN(ArraySize(aVal), pIdx->nKeyCol);
+        |               ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:133533:20: warning: implicit conversion loses integer precision: 'sqlite3_int64' (aka 'long long') to 'u32' (aka 'unsigned int') [-Wshorten-64-to-32]
+ 133533 |     pSrc->nAlloc = nAlloc;
+        |                  ~ ^~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:136702:24: warning: implicit conversion loses integer precision: 'sqlite3_int64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 136702 |     sqlite3_randomness(n, p);
+        |     ~~~~~~~~~~~~~~~~~~ ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:136703:44: warning: implicit conversion loses integer precision: 'sqlite3_int64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 136703 |     sqlite3_result_blob(context, (char*)p, n, sqlite3_free);
+        |     ~~~~~~~~~~~~~~~~~~~                    ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:137240:31: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'u32' (aka 'unsigned int') [-Wshorten-64-to-32]
+ 137240 |         pStr->nChar = nBlob*2 + 3;
+        |                     ~ ~~~~~~~~^~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:137316:11: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 137316 |     n = z - &zIn[i];
+        |       ~ ~~^~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:137553:39: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 137553 |   sqlite3_result_blob(pCtx, pBlob, (p - pBlob), sqlite3_free);
+        |   ~~~~~~~~~~~~~~~~~~~               ~~^~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:140384:75: warning: possible misuse of comma operator here [-Wcomma]
+ 140384 |       pRaise = sqlite3Expr(db, TK_STRING, "FOREIGN KEY constraint failed"),
+        |                                                                           ^
+ 140384 |       pRaise = sqlite3Expr(db, TK_STRING, "FOREIGN KEY constraint failed"),
+        |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        |       (void)(                                                             )
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:145464:36: warning: implicit conversion loses integer precision: 'u64' (aka 'unsigned long long') to 'int' [-Wshorten-64-to-32]
+ 145464 |         sqlite3OsDlError(pVfs, nMsg-1, zErrmsg);
+        |         ~~~~~~~~~~~~~~~~       ~~~~^~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:145505:34: warning: implicit conversion loses integer precision: 'u64' (aka 'unsigned long long') to 'int' [-Wshorten-64-to-32]
+ 145505 |       sqlite3OsDlError(pVfs, nMsg-1, zErrmsg);
+        |       ~~~~~~~~~~~~~~~~       ~~~~^~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:148747:28: warning: implicit conversion loses integer precision: 'const u64' (aka 'const unsigned long long') to 'int' [-Wshorten-64-to-32]
+ 148747 |     int iCookie = pPragma->iArg;  /* Which cookie to read or write */
+        |         ~~~~~~~   ~~~~~~~~~^~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:156879:29: warning: implicit conversion loses integer precision: 'u64' (aka 'unsigned long long') to 'int' [-Wshorten-64-to-32]
+ 156879 |     int flags = pParse->db->flags;
+        |         ~~~~~   ~~~~~~~~~~~~^~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:167352:19: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 167352 |       nExtraReg = MAX(nExtraReg, pLoop->u.btree.nBtm);
+        |                   ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:167359:19: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 167359 |       nExtraReg = MAX(nExtraReg, pLoop->u.btree.nTop);
+        |                   ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:170732:43: warning: possible misuse of comma operator here [-Wcomma]
+ 170732 |              && (pX = pTerm->pExpr->pRight, ALWAYS(pX!=0))
+        |                                           ^
+ 170732 |              && (pX = pTerm->pExpr->pRight, ALWAYS(pX!=0))
+        |                  ^~~~~~~~~~~~~~~~~~~~~~~~~
+        |                  (void)(                  )
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:171415:14: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 171415 |   mxBitCol = MIN(BMS-1,pTable->nCol);
+        |              ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:172098:12: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 172098 |   nField = MIN(pRec->nField, nField);
+        |            ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:173015:25: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 173015 |       pTemplate->rRun = MIN(p->rRun, pTemplate->rRun);
+        |                         ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:173016:25: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 173016 |       pTemplate->nOut = MIN(p->nOut - 1, pTemplate->nOut);
+        |                         ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:173024:25: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 173024 |       pTemplate->rRun = MAX(p->rRun, pTemplate->rRun);
+        |                         ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:173025:25: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 173025 |       pTemplate->nOut = MAX(p->nOut + 1, pTemplate->nOut);
+        |                         ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:173369:10: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 173369 |   nCmp = MIN(nCmp, (pIdx->nColumn - nEq));
+        |          ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:176078:19: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 176078 |   aFrom[0].nRow = MIN(pParse->nQueryLoop, 48);  assert( 48==sqlite3LogEst(28) );
+        |                   ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:178457:28: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 178457 |     int nSize = (p->nTotal / p->nParam);
+        |         ~~~~~    ~~~~~~~~~~^~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:180008:12: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 180008 |     nArg = MAX(nArg, windowArgCount(pWin));
+        |            ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:181286:61: warning: implicit conversion loses integer precision: 'sqlite3_uint64' (aka 'unsigned long long') to 'int' [-Wshorten-64-to-32]
+ 181286 |     return sqlite3FaultSim(700) ? 0 : sqlite3_realloc(pOld, newSize);
+        |                                       ~~~~~~~~~~~~~~~       ^~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:184799:9: warning: code will never be executed [-Wunreachable-code]
+ 184799 |         YYMINORTYPE yylhsminor;
+        |         ^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:189305:19: warning: implicit conversion loses integer precision: 'sqlite3_int64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 189305 |     nBig = szAlloc/(3*LOOKASIDE_SMALL+sz);
+        |          ~ ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:189306:40: warning: implicit conversion loses integer precision: 'sqlite_int64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 189306 |     nSm = (szAlloc - (i64)sz*(i64)nBig)/LOOKASIDE_SMALL;
+        |         ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:189308:19: warning: implicit conversion loses integer precision: 'sqlite3_int64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 189308 |     nBig = szAlloc/(LOOKASIDE_SMALL+sz);
+        |          ~ ~~~~~~~^~~~~~~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:189309:40: warning: implicit conversion loses integer precision: 'sqlite_int64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 189309 |     nSm = (szAlloc - (i64)sz*(i64)nBig)/LOOKASIDE_SMALL;
+        |         ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:189313:19: warning: implicit conversion loses integer precision: 'sqlite3_int64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 189313 |     nBig = szAlloc/sz;
+        |          ~ ~~~~~~~^~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:196118:14: warning: implicit conversion loses integer precision: 'sqlite3_int64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 196118 |     *pnStr = nStr;
+        |            ~ ^~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:205220:56: warning: implicit conversion loses integer precision: 'sqlite3_int64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 205220 |       rc = pTab->pMod->xOpen(pTab->pTok, pCsr->zInput, nByte, &pCsr->pCsr);
+        |            ~~~~                                        ^~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:206588:11: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 206588 |   nRead = MIN(pReader->nNode - pReader->nPopulate, FTS3_NODE_CHUNKSIZE);
+        |           ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:206737:27: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 206737 |     pReader->nTermAlloc = nNew;
+        |                         ~ ^~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:207664:22: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 207664 |     pWriter->nSize = nReq;
+        |                    ~ ^~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:207998:24: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 207998 |     int nNew = nList*2 + FTS3_NODE_PADDING;
+        |         ~~~~   ~~~~~~~~^~~~~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:209527:14: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 209527 |   int nCmp = MIN(nLhs, nRhs);
+        |              ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:209675:11: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 209675 |           MAX(nRoot, p->nNodeSize)+FTS3_NODE_PADDING, &rc
+        |           ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:209705:19: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 209705 |                   MAX(nBlock, p->nNodeSize)+FTS3_NODE_PADDING, &rc
+        |                   ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:210283:37: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 210283 |     sqlite3_bind_int(pFindLevel, 1, MAX(2, nMin));
+        |                                     ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:210312:16: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 210312 |         nSeg = MIN(MAX(nMin,nSeg), nHintSeg);
+        |                ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:210312:20: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 210312 |         nSeg = MIN(MAX(nMin,nSeg), nHintSeg);
+        |                    ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:211310:41: warning: implicit conversion loses integer precision: 'long' to 'u32' (aka 'unsigned int') [-Wshorten-64-to-32]
+ 211310 |     pRet->aMI[0] = (u8*)(&pRet->aMI[1]) - (u8*)pRet;
+        |                  ~ ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:211561:25: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 211561 |         iEnd = pPhrase->iHead;
+        |              ~ ~~~~~~~~~^~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:211791:20: warning: implicit conversion loses integer precision: 'sqlite3_int64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 211791 |     pStr->nAlloc = nAlloc;
+        |                  ~ ^~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:212868:29: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 212868 |           iMinPos = pT->iPos-pT->iOff;
+        |                   ~ ~~~~~~~~^~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:214594:28: warning: implicit conversion loses integer precision: 'u64' (aka 'unsigned long long') to 'int' [-Wshorten-64-to-32]
+ 214594 |         pParse->nJson = p->nUsed;
+        |                       ~ ~~~^~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:215828:20: warning: implicit conversion loses integer precision: 'u64' (aka 'unsigned long long') to 'int' [-Wshorten-64-to-32]
+ 215828 |   px.nJson = pStr->nUsed;
+        |            ~ ~~~~~~^~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:216372:43: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'u32' (aka 'unsigned int') [-Wshorten-64-to-32]
+ 216372 |       jsonBlobExpand(pParse, pParse->nBlob+d);
+        |       ~~~~~~~~~~~~~~         ~~~~~~~~~~~~~^~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:218904:19: warning: implicit conversion loses integer precision: 'u64' (aka 'unsigned long long') to 'u32' (aka 'unsigned int') [-Wshorten-64-to-32]
+ 218904 |   u32 n = p->path.nUsed;
+        |       ~   ~~~~~~~~^~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:221514:26: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 221514 |       p1->aCoord[ii].f = MIN(p1->aCoord[ii].f, p2->aCoord[ii].f);
+        |                          ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:221515:28: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 221515 |       p1->aCoord[ii+1].f = MAX(p1->aCoord[ii+1].f, p2->aCoord[ii+1].f);
+        |                            ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:221520:26: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 221520 |       p1->aCoord[ii].i = MIN(p1->aCoord[ii].i, p2->aCoord[ii].i);
+        |                          ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:221521:28: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 221521 |       p1->aCoord[ii+1].i = MAX(p1->aCoord[ii+1].i, p2->aCoord[ii+1].i);
+        |                            ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:221562:12: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 221562 |       x1 = MAX(DCOORD(p->aCoord[jj]), DCOORD(aCell[ii].aCoord[jj]));
+        |            ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:221563:12: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 221563 |       x2 = MIN(DCOORD(p->aCoord[jj+1]), DCOORD(aCell[ii].aCoord[jj+1]));
+        |            ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:222683:21: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 222683 |   pRtree->nRowEst = MAX(nRow, RTREE_MIN_ROWEST);
+        |                     ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:225578:20: warning: implicit conversion loses integer precision: 'sqlite3_int64' (aka 'long long') to 'u32' (aka 'unsigned int') [-Wshorten-64-to-32]
+ 225578 |     pBlob->iSize = nBlob;
+        |                  ~ ^~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:243437:9: warning: code will never be executed [-Wunreachable-code]
+ 243437 |         fts5YYMINORTYPE fts5yylhsminor;
+        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:245474:29: warning: implicit conversion loses integer precision: 'sqlite3_int64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 245474 |           pConfig->t.nArg = nArg;
+        |                           ~ ^~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:246517:23: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 246517 |       pToken->n = (z2 - z);
+        |                 ~  ~~~^~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:246529:23: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 246529 |       pToken->n = (z2 - z);
+        |                 ~  ~~~^~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:248558:18: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 248558 |     p->iHeight = MAX(p->iHeight, p->apChild[ii]->iHeight + 1);
+        |                  ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:249968:18: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 249968 |       int nMin = MIN(p1->nKey, p2->nKey);
+        |                  ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:250922:10: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 250922 |   nCmp = MIN(pLeft->n, pRight->n);
+        |          ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:251304:27: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 251304 |             nOriginCntr = MAX(nOriginCntr, pSeg->iOrigin2);
+        |                           ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:251989:18: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 251989 |       int iEod = MIN(pIter->iEndofDoclist, pIter->pLeaf->szLeaf);
+        |                  ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:251986:23: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 251986 |     int iOff = pIter->iLeafOffset;  /* Offset to read at */
+        |         ~~~~   ~~~~~~~^~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:252060:28: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 252060 |   pIter->iTermLeafOffset = iOff;
+        |                          ~ ^~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:252101:26: warning: implicit conversion loses integer precision: 'const i64' (aka 'const long long') to 'int' [-Wshorten-64-to-32]
+ 252101 |       pNew->nTombstone = nTomb;
+        |                        ~ ^~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:252171:18: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 252171 |   int i = pIter->iLeafOffset;
+        |       ~   ~~~~~~~^~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:252211:50: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 252211 |     pIter->aRowidOffset[iRowidOffset++] = pIter->iLeafOffset;
+        |                                         ~ ~~~~~~~^~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:252304:19: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 252304 |     iOff = pIter->iLeafOffset;
+        |          ~ ~~~~~~~^~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:252333:17: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 252333 |   iOff = pIter->iLeafOffset;
+        |        ~ ~~~~~~~^~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:252414:29: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 252414 |   iOff = pIter->iLeafOffset + pIter->nPos;
+        |        ~ ~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:252687:19: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 252687 |       nCmp = (u32)MIN(nNew, nTerm-nMatch);
+        |                   ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:252755:35: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 252755 |   pIter->iTermLeafOffset = pIter->iLeafOffset;
+        |                          ~ ~~~~~~~^~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:253562:18: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 253562 |     pNew->nSeg = nSlot;
+        |                ~ ^~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:253692:16: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 253692 |   int nChunk = MIN(nRem, pSeg->pLeaf->szLeaf - pSeg->iLeafOffset);
+        |                ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:253717:16: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 253717 |       nChunk = MIN(nRem, pData->szLeaf - 4);
+        |                ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:253692:46: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 253692 |   int nChunk = MIN(nRem, pSeg->pLeaf->szLeaf - pSeg->iLeafOffset);
+        |       ~~~~~~             ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |                                   ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:253814:32: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 253814 |           pIter->base.nData = p-aCopy;
+        |                             ~ ~^~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:253934:30: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 253934 |     pIter->base.nData = aOut - pIter->poslist.p;
+        |                       ~ ~~~~~^~~~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:254061:14: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 254061 |       nSeg = MIN(pStruct->aLevel[iLevel].nSeg, nSegment);
+        |              ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:254567:14: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 254567 |   int nMin = MIN(pPage->term.n, nTerm);
+        |              ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:255042:38: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 255042 |         int nPercent = (nTomb * 100) / nEntry;
+        |             ~~~~~~~~   ~~~~~~~~~~~~~~^~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:255519:17: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 255519 |       nPrefix = MIN(nPrefix, nPrefix2);
+        |                 ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:255425:36: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 255425 |       iNextOff = pSeg->iLeafOffset + pSeg->nPos;
+        |                ~ ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:255960:20: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 255960 |     pNew->nLevel = MIN(pStruct->nLevel+1, FTS5_MAX_LEVEL);
+        |                    ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:256625:18: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 256625 |         int n1 = MIN(nHalf, pT->nMap-i1);
+        |                  ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:256626:18: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 256626 |         int n2 = MIN(nHalf, pT->nMap-i1-n1);
+        |                  ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:256625:22: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 256625 |         int n1 = MIN(nHalf, pT->nMap-i1);
+        |             ~~       ^~~~~
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |                               ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:256626:22: warning: implicit conversion loses integer precision: 'i64' (aka 'long long') to 'int' [-Wshorten-64-to-32]
+ 256626 |         int n2 = MIN(nHalf, pT->nMap-i1-n1);
+        |             ~~       ^~~~~
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |                               ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:258075:22: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 258075 |   int nSlotPerPage = MAX(MINSLOT, (p->pConfig->pgsz - 8) / szKey);
+        |                      ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:258105:13: warning: ambiguous expansion of macro 'MAX' [-Wambiguous-macro]
+ 258105 |     nSlot = MAX(nElem*4, MINSLOT);
+        |             ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  218 | #define MAX(a, b) (((a)>(b))?(a):(b))
+      |         ^
+ 15290 | # define MAX(A,B) ((A)>(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:258612:53: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 258612 |         res = fts5Memcmp(&pLeaf->p[iOff], zIdxTerm, MIN(nTerm, nIdxTerm));
+        |                                                     ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:260495:40: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 260495 |       pSorter->aIdx[i] = &aBlob[nBlob] - a;
+        |                        ~ ~~~~~~~~~~~~~~^~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:265479:19: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 265479 |         is = zCsr - (unsigned char*)pText;
+        |            ~ ~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:265486:21: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 265486 |           is = zCsr - (unsigned char*)pText;
+        |              ~ ~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:265536:17: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 265536 |       ie = zCsr - (unsigned char*)pText;
+        |          ~ ~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:265540:37: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 265540 |     rc = xToken(pCtx, 0, aFold, zOut-aFold, is, ie);
+        |          ~~~~~~                 ~~~~^~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:266367:24: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 266367 |       aStart[ii] = zIn - (const unsigned char*)pText;
+        |                  ~ ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:266389:19: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 266389 |       iNext = zIn - (const unsigned char*)pText;
+        |             ~ ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:266399:36: warning: implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]
+ 266399 |     rc = xToken(pCtx, 0, aBuf, zOut-aBuf, aStart[0], iNext);
+        |          ~~~~~~                ~~~~^~~~~
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:268053:18: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 268053 |       int nCmp = MIN(nTerm, pCsr->nLeTerm);
+        |                  ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:268127:20: warning: ambiguous expansion of macro 'MIN' [-Wambiguous-macro]
+ 268127 |         int nCmp = MIN(nTerm, pCsr->nLeTerm);
+        |                    ^
+In module 'Darwin' imported from /tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/3362d457-81f2-4222-9b7e-54a8f9b84bff/scratchpad/wt/macos/Pods/SQLCipher/sqlite3.c:27314:
+  215 | #define MIN(a, b) (((a)<(b))?(a):(b))
+      |         ^
+ 15287 | # define MIN(A,B) ((A)<(B)?(A):(B))
+       |          ^
+193 warnings generated.
+/Users/carpeasrael/.pub-cache/hosted/pub.dev/sqflite_sqlcipher-3.4.1/macos/Classes/SqfliteSqlCipherPlugin.m:655:15: warning: treating Unicode character as whitespace [-Wunicode-whitespace]
+  655 |         } else {
+      |               ^
+1 warning generated.
+warning: Run script build phase 'Run Script' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase. (in target 'Flutter Assemble' from project 'Runner')
+✓ Built build/macos/Build/Products/Debug/FamilyNexus.app

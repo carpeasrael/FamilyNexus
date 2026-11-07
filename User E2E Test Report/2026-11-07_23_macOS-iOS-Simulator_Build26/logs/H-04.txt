@@ -1,0 +1,21 @@
+familynexus_app.db | Testfamilie 1107b: 0
+familynexus_app.db | Test geteilt 2: 0
+familynexus_app.db | Hallo von Nutzer 1: 0
+familynexus_app.db | Nur fuer dich: 0
+familynexus_app.db | Nur für dich: 0
+familynexus_app.db | Test N1: 0
+familynexus_app.db | Test Nutzer 2: 0
+familynexus_app.db | Zitat-Test: 0
+familynexus_app.db | fnt-1107b: 0
+familynexus_matrix.db | Testfamilie 1107b: 0
+familynexus_matrix.db | Test geteilt 2: 0
+familynexus_matrix.db | Hallo von Nutzer 1: 0
+familynexus_matrix.db | Nur fuer dich: 0
+familynexus_matrix.db | Nur für dich: 0
+familynexus_matrix.db | Test N1: 0
+familynexus_matrix.db | Test Nutzer 2: 0
+familynexus_matrix.db | Zitat-Test: 0
+familynexus_matrix.db | fnt-1107b: 0
+rekursiv Container-Treffer (Dateien):
+       0
+       0

@@ -1,0 +1,5 @@
+Testfamilie 1107b: 1
+Test geteilt 2: 1
+Hallo von Nutzer 1: 0
+Test N1: 1
+Test Nutzer 2: 0

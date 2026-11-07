@@ -1,0 +1,14 @@
+== (a) TLS
+subject=/CN=matrix-synapse-3ues.srv1348446.hstgr.cloud
+issuer=/C=US/O=Let's Encrypt/CN=YR1
+New, TLSv1/SSLv3, Cipher is AEAD-CHACHA20-POLY1305-SHA256
+    Protocol  : TLSv1.3
+    Verify return code: 0 (ok)
+== (b) Verbindungen der App
+pid 82174
+   1 TCP 127.0.0.1:54808 (LISTEN)
+   1 TCP 192.172.10.137:54845->76.13.153.15:443 (ESTABLISHED)
+== DNS Anbieter
+76.13.153.15
+matrix-synapse-3ues.srv1348446.hstgr.cloud has address 76.13.153.15
+matrix-synapse-3ues.srv1348446.hstgr.cloud has IPv6 address 2a02:4780:79:7cd0::1
