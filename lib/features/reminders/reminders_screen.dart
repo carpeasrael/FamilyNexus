@@ -43,7 +43,7 @@ class RemindersScreen extends StatelessWidget {
               Builder(builder: (context) {
                 final hint = reminderPermissionHint(l, reminders, perm);
                 return SectionCard(
-                  title: l.remindersTitle,
+                  title: l.remindersPermissionTitle,
                   trailing: TextButton(onPressed: hint.onPressed, child: Text(hint.action)),
                   child: Text(hint.text),
                 );

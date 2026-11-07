@@ -494,6 +494,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get remindersTitle => 'Erinnerungen';
 
   @override
+  String get remindersPermissionTitle => 'Berechtigung fehlt';
+
+  @override
   String get remindersHint =>
       'Erinnerungen sind lokale Benachrichtigungen dieses Geräts. Sie zeigen nie Titel oder Ort.';
 
