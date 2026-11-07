@@ -47,8 +47,10 @@ void main() {
     final dir = await Directory.systemTemp.createTemp('fn_dbus');
     final server = DBusServer();
     final address = await server.listenAddress(DBusAddress.unix(dir: dir));
-    final listener = DBusClient(address);
-    final sender = DBusClient(address);
+    // dbus 0.8.0 kennt die EXTERNAL-Anmeldung nur unter Linux und Windows und wirft sonst (macOS: Test hängt, #322).
+    // Der Testserver prüft die uid nicht; eine feste uid macht den Test plattformunabhängig. Je Client eine eigene Instanz.
+    final listener = DBusClient(address, authClient: DBusAuthClient(uid: '1000'));
+    final sender = DBusClient(address, authClient: DBusAuthClient(uid: '1000'));
     addTearDown(() async {
       await listener.close();
       await server.close();
