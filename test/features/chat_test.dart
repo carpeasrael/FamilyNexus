@@ -198,6 +198,30 @@ void main() {
     expect(find.text('${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}'), findsNothing);
   });
 
+  testWidgets('#332: Screenreader-Label eigener Nachricht „Nachricht von dir“, nie „von Du“; Bens bleibt „von Ben“', (tester) async {
+    final semantics = tester.ensureSemantics();
+    final app = await buildTestApp();
+    final ben = await _joinBen(app);
+    await app.gateway.sendMessage('Hallo eigene');
+    await ben.sendMessage('Hallo von Ben');
+    await _openChat(tester, app);
+    // Das Label steht im Semantics-Baum zusammengeführt mit Text und Uhrzeit, daher Anfang statt exakter Text.
+    expect(find.bySemanticsLabel(RegExp('^Nachricht von dir')), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('^Nachricht von Du')), findsNothing);
+    expect(find.bySemanticsLabel(RegExp('^Nachricht von Ben')), findsOneWidget);
+    semantics.dispose();
+  });
+
+  testWidgets('#332: Screenreader-Label eigener Nachricht auf Englisch „Message from you“', (tester) async {
+    final semantics = tester.ensureSemantics();
+    final app = await buildTestApp(lang: 'en');
+    await app.gateway.sendMessage('Hello own');
+    await _openChatEn(tester, app, use24h: true);
+    expect(find.bySemanticsLabel(RegExp('^Message from you')), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('^Message from You')), findsNothing);
+    semantics.dispose();
+  });
+
   testWidgets('Nachricht von Ben wird mit Absendernamen angezeigt', (tester) async {
     final app = await buildTestApp();
     final ben = await _joinBen(app);

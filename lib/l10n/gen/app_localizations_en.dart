@@ -337,6 +337,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get chatMessageFromYou => 'Message from you';
+
+  @override
   String get chatToday => 'Today';
 
   @override

@@ -698,6 +698,12 @@ abstract class AppLocalizations {
   /// **'Nachricht von {name}'**
   String chatMessageFrom(String name);
 
+  /// No description provided for @chatMessageFromYou.
+  ///
+  /// In de, this message translates to:
+  /// **'Nachricht von dir'**
+  String get chatMessageFromYou;
+
   /// No description provided for @chatToday.
   ///
   /// In de, this message translates to:
