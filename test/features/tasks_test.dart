@@ -356,6 +356,43 @@ void main() {
     anna.services.closeCalendar(); // nie im Widget-Baum: Zeitgeber selbst beenden
   });
 
+  testWidgets('#329: eigene Liste zeigt „Zugewiesen an dich“ (Liste und Detail), nie „an Du“', (tester) async {
+    _tall(tester);
+    final app = await buildTestApp(clock: () => DateTime.utc(2026, 10, 24, 8));
+    await _open(tester, app);
+    await app.services.tasks!.create(
+      title: 'Haushalt',
+      assignee: app.gateway.userId!,
+      rule: const TaskRule.weekdays(),
+      items: <String>['Spülen'],
+    );
+    await _openTasks(tester);
+    expect(find.textContaining('Zugewiesen an dich'), findsOneWidget);
+    expect(find.textContaining('Zugewiesen an Du'), findsNothing);
+    await tester.tap(find.text('Haushalt'));
+    await tester.pumpAndSettle();
+    expect(find.text('Zugewiesen an dich'), findsOneWidget);
+    expect(find.text('Zugewiesen an Du'), findsNothing);
+  });
+
+  testWidgets('#329: eigene Liste auf Englisch: „Assigned to you“', (tester) async {
+    _tall(tester);
+    final app = await buildTestApp(lang: 'en', clock: () => DateTime.utc(2026, 10, 24, 8));
+    await _open(tester, app);
+    await app.services.tasks!.create(
+      title: 'Chores',
+      assignee: app.gateway.userId!,
+      rule: const TaskRule.weekdays(),
+      items: <String>['Dishes'],
+    );
+    await tester.tap(find.byTooltip('Open menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Tasks'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Assigned to you'), findsOneWidget);
+    expect(find.textContaining('Assigned to You'), findsNothing);
+  });
+
   testWidgets('#98: Liste für ein nicht mehr vorhandenes Mitglied zeigt „Ehemaliges Mitglied“, nie die Matrix-ID', (tester) async {
     _tall(tester);
     final app = await buildTestApp(clock: () => DateTime.utc(2026, 10, 24, 8));

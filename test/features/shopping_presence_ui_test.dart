@@ -89,6 +89,31 @@ void main() {
       expect(app.shoppingStore.items, isEmpty);
     });
 
+    testWidgets('#329: eigener Eintrag zeigt „zuletzt von dir“, nie „zuletzt von Du“', (tester) async {
+      _tall(tester);
+      final app = await buildTestApp();
+      await _open(tester, app);
+      await _tab(tester, 'Einkauf');
+      await tester.enterText(find.widgetWithText(TextField, 'Was wird gebraucht?'), 'Milch');
+      await tester.tap(find.byTooltip('Hinzufügen'));
+      await tester.pumpAndSettle();
+      expect(app.shoppingStore.items.values.single.by, app.gateway.userId);
+      expect(find.text('zuletzt von dir'), findsOneWidget);
+      expect(find.text('zuletzt von Du'), findsNothing);
+    });
+
+    testWidgets('#329: eigener Eintrag auf Englisch: „last changed by you“', (tester) async {
+      _tall(tester);
+      final app = await buildTestApp(lang: 'en');
+      await _open(tester, app);
+      await _tab(tester, 'Shopping');
+      await tester.enterText(find.widgetWithText(TextField, 'What do you need?'), 'Milk');
+      await tester.tap(find.byTooltip('Add'));
+      await tester.pumpAndSettle();
+      expect(find.text('last changed by you'), findsOneWidget);
+      expect(find.text('last changed by You'), findsNothing);
+    });
+
     testWidgets('Änderungen von Ben erscheinen und tragen seinen Namen', (tester) async {
       _tall(tester);
       final app = await buildTestApp();

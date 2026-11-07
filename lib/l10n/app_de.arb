@@ -829,6 +829,7 @@
       }
     }
   },
+  "shoppingLastByYou": "zuletzt von dir",
   "shoppingLimit": "Der Einkaufszettel ist voll (höchstens 300 Einträge). Entferne erledigte Einträge.",
   "shoppingInvalid": "Dieser Eintrag ist ungültig (leer, zu lang oder mit unzulässigen Zeichen).",
   "todayOnlineHeader": "Wer ist online",
@@ -984,6 +985,7 @@
       }
     }
   },
+  "tasksAssignedToYou": "Zugewiesen an dich",
   "tasksProgress": "{done} von {total} erledigt",
   "@tasksProgress": {
     "placeholders": {

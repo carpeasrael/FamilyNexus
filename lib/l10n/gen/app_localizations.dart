@@ -2612,6 +2612,12 @@ abstract class AppLocalizations {
   /// **'zuletzt von {name}'**
   String shoppingLastBy(String name);
 
+  /// No description provided for @shoppingLastByYou.
+  ///
+  /// In de, this message translates to:
+  /// **'zuletzt von dir'**
+  String get shoppingLastByYou;
+
   /// No description provided for @shoppingLimit.
   ///
   /// In de, this message translates to:
@@ -3019,6 +3025,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Zugewiesen an {name}'**
   String tasksAssignedTo(String name);
+
+  /// No description provided for @tasksAssignedToYou.
+  ///
+  /// In de, this message translates to:
+  /// **'Zugewiesen an dich'**
+  String get tasksAssignedToYou;
 
   /// No description provided for @tasksProgress.
   ///
