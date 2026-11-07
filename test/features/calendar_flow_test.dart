@@ -754,6 +754,21 @@ void main() {
       expect(app.scheduler.requested, 1);
     });
 
+    testWidgets('#317: Hinweis-Karte hat eigene Überschrift, „Erinnerungen“ steht auf „Heute“ nur einmal', (tester) async {
+      final app = await _app();
+      app.scheduler.current = ReminderPermission.notificationsDenied;
+      await _start(tester, app);
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      expect(find.text('Erinnerungen'), findsOneWidget);
+      expect(find.text('Berechtigung fehlt'), findsOneWidget);
+      await tester.tap(find.text('Übersicht'));
+      await tester.pumpAndSettle();
+      // Übersicht: „Erinnerungen“ nur in der AppBar, die Hinweis-Karte heißt „Berechtigung fehlt“.
+      expect(find.text('Erinnerungen'), findsOneWidget);
+      expect(find.text('Berechtigung fehlt'), findsOneWidget);
+    });
+
     testWidgets('#57: „Erlauben“ ohne Wirkung → „Einstellungen öffnen“; nach der Rückkehr verschwindet der Hinweis', (tester) async {
       final app = await _app();
       app.scheduler
