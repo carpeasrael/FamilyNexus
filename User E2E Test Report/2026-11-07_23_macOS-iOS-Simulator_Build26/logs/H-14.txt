@@ -1,0 +1,7 @@
+Link-Teile: Web-Link https://carpeasrael.github.io/FamilyNexus/join/#... Parameter hinter #: ['d', 'v'] v= ['4'] Gesamtlänge 366
+d dekodiert: Bytes 234 Kopf 726f6f6d
+kein JSON erkennbar
+Felder (Schlüssel): ['room', 'via', 'srv', 'inv', 'exp', 'by', 'n'] Länge 234
+n Länge 32 hex32: True
+exp numerisch: True 2026-11-10T09:43:48
+by gesetzt: True | Familienname im Link: False | Passwort/Token/Gerät: False

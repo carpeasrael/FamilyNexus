@@ -1,0 +1,6 @@
+register/available:
+n1 400 M_USER_IN_USE
+n12 400 M_USER_IN_USE
+i2 400 M_USER_IN_USE
+n9 200 available:true
+login n1/n12/i2: 403 M_FORBIDDEN (F-02, F-07, E-32)

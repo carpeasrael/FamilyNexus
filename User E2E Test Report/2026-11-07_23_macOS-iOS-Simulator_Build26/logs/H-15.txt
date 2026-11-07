@@ -1,0 +1,13 @@
+Original:
+ed43d75d4e2dada0…
+6eea49061173aef0…
+Gespeichert (Simulator):
+ed43d75d4e2dada0…
+6eea49061173aef0…
+ 
+40 FN-ANHANG.txt
+36 a_b_c_d_e_f_g.txt
+614 testbild.png
+41 testdatei.txt
+FN-ANHANG identisch
+Sonderzeichen-Datei identisch

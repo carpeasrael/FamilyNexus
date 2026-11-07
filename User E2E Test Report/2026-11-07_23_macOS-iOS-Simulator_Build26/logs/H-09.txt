@@ -1,0 +1,8 @@
+s_pw: 0
+s_KN1: 0
+s_KN1b: 0
+s_KN1c: 0
+token: 0
+770:Außerdem gespeichert, aber aus Sicherheitsgründen nicht angezeigt: Zugangstoken der Sitzung, Geräteschlüssel und Schlüssel der verschlüsselten Gespräche.
+772:Nie gespeichert, nur im Arbeitsspeicher: Online-Status der Familienmitglieder.
+773:Geplante Erinnerungen liegen zusätzlich beim Betriebssystem.

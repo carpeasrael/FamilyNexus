@@ -1,0 +1,26 @@
+login 200
+rooms 3
+!Cuinx… joined= 2 events= {'m.room.encrypted': 11, 'm.room.member': 3, 'm.room.encryption': 1, 'm.room.history_visibility': 1, 'm.room.guest_access': 1, 'm.room.join_rules': 1, 'm.room.power_levels': 1, 'm.room.create': 1} state= {'enc': 'm.megolm.v1.aes-sha2', 'hist': 'shared', 'join': 'invite'} statetypes {'m.room.encryption': 1, 'm.room.guest_access': 1, 'm.room.history_visibility': 1, 'm.room.join_rules': 1, 'm.room.power_levels': 1, 'm.room.member': 2, 'm.room.create': 1}
+  encrypted ok: True n= 11 body-field-in-encrypted: False
+!GBBXI… joined= 2 events= {'m.room.power_levels': 1, 'm.room.encrypted': 41, 'm.room.member': 7, 'm.room.name': 1} state= {'name': 'Testfamilie 1107b neu', 'enc': 'm.megolm.v1.aes-sha2', 'hist': 'shared', 'join': 'knock'} statetypes {'m.room.create': 1, 'm.room.member': 3, 'm.room.name': 1, 'm.room.encryption': 1, 'm.room.guest_access': 1, 'm.room.history_visibility': 1, 'm.room.join_rules': 1, 'm.room.power_levels': 1}
+  encrypted ok: True n= 41 body-field-in-encrypted: False
+!QHXEp… joined= 1 events= {'m.room.encrypted': 9, 'm.room.name': 1, 'm.room.history_visibility': 1, 'm.room.encryption': 1, 'm.room.guest_access': 1, 'm.room.join_rules': 1, 'm.room.power_levels': 1, 'm.room.member': 1, 'm.room.create': 1} state= {'enc': 'm.megolm.v1.aes-sha2', 'hist': 'shared', 'join': 'invite', 'name': 'FamilyNexus'} statetypes {'m.room.member': 1, 'm.room.create': 1, 'm.room.encryption': 1, 'm.room.guest_access': 1, 'm.room.history_visibility': 1, 'm.room.join_rules': 1, 'm.room.name': 1, 'm.room.power_levels': 1}
+  encrypted ok: True n= 9 body-field-in-encrypted: False
+TOTAL {'m.room.encrypted': 61, 'm.room.member': 11, 'm.room.encryption': 2, 'm.room.history_visibility': 2, 'm.room.guest_access': 2, 'm.room.join_rules': 2, 'm.room.power_levels': 3, 'm.room.create': 2, 'm.room.name': 2}
+  term 'Hallo von Nutzer 1' 0
+  term 'Nur fuer dich' 0
+  term 'Nur für dich' 0
+  term 'FN-ANHANG' 0
+  term 'Test geteilt 2' 0
+  term 'Test privat' 0
+  term 'Test Nutzer 2' 11
+  term 'Zitat-Test' 0
+  term 'Melde-Test' 0
+  term 'Milch' 0
+  term 'Bad putzen' 0
+  term 'testdatei' 0
+  term 'Testfamilie 1107b' 3
+m.room.message count: 0 m.reaction: 0
+devices: ['FamilyNexus macOS', 'Testwerkzeug']
+logout 200
+flows ok 200

@@ -1,0 +1,8 @@
+== familynexus_app.db
+00000000: 2e3d 92b0 5f77 2c54 6d60 62c4 3b7f 0174  .=.._w,Tm`b.;..t
+familynexus_app.db: data
+Error: in prepare, file is not a database (26)
+== familynexus_matrix.db
+00000000: ee0f 9195 e2ae 87d5 dffb 2b88 9347 239a  ..........+..G#.
+familynexus_matrix.db: data
+Error: in prepare, file is not a database (26)

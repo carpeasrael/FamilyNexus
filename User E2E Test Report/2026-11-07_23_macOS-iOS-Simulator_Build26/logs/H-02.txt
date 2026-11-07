@@ -1,0 +1,3 @@
+total 1352
+-rw-r--r--@ 1 carpeasrael  staff   81920 Nov  7 10:28 familynexus_app.db
+-rw-r--r--@ 1 carpeasrael  staff  589824 Nov  7 10:35 familynexus_matrix.db
