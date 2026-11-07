@@ -1,0 +1,6 @@
+N1 Anmeldung nach Loeschen:
+{"errcode":"M_FORBIDDEN","error":"Invalid username or password"}
+N2 deactivate:
+{"id_server_unbind_result":"success"}
+N2 Anmeldung nach Loeschen:
+{"errcode":"M_FORBIDDEN","error":"Invalid username or password"}

@@ -1,0 +1,16 @@
+Info.plist iPhone-Sim:
+1.2.2
+26
+pubspec:
+version: 1.2.2+26
+pubspec.lock sqlite3:
+    version: "3.8.0"
+git:
+c9c300d
+iPhone 17 Sim iOS:
+-- iOS 26.4 --
+
+macOS e2e app:
+1.2.2
+26
+de.inneso.familynexus.e2e

@@ -1,0 +1,38 @@
+ID	Plattform	Issue	Ergebnis	Beleg	Bemerkung
+V-01..V-06	Mac	-	bestanden	-	Bedienungshilfen und Bildschirmaufnahme vorhanden (cliclick, screencapture); Simulator-App heisst auf diesem Mac 'Device Hub'; V-06 Fokus/Schlafmodus nicht geprueft
+A-01	iPhone-Sim	#266	Simulator bestanden	logs/A-01.txt	Nur Version geprueft: 1.2.2 (26), sqlite3 3.8.0 in pubspec.lock; Build entfiel (Abweichung 1). Start zeigt Willkommen. Simulator-iOS 26.4 (nicht 27.2 wie im Plan)
+A-02	macOS	#266	fehlgeschlagen/Umgebung	logs/A-02.txt screenshots/A-02_macOS.png	e2e-App (Bundle-ID .e2e) startet, Fenster sichtbar, Version 1.2.2 (26); Schluesselbund-Dialog fordert Login-Passwort, nach Ablehnen 'Lokale Daten nicht lesbar'; Zuruecksetzen bewusst nicht geklickt; Rest macOS nicht getestet
+A-10	iPhone-Sim	#266	Simulator bestanden	screenshots/A-10_iPhone-Sim.png	Konto fnt-1107-n1 auf Testserver, Familie 'Testfamilie 1107', Heute ohne Fehler
+A-11	iPhone-Sim	#266	Simulator bestanden	screenshots/A-11_iPhone-Sim.png logs/A-11.txt	Neustart: Sitzung ohne Anmeldung, log show leer
+A-12	iPhone-Sim	#254	Simulator bestanden	screenshots/A-12a_iPhone-Sim.png A-12a_de A-12b	Dialog Nicht erlauben/Erlauben gesehen (A-12b), verweigert; danach Systemeinstellung aus und Heute-Karte 'Benachrichtigungen sind blockiert'. Hinweistext: 'Meldungen ohne Inhalt, nur solange die App laeuft. Ist die App beendet, kommt keine Meldung (es gibt keinen Push-Dienst).'. Dass der Dialog genau einmal kam, nicht gesondert belegt
+A-13	iPhone-Sim	#144	Simulator bestanden	screenshots/A-13_iPhone-Sim.png A-13en	de: 'Verdeckt die App im App-Umschalter und bei Bildschirmaufnahmen. Einzelne Screenshots lassen sich unter iOS nicht verhindern.' en: 'Hides the app in the app switcher and during screen recordings. Individual screenshots cannot be prevented on iOS.'
+A-14	iPhone-Sim	#144	Simulator bestanden	screenshots/A-14_iPhone-Sim.png	Screenshot bei Sichtschutz an zeigt normalen Inhalt
+A-15	iPhone-Sim	#144	Simulator bestanden	screenshots/A-15a_iPhone-Sim.png A-15b	an: Karte verdeckt (Marken-Flaeche), aus: Inhalt sichtbar. Zielgeraet nicht geprueft
+A-16	iPhone-Sim	#144	nicht getestet	logs/A-16.txt	Simulator-recordVideo startete (Datei 0 Byte nach 5 s abgebrochen); isCaptured im Simulator nicht belegbar
+A-20	macOS	-	nicht getestet	logs/A-02.txt	Mac-App nicht nutzbar (Schluesselbund-Passwort). Zweitkonto fnt-1107-n2 stattdessen per Registrierungs-API angelegt und als G2 ueber einen Gateway-Daemon (Flutter-Test mit dem App-Gateway, kein UI) betrieben
+A-21	iPhone-Sim	-	Simulator bestanden (Teil)	screenshots/A-21a_iPhone-Sim.png	Beitritt N2 per API-Einladung (curl invite/join), nicht per Link/Anfrage in der App; G1 zeigt N2 als Mitglied unter Familie. Einladungslink-Ablauf NICHT getestet; A-21b macOS nicht getestet
+A-22	macOS	#144	nicht getestet	logs/A-22.txt	Nur Code gelesen (hasNoScreenProtection enthaelt isMacOS), kein UI-Beleg
+A-30	iPhone-Sim	#254	Simulator bestanden	screenshots/A-30a_iPhone-Sim.png A-30b A-30c	Berechtigung aus: keine Meldung, Chat-Tab Zaehler 1, kein Abzeichen am Symbol. Zahl am Symbol blieb 0
+A-31	iPhone-Sim	#254	Simulator bestanden	screenshots/A-31_iPhone-Sim.png	Mitteilungen, Kennzeichen, Toene, Banner an (Systemeinstellung per Schalter, Dialog kam kein zweites Mal)
+A-32	iPhone-Sim	#254	Simulator bestanden (mit Abweichung)	screenshots/A-32a_iPhone-Sim.png A-32b A-32c logs/A-32_usernotifications.txt	Banner 'FamilyNexus / Neue Nachrichten' ohne Inhalt (A-32a, zweiter Anlauf mit Test 1b); Sperrbildschirm zeigt 'Neue Eintraege auf dem Einkaufszettel' ohne Inhalt (A-32b). Erster Anlauf (Test 1, Test 2, Melde-Milch): Log zeigt 2 Chat-Requests mit gleicher ID und 1 Einkaufs-Request; sichtbar blieb nur die Einkaufsmeldung (Banner nicht abgefangen, Chatmeldung in der Zentrale nicht gesehen). Gleichzeitig je eine Chat- und eine Einkaufsmeldung in der Zentrale daher NICHT belegt
+A-33	iPhone-Sim	#254	Simulator bestanden	screenshots/A-33_iPhone-Sim.png	Abzeichen 1 auf Home-Bildschirm, gleich Chat-Tab-Zaehler 1 (Log: badge 2 im ersten Anlauf)
+A-34	iPhone-Sim	#254	Simulator bestanden	screenshots/A-34a_iPhone-Sim.png A-34b	Nach Lesen Chat/Einkauf: Abzeichen weg, Log 'Removing delivered' und badge 0
+A-35	iPhone-Sim	#254	Simulator bestanden	screenshots/A-35_iPhone-Sim.png	Abhaken durch G2: keine Meldung (Log 0 'Adding notification'); Einkaufszettel 0 offen
+A-36	iPhone-Sim	#254	Simulator bestanden	screenshots/A-36_iPhone-Sim.png	Chat offen: keine Meldung, Abzeichen 0
+A-37	iPhone-Sim	#254	Simulator bestanden	screenshots/A-37_iPhone-Sim.png	Englisch: 'FamilyNexus / New messages' ohne Inhalt
+A-38	iPhone-Sim	#254	Simulator bestanden (Beobachtung)	screenshots/A-38_iPhone-Sim.png	Gesperrtes Geraet: keine Meldung waehrend der Sperre, Abzeichen stieg beim Entsperren auf 2; echter Sperrbildschirm nicht getestet
+A-39	iPhone-Sim	#254	Beobachtung (nicht als Pass)	screenshots/A-39_iPhone-Sim.png	Hintergrund (Home): 30 s lang keine Meldung; App wurde erst beim Oeffnen aktualisiert (Abzeichen 2), Verweis #273
+A-3A	iPhone-Sim	#254	Simulator bestanden	screenshots/A-3A_iPhone-Sim.png	App beendet: keine Meldung fuer Test 8, nach Start Zahl 1
+A-3B	iPhone-Sim	#254	Simulator bestanden	screenshots/A-3B_iPhone-Sim.png	Chat-Schalter aus: keine Meldung, Zahl stieg 1 auf 2; danach wieder an
+A-3C	iPhone-Sim	#266	Simulator bestanden	screenshots/A-3C_iPhone-Sim.png A-3C_relogin logs/A-3C.txt	Zahl 2, Abmelden: badge 0, Meldungen entfernt. Wiederanmeldung mit Notfallschluessel: Familie und Daten wieder da (zweimal ausgefuehrt)
+A-3D	macOS	#254	nicht getestet	-	Mac-App nicht nutzbar
+A-3E	macOS	#254	nicht getestet	-	Mac-App nicht nutzbar
+A-40	macOS	#268	bestanden (Teilbeleg)	logs/A-40.txt	Release-Build (Bundle-ID .e2e): network.client vorhanden, network.server fehlt (grep 0). Debug hat network.server und allow-jit
+A-41..A-45	macOS	#274	nicht getestet	logs/A-02.txt	Mac-App nicht nutzbar
+A-46	iPhone-Sim	#274	Simulator bestanden	screenshots/A-46a_iPhone-Sim.png A-46b A-46c A-46d	Hochformat 402 pt: einspaltig, Leiste unten, kein Trenner. Chat mit Bildschirmtastatur: Eingabefeld sichtbar, Tastatur verdeckt die untere Leiste (erwartbar). Tabs Heute, Kalender, Einkauf, Chat angesehen, Familie nur A-47c
+A-47	iPhone-Sim	#274	teilweise	screenshots/A-47_iPhone-Sim.png A-47b A-47c	Querformat (Rotate Left): einspaltig, Leiste unten, kein Zweispalter, keine Abmeldung. Entwurf bleibt beim Drehen NICHT belegt (Text kam im Feld nicht an: A-47 zeigt Platzhalter). Schriftgroesse accessibility-extra-extra-extra-large: Inhalt scrollbar, aber Woerter brechen mitten im Wort um ('Recommendati/on', A-47c) und Titel werden gross: Auffaelligkeit, zurueck auf large
+A-50	iPhone/Mac	#268	nicht getestet	-	OAuth nur matrix.org
+A-51	iPhone	#297	nicht getestet	-	OAuth nur matrix.org
+A-52	iPhone	#144,#254	nicht getestet	-	echtes Geraet, iOS 15, Push, Sperrbildschirm echt
+A-60	iPhone-Sim	-	bestanden	screenshots/A-60a_dialog_iPhone-Sim.png A-60 logs/A-60.txt	N1 in App geloescht (Dialog zeigt Anbieter-Adresse und Moderator-Warnung); N2 per Deactivate-API; Anmeldung beider scheitert mit M_FORBIDDEN
+A-61	iPhone-Sim/Mac	-	teilweise	-	Simulator-App deinstalliert; Mac-Container ~/Library/Containers/de.inneso.familynexus.e2e nicht loeschbar (Operation not permitted), blieb bestehen

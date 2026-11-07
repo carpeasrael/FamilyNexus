@@ -1,0 +1,9 @@
+macOS e2e-App (Bundle-ID de.inneso.familynexus.e2e) Start: Keychain-Dialog 'flutter_secure_storage_service' verlangt das Login-Passwort des Mac-Nutzers (nicht vorhanden, nicht erraten). Nach 'Nicht erlauben': Anzeige 'Lokale Daten nicht lesbar'. 'Lokale Daten zuruecksetzen' bewusst NICHT geklickt: der Dienstname flutter_secure_storage_service ist bei allen Flutter-Apps gleich und das Zuruecksetzen koennte Schluesselbund-Eintraege der echten FamilyNexus-Installation loeschen.
+
+Debug-Entitlements der .e2e-Variante:
+	[Key] com.apple.security.app-sandbox
+	[Key] com.apple.security.cs.allow-jit
+	[Key] com.apple.security.files.user-selected.read-write
+	[Key] com.apple.security.get-task-allow
+	[Key] com.apple.security.network.client
+	[Key] com.apple.security.network.server

@@ -1,0 +1,5 @@
+lib/features/settings/settings_screen.dart:105:                      l, secureScreenPlatform(ios: PlatformInfo.isIOS, windows: PlatformInfo.isWindows))),
+lib/features/settings/settings_screen.dart:150:/// Plattformen mit Schalter „Bildschirmschutz“ (alle außer `PlatformInfo.hasNoScreenProtection`).
+lib/features/settings/settings_screen.dart:153:/// Plattformauswahl für [secureScreenHint]; Parameter statt Abfrage, weil `Platform.isIOS` im Test false ist.
+lib/features/settings/settings_screen.dart:157:/// Hinweis zum Bildschirmschutz je Plattform (#144): Android sperrt Screenshots und verbirgt die App in der Übersicht
+lib/features/settings/settings_screen.dart:432:          if (PlatformInfo.isIOS || PlatformInfo.isMacOS)

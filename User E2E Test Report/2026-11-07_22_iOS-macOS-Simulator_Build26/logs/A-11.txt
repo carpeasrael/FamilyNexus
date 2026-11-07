@@ -1,0 +1,1 @@
+(Ausgabe leer: kein restore/out of bounds/sqlite-Treffer in 'log show --last 3m' fuer Runner; Sitzung ohne Anmeldung wiederhergestellt)
