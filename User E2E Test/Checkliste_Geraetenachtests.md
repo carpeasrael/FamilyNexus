@@ -1,28 +1,30 @@
-# Checkliste Gerätenachtests (Stand main c9c300d + Lauf 22, 07.11.2026)
+# Checkliste Gerätenachtests (Stand main d0bdfa6 + PR #319/#320, Lauf 22 und 23, 07.11.2026)
 
 **Seit dem letzten Stand erledigt:** #150 geschlossen (Entscheidung des Nutzers, Messung H-20 entfällt, E-85); #296 geschlossen (PR #312, Store-Datenschutz nennt Meldungen und Zahl am Symbol). Zum Merge ausstehend: PR #313 (Testreport Lauf 22).
+
+**Neu seit Lauf 22:** Lauf 23 (`User E2E Test Report/2026-11-07_23_macOS-iOS-Simulator_Build26/`, PR #318): vollständiger Plan auf macOS (Debug-Build, ad hoc signiert, Schlüsselbund-Abfrage vom Nutzer bestätigt) und iPhone-Simulator, 106 ✅ / 19 ⚠️ / 0 ❌ / 10 ⏳ / 12 n/a; Teilbelege stehen bei den Punkten unten („Lauf 23“). Fixes **#317** (Hinweiskarte „Berechtigung fehlt“, PR #319, E-93) und **#316** (Ladebild, iOS-Startbild als Farbfläche, Zeitlog je Startschritt, PR #320, E-94) sind auf `main`; beide Issues bleiben bis zur Abnahme am Gerät offen.
 
 **Lauf 22 (07.11.2026, iPhone-Simulator, Mac nur Teilbeleg):** Siehe `User E2E Test Report/2026-11-07_22_iOS-macOS-Simulator_Build26/Testreport.md`. Punkte mit „Sim.“ sind im iPhone-Simulator bestanden, am echten Gerät aber **nicht abgenommen**; macOS-Oberfläche war nicht benutzbar (Schlüsselbund-Abfrage des ad hoc signierten Debug-Builds), dort braucht es den signierten TestFlight-Build 26.
 
 Quelle: letzte Kommentare der offenen Issues. Jeder Punkt schließt nur dann ein Issue, wenn er bestanden ist; Ergebnis jeweils im Issue vermerken. Issues schließen sich beim Merge, nicht von Hand (bei diesen Issues ist der Code bereits gemergt, das Schließen entscheidest du nach dem Nachtest).
 
 ## Windows 11 (echte Tastatur)
-- [ ] **#263 Zeitwähler:** Termin-Editor, Beginn, Zeitwähler, Tastatur-Symbol. Klick ins Feld „Stunde“, `21` tippen, dann Minuten `30`. Erwartet: Stunde 21, Minuten 30. Zusätzlich beobachten: Klick aktiviert das Fenster direkt im Feld (Restfall).
-- [ ] **#144 Screenshot-Hinweis (Testplan B-18):** Hinweis lautet „Nimmt die App von Screenshots, Bildschirmaufnahmen und Bildschirmfreigaben aus.“. Screenshot und Aufnahme müssen leer sein. Alt-Tab beobachten und notieren (nur beobachten, nicht belegt).
+- [ ] **#263 Zeitwähler:** *(Lauf 23, macOS bestanden: `21` ersetzt den Wert, Fokus springt zu den Minuten.)* Termin-Editor, Beginn, Zeitwähler, Tastatur-Symbol. Klick ins Feld „Stunde“, `21` tippen, dann Minuten `30`. Erwartet: Stunde 21, Minuten 30. Zusätzlich beobachten: Klick aktiviert das Fenster direkt im Feld (Restfall).
+- [ ] **#144 Screenshot-Hinweis (Testplan B-18):** *(Lauf 23, iPhone-Simulator: Schalter standardmäßig an, Text richtig.)* Hinweis lautet „Nimmt die App von Screenshots, Bildschirmaufnahmen und Bildschirmfreigaben aus.“. Screenshot und Aufnahme müssen leer sein. Alt-Tab beobachten und notieren (nur beobachten, nicht belegt).
 - [ ] **#254 E-16b:** Meldungen und Zahl als Overlay-Symbol in der Taskleiste (neuer nativer Code `taskbar_badge.cpp`).
-- [ ] **#274 (Desktop-Fenster):** Fenster auf 599/600/1000 dp-Breite ziehen: Leiste ↔ Rail ↔ Zweispalter, kein Zustandsverlust, Tab-Reihenfolge Inhalt vor Rail. Ab 1000 dp kein senkrechter Strich auf Heute, Einkauf und Familie (#309).
+- [ ] **#274 (Desktop-Fenster):** *(Lauf 23, macOS: Breiten 500/800/1150 pt, Entwurf bleibt erhalten; 599/600/1000 dp offen.)* Fenster auf 599/600/1000 dp-Breite ziehen: Leiste ↔ Rail ↔ Zweispalter, kein Zustandsverlust, Tab-Reihenfolge Inhalt vor Rail. Ab 1000 dp kein senkrechter Strich auf Heute, Einkauf und Familie (#309).
 
 ## iPhone (echt)
 - [ ] **#144 (B-18):** Hinweis lautet „Verdeckt die App im App-Umschalter und bei Bildschirmaufnahmen. Einzelne Screenshots lassen sich unter iOS nicht verhindern.“. Screenshot gelingt, App-Umschalter verdeckt die App. *Lauf 22, Sim.: Hinweistext de und en richtig, Karte im App-Umschalter nur Markenfläche. Offen am echten iPhone: Bildschirmaufnahme (im Simulator nicht belegbar), App-Umschalter am Gerät.*
 - [ ] **#268 (TP-OAUTH-11):** Kontoanlage und Anmeldung in der System-Sitzung (ASWebAuthenticationSession), Captcha, Konto-löschen- und Passwort-Seite, Sichtschutz. Gegen matrix.org nur mit deiner Freigabe und eigenem Konto. *Lauf 22: nicht getestet (kein OAuth-Anbieter auf dem Testserver).*
 - [ ] **#297:** In der System-Sitzung (Captcha, Konto löschen) nennt der Hinweis zum Schließen „iPhone, iPad und Mac“ und „Abbrechen“. Braucht einen OAuth-Anbieter (Lauf 22: nicht getestet).
-- [ ] **#254 E-16b:** Meldung ohne Inhalt („Neue Nachricht“), Zahl am App-Symbol, Berechtigungsabfrage. *Lauf 22, Sim.: Berechtigung, Banner ohne Inhalt (de, en), Abzeichen, Zurücksetzen beim Lesen und Abmelden bestanden. Offen am echten iPhone: Sperrbildschirm, iOS 15, nachträgliche Freigabe „Kennzeichen“; gleichzeitig angezeigte Chat- und Einkaufsmeldung nicht belegt.*
+- [ ] **#254 E-16b:** Meldung ohne Inhalt („Neue Nachricht“), Zahl am App-Symbol, Berechtigungsabfrage. *Lauf 22/23, Sim.: Berechtigung, Banner ohne Inhalt (de, en), allgemeine Meldungen für Chat und Einkauf, keine Meldung bei geöffnetem Chat, Abzeichen, Zurücksetzen beim Lesen und Abmelden bestanden. Offen am echten iPhone: Sperrbildschirm, iOS 15, nachträgliche Freigabe „Kennzeichen“; gleichzeitig angezeigte Chat- und Einkaufsmeldung nicht belegt.*
 
 ## Mac (macOS)
 **Voraussetzung:** der signierte TestFlight-Build 26. Der Debug-Build (ad hoc signiert) fragt beim Start das Login-Passwort für den Schlüsselbund ab und ist nicht bedienbar (Lauf 22). Die Test-Bundle-ID `.e2e` ist nur für Läufe ohne Nutzerdaten gedacht; den Rest `~/Library/Containers/de.inneso.familynexus.e2e` von Hand löschen.
 
 - [ ] **#268 (TP-OAUTH-11):** Anmeldung in der System-Sitzung, Start ohne `network.server`-Berechtigung, Mac mit Chrome als Standardbrowser. *Lauf 22: Teilbeleg, der Release-Build trägt `network.client` und kein `network.server`; Anmeldung nicht getestet.*
-- [ ] **#254 E-16b:** Meldung, Zahl am Dock-Symbol, Berechtigungsabfrage. *Lauf 22: nicht getestet (App nicht bedienbar, siehe oben).*
+- [ ] **#254 E-16b:** Meldung, Zahl am Dock-Symbol, Berechtigungsabfrage. *Lauf 22: nicht getestet (App nicht bedienbar, siehe oben). Lauf 23: Debug-Build mit Bestätigung der Schlüsselbund-Abfrage bedienbar, Dock-Zahl und Berechtigung am signierten Build offen.*
 - [ ] **#274 (Desktop-Fenster):** wie bei Windows. *Lauf 22: nicht getestet.*
 - [ ] **#266 (Apple-Laufzeit):** App startet mit `sqlite3` 3.8.0, Tresor und Datenbank lesbar. *iOS-Simulator Lauf 22 bestanden; macOS offen.*
 
@@ -35,6 +37,10 @@ Quelle: letzte Kommentare der offenen Issues. Jeder Punkt schließt nur dann ein
 - [ ] **#274 (B-25):** Drehen mit und ohne Rotationssperre, Multi-Window, Bildschirmtastatur (`adjustResize`: Klasse darf beim Tippen nicht wechseln), 200 % Schrift. Ab 1000 dp kein senkrechter Strich auf Heute, Einkauf und Familie (#309).
 - [ ] **#268 (TP-OAUTH-12):** Custom Tab auf frischem AVD oder nach Deinstallation (auf dem vorhandenen AVD ist FamilyNexus mit anderem Zertifikat installiert). Außerdem Geräte mit anderem oder ohne Standardbrowser.
 - [ ] **#254 E-16b Hintergrund:** Meldungen im Hintergrund schlagen fehl, siehe **#273** (Entscheidung a/b/c nötig, bevor ein Nachtest sinnvoll ist).
+
+## Neue Fixes: Sichtkontrolle am Gerät
+- [ ] **#317 (Testplan B-02):** Bei blockierten Benachrichtigungen zeigt „Heute“ die Karte „Berechtigung fehlt“ und „Erinnerungen“ nur einmal; dasselbe in der Erinnerungs-Übersicht (AppBar „Erinnerungen“). iPhone und signierter Mac; hell, dunkel, große Schrift. Linux und Windows: keine Karte (Berechtigung gilt dort immer als erteilt). *Widget-Test und CI grün, PR #319.*
+- [ ] **#316 (Testplan A-01):** Kaltstart (App beenden, neu öffnen) hell und dunkel: erst einfarbige Fläche (`#F6F7FB` / `#0B1120`), dann „Lädt …“, nie weiß oder schwarz. Zeit bis „Heute“ notieren. Zusätzlich `flutter run --profile` am echten iPhone, Log `schritt=<name> ms=<n>` je Startschritt auswerten; bei einem dominanten Schritt Folge-Issue. *Build und Tests grün (PR #320); im Simulator ließ sich das Startbild nicht aufnehmen. macOS-Fensterfarbe bewusst verworfen (E-94).* Offen: Antwort des Melders zu „Stadtbild“ = Startbild?
 
 ## Eigener Testserver + Gerät
 - [ ] **#259 (B-21, B-22, F-01, F-06, H-08):** Konto mit Anbieter-Adresse `matrix-synapse-3ues…` (Matrix-ID-Servername `matrix.chaostribunal.de`): Einstellungen → Konto → „Server“, Speicherorte und Dialog „Konto löschen?“ zeigen die eingegebene Anbieter-Adresse. Beachten: Eine vor dem Update angemeldete Sitzung zeigt bis zur nächsten Anmeldung weiter den aufgelösten Server.
