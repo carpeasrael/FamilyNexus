@@ -1,0 +1,8 @@
+flutter build macos --release (Worktree, Bundle-ID .e2e): ✓ Built build/macos/Build/Products/Release/FamilyNexus.app (71.0MB) exit 0 
+de.inneso.familynexus.e2e
+	[Key] com.apple.security.app-sandbox
+	[Key] com.apple.security.files.user-selected.read-write
+	[Key] com.apple.security.get-task-allow
+	[Key] com.apple.security.network.client
+--- grep network.server:
+0

@@ -1,0 +1,7 @@
+ections] [de.inneso.familynexus] Removing 1 pending notification requests with identifiers 
+ections] [de.inneso.familynexus] Removing 1 delivered notifications with identifiers (
+ections] [de.inneso.familynexus] Removing all pending notification requests
+ections] [de.inneso.familynexus] Removing all delivered notifications
+ections] [de.inneso.familynexus] Removing all pending notification requests
+ections] [de.inneso.familynexus] Removing all delivered notifications
+ections] [de.inneso.familynexus] Setting badge count to 0

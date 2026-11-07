@@ -1,4 +1,6 @@
-# Checkliste Gerätenachtests (Stand main 86f379c + #309, 06.11.2026)
+# Checkliste Gerätenachtests (Stand main c9c300d, 07.11.2026)
+
+**Lauf 22 (07.11.2026, iPhone-Simulator, Mac nur Teilbeleg):** Siehe `User E2E Test Report/2026-11-07_22_iOS-macOS-Simulator_Build26/Testreport.md`. Punkte mit „Sim.“ sind im iPhone-Simulator bestanden, am echten Gerät aber **nicht abgenommen**; macOS-Oberfläche war nicht benutzbar (Schlüsselbund-Abfrage des ad hoc signierten Debug-Builds), dort braucht es den signierten TestFlight-Build 26.
 
 Quelle: letzte Kommentare der offenen Issues. Jeder Punkt schließt nur dann ein Issue, wenn er bestanden ist; Ergebnis jeweils im Issue vermerken. Issues schließen sich beim Merge, nicht von Hand (bei diesen Issues ist der Code bereits gemergt, das Schließen entscheidest du nach dem Nachtest).
 
@@ -9,13 +11,13 @@ Quelle: letzte Kommentare der offenen Issues. Jeder Punkt schließt nur dann ein
 - [ ] **#274 (Desktop-Fenster):** Fenster auf 599/600/1000 dp-Breite ziehen: Leiste ↔ Rail ↔ Zweispalter, kein Zustandsverlust, Tab-Reihenfolge Inhalt vor Rail. Ab 1000 dp kein senkrechter Strich auf Heute, Einkauf und Familie (#309).
 
 ## iPhone (echt)
-- [ ] **#144 (B-18):** Hinweis lautet „Verdeckt die App im App-Umschalter und bei Bildschirmaufnahmen. Einzelne Screenshots lassen sich unter iOS nicht verhindern.“. Screenshot gelingt, App-Umschalter verdeckt die App.
+- [ ] **#144 (B-18):** Hinweis lautet „Verdeckt die App im App-Umschalter und bei Bildschirmaufnahmen. Einzelne Screenshots lassen sich unter iOS nicht verhindern.“. Screenshot gelingt, App-Umschalter verdeckt die App. *Lauf 22, Sim.: Hinweistext de und en richtig, Karte im App-Umschalter nur Markenfläche. Offen am echten iPhone: Bildschirmaufnahme (im Simulator nicht belegbar), App-Umschalter am Gerät.*
 - [ ] **#268 (TP-OAUTH-11):** Kontoanlage und Anmeldung in der System-Sitzung (ASWebAuthenticationSession), Captcha, Konto-löschen- und Passwort-Seite, Sichtschutz. Gegen matrix.org nur mit deiner Freigabe und eigenem Konto.
-- [ ] **#254 E-16b:** Meldung ohne Inhalt („Neue Nachricht“), Zahl am App-Symbol, Berechtigungsabfrage.
+- [ ] **#254 E-16b:** Meldung ohne Inhalt („Neue Nachricht“), Zahl am App-Symbol, Berechtigungsabfrage. *Lauf 22, Sim.: Berechtigung, Banner ohne Inhalt (de, en), Abzeichen, Zurücksetzen beim Lesen und Abmelden bestanden. Offen am echten iPhone: Sperrbildschirm, iOS 15, nachträgliche Freigabe „Kennzeichen“; gleichzeitig angezeigte Chat- und Einkaufsmeldung nicht belegt.*
 
 ## Mac (macOS)
 - [ ] **#268 (TP-OAUTH-11):** Anmeldung in der System-Sitzung, Start ohne `network.server`-Berechtigung, Mac mit Chrome als Standardbrowser.
-- [ ] **#254 E-16b:** Meldung, Zahl am Dock-Symbol, Berechtigungsabfrage.
+- [ ] **#254 E-16b:** Meldung, Zahl am Dock-Symbol, Berechtigungsabfrage. *Lauf 22: nicht getestet (App nicht bedienbar, siehe oben).*
 - [ ] **#274 (Desktop-Fenster):** wie bei Windows.
 
 ## iPad (echt oder Simulator)
