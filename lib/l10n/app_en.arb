@@ -829,6 +829,7 @@
       }
     }
   },
+  "shoppingLastByYou": "last changed by you",
   "shoppingLimit": "The shopping list is full (at most 300 items). Remove done items.",
   "shoppingInvalid": "This item is invalid (empty, too long or with forbidden characters).",
   "todayOnlineHeader": "Who is online",
@@ -984,6 +985,7 @@
       }
     }
   },
+  "tasksAssignedToYou": "Assigned to you",
   "tasksProgress": "{done} of {total} done",
   "@tasksProgress": {
     "placeholders": {

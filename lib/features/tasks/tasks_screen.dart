@@ -95,6 +95,10 @@ String _time(BuildContext context, TaskList list, DateTime at) {
 
 String _nameOf(AppServices s, TasksController c, AppLocalizations l, String id) => memberLabel(l, s.gateway.family, id, me: c.me);
 
+/// „Zugewiesen an dich“ für die eigene Liste, sonst „Zugewiesen an {Name}“ (Dativ, #329).
+String _assignedLabel(AppServices s, TasksController c, AppLocalizations l, String assignee) =>
+    assignee == c.me ? l.tasksAssignedToYou : l.tasksAssignedTo(_nameOf(s, c, l, assignee));
+
 void _toast(BuildContext context, String text) {
   if (!context.mounted) return;
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
@@ -183,7 +187,7 @@ class _ListTile extends StatelessWidget {
         child: ListTile(
           title: Text(list.title),
           subtitle: Text(
-            '${l.tasksAssignedTo(_nameOf(services, controller, l, list.assignee))}\n${l.tasksProgress(done, total)}',
+            '${_assignedLabel(services, controller, l, list.assignee)}\n${l.tasksProgress(done, total)}',
             style: TextStyle(color: t.textSecondary),
           ),
           isThreeLine: true,
@@ -273,7 +277,7 @@ class TaskDetailScreen extends StatelessWidget {
           ]),
           body: SafeArea(
             child: ContentWidth(child: ListView(padding: const EdgeInsets.fromLTRB(12, 8, 12, 24), children: <Widget>[
-              Text(l.tasksAssignedTo(_nameOf(services, c, l, list.assignee)), style: Theme.of(context).textTheme.titleSmall),
+              Text(_assignedLabel(services, c, l, list.assignee), style: Theme.of(context).textTheme.titleSmall),
               Text('${_ruleLabel(l, list.rule)} · ${_resetLabel(l, list.rule)}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary)),
               if (c.nextReset(list) case final next?)

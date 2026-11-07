@@ -1528,6 +1528,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get shoppingLastByYou => 'zuletzt von dir';
+
+  @override
   String get shoppingLimit =>
       'Der Einkaufszettel ist voll (höchstens 300 Einträge). Entferne erledigte Einträge.';
 
@@ -1763,6 +1766,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String tasksAssignedTo(String name) {
     return 'Zugewiesen an $name';
   }
+
+  @override
+  String get tasksAssignedToYou => 'Zugewiesen an dich';
 
   @override
   String tasksProgress(int done, int total) {

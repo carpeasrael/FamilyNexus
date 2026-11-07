@@ -115,6 +115,7 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
         Widget tile(ShoppingItem i) => _ItemTile(
               item: i,
               by: nameOf(i.by),
+              byMe: i.by == c.me,
               onToggle: () => _run(() => c.setChecked(i.id, !i.checked)),
               onEdit: () => _edit(c, i),
               onDelete: () => _run(() => c.remove(i.id)),
@@ -323,9 +324,12 @@ class _GroupHeader extends StatelessWidget {
 }
 
 class _ItemTile extends StatelessWidget {
-  const _ItemTile({required this.item, required this.by, required this.onToggle, required this.onEdit, required this.onDelete});
+  const _ItemTile({required this.item, required this.by, required this.byMe, required this.onToggle, required this.onEdit, required this.onDelete});
   final ShoppingItem item;
   final String by;
+
+  /// Eigene Änderung: „zuletzt von dir“ (Dativ), nicht „von Du“ (#329).
+  final bool byMe;
   final VoidCallback onToggle;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
@@ -349,7 +353,7 @@ class _ItemTile extends StatelessWidget {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
               Text(item.title, style: style),
-              Text(l.shoppingLastBy(by), style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary)),
+              Text(byMe ? l.shoppingLastByYou : l.shoppingLastBy(by), style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary)),
             ]),
           ),
           if (item.quantity.isNotEmpty)
