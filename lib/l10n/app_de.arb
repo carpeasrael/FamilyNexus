@@ -146,6 +146,7 @@
   "chatReplyUnavailable": "Antwort auf eine Nachricht, die hier nicht angezeigt wird",
   "chatYou": "Du",
   "chatFormerMember": "Ehemaliges Mitglied",
+  "chatFormerMemberQuoted": "„Ehemaliges Mitglied“",
   "logout": "Abmelden",
   "logoutBody": "Termine, Einkaufszettel und Aufgaben werden von diesem Gerät entfernt. Was schon gesendet ist, bleibt verschlüsselt in deiner Familie und kommt nach der nächsten Anmeldung zurück; noch nicht gesendete Änderungen gehen verloren.",
   "settingsAccount": "Konto",

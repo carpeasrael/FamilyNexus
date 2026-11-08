@@ -752,6 +752,12 @@ abstract class AppLocalizations {
   /// **'Ehemaliges Mitglied'**
   String get chatFormerMember;
 
+  /// No description provided for @chatFormerMemberQuoted.
+  ///
+  /// In de, this message translates to:
+  /// **'„Ehemaliges Mitglied“'**
+  String get chatFormerMemberQuoted;
+
   /// No description provided for @logout.
   ///
   /// In de, this message translates to:

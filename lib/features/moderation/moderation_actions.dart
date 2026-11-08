@@ -73,7 +73,7 @@ class ModerationActions {
       action: canBlock
           ? SnackBarAction(
               label: l.reportBlockOffer,
-              onPressed: () => block(context, services, userId: message.senderId, name: message.senderLabel(l)),
+              onPressed: () => block(context, services, userId: message.senderId, name: message.senderLabel(l, inSentence: true)),
             )
           : null,
     ));

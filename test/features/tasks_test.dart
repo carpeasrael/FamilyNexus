@@ -404,7 +404,8 @@ void main() {
       items: <String>['Tonne raus'],
     );
     await _openTasks(tester);
-    expect(find.textContaining('Zugewiesen an Ehemaliges Mitglied'), findsOneWidget);
+    expect(find.textContaining('Zugewiesen an „Ehemaliges Mitglied“'), findsOneWidget, reason: '#326: im Satz in Anführungszeichen');
+    expect(find.textContaining('Zugewiesen an Ehemaliges Mitglied'), findsNothing);
     expect(find.textContaining('@geloescht'), findsNothing);
   });
 }
