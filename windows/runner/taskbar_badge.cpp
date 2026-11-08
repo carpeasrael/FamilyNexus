@@ -43,7 +43,10 @@ HICON CreateBadgeIcon(int count) {
   HGDIOBJ old_pen = SelectObject(dc, GetStockObject(NULL_PEN));
   Ellipse(dc, 0, 0, kSize + 1, kSize + 1);
 
-  HFONT font = CreateFontW(-11, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
+  // „9+“ ist zwei Zeichen breit und berührt bei 11 px den Rand des Kreises (#330): dafür kleiner. Einstellige Zahlen
+  // bleiben bei 11 px.
+  const int font_height = count > 9 ? -9 : -11;
+  HFONT font = CreateFontW(font_height, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
                            DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
                            CLIP_DEFAULT_PRECIS, NONANTIALIASED_QUALITY,
                            DEFAULT_PITCH, L"Segoe UI");
