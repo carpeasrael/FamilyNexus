@@ -93,11 +93,12 @@ String _time(BuildContext context, TaskList list, DateTime at) {
   return formatClock(context, d.hour, d.minute);
 }
 
-String _nameOf(AppServices s, TasksController c, AppLocalizations l, String id) => memberLabel(l, s.gateway.family, id, me: c.me);
+String _nameOf(AppServices s, TasksController c, AppLocalizations l, String id, {bool inSentence = false}) =>
+    memberLabel(l, s.gateway.family, id, me: c.me, inSentence: inSentence);
 
 /// „Zugewiesen an dich“ für die eigene Liste, sonst „Zugewiesen an {Name}“ (Dativ, #329).
 String _assignedLabel(AppServices s, TasksController c, AppLocalizations l, String assignee) =>
-    assignee == c.me ? l.tasksAssignedToYou : l.tasksAssignedTo(_nameOf(s, c, l, assignee));
+    assignee == c.me ? l.tasksAssignedToYou : l.tasksAssignedTo(_nameOf(s, c, l, assignee, inSentence: true));
 
 void _toast(BuildContext context, String text) {
   if (!context.mounted) return;

@@ -1,6 +1,7 @@
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/server.dart';
+import 'package:family_nexus/domain/shopping.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -136,6 +137,26 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('last changed by you'), findsOneWidget);
       expect(find.text('last changed by You'), findsNothing);
+    });
+
+    testWidgets('#326: Eintrag eines nicht mehr vorhandenen Mitglieds: „zuletzt von „Ehemaliges Mitglied““, nie die Matrix-ID', (tester) async {
+      _tall(tester);
+      final app = await buildTestApp();
+      await app.shoppingStore.put(ShoppingItem(id: 'x1', title: 'Käse', by: '@geloescht:fake.test', updatedAt: DateTime.utc(2026, 11, 1)));
+      await _open(tester, app);
+      await _tab(tester, 'Einkauf');
+      expect(find.text('Käse'), findsOneWidget);
+      expect(find.text('zuletzt von „Ehemaliges Mitglied“'), findsOneWidget);
+      expect(find.textContaining('@geloescht'), findsNothing);
+    });
+
+    testWidgets('#326: auf Englisch: last changed by “Former member”', (tester) async {
+      _tall(tester);
+      final app = await buildTestApp(lang: 'en');
+      await app.shoppingStore.put(ShoppingItem(id: 'x1', title: 'Cheese', by: '@geloescht:fake.test', updatedAt: DateTime.utc(2026, 11, 1)));
+      await _open(tester, app);
+      await _tab(tester, 'Shopping');
+      expect(find.text('last changed by “Former member”'), findsOneWidget);
     });
 
     testWidgets('Änderungen von Ben erscheinen und tragen seinen Namen', (tester) async {

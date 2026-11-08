@@ -370,6 +370,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chatFormerMember => 'Ehemaliges Mitglied';
 
   @override
+  String get chatFormerMemberQuoted => '„Ehemaliges Mitglied“';
+
+  @override
   String get logout => 'Abmelden';
 
   @override

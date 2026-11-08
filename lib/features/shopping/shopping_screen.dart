@@ -109,7 +109,8 @@ class _ShoppingScreenState extends State<ShoppingScreen> {
       builder: (context, _) {
         final open = c.open;
         final done = c.done;
-        String nameOf(String id) => memberLabel(l, services.gateway.family, id, me: c.me);
+        // Der Name steht nur in „zuletzt von {name}“, also im Satz (#326).
+        String nameOf(String id) => memberLabel(l, services.gateway.family, id, me: c.me, inSentence: true);
         final groups = c.openGroups;
         final named = groups.any((g) => g.label != null);
         Widget tile(ShoppingItem i) => _ItemTile(

@@ -364,6 +364,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatFormerMember => 'Former member';
 
   @override
+  String get chatFormerMemberQuoted => '“Former member”';
+
+  @override
   String get logout => 'Sign out';
 
   @override

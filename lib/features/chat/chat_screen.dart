@@ -244,10 +244,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
             ),
             ListTile(
               leading: const Icon(Icons.block),
-              title: Text(l.chatBlockSender(m.senderLabel(l))),
+              title: Text(l.chatBlockSender(m.senderLabel(l, inSentence: true))),
               onTap: () {
                 Navigator.pop(c);
-                ModerationActions.block(context, _services, userId: m.senderId, name: m.senderLabel(l)).ignore();
+                ModerationActions.block(context, _services, userId: m.senderId, name: m.senderLabel(l, inSentence: true)).ignore();
               },
             ),
           ],
@@ -403,7 +403,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                 child: Row(children: <Widget>[
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: <Widget>[
-                      Text(l.chatReplyingTo(_replyTo!.senderLabel(l)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(l.chatReplyingTo(_replyTo!.senderLabel(l, inSentence: true)), maxLines: 1, overflow: TextOverflow.ellipsis),
                       // Vorschau des Zitats, einzeilig (#254).
                       Text(
                         _quoteText(_replyTo!),
@@ -527,7 +527,7 @@ class _Bubble extends StatelessWidget {
           child: Semantics(
             container: true,
             // Eigene Nachricht: „von dir“ (Dativ), nicht „von Du“ (#332).
-            label: mine ? l.chatMessageFromYou : l.chatMessageFrom(m.senderLabel(l)),
+            label: mine ? l.chatMessageFromYou : l.chatMessageFrom(m.senderLabel(l, inSentence: true)),
             child: GestureDetector(
               onLongPress: onLongPress,
               child: GlassCard(

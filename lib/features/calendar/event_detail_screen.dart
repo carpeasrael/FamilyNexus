@@ -185,7 +185,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   ],
                   if (e.note.isNotEmpty) ...<Widget>[const SizedBox(height: 10), Text(e.note)],
                   const SizedBox(height: 10),
-                  Text(e.ownerId == c.me ? l.eventOwnerYou : l.eventOwner(nameOf(e.ownerId)), style: Theme.of(context).textTheme.bodySmall),
+                  Text(e.ownerId == c.me ? l.eventOwnerYou : l.eventOwner(memberLabel(l, family, e.ownerId, me: c.me, inSentence: true)), style: Theme.of(context).textTheme.bodySmall),
                   if (!mine) Padding(padding: const EdgeInsets.only(top: 4), child: Text(l.eventReadOnly, style: Theme.of(context).textTheme.bodySmall)),
                 ]),
               ),

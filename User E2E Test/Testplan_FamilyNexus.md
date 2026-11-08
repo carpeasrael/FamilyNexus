@@ -1,6 +1,6 @@
 # Testplan FamilyNexus (Gesamtplan)
 
-**Planversion: 1.39** (08.11.2026) · Dokument-ID `TP-FN-001` · Änderungen siehe „Versionshistorie“ am Ende und Anhang E. Reports und Issues nennen Planversion und Git-Commit (z. B. „TP-FN-001 v1.0 @ 4abf400“).
+**Planversion: 1.40** (08.11.2026) · Dokument-ID `TP-FN-001` · Änderungen siehe „Versionshistorie“ am Ende und Anhang E. Reports und Issues nennen Planversion und Git-Commit (z. B. „TP-FN-001 v1.0 @ 4abf400“).
 
 Ersetzt: `Testplan_Nutzeranlage.md`, `Testplan_Pruefanleitung.md`, `Testplan_Einladung_Zweiter_Nutzer.md`, `Testdaten_Stammdaten.md` (Zuordnung der alten IDs: Anhang C)
 Bezug: `Massnahmenplan_App_Store_Review.md` (Maßnahme 6), Issues #10–#14, Nachtest #15
@@ -228,7 +228,7 @@ G2 zeigt nach D-06 „Willkommen“ (N2 ist abgemeldet und wird erst in F-01 wie
 | E-29 | G1 | **Einziger Moderator:** Einstellungen → „Konto löschen“ → nur Dialog ansehen → „Abbrechen“ | „Konto löschen?“ mit „Du bist der einzige Moderator der Familie. Ernenne vorher ein anderes Mitglied zum Moderator …“ (#12); „Konto endgültig löschen“ ohne Passwort inaktiv; nach „Abbrechen“ unverändert | | E-29-G1 | |
 | E-30 | G1, G2 | **Zum Moderator ernennen:** Aktionen für Test Nutzer 2 → „Zum Moderator ernennen“ → bestätigen | Rückfrage „… zum Moderator ernennen? …“; beide sehen Test Nutzer 2 als Moderator; Empfehlung zum zweiten Moderator verschwindet | | E-30-G1 | |
 | E-31 | G1 | Einstellungen → „Konto löschen“ → Dialog ansehen → „Abbrechen“ | **Kein** Hinweis „einziger Moderator“ mehr | | E-31-G1 | |
-| E-32 | G2, G1 | **Mitglied löscht sein Konto:** G2 Einstellungen → „Konto löschen“ → Passwort von I2 → „Konto endgültig löschen“; danach G1 Tab „Familie“ und Chat (Windows: Bildschirmschutz danach wieder an (Standard) – Regel in Abschnitt 2) | G2: kein Moderator-Hinweis (N1 ist Moderator), danach „Willkommen“ (nicht „Anmelden“; B-1 vom 26.10. behoben); zwischen Bestätigung und „Willkommen“ nur ein Ladekreis, auch nicht kurz „Anmelden“ oder „Verbinde mit matrix.org …“ (#272). G1: Test Nutzer 2 ist nicht mehr Mitglied; frühere Nachrichten bleiben sichtbar, mit dem Namen „Test Nutzer 2“ oder „Ehemaliges Mitglied“, nie mit der Matrix-ID (#60) | | E-32a-G2, E-32b-G1 | |
+| E-32 | G2, G1 | **Mitglied löscht sein Konto:** G2 Einstellungen → „Konto löschen“ → Passwort von I2 → „Konto endgültig löschen“; danach G1 Tab „Familie“ und Chat (Windows: Bildschirmschutz danach wieder an (Standard) – Regel in Abschnitt 2) | G2: kein Moderator-Hinweis (N1 ist Moderator), danach „Willkommen“ (nicht „Anmelden“; B-1 vom 26.10. behoben); zwischen Bestätigung und „Willkommen“ nur ein Ladekreis, auch nicht kurz „Anmelden“ oder „Verbinde mit matrix.org …“ (#272). G1: Test Nutzer 2 ist nicht mehr Mitglied; frühere Nachrichten bleiben sichtbar, mit dem Namen „Test Nutzer 2“ oder „Ehemaliges Mitglied“, nie mit der Matrix-ID (#60); in Sätzen („Von …“, „zuletzt von …“, „Zugewiesen an …“, Blockieren) steht „Ehemaliges Mitglied“ in Anführungszeichen (#326) | | E-32a-G2, E-32b-G1 | |
 
 ### F. Lokale Daten, Löschen und Aufräumen
 
@@ -713,5 +713,6 @@ Regel: Änderungen an Schritten, erwarteten Ergebnissen oder Reihenfolge erhöhe
 | 1.37 | 07.11.2026 | Basis `main` + #316 | A-01: Startbild und Ladeanzeige beim Kaltstart (E-94, #316) |
 | 1.38 | 07.11.2026 | Basis `main` + #329 | B-15, E-22: „Zugewiesen an dich“ und „zuletzt von dir“ für eigene Listen und Einträge (#329) |
 | 1.39 | 08.11.2026 | Basis `main` + #326 (Plural) | D-02, E-11: Tab „Familie – 1 offene Anfrage“ (Singular, #326) |
+| 1.40 | 08.11.2026 | Basis `main` + #326 (E4) | E-32: „Ehemaliges Mitglied“ in Sätzen in Anführungszeichen (#326) |
 
 **Zuordnung Issues zur Planversion:** #23 bis #27 (Lauf 1) beziehen sich auf v1.0 (`4abf400`), #28 bis #30 (Lauf 2) auf v1.2 (`d6cecbf`), #31 bis #40 (Lauf 3, Linux/Android) auf v1.0 (`4abf400`); die Plantexte dazu stehen seit v1.1, v1.3 bzw. v1.4 im Plan. Seit v1.5 beschreibt der Plan das Verhalten nach den Fixes aus PR #41 (#23 bereits durch PR #22). #75 bis #78 (Lauf mit Build 19) beziehen sich auf v1.6 (`f4c358c`); #43 bis #46 und #56 bis #69 beziehen sich auf v1.5 (`bb7f347` bzw. `423a3db`); seit v1.6 beschreibt der Plan das Verhalten nach den Fixes vom 28.10.2026.
