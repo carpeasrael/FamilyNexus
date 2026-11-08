@@ -71,11 +71,35 @@ void main() {
 
       await tester.tap(find.text('Erledigte entfernen'));
       await tester.pumpAndSettle();
-      expect(find.text('1 erledigte Einträge für die ganze Familie entfernen?'), findsOneWidget);
+      expect(find.text('1 erledigten Eintrag für die ganze Familie entfernen?'), findsOneWidget);
       await tester.tap(find.widgetWithText(FilledButton, 'Erledigte entfernen'));
       await tester.pumpAndSettle();
+      expect(find.text('1 Eintrag entfernt'), findsOneWidget, reason: '#326: Singular');
       expect(find.text('Hafermilch'), findsNothing);
       expect(find.text('Der Einkaufszettel ist leer. Füge oben etwas hinzu.'), findsOneWidget);
+    });
+
+    testWidgets('#326: zwei erledigte Einträge entfernen: Plural in Frage und Meldung', (tester) async {
+      _tall(tester);
+      final app = await buildTestApp();
+      await _open(tester, app);
+      await _tab(tester, 'Einkauf');
+      for (final name in ['Milch', 'Brot']) {
+        await tester.enterText(find.widgetWithText(TextField, 'Was wird gebraucht?'), name);
+        await tester.tap(find.byTooltip('Hinzufügen'));
+        await tester.pumpAndSettle();
+      }
+      await tester.tap(find.byType(Checkbox).at(0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(Checkbox).at(0));
+      await tester.pumpAndSettle();
+      expect(find.text('Erledigt (2)'), findsOneWidget);
+      await tester.tap(find.text('Erledigte entfernen'));
+      await tester.pumpAndSettle();
+      expect(find.text('2 erledigte Einträge für die ganze Familie entfernen?'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilledButton, 'Erledigte entfernen'));
+      await tester.pumpAndSettle();
+      expect(find.text('2 Einträge entfernt'), findsOneWidget);
     });
 
     testWidgets('leere und überlange Eingaben legen nichts an', (tester) async {

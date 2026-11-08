@@ -2573,13 +2573,13 @@ abstract class AppLocalizations {
   /// No description provided for @shoppingClearConfirm.
   ///
   /// In de, this message translates to:
-  /// **'{count} erledigte Einträge für die ganze Familie entfernen?'**
+  /// **'{count, plural, =1{1 erledigten Eintrag für die ganze Familie entfernen?} other{{count} erledigte Einträge für die ganze Familie entfernen?}}'**
   String shoppingClearConfirm(int count);
 
   /// No description provided for @shoppingCleared.
   ///
   /// In de, this message translates to:
-  /// **'{count} Einträge entfernt'**
+  /// **'{count, plural, =1{1 Eintrag entfernt} other{{count} Einträge entfernt}}'**
   String shoppingCleared(int count);
 
   /// No description provided for @shoppingEditTitle.
@@ -3803,7 +3803,7 @@ abstract class AppLocalizations {
   /// No description provided for @tabFamilyRequests.
   ///
   /// In de, this message translates to:
-  /// **'Familie – {count} offene Anfragen'**
+  /// **'{count, plural, =1{Familie – 1 offene Anfrage} other{Familie – {count} offene Anfragen}}'**
   String tabFamilyRequests(int count);
 
   /// No description provided for @familyInviteServerLabel.

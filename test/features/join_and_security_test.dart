@@ -165,11 +165,16 @@ void main() {
       await ben.gateway.login(server: ServerUrl.tryParse(annaApp.server.host)!, username: 'ben', password: 'geheim456');
       await ben.gateway.setUpSecurity();
       await ben.gateway.requestToJoin(InviteLink.tryParse(link, now: DateTime.now(), ownHost: 'fake.test')!);
+      final semantics = tester.ensureSemantics();
       await _pump(tester, annaApp);
       expect(navTab('1'), findsOneWidget);
+      // #326: Screenreader-Label im Singular („1 offene Anfrage“, nicht „1 offene Anfragen“).
+      expect(find.bySemanticsLabel(RegExp('Familie – 1 offene Anfrage')), findsWidgets);
+      expect(find.bySemanticsLabel(RegExp('1 offene Anfragen')), findsNothing);
       await annaApp.gateway.rejectRequest('@ben:fake.test');
       await tester.pumpAndSettle();
       expect(navTab('1'), findsNothing);
+      semantics.dispose();
     });
 
     testWidgets('E-79: Link der Version 3 zeigt die Karte weiter mit Familienname', (tester) async {

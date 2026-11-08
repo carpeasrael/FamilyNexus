@@ -33,7 +33,7 @@ Eingabe auf einem **echten iPhone mit Bildschirmtastatur**. Im Simulator gingen 
 | ID | Gerät | Schritt | Erwartung | Beobachtet | Erg. |
 |---|---|---|---|---|---|
 | D-02a | G2 | Frisches Konto `fnt-1028-n3` anlegen (Kontoanlage → Familienschritt), „Beitreten“ → „Ohne Link beitreten (Familien-Code)“. G1 (N1): Tab „Familie“ → „Familien-Code“ → „Code kopieren“, auf G2 einfügen → „Beitritt anfragen“. **Uhrzeit der Anfrage notieren:** ____ | „Fast geschafft! …“ | | |
-| D-02b | G1 | Anfrage in „Familie – 1 offene Anfragen“ ansehen → „Ablehnen“. **Uhrzeit notieren:** ____ | Anfrage verschwindet | | |
+| D-02b | G1 | Anfrage in „Familie – 1 offene Anfrage“ ansehen → „Ablehnen“. **Uhrzeit notieren:** ____ | Anfrage verschwindet | | |
 | D-02c | G2 | App im Vordergrund lassen, bis zu 2 Minuten warten. **Uhrzeit, zu der „Deine Anfrage wurde abgelehnt“ erscheint:** ____ | „Deine Anfrage wurde abgelehnt. …“ mit „Verstanden“, spätestens nach etwa 10 bis 20 Sekunden (die App fragt alle 10 s) | | |
 | D-02d | G2 | Erscheint nichts: App beenden und neu starten, erneut 1 Minute warten | Meldung nach Neustart? (ja/nein) | | |
 

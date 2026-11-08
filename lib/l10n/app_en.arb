@@ -787,7 +787,7 @@
     }
   },
   "shoppingClearDone": "Remove done items",
-  "shoppingClearConfirm": "Remove {count} done items for the whole family?",
+  "shoppingClearConfirm": "{count, plural, =1{Remove 1 done item for the whole family?} other{Remove {count} done items for the whole family?}}",
   "@shoppingClearConfirm": {
     "placeholders": {
       "count": {
@@ -795,7 +795,7 @@
       }
     }
   },
-  "shoppingCleared": "{count} items removed",
+  "shoppingCleared": "{count, plural, =1{1 item removed} other{{count} items removed}}",
   "@shoppingCleared": {
     "placeholders": {
       "count": {
@@ -1244,7 +1244,7 @@
   "joinDiagnosticTitle": "Technical details",
   "joinDiagnosticCopy": "Copy",
   "joinDiagnosticCopied": "Copied",
-  "tabFamilyRequests": "Family – {count} open requests",
+  "tabFamilyRequests": "{count, plural, =1{Family – 1 open request} other{Family – {count} open requests}}",
   "@tabFamilyRequests": {
     "placeholders": {
       "count": {"type": "int"}
