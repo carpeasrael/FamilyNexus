@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support/text_norm.dart';
+
 List<File> _dartFiles(String dir) => Directory(dir)
     .listSync(recursive: true)
     .whereType<File>()
-    .where((f) => f.path.endsWith('.dart') && !f.path.contains('/l10n/gen/'))
+    .where((f) => f.path.endsWith('.dart') && !posix(f.path).contains('/l10n/gen/'))
     .toList();
 
 List<String> _imports(File f) => f
@@ -59,7 +61,7 @@ void main() {
 
   test('Android-spezifische Dart-Brücken liegen nur in data/platform', () {
     for (final f in _dartFiles('lib')) {
-      if (f.path.contains('lib/data/platform/')) continue;
+      if (posix(f.path).contains('lib/data/platform/')) continue;
       expect(f.readAsStringSync(), isNot(contains('MethodChannel(')), reason: f.path);
     }
   });
