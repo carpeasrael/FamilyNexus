@@ -472,7 +472,7 @@
   "verifyNoMatch": "They do not match",
   "verifyWaitingConfirm": "Waiting for the other side to confirm …",
   "verifyDone": "Verified.",
-  "verifyCancelled": "The verification was cancelled.",
+  "verifyCancelled": "The verification was canceled.",
   "accept": "Accept",
   "decline": "Decline",
   "familyManage": "Management",
@@ -552,13 +552,13 @@
     "description": "Subtitle of “Delete all local data” in the browser: there are no reminders there (E-53, #237)."
   },
   "deleteDataTitle": "Delete all local data?",
-  "deleteDataBody": "All data of this app on this device will be deleted permanently and you will be signed out. Messages and shared events on other family members' devices cannot technically be deleted. Your account on the server remains; you can delete it under Settings → Account → “Delete account”.",
+  "deleteDataBody": "All data of this app on this device will be deleted permanently and you will be signed out. Messages and shared events on other family members’ devices cannot technically be deleted. Your account on the server remains; you can delete it under Settings → Account → “Delete account”.",
   "deleteDataConfirm": "Delete permanently",
   "privacyTitle": "Privacy policy",
   "privacy1Title": "Who processes your data?",
   "privacy1Body": "FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. Responsible for processing on the server is the operator of the provider you chose (Matrix server); it is shown during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that have their own sign-in page (e.g. matrix.org) you enter these details directly on their page.",
   "privacy2Title": "What data exists?",
-  "privacy2Body": "Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted ({cipher}) on your device. The key is held here: {keyStore} – not in the database file.",
+  "privacy2Body": "Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, family members and your settings. Events and messages are stored encrypted ({cipher}) on your device. The key is held here: {keyStore} – not in the database file.",
   "@privacy2Body": {
     "placeholders": {
       "keyStore": {
@@ -573,7 +573,7 @@
   "privacy3Title": "What does the server see?",
   "privacy3Body": "Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships and room and profile names (for example the family name). With your own server you decide who sees this information.",
   "privacy4Title": "Private events",
-  "privacy4Body": "Private events are never sent to the family. Between your own devices they are synchronised through a private, encrypted room that only your account belongs to.",
+  "privacy4Body": "Private events are never sent to the family. Between your own devices they are synchronized through a private, encrypted room that only your account belongs to.",
   "privacy5Title": "Reminders and notifications",
   "privacy5Body": "Reminders are local notifications. They never show title, location or note, only “Event in …”. For new messages and shopping items the app only shows “New messages” or “New items on the shopping list”, without sender or content and only while it is running; the number of unread messages may appear on the app icon. There is no third-party push service.",
   "privacy6Title": "Permissions",
@@ -586,8 +586,8 @@
   "privacy6BodyWeb": "Internet (connection to the server). The web version asks for no permission for notifications, reminders or device credentials. No contacts, location, camera or microphone are needed.",
   "privacy7Title": "Backup and deletion",
   "privacy7BackupAndroid": "Android backups are disabled.",
-  "privacy7BackupIos": "The app's data is excluded from backups.",
-  "privacy7BackupMacos": "The app's data is excluded from backups (e.g. Time Machine).",
+  "privacy7BackupIos": "The app’s data is excluded from backups.",
+  "privacy7BackupMacos": "The app’s data is excluded from backups (e.g. Time Machine).",
   "privacy7BackupOther": "The app does not create a backup of your data itself.",
   "privacy7Save": "If you deliberately save an attachment via “Save”, the decrypted file is stored outside the app in the folder you chose.",
   "privacy7Wipe": "“Delete all local data” removes all data, keys and reminders from this device.",
@@ -599,7 +599,7 @@
   "privacy8Title": "Children",
   "privacy8Body": "Children can be family members. This requires the consent of their legal guardians; accounts of minors go through invitation and confirmation by a moderator.",
   "privacy9Title": "Your rights",
-  "privacy9Body": "You can request access, correction and deletion at any time. You manage local data in this app and delete your account under Settings → Account → “Delete account”; other server data with your server's operator.",
+  "privacy9Body": "You can request access, correction and deletion at any time. You manage local data in this app and delete your account under Settings → Account → “Delete account”; other server data with your server’s operator.",
   "familyRequestCheckValid": "Valid invitation link",
   "familyRequestCheckExpired": "Link expired – reject the request and send a new link",
   "familyRequestCheckUnknown": "Unknown or already used link",
@@ -615,7 +615,7 @@
   "identityPinned": "Not checked in person",
   "identityUnknown": "No keys known",
   "identityChanged": "Identity changed",
-  "identityChangedWarning": "{name}'s security key has changed. Their devices are blocked until you have checked each other in person using the emoji comparison.",
+  "identityChangedWarning": "{name}’s security key has changed. Their devices are blocked until you have checked each other in person using the emoji comparison.",
   "@identityChangedWarning": {
     "placeholders": {
       "name": {
@@ -641,7 +641,7 @@
       }
     }
   },
-  "familyInviteConfirm": "Invite {user}? Invitees receive the family's message keys even before accepting – only invite people you know for certain.",
+  "familyInviteConfirm": "Invite {user}? Invitees receive the family’s message keys even before accepting – only invite people you know for certain.",
   "@familyInviteConfirm": {
     "placeholders": {
       "user": {
@@ -649,10 +649,10 @@
       }
     }
   },
-  "attachmentSaveWarning": "The file is decrypted and saved unencrypted in the folder you choose. It stays there after logging out or deleting app data. Continue?",
+  "attachmentSaveWarning": "The file is decrypted and saved unencrypted in the folder you choose. It stays there after signing out or deleting app data. Continue?",
   "tabShopping": "Shopping",
   "settingsShareOnlineStatus": "Share online status",
-  "settingsShareOnlineStatusHint": "Shows your family when you are using the app. It is sent end-to-end encrypted to family members' devices only. When off, you appear offline to others.",
+  "settingsShareOnlineStatusHint": "Shows your family when you are using the app. It is sent end-to-end encrypted to family members’ devices only. When off, you appear offline to others.",
   "presenceOnline": "Online",
   "presenceOffline": "Offline",
   "presenceUnknown": "Status unknown",
@@ -845,7 +845,7 @@
     }
   },
   "privacy10Title": "Online status, direct chats, shopping list",
-  "privacy10Body": "The online status (\"online\" or \"offline\" with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. The server only sees the metadata it always sees (see “What does the server see?”).",
+  "privacy10Body": "The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. The server only sees the metadata it always sees (see “What does the server see?”).",
   "onbFamilyFound": "Found family “{name}” – you are already a member. Finishing setup.",
   "@onbFamilyFound": {
     "placeholders": {
@@ -854,8 +854,8 @@
       }
     }
   },
-  "settingsAccent": "Accent colour",
-  "settingsAccentHint": "Neon colour for buttons, selection and highlights. Applies to the light and the dark design.",
+  "settingsAccent": "Accent color",
+  "settingsAccentHint": "Neon color for buttons, selection and highlights. Applies to the light and the dark theme.",
   "accentTeal": "Teal",
   "accentMagenta": "Magenta",
   "accentViolet": "Violet",
@@ -955,7 +955,7 @@
   },
   "familyInviteMailFailed": "No mail app found. The link was copied instead.",
   "onbInvitedTitle": "You have been invited",
-  "onbInvitedJoin": "Join \"{family}\"",
+  "onbInvitedJoin": "Join “{family}”",
   "@onbInvitedJoin": {
     "placeholders": {
       "family": {
@@ -965,7 +965,7 @@
   },
   "onbInvitedOther": "Create or join a different family instead",
   "tasksTitle": "Tasks",
-  "tasksNote": "Only moderators create lists. Only the assigned person can tick items off.",
+  "tasksNote": "Only moderators create lists. Only the assigned person can check items off.",
   "tasksEmpty": "No task lists yet.",
   "tasksSectionMine": "Assigned to me",
   "tasksSectionOthers": "Other lists",
@@ -1106,7 +1106,7 @@
   "webEmbeddedTitle": "Opened inside another page",
   "webEmbeddedBody": "For security reasons, FamilyNexus cannot be used embedded in another website. Open the app directly in its own tab.",
   "privacy13Title": "Browser version",
-  "privacy13Body": "In the web version your data is stored encrypted in this browser (IndexedDB, SQLite3MultipleCiphers). The key is protected by your browser password, which is stored nowhere. There is no screen protection, no reminders and no notifications, even while the page is open. Do not use the web version on a foreign or shared computer. The page loads nothing from third parties.",
+  "privacy13Body": "In the web version your data is stored encrypted in this browser (IndexedDB, SQLite3MultipleCiphers). The key is protected by your browser password, which is stored nowhere. There is no screen protection, no reminders and no notifications, even while the page is open. Do not use the web version on a computer that is not yours or that others share. The page loads nothing from third parties.",
   "startCreateTitle": "Start a new family",
   "startCreateBody": "You set everything up and then invite your family.",
   "startInvitedTitle": "I was invited",
@@ -1186,10 +1186,10 @@
   "regTokenBody": "This provider only activates accounts with an access code. You get it from the provider (it is not the family’s invitation link).",
   "regTokenLabel": "Provider access code",
   "regTokenWrong": "The code does not match. Please check it.",
-  "regCaptchaBody": "Please confirm briefly on the provider's page that you are not a robot. Then close the page (on iPhone, iPad and Mac with “Cancel”); you continue here automatically.",
+  "regCaptchaBody": "Please confirm briefly on the provider’s page that you are not a robot. Then close the page (on iPhone, iPad and Mac with “Cancel”); you continue here automatically.",
   "regCaptchaOpen": "Open page",
   "regCaptchaDone": "I am done",
-  "regCaptchaNotYet": "Not finished yet. Please complete the check on the provider's page.",
+  "regCaptchaNotYet": "Not finished yet. Please complete the check on the provider’s page.",
   "regCaptchaNoPage": "The page could not be opened. Please try again.",
   "regOAuthIntro": "At {host} you create your account on the provider’s page. Afterwards you return here automatically.",
   "@regOAuthIntro": {
@@ -1508,7 +1508,7 @@
       }
     }
   },
-  "tasksResetWeekdays": "Restarts Monday to Friday, not at the weekend",
+  "tasksResetWeekdays": "Restarts Monday to Friday, not on weekends",
   "tasksResetWeeklyOn": "Restarts every {weekday}",
   "@tasksResetWeeklyOn": {
     "placeholders": {
@@ -1633,7 +1633,7 @@
   "settingsReportOnline": "Report: show all data stored online",
   "reportLocalTitle": "Locally stored data",
   "reportOnlineTitle": "Data stored online",
-  "reportWarning": "The report shows your data in plain text. When you copy or save it, the data leaves the app's encrypted storage.",
+  "reportWarning": "The report shows your data in plain text. When you copy or save it, the data leaves the app’s encrypted storage.",
   "reportCopy": "Copy",
   "reportCopied": "Report copied. The app tries to clear the clipboard after one minute. If in doubt, clear it yourself.",
   "reportSave": "Save as file",
@@ -1670,9 +1670,9 @@
     }
   },
   "reportSectionMatrixDb": "Matrix database (cache)",
-  "reportMatrixSecrets": "Also stored, but not shown for security reasons: the session's access token, device keys and the keys of encrypted conversations.",
+  "reportMatrixSecrets": "Also stored, but not shown for security reasons: the session’s access token, device keys and the keys of encrypted conversations.",
   "reportMatrixUnavailable": "Not available (not signed in or read error).",
-  "reportMemoryOnly": "Never stored, only kept in memory: family members' online status.",
+  "reportMemoryOnly": "Never stored, only kept in memory: family members’ online status.",
   "reportOsReminders": "Scheduled reminders are additionally held by the operating system.",
   "reportSectionAccount": "Account",
   "reportHomeserver": "Homeserver (resolved via .well-known)",
@@ -1723,7 +1723,7 @@
     }
   },
   "reportFamilyMembers": "Family members",
-  "reportOnlineNote": "Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), time and size of events and the types of account data. Event counts are based on this device's sync; the provider may hold older events as well.",
+  "reportOnlineNote": "Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), time and size of events and the types of account data. Event counts are based on this device’s sync; the provider may hold older events as well.",
   "eventTypeMessage": "Messages",
   "eventTypeReaction": "Reactions",
   "eventTypeSharedEvent": "Events (shared)",
@@ -1754,16 +1754,16 @@
       "server": {"type": "String"}
     }
   },
-  "accountDeleteSoleModerator": "You are the family's only moderator. Make another member a moderator first, otherwise nobody can manage the family any more.",
+  "accountDeleteSoleModerator": "You are the family’s only moderator. Make another member a moderator first, otherwise nobody can manage the family any more.",
   "accountDeletePassword": "Password to confirm",
   "accountDeleteConfirm": "Delete account permanently",
-  "accountDeleteBrowserIntro": "You confirm the deletion on your provider's account page.",
-  "accountDeleteBrowserWait": "Confirm the deletion on the provider's page, close it (on iPhone, iPad and Mac with “Cancel”) and then come back here.",
+  "accountDeleteBrowserIntro": "You confirm the deletion on your provider’s account page.",
+  "accountDeleteBrowserWait": "Confirm the deletion on the provider’s page, close it (on iPhone, iPad and Mac with “Cancel”) and then come back here.",
   "accountDeleteOpen": "Open deletion page",
   "accountDeleteOpenAgain": "Open page again",
   "accountDeleteCheck": "Check deletion",
-  "accountDeleteStillActive": "The account still exists. Finish the deletion on the provider's page.",
-  "accountDeleteNoBrowser": "The provider's page could not be opened.",
+  "accountDeleteStillActive": "The account still exists. Finish the deletion on the provider’s page.",
+  "accountDeleteNoBrowser": "The provider’s page could not be opened.",
   "chatOpening": "Opening direct chat …",
   "chatOpenFailed": "The direct chat could not be opened. Please try again.",
   "chatBeforeJoin": "Older messages from before you joined cannot be read.",

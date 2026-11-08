@@ -990,7 +990,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verifyDone => 'Verified.';
 
   @override
-  String get verifyCancelled => 'The verification was cancelled.';
+  String get verifyCancelled => 'The verification was canceled.';
 
   @override
   String get accept => 'Accept';
@@ -1175,7 +1175,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteDataBody =>
-      'All data of this app on this device will be deleted permanently and you will be signed out. Messages and shared events on other family members\' devices cannot technically be deleted. Your account on the server remains; you can delete it under Settings → Account → “Delete account”.';
+      'All data of this app on this device will be deleted permanently and you will be signed out. Messages and shared events on other family members’ devices cannot technically be deleted. Your account on the server remains; you can delete it under Settings → Account → “Delete account”.';
 
   @override
   String get deleteDataConfirm => 'Delete permanently';
@@ -1195,7 +1195,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String privacy2Body(String keyStore, String cipher) {
-    return 'Chat messages, files, shared and private events, responses, the shopping list, family members and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
+    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, family members and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
   }
 
   @override
@@ -1210,7 +1210,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy4Body =>
-      'Private events are never sent to the family. Between your own devices they are synchronised through a private, encrypted room that only your account belongs to.';
+      'Private events are never sent to the family. Between your own devices they are synchronized through a private, encrypted room that only your account belongs to.';
 
   @override
   String get privacy5Title => 'Reminders and notifications';
@@ -1255,11 +1255,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacy7BackupAndroid => 'Android backups are disabled.';
 
   @override
-  String get privacy7BackupIos => 'The app\'s data is excluded from backups.';
+  String get privacy7BackupIos => 'The app’s data is excluded from backups.';
 
   @override
   String get privacy7BackupMacos =>
-      'The app\'s data is excluded from backups (e.g. Time Machine).';
+      'The app’s data is excluded from backups (e.g. Time Machine).';
 
   @override
   String get privacy7BackupOther =>
@@ -1293,7 +1293,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy9Body =>
-      'You can request access, correction and deletion at any time. You manage local data in this app and delete your account under Settings → Account → “Delete account”; other server data with your server\'s operator.';
+      'You can request access, correction and deletion at any time. You manage local data in this app and delete your account under Settings → Account → “Delete account”; other server data with your server’s operator.';
 
   @override
   String get familyRequestCheckValid => 'Valid invitation link';
@@ -1324,7 +1324,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String identityChangedWarning(String name) {
-    return '$name\'s security key has changed. Their devices are blocked until you have checked each other in person using the emoji comparison.';
+    return '$name’s security key has changed. Their devices are blocked until you have checked each other in person using the emoji comparison.';
   }
 
   @override
@@ -1346,12 +1346,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String familyInviteConfirm(String user) {
-    return 'Invite $user? Invitees receive the family\'s message keys even before accepting – only invite people you know for certain.';
+    return 'Invite $user? Invitees receive the family’s message keys even before accepting – only invite people you know for certain.';
   }
 
   @override
   String get attachmentSaveWarning =>
-      'The file is decrypted and saved unencrypted in the folder you choose. It stays there after logging out or deleting app data. Continue?';
+      'The file is decrypted and saved unencrypted in the folder you choose. It stays there after signing out or deleting app data. Continue?';
 
   @override
   String get tabShopping => 'Shopping';
@@ -1361,7 +1361,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsShareOnlineStatusHint =>
-      'Shows your family when you are using the app. It is sent end-to-end encrypted to family members\' devices only. When off, you appear offline to others.';
+      'Shows your family when you are using the app. It is sent end-to-end encrypted to family members’ devices only. When off, you appear offline to others.';
 
   @override
   String get presenceOnline => 'Online';
@@ -1559,7 +1559,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy10Body =>
-      'The online status (\"online\" or \"offline\" with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. The server only sees the metadata it always sees (see “What does the server see?”).';
+      'The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. The server only sees the metadata it always sees (see “What does the server see?”).';
 
   @override
   String onbFamilyFound(String name) {
@@ -1567,11 +1567,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsAccent => 'Accent colour';
+  String get settingsAccent => 'Accent color';
 
   @override
   String get settingsAccentHint =>
-      'Neon colour for buttons, selection and highlights. Applies to the light and the dark design.';
+      'Neon color for buttons, selection and highlights. Applies to the light and the dark theme.';
 
   @override
   String get accentTeal => 'Teal';
@@ -1714,7 +1714,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String onbInvitedJoin(String family) {
-    return 'Join \"$family\"';
+    return 'Join “$family”';
   }
 
   @override
@@ -1725,7 +1725,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tasksNote =>
-      'Only moderators create lists. Only the assigned person can tick items off.';
+      'Only moderators create lists. Only the assigned person can check items off.';
 
   @override
   String get tasksEmpty => 'No task lists yet.';
@@ -1922,7 +1922,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy13Body =>
-      'In the web version your data is stored encrypted in this browser (IndexedDB, SQLite3MultipleCiphers). The key is protected by your browser password, which is stored nowhere. There is no screen protection, no reminders and no notifications, even while the page is open. Do not use the web version on a foreign or shared computer. The page loads nothing from third parties.';
+      'In the web version your data is stored encrypted in this browser (IndexedDB, SQLite3MultipleCiphers). The key is protected by your browser password, which is stored nowhere. There is no screen protection, no reminders and no notifications, even while the page is open. Do not use the web version on a computer that is not yours or that others share. The page loads nothing from third parties.';
 
   @override
   String get startCreateTitle => 'Start a new family';
@@ -2124,7 +2124,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regCaptchaBody =>
-      'Please confirm briefly on the provider\'s page that you are not a robot. Then close the page (on iPhone, iPad and Mac with “Cancel”); you continue here automatically.';
+      'Please confirm briefly on the provider’s page that you are not a robot. Then close the page (on iPhone, iPad and Mac with “Cancel”); you continue here automatically.';
 
   @override
   String get regCaptchaOpen => 'Open page';
@@ -2134,7 +2134,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regCaptchaNotYet =>
-      'Not finished yet. Please complete the check on the provider\'s page.';
+      'Not finished yet. Please complete the check on the provider’s page.';
 
   @override
   String get regCaptchaNoPage =>
@@ -2609,8 +2609,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get tasksResetWeekdays =>
-      'Restarts Monday to Friday, not at the weekend';
+  String get tasksResetWeekdays => 'Restarts Monday to Friday, not on weekends';
 
   @override
   String tasksResetWeeklyOn(String weekday) {
@@ -2760,7 +2759,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportWarning =>
-      'The report shows your data in plain text. When you copy or save it, the data leaves the app\'s encrypted storage.';
+      'The report shows your data in plain text. When you copy or save it, the data leaves the app’s encrypted storage.';
 
   @override
   String get reportCopy => 'Copy';
@@ -2814,7 +2813,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportMatrixSecrets =>
-      'Also stored, but not shown for security reasons: the session\'s access token, device keys and the keys of encrypted conversations.';
+      'Also stored, but not shown for security reasons: the session’s access token, device keys and the keys of encrypted conversations.';
 
   @override
   String get reportMatrixUnavailable =>
@@ -2822,7 +2821,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportMemoryOnly =>
-      'Never stored, only kept in memory: family members\' online status.';
+      'Never stored, only kept in memory: family members’ online status.';
 
   @override
   String get reportOsReminders =>
@@ -2913,7 +2912,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportOnlineNote =>
-      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), time and size of events and the types of account data. Event counts are based on this device\'s sync; the provider may hold older events as well.';
+      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), time and size of events and the types of account data. Event counts are based on this device’s sync; the provider may hold older events as well.';
 
   @override
   String get eventTypeMessage => 'Messages';
@@ -2979,7 +2978,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountDeleteSoleModerator =>
-      'You are the family\'s only moderator. Make another member a moderator first, otherwise nobody can manage the family any more.';
+      'You are the family’s only moderator. Make another member a moderator first, otherwise nobody can manage the family any more.';
 
   @override
   String get accountDeletePassword => 'Password to confirm';
@@ -2989,11 +2988,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountDeleteBrowserIntro =>
-      'You confirm the deletion on your provider\'s account page.';
+      'You confirm the deletion on your provider’s account page.';
 
   @override
   String get accountDeleteBrowserWait =>
-      'Confirm the deletion on the provider\'s page, close it (on iPhone, iPad and Mac with “Cancel”) and then come back here.';
+      'Confirm the deletion on the provider’s page, close it (on iPhone, iPad and Mac with “Cancel”) and then come back here.';
 
   @override
   String get accountDeleteOpen => 'Open deletion page';
@@ -3006,11 +3005,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountDeleteStillActive =>
-      'The account still exists. Finish the deletion on the provider\'s page.';
+      'The account still exists. Finish the deletion on the provider’s page.';
 
   @override
   String get accountDeleteNoBrowser =>
-      'The provider\'s page could not be opened.';
+      'The provider’s page could not be opened.';
 
   @override
   String get chatOpening => 'Opening direct chat …';
