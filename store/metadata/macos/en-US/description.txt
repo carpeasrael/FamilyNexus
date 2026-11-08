@@ -19,7 +19,7 @@ SHOPPING LIST
 TASKS
 • Moderators create task lists and assign them to a family member
 • Start over on a schedule: daily, Monday to Friday, weekly or monthly
-• The assigned person ticks items off, with an optional comment; the history is kept
+• The assigned person checks items off, with an optional comment; the history is kept
 
 SECURITY AND PRIVACY
 • End-to-end encrypted over the open Matrix protocol (chat, shared events, shopping list, tasks)

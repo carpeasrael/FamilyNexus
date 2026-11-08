@@ -206,9 +206,9 @@ Auskunft über sämtliche Serverprotokolle oder Backups deines Anbieters.
 
 Bei Anbietern mit eigener Anmeldeseite öffnet die App für Anmeldung, Kontoanlage,
 Kontolöschung und Passwortänderung die vom gewählten Anbieter bereitgestellte
-Seite. Auf iOS und macOS öffnet sie in einem Anmeldefenster des Systems
+Seite. Auf iOS und macOS öffnet die App sie in einem Anmeldefenster des Systems
 (ASWebAuthenticationSession); bei dessen Standardausführung ohne gemeinsame
-Browserdaten. Auf Android öffnet sie in der Regel in einem Custom Tab des
+Browserdaten. Auf Android öffnet die App sie in der Regel in einem Custom Tab des
 Standardbrowsers, wenn dieser Custom Tabs anbietet (mit den Cookies dieses
 Browsers), sonst im Standardbrowser selbst; auf Linux und Windows im Browser.
 Dort können weitere Dienste für Anmeldung, E-Mail-Bestätigung oder CAPTCHA
