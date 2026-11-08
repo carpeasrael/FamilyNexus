@@ -39,7 +39,7 @@ operation. A family moderator is not automatically the server operator.
 ## 2. Types of data, purposes and origin
 
 The app processes your inputs as well as data that other members
-share with you or that your provider supplies for synchronisation.
+share with you or that your provider supplies for synchronization.
 
 | Data | Purpose and processing |
 |---|---|
@@ -56,14 +56,14 @@ share with you or that your provider supplies for synchronisation.
 
 You decide which content you enter and share. Free text and files can
 also contain information about other people or particularly sensitive information, such as on
-health. Share such information only with the appropriate authorisation
+health. Share such information only with the appropriate authorization
 and with the intended recipients.
 
 ## 3. Local storage and protection on the platforms
 
 The application and Matrix databases are stored on the device **encrypted with
 SQLCipher**, in the web app instead with SQLite3MultipleCiphers.
-They contain, among other things, synchronised content, settings and required
+They contain, among other things, synchronized content, settings and required
 session data. For the database keys, the app uses the secure
 storage solution of the respective platform, in the web app a password-protected
 vault in the browser.
@@ -72,7 +72,7 @@ vault in the browser.
 |---|---|
 | Android | Storage protected by Android Keystore. The app disables the intended automatic Android app backups and excludes app data via backup rules. |
 | iOS | Apple Keychain with device-bound accessibility after the first unlock. The key configuration used does not provide for transferring these keys to other devices. |
-| macOS | Apple Keychain; the app does not enable iCloud synchronisation for these keys. |
+| macOS | Apple Keychain; the app does not enable iCloud synchronization for these keys. |
 | Windows | Secure storage via `flutter_secure_storage` with protection by the Windows credential manager. The databases are located in the local user profile. |
 | Linux | Secret Service via `libsecret`, for example the keyring of your desktop environment. The databases are located in the app data directory of the user account. |
 | Flatpak | Storage within the sandbox via `libsecret` and the Secret portal; the app does not get access to the entire keyring of your desktop environment. The databases are located in the app data directory of the sandbox. |
@@ -101,10 +101,10 @@ Messages use Olm/Megolm; attachments are encrypted before upload.
 The connections to the provider are additionally protected with HTTPS/TLS.
 
 - **Family room:** Shared messages, events, shopping lists and tasks
-  including their history are readable by authorised family members on their
+  including their history are readable by authorized family members on their
   approved devices.
 - **Direct chat:** Content is shared between the two accounts involved.
-- **Private events:** They are synchronised between your own devices via a separate
+- **Private events:** They are synchronized between your own devices via a separate
   encrypted room of your account. "Private" therefore does not mean
   "stored exclusively on this one device".
 - **Invitations:** A direct Matrix invitation can already lead to the distribution of
@@ -148,7 +148,7 @@ report text, it becomes part of the readable report.
 ## 6. Permissions, local reminders and notifications
 
 The app requires network access for account functions, server checks and
-synchronisation. Content already available locally can also be used
+synchronization. Content already available locally can also be used
 offline; pending changes are transmitted when the connection is
 restored.
 
@@ -186,7 +186,7 @@ safe and do not pass it on to support staff or other people.
 
 When you expressly save attachments, data logs or the
 emergency key, **unencrypted files are created outside the protected
-app databases**. The chosen folder may be synchronised with a cloud storage service.
+app databases**. The chosen folder may be synchronized with a cloud storage service.
 In that case its access and privacy terms additionally apply.
 Selected original files remain in their previous storage location; when
 reading them in, the app tries to remove temporary selection copies.
@@ -258,21 +258,21 @@ appropriate safeguards. Encryption alone does not replace these requirements.
 ## 10. Purposes and legal bases
 
 The technical processing serves the communication,
-organisation and security functions you have chosen. Which legal basis applies to it in
+organization and security functions you have chosen. Which legal basis applies to it in
 an individual case depends on the controller actually responsible and on the
 usage relationship. Using free software is not a blanket consent
 to arbitrary data processing.
 
 - Processing necessary for an agreed account and communication service
-  may be based on **Art. 6 (1) point (b) DSGVO**. The server provider names the
+  may be based on **Art. 6 (1) point (b) GDPR**. The server provider names the
   basis applicable to its service.
 - Where processing is based on your consent, **Art. 6 (1)
-  point (a) DSGVO** applies. It can be withdrawn with effect for the future. An
+  point (a) GDPR** applies. It can be withdrawn with effect for the future. An
   operating system permission alone does not automatically replace
   consent under data protection law.
 - For a support request initiated by you, the publisher processes your
-  details in order to handle it. Where a contract is involved, **Art. 6 (1) point (b) DSGVO** applies,
-  otherwise **Art. 6 (1) point (f) DSGVO**; the legitimate interest is
+  details in order to handle it. Where a contract is involved, **Art. 6 (1) point (b) GDPR** applies,
+  otherwise **Art. 6 (1) point (f) GDPR**; the legitimate interest is
   answering the request and resolving reported problems.
 - For server-side security logs and abuse reports, the
   operator must explain its specific legal basis and, where applicable, its legitimate
@@ -283,10 +283,10 @@ app functions you have expressly requested, **§ 25 (2)
 No. 2 TDDDG** is decisive in Germany, to the extent this provision applies. No
 additional storage access for advertising or analytics purposes is used.
 Legal texts:
-[DSGVO](https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX%3A32016R0679) and
+[GDPR](https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX%3A32016R0679) and
 [§ 25 TDDDG](https://www.gesetze-im-internet.de/ttdsg/__25.html).
 
-Account and connection data are required for sign-in and synchronisation.
+Account and connection data are required for sign-in and synchronization.
 Without them, the online functions cannot be used. You determine content, attachments, comments and
 the sharing of the online status yourself; your provider may require certain registration
 details. FamilyNexus does not carry out profiling or
@@ -310,11 +310,11 @@ and cancels scheduled reminders, removes notifications and resets the number on 
 This also applies if the session ends in another
 way, for example because the device was signed out from another device.
 App settings such as language and appearance are retained. Content already sent
-is synchronised again after the next sign-in; changes not yet
+is synchronized again after the next sign-in; changes not yet
 sent are lost.
 
 **On the server:** Local deletion is not account deletion. After signing in again,
-server data that still exists can be synchronised again. Retention periods
+server data that still exists can be synchronized again. Retention periods
 for account, content, connection and report data as well as backups are determined by the
 respective operator. The app sets no uniform period for third-party servers.
 
@@ -326,7 +326,7 @@ completion, the local account data is cleaned up. Which server data is actually
 deleted or retained further depends on the provider and
 any statutory obligations.
 
-**Remaining copies:** Neither local deletion nor account deletion guarantee
+**Remaining copies:** Neither local deletion nor account deletion guarantees
 the removal of content already delivered on other people's devices, federated
 servers or in their backups. Files you exported yourself, printouts,
 clipboard histories and external backups are not deleted by the app.
@@ -335,7 +335,7 @@ Uninstalling also does not replace targeted account deletion.
 **Requests to the publisher:** Details from privacy or support requests
 are retained only for as long as necessary for handling them and, where applicable, for
 fulfilling statutory obligations or for the establishment, exercise or
-defence of legal claims; afterwards they are deleted.
+defense of legal claims; afterwards they are deleted.
 
 ## 12. Children and young people
 
@@ -343,9 +343,9 @@ FamilyNexus can also be used by children within a family.
 Legal guardians should accompany the setup, observe the terms of the chosen
 account provider and discuss with the child who can see shared content.
 
-Where consent under Art. 6 (1) point (a) DSGVO is required for an online service
+Where consent under Art. 6 (1) point (a) GDPR is required for an online service
 offered directly to children, the requirements of
-**Art. 8 DSGVO** apply. In Germany, for persons under 16 this generally requires the
+**Art. 8 GDPR** apply. In Germany, for persons under 16 this generally requires the
 consent or approval of the legal guardians; other countries
 may provide for other age limits within the legal framework. Confirmation by
 a family moderator is not an automatic check of age, guardianship
@@ -356,18 +356,18 @@ or legally effective consent.
 Where the statutory requirements are met, you have in particular the
 following rights against the respective controller:
 
-- **Access** to your personal data (Art. 15 DSGVO).
+- **Access** to your personal data (Art. 15 GDPR).
 - **Rectification** of inaccurate and completion of incomplete details
-  (Art. 16 DSGVO).
-- **Erasure** and **restriction of processing** (Art. 17 and 18 DSGVO).
-- **Data portability** for the processing operations intended for it (Art. 20 DSGVO).
+  (Art. 16 GDPR).
+- **Erasure** and **restriction of processing** (Art. 17 and 18 GDPR).
+- **Data portability** for the processing operations intended for it (Art. 20 GDPR).
 - **Objection** on grounds relating to your particular situation to processing based on
-  Art. 6 (1) point (e) or (f) DSGVO (Art. 21 DSGVO).
+  Art. 6 (1) point (e) or (f) GDPR (Art. 21 GDPR).
 - **Withdrawal of consent** with effect for the future; the lawfulness
-  of the processing up to the withdrawal remains unaffected (Art. 7 (3) DSGVO).
+  of the processing up to the withdrawal remains unaffected (Art. 7 (3) GDPR).
 - **Complaint to a data protection supervisory authority**, in particular at the place of your
   habitual residence, your place of work or the place of the alleged infringement
-  (Art. 77 DSGVO).
+  (Art. 77 GDPR).
 
 For processing by the publisher, use the contact in section 1; for account
 and server data, contact your provider. The publisher cannot delete or decrypt data on
