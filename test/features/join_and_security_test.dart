@@ -279,7 +279,7 @@ void main() {
       final s = await _benWithoutFamily();
       await s.anna.inviteUser('@ben:fake.test');
       await _pump(tester, s.ben);
-      await _tap(tester, 'Stattdessen eine andere Familie gründen oder beitreten');
+      await _tap(tester, 'Stattdessen eine neue Familie gründen oder einer anderen beitreten');
       expect(find.byType(SegmentedButton<bool>), findsOneWidget);
       expect(find.text('Gründe eine neue Familie oder tritt einer bestehenden bei.'), findsOneWidget);
       expect(s.ben.gateway.family, isNull);
