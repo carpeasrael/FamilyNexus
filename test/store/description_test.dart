@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/text_norm.dart';
+
 /// #159: Die Store-Beschreibung nennt nur, was die App auf der Plattform wirklich kann.
 /// macOS hat bewusst keinen Bildschirmschutz (E-18, E-44; `PlatformInfo.hasNoScreenProtection`).
 void main() {
@@ -36,7 +38,7 @@ void main() {
     'store/metadata/android/en-US/full_description.txt',
   ]) {
     test('$f: Aufgabenlisten genannt, höchstens 4000 Zeichen', () {
-      final text = File(f).readAsStringSync();
+      final text = readNormalized(f);
       final de = f.contains('/de-DE/');
       expect(text, contains(de ? '\nAUFGABEN\n' : '\nTASKS\n'));
       expect(text, contains(de ? 'Montag bis Freitag' : 'Monday to Friday'));

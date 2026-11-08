@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/text_norm.dart';
+
 Map<String, dynamic> _arb(String name) =>
     json.decode(File('lib/l10n/$name.arb').readAsStringSync()) as Map<String, dynamic>;
 
@@ -21,7 +23,7 @@ void main() {
     );
     final offenders = <String>[];
     for (final f in Directory('lib').listSync(recursive: true).whereType<File>()) {
-      if (!f.path.endsWith('.dart') || f.path.contains('/l10n/gen/')) continue;
+      if (!f.path.endsWith('.dart') || posix(f.path).contains('/l10n/gen/')) continue;
       final text = f.readAsStringSync();
       for (final m in literal.allMatches(text)) {
         // Interpolationen (`${l.x}`, `$e`) zählen nicht als fester Text.

@@ -1,6 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
+
+import '../support/text_norm.dart';
 
 /// Release Notes 1.2.2 (#242, #243): Sie versprechen nur, was die App kann, und folgen den Entscheidungen
 /// zu älteren App-Versionen (E-40 Nachträge #161, #211; E-86).
@@ -22,7 +22,7 @@ List<String> _clauses(String text) =>
 void main() {
   for (final f in _files) {
     final de = _isGerman(f);
-    final text = File(f).readAsStringSync();
+    final text = readNormalized(f);
 
     test('#242 $f: zusammengesetzte Emojis nicht in Terminen und nicht „überall“', () {
       final negation = de ? 'in Terminen weiterhin nicht' : 'still not in events';
