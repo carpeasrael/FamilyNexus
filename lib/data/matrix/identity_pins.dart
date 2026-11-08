@@ -23,6 +23,26 @@ IdentityDecision decide({required String? pinned, required String pub, required 
   return pinned == null ? IdentityDecision.firstSeen : IdentityDecision.ok;
 }
 
+/// Ergebnis von [resolvePin].
+typedef PinResolution = ({IdentityDecision decision, String? pinned, bool adopt});
+
+/// Bestimmt Pin, Entscheidung und lokale Übernahme (#142). Vorrang: ausdrücklich akzeptiert, lokale Kopie dieses
+/// Geräts, Kontodaten (vom Server änderbar), noch nicht gespeicherter erster Pin. Übernommen wird nur, wenn es lokal
+/// noch keinen Vermerk gibt und die Identität nicht als geändert gilt.
+PinResolution resolvePin({
+  String? accepted,
+  String? local,
+  String? account,
+  String? pending,
+  required String pub,
+  required bool anyBlocked,
+}) {
+  final pinned = accepted ?? local ?? account ?? pending;
+  final decision = decide(pinned: pinned, pub: pub, anyBlocked: anyBlocked);
+  final adopt = local == null && decision != IdentityDecision.changed;
+  return (decision: decision, pinned: pinned, adopt: adopt);
+}
+
 /// Ob ein Gerät gesperrt ist, weil die App es gesperrt hat. Das SDK meldet ein Gerät auch dann als gesperrt,
 /// wenn seine Selbstsignatur ungültig ist (`DeviceKeys.blocked = gesperrt || !selfSigned`); das hebt kein
 /// Akzeptieren auf und würde einen Dauer-Fehlalarm erzeugen. Deshalb zählen nur Geräte mit gültiger Selbstsignatur.
@@ -39,8 +59,16 @@ class IdentityPinBook {
   final Map<String, ({String pub, String? base})> _accepted = <String, ({String pub, String? base})>{};
   final Map<String, String> _pending = <String, String>{};
 
-  /// Maßgeblicher Pin: lokal akzeptiert, sonst die Kontodaten, sonst ein noch nicht gespeicherter erster Pin.
-  String? pinned(String uid, Map<String, String> accountPins) => _accepted[uid]?.pub ?? accountPins[uid] ?? _pending[uid];
+  /// Ausdrücklich akzeptierter Pin, solange die Kontodaten ihn noch nicht zeigen.
+  String? accepted(String uid) => _accepted[uid]?.pub;
+
+  /// Noch nicht gespeicherter erster Pin.
+  String? pending(String uid) => _pending[uid];
+
+  /// Maßgeblicher Pin: lokal akzeptiert, sonst die lokale Kopie dieses Geräts (#142), sonst die Kontodaten, sonst
+  /// ein noch nicht gespeicherter erster Pin.
+  String? pinned(String uid, Map<String, String> accountPins, {Map<String, String> local = const <String, String>{}}) =>
+      _accepted[uid]?.pub ?? local[uid] ?? accountPins[uid] ?? _pending[uid];
 
   /// Der Nutzer hat [pub] akzeptiert. [base] ist der Kontodaten-Pin zu diesem Zeitpunkt. Erst nach erfolgreichem
   /// Schreiben der Kontodaten aufrufen.
@@ -61,10 +89,13 @@ class IdentityPinBook {
   /// Merkt den ersten Pin eines Mitglieds, bis er in den Kontodaten steht.
   void remember(String uid, String pub) => _pending[uid] = pub;
 
-  /// Zu schreibende Kontodaten: akzeptierte Pins vor den Kontodaten, ungespeicherte erste Pins nur ohne anderen.
-  Map<String, String> merged(Map<String, String> accountPins) => <String, String>{
+  /// Zu schreibende Kontodaten (der Spiegel): akzeptierte Pins vor den lokalen, diese vor den Kontodaten (#142: ein
+  /// vom Server geänderter Wert wird beim nächsten Schreiben überschrieben), ungespeicherte erste Pins nur ohne anderen.
+  Map<String, String> merged(Map<String, String> accountPins, {Map<String, String> local = const <String, String>{}}) =>
+      <String, String>{
         ..._pending,
         ...accountPins,
+        ...local,
         for (final e in _accepted.entries) e.key: e.value.pub,
       };
 

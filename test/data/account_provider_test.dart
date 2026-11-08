@@ -295,4 +295,69 @@ void main() {
     expect(g.session, SessionState.ready);
     expect(g.server?.host, 'provider.example', reason: 'für die laufende Sitzung im Speicher');
   });
+  group('#142: lokale Kopie der Identitätsvermerke', () {
+    const pinsKey = 'identityPins';
+    String pins(String user, Map<String, String> m) => json.encode(<String, Object?>{'user_id': user, 'pins': m});
+
+    test('restore lädt den Eintrag einmal; ein zweites restore liest nicht erneut', () async {
+      await _seedSession(dir, keys);
+      final kv = MemoryKeyValueStore()..data[pinsKey] = pins(_me, <String, String>{'@ben:hs.example': 'A'});
+      final g = await _gateway(_Hs(), dir, keys, kv: kv);
+      await g.restore();
+      expect(g.localIdentityPins, <String, String>{'@ben:hs.example': 'A'});
+      kv.data[pinsKey] = pins(_me, <String, String>{'@ben:hs.example': 'ANDERS'});
+      await g.restore();
+      expect(g.localIdentityPins, <String, String>{'@ben:hs.example': 'A'});
+    });
+
+    test('Abmelden löscht den Eintrag, auch ohne gespeicherten accountProvider', () async {
+      await _seedSession(dir, keys);
+      final kv = MemoryKeyValueStore()..data[pinsKey] = pins(_me, <String, String>{'@ben:hs.example': 'A'});
+      final g = await _gateway(_Hs(), dir, keys, kv: kv);
+      await g.restore();
+      expect(kv.data.containsKey(_key), isFalse, reason: 'Vorbedingung: kein Anbieter-Eintrag');
+      await g.logout();
+      expect(kv.data.containsKey(pinsKey), isFalse);
+      expect(g.localIdentityPins, isEmpty);
+    });
+
+    test('Abmelden ohne Client löscht den Eintrag ebenfalls', () async {
+      final kv = MemoryKeyValueStore()..data[pinsKey] = pins(_me, <String, String>{'@ben:hs.example': 'A'});
+      final g = await _gateway(_Hs(), dir, keys, kv: kv);
+      await g.logout();
+      expect(kv.data.containsKey(pinsKey), isFalse);
+    });
+
+    test('erzwungenes Sitzungsende (ungültiges Token) löscht die lokale Kopie NICHT', () async {
+      final hs = _Hs();
+      final kv = MemoryKeyValueStore()..data[pinsKey] = pins(_me, <String, String>{'@ben:hs.example': 'A'});
+      final g = await _gateway(hs, dir, keys, kv: kv);
+      await g.restore();
+      await g.login(server: _provider, username: 'n1', password: 'geheim123');
+      hs.revoked = true;
+      hs.release();
+      await _until(() => g.session == SessionState.loggedOut, what: 'Sitzung beendet');
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(kv.data.containsKey(pinsKey), isTrue, reason: 'der Server darf den Schutz nicht zurücksetzen');
+      expect(kv.data.containsKey(_key), isFalse, reason: 'der Anbieter-Eintrag wird weiter gelöscht (#259)');
+    });
+
+    test('ohne Ablage und bei Lesefehler: kein Absturz, nichts geladen', () async {
+      await _seedSession(dir, keys);
+      final g1 = await _gateway(_Hs(), dir, keys);
+      await g1.restore();
+      expect(g1.session, SessionState.ready);
+      expect(g1.localIdentityPins, isEmpty);
+      await g1.close();
+
+      final kv = _FlakyStore()
+        ..data[pinsKey] = pins(_me, <String, String>{'@ben:hs.example': 'A'})
+        ..failReads = true;
+      final g2 = await _gateway(_Hs(), dir, keys, kv: kv);
+      await g2.restore();
+      expect(g2.session, SessionState.ready);
+      expect(g2.localIdentityPins, isEmpty);
+      expect(kv.data.containsKey(pinsKey), isTrue, reason: 'der unlesbare Eintrag bleibt unberührt');
+    });
+  });
 }
