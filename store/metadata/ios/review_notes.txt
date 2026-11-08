@@ -1,9 +1,9 @@
 [English]
 FamilyNexus connects to a Matrix server (default: matrix.org, checked automatically; other servers under "Advanced"). Accounts can be created in the app. At matrix.org, sign-in and account creation take place on the provider's page (account.matrix.org) in a secure sign-in sheet of the provider within the app; the app then continues automatically.
 
-Review account (user name and password: see "Sign-in information"):
+Review account (username and password: see "Sign-in information"):
 1. Welcome screen → "I already have an account".
-2. "Sign in at matrix.org" → a secure sign-in sheet of the provider opens within the app → enter user name and password → "Continue".
+2. "Sign in at matrix.org" → a secure sign-in sheet of the provider opens within the app → enter username and password → "Continue".
 3. Back in the app: "Unlock this device" → enter the emergency key below → "Unlock".
 4. Main view with the tabs Today, Calendar, Chat, Shopping, Family. The review account is moderator of a sample family with a second member and sample data.
 Emergency key of the review account: <EMERGENCY KEY OF THE REVIEW ACCOUNT>

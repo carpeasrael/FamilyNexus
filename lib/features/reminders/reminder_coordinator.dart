@@ -276,7 +276,7 @@ class ReminderCoordinator extends ChangeNotifier {
     await scheduler.replaceAll(
       plan,
       title: l.reminderTitle,
-      bodyFor: (m) => l.reminderBody(durationText(l, m)),
+      bodyFor: (m) => m == 0 ? l.reminderBodyNow : l.reminderBody(durationText(l, m)),
     );
     notifyListeners();
   }

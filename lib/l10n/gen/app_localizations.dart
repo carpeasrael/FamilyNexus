@@ -830,6 +830,12 @@ abstract class AppLocalizations {
   /// **'Termin in {duration}'**
   String reminderBody(String duration);
 
+  /// No description provided for @reminderBodyNow.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Termin beginnt jetzt'**
+  String get reminderBodyNow;
+
   /// No description provided for @activityChatBody.
   ///
   /// In de, this message translates to:
@@ -2153,7 +2159,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy5Body.
   ///
   /// In de, this message translates to:
-  /// **'Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“. Bei neuen Nachrichten und Einkaufseinträgen meldet die App nur „Neue Nachrichten“ bzw. „Neue Einträge auf dem Einkaufszettel“, ohne Absender oder Inhalt und nur, solange sie läuft; die Zahl ungelesener Nachrichten kann am App-Symbol erscheinen. Es gibt keinen Push-Dienst eines Dritten.'**
+  /// **'Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“ oder „Der Termin beginnt jetzt“. Bei neuen Nachrichten und Einkaufseinträgen meldet die App nur „Neue Nachrichten“ bzw. „Neue Einträge auf dem Einkaufszettel“, ohne Absender oder Inhalt und nur, solange sie läuft; die Zahl ungelesener Nachrichten kann am App-Symbol erscheinen. Es gibt keinen Push-Dienst eines Dritten.'**
   String get privacy5Body;
 
   /// No description provided for @privacy6Title.
@@ -2414,11 +2420,11 @@ abstract class AppLocalizations {
   /// **'Zuletzt online {ago}'**
   String presenceLastSeen(String ago);
 
-  /// No description provided for @presenceAgoNow.
+  /// No description provided for @presenceSeenJustNow.
   ///
   /// In de, this message translates to:
-  /// **'gerade eben'**
-  String get presenceAgoNow;
+  /// **'Eben noch online'**
+  String get presenceSeenJustNow;
 
   /// No description provided for @presenceAgoMinutes.
   ///
@@ -3731,7 +3737,7 @@ abstract class AppLocalizations {
   /// No description provided for @familyCodeHint.
   ///
   /// In de, this message translates to:
-  /// **'Wer dir ohne Link beitreten will, gibt diesen Code ein. Du musst die Anfrage danach ausdrücklich bestätigen.'**
+  /// **'Wer deiner Familie ohne Link beitreten will, gibt diesen Code ein. Du musst die Anfrage danach ausdrücklich bestätigen.'**
   String get familyCodeHint;
 
   /// No description provided for @familyCodeCopy.
@@ -5021,7 +5027,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleteBody.
   ///
   /// In de, this message translates to:
-  /// **'Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Matrix-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar. Anschließend werden alle Daten auf diesem Gerät gelöscht.'**
+  /// **'Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar. Anschließend werden alle Daten auf diesem Gerät gelöscht.'**
   String accountDeleteBody(String userId, String server);
 
   /// No description provided for @accountDeleteSoleModerator.

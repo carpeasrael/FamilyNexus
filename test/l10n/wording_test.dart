@@ -55,4 +55,19 @@ void main() {
     expect(de.privacy2Body('X', 'Y'), contains('Aufgabenlisten mit ihrem Verlauf'));
     expect(enL.privacy2Body('X', 'Y'), contains('task lists with their history'));
   });
+  test('#326 Gruppe 5: eindeutige Formulierungen', () {
+    expect(de.familyCodeHint, contains('Wer deiner Familie ohne Link beitreten will'));
+    expect(de.familyCodeHint, isNot(contains('dir ohne Link')));
+    expect(de.accountDeleteBody('@a:b.c', 'b.c'), contains('Die Benutzer-ID kann danach'));
+    expect(de.accountDeleteBody('@a:b.c', 'b.c'), isNot(contains('Matrix-ID')));
+    expect(enL.accountDeleteBody('@a:b.c', 'b.c'), contains('The user ID cannot be used again'));
+    expect(enL.accountDeleteBody('@a:b.c', 'b.c'), isNot(contains('Matrix ID')));
+    expect(de.presenceSeenJustNow, 'Eben noch online');
+    expect(enL.presenceSeenJustNow, 'Last online just now');
+    expect(de.reminderBodyNow, 'Der Termin beginnt jetzt');
+    expect(enL.reminderBodyNow, 'The event starts now');
+    // Das „nur“ der Datenschutzaussage bleibt wahr: beide Erinnerungstexte sind genannt.
+    expect(de.privacy5Body, contains('„Termin in …“ oder „Der Termin beginnt jetzt“'));
+    expect(enL.privacy5Body, contains('“Event in …” or “The event starts now”'));
+  });
 }

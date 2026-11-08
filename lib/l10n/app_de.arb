@@ -173,6 +173,7 @@
       }
     }
   },
+  "reminderBodyNow": "Der Termin beginnt jetzt",
   "activityChatBody": "Neue Nachrichten",
   "activityShoppingBody": "Neue Einträge auf dem Einkaufszettel",
   "activityChannelName": "Nachrichten und Einkauf",
@@ -575,7 +576,7 @@
   "privacy4Title": "Private Termine",
   "privacy4Body": "Private Termine werden nie an die Familie gesendet. Zwischen deinen eigenen Geräten werden sie über einen privaten, verschlüsselten Raum abgeglichen, dem nur dein Konto angehört.",
   "privacy5Title": "Erinnerungen und Benachrichtigungen",
-  "privacy5Body": "Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“. Bei neuen Nachrichten und Einkaufseinträgen meldet die App nur „Neue Nachrichten“ bzw. „Neue Einträge auf dem Einkaufszettel“, ohne Absender oder Inhalt und nur, solange sie läuft; die Zahl ungelesener Nachrichten kann am App-Symbol erscheinen. Es gibt keinen Push-Dienst eines Dritten.",
+  "privacy5Body": "Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“ oder „Der Termin beginnt jetzt“. Bei neuen Nachrichten und Einkaufseinträgen meldet die App nur „Neue Nachrichten“ bzw. „Neue Einträge auf dem Einkaufszettel“, ohne Absender oder Inhalt und nur, solange sie läuft; die Zahl ungelesener Nachrichten kann am App-Symbol erscheinen. Es gibt keinen Push-Dienst eines Dritten.",
   "privacy6Title": "Berechtigungen",
   "privacy6Net": "Internet (Verbindung zum Server)",
   "privacy6NotifAndroid": "Benachrichtigungen (Erinnerungen, neue Nachrichten und Einkaufseinträge) und genaue Alarme (Erinnerungen), Neustart-Meldung (Erinnerungen neu planen)",
@@ -664,7 +665,7 @@
       }
     }
   },
-  "presenceAgoNow": "gerade eben",
+  "presenceSeenJustNow": "Eben noch online",
   "presenceAgoMinutes": "vor {count} Min.",
   "@presenceAgoMinutes": {
     "placeholders": {
@@ -1235,7 +1236,7 @@
     }
   },
   "familyCodeTitle": "Familien-Code",
-  "familyCodeHint": "Wer dir ohne Link beitreten will, gibt diesen Code ein. Du musst die Anfrage danach ausdrücklich bestätigen.",
+  "familyCodeHint": "Wer deiner Familie ohne Link beitreten will, gibt diesen Code ein. Du musst die Anfrage danach ausdrücklich bestätigen.",
   "familyCodeCopy": "Code kopieren",
   "familyCodeCopied": "Code kopiert",
   "joinCodeTitle": "Ohne Link beitreten (Familien-Code)",
@@ -1756,7 +1757,7 @@
   "accountDelete": "Konto löschen",
   "accountDeleteHint": "Matrix-Konto beim Anbieter dauerhaft löschen",
   "accountDeleteTitle": "Konto löschen?",
-  "accountDeleteBody": "Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Matrix-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar. Anschließend werden alle Daten auf diesem Gerät gelöscht.",
+  "accountDeleteBody": "Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar. Anschließend werden alle Daten auf diesem Gerät gelöscht.",
   "@accountDeleteBody": {
     "placeholders": {
       "userId": {"type": "String"},

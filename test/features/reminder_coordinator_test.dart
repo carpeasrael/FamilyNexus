@@ -72,7 +72,7 @@ void main() {
       expect(all, isNot(contains(secret)));
     }
     expect(sched.texts.map((t) => t.body).toSet(), <String>{
-      'Termin in 0 Minuten',
+      'Der Termin beginnt jetzt',
       'Termin in 10 Minuten',
       'Termin in 1 Stunde',
       'Termin in 1 Tag',
