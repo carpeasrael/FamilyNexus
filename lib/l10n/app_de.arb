@@ -787,7 +787,7 @@
     }
   },
   "shoppingClearDone": "Erledigte entfernen",
-  "shoppingClearConfirm": "{count} erledigte Einträge für die ganze Familie entfernen?",
+  "shoppingClearConfirm": "{count, plural, =1{1 erledigten Eintrag für die ganze Familie entfernen?} other{{count} erledigte Einträge für die ganze Familie entfernen?}}",
   "@shoppingClearConfirm": {
     "placeholders": {
       "count": {
@@ -795,7 +795,7 @@
       }
     }
   },
-  "shoppingCleared": "{count} Einträge entfernt",
+  "shoppingCleared": "{count, plural, =1{1 Eintrag entfernt} other{{count} Einträge entfernt}}",
   "@shoppingCleared": {
     "placeholders": {
       "count": {
@@ -1247,7 +1247,7 @@
   "joinDiagnosticTitle": "Technische Angaben",
   "joinDiagnosticCopy": "Kopieren",
   "joinDiagnosticCopied": "Kopiert",
-  "tabFamilyRequests": "Familie – {count} offene Anfragen",
+  "tabFamilyRequests": "{count, plural, =1{Familie – 1 offene Anfrage} other{Familie – {count} offene Anfragen}}",
   "@tabFamilyRequests": {
     "placeholders": {
       "count": {"type": "int"}

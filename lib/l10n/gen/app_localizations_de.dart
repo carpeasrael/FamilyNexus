@@ -1498,12 +1498,24 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String shoppingClearConfirm(int count) {
-    return '$count erledigte Einträge für die ganze Familie entfernen?';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count erledigte Einträge für die ganze Familie entfernen?',
+      one: '1 erledigten Eintrag für die ganze Familie entfernen?',
+    );
+    return '$_temp0';
   }
 
   @override
   String shoppingCleared(int count) {
-    return '$count Einträge entfernt';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Einträge entfernt',
+      one: '1 Eintrag entfernt',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -2227,7 +2239,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String tabFamilyRequests(int count) {
-    return 'Familie – $count offene Anfragen';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Familie – $count offene Anfragen',
+      one: 'Familie – 1 offene Anfrage',
+    );
+    return '$_temp0';
   }
 
   @override
