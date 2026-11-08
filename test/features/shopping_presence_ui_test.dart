@@ -211,7 +211,7 @@ void main() {
       await ben.announcePresence(online: false);
       await tester.pumpAndSettle();
       expect(find.text('Online'), findsNothing);
-      expect(find.textContaining('Zuletzt online'), findsOneWidget);
+      expect(find.text('Eben noch online'), findsOneWidget);
     });
 
     testWidgets('Heute listet online befindliche Mitglieder', (tester) async {

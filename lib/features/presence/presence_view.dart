@@ -18,13 +18,12 @@ String presenceLabel(AppLocalizations l, PresenceInfo info, DateTime now) {
       final seen = info.lastSeen;
       if (seen == null) return l.presenceOffline;
       final d = now.toUtc().difference(seen);
-      final ago = d.inMinutes < 1
-          ? l.presenceAgoNow
-          : d.inMinutes < 60
-              ? l.presenceAgoMinutes(d.inMinutes)
-              : d.inHours < 24
-                  ? l.presenceAgoHours(d.inHours)
-                  : l.presenceAgoDays(d.inDays);
+      if (d.inMinutes < 1) return l.presenceSeenJustNow;
+      final ago = d.inMinutes < 60
+          ? l.presenceAgoMinutes(d.inMinutes)
+          : d.inHours < 24
+              ? l.presenceAgoHours(d.inHours)
+              : l.presenceAgoDays(d.inDays);
       return l.presenceLastSeen(ago);
   }
 }

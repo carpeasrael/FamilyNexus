@@ -62,4 +62,15 @@ void main() {
       expect(File(f).existsSync(), isTrue, reason: f);
     }
   });
+  test('#326 D27: Die deutsche Erklärung sagt „Einkaufszettel“ wie die App', () {
+    expect(readNormalized('store/privacy/privacy-policy.de.md'), isNot(contains('Einkaufsliste')));
+  });
+
+  test('#326 E29: „username“ in den Review Notes', () {
+    for (final f in <String>['store/metadata/ios/review_notes.txt', 'store/metadata/macos/review_notes.txt']) {
+      final text = readNormalized(f);
+      expect(text, contains('username'), reason: f);
+      expect(text, isNot(contains('user name')), reason: f);
+    }
+  });
 }

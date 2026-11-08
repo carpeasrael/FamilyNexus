@@ -173,6 +173,7 @@
       }
     }
   },
+  "reminderBodyNow": "The event starts now",
   "activityChatBody": "New messages",
   "activityShoppingBody": "New items on the shopping list",
   "activityChannelName": "Messages and shopping",
@@ -575,7 +576,7 @@
   "privacy4Title": "Private events",
   "privacy4Body": "Private events are never sent to the family. Between your own devices they are synchronized through a private, encrypted room that only your account belongs to.",
   "privacy5Title": "Reminders and notifications",
-  "privacy5Body": "Reminders are local notifications. They never show title, location or note, only “Event in …”. For new messages and shopping items the app only shows “New messages” or “New items on the shopping list”, without sender or content and only while it is running; the number of unread messages may appear on the app icon. There is no third-party push service.",
+  "privacy5Body": "Reminders are local notifications. They never show title, location or note, only “Event in …” or “The event starts now”. For new messages and shopping items the app only shows “New messages” or “New items on the shopping list”, without sender or content and only while it is running; the number of unread messages may appear on the app icon. There is no third-party push service.",
   "privacy6Title": "Permissions",
   "privacy6Net": "Internet (connection to the server)",
   "privacy6NotifAndroid": "notifications (reminders, new messages and shopping items) and exact alarms (reminders), boot notification (re-schedule reminders)",
@@ -664,7 +665,7 @@
       }
     }
   },
-  "presenceAgoNow": "just now",
+  "presenceSeenJustNow": "Last online just now",
   "presenceAgoMinutes": "{count} min ago",
   "@presenceAgoMinutes": {
     "placeholders": {
@@ -1747,7 +1748,7 @@
   "accountDelete": "Delete account",
   "accountDeleteHint": "Permanently delete your Matrix account at the provider",
   "accountDeleteTitle": "Delete account?",
-  "accountDeleteBody": "Your account {userId} will be permanently deleted at {server}. The Matrix ID cannot be used again. Messages you sent remain visible to the other family members. Afterwards all data on this device is deleted.",
+  "accountDeleteBody": "Your account {userId} will be permanently deleted at {server}. The user ID cannot be used again. Messages you sent remain visible to the other family members. Afterwards all data on this device is deleted.",
   "@accountDeleteBody": {
     "placeholders": {
       "userId": {"type": "String"},

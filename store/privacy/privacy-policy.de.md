@@ -45,7 +45,7 @@ teilen oder die dein Anbieter zur Synchronisierung bereitstellt.
 | Gerätekennungen und -namen, Zugriffstoken, gegebenenfalls Aktualisierungstoken, Verifizierungsinformationen und kryptografische Schlüssel | Anmeldung aufrechterhalten, eigene Geräte verbinden, Inhalte ver- und entschlüsseln, Geräte überprüfen und Schlüssel wiederherstellen. |
 | Nachrichten, Antworten, Reaktionen und ausgewählte Dateianhänge einschließlich Dateinamen | Familienchat und Einzelchats zwischen Familienmitgliedern. |
 | Gemeinsame und private Termine, Titel, Orte, Notizen, Zeiten, Zeitzonen, Wiederholungen und Zu- oder Absagen | Kalender, Terminabstimmung und lokale Erinnerungen. Ein eingegebener Terminort ist keine Erfassung des Gerätestandorts. |
-| Einkaufsartikel, Mengen, Gruppen und Bearbeitungszustände | Gemeinsame Einkaufsliste. |
+| Einkaufsartikel, Mengen, Gruppen und Bearbeitungszustände | Gemeinsamer Einkaufszettel. |
 | Aufgabenlisten, Zuordnungen, Wiederholungsregeln, Erledigungen, Zeitpunkte und freiwillige Kommentare | Aufgaben verteilen und den Erledigungsverlauf anzeigen. Der Verlauf bleibt auch nach einem periodischen Neustart der Liste erhalten. |
 | Familien- und Raumnamen, Mitgliedschaften, Rollen, Einladungen und Beitrittsanfragen | Familie verwalten und den Zugriff auf gemeinsame Inhalte steuern. |
 | Online-/Offline-Status mit Zeitpunkt | Optional anderen Familienmitgliedern die Erreichbarkeit anzeigen. |
@@ -98,7 +98,7 @@ Chatinhalte, Anhänge, Kalender-, Einkaufs- und Aufgabendaten werden vor der
 Nachrichten verwenden Olm/Megolm; Anhänge werden vor dem Hochladen verschlüsselt.
 Die Verbindungen zum Anbieter sind zusätzlich mit HTTPS/TLS geschützt.
 
-- **Familienraum:** Gemeinsame Nachrichten, Termine, Einkaufslisten und Aufgaben
+- **Familienraum:** Gemeinsame Nachrichten, Termine, Einkaufszettel und Aufgaben
   einschließlich ihres Verlaufs sind für berechtigte Familienmitglieder auf ihren
   freigeschalteten Geräten lesbar.
 - **Einzelchat:** Inhalte werden zwischen den beiden beteiligten Konten geteilt.
@@ -305,7 +305,7 @@ Daten löschen** werden die App- und Matrix-Datenbanken, die zugehörigen lokal
 abgelegten Schlüssel und die durch die App verwalteten Erinnerungen und Meldungen entfernt.
 
 **Abmelden:** Beim Abmelden unter **Einstellungen → Konto → Abmelden** entfernt die
-App die Termine (auch private), Einkaufslisten und Aufgaben dieses Kontos vom Gerät
+App die Termine (auch private), Einkaufszettel und Aufgaben dieses Kontos vom Gerät
 und bricht geplante Erinnerungen ab, entfernt Meldungen und setzt die Zahl am App-Symbol
 zurück. Das gilt auch, wenn die Sitzung auf andere
 Weise endet, etwa weil das Gerät von einem anderen Gerät aus abgemeldet wurde.

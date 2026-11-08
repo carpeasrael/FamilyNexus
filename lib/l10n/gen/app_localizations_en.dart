@@ -408,6 +408,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get reminderBodyNow => 'The event starts now';
+
+  @override
   String get activityChatBody => 'New messages';
 
   @override
@@ -1217,7 +1220,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy5Body =>
-      'Reminders are local notifications. They never show title, location or note, only “Event in …”. For new messages and shopping items the app only shows “New messages” or “New items on the shopping list”, without sender or content and only while it is running; the number of unread messages may appear on the app icon. There is no third-party push service.';
+      'Reminders are local notifications. They never show title, location or note, only “Event in …” or “The event starts now”. For new messages and shopping items the app only shows “New messages” or “New items on the shopping list”, without sender or content and only while it is running; the number of unread messages may appear on the app icon. There is no third-party push service.';
 
   @override
   String get privacy6Title => 'Permissions';
@@ -1378,7 +1381,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get presenceAgoNow => 'just now';
+  String get presenceSeenJustNow => 'Last online just now';
 
   @override
   String presenceAgoMinutes(int count) {
@@ -2973,7 +2976,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String accountDeleteBody(String userId, String server) {
-    return 'Your account $userId will be permanently deleted at $server. The Matrix ID cannot be used again. Messages you sent remain visible to the other family members. Afterwards all data on this device is deleted.';
+    return 'Your account $userId will be permanently deleted at $server. The user ID cannot be used again. Messages you sent remain visible to the other family members. Afterwards all data on this device is deleted.';
   }
 
   @override

@@ -416,6 +416,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get reminderBodyNow => 'Der Termin beginnt jetzt';
+
+  @override
   String get activityChatBody => 'Neue Nachrichten';
 
   @override
@@ -1227,7 +1230,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy5Body =>
-      'Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“. Bei neuen Nachrichten und Einkaufseinträgen meldet die App nur „Neue Nachrichten“ bzw. „Neue Einträge auf dem Einkaufszettel“, ohne Absender oder Inhalt und nur, solange sie läuft; die Zahl ungelesener Nachrichten kann am App-Symbol erscheinen. Es gibt keinen Push-Dienst eines Dritten.';
+      'Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“ oder „Der Termin beginnt jetzt“. Bei neuen Nachrichten und Einkaufseinträgen meldet die App nur „Neue Nachrichten“ bzw. „Neue Einträge auf dem Einkaufszettel“, ohne Absender oder Inhalt und nur, solange sie läuft; die Zahl ungelesener Nachrichten kann am App-Symbol erscheinen. Es gibt keinen Push-Dienst eines Dritten.';
 
   @override
   String get privacy6Title => 'Berechtigungen';
@@ -1390,7 +1393,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get presenceAgoNow => 'gerade eben';
+  String get presenceSeenJustNow => 'Eben noch online';
 
   @override
   String presenceAgoMinutes(int count) {
@@ -2199,7 +2202,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get familyCodeHint =>
-      'Wer dir ohne Link beitreten will, gibt diesen Code ein. Du musst die Anfrage danach ausdrücklich bestätigen.';
+      'Wer deiner Familie ohne Link beitreten will, gibt diesen Code ein. Du musst die Anfrage danach ausdrücklich bestätigen.';
 
   @override
   String get familyCodeCopy => 'Code kopieren';
@@ -2996,7 +2999,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String accountDeleteBody(String userId, String server) {
-    return 'Dein Konto $userId wird bei $server dauerhaft gelöscht. Die Matrix-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar. Anschließend werden alle Daten auf diesem Gerät gelöscht.';
+    return 'Dein Konto $userId wird bei $server dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar. Anschließend werden alle Daten auf diesem Gerät gelöscht.';
   }
 
   @override
