@@ -66,6 +66,30 @@ void main() {
       });
     }
 
+    // #345, E-94: Das Ladebild folgt der Systemdarstellung, die App danach ihrer Einstellung (Standard: dunkel).
+    for (final (system, base, app) in <(Brightness, Color, Brightness)>[
+      (Brightness.light, const Color(0xFFF6F7FB), Brightness.dark),
+      (Brightness.dark, const Color(0xFF0B1120), Brightness.dark),
+    ]) {
+      testWidgets('#345: System ${system.name}: Ladebild ${system.name}, danach die App im Standard-Thema ${app.name}', (tester) async {
+        tester.platformDispatcher.platformBrightnessTestValue = system;
+        addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+        final pending = Completer<AppServices>();
+        await tester.pumpWidget(Bootstrapper(bootstrapFn: ({KeyStore? keyStore}) => pending.future));
+        await tester.pump();
+        final box = tester.widget<DecoratedBox>(find.descendant(of: find.byType(AuroraBackground), matching: find.byType(DecoratedBox)).first);
+        expect((box.decoration as BoxDecoration).color, base);
+        expect(Theme.of(tester.element(find.byType(Scaffold))).brightness, system);
+
+        final started = await buildTestApp();
+        pending.complete(started.services);
+        await tester.pump();
+        await tester.pump();
+        expect(find.byType(FamilyNexusApp), findsOneWidget);
+        expect(Theme.of(tester.element(find.byType(Scaffold).first)).brightness, app);
+      });
+    }
+
     testWidgets('Deutsch', (tester) async {
       tester.platformDispatcher.localesTestValue = const <Locale>[Locale('de')];
       addTearDown(tester.platformDispatcher.clearLocalesTestValue);
