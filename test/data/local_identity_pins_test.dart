@@ -94,6 +94,30 @@ void main() {
     expect(_stored(kv), <String, Object?>{'user_id': _me, 'pins': <String, String>{}});
   });
 
+  test('#352 Kontowechsel im selben Prozess ohne forget verwirft die Vermerke des alten Kontos', () async {
+    final kv = MemoryKeyValueStore();
+    final p = LocalIdentityPins(kv);
+    await p.load();
+    p.bind(_me);
+    expect(p.adopt(_ben, 'KEY-B'), isTrue);
+    await p.flushIfDirty();
+    p.bind('@jemand:hs.test');
+    expect(p.pins, isEmpty);
+    expect(p.isDirty, isTrue);
+    await p.flushIfDirty();
+    expect(_stored(kv), <String, Object?>{'user_id': '@jemand:hs.test', 'pins': <String, String>{}});
+  });
+
+  test('#352 erneutes bind mit demselben Konto behält die Vermerke', () async {
+    final kv = MemoryKeyValueStore();
+    final p = LocalIdentityPins(kv);
+    await p.load();
+    p.bind(_me);
+    p.adopt(_ben, 'KEY-B');
+    p.bind(_me);
+    expect(p.pins, <String, String>{_ben: 'KEY-B'});
+  });
+
   test('Lesefehler: unzuverlässig, nichts übernommen, nichts überschrieben', () async {
     final kv = _FlakyStore()
       ..data[_key] = _entry(_me, <String, String>{_ben: 'ALT'})
