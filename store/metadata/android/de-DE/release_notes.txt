@@ -1,10 +1,11 @@
+Neu in 1.2.3:
+• Identitätsvermerke zusätzlich auf dem Gerät gespeichert.
+• Ladebild folgt der Darstellung des Geräts.
 Neu in 1.2.2:
 • Bitte alle Geräte der Familie aktualisieren.
-• Einkauf: Einträge nach Gruppen ordnen, z. B. nach Geschäft.
-• Heute: Erinnerungen ansehen und bestätigen.
+• Einkauf: Einträge nach Gruppen ordnen.
+• Heute: Erinnerungen bestätigen.
 • Jeden Beitritt bestätigt ein Moderator; Einladungslinks ohne lesbare Namen.
 • Passwort ändern in den Einstellungen.
 • Reaktionen werden verschlüsselt gesendet.
-• Mehr Schutz bei Familienwechsel und Heimnetz-Servern.
-• Uhrzeiten folgen der Geräteeinstellung; zusammengesetzte Emojis in Einkauf und Aufgaben.
 • Viele Korrekturen.
