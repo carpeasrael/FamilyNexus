@@ -134,4 +134,70 @@ void main() {
       expect(book.pinned(cara, <String, String>{}), isNull);
     });
   });
+  group('#142: lokale Kopie hat Vorrang vor den Kontodaten', () {
+    test('Vorrang: akzeptiert > lokal > Kontodaten > noch nicht gespeichert', () {
+      final book = IdentityPinBook()..remember(ben, 'P');
+      expect(book.pinned(ben, <String, String>{ben: 'A'}, local: <String, String>{ben: 'L'}), 'L');
+      expect(book.pinned(ben, <String, String>{ben: 'A'}), 'A');
+      expect(book.pinned(ben, const <String, String>{}), 'P');
+      book.accept(ben, 'X', base: 'A');
+      expect(book.pinned(ben, <String, String>{ben: 'A'}, local: <String, String>{ben: 'L'}), 'X');
+    });
+
+    test('Server löscht den Vermerk und tauscht den Schlüssel: weiter „changed“, keine Übernahme', () {
+      final r = resolvePin(local: k1, account: null, pub: k2, anyBlocked: false);
+      expect(r.decision, IdentityDecision.changed);
+      expect(r.adopt, isFalse);
+    });
+
+    test('Server ändert den Vermerk auf den neuen Schlüssel: lokal gilt, weiter „changed“', () {
+      final r = resolvePin(local: k1, account: k2, pub: k2, anyBlocked: false);
+      expect(r.decision, IdentityDecision.changed);
+      expect(r.pinned, k1);
+      expect(r.adopt, isFalse);
+    });
+
+    test('lokaler Pin passt, Kontodaten fehlen oder weichen ab: „ok“, nichts zu übernehmen', () {
+      for (final account in <String?>[null, k3]) {
+        final r = resolvePin(local: k1, account: account, pub: k1, anyBlocked: false);
+        expect(r.decision, IdentityDecision.ok);
+        expect(r.adopt, isFalse);
+      }
+    });
+
+    test('erster Kontakt wird übernommen; Pin aus den Kontodaten bei fehlendem lokalem Pin ebenfalls', () {
+      final first = resolvePin(pub: k1, anyBlocked: false);
+      expect(first.decision, IdentityDecision.firstSeen);
+      expect(first.adopt, isTrue);
+      final fromAccount = resolvePin(account: k1, pub: k1, anyBlocked: false);
+      expect(fromAccount.decision, IdentityDecision.ok);
+      expect(fromAccount.adopt, isTrue);
+    });
+
+    test('Migration: Pin nur in den Kontodaten, der Server liefert einen anderen Schlüssel: „changed“, keine Übernahme', () {
+      final r = resolvePin(account: k1, pub: k2, anyBlocked: false);
+      expect(r.decision, IdentityDecision.changed);
+      expect(r.pinned, k1);
+      expect(r.adopt, isFalse);
+    });
+
+    test('gesperrte Geräte bei passendem Pin: „changed“, keine Übernahme', () {
+      final r = resolvePin(account: k1, pub: k1, anyBlocked: true);
+      expect(r.decision, IdentityDecision.changed);
+      expect(r.adopt, isFalse);
+    });
+
+    test('merged: lokale Vermerke stehen vor den Kontodaten (der Spiegel heilt sich selbst)', () {
+      final book = IdentityPinBook()..remember(cara, k3);
+      final merged = book.merged(<String, String>{ben: 'SERVER'}, local: <String, String>{ben: k1});
+      expect(merged, <String, String>{cara: k3, ben: k1});
+      book.accept(ben, k2, base: k1);
+      expect(book.merged(<String, String>{ben: 'SERVER'}, local: <String, String>{ben: k1})[ben], k2);
+    });
+
+    test('neues Gerät ohne lokalen Pin folgt den Kontodaten', () {
+      final book = IdentityPinBook();
+      expect(book.pinned(ben, <String, String>{ben: k1}), k1);
+    });
+  });
 }
