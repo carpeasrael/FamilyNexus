@@ -174,6 +174,13 @@ void main() {
       expect(fromAccount.adopt, isTrue);
     });
 
+    test('Migration: Pin nur in den Kontodaten, der Server liefert einen anderen Schlüssel: „changed“, keine Übernahme', () {
+      final r = resolvePin(account: k1, pub: k2, anyBlocked: false);
+      expect(r.decision, IdentityDecision.changed);
+      expect(r.pinned, k1);
+      expect(r.adopt, isFalse);
+    });
+
     test('gesperrte Geräte bei passendem Pin: „changed“, keine Übernahme', () {
       final r = resolvePin(account: k1, pub: k1, anyBlocked: true);
       expect(r.decision, IdentityDecision.changed);
