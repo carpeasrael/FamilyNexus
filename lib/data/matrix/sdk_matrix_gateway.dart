@@ -50,6 +50,7 @@ import 'family_scope.dart';
 import 'background_image_work.dart';
 import 'https_only_client.dart';
 import 'identity_pins.dart';
+import 'local_identity_pins.dart';
 import 'local_sends.dart';
 import 'server_probe.dart';
 import 'sync_relevance.dart';
@@ -604,6 +605,8 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       }
       // Vor `init`: Schon der erste Abgleich zeigt die eingegebene Adresse; die Bindung prüft [server] (#259).
       await _loadProvider();
+      // Ebenfalls vor `init` und nur einmal: die lokale Kopie der Identitätsvermerke (#142).
+      await _localPins.load();
       if (!client.isLogged()) {
         // Der Startwert wird erst nach `init` lesbar; der erste echte Sync wartet darauf (#254).
         final seed = Completer<DateTime?>();
@@ -1099,7 +1102,10 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     cancelRegistration();
     _dropOAuth();
     final client = _client;
-    if (client == null) return;
+    if (client == null) {
+      await _localPins.forget();
+      return;
+    }
     try {
       await client.logout();
     } catch (e) {
@@ -1111,6 +1117,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       }
     }
     await _forgetProvider();
+    await _localPins.forget();
     _resetLocal();
     notifyListeners();
   }
@@ -1327,6 +1334,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       AppLog.e('gateway', 'Lokales Bereinigen fehlgeschlagen', e);
     }
     await _forgetProvider();
+    await _localPins.forget();
     _resetLocal();
     notifyListeners();
   }
@@ -3705,6 +3713,13 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   final Set<String> _identityChanged = <String>{};
   final IdentityPinBook _pinBook = IdentityPinBook();
+
+  /// Lokale Kopie der Vermerke mit Vorrang vor den Kontodaten (#142); überlebt [_resetLocal].
+  late final LocalIdentityPins _localPins = LocalIdentityPins(_accountStore);
+  final Set<String> _pinConflictLogged = <String>{};
+
+  @visibleForTesting
+  Map<String, String> get localIdentityPins => _localPins.loadedPins;
   final Map<String, String> _knockNonces = <String, String>{};
   bool _pinsPersisting = false;
 
@@ -3743,24 +3758,46 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final master = c.userDeviceKeys[uid]?.masterKey;
     final pub = master?.publicKey;
     if (master == null || pub == null) return IdentityStatus.unknown;
+    final userId = c.userID;
+    // Nur mit angemeldetem Client: Ein verspäteter Abgleich nach dem Abmelden legt nichts neu an (#142).
+    if (c.isLogged() && userId != null) _localPins.bind(userId);
     final accountPins = _pins();
     _pinBook.synced(accountPins);
-    final pinned = _pinBook.pinned(uid, accountPins);
-    switch (decide(pinned: pinned, pub: pub, anyBlocked: _anyDeviceBlocked(uid))) {
+    final local = _localPins.pins;
+    final r = resolvePin(
+      accepted: _pinBook.accepted(uid),
+      local: local[uid],
+      account: accountPins[uid],
+      pending: _pinBook.pending(uid),
+      pub: pub,
+      anyBlocked: _anyDeviceBlocked(uid),
+    );
+    final pinned = r.pinned;
+    final localPin = local[uid];
+    final accountPin = accountPins[uid];
+    if (localPin != null && accountPin != localPin && _pinConflictLogged.add(uid)) {
+      // Einmal je Mitglied, ohne Schlüssel: Die Kontodaten weichen vom lokalen Vermerk ab oder fehlen.
+      AppLog.w('gateway', 'Identitätsvermerk in den Kontodaten weicht vom lokalen Stand ab; lokal gilt');
+    }
+    final IdentityStatus status;
+    switch (r.decision) {
       case IdentityDecision.firstSeen:
         _identityChanged.remove(uid);
         _pinBook.remember(uid, pub);
         _persistPins().ignore();
-        return master.verified ? IdentityStatus.verified : IdentityStatus.pinned;
+        status = master.verified ? IdentityStatus.verified : IdentityStatus.pinned;
       case IdentityDecision.changed:
         _identityChanged.add(uid);
         // Neu sperren nur bei einem anderen Schlüssel; entsperrt wird ausschließlich beim Akzeptieren (E-37).
         if (pinned != null && pinned != pub) _setBlocked(uid, true);
-        return IdentityStatus.changed;
+        status = IdentityStatus.changed;
       case IdentityDecision.ok:
         _identityChanged.remove(uid);
-        return master.verified ? IdentityStatus.verified : IdentityStatus.pinned;
+        status = master.verified ? IdentityStatus.verified : IdentityStatus.pinned;
     }
+    if (r.adopt) _localPins.adopt(uid, pub);
+    _localPins.flushIfDirty().ignore();
+    return status;
   }
 
   Future<void> _persistPins() async {
@@ -3768,7 +3805,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (_pinsPersisting || c == null || !c.isLogged() || !_pinBook.hasPending) return;
     _pinsPersisting = true;
     try {
-      final merged = _pinBook.merged(_pins());
+      final merged = _pinBook.merged(_pins(), local: _localPins.pins);
       await c.setAccountData(c.userID!, pinsAccountData, <String, Object?>{...merged});
       _pinBook.persisted(merged);
     } catch (e) {
@@ -3789,12 +3826,14 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
     final accountPins = _pins();
     try {
-      await c.setAccountData(c.userID!, pinsAccountData, <String, Object?>{..._pinBook.merged(accountPins), userId: pub});
+      await c.setAccountData(c.userID!, pinsAccountData, <String, Object?>{..._pinBook.merged(accountPins, local: _localPins.pins), userId: pub});
     } catch (e) {
       throw _map(e);
     }
     // Erst nach erfolgreichem Schreiben: Bis der Sync die Kontodaten bringt, gilt der akzeptierte Pin lokal.
     _pinBook.accept(userId, pub, base: accountPins[userId]);
+    _localPins.accept(userId, pub);
+    _localPins.flushIfDirty().ignore();
     _identityChanged.remove(userId);
     _setBlocked(userId, false);
     _scheduleRefresh();

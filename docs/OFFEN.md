@@ -63,7 +63,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 - **Identitätswechsel eines Mitglieds (E-37, #133):** Nach dem Akzeptieren gilt der neue Schlüssel lokal sofort, die Geräte bleiben
   entsperrt. Bleiben Geräte gesperrt (Neustart, zweites eigenes Gerät), zeigt die App weiter „Identität geändert“ und bietet
   „Akzeptieren“ an: Jedes Gerät bestätigt selbst, Kontodaten des Servers entsperren nichts. Der Pfad mit echten Geräteschlüsseln
-  ist nicht getestet (Testlücke Identitätswechsel gegen echten Server). Die Pin-Map hat Last-Writer-Wins zwischen eigenen Geräten.
+  ist nicht getestet (Testlücke Identitätswechsel gegen echten Server). Die Pin-Map hat Last-Writer-Wins zwischen eigenen Geräten. Seit #142 gilt eine lokale Kopie der Vermerke je Gerät (E-37, Nachtrag #142): Der Homeserver kann sie weder ändern noch löschen; Grenzen: neues Gerät, Neuinstallation und Abmelden/Anmelden setzen den Schutz zurück, ein beschädigter oder unlesbarer Eintrag schaltet ihn ab bzw. zurück; der Fluss mit echten Geräteschlüsseln ist nur gegen einen Synapse prüfbar (Nachtest).
 
 - **Klartext in verschlüsselten Räumen (E-30, #138):**
   - **Verschlüsselung, nicht Herkunft:** `arrivedEncrypted` belegt, dass ein Ereignis verschlüsselt ankam, nicht, von wem es stammt. Der Server kann für ein Mitglied ein eigenes Gerät anlegen und echt verschlüsselt senden. Der eigene Homeserver des Opfers kann sogar ohne Gerät eine selbst erzeugte Megolm-Sitzung in die Online-Schlüsselsicherung schreiben (der öffentliche Schlüssel genügt); das SDK lädt sie bei unbekannter Sitzung ohne Absenderprüfung. Dann besteht frei gewählter Inhalt mit frei gewähltem `sender` die Prüfung, auf diesem Gerät. Eine Prüfung der Sitzungsherkunft wäre eigene Arbeit.

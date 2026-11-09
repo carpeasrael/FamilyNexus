@@ -1,6 +1,6 @@
 # Testplan FamilyNexus (Gesamtplan)
 
-**Planversion: 1.44** (09.11.2026) · Dokument-ID `TP-FN-001` · Änderungen siehe „Versionshistorie“ am Ende und Anhang E. Reports und Issues nennen Planversion und Git-Commit (z. B. „TP-FN-001 v1.0 @ 4abf400“).
+**Planversion: 1.43** (08.11.2026) · Dokument-ID `TP-FN-001` · Änderungen siehe „Versionshistorie“ am Ende und Anhang E. Reports und Issues nennen Planversion und Git-Commit (z. B. „TP-FN-001 v1.0 @ 4abf400“).
 
 Ersetzt: `Testplan_Nutzeranlage.md`, `Testplan_Pruefanleitung.md`, `Testplan_Einladung_Zweiter_Nutzer.md`, `Testdaten_Stammdaten.md` (Zuordnung der alten IDs: Anhang C)
 Bezug: `Massnahmenplan_App_Store_Review.md` (Maßnahme 6), Issues #10–#14, Nachtest #15
@@ -358,7 +358,7 @@ Jede Funktion der App ist mindestens einem Schritt zugeordnet. Wird eine Funktio
 | Datenaustausch | Reaktionen verschlüsselt: auf dem Server kein `m.reaction`, keine Annotation, kein Emoji; keine Doppelsendung (#139) | E-16, H-11, G-04, G-05 |
 | Datenaustausch | Einladungslink ohne Geheimnisse, Anhänge (unverändert, Dateiname, Typ und Größe), Transport und Verbindungen | H-14 bis H-17 |
 | Schlüssel | Löschen entfernt Dateien und Schlüssel, Schlüssel verloren (Startfehler, Wiederherstellung) | H-18, H-19 |
-| Nicht manuell | Zusatzschritte, OAuth, abgelaufener Link, geänderte Identität, Startfehler, Familienwechsel (#140), Klartext in verschlüsselten Räumen (#138), gefälschte Reaktionen und Doppelsendungen (#139) | G-05 |
+| Nicht manuell | Zusatzschritte, OAuth, abgelaufener Link, geänderte Identität (lokale Kopie der Vermerke #142: `test/data/local_identity_pins_test.dart`, `identity_pins_test.dart`, `account_provider_test.dart`; der Fluss mit echten Geräteschlüsseln nur gegen einen Synapse), Startfehler, Familienwechsel (#140), Klartext in verschlüsselten Räumen (#138), gefälschte Reaktionen und Doppelsendungen (#139) | G-05 |
 
 ## 7. Abnahme und Report
 
@@ -548,6 +548,7 @@ Quelle (Planversion 1.6 → 1.7): Lauf vom 28.10.2026 mit Build 1.2.1 (19) (macO
 | P-91 | B-25, Anhang B | Die Hinweise zum Schließen der Anbieterseite nannten nur iPhone und Mac, das iPad (E-92) fehlte (#297) | iPad in B-25 (Erwartung) und im Hinweis zum Prüfkonto ergänzt; App-Texte `regCaptchaBody`, `accountDeleteBrowserWait` nennen „iPhone, iPad und Mac“ (#297, E-91) |
 | P-92 | B-25 | Im breiten Fenster (ab 1000) lag der Trenner des Zweispalters auch über Heute, Einkauf und Familie als senkrechter Strich (#309) | Erwartung in B-25 ergänzt: kein Trenner auf Heute, Einkauf und Familie; App zeigt den Trenner nur, wenn Kalender und Chat nebeneinander stehen (#309, E-92) |
 | P-93 | B-19 | Die Store-Datenschutzerklärung nannte nur Terminerinnerungen, die In-App-Fassung seit E-88 auch Meldungen zu Chat und Einkauf und die Zahl am App-Symbol (#296) | Erwartung in B-19 ergänzt; Store-Fassung (de, en) Abschnitt 3, 6, Löschen und Abmelden angeglichen, Test `privacy_policy_notifications_test.dart` (#296, E-88) |
+| P-94 | B-21, G-05 | Die Identitätsvermerke lagen nur in den vom Server änderbaren Kontodaten (#142). Jetzt hält jedes Gerät eine lokale Kopie, die vorgeht (E-37, Nachtrag #142) | Der Datenbericht in B-21 zeigt zusätzlich den Eintrag `identityPins` (Matrix-IDs und öffentliche Hauptschlüssel, keine Geheimnisse); G-05 „geänderte Identität“ ist durch die neuen Tests abgedeckt, der Fluss mit echten Geräteschlüsseln gegen einen Synapse bleibt Nachtest (Checkliste) |
 
 ## Anhang F: Hilfsbefehle für Abschnitt H
 
@@ -716,6 +717,6 @@ Regel: Änderungen an Schritten, erwarteten Ergebnissen oder Reihenfolge erhöhe
 | 1.40 | 08.11.2026 | Basis `main` + #326 (E4) | E-32: „Ehemaliges Mitglied“ in Sätzen in Anführungszeichen (#326) |
 | 1.41 | 08.11.2026 | Basis `main` + #326 (Gruppe 5) | E-15: Online-Status unter einer Minute „Eben noch online“ (#326) |
 | 1.42 | 08.11.2026 | Basis `main` + #330 | E-16b: Windows-Overlay „9+“ berührt den Kreisrand nicht (#330) |
-| 1.44 | 09.11.2026 | Basis `main` + #345 | A-01: natives Startbild einfarbig, Ladebild mit Verlauf, beide nach dem System; Blitz bei abweichender App-Helligkeit bekannt (E-94, #345). 1.43 ist durch #142 (PR #344) vorgemerkt |
+| 1.43 | 08.11.2026 | Basis `main` + #142 | B-21, G-05: lokale Kopie der Identitätsvermerke (#142, P-94) |
 
 **Zuordnung Issues zur Planversion:** #23 bis #27 (Lauf 1) beziehen sich auf v1.0 (`4abf400`), #28 bis #30 (Lauf 2) auf v1.2 (`d6cecbf`), #31 bis #40 (Lauf 3, Linux/Android) auf v1.0 (`4abf400`); die Plantexte dazu stehen seit v1.1, v1.3 bzw. v1.4 im Plan. Seit v1.5 beschreibt der Plan das Verhalten nach den Fixes aus PR #41 (#23 bereits durch PR #22). #75 bis #78 (Lauf mit Build 19) beziehen sich auf v1.6 (`f4c358c`); #43 bis #46 und #56 bis #69 beziehen sich auf v1.5 (`bb7f347` bzw. `423a3db`); seit v1.6 beschreibt der Plan das Verhalten nach den Fixes vom 28.10.2026.

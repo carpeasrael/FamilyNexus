@@ -55,8 +55,9 @@ Quelle: letzte Kommentare der offenen Issues. Jeder Punkt schließt nur dann ein
 ## Docker (Entwicklungsrechner)
 - [ ] **#281:** Docker Desktop starten, `tool/synapse/up.sh` ausführen, danach `curl -fsk https://localhost:18448/_matrix/client/versions` muss 200 liefern, nie 502. Auch `tool/synapse/password_variants.sh` einmal laufen lassen.
 
+- [ ] **#142 (Testlücke Identitätswechsel):** Gegen den lokalen Synapse (`tool/synapse/up.sh`): Zwei Konten in einer Familie, die Hauptschlüssel eines Mitglieds wechseln (Cross-Signing zurücksetzen) und dabei den Vermerk in den Kontodaten des anderen Kontos löschen oder auf den neuen Schlüssel setzen: Erwartet „Identität geändert“, Geräte gesperrt, auch nach App-Neustart; „Akzeptieren“ hebt es auf und gilt nach Neustart weiter. Ein zweites eigenes Gerät muss selbst bestätigen. Der Datenbericht zeigt den Eintrag `identityPins`.
+
 ## Rein manuell / Entscheidungen
 - [ ] **#15 Prüfkonto und Prüfanleitung** auf neuem Build nachtesten.
 - [ ] **#273:** Variante a, b oder c wählen.
-- [ ] **#142:** Entscheidung des Herausgebers zu E-37.
 - [ ] **#119, #120, #121:** v1.3-Entwürfe; #121 ohne rechtliche Freigabe nicht angehen.

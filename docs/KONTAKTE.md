@@ -282,7 +282,7 @@ weiter für die Einrichtung; TP-L10N-01 bleibt unverändert.
 | Gefälschte Terminkarte, fremde App-Ereignisse | `allowEventRefs`, Signale nur aus Familienraum | – |
 | Gruppe wird zur Familie gemacht | B1, Prüfung in `acceptInvitation` | Fremde Matrix-Apps sind außerhalb der App |
 | Schädliche Anhänge von Fremden | E-19/E-28 unverändert, kein automatisches Laden, keine Linkvorschau, Text wird nicht als Link dargestellt | Lücke im Bilddecoder nach Tipp |
-| Server-Metadaten | Transparenz in Datenschutz | Server sehen, wer mit wem in welchem Raum ist und den Gruppennamen; `m.direct` und `identity_pins` nennen Partner dem eigenen Server (SA-11) |
+| Server-Metadaten | Transparenz in Datenschutz | Server sehen, wer mit wem in welchem Raum ist und den Gruppennamen; `m.direct` und `identity_pins` nennen Partner dem eigenen Server (SA-11); `identity_pins` ist nur noch Spiegel, maßgeblich ist die lokale Kopie je Gerät (#142) |
 | Föderation | Inhalte E2EE | Fremde Server sehen Metadaten und Klartext-Gruppennamen |
 | Großräume als Ressourcenangriff | Obergrenze 50, Prüfung nach Beitritt, Zeitleisten bei Bedarf | Beitritt kurzzeitig nötig, um die Größe sicher zu kennen |
 
