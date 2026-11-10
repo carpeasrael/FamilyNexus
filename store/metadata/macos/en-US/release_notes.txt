@@ -1,3 +1,7 @@
+New in 1.2.3:
+• Security: The identity records of family members are also kept encrypted on the device; if the server changes a key, it is noticed.
+• The loading screen at startup follows the device's appearance.
+
 New in 1.2.2:
 • Please update all devices of your family. Older app versions do not show groups, items with combined emojis or new reactions; if someone edits or checks off an item there, its group is lost for everyone.
 • Shopping: items can be assigned to a group, for example a shop. The list shows open items by group, “No group” at the end.
