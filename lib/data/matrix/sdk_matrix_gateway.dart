@@ -55,6 +55,10 @@ import 'local_sends.dart';
 import 'server_probe.dart';
 import 'sync_relevance.dart';
 
+part 'gateway/app_client.dart';
+part 'gateway/join_diagnostic.dart';
+part 'gateway/registration_session.dart';
+
 /// Produktive Implementierung auf Basis des Matrix-Dart-SDK (E-01).
 ///
 /// Sicherheitsrelevante Entscheidungen:
@@ -4048,131 +4052,6 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _http.close();
     super.dispose();
   }
-}
-
-/// Stand der Ablehnungs-Abfrage für „Details“ im Familienschritt (#116), nur im Arbeitsspeicher. Enthält
-/// ausschließlich feste Wörter, Zahlen und Zeiten: keine Raum-IDs, MXIDs oder Fehlertexte. Der Text ist
-/// eine feste technische Ausgabe für Testberichte und wird deshalb nicht übersetzt.
-class _JoinDiagnostic {
-  String state = '-';
-  String? membership;
-  String? previous;
-  bool? own;
-  int? offsetSeconds;
-  String trigger = '-';
-  int polls = 0;
-  final Map<String, int> timeouts = <String, int>{'auth': 0, 'headers': 0, 'body': 0};
-  int maxGapSeconds = 0;
-  DateTime? lastPoll;
-  DateTime? detectedAt;
-
-  void note(String newState) {
-    state = newState;
-    membership = previous = null;
-    own = null;
-    offsetSeconds = null;
-  }
-
-  void leaveOther({required String membership, required String previous, required bool own, required int offsetSeconds}) {
-    this.membership = membership;
-    this.previous = previous;
-    this.own = own;
-    this.offsetSeconds = offsetSeconds;
-  }
-
-  void polled(String by, DateTime now) {
-    polls++;
-    checked(by, now);
-  }
-
-  /// Durchlauf der Abfrage-Schleife, auch wenn er vor der Serveranfrage endet (`staleNote`): `Abfragen` zählt
-  /// nur, was den Server erreicht.
-  void checked(String by, DateTime now) {
-    trigger = by;
-    final last = lastPoll;
-    if (last != null && now.difference(last).inSeconds > maxGapSeconds) maxGapSeconds = now.difference(last).inSeconds;
-    lastPoll = now;
-  }
-
-  void timedOut(String phase) => timeouts[phase] = timeouts[phase]! + 1;
-
-  static String _time(DateTime? t) => t == null ? '-' : '${t.toUtc().toIso8601String().substring(0, 19)}Z';
-
-  String render({required bool timerActive, required DateTime now}) {
-    final detected = detectedAt;
-    return <String>[
-      'Zustand: $state',
-      if (membership != null) 'membership: $membership',
-      if (previous != null) 'vorher: $previous',
-      if (own != null) 'eigen: ${own! ? 'ja' : 'nein'}',
-      if (offsetSeconds != null) 'Versatz: ${offsetSeconds}s',
-      'Auslöser: $trigger',
-      'Abfragen: $polls',
-      'Zeitüberschreitungen: auth=${timeouts['auth']} headers=${timeouts['headers']} body=${timeouts['body']}',
-      'Größter Abstand: ${maxGapSeconds}s',
-      'Letzte Abfrage: ${_time(lastPoll)}',
-      'Erkannt: ${detected == null ? '-' : '${_time(detected)} (${detected.millisecondsSinceEpoch})'}',
-      'Timer aktiv: ${timerActive ? 'ja' : 'nein'}',
-      'Angezeigt: ${_time(now)}',
-    ].join('\n');
-  }
-}
-
-/// SDK-Client, der während einer Browser-Anmeldung die beim Start geprüften OAuth-Metadaten festhält
-/// (#222). Die OAuth-Erweiterungen des SDK rufen `getAuthMetadata` am Objekt und laden ohne Anmeldung
-/// sonst jedes Mal neu; der Server könnte dann nach der Prüfung andere Endpunkte nennen.
-class _AppClient extends Client {
-  _AppClient(
-    super.clientName, {
-    required super.database,
-    super.httpClient,
-    super.supportedLoginTypes,
-    super.verificationMethods,
-    super.receiptsPublicByDefault,
-    super.shareKeysWith,
-    super.logLevel,
-    super.requestHistoryOnLimitedTimeline,
-    super.customImageResizer,
-  });
-
-  /// Gesetzt nur zwischen geprüftem Start und Abschluss/Abbruch der Browser-Anmeldung.
-  GetAuthMetadataResponse? pinnedAuthMetadata;
-
-  @override
-  Future<GetAuthMetadataResponse> getAuthMetadata({
-    Duration cacheLifetime = const Duration(days: 3),
-    bool throwOnUpdateFailure = false,
-  }) {
-    final pinned = pinnedAuthMetadata;
-    if (pinned != null) return Future<GetAuthMetadataResponse>.value(pinned);
-    return super.getAuthMetadata(cacheLifetime: cacheLifetime, throwOnUpdateFailure: throwOnUpdateFailure);
-  }
-}
-
-/// Laufende klassische Registrierung. Das Passwort liegt nur hier und nur bis zum Ende.
-class _RegistrationSession {
-  _RegistrationSession({
-    required this.username,
-    required this.password,
-    required this.displayName,
-    required this.language,
-    this.provider,
-  });
-
-  final String username;
-
-  /// Eingegebene Adresse und Basis dieser Registrierung (#259).
-  final _Entered? provider;
-  String? password;
-  final String displayName;
-  final String language;
-  String? session;
-  List<List<String>> flows = const <List<String>>[];
-  Set<String> completed = const <String>{};
-  Map<String, Object?>? params;
-  String? clientSecret;
-  int sendAttempt = 0;
-  String? sid;
 }
 
 /// Eingegebene Anbieter-Adresse und die dazu aufgelöste, normalisierte Basis eines Anmeldevorgangs (#259).
