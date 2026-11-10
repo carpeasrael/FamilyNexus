@@ -53,9 +53,9 @@ Erst wenn **beide** `OK` melden: Lösung als Kommentar ins Issue schreiben (Ursa
 - Keine Geheimnisse (Notfall-Schlüssel, Passwörter, Signaturen) in Repository oder Issues.
 - Bestehende Tests nicht abschwächen, um grün zu werden.
 
-## Release-Review vor jedem Build
+## Release-Review vor jedem Build und am Sprint-Ende
 
-Vor jedem Build-Release läuft der Skill `release-review`: vier Agenten prüfen den App-Code, der Control-Agent prüft ihre Observations nach, bestätigte werden gh-Issues. Ohne passenden Bericht unter `docs/release-reviews/` bricht `release.yml` ab (E-75). Der Skill selbst ist kein Release: Er setzt keine Tags, ändert keine Build-Nummer und startet keinen Build. Bestätigte Issues folgen dem Standardablauf oben.
+Vor jedem Build-Release **und am Ende jedes Sprints** (Milestone abgeschlossen) läuft der Skill `release-review`: fünf Agenten (Performance, Qualität, Coding Standards, Sicherheit, Konsistenz) prüfen den App-Code, der Control-Agent prüft ihre Observations nach, bestätigte werden gh-Issues. Ohne passenden Bericht unter `docs/release-reviews/` bricht `release.yml` ab (E-75). Der Skill selbst ist kein Release: Er setzt keine Tags, ändert keine Build-Nummer und startet keinen Build. Bestätigte Issues folgen dem Standardablauf oben.
 
 ## Lokale Testumgebung
 
