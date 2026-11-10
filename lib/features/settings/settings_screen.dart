@@ -593,7 +593,7 @@ class _AccentPicker extends StatelessWidget {
                     CircleAvatar(
                       radius: 11,
                       backgroundColor: dark ? AccentPalette.of(a).neon : AccentPalette.of(a).deep,
-                      child: a == selected ? Icon(Icons.check, size: 14, color: dark ? const Color(0xFF0B1120) : Colors.white) : null,
+                      child: a == selected ? Icon(Icons.check, size: 14, color: dark ? AuroraTokens.dark.bgBody : Colors.white) : null,
                     ),
                     const SizedBox(width: 8),
                     Flexible(child: Text(_name(l, a))),

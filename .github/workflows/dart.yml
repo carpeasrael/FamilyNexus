@@ -30,6 +30,10 @@ jobs:
       - name: Analyze project source
         run: flutter analyze
 
+      # Dateien über 1000 Zeilen und build-Methoden über 150 Zeilen (Ausnahmen: tool/lib_size_exceptions.txt).
+      - name: Check lib size
+        run: dart tool/check_lib_size.dart
+
       # On Linux, sqflite_common_ffi loads the system SQLCipher (pubspec.yaml → hooks).
       - name: Install SQLCipher
         run: sudo apt-get update && sudo apt-get install -y libsqlcipher-dev

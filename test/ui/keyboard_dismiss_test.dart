@@ -17,7 +17,7 @@ bool _keyboardOpen(WidgetTester tester) => tester.testTextInput.isVisible;
 
 /// Issue #2: Auf dem iPhone ließ sich die Bildschirmtastatur nicht mehr schließen.
 void main() {
-  final mobile = TargetPlatformVariant(<TargetPlatform>{TargetPlatform.iOS, TargetPlatform.android});
+  final mobile = const TargetPlatformVariant(<TargetPlatform>{TargetPlatform.iOS, TargetPlatform.android});
   testWidgets('Tippen außerhalb des Textfelds schließt die Tastatur', (tester) async {
     final app = await buildTestApp(loggedIn: false);
     await _pump(tester, app);

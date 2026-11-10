@@ -71,9 +71,9 @@ void main() {
     await badge.close();
 
     expect(received, hasLength(2));
-    expect(received.first.values.first, DBusString('application://de.inneso.familynexus.desktop'));
+    expect(received.first.values.first, const DBusString('application://de.inneso.familynexus.desktop'));
     final props = received.first.values[1].asStringVariantDict();
-    expect(props['count'], DBusInt64(3));
+    expect(props['count'], const DBusInt64(3));
     expect(props['count-visible'], const DBusBoolean(true));
     expect(received.last.values[1].asStringVariantDict()['count-visible'], const DBusBoolean(false));
   });

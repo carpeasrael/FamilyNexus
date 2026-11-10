@@ -11,8 +11,8 @@ void main() {
     addTearDown(tester.view.reset);
     await tester.pumpWidget(MaterialApp(
       theme: buildTheme(Brightness.light),
-      home: Scaffold(
-        body: SectionCard(title: 'Titel', trailing: const Text('Aktion'), child: const SizedBox(height: 10)),
+      home: const Scaffold(
+        body: SectionCard(title: 'Titel', trailing: Text('Aktion'), child: SizedBox(height: 10)),
       ),
     ));
     final title = tester.getRect(find.text('Titel'));

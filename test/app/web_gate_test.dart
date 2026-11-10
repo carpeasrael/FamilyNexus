@@ -131,7 +131,7 @@ void main() {
     });
 
     testWidgets('$lang: falsches Passwort meldet weiterhin „falsch“', (tester) async {
-      await pump(tester, _Vault(exists: true)..unlockError = WrongVaultPasswordException(), lang);
+      await pump(tester, _Vault(exists: true)..unlockError = const WrongVaultPasswordException(), lang);
       await enter(tester);
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();

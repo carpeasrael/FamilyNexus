@@ -339,7 +339,7 @@ void main() {
     });
 
     group('#263: Zeitwähler markiert beim Fokus den Wert (Desktop)', () {
-      final desktop = TargetPlatformVariant(<TargetPlatform>{TargetPlatform.windows, TargetPlatform.linux, TargetPlatform.macOS});
+      final desktop = const TargetPlatformVariant(<TargetPlatform>{TargetPlatform.windows, TargetPlatform.linux, TargetPlatform.macOS});
 
       /// Editor öffnen, Zeitwähler für den Beginn (Vorschlag 12:00) in der Texteingabe; liefert die beiden Felder.
       Future<Finder> openTimeInput(WidgetTester tester) async {
