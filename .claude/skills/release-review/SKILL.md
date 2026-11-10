@@ -1,9 +1,11 @@
 ---
 name: release-review
-description: Pflicht vor jedem Build-Release von FamilyNexus. Vier Agenten prüfen den App-Code auf Performance, Qualität und Coding Standards, Sicherheit und Konsistenz, ein Control-Agent prüft die Observations nach, bestätigte werden zu gh-Issues. Verwenden, wenn ein Build, Release, Tag, Upload oder eine neue Build-Nummer ansteht oder wenn nach dem Release-Review gefragt wird. Argument "voll" erzwingt die Prüfung des ganzen App-Codes.
+description: Pflicht vor jedem Build-Release von FamilyNexus. Fünf Agenten prüfen den App-Code auf Performance, Qualität, Coding Standards, Sicherheit und Konsistenz, ein Control-Agent prüft die Observations nach, bestätigte werden zu gh-Issues. Verwenden, wenn ein Build, Release, Tag, Upload oder eine neue Build-Nummer ansteht, am Ende jedes Sprints (Milestone) oder wenn nach dem Release-Review gefragt wird. Argument "voll" erzwingt die Prüfung des ganzen App-Codes.
 ---
 
 # Release-Review
+
+Läuft vor jedem Build und am Ende jedes Sprints (= Milestone, nachdem dessen Issues gemergt sind), jeweils mit allen fünf Reviewern. Am Sprint-Ende ohne Build entsteht trotzdem der Bericht für den aktuellen Stand von `main`.
 
 Prüft genau den Stand, der gebaut werden soll. Ohne Bericht zu diesem Stand bricht `.github/workflows/release.yml` ab (Prüfung: `tool/check_release_review.sh`).
 
@@ -30,11 +32,11 @@ gh issue list --state all --limit 500 --json number,state,stateReason,title,labe
 
 Für die Agenten daraus einen Auszug bilden: Nummer, Zustand, Titel, und bei Issues mit Label `code-review` die Zeile `Review-Schlüssel`. Ganze Issue-Texte werden nicht weitergegeben.
 
-## 3. Vier Reviewer parallel starten
+## 3. Fünf Reviewer parallel starten
 
-In **einer** Nachricht vier `Agent`-Aufrufe: `review-performance`, `review-quality`, `review-security`, `review-consistency`. Jeder bekommt denselben Auftrag: geprüfter Commit, Umfang und Issue-Auszug. Keine eigene Einschätzung mitgeben.
+In **einer** Nachricht fünf `Agent`-Aufrufe: `review-performance`, `review-quality`, `review-standards`, `review-security`, `review-consistency`. Jeder bekommt denselben Auftrag: geprüfter Commit, Umfang und Issue-Auszug. Keine eigene Einschätzung mitgeben.
 
-Warten, bis alle vier fertig sind. Fehlt ein Ergebnis, ist es kein gültiges JSON oder steht unter `nicht_geprueft` ein wesentlicher Teil des Umfangs: diesen Reviewer einmal neu starten. Scheitert er erneut, abbrechen.
+Warten, bis alle fünf fertig sind. Fehlt ein Ergebnis, ist es kein gültiges JSON oder steht unter `nicht_geprueft` ein wesentlicher Teil des Umfangs: diesen Reviewer einmal neu starten. Scheitert er erneut, abbrechen.
 
 ## 4. Control-Agent
 
@@ -47,7 +49,7 @@ Einen `review-control` mit frischem Kontext starten. Er bekommt alle Observation
 
 ## 5. Issues anlegen
 
-Nur für `BESTÄTIGT`. Vorher die Labels sicherstellen (`gh label create <name> --force`): `code-review`, `review:performance`, `review:qualitaet`, `review:sicherheit`, `review:konsistenz`.
+Nur für `BESTÄTIGT`. Vorher die Labels sicherstellen (`gh label create <name> --force`): `code-review`, `review:performance`, `review:qualitaet`, `review:standards`, `review:sicherheit`, `review:konsistenz`.
 
 Abgleich über `Review-Schlüssel` in den bestehenden Issues:
 

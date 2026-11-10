@@ -1,6 +1,6 @@
 # Regeln für alle Review-Agenten
 
-Gilt für `review-performance`, `review-quality`, `review-security` und `review-consistency`.
+Gilt für `review-performance`, `review-quality`, `review-standards`, `review-security` und `review-consistency`.
 
 ## Auftrag und Umfang
 
@@ -42,7 +42,7 @@ Antworte ausschließlich mit diesem JSON-Block, ohne Text davor oder danach:
 
 ```json
 {
-  "agent": "performance | qualitaet | sicherheit | konsistenz",
+  "agent": "performance | qualitaet | standards | sicherheit | konsistenz",
   "umfang_geprueft": "Was du tatsächlich gelesen hast",
   "nicht_geprueft": "Was du auslassen musstest und warum, sonst leer",
   "observations": [
@@ -63,4 +63,4 @@ Antworte ausschließlich mit diesem JSON-Block, ohne Text davor oder danach:
 }
 ```
 
-`id`: Präfix `P` Performance, `Q` Qualität, `S` Sicherheit, `K` Konsistenz. `schluessel` muss über Läufe stabil bleiben: Bereich, Datei und ein Thema aus wenigen Wörtern in Kleinbuchstaben, ohne Zeilennummer.
+`id`: Präfix `P` Performance, `Q` Qualität, `C` Coding Standards, `S` Sicherheit, `K` Konsistenz. `schluessel` muss über Läufe stabil bleiben: Bereich, Datei und ein Thema aus wenigen Wörtern in Kleinbuchstaben, ohne Zeilennummer.
