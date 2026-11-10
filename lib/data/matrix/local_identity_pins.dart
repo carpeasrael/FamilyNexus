@@ -92,7 +92,9 @@ class LocalIdentityPins {
     if (_store == null || !_loaded) return;
     _sealed = false;
     if (_owner == userId) return;
-    if (_storedOwner != null && _storedOwner != userId) {
+    // Besitzer des Bestands: das zuvor gebundene Konto, sonst der beim Laden gelesene Eintrag (#352).
+    final previous = _owner ?? _storedOwner;
+    if (previous != null && previous != userId) {
       _pins.clear();
       _dirty = _reliable;
     }

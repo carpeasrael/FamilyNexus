@@ -1,8 +1,9 @@
+import 'package:family_nexus/app/app_version.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/text_norm.dart';
 
-/// Release Notes 1.2.2 (#242, #243): Sie versprechen nur, was die App kann, und folgen den Entscheidungen
+/// Release Notes (#353: die erste Zeile nennt die aktuelle Version, docs/STORE.md Abschnitt 7 Nr. 2); 1.2.2 (#242, #243): Sie versprechen nur, was die App kann, und folgen den Entscheidungen
 /// zu älteren App-Versionen (E-40 Nachträge #161, #211; E-86).
 const _files = <String>[
   'store/metadata/android/de-DE/release_notes.txt',
@@ -33,6 +34,10 @@ void main() {
           expect(c, contains(negation), reason: 'Termine sperren ZWJ/ZWNJ (E-33, E-40 Nachtrag #161): $c');
         }
       }
+    });
+
+    test('#353 $f: beginnt mit den Neuerungen der aktuellen Version', () {
+      expect(text.split('\n').first.trim(), '${de ? 'Neu in' : 'New in'} $appVersion:');
     });
 
     test('#243 $f: bittet, alle Geräte zu aktualisieren', () {

@@ -1,3 +1,7 @@
+Neu in 1.2.3:
+• Sicherheit: Die Identitätsvermerke der Familienmitglieder liegen zusätzlich verschlüsselt auf dem Gerät; ändert der Server einen Schlüssel, fällt das auf.
+• Das Ladebild beim Start folgt der Darstellung des Geräts.
+
 Neu in 1.2.2:
 • Bitte alle Geräte der Familie aktualisieren. Ältere App-Versionen zeigen Gruppen, Einträge mit zusammengesetzten Emojis und neue Reaktionen nicht; ändert oder hakt jemand dort einen Eintrag ab, geht dessen Gruppe für alle verloren.
 • Einkauf: Einträge lassen sich einer Gruppe zuordnen, zum Beispiel einem Geschäft. Die Liste zeigt die offenen Einträge nach Gruppen, „Ohne Gruppe“ am Ende.
