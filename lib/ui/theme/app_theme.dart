@@ -23,6 +23,7 @@ ThemeData buildTheme(Brightness brightness, {bool reduceEffects = false, AccentC
     primary: t.primary,
     onPrimary: t.onPrimary,
     secondary: t.magenta,
+    // onSecondary und onError sind bewusst fest (dunkel auf Magenta bzw. Rot); Kontrast prüft test/core/contrast_test.dart.
     onSecondary: brightness == Brightness.dark ? const Color(0xFF2A0A1A) : Colors.white,
     tertiary: t.violet,
     error: t.danger,

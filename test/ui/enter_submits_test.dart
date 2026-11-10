@@ -29,7 +29,7 @@ Future<void> _type(WidgetTester tester, Finder field, String text) async {
 }
 
 void main() {
-  final desktop = TargetPlatformVariant(<TargetPlatform>{TargetPlatform.linux, TargetPlatform.windows, TargetPlatform.macOS});
+  final desktop = const TargetPlatformVariant(<TargetPlatform>{TargetPlatform.linux, TargetPlatform.windows, TargetPlatform.macOS});
 
   testWidgets('Desktop: Enter sendet im Chat, Umschalt+Enter nicht', (tester) async {
     final app = await _open(tester, 'Chat');
