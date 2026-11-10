@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../app/app_services.dart';
+import '../../core/app_log.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/security.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -38,8 +39,9 @@ void clearClipboardLater(String secret, {Duration delay = const Duration(seconds
       listener?.dispose();
       giveUp?.cancel();
       if (current.text == secret) await Clipboard.setData(const ClipboardData(text: ''));
-    } catch (_) {
+    } catch (e) {
       // Ohne Zugriff auf die Zwischenablage bleibt nichts zu tun.
+      AppLog.d('security', 'Zwischenablage nicht lesbar (${e.runtimeType})');
     }
   }
 

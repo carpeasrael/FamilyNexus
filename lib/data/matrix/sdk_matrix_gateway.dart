@@ -2519,6 +2519,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       // Die Link-ID steht im Grund der Einladung; so erkennen auch andere Moderator-Geräte den Link als verbraucht.
       await _roomOp((room) => room.invite(userId, reason: viaLink ? '$knockReasonPrefix$nonce' : null));
     } catch (_) {
+      // Einladung gescheitert: Link-ID wieder freigeben, Fehler unverändert weiter.
       if (viaLink) _usedTickets.remove(nonce);
       rethrow;
     }

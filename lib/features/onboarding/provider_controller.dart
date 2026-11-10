@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../core/app_log.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/app_settings.dart';
 import '../../domain/registration.dart';
@@ -136,8 +137,10 @@ class ProviderController extends ChangeNotifier {
       if (run != _run || _disposed) return;
       _error = e.error;
       _status = ProviderStatus.failed;
-    } catch (_) {
+    } catch (e) {
       if (run != _run || _disposed) return;
+      // Kein Gateway-Fehler: Die Oberfläche zeigt „unbekannt“, die Ursache steht im Protokoll (nur der Typ).
+      AppLog.e('onboarding', 'Anbieter-Prüfung fehlgeschlagen', e);
       _error = GatewayError.unknown;
       _status = ProviderStatus.failed;
     }

@@ -80,6 +80,7 @@ class _AccountDeletionDialogState extends State<AccountDeletionDialog> {
         try {
           await s.gateway.deleteAccount(password: _password.text);
         } catch (_) {
+          // Scheitert das Löschen, bleibt das Konto bestehen: Markierung zurücknehmen, Fehler unverändert weiter.
           s.accountDeletionPending = false;
           rethrow;
         }
