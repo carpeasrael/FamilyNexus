@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../core/app_log.dart';
 import '../../domain/attachment_policy.dart';
 
 class PickedFile {
@@ -66,8 +67,9 @@ class SystemFileAccess implements FileAccess {
     if (_active > 0) return; // Der letzte Vorgang räumt auf.
     try {
       await FilePicker.clearTemporaryFiles();
-    } catch (_) {
+    } catch (e) {
       // Aufräumen ist Bestpreis: Es ändert kein Ergebnis und hält weder Start noch Löschen auf.
+      AppLog.d('files', 'Temporäre Dateien nicht aufgeräumt (${e.runtimeType})');
     }
   }
 }

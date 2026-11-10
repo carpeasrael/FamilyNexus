@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
 import '../../app/app_version.dart';
+import '../../core/app_log.dart';
 import '../../data/platform/secret_clipboard.dart';
 import '../../domain/data_inventory.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -45,8 +46,9 @@ class _DataReportScreenState extends State<DataReportScreen> {
         OnlineInventory? matrix;
         try {
           matrix = await gateway.dataInventory(refresh: false);
-        } catch (_) {
+        } catch (e) {
           // Abgemeldet: der Abschnitt meldet „nicht verfügbar“.
+          AppLog.d('report', 'Online-Inventar nicht verfügbar (${e.runtimeType})');
         }
         return DataReport.local(l: l, inventory: await local.read(), matrix: matrix, now: now, version: appVersionWithBuild);
     }

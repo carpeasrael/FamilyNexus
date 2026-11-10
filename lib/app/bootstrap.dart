@@ -78,8 +78,9 @@ Future<bool> restoreSession(MatrixGateway gateway, KeyValueStore kv) async {
       }
     }
     rethrow;
-  } catch (_) {
+  } catch (e) {
     // Offline/Serverfehler beim Start: Sitzung bleibt lokal bestehen, Sync holt auf.
+    AppLog.w('startup', 'Sitzung nicht bestätigt, Start läuft lokal weiter (${e.runtimeType})');
   }
   if (!(await kv.readAll()).containsKey(AppServices.keepAccountDataKey)) return false;
   if (gateway.session != SessionState.ready) return true;
@@ -245,14 +246,16 @@ Future<void> fullLocalReset(AppServices s, {@visibleForTesting Future<void> Func
   s.resetting.value = true;
   try {
     await s.presence?.goOffline();
-  } catch (_) {
+  } catch (e) {
     // best effort
+    AppLog.w('reset', 'Offline-Meldung vor dem Löschen nicht gesendet (${e.runtimeType})');
   }
   s.closeCalendar(cancelReminders: true);
   try {
     await s.gateway.logout();
-  } catch (_) {
+  } catch (e) {
     // Server nicht erreichbar: lokal wird trotzdem vollständig gelöscht.
+    AppLog.w('reset', 'Abmeldung vor dem Löschen nicht möglich (${e.runtimeType})');
   }
   await s.gateway.close();
   await s.database?.close();

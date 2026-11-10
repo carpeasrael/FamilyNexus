@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
+import '../../core/app_log.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../data/platform/element_launcher.dart';
 import '../../domain/registration.dart';
@@ -243,8 +244,9 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
         if (name.isNotEmpty) {
           try {
             await _s.gateway.setDisplayName(name);
-          } catch (_) {
+          } catch (e) {
             // Der Name lässt sich später in den Einstellungen des Anbieters ändern; kein Abbruch.
+            AppLog.w('onboarding', 'Anzeigename nicht gesetzt (${e.runtimeType})');
           }
         }
       });

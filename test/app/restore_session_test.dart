@@ -2,6 +2,7 @@ import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/app/app_services.dart';
 import 'package:family_nexus/app/bootstrap.dart';
 import 'package:family_nexus/app/startup_failure.dart';
+import 'package:family_nexus/core/app_log.dart';
 import 'package:family_nexus/data/db/app_database.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:flutter/material.dart';
@@ -59,6 +60,15 @@ void main() {
       final g = _Gateway(FakeMatrixServer(), failure: const GatewayException(GatewayError.serverUnreachable), loggedIn: true);
       expect(await restoreSession(g, kv), isFalse);
       expect(kv.data, isNot(contains(key)));
+    });
+
+    test('#359 verschluckter Fehler mit Sitzung steht im Protokoll (nur der Typ), Ergebnis unverändert', () async {
+      AppLog.captured.clear();
+      AppLog.capture = true;
+      addTearDown(() => AppLog.capture = false);
+      final g = _Gateway(FakeMatrixServer(), failure: const GatewayException(GatewayError.serverUnreachable), loggedIn: true);
+      expect(await restoreSession(g, kv), isFalse);
+      expect(AppLog.captured, contains('W/startup: Sitzung nicht bestätigt, Start läuft lokal weiter (GatewayException)'));
     });
 
     test('ein alter Vermerk fällt mit stehender Sitzung weg, auch nach einem verschluckten Fehler', () async {

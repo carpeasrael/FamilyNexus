@@ -159,7 +159,9 @@ class LocalIdentityPins {
     if (store == null) return;
     try {
       await _running;
-    } catch (_) {}
+    } catch (_) {
+      // Fehler des laufenden Schreibens sind in [_write] schon protokolliert; gelöscht wird trotzdem.
+    }
     try {
       await store.delete(storeKey);
       // Die Ablage ist jetzt leer und lesbar: Schutz ab der nächsten Anmeldung wieder wirksam.

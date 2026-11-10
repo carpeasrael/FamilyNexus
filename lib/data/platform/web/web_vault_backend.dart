@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:web/web.dart' as web;
 
+import '../../../core/app_log.dart';
 import '../vault_key_store.dart';
 
 VaultBackend? createWebVaultBackend() => WebVaultBackend();
@@ -84,7 +85,9 @@ class WebVaultBackend implements VaultBackend {
       m = jsonDecode(raw) as Map<String, dynamic>;
       _salt = base64Decode(m['s'] as String);
       _iterations = (m['i'] as num).toInt();
-    } catch (_) {
+    } catch (e) {
+      // Beschädigter Eintrag: wie ein falsches Passwort melden; Typ ins Protokoll, nie Inhalt oder Schlüssel.
+      AppLog.w('vault', 'Tresor-Kopfdaten nicht lesbar (${e.runtimeType})');
       throw const WrongVaultPasswordException();
     }
     // Untergrenze (Pen-Test F-06): ein untergeschobener Tresor mit wenigen Runden würde das Passwort leicht
@@ -94,7 +97,9 @@ class WebVaultBackend implements VaultBackend {
     _key = await _derive(password, _salt!, _iterations);
     try {
       await load();
-    } catch (_) {
+    } catch (e) {
+      // Normalfall bei falschem Passwort (Entschlüsselung scheitert); nur der Typ, nie Inhalt oder Schlüssel.
+      AppLog.d('vault', 'Tresor nicht entschlüsselbar (${e.runtimeType})');
       _key = null;
       throw const WrongVaultPasswordException();
     }
