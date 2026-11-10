@@ -55,6 +55,7 @@ import 'local_sends.dart';
 import 'server_probe.dart';
 import 'sync_relevance.dart';
 
+part 'gateway/account_deletion.dart';
 part 'gateway/app_client.dart';
 part 'gateway/join_diagnostic.dart';
 part 'gateway/registration_session.dart';
@@ -68,7 +69,7 @@ part 'gateway/registration_session.dart';
 /// * Lesebestätigungen sind privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -122,6 +123,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Alle Verbindungen des SDK laufen über diesen Client: nur https, keine Weiterleitungen.
   final HttpsOnlyClient _http;
 
+  @override
   _AppClient? _client;
   StreamSubscription<Object?>? _syncSub;
   StreamSubscription<Object?>? _loginSub;
@@ -397,6 +399,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   /// Vergisst die Anbieter-Adresse (Sitzungsende): erst das Feld, dann die Ablage. Idempotent; Fehler nur im Log.
+  @override
   Future<void> _forgetProvider() async {
     final had = _provider != null || _providerMaybeStored;
     _provider = null;
@@ -735,6 +738,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   /// Beendet eine offene Browser-Anmeldung samt der dafür festgehaltenen Metadaten (#222): beide
   /// werden immer gemeinsam aufgehoben.
+  @override
   void _dropOAuth() {
     _oauth = null;
     _oauthPair = null;
@@ -1131,6 +1135,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   static const String _deactivateAction = 'org.matrix.account_deactivate';
 
   /// Wurde die Sitzung im Browser angemeldet (OAuth)? Dann darf der Client das Konto nicht selbst löschen.
+  @override
   Future<bool> _signedInViaOAuth(Client c) async {
     final stored = await c.database.getClient(c.clientName);
     return stored?.tryGet<String>('oidc_client_id') != null;
@@ -1162,6 +1167,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   /// Liest die OAuth-Metadaten selbst: Das SDK-Modell bricht bei unbekannten Kontoaktionen ab.
+  @override
   Future<Uri?> _accountManagementPage(Client c, Uri? Function(Map<String, Object?> metadata) pick) async {
     final base = c.homeserver;
     if (base == null) return null;
@@ -1173,78 +1179,6 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
       return json is Map<String, Object?> ? pick(json) : null;
     }
     return null;
-  }
-
-  @override
-  Future<AccountDeletion> accountDeletion() async {
-    final c = _client;
-    if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
-    try {
-      if (!await _signedInViaOAuth(c)) return const AccountDeletionInApp();
-      final page = await _accountManagementPage(c, accountDeletionPage);
-      if (page == null) throw const GatewayException(GatewayError.serverUnsupported);
-      return AccountDeletionInBrowser(page);
-    } on GatewayException {
-      rethrow;
-    } catch (e) {
-      AppLog.e('gateway', 'Kontoseite des Anbieters nicht ermittelt', e);
-      throw _map(e);
-    }
-  }
-
-  @override
-  Future<void> deleteAccount({required String password}) async {
-    final c = _client;
-    if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
-    if (password.isEmpty || password.length > 1024) throw const GatewayException(GatewayError.invalidInput);
-    try {
-      if (await _signedInViaOAuth(c)) throw const GatewayException(GatewayError.notAllowed);
-      // `erase`: Später beitretende sehen die Nachrichten des Kontos nur noch geschwärzt.
-      try {
-        await c.deactivateAccount(erase: true);
-      } on MatrixException catch (e) {
-        final session = e.session;
-        if (session == null || e.authenticationFlows == null) rethrow;
-        if (!_offersPassword(e.authenticationFlows!)) {
-          throw const GatewayException(GatewayError.serverUnsupported);
-        }
-        await c.deactivateAccount(
-          erase: true,
-          auth: AuthenticationPassword(session: session, password: password, identifier: AuthenticationUserIdentifier(user: c.userID!)),
-        );
-      }
-    } on GatewayException {
-      rethrow;
-    } catch (e) {
-      AppLog.e('gateway', 'Kontolöschung fehlgeschlagen', e);
-      if (e is MatrixException && (e.errcode == 'M_FORBIDDEN' || e.errcode == 'M_UNAUTHORIZED')) {
-        throw const GatewayException(GatewayError.invalidCredentials);
-      }
-      throw _map(e);
-    }
-    await _endDeletedSession(c);
-  }
-
-  @override
-  Future<bool> checkAccountDeleted() async {
-    final c = _client;
-    if (c == null) return true;
-    if (c.isLogged()) {
-      try {
-        await c.getTokenOwner();
-        return false;
-      } on MatrixException catch (e) {
-        if (e.errcode != 'M_UNKNOWN_TOKEN' && e.errcode != 'M_USER_DEACTIVATED') throw _map(e);
-      } catch (e) {
-        // Das SDK kann die Sitzung beim gescheiterten Auffrischen des Tokens selbst beenden.
-        if (c.isLogged()) {
-          AppLog.e('gateway', 'Kontostatus nicht prüfbar', e);
-          throw _map(e);
-        }
-      }
-    }
-    await _endDeletedSession(c);
-    return true;
   }
 
   // ------------------------------------------------- Passwort ändern (#117)
@@ -1328,23 +1262,9 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return null;
   }
 
-  /// Das Konto ist beim Anbieter gelöscht: Sitzung nur noch lokal beenden (der Server kennt sie nicht mehr).
-  Future<void> _endDeletedSession(Client c) async {
-    cancelRegistration();
-    _dropOAuth();
-    try {
-      await c.clear();
-    } catch (e) {
-      AppLog.e('gateway', 'Lokales Bereinigen fehlgeschlagen', e);
-    }
-    await _forgetProvider();
-    await _localPins.forget();
-    _resetLocal();
-    notifyListeners();
-  }
-
   /// Gemeinsamer Rücksetzpfad für Abmelden und erzwungene Abmeldung
   /// (ungültiges Token): sonst blieben Timeline-Abonnements und Zustände hängen.
+  @override
   void _resetLocal() {
     _resetLive();
     _timeline?.cancelSubscriptions();
@@ -3720,6 +3640,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
   final IdentityPinBook _pinBook = IdentityPinBook();
 
   /// Lokale Kopie der Vermerke mit Vorrang vor den Kontodaten (#142); überlebt [_resetLocal].
+  @override
   late final LocalIdentityPins _localPins = LocalIdentityPins(_accountStore);
   final Set<String> _pinConflictLogged = <String>{};
 
@@ -3888,6 +3809,7 @@ class SdkMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   // ------------------------------------------------------------- Fehler
 
+  @override
   GatewayException _map(Object e, {bool forLogin = false}) {
     if (e is GatewayException) return e;
     if (e is MatrixException) {
