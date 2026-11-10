@@ -1,3 +1,6 @@
+New in 1.2.3:
+• Identity records are also kept on the device.
+• The loading screen follows the device's appearance.
 New in 1.2.2:
 • Please update all devices of your family.
 • Shopping: group items, e.g. by shop.
@@ -5,6 +8,4 @@ New in 1.2.2:
 • A moderator confirms every join; invitation links no longer show names.
 • Change your password in the settings.
 • Reactions are sent encrypted.
-• Better protection when switching families and for home-network servers.
-• Times follow the device setting; combined emojis in shopping and tasks.
 • Many fixes.
