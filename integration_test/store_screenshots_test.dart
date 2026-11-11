@@ -13,8 +13,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import '../tool/preview/preview_data.dart';
 import '../test/helpers/shell_finders.dart';
+import '../tool/preview/preview_data.dart';
 
 // Sprache der Aufnahmen: --dart-define=SHOTS_LANG=en (Standard de); die Dateien landen dann in .../fn_store_shots_<sprache>.
 const _lang = String.fromEnvironment('SHOTS_LANG', defaultValue: 'de');
