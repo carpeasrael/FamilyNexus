@@ -4,6 +4,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../../data/platform/reminder_scheduler.dart';
 import '../../domain/reminder_planner.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../ui/layout/adaptive.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/clock_tick.dart';
 import '../../ui/widgets/glass.dart';
@@ -11,7 +12,6 @@ import '../calendar/calendar_controller.dart';
 import '../calendar/calendar_screen.dart' show SectionCard;
 import '../calendar/event_detail_screen.dart';
 import '../calendar/formatting.dart';
-import '../../ui/layout/adaptive.dart';
 import 'permission_hint.dart';
 import 'reminder_coordinator.dart';
 

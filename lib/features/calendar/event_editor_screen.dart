@@ -9,11 +9,11 @@ import '../../domain/calendar_service.dart';
 import '../../domain/family.dart';
 import '../../domain/recurrence.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../ui/layout/adaptive.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../../ui/widgets/length_limit.dart';
 import '../reminders/reminder_coordinator.dart';
-import '../../ui/layout/adaptive.dart';
 import 'calendar_controller.dart';
 import 'formatting.dart';
 

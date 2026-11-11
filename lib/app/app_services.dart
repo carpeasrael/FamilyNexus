@@ -10,7 +10,6 @@ import '../data/db/sql_task_store.dart';
 import '../data/matrix/matrix_gateway.dart';
 import '../data/platform/browser_launcher.dart';
 import '../data/platform/element_launcher.dart';
-import '../domain/server.dart';
 import '../data/platform/file_access.dart';
 import '../data/platform/key_store.dart';
 import '../data/platform/link_source.dart';
@@ -18,16 +17,18 @@ import '../data/platform/mail_launcher.dart';
 import '../data/platform/oauth_redirect.dart';
 import '../data/platform/reminder_scheduler.dart';
 import '../data/platform/screen_protection.dart';
+import '../data/platform/store_launcher.dart';
 import '../data/sync/activity_notifier.dart';
 import '../data/sync/presence_sync.dart';
 import '../domain/data_inventory.dart';
 import '../domain/invite_link.dart';
+import '../domain/server.dart';
 import '../features/calendar/calendar_controller.dart';
 import '../features/lock/app_lock_controller.dart';
 import '../features/reminders/reminder_coordinator.dart';
+import '../features/settings/settings_controller.dart';
 import '../features/shopping/shopping_controller.dart';
 import '../features/tasks/tasks_controller.dart';
-import '../features/settings/settings_controller.dart';
 
 /// Erzeugt den Kalender für den angemeldeten Nutzer (inkl. lokaler Ablage) und dessen Familie [familyRoom].
 typedef CalendarBuilder = Future<CalendarController> Function(String userId, String? familyRoom);
@@ -59,6 +60,7 @@ class AppServices {
     this.activityPlatform,
     this.badge,
     this.mail = const SystemMailLauncher(),
+    this.store = const SystemStoreLauncher(),
     this.browser = const SystemBrowserLauncher(),
     this.element = const SystemElementLauncher(),
     this.oauthRedirect,
@@ -74,6 +76,9 @@ class AppServices {
 
   /// Öffnet das Mailprogramm für Einladungslinks (E-49).
   final MailLauncher mail;
+
+  /// Öffnet den Store-Eintrag zum Bewerten (#350).
+  final StoreLauncher store;
 
   /// Öffnet Seiten des Anbieters (Anmeldung, Bedingungen, Captcha, Kontoseiten; E-55, E-91).
   final BrowserLauncher browser;

@@ -7,13 +7,13 @@ import '../../domain/task_period.dart';
 import '../../domain/tasks.dart';
 import '../../domain/time_zones.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../ui/layout/adaptive.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../../ui/widgets/length_limit.dart';
 import '../calendar/formatting.dart';
-import '../common/error_text.dart';
 import '../chat/sender_name.dart';
-import '../../ui/layout/adaptive.dart';
+import '../common/error_text.dart';
 import 'tasks_controller.dart';
 
 /// Kurzlabel für die Kachel (Täglich, Mo–Fr, Wöchentlich, Monatlich).

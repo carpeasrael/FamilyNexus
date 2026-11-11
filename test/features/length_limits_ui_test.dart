@@ -5,8 +5,8 @@ import 'package:family_nexus/domain/tasks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../support/test_app.dart';
 import '../helpers/shell_finders.dart';
+import '../support/test_app.dart';
 
 /// #221: Die Eingabefelder zählen wie die Prüfung der Domäne (Einkauf und Aufgaben Codepunkte,
 /// Termine UTF-16-Einheiten), nicht sichtbare Zeichen.

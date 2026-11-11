@@ -176,6 +176,120 @@ abstract class AppLocalizations {
   /// **'Datenschutz'**
   String get settingsSectionPrivacy;
 
+  /// No description provided for @settingsShareApp.
+  ///
+  /// In de, this message translates to:
+  /// **'App teilen'**
+  String get settingsShareApp;
+
+  /// No description provided for @settingsShareAppHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Kopiert den Link zum Store-Eintrag, damit du ihn weitergeben kannst. Es werden keine Familiendaten geteilt.'**
+  String get settingsShareAppHint;
+
+  /// No description provided for @settingsShareAppText.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich nutze FamilyNexus, den Familienplaner mit Kalender, Chat und Einkaufsliste. Hier gibt es die App:'**
+  String get settingsShareAppText;
+
+  /// No description provided for @settingsShareAppCopied.
+  ///
+  /// In de, this message translates to:
+  /// **'Link zum Store-Eintrag kopiert'**
+  String get settingsShareAppCopied;
+
+  /// No description provided for @settingsRateApp.
+  ///
+  /// In de, this message translates to:
+  /// **'App bewerten'**
+  String get settingsRateApp;
+
+  /// No description provided for @settingsRateAppHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Öffnet den Eintrag im Play Store.'**
+  String get settingsRateAppHint;
+
+  /// No description provided for @settingsRateAppFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Store-Eintrag konnte nicht geöffnet werden.'**
+  String get settingsRateAppFailed;
+
+  /// No description provided for @tourStepOf.
+  ///
+  /// In de, this message translates to:
+  /// **'Schritt {step} von {total}'**
+  String tourStepOf(int step, int total);
+
+  /// No description provided for @tourNext.
+  ///
+  /// In de, this message translates to:
+  /// **'Weiter'**
+  String get tourNext;
+
+  /// No description provided for @tourBack.
+  ///
+  /// In de, this message translates to:
+  /// **'Zurück'**
+  String get tourBack;
+
+  /// No description provided for @tourSkip.
+  ///
+  /// In de, this message translates to:
+  /// **'Überspringen'**
+  String get tourSkip;
+
+  /// No description provided for @tourDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Los geht’s'**
+  String get tourDone;
+
+  /// No description provided for @tourCalendarTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kalender'**
+  String get tourCalendarTitle;
+
+  /// No description provided for @tourCalendarBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Trage Termine ein, teile sie mit der Familie oder halte sie privat. „Heute“ zeigt dir, was als Nächstes ansteht.'**
+  String get tourCalendarBody;
+
+  /// No description provided for @tourChatTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Chat'**
+  String get tourChatTitle;
+
+  /// No description provided for @tourChatBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Schreibe der ganzen Familie oder einzelnen Mitgliedern. Termine lassen sich im Chat teilen und direkt zu- oder absagen.'**
+  String get tourChatBody;
+
+  /// No description provided for @tourShoppingTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Einkauf'**
+  String get tourShoppingTitle;
+
+  /// No description provided for @tourShoppingBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Eine gemeinsame Einkaufsliste für alle, auch ohne Netz. Abhaken, ergänzen, erledigt: Jeder sieht den aktuellen Stand.'**
+  String get tourShoppingBody;
+
+  /// No description provided for @settingsTourRestart.
+  ///
+  /// In de, this message translates to:
+  /// **'Einführung erneut ansehen'**
+  String get settingsTourRestart;
+
   /// No description provided for @settingsSectionAbout.
   ///
   /// In de, this message translates to:
@@ -1135,6 +1249,18 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'{count, plural, =0{Keine Termine} =1{1 Termin} other{{count} Termine}}'**
   String calendarEventsOnDay(int count);
+
+  /// No description provided for @calendarYearText.
+  ///
+  /// In de, this message translates to:
+  /// **'Tag {day} von {total} · noch {left, plural, =0{0 Tage} =1{1 Tag} other{{left} Tage}} · {percent} % des Jahres verstrichen'**
+  String calendarYearText(int day, int total, int left, int percent);
+
+  /// No description provided for @calendarYearSemantics.
+  ///
+  /// In de, this message translates to:
+  /// **'Jahresfortschritt: {percent} Prozent verstrichen'**
+  String calendarYearSemantics(int percent);
 
   /// No description provided for @todayNext.
   ///

@@ -50,6 +50,71 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsSectionPrivacy => 'Datenschutz';
 
   @override
+  String get settingsShareApp => 'App teilen';
+
+  @override
+  String get settingsShareAppHint =>
+      'Kopiert den Link zum Store-Eintrag, damit du ihn weitergeben kannst. Es werden keine Familiendaten geteilt.';
+
+  @override
+  String get settingsShareAppText =>
+      'Ich nutze FamilyNexus, den Familienplaner mit Kalender, Chat und Einkaufsliste. Hier gibt es die App:';
+
+  @override
+  String get settingsShareAppCopied => 'Link zum Store-Eintrag kopiert';
+
+  @override
+  String get settingsRateApp => 'App bewerten';
+
+  @override
+  String get settingsRateAppHint => 'Öffnet den Eintrag im Play Store.';
+
+  @override
+  String get settingsRateAppFailed =>
+      'Der Store-Eintrag konnte nicht geöffnet werden.';
+
+  @override
+  String tourStepOf(int step, int total) {
+    return 'Schritt $step von $total';
+  }
+
+  @override
+  String get tourNext => 'Weiter';
+
+  @override
+  String get tourBack => 'Zurück';
+
+  @override
+  String get tourSkip => 'Überspringen';
+
+  @override
+  String get tourDone => 'Los geht’s';
+
+  @override
+  String get tourCalendarTitle => 'Kalender';
+
+  @override
+  String get tourCalendarBody =>
+      'Trage Termine ein, teile sie mit der Familie oder halte sie privat. „Heute“ zeigt dir, was als Nächstes ansteht.';
+
+  @override
+  String get tourChatTitle => 'Chat';
+
+  @override
+  String get tourChatBody =>
+      'Schreibe der ganzen Familie oder einzelnen Mitgliedern. Termine lassen sich im Chat teilen und direkt zu- oder absagen.';
+
+  @override
+  String get tourShoppingTitle => 'Einkauf';
+
+  @override
+  String get tourShoppingBody =>
+      'Eine gemeinsame Einkaufsliste für alle, auch ohne Netz. Abhaken, ergänzen, erledigt: Jeder sieht den aktuellen Stand.';
+
+  @override
+  String get settingsTourRestart => 'Einführung erneut ansehen';
+
+  @override
   String get settingsSectionAbout => 'Über die App';
 
   @override
@@ -634,6 +699,23 @@ class AppLocalizationsDe extends AppLocalizations {
       zero: 'Keine Termine',
     );
     return '$_temp0';
+  }
+
+  @override
+  String calendarYearText(int day, int total, int left, int percent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: '$left Tage',
+      one: '1 Tag',
+      zero: '0 Tage',
+    );
+    return 'Tag $day von $total · noch $_temp0 · $percent % des Jahres verstrichen';
+  }
+
+  @override
+  String calendarYearSemantics(int percent) {
+    return 'Jahresfortschritt: $percent Prozent verstrichen';
   }
 
   @override

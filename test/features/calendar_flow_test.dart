@@ -9,9 +9,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/shell_finders.dart';
 import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
-import '../helpers/shell_finders.dart';
 
 final DateTime _now = DateTime.utc(2026, 3, 20, 10); // 11:00 in Berlin
 

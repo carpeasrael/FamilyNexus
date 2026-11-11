@@ -8,8 +8,8 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../../ui/widgets/length_limit.dart';
-import '../common/error_text.dart';
 import '../chat/sender_name.dart';
+import '../common/error_text.dart';
 import 'shopping_controller.dart';
 
 /// Gemeinsamer Einkaufszettel der Familie (E-40).

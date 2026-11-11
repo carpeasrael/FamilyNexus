@@ -13,6 +13,31 @@
   "emptyFamily": "Es ist noch keine Familie eingerichtet.",
   "settingsSectionDisplay": "Darstellung",
   "settingsSectionPrivacy": "Datenschutz",
+  "settingsShareApp": "App teilen",
+  "settingsShareAppHint": "Kopiert den Link zum Store-Eintrag, damit du ihn weitergeben kannst. Es werden keine Familiendaten geteilt.",
+  "settingsShareAppText": "Ich nutze FamilyNexus, den Familienplaner mit Kalender, Chat und Einkaufsliste. Hier gibt es die App:",
+  "settingsShareAppCopied": "Link zum Store-Eintrag kopiert",
+  "settingsRateApp": "App bewerten",
+  "settingsRateAppHint": "Öffnet den Eintrag im Play Store.",
+  "settingsRateAppFailed": "Der Store-Eintrag konnte nicht geöffnet werden.",
+  "tourStepOf": "Schritt {step} von {total}",
+  "@tourStepOf": {
+    "placeholders": {
+      "step": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "tourNext": "Weiter",
+  "tourBack": "Zurück",
+  "tourSkip": "Überspringen",
+  "tourDone": "Los geht’s",
+  "tourCalendarTitle": "Kalender",
+  "tourCalendarBody": "Trage Termine ein, teile sie mit der Familie oder halte sie privat. „Heute“ zeigt dir, was als Nächstes ansteht.",
+  "tourChatTitle": "Chat",
+  "tourChatBody": "Schreibe der ganzen Familie oder einzelnen Mitgliedern. Termine lassen sich im Chat teilen und direkt zu- oder absagen.",
+  "tourShoppingTitle": "Einkauf",
+  "tourShoppingBody": "Eine gemeinsame Einkaufsliste für alle, auch ohne Netz. Abhaken, ergänzen, erledigt: Jeder sieht den aktuellen Stand.",
+  "settingsTourRestart": "Einführung erneut ansehen",
   "settingsSectionAbout": "Über die App",
   "settingsLanguage": "Sprache",
   "languageSystem": "Gerätesprache",
@@ -299,6 +324,21 @@
       "count": {
         "type": "int"
       }
+    }
+  },
+  "calendarYearText": "Tag {day} von {total} · noch {left, plural, =0{0 Tage} =1{1 Tag} other{{left} Tage}} · {percent} % des Jahres verstrichen",
+  "@calendarYearText": {
+    "placeholders": {
+      "day": {"type": "int"},
+      "total": {"type": "int"},
+      "left": {"type": "int"},
+      "percent": {"type": "int"}
+    }
+  },
+  "calendarYearSemantics": "Jahresfortschritt: {percent} Prozent verstrichen",
+  "@calendarYearSemantics": {
+    "placeholders": {
+      "percent": {"type": "int"}
     }
   },
   "todayNext": "Nächste Termine",

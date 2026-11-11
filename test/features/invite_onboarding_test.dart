@@ -12,11 +12,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/shell_finders.dart';
 import '../support/fake_browser.dart';
 import '../support/fake_matrix.dart';
 import '../support/registration_form.dart';
 import '../support/test_app.dart';
-import '../helpers/shell_finders.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
   tester.view.physicalSize = const Size(900, 3000);

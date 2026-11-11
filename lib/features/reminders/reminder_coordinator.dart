@@ -5,11 +5,11 @@ import 'package:flutter/widgets.dart';
 
 import '../../core/app_log.dart';
 import '../../data/platform/reminder_scheduler.dart';
+import '../../domain/app_settings.dart';
+import '../../domain/calendar_event.dart';
 import '../../domain/key_value_store.dart';
 import '../../domain/reminder_planner.dart';
 import '../../l10n/gen/app_localizations.dart';
-import '../../domain/app_settings.dart';
-import '../../domain/calendar_event.dart';
 import '../calendar/calendar_controller.dart';
 import '../settings/settings_controller.dart';
 

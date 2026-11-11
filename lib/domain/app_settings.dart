@@ -17,6 +17,7 @@ class AppSettings {
     this.secureScreen = true,
     this.serverUrl = defaultServerUrl,
     this.onboardingDone = false,
+    this.tourSeen = false,
     this.lockEnabled = false,
     this.lockTimeoutSeconds = 60,
     this.shareOnlineStatus = true,
@@ -38,6 +39,9 @@ class AppSettings {
   final bool secureScreen;
   final String serverUrl;
   final bool onboardingDone;
+
+  /// Die Einführungstour wurde gesehen oder übersprungen (#347). Rein lokal, ohne Personenbezug.
+  final bool tourSeen;
   final bool lockEnabled;
   final int lockTimeoutSeconds;
 
@@ -69,6 +73,7 @@ class AppSettings {
     bool? secureScreen,
     String? serverUrl,
     bool? onboardingDone,
+    bool? tourSeen,
     bool? lockEnabled,
     int? lockTimeoutSeconds,
     bool? shareOnlineStatus,
@@ -87,6 +92,7 @@ class AppSettings {
         secureScreen: secureScreen ?? this.secureScreen,
         serverUrl: serverUrl == null ? this.serverUrl : (_validServer(serverUrl) ?? this.serverUrl),
         onboardingDone: onboardingDone ?? this.onboardingDone,
+        tourSeen: tourSeen ?? this.tourSeen,
         lockEnabled: lockEnabled ?? this.lockEnabled,
         lockTimeoutSeconds: (lockTimeoutSeconds ?? this.lockTimeoutSeconds).clamp(0, 3600),
         shareOnlineStatus: shareOnlineStatus ?? this.shareOnlineStatus,
@@ -107,6 +113,7 @@ class AppSettings {
         'secureScreen': '$secureScreen',
         'serverUrl': serverUrl,
         'onboardingDone': '$onboardingDone',
+        'tourSeen': '$tourSeen',
         'lockEnabled': '$lockEnabled',
         'lockTimeout': '$lockTimeoutSeconds',
         'shareOnlineStatus': '$shareOnlineStatus',
@@ -140,6 +147,8 @@ class AppSettings {
       secureScreen: m['secureScreen'] != 'false',
       serverUrl: _validServer(m['serverUrl']) ?? d.serverUrl,
       onboardingDone: m['onboardingDone'] == 'true',
+      // Bestehende Einrichtungen ohne den Schlüssel (Stand vor #347) bekommen die Tour nicht nachträglich.
+      tourSeen: m['tourSeen'] == 'true' || (m['onboardingDone'] == 'true' && !m.containsKey('tourSeen')),
       lockEnabled: m['lockEnabled'] == 'true',
       lockTimeoutSeconds: (timeout != null && timeout >= 0 && timeout <= 3600) ? timeout : d.lockTimeoutSeconds,
       shareOnlineStatus: m['shareOnlineStatus'] != 'false',

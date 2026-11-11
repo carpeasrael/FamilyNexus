@@ -4,9 +4,9 @@ import 'package:family_nexus/features/shell/home_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/shell_finders.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
-import '../helpers/shell_finders.dart';
 
 /// #140: Die Familie wechselt, ohne dass die Oberfläche „keine Familie“ sieht (Join B, Leave A und Kontodaten in einer
 /// Sync-Antwort). Die Dienste der alten Familie schließen, die der neuen öffnen genau einmal.

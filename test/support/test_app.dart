@@ -1,23 +1,23 @@
 import 'dart:typed_data';
 
 import 'package:family_nexus/app/app_services.dart';
-import 'package:family_nexus/data/sync/activity_notifier.dart';
 import 'package:family_nexus/app/calendar_factory.dart';
-import 'package:family_nexus/data/sync/shopping_sync.dart';
-import 'package:family_nexus/features/calendar/calendar_controller.dart';
-import 'package:family_nexus/domain/shopping.dart';
-import 'package:family_nexus/features/shopping/shopping_controller.dart';
-import 'package:family_nexus/data/sync/task_sync.dart';
-import 'package:family_nexus/domain/permissions.dart';
-import 'package:family_nexus/domain/tasks.dart';
-import 'package:family_nexus/features/tasks/tasks_controller.dart';
 import 'package:family_nexus/data/platform/file_access.dart';
 import 'package:family_nexus/data/platform/oauth_redirect.dart';
-import 'package:family_nexus/features/lock/app_lock_controller.dart';
 import 'package:family_nexus/data/platform/screen_protection.dart';
+import 'package:family_nexus/data/sync/activity_notifier.dart';
+import 'package:family_nexus/data/sync/shopping_sync.dart';
+import 'package:family_nexus/data/sync/task_sync.dart';
 import 'package:family_nexus/domain/data_inventory.dart';
+import 'package:family_nexus/domain/permissions.dart';
 import 'package:family_nexus/domain/server.dart';
+import 'package:family_nexus/domain/shopping.dart';
+import 'package:family_nexus/domain/tasks.dart';
+import 'package:family_nexus/features/calendar/calendar_controller.dart';
+import 'package:family_nexus/features/lock/app_lock_controller.dart';
 import 'package:family_nexus/features/settings/settings_controller.dart';
+import 'package:family_nexus/features/shopping/shopping_controller.dart';
+import 'package:family_nexus/features/tasks/tasks_controller.dart';
 
 import 'fake_browser.dart';
 import 'fake_device_auth.dart';
@@ -25,10 +25,11 @@ import 'fake_links.dart';
 import 'fake_mail.dart';
 import 'fake_matrix.dart';
 import 'fake_scheduler.dart';
+import 'fake_store.dart';
 import 'memory_event_store.dart';
 import 'memory_shopping_store.dart';
-import 'memory_task_store.dart';
 import 'memory_stores.dart';
+import 'memory_task_store.dart';
 
 class TestApp {
   TestApp({
@@ -44,6 +45,7 @@ class TestApp {
     required this.links,
     required this.auth,
     required this.mail,
+    required this.storeLauncher,
     required this.browser,
     required this.element,
     required this.oauth,
@@ -68,6 +70,7 @@ class TestApp {
   final FakeLinkSource links;
   final FakeDeviceAuth auth;
   final FakeMailLauncher mail;
+  final FakeStoreLauncher storeLauncher;
   final FakeBrowser browser;
   final FakeElement element;
   final FakeOAuthRedirect oauth;
@@ -115,9 +118,14 @@ Future<TestApp> buildTestApp({
   AppBadge? badge,
   // Test: eigener Rücksprung statt des Fakes (z. B. `SessionOAuthRedirect`, #268). `TestApp.oauth` bleibt der Fake.
   OAuthRedirect? oauthRedirect,
+  // Test: „App bewerten“ (#350). Standard: Android-Gerät mit Play Store.
+  FakeStoreLauncher? storeLauncher,
+  // Test: Einführungstour (#347). Standard: schon gesehen, damit sie Abläufe nach der Einrichtung nicht überdeckt.
+  bool tourSeen = true,
 }) async {
   final store = MemoryKeyValueStore();
   if (lang != null) store.data['language'] = lang;
+  store.data['tourSeen'] = '$tourSeen';
   final fake = server ?? FakeMatrixServer();
   if (server == null) {
     fake.addAccount('anna', 'geheim123', displayName: 'Anna');
@@ -140,6 +148,7 @@ Future<TestApp> buildTestApp({
   final links = FakeLinkSource();
   final auth = FakeDeviceAuth();
   final mail = FakeMailLauncher();
+  final storeFake = storeLauncher ?? FakeStoreLauncher();
   final browser = FakeBrowser();
   final element = FakeElement();
   final oauth = FakeOAuthRedirect(browser);
@@ -162,6 +171,7 @@ Future<TestApp> buildTestApp({
     activityPlatform: activity,
     badge: badge,
     mail: mail,
+    store: storeFake,
     browser: browser,
     element: element,
     oauthRedirect: oauthRedirect ?? oauth,
@@ -228,6 +238,7 @@ Future<TestApp> buildTestApp({
     links: links,
     auth: auth,
     mail: mail,
+    storeLauncher: storeFake,
     browser: browser,
     element: element,
     oauth: oauth,

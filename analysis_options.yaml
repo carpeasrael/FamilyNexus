@@ -30,3 +30,4 @@ linter:
     - use_build_context_synchronously
     - avoid_dynamic_calls
     - prefer_const_constructors
+    - directives_ordering

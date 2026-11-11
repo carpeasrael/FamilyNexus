@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/platform_info.dart';
 import '../../domain/data_inventory.dart';
 import '../../l10n/gen/app_localizations.dart';
-import '../../ui/widgets/glass.dart';
 import '../../ui/layout/adaptive.dart';
+import '../../ui/widgets/glass.dart';
 import 'data_report.dart';
 
 /// Plattform für den Datenschutztext (#160): Schlüsselspeicher, Berechtigungen und Backups unterscheiden sich.

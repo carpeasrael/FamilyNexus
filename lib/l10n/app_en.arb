@@ -13,6 +13,31 @@
   "emptyFamily": "No family has been set up yet.",
   "settingsSectionDisplay": "Appearance",
   "settingsSectionPrivacy": "Privacy",
+  "settingsShareApp": "Share app",
+  "settingsShareAppHint": "Copies the link to the store listing so you can pass it on. No family data is shared.",
+  "settingsShareAppText": "I use FamilyNexus, the family planner with calendar, chat and shopping list. Get the app here:",
+  "settingsShareAppCopied": "Store link copied",
+  "settingsRateApp": "Rate app",
+  "settingsRateAppHint": "Opens the listing in the Play Store.",
+  "settingsRateAppFailed": "The store listing could not be opened.",
+  "tourStepOf": "Step {step} of {total}",
+  "@tourStepOf": {
+    "placeholders": {
+      "step": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "tourNext": "Next",
+  "tourBack": "Back",
+  "tourSkip": "Skip",
+  "tourDone": "Let’s go",
+  "tourCalendarTitle": "Calendar",
+  "tourCalendarBody": "Add events, share them with your family or keep them private. “Today” shows what is coming up next.",
+  "tourChatTitle": "Chat",
+  "tourChatBody": "Write to the whole family or to single members. Events can be shared in the chat and answered right there.",
+  "tourShoppingTitle": "Shopping",
+  "tourShoppingBody": "One shared shopping list for everyone, even offline. Check off, add, done: everybody sees the current state.",
+  "settingsTourRestart": "Watch the introduction again",
   "settingsSectionAbout": "About",
   "settingsLanguage": "Language",
   "languageSystem": "Device language",
@@ -299,6 +324,21 @@
       "count": {
         "type": "int"
       }
+    }
+  },
+  "calendarYearText": "Day {day} of {total} · {left, plural, =0{0 days} =1{1 day} other{{left} days}} left · {percent}% of the year elapsed",
+  "@calendarYearText": {
+    "placeholders": {
+      "day": {"type": "int"},
+      "total": {"type": "int"},
+      "left": {"type": "int"},
+      "percent": {"type": "int"}
+    }
+  },
+  "calendarYearSemantics": "Year progress: {percent} percent elapsed",
+  "@calendarYearSemantics": {
+    "placeholders": {
+      "percent": {"type": "int"}
     }
   },
   "todayNext": "Upcoming events",

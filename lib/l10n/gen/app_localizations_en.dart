@@ -49,6 +49,70 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSectionPrivacy => 'Privacy';
 
   @override
+  String get settingsShareApp => 'Share app';
+
+  @override
+  String get settingsShareAppHint =>
+      'Copies the link to the store listing so you can pass it on. No family data is shared.';
+
+  @override
+  String get settingsShareAppText =>
+      'I use FamilyNexus, the family planner with calendar, chat and shopping list. Get the app here:';
+
+  @override
+  String get settingsShareAppCopied => 'Store link copied';
+
+  @override
+  String get settingsRateApp => 'Rate app';
+
+  @override
+  String get settingsRateAppHint => 'Opens the listing in the Play Store.';
+
+  @override
+  String get settingsRateAppFailed => 'The store listing could not be opened.';
+
+  @override
+  String tourStepOf(int step, int total) {
+    return 'Step $step of $total';
+  }
+
+  @override
+  String get tourNext => 'Next';
+
+  @override
+  String get tourBack => 'Back';
+
+  @override
+  String get tourSkip => 'Skip';
+
+  @override
+  String get tourDone => 'Let’s go';
+
+  @override
+  String get tourCalendarTitle => 'Calendar';
+
+  @override
+  String get tourCalendarBody =>
+      'Add events, share them with your family or keep them private. “Today” shows what is coming up next.';
+
+  @override
+  String get tourChatTitle => 'Chat';
+
+  @override
+  String get tourChatBody =>
+      'Write to the whole family or to single members. Events can be shared in the chat and answered right there.';
+
+  @override
+  String get tourShoppingTitle => 'Shopping';
+
+  @override
+  String get tourShoppingBody =>
+      'One shared shopping list for everyone, even offline. Check off, add, done: everybody sees the current state.';
+
+  @override
+  String get settingsTourRestart => 'Watch the introduction again';
+
+  @override
   String get settingsSectionAbout => 'About';
 
   @override
@@ -626,6 +690,23 @@ class AppLocalizationsEn extends AppLocalizations {
       zero: 'No events',
     );
     return '$_temp0';
+  }
+
+  @override
+  String calendarYearText(int day, int total, int left, int percent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: '$left days',
+      one: '1 day',
+      zero: '0 days',
+    );
+    return 'Day $day of $total · $_temp0 left · $percent% of the year elapsed';
+  }
+
+  @override
+  String calendarYearSemantics(int percent) {
+    return 'Year progress: $percent percent elapsed';
   }
 
   @override

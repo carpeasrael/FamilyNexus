@@ -1,6 +1,9 @@
 New in 1.2.3:
 • Security: The identity records of family members are also kept encrypted on the device; if the server changes a key, it is noticed.
 • The loading screen at startup follows the device's appearance.
+• Calendar: shows how far the year is (day, days left, percent); the calendar also syncs with the server every 15 minutes.
+• New users get a short introduction to calendar, chat and shopping; it can be watched again in the settings.
+• Settings: “Share app” copies the link to the store listing, “Rate app” opens it (Android).
 
 New in 1.2.2:
 • Please update all devices of your family. Older app versions do not show groups, items with combined emojis or new reactions; if someone edits or checks off an item there, its group is lost for everyone.

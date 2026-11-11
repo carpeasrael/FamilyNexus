@@ -7,8 +7,10 @@ import 'package:flutter/services.dart';
 import '../../app/app_services.dart';
 import '../../core/app_log.dart';
 import '../../data/matrix/matrix_gateway.dart';
+import '../../data/platform/secret_clipboard.dart';
 import '../../domain/security.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../ui/layout/adaptive.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
@@ -16,8 +18,6 @@ import '../calendar/formatting.dart';
 import '../common/error_text.dart';
 import '../common/prompt_dialog.dart';
 import '../common/syncing_view.dart';
-import '../../data/platform/secret_clipboard.dart';
-import '../../ui/layout/adaptive.dart';
 
 /// Leert die Zwischenablage nach [delay], falls sie noch [secret] enthält (E-57). Bewusst nicht an ein
 /// Widget gebunden: Der Schlüssel darf nicht liegen bleiben, nur weil die Einrichtung weitergeht.

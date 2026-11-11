@@ -1,7 +1,7 @@
 import 'package:family_nexus/core/contrast.dart';
+import 'package:family_nexus/domain/app_settings.dart';
 import 'package:family_nexus/ui/theme/app_theme.dart';
 import 'package:family_nexus/ui/theme/tokens.dart';
-import 'package:family_nexus/domain/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

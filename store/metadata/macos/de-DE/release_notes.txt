@@ -1,6 +1,9 @@
 Neu in 1.2.3:
 • Sicherheit: Die Identitätsvermerke der Familienmitglieder liegen zusätzlich verschlüsselt auf dem Gerät; ändert der Server einen Schlüssel, fällt das auf.
 • Das Ladebild beim Start folgt der Darstellung des Geräts.
+• Kalender: Anzeige, wie weit das Jahr ist (Tag, verbleibende Tage, Prozent); der Kalender gleicht zusätzlich alle 15 Minuten mit dem Server ab.
+• Neue Nutzer bekommen eine kurze Einführung in Kalender, Chat und Einkauf; sie lässt sich in den Einstellungen erneut ansehen.
+• Einstellungen: „App teilen“ kopiert den Link zum Store-Eintrag, „App bewerten“ öffnet ihn (Android).
 
 Neu in 1.2.2:
 • Bitte alle Geräte der Familie aktualisieren. Ältere App-Versionen zeigen Gruppen, Einträge mit zusammengesetzten Emojis und neue Reaktionen nicht; ändert oder hakt jemand dort einen Eintrag ab, geht dessen Gruppe für alle verloren.

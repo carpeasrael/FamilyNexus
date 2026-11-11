@@ -1,4 +1,9 @@
-FamilyNexus combines a family calendar, a messenger, a shared shopping list and task lists in one app – without your data ending up at a central provider.
+FamilyNexus is the family planner with a shared family calendar, family chat, shopping list and task lists in one app – so the whole family can organize appointments, errands and chores in one place, without your data ending up at a central provider.
+
+WHY FAMILYNEXUS
+• Everything for daily life: who does what, when and where – one look at "Today" is enough
+• Private and shared kept apart: your own events stay with you, family events are visible to everyone
+• Privacy first: end-to-end encrypted, no ads, no trackers
 
 CALENDAR
 • Day, week, month and agenda views, filter by person

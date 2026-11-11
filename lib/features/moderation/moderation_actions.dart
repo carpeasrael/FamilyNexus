@@ -4,8 +4,8 @@ import '../../app/app_services.dart';
 import '../../domain/chat.dart';
 import '../../domain/moderation.dart';
 import '../../l10n/gen/app_localizations.dart';
-import '../common/error_text.dart';
 import '../chat/sender_name.dart';
+import '../common/error_text.dart';
 
 /// Blockieren und Melden aus Chat und Familie (E-48).
 class ModerationActions {

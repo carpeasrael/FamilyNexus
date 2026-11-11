@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/shell_finders.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
-import '../helpers/shell_finders.dart';
 
 /// #37: Auf dem Desktop schickt Enter ab (Chat senden, Einkauf hinzufügen); Umschalt+Enter macht im
 /// Chat keinen Versand. Mobil bleibt die Tastatur-Aktion unverändert.

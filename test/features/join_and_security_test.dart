@@ -1,19 +1,19 @@
 import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/security.dart';
 import 'package:family_nexus/domain/server.dart';
-import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/features/security/security_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/shell_finders.dart';
 import '../support/fake_matrix.dart';
 import '../support/invite_links.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
-import '../helpers/shell_finders.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
   tester.view.physicalSize = const Size(900, 3000);

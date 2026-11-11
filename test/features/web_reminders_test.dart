@@ -3,9 +3,9 @@ import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/shell_finders.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
-import '../helpers/shell_finders.dart';
 
 /// #145: Im Browser gibt es keine Erinnerungen (E-53, `services.reminders == null`). Dann bietet die App sie
 /// auch nicht an: weder in den Einstellungen noch im Termin-Editor, in der Detailansicht oder auf „Heute“.

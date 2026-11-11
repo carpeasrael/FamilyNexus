@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../support/fake_matrix.dart';
-import '../support/shopping_peer.dart';
-import '../support/nav.dart';
-import '../support/test_app.dart';
 import '../helpers/shell_finders.dart';
+import '../support/fake_matrix.dart';
+import '../support/nav.dart';
+import '../support/shopping_peer.dart';
+import '../support/test_app.dart';
 
 Future<FakeMatrixGateway> _joinBen(TestApp app) async {
   final ben = app.server.newDevice();

@@ -1,11 +1,11 @@
 New in 1.2.3:
 • Identity records are also kept on the device.
 • The loading screen follows the device's appearance.
+• Calendar: year progress, sync every 15 min.
+• Introduction for new users; share and rate the app.
 New in 1.2.2:
 • Please update all devices of your family.
 • Shopping: group items, e.g. by shop.
-• Today: view and confirm reminders.
 • A moderator confirms every join; invitation links no longer show names.
 • Change your password in the settings.
 • Reactions are sent encrypted.
-• Many fixes.
