@@ -25,6 +25,7 @@ import '../presence/presence_view.dart';
 import 'chat_layout.dart';
 import 'sender_name.dart';
 
+part 'widgets/attachment_view.dart';
 part 'widgets/chat_parts.dart';
 part 'widgets/message_bubble.dart';
 part 'widgets/thread_and_lines.dart';
