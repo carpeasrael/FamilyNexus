@@ -18,6 +18,8 @@ import 'event_editor_screen.dart';
 import 'event_tile.dart';
 import 'formatting.dart';
 
+part 'widgets/event_detail_parts.dart';
+
 String rsvpLabel(AppLocalizations l, RsvpStatus s) => switch (s) {
       RsvpStatus.accepted => l.rsvpAccepted,
       RsvpStatus.declined => l.rsvpDeclined,
@@ -130,7 +132,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Widget build(BuildContext context) {
     final services = AppScope.of(context);
     final l = AppLocalizations.of(context);
-    final t = AuroraTokens.of(context);
     return ListenableBuilder(
       listenable: c,
       builder: (context, _) {
@@ -162,138 +163,26 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
           body: SafeArea(
             child: ContentWidth(child: ListView(padding: const EdgeInsets.all(16), children: <Widget>[
-              GlassCard(
+              _EventSummaryCard(
+                event: e,
                 glow: AuroraTokens.personColors[c.displayColorIndex(e) % AuroraTokens.personColors.length],
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                  Semantics(header: true, child: Text(e.title, style: Theme.of(context).textTheme.headlineSmall)),
-                  const SizedBox(height: 6),
-                  Text(fmt.range(occurrence, l), style: monoStyle(context, size: 15)),
-                  Text(fmt.dateLong(DateTime.parse(occurrence.dateKey)), style: Theme.of(context).textTheme.bodyMedium),
-                  const SizedBox(height: 8),
-                  Wrap(spacing: 8, runSpacing: 4, children: <Widget>[
-                    StatusBadge(
-                      label: visibilityLabel(l, e.visibility),
-                      color: e.isShared ? t.primary : t.violet,
-                      icon: e.isShared ? Icons.groups_outlined : Icons.lock_outline,
-                    ),
-                    if (e.recurrence.isRecurring)
-                      StatusBadge(label: recurrenceSummary(l, e.recurrence), color: t.info, icon: Icons.repeat),
-                  ]),
-                  if (e.location.isNotEmpty) ...<Widget>[
-                    const SizedBox(height: 10),
-                    Row(children: <Widget>[const Icon(Icons.place_outlined, size: 18), const SizedBox(width: 6), Expanded(child: Text(e.location))]),
-                  ],
-                  if (e.note.isNotEmpty) ...<Widget>[const SizedBox(height: 10), Text(e.note)],
-                  const SizedBox(height: 10),
-                  Text(e.ownerId == c.me ? l.eventOwnerYou : l.eventOwner(memberLabel(l, family, e.ownerId, me: c.me, inSentence: true)), style: Theme.of(context).textTheme.bodySmall),
-                  if (!mine) Padding(padding: const EdgeInsets.only(top: 4), child: Text(l.eventReadOnly, style: Theme.of(context).textTheme.bodySmall)),
-                ]),
+                range: fmt.range(occurrence, l),
+                dateLong: fmt.dateLong(DateTime.parse(occurrence.dateKey)),
+                owner: e.ownerId == c.me ? l.eventOwnerYou : l.eventOwner(memberLabel(l, family, e.ownerId, me: c.me, inSentence: true)),
+                mine: mine,
               ),
               if (e.isShared) ...<Widget>[
                 const SizedBox(height: 12),
-                GlassCard(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                    Text(l.eventRsvp, style: Theme.of(context).textTheme.titleSmall),
-                    const SizedBox(height: 8),
-                    RsvpButtons(controller: c, eventId: e.id),
-                    const SizedBox(height: 8),
-                    for (final entry in rsvps.entries)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Row(children: <Widget>[
-                          PersonDot(colorIndex: c.colorIndexFor(entry.key)),
-                          const SizedBox(width: 8),
-                          Expanded(child: Text(nameOf(entry.key))),
-                          Text(rsvpLabel(l, entry.value)),
-                        ]),
-                      ),
-                    if (rsvps.isEmpty) Text(l.rsvpNone, style: Theme.of(context).textTheme.bodySmall),
-                    if (e.attendees.isNotEmpty) ...<Widget>[
-                      const Divider(),
-                      Text(l.eventAttendees, style: Theme.of(context).textTheme.labelMedium),
-                      Wrap(spacing: 6, children: <Widget>[for (final a in e.attendees) Chip(label: Text(nameOf(a)))]),
-                    ],
-                  ]),
-                ),
-                if (mine)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.forum_outlined),
-                      label: Text(l.eventShareInChat),
-                      onPressed: () async {
-                        final m = ScaffoldMessenger.of(context);
-                        try {
-                          await c.shareInChat(e);
-                          m.showSnackBar(SnackBar(content: Text(l.eventShared)));
-                        } catch (err) {
-                          m.showSnackBar(SnackBar(content: Text(errorText(l, err))));
-                        }
-                      },
-                    ),
-                  ),
+                _RsvpCard(controller: c, event: e, rsvps: rsvps, nameOf: nameOf),
+                if (mine) _ShareInChatButton(controller: c, event: e),
               ],
               // Im Browser gibt es keine Erinnerungen (E-53, #145): keine Karte; gespeicherte Werte bleiben unberührt.
               if (services.reminders != null) ...<Widget>[
                 const SizedBox(height: 12),
-                GlassCard(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                    Text(l.eventYourReminders, style: Theme.of(context).textTheme.titleSmall),
-                    const SizedBox(height: 8),
-                    Wrap(spacing: 8, runSpacing: 4, children: <Widget>[
-                      for (final m in kReminderChoices)
-                        FilterChip(
-                          label: Text(m == 0 ? l.reminderAtStart : l.reminderBefore(ReminderCoordinator.durationText(l, m))),
-                          selected: reminderSet.contains(m),
-                          onSelected: (v) {
-                            final next = <int>{...reminderSet};
-                            v ? next.add(m) : next.remove(m);
-                            c.setReminders(e.id, (next.toList()..sort((a, b) => b.compareTo(a)))).ignore();
-                          },
-                        ),
-                    ]),
-                    if (c.hasCustomReminders(e.id))
-                      TextButton(onPressed: () => c.setReminders(e.id, null), child: Text(l.eventResetReminders)),
-                  ]),
-                ),
+                _ReminderCard(controller: c, event: e, selected: reminderSet),
               ],
               _History(controller: c, event: e),
             ])),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _History extends StatelessWidget {
-  const _History({required this.controller, required this.event});
-  final CalendarController controller;
-  final CalendarEvent event;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    return FutureBuilder<List<CalendarEvent>>(
-      future: controller.history(event.id),
-      builder: (context, snap) {
-        final list = snap.data ?? const <CalendarEvent>[];
-        if (list.isEmpty) return const SizedBox.shrink();
-        return Padding(
-          padding: const EdgeInsets.only(top: 12),
-          child: GlassCard(
-            padding: EdgeInsets.zero,
-            child: ExpansionTile(
-              title: Text('${l.eventHistory} (${list.length})'),
-              children: <Widget>[
-                for (final h in list)
-                  ListTile(
-                    dense: true,
-                    title: Text(h.deleted ? l.eventCancelled : h.title),
-                    subtitle: Text(l.eventVersion(h.version), style: monoStyle(context, size: 12)),
-                  ),
-              ],
-            ),
           ),
         );
       },
