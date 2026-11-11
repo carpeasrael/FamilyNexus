@@ -65,6 +65,7 @@ part 'gateway/direct_chats.dart';
 part 'gateway/family.dart';
 part 'gateway/gateway_errors.dart';
 part 'gateway/identities.dart';
+part 'gateway/live_baseline.dart';
 part 'gateway/password_change.dart';
 part 'gateway/presence.dart';
 part 'gateway/invitations.dart';
@@ -81,7 +82,7 @@ part 'gateway/security_verification.dart';
 /// * Lesebestätigungen sind privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _DataInventoryModule, _ConnectionModule, _GatewayErrorsModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _GatewayErrorsModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -221,18 +222,23 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   // ------------------------------------------------- Grundlinie für Meldungen (#254, E-88)
 
   /// Server-Zeitstempel, ab dem Ereignisse als „neu“ gelten. `null` bis zum ersten echten Sync dieser Sitzung.
+  @override
   DateTime? _liveSince;
 
   /// Höchster `originServerTs` aller Timeline-Ereignisse aus echten Syncs dieser Sitzung (jeder Typ).
+  @override
   DateTime? _maxServerTs;
 
   /// Sitzung (`Nutzer|Gerät`), zu der [_liveSince] gehört; ein Wechsel beginnt neu.
+  @override
   String? _liveKey;
 
   /// Zählt Sitzungswechsel: Eine verspätete Fortsetzung der alten Sitzung schreibt nichts mehr.
+  @override
   int _liveGeneration = 0;
 
   /// Startwert aus der Datenbank (nur beim Wiederherstellen), bis zum ersten echten Sync abgeholt.
+  @override
   Future<DateTime?>? _pendingSeed;
 
   /// Obergrenze: Eine vorgehende Server- oder Geräteuhr unterdrückt Meldungen höchstens so lange.
@@ -248,42 +254,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     return t.isAfter(cap) ? cap : t;
   }
 
-  void _resetLive() {
-    _liveGeneration++;
-    _liveSince = null;
-    _maxServerTs = null;
-    _liveKey = null;
-    _liveFirstPending = false;
-  }
-
-  /// Wertet einen Sync für [liveSince] aus. Künstliche Syncs des SDK (Verlauf, Sendezustände) haben ein leeres
-  /// `nextBatch` und zählen nicht; `room.lastEvent` scheidet aus, weil es App-Ereignisse nicht kennt.
-  void _trackLive(Client client, SyncUpdate update) {
-    if (update.nextBatch.isEmpty) return;
-    final key = '${client.userID}|${client.deviceID}';
-    if (key != _liveKey) {
-      _resetLive();
-      _liveKey = key;
-    }
-    final seen = _liveSince != null || _liveFirstPending;
-    for (final room in update.rooms?.join?.values ?? const <JoinedRoomUpdate>[]) {
-      for (final e in room.timeline?.events ?? const <MatrixEvent>[]) {
-        _maxServerTs = _later(_maxServerTs, e.originServerTs.toUtc());
-      }
-    }
-    if (seen) return;
-    _liveFirstPending = true;
-    final generation = _liveGeneration;
-    final seed = _pendingSeed ?? Future<DateTime?>.value();
-    _pendingSeed = null;
-    seed.catchError((Object _) => null).then((value) {
-      if (generation != _liveGeneration) return;
-      _liveFirstPending = false;
-      _liveSince = _capLive(_later(value, _maxServerTs) ?? DateTime.now().toUtc());
-      notifyListeners();
-    });
-  }
-
+  @override
   bool _liveFirstPending = false;
 
   /// Jüngstes gespeichertes, vom Server bestätigtes Ereignis aller beigetretenen Räume (Startwert beim
