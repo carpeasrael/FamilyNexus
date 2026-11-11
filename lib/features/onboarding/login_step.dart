@@ -11,6 +11,8 @@ import 'browser_sign_in.dart';
 import 'provider_controller.dart';
 import 'provider_section.dart';
 
+part 'widgets/login_parts.dart';
+
 /// „Anmelden“ mit einem bestehenden Konto. Auf Anbietern mit Anmeldung beim Anbieter (OAuth) öffnet sich
 /// dessen Seite (in der App, E-91); sonst Benutzername und Passwort. Eine vollständige ID (`@anna:beispiel.de`) wählt den
 /// Anbieter selbst aus.
@@ -98,7 +100,6 @@ class _LoginStepState extends State<LoginStep> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     return ListenableBuilder(
       listenable: widget.provider,
       builder: (context, _) {
@@ -107,30 +108,9 @@ class _LoginStepState extends State<LoginStep> {
         final oauth = p.ready && p.usesOAuth && _s.oauthRedirect != null;
         final List<Widget> main;
         if (_waitingForBrowser) {
-          main = <Widget>[
-            Row(children: <Widget>[
-              const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
-              const SizedBox(width: 12),
-              Expanded(child: Semantics(liveRegion: true, child: Text(l.oauthWaiting(host)))),
-            ]),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton(onPressed: () => _s.oauthRedirect?.cancel(), child: Text(l.cancel)),
-            ),
-          ];
+          main = <Widget>[_LoginBrowserWaiting(host: host, onCancel: () => _s.oauthRedirect?.cancel())];
         } else if (oauth) {
-          main = <Widget>[
-            Text(l.loginOAuthIntro(host)),
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton.icon(
-                icon: const Icon(Icons.open_in_new, size: 18),
-                onPressed: _busy ? null : _loginInBrowser,
-                label: Text(l.loginOAuth(host)),
-              ),
-            ),
-          ];
+          main = <Widget>[_LoginOAuth(host: host, busy: _busy, onLogin: _loginInBrowser)];
         } else {
           // Vollständige ID eines anderen Anbieters: erst nach dem Wechsel anmelden, nie das Passwort an
           // den bisher gewählten Anbieter senden.
@@ -143,51 +123,23 @@ class _LoginStepState extends State<LoginStep> {
               _user.text.trim().isNotEmpty &&
               _pass.text.isNotEmpty;
           main = <Widget>[
-            TextField(
-              controller: _user,
-              autocorrect: false,
-              enableSuggestions: false,
-              enableIMEPersonalizedLearning: false,
-              onChanged: _onUser,
-              decoration: InputDecoration(labelText: l.accountUsername),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _pass,
-              obscureText: !_showPassword,
-              autocorrect: false,
-              enableSuggestions: false,
-              enableIMEPersonalizedLearning: false,
-              onChanged: (_) => setState(() {}),
-              onSubmitted: (_) => canLogin && !_busy ? _login() : null,
-              decoration: InputDecoration(
-                labelText: l.accountPassword,
-                suffixIcon: IconButton(
-                  tooltip: _showPassword ? l.passwordHide : l.passwordShow,
-                  icon: Icon(_showPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined),
-                  onPressed: () => setState(() => _showPassword = !_showPassword),
-                ),
-              ),
-            ),
-            if (p.ready && !p.info!.supportsPasswordLogin)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(l.serverNoPassword, style: TextStyle(color: theme.colorScheme.error)),
-              ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton(onPressed: _busy || !canLogin ? null : _login, child: Text(_busy ? l.accountLoggingIn : l.accountLogin)),
+            _LoginPasswordForm(
+              user: _user,
+              password: _pass,
+              show: _showPassword,
+              busy: _busy,
+              canLogin: canLogin,
+              noPasswordLogin: p.ready && !p.info!.supportsPasswordLogin,
+              onUser: _onUser,
+              onPassword: () => setState(() {}),
+              onToggleShow: () => setState(() => _showPassword = !_showPassword),
+              onLogin: _login,
             ),
           ];
         }
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
           ...main,
-          if (_error != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Semantics(liveRegion: true, child: Text(_error!, style: TextStyle(color: theme.colorScheme.error))),
-            ),
+          if (_error != null) _LoginError(text: _error!),
           if (!_waitingForBrowser) ...<Widget>[
             const SizedBox(height: 8),
             Align(
