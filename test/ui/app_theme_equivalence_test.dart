@@ -16,6 +16,39 @@ List<Object> _tokens(AuroraTokens t) => <Object>[
       t.magenta, t.violet, t.success, t.warning, t.danger, t.info, t.shadow, t.reduceEffects, t.gradientA, t.gradientB,
     ];
 
+/// Werte, die als `WidgetStateProperty` (Funktion) im Theme stehen und in der Ausgabe nur als „Closure“ erscheinen,
+/// ausgewertet für die Zustände „keiner“, „ausgewählt“ und „deaktiviert“.
+List<String> _resolved(ThemeData t) {
+  final states = <Set<WidgetState>>[
+    <WidgetState>{},
+    <WidgetState>{WidgetState.selected},
+    <WidgetState>{WidgetState.disabled},
+  ];
+  String of<T>(WidgetStateProperty<T>? p, Set<WidgetState> s) => '${p?.resolve(s)}';
+  final styles = <String, ButtonStyle?>{
+    'filled': t.filledButtonTheme.style,
+    'outlined': t.outlinedButtonTheme.style,
+    'text': t.textButtonTheme.style,
+  };
+  return <String>[
+    for (final s in states) ...<String>[
+      for (final e in styles.entries) ...<String>[
+        '${e.key} minimumSize ${of(e.value?.minimumSize, s)}',
+        '${e.key} padding ${of(e.value?.padding, s)}',
+        '${e.key} shape ${of(e.value?.shape, s)}',
+        '${e.key} side ${of(e.value?.side, s)}',
+        '${e.key} textStyle ${of(e.value?.textStyle, s)}',
+        '${e.key} foreground ${of(e.value?.foregroundColor, s)}',
+        '${e.key} background ${of(e.value?.backgroundColor, s)}',
+      ],
+      'switch thumb ${of(t.switchTheme.thumbColor, s)}',
+      'switch track ${of(t.switchTheme.trackColor, s)}',
+      'navBar label ${of(t.navigationBarTheme.labelTextStyle, s)}',
+      'navBar icon ${of(t.navigationBarTheme.iconTheme, s)}',
+    ],
+  ];
+}
+
 void main() {
   test('buildTheme liefert in jeder Kombination dasselbe Theme wie vor der Zerlegung', () {
     var n = 0;
@@ -29,6 +62,7 @@ void main() {
             _dump(expected),
             reason: '$brightness, reduceEffects=$reduce, $accent',
           );
+          expect(_resolved(actual), _resolved(expected), reason: 'Zustandswerte: $brightness, $reduce, $accent');
           expect(_tokens(actual.extension<AuroraTokens>()!), _tokens(expected.extension<AuroraTokens>()!), reason: 'Tokens: $brightness, $reduce, $accent');
           expect(actual.colorScheme, expected.colorScheme, reason: '$brightness, $reduce, $accent');
           expect(actual.textTheme, expected.textTheme, reason: '$brightness, $reduce, $accent');
