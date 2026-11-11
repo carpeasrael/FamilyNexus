@@ -1,9 +1,11 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../app/app_services.dart';
 import '../../app/app_version.dart';
 import '../../core/platform_info.dart';
+import '../../data/platform/store_launcher.dart';
 import '../../domain/app_settings.dart';
 import '../../domain/data_inventory.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -136,6 +138,7 @@ class SettingsScreen extends StatelessWidget {
                 onTap: () => _confirmDelete(context),
               ),
               // Version und Build wie in App Store Connect (für Testberichte und Bildschirmaufnahmen, #14).
+              const _RecommendTiles(),
               ListTile(leading: const Icon(Icons.info_outline), title: Text(l.menuVersion(appVersionWithBuild))),
               ListTile(title: Text(l.settingsNoTelemetry)),
               ListTile(title: Text(l.settingsLicense)),
@@ -604,5 +607,43 @@ class _AccentPicker extends StatelessWidget {
         ]),
       ]),
     );
+  }
+}
+
+
+/// „App teilen“ und „App bewerten“ (#351, #350). Geteilt wird nur ein kurzer Satz mit dem öffentlichen Store-Link,
+/// nie Familien-, Raum- oder Einladungsdaten. Das System-Teilen-Menü braucht eine neue Bibliothek mit nativen Teilen auf
+/// allen Plattformen und ist ein eigener Schritt; bis dahin landet der Text in der Zwischenablage.
+class _RecommendTiles extends StatelessWidget {
+  const _RecommendTiles();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final store = AppScope.of(context).store;
+    return Column(children: <Widget>[
+      ListTile(
+        leading: const Icon(Icons.ios_share),
+        title: Text(l.settingsShareApp),
+        subtitle: Text(l.settingsShareAppHint),
+        onTap: () async {
+          final messenger = ScaffoldMessenger.of(context);
+          final copied = l.settingsShareAppCopied;
+          await Clipboard.setData(ClipboardData(text: AppStoreListing.shareText(l.settingsShareAppText)));
+          messenger.showSnackBar(SnackBar(content: Text(copied)));
+        },
+      ),
+      if (store.canRate)
+        ListTile(
+          leading: const Icon(Icons.star_outline),
+          title: Text(l.settingsRateApp),
+          subtitle: Text(l.settingsRateAppHint),
+          onTap: () async {
+            final messenger = ScaffoldMessenger.of(context);
+            final failed = l.settingsRateAppFailed;
+            if (!await store.openListing()) messenger.showSnackBar(SnackBar(content: Text(failed)));
+          },
+        ),
+    ]);
   }
 }

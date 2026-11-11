@@ -49,6 +49,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSectionPrivacy => 'Privacy';
 
   @override
+  String get settingsShareApp => 'Share app';
+
+  @override
+  String get settingsShareAppHint =>
+      'Copies the link to the store listing so you can pass it on. No family data is shared.';
+
+  @override
+  String get settingsShareAppText =>
+      'I use FamilyNexus, the family planner with calendar, chat and shopping list. Get the app here:';
+
+  @override
+  String get settingsShareAppCopied => 'Store link copied';
+
+  @override
+  String get settingsRateApp => 'Rate app';
+
+  @override
+  String get settingsRateAppHint => 'Opens the listing in the Play Store.';
+
+  @override
+  String get settingsRateAppFailed => 'The store listing could not be opened.';
+
+  @override
   String get settingsSectionAbout => 'About';
 
   @override

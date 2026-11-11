@@ -23,6 +23,7 @@ import 'fake_browser.dart';
 import 'fake_device_auth.dart';
 import 'fake_links.dart';
 import 'fake_mail.dart';
+import 'fake_store.dart';
 import 'fake_matrix.dart';
 import 'fake_scheduler.dart';
 import 'memory_event_store.dart';
@@ -44,6 +45,7 @@ class TestApp {
     required this.links,
     required this.auth,
     required this.mail,
+    required this.storeLauncher,
     required this.browser,
     required this.element,
     required this.oauth,
@@ -68,6 +70,7 @@ class TestApp {
   final FakeLinkSource links;
   final FakeDeviceAuth auth;
   final FakeMailLauncher mail;
+  final FakeStoreLauncher storeLauncher;
   final FakeBrowser browser;
   final FakeElement element;
   final FakeOAuthRedirect oauth;
@@ -115,6 +118,8 @@ Future<TestApp> buildTestApp({
   AppBadge? badge,
   // Test: eigener Rücksprung statt des Fakes (z. B. `SessionOAuthRedirect`, #268). `TestApp.oauth` bleibt der Fake.
   OAuthRedirect? oauthRedirect,
+  // Test: „App bewerten“ (#350). Standard: Android-Gerät mit Play Store.
+  FakeStoreLauncher? storeLauncher,
 }) async {
   final store = MemoryKeyValueStore();
   if (lang != null) store.data['language'] = lang;
@@ -140,6 +145,7 @@ Future<TestApp> buildTestApp({
   final links = FakeLinkSource();
   final auth = FakeDeviceAuth();
   final mail = FakeMailLauncher();
+  final storeFake = storeLauncher ?? FakeStoreLauncher();
   final browser = FakeBrowser();
   final element = FakeElement();
   final oauth = FakeOAuthRedirect(browser);
@@ -162,6 +168,7 @@ Future<TestApp> buildTestApp({
     activityPlatform: activity,
     badge: badge,
     mail: mail,
+    store: storeFake,
     browser: browser,
     element: element,
     oauthRedirect: oauthRedirect ?? oauth,
@@ -228,6 +235,7 @@ Future<TestApp> buildTestApp({
     links: links,
     auth: auth,
     mail: mail,
+    storeLauncher: storeFake,
     browser: browser,
     element: element,
     oauth: oauth,

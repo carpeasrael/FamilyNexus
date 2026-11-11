@@ -50,6 +50,30 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsSectionPrivacy => 'Datenschutz';
 
   @override
+  String get settingsShareApp => 'App teilen';
+
+  @override
+  String get settingsShareAppHint =>
+      'Kopiert den Link zum Store-Eintrag, damit du ihn weitergeben kannst. Es werden keine Familiendaten geteilt.';
+
+  @override
+  String get settingsShareAppText =>
+      'Ich nutze FamilyNexus, den Familienplaner mit Kalender, Chat und Einkaufsliste. Hier gibt es die App:';
+
+  @override
+  String get settingsShareAppCopied => 'Link zum Store-Eintrag kopiert';
+
+  @override
+  String get settingsRateApp => 'App bewerten';
+
+  @override
+  String get settingsRateAppHint => 'Öffnet den Eintrag im Play Store.';
+
+  @override
+  String get settingsRateAppFailed =>
+      'Der Store-Eintrag konnte nicht geöffnet werden.';
+
+  @override
   String get settingsSectionAbout => 'Über die App';
 
   @override

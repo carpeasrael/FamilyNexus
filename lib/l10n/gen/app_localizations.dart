@@ -176,6 +176,48 @@ abstract class AppLocalizations {
   /// **'Datenschutz'**
   String get settingsSectionPrivacy;
 
+  /// No description provided for @settingsShareApp.
+  ///
+  /// In de, this message translates to:
+  /// **'App teilen'**
+  String get settingsShareApp;
+
+  /// No description provided for @settingsShareAppHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Kopiert den Link zum Store-Eintrag, damit du ihn weitergeben kannst. Es werden keine Familiendaten geteilt.'**
+  String get settingsShareAppHint;
+
+  /// No description provided for @settingsShareAppText.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich nutze FamilyNexus, den Familienplaner mit Kalender, Chat und Einkaufsliste. Hier gibt es die App:'**
+  String get settingsShareAppText;
+
+  /// No description provided for @settingsShareAppCopied.
+  ///
+  /// In de, this message translates to:
+  /// **'Link zum Store-Eintrag kopiert'**
+  String get settingsShareAppCopied;
+
+  /// No description provided for @settingsRateApp.
+  ///
+  /// In de, this message translates to:
+  /// **'App bewerten'**
+  String get settingsRateApp;
+
+  /// No description provided for @settingsRateAppHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Öffnet den Eintrag im Play Store.'**
+  String get settingsRateAppHint;
+
+  /// No description provided for @settingsRateAppFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Store-Eintrag konnte nicht geöffnet werden.'**
+  String get settingsRateAppFailed;
+
   /// No description provided for @settingsSectionAbout.
   ///
   /// In de, this message translates to:
