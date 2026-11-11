@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import '../../app/app_services.dart';
 import '../../domain/family.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../ui/layout/adaptive.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
-import '../../ui/layout/adaptive.dart';
 import 'moderation_actions.dart';
 
 /// Liste der lokal blockierten Mitglieder mit „Blockierung aufheben“ (E-48).

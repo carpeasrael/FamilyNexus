@@ -11,9 +11,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 
+import '../helpers/shell_finders.dart';
 import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
-import '../helpers/shell_finders.dart';
 
 /// Kleinstes gültiges PNG (1 × 1 Pixel).
 const _png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';

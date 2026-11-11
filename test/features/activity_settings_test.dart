@@ -1,6 +1,6 @@
 import 'package:family_nexus/app/app.dart';
-import 'package:family_nexus/data/sync/activity_notifier.dart';
 import 'package:family_nexus/data/platform/reminder_scheduler.dart';
+import 'package:family_nexus/data/sync/activity_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

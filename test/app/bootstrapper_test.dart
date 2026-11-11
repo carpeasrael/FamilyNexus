@@ -4,11 +4,11 @@ import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/app/app_services.dart';
 import 'package:family_nexus/app/bootstrap.dart' show timedStep;
 import 'package:family_nexus/app/bootstrapper.dart';
+import 'package:family_nexus/app/startup_failure.dart';
 import 'package:family_nexus/app/startup_loading.dart';
 import 'package:family_nexus/core/app_log.dart';
-import 'package:family_nexus/ui/widgets/glass.dart';
-import 'package:family_nexus/app/startup_failure.dart';
 import 'package:family_nexus/data/platform/key_store.dart';
+import 'package:family_nexus/ui/widgets/glass.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

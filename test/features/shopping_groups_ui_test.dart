@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../support/test_app.dart';
 import '../helpers/shell_finders.dart';
+import '../support/test_app.dart';
 
 /// #211: Gruppen im Einkaufszettel, mit Fokus, Tastatur, Überlauf und Screenreader.
 Finder get _groupField => find.byType(TextField).at(2);

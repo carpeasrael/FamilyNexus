@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../l10n/gen/app_localizations.dart';
 import '../../data/matrix/matrix_gateway.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../common/error_text.dart';
 import 'provider_controller.dart';
 

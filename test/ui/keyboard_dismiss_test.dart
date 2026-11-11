@@ -2,8 +2,8 @@ import 'package:family_nexus/app/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../support/test_app.dart';
 import '../helpers/shell_finders.dart';
+import '../support/test_app.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
   tester.view.physicalSize = const Size(900, 2000);

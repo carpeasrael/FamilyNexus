@@ -7,12 +7,12 @@ import '../../core/app_log.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../data/platform/oauth_redirect.dart';
 import '../../domain/invite_link.dart';
-import '../../domain/server.dart';
 import '../../domain/security.dart';
+import '../../domain/server.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../common/invite_link_text.dart';
-import '../security/verification_dialog.dart';
 import '../onboarding/onboarding_screen.dart';
+import '../security/verification_dialog.dart';
 import 'home_shell.dart';
 
 /// Entscheidet zwischen Einrichtung und Hauptoberfläche.

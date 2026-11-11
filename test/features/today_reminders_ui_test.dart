@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../support/test_app.dart';
 import '../helpers/shell_finders.dart';
+import '../support/test_app.dart';
 
 /// #218: „Heute“ zeigt höchstens drei Termine; Erinnerungen in einer Übersicht ansehen und bestätigen.
 void main() {

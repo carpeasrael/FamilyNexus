@@ -6,11 +6,11 @@ import 'package:family_nexus/features/settings/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/shell_finders.dart';
 import '../support/fake_device_auth.dart';
 import '../support/memory_stores.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
-import '../helpers/shell_finders.dart';
 
 Future<(AppLockController, FakeDeviceAuth, SettingsController, DateTime Function())> _make({
   bool enabled = true,

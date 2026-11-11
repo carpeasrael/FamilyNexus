@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
 import '../../data/platform/reminder_scheduler.dart';
+import '../../domain/family.dart';
+import '../../domain/presence.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../ui/widgets/clock_tick.dart';
 import '../calendar/calendar_screen.dart' show SectionCard;
 import '../calendar/event_detail_screen.dart';
 import '../calendar/event_editor_screen.dart';
 import '../calendar/event_tile.dart';
 import '../presence/presence_view.dart';
-import '../tasks/tasks_screen.dart';
-import '../../domain/family.dart';
-import '../../domain/presence.dart';
 import '../reminders/permission_hint.dart';
 import '../reminders/reminders_screen.dart';
-import '../../ui/widgets/clock_tick.dart';
+import '../tasks/tasks_screen.dart';
 
 /// „Heute“: nächste Termine, Erinnerungen, ungelesene Nachrichten.
 class TodayScreen extends StatelessWidget {

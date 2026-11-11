@@ -11,8 +11,8 @@ import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
-import '../moderation/moderation_actions.dart';
 import '../common/prompt_dialog.dart';
+import '../moderation/moderation_actions.dart';
 import '../presence/presence_view.dart';
 import 'invite_dialog.dart';
 

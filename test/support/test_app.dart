@@ -1,35 +1,35 @@
 import 'dart:typed_data';
 
 import 'package:family_nexus/app/app_services.dart';
-import 'package:family_nexus/data/sync/activity_notifier.dart';
 import 'package:family_nexus/app/calendar_factory.dart';
-import 'package:family_nexus/data/sync/shopping_sync.dart';
-import 'package:family_nexus/features/calendar/calendar_controller.dart';
-import 'package:family_nexus/domain/shopping.dart';
-import 'package:family_nexus/features/shopping/shopping_controller.dart';
-import 'package:family_nexus/data/sync/task_sync.dart';
-import 'package:family_nexus/domain/permissions.dart';
-import 'package:family_nexus/domain/tasks.dart';
-import 'package:family_nexus/features/tasks/tasks_controller.dart';
 import 'package:family_nexus/data/platform/file_access.dart';
 import 'package:family_nexus/data/platform/oauth_redirect.dart';
-import 'package:family_nexus/features/lock/app_lock_controller.dart';
 import 'package:family_nexus/data/platform/screen_protection.dart';
+import 'package:family_nexus/data/sync/activity_notifier.dart';
+import 'package:family_nexus/data/sync/shopping_sync.dart';
+import 'package:family_nexus/data/sync/task_sync.dart';
 import 'package:family_nexus/domain/data_inventory.dart';
+import 'package:family_nexus/domain/permissions.dart';
 import 'package:family_nexus/domain/server.dart';
+import 'package:family_nexus/domain/shopping.dart';
+import 'package:family_nexus/domain/tasks.dart';
+import 'package:family_nexus/features/calendar/calendar_controller.dart';
+import 'package:family_nexus/features/lock/app_lock_controller.dart';
 import 'package:family_nexus/features/settings/settings_controller.dart';
+import 'package:family_nexus/features/shopping/shopping_controller.dart';
+import 'package:family_nexus/features/tasks/tasks_controller.dart';
 
 import 'fake_browser.dart';
 import 'fake_device_auth.dart';
 import 'fake_links.dart';
 import 'fake_mail.dart';
-import 'fake_store.dart';
 import 'fake_matrix.dart';
 import 'fake_scheduler.dart';
+import 'fake_store.dart';
 import 'memory_event_store.dart';
 import 'memory_shopping_store.dart';
-import 'memory_task_store.dart';
 import 'memory_stores.dart';
+import 'memory_task_store.dart';
 
 class TestApp {
   TestApp({

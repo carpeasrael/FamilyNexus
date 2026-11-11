@@ -8,10 +8,10 @@ import '../../core/app_log.dart';
 import '../../data/platform/secret_clipboard.dart';
 import '../../domain/data_inventory.dart';
 import '../../l10n/gen/app_localizations.dart';
+import '../../ui/layout/adaptive.dart';
 import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
 import '../security/security_panel.dart' show clearClipboardLater;
-import '../../ui/layout/adaptive.dart';
 import 'data_report.dart';
 
 enum DataReportKind { local, online }

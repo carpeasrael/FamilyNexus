@@ -5,16 +5,17 @@ import 'package:family_nexus/app/app_services.dart';
 import 'package:family_nexus/app/app_version.dart';
 import 'package:family_nexus/app/bootstrap.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
-import 'package:family_nexus/features/onboarding/onboarding_screen.dart';
-import '../support/memory_stores.dart';
-import '../support/nav.dart';
-import '../support/test_app.dart';
 import 'package:family_nexus/data/platform/reminder_scheduler.dart';
 import 'package:family_nexus/domain/app_settings.dart';
+import 'package:family_nexus/features/onboarding/onboarding_screen.dart';
 import 'package:family_nexus/ui/theme/tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../helpers/shell_finders.dart';
+import '../support/memory_stores.dart';
+import '../support/nav.dart';
+import '../support/test_app.dart';
 
 Future<(AppServices, NoopScreenProtection)> _services({String? lang}) async {
   final app = await buildTestApp(lang: lang);

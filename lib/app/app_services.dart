@@ -10,7 +10,6 @@ import '../data/db/sql_task_store.dart';
 import '../data/matrix/matrix_gateway.dart';
 import '../data/platform/browser_launcher.dart';
 import '../data/platform/element_launcher.dart';
-import '../domain/server.dart';
 import '../data/platform/file_access.dart';
 import '../data/platform/key_store.dart';
 import '../data/platform/link_source.dart';
@@ -23,12 +22,13 @@ import '../data/sync/activity_notifier.dart';
 import '../data/sync/presence_sync.dart';
 import '../domain/data_inventory.dart';
 import '../domain/invite_link.dart';
+import '../domain/server.dart';
 import '../features/calendar/calendar_controller.dart';
 import '../features/lock/app_lock_controller.dart';
 import '../features/reminders/reminder_coordinator.dart';
+import '../features/settings/settings_controller.dart';
 import '../features/shopping/shopping_controller.dart';
 import '../features/tasks/tasks_controller.dart';
-import '../features/settings/settings_controller.dart';
 
 /// Erzeugt den Kalender für den angemeldeten Nutzer (inkl. lokaler Ablage) und dessen Familie [familyRoom].
 typedef CalendarBuilder = Future<CalendarController> Function(String userId, String? familyRoom);

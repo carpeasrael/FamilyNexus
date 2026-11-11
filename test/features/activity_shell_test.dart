@@ -2,8 +2,8 @@ import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/data/sync/activity_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../support/test_app.dart';
 import '../helpers/shell_finders.dart';
+import '../support/test_app.dart';
 
 class _Platform implements ActivityPlatform {
   final List<ActivityKind> shown = <ActivityKind>[];

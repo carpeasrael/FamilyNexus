@@ -13,9 +13,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/shell_finders.dart';
 import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
-import '../helpers/shell_finders.dart';
 
 final bool _enabled = Platform.environment['FN_SCREENSHOTS'] == '1';
 final Directory _out = Directory(Platform.environment['FN_SCREENSHOTS_DIR'] ?? 'build/onboarding_tour');

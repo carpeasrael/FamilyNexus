@@ -3,8 +3,8 @@ import 'package:family_nexus/domain/server.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../support/test_app.dart';
 import '../helpers/shell_finders.dart';
+import '../support/test_app.dart';
 
 Future<void> _tapText(WidgetTester tester, String text) async {
   var finder = find.widgetWithText(FilledButton, text);

@@ -1,8 +1,7 @@
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/recurrence.dart';
-import 'package:timezone/timezone.dart' as tz;
-
 import 'package:family_nexus/domain/time_zones.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 const String kOwner = '@anna:fake.test';
 const String kOther = '@ben:fake.test';

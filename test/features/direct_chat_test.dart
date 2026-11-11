@@ -5,9 +5,9 @@ import 'package:family_nexus/domain/server.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/shell_finders.dart';
 import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
-import '../helpers/shell_finders.dart';
 
 Future<FakeMatrixGateway> _joinBen(TestApp app) async {
   final ben = app.server.newDevice();

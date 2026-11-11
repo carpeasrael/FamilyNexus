@@ -7,8 +7,8 @@ import 'package:family_nexus/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../support/test_app.dart';
 import '../helpers/shell_finders.dart';
+import '../support/test_app.dart';
 
 /// #153: Scheitert das Öffnen der Familiendienste, zeigt die Hauptansicht eine Meldung mit „Erneut versuchen“
 /// und das Menü statt eines dauerhaften Ladekreises; es bleibt kein Teilzustand zurück.

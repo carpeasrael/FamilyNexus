@@ -1,6 +1,7 @@
-import '../support/memory_stores.dart';
 import 'package:family_nexus/features/settings/settings_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../support/memory_stores.dart';
 
 void main() {
   test('Änderungen werden persistiert und wieder geladen', () async {

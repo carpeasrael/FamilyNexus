@@ -1,12 +1,14 @@
-import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'dart:async';
 
+import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/domain/account_deletion.dart';
 import 'package:family_nexus/domain/attachment_policy.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
+import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/data_inventory.dart';
 import 'package:family_nexus/domain/event_codec.dart';
+import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/family_code.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/moderation.dart';
@@ -14,13 +16,11 @@ import 'package:family_nexus/domain/password_change.dart';
 import 'package:family_nexus/domain/permissions.dart';
 import 'package:family_nexus/domain/presence.dart';
 import 'package:family_nexus/domain/registration.dart';
-import 'package:family_nexus/domain/username_suggestion.dart';
+import 'package:family_nexus/domain/security.dart';
+import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/domain/shopping.dart';
 import 'package:family_nexus/domain/tasks.dart';
-import 'package:family_nexus/domain/security.dart';
-import 'package:family_nexus/domain/chat.dart';
-import 'package:family_nexus/domain/family.dart';
-import 'package:family_nexus/domain/server.dart';
+import 'package:family_nexus/domain/username_suggestion.dart';
 import 'package:flutter/foundation.dart';
 
 /// Ereignis im Fake-Server (entspricht einem verschlüsselten Raumereignis).
