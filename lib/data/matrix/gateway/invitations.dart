@@ -194,21 +194,21 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
         return;
       }
       final data = json.decode(body);
-      final rooms = (data as Map)['rooms'] as Map?;
-      final leave = (rooms?['leave'] as Map?)?[roomId] as Map?;
+      final rooms = JsonRead.map(JsonRead.at(data, 'rooms'));
+      final leave = JsonRead.map(JsonRead.path(rooms, <Object?>['leave', roomId]));
       if (leave == null) {
-        bool inSection(String section) => (rooms?[section] as Map?)?.containsKey(roomId) == true;
+        bool inSection(String section) => JsonRead.map(JsonRead.at(rooms, section))?.containsKey(roomId) == true;
         _noteJoinState(inSection('knock') ? 'knock' : (inSection('invite') ? 'invite' : (inSection('join') ? 'join' : 'noRoom')));
         return;
       }
       final events = <Object?>[
-        ...((leave['state'] as Map?)?['events'] as List? ?? const <Object?>[]),
-        ...((leave['timeline'] as Map?)?['events'] as List? ?? const <Object?>[]),
+        ...?JsonRead.list(JsonRead.path(leave, <Object?>['state', 'events'])),
+        ...?JsonRead.list(JsonRead.path(leave, <Object?>['timeline', 'events'])),
       ];
       Map<Object?, Object?>? last;
       for (final e in events) {
         if (e is! Map || e['type'] != 'm.room.member' || e['state_key'] != me) continue;
-        if (last == null || (e['origin_server_ts'] as int? ?? 0) >= (last['origin_server_ts'] as int? ?? 0)) last = e;
+        if (last == null || (JsonRead.integer(e['origin_server_ts']) ?? 0) >= (JsonRead.integer(last['origin_server_ts']) ?? 0)) last = e;
       }
       if (last == null) {
         AppLog.w('gateway', 'Ablehnung der Beitrittsanfrage: Raum unter „verlassen“, aber ohne eigenes Mitgliedsereignis');
@@ -219,10 +219,10 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
       if (!rejected) {
         final content = last['content'];
         final unsigned = last['unsigned'];
-        final membership = SdkMatrixGateway.membershipLabel(content is Map ? content['membership'] : null);
-        final previous = SdkMatrixGateway.membershipLabel(unsigned is Map && unsigned['prev_content'] is Map ? (unsigned['prev_content'] as Map)['membership'] : null);
+        final membership = SdkMatrixGateway.membershipLabel(JsonRead.at(content, 'membership'));
+        final previous = SdkMatrixGateway.membershipLabel(JsonRead.at(JsonRead.at(unsigned, 'prev_content'), 'membership'));
         final own = last['sender'] == me;
-        final offset = ((last['origin_server_ts'] as int? ?? 0) - (req['ts']! as int)) ~/ 1000;
+        final offset = ((JsonRead.integer(last['origin_server_ts']) ?? 0) - (req['ts']! as int)) ~/ 1000;
         AppLog.w(
           'gateway',
           'Ablehnung der Beitrittsanfrage: Ereignis nicht als Ablehnung gewertet '

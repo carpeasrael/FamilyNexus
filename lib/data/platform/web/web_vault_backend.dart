@@ -80,9 +80,9 @@ class WebVaultBackend implements VaultBackend {
   Future<void> unlock(String password) async {
     final raw = web.window.localStorage.getItem(storageKey);
     if (raw == null) throw const WrongVaultPasswordException();
-    final Map<String, dynamic> m;
+    final Map<String, Object?> m;
     try {
-      m = jsonDecode(raw) as Map<String, dynamic>;
+      m = jsonDecode(raw) as Map<String, Object?>;
       _salt = base64Decode(m['s'] as String);
       _iterations = (m['i'] as num).toInt();
     } catch (e) {
@@ -109,9 +109,9 @@ class WebVaultBackend implements VaultBackend {
   Future<Map<String, String>> load() async {
     final raw = web.window.localStorage.getItem(storageKey);
     if (raw == null || _key == null) throw const WrongVaultPasswordException();
-    final m = jsonDecode(raw) as Map<String, dynamic>;
+    final m = jsonDecode(raw) as Map<String, Object?>;
     final plain = await _decrypt(base64Decode(m['n'] as String), base64Decode(m['c'] as String));
-    final entries = jsonDecode(utf8.decode(plain)) as Map<String, dynamic>;
+    final entries = jsonDecode(utf8.decode(plain)) as Map<String, Object?>;
     return entries.map((k, v) => MapEntry(k, v as String));
   }
 

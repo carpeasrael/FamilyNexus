@@ -157,7 +157,7 @@ class RegistrationFlows {
       if (p is! Map<String, Object?>) continue;
       final langs = <String, Map<String, Object?>>{
         for (final e in p.entries)
-          if (e.value is Map<String, Object?>) e.key: e.value! as Map<String, Object?>,
+          if (e.value case final Map<String, Object?> v) e.key: v,
       };
       final entry = langs[language] ?? langs['en'] ?? (langs.isEmpty ? null : langs.values.first);
       if (entry == null) continue;
