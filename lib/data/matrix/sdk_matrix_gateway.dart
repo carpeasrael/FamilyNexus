@@ -64,6 +64,7 @@ part 'gateway/direct_chats.dart';
 part 'gateway/gateway_errors.dart';
 part 'gateway/identities.dart';
 part 'gateway/password_change.dart';
+part 'gateway/presence.dart';
 part 'gateway/invitations.dart';
 part 'gateway/join_diagnostic.dart';
 part 'gateway/registration_session.dart';
@@ -78,7 +79,7 @@ part 'gateway/security_verification.dart';
 /// * Lesebestätigungen sind privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _DirectChatsModule, _IdentitiesModule, _GatewayErrorsModule, _DataInventoryModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _DirectChatsModule, _IdentitiesModule, _GatewayErrorsModule, _DataInventoryModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -162,8 +163,10 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   List<ChatThread> _threads = const <ChatThread>[];
 
   /// Online-Status der anderen Mitglieder (E-38), nur im Arbeitsspeicher.
+  @override
   final PresenceBoard _presence = PresenceBoard();
   String? _presenceRoomId;
+  @override
   final StreamController<String> _presenceAsks = StreamController<String>.broadcast();
   StreamSubscription<Object?>? _toDeviceSub;
   final StreamController<CalendarSignal> _signals = StreamController<CalendarSignal>.broadcast();
@@ -1730,65 +1733,6 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   }
 
   // ------------------------------------------------------ Online-Status (E-38)
-
-  @override
-  Map<String, PresenceStamp> get presence => _presence.snapshot();
-
-  @override
-  Stream<String> get presenceAsks => _presenceAsks.stream;
-
-  @override
-  Future<void> announcePresence({required bool online, bool ask = false, String? onlyTo}) async {
-    final client = _client;
-    final f = _family;
-    if (client == null || !client.isLogged() || f == null || !client.encryptionEnabled) {
-      throw const GatewayException(GatewayError.notAllowed);
-    }
-    if (onlyTo != null && !MatrixIds.isUserId(onlyTo)) throw const GatewayException(GatewayError.invalidInput);
-    // Nur an Geräte, die auch Raumschlüssel erhielten (cross-signiert, nicht gesperrt) und nur an
-    // beigetretene Mitglieder – nie an Eingeladene, Anfragende oder Entfernte.
-    final devices = <DeviceKeys>[];
-    for (final m in f.joined) {
-      if (m.userId == f.myUserId || (onlyTo != null && m.userId != onlyTo)) continue;
-      final list = client.userDeviceKeys[m.userId]?.deviceKeys.values;
-      if (list == null) continue;
-      for (final d in list) {
-        if (d.encryptToDevice) devices.add(d);
-      }
-    }
-    if (devices.isEmpty) return;
-    try {
-      await client.sendToDeviceEncryptedChunked(
-        devices,
-        PresenceCodec.type,
-        PresenceCodec.encode(online: online, now: DateTime.now().toUtc(), ask: ask),
-      );
-    } catch (e) {
-      AppLog.e('gateway', 'Online-Status konnte nicht gesendet werden', e);
-      throw _map(e);
-    }
-  }
-
-  void _onToDevice(ToDeviceEvent e) {
-    if (e.type != PresenceCodec.type) return;
-    // Nur Ende-zu-Ende-verschlüsselt Angekommenes zählt: ein unverschlüsseltes Ereignis könnte
-    // der Server im Namen eines Mitglieds erzeugen.
-    if (e.encryptedContent == null) return;
-    final f = _family;
-    if (f == null || e.sender == f.myUserId || f.member(e.sender)?.status != MemberStatus.joined) return;
-    final d = PresenceCodec.decode(Map<String, Object?>.from(e.content), now: DateTime.now().toUtc());
-    if (d == null) return;
-    // Je Gerät führen (Schlüssel des sendenden Geräts): ein Mitglied gilt als online, solange
-    // irgendein Gerät online meldet.
-    final key = e.encryptedContent?['sender_key'];
-    final now = DateTime.now().toUtc();
-    final before = _presence.stampOf(e.sender, now);
-    if (_presence.apply(e.sender, deviceId: key is String ? key : '', online: d.online, at: d.at)) {
-      final after = _presence.stampOf(e.sender, now);
-      if (before == null || after == null || before.online != after.online) notifyListeners();
-    }
-    if (d.ask && !_presenceAsks.isClosed) _presenceAsks.add(e.sender);
-  }
 
   // ------------------------------------------- Identitäten der Mitglieder (S1)
 
