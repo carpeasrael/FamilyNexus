@@ -59,6 +59,7 @@ part 'gateway/account_deletion.dart';
 part 'gateway/app_client.dart';
 part 'gateway/calendar_data.dart';
 part 'gateway/chat.dart';
+part 'gateway/connection.dart';
 part 'gateway/data_inventory.dart';
 part 'gateway/direct_chats.dart';
 part 'gateway/family.dart';
@@ -80,7 +81,7 @@ part 'gateway/security_verification.dart';
 /// * Lesebestätigungen sind privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _GatewayErrorsModule, _DataInventoryModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _DataInventoryModule, _ConnectionModule, _GatewayErrorsModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -125,6 +126,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   static const Duration roomSyncTimeout = Duration(seconds: 30);
 
   final KeyStore _keyStore;
+  @override
   final ServerProbe _probe;
 
   /// Ablage der eingegebenen Anbieter-Adresse in der App-Datenbank (#259, E-90); ohne Ablage nur im Speicher.
@@ -343,6 +345,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
 
   /// Bei der Serverprüfung bestätigte Basisadresse je Eingabe: Der Login nutzt
   /// genau diese und löst nicht erneut auf (kein Wechsel zwischen Prüfung und Anmeldung).
+  @override
   final Map<ServerUrl, ServerUrl> _confirmedBase = <ServerUrl, ServerUrl>{};
 
   @override
@@ -381,6 +384,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   }
 
   /// Übernimmt das an einen Anmeldevorgang gebundene Paar, wenn die Sitzung steht und ihre Basis passt.
+  @override
   Future<void> _adoptProvider(Client client, _Entered? pair) async {
     final user = client.userID;
     if (pair == null || !client.isLogged() || user == null) return;
@@ -535,6 +539,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     };
   }
 
+  @override
   Future<_AppClient> _ensureClient() async {
     final existing = _client;
     if (existing != null) return existing;
@@ -682,84 +687,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
 
   // ------------------------------------------------------------ Verbindung
 
-  @override
-  Future<ServerInfo> probeServer(ServerUrl url) async {
-    try {
-      final info = await _probe.probe(url);
-      _confirmedBase[url] = info.url;
-      return info;
-    } on GatewayException {
-      rethrow;
-    } catch (e) {
-      AppLog.e('gateway', 'Serverprüfung fehlgeschlagen', e);
-      throw _map(e);
-    }
-  }
-
   static final RegExp _usernameRe = RegExp(r'^[A-Za-z0-9._=\-/+@:]{1,255}$');
-
-  /// Setzt den Homeserver des SDK auf die geprüfte Adresse. Das SDK darf keine eigene
-  /// `.well-known`-Abfrage machen (ungeprüfte Ziele, Weiterleitungen, Zwischenspeicherung).
-  /// Mit [oauth] liefert es die dabei abgerufenen OAuth-Metadaten (`null`, wenn keine abrufbar waren), dazu immer
-  /// das Paar aus eingegebener Adresse und normalisierter Basis für den laufenden Vorgang (#259).
-  Future<(GetAuthMetadataResponse?, _Entered?)> _useHomeserver(Client client, ServerUrl server, {bool oauth = false}) async {
-    // Passwort-Anmeldung und Registrierung beenden eine offene Browser-Anmeldung samt festgehaltener
-    // Metadaten (#222) – vor `checkHomeserver`, das ab Matrix v1.15 auch hier `getAuthMetadata` ruft.
-    if (!oauth) _dropOAuth();
-    final base = _confirmedBase[server] ?? await _probe.resolveBase(server);
-    // Die OAuth-Metadaten nur für die Browser-Anmeldung abfragen: Fehlerseiten von Proxys würden
-    // sonst auch die Passwort-Anmeldung verhindern.
-    final (_, _, _, meta) = await client.checkHomeserver(base.uri, checkWellKnown: false, fetchAuthMetadata: oauth ? true : null);
-    if (client.homeserver?.scheme != 'https') {
-      client.homeserver = null;
-      throw const GatewayException(GatewayError.serverUnsupported);
-    }
-    final resolved = _baseOf(client);
-    final _Entered? pair = resolved == null ? null : (entered: server, base: resolved);
-    return (oauth ? meta : null, pair);
-  }
-
-  @override
-  Future<void> login({
-    required ServerUrl server,
-    required String username,
-    required String password,
-  }) async {
-    final user = username.trim();
-    if (!_usernameRe.hasMatch(user) || password.isEmpty || password.length > 1024) {
-      throw const GatewayException(GatewayError.invalidInput);
-    }
-    cancelRegistration();
-    try {
-      final client = await _ensureClient();
-      final (_, pair) = await _useHomeserver(client, server);
-      try {
-        await client.login(
-          LoginType.mLoginPassword,
-          identifier: AuthenticationUserIdentifier(user: user),
-          password: password,
-          initialDeviceDisplayName: PlatformInfo.deviceName,
-        );
-      } finally {
-        // Auch wenn nach der Anmeldung ein Folgeschritt scheitert (#28): Die Sitzung steht.
-        await _adoptProvider(client, pair);
-      }
-      await _refresh();
-    } on GatewayException {
-      rethrow;
-    } catch (e) {
-      // Angemeldet ist angemeldet: scheitert nur ein Folgeschritt (z. B. Schlüssel hochladen,
-      // erster Abgleich), keine Fehlermeldung zeigen – der Abgleich holt ihn nach (#28).
-      if (_client?.isLogged() ?? false) {
-        AppLog.e('gateway', 'Nach der Anmeldung fehlgeschlagen (Anmeldung gilt)', e);
-        _scheduleRefresh();
-        notifyListeners();
-        return;
-      }
-      AppLog.e('gateway', 'Anmeldung fehlgeschlagen', e);
-      throw _map(e, forLogin: true);
-    }
-  }
 
   // ------------------------------------------------------ Kontoanlage (E-55)
 
