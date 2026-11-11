@@ -28,6 +28,8 @@ import 'privacy_screen.dart';
 import 'settings_actions.dart';
 import 'settings_controller.dart';
 
+part 'widgets/settings_account_parts.dart';
+part 'widgets/settings_notify_parts.dart';
 part 'widgets/settings_parts.dart';
 
 class SettingsScreen extends StatelessWidget {
