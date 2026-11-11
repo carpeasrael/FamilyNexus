@@ -57,6 +57,8 @@ import 'sync_relevance.dart';
 
 part 'gateway/account_deletion.dart';
 part 'gateway/app_client.dart';
+part 'gateway/data_inventory.dart';
+part 'gateway/gateway_errors.dart';
 part 'gateway/join_diagnostic.dart';
 part 'gateway/registration_session.dart';
 
@@ -69,7 +71,7 @@ part 'gateway/registration_session.dart';
 /// * Lesebestätigungen sind privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _GatewayErrorsModule, _DataInventoryModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -185,6 +187,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule implem
     _participantsFailures = 0;
   }
   bool _syncedOnce = false;
+  @override
   Family? _family;
 
   // ------------------------------------------------- Grundlinie für Meldungen (#254, E-88)
@@ -1332,6 +1335,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule implem
   // ------------------------------------------------------------- Familie
 
   /// Familienraum laut Kontodaten, unabhängig vom Beitrittsstatus.
+  @override
   Room? _familyRoomAnyState() {
     final client = _client;
     if (client == null || !client.isLogged()) return null;
@@ -1340,6 +1344,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule implem
     return client.getRoomById(id);
   }
 
+  @override
   Room? _familyRoom() {
     final room = _familyRoomAnyState();
     return (room != null && room.membership == Membership.join) ? room : null;
@@ -3059,6 +3064,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule implem
     }
   }
 
+  @override
   Room? _privateRoom() {
     final client = _client;
     if (client == null || !client.isLogged()) return null;
@@ -3807,147 +3813,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule implem
     );
   }
 
-  // ------------------------------------------------------------- Fehler
-
-  @override
-  GatewayException _map(Object e, {bool forLogin = false}) {
-    if (e is GatewayException) return e;
-    if (e is MatrixException) {
-      switch (e.errcode) {
-        case 'M_FORBIDDEN':
-        case 'M_USER_DEACTIVATED':
-        case 'M_UNKNOWN_TOKEN':
-          return GatewayException(forLogin ? GatewayError.invalidCredentials : GatewayError.notAllowed);
-        case 'M_LIMIT_EXCEEDED':
-          return const GatewayException(GatewayError.rateLimited);
-        case 'M_NOT_FOUND':
-          return const GatewayException(GatewayError.notFound);
-        // Serverseitige Ablehnung ist kein lokaler Eingabefehler: nicht als `invalidInput`
-        // melden (sonst würde die Warteschlange den Eintrag verwerfen).
-        case 'M_TOO_LARGE':
-        case 'M_BAD_JSON':
-          return const GatewayException(GatewayError.unknown);
-        case 'M_UNSUPPORTED_ROOM_VERSION':
-        case 'M_INCOMPATIBLE_ROOM_VERSION':
-          return const GatewayException(GatewayError.serverUnsupported);
-        default:
-          return const GatewayException(GatewayError.unknown);
-      }
-    }
-    if (e is BadServerLoginTypesException) {
-      return const GatewayException(GatewayError.serverUnsupported);
-    }
-    if (e is TimeoutException) return const GatewayException(GatewayError.serverUnreachable);
-    final s = e.runtimeType.toString();
-    if (s.contains('Socket') || s.contains('Handshake') || s.contains('ClientException') || s.contains('Tls')) {
-      return const GatewayException(GatewayError.serverUnreachable);
-    }
-    return const GatewayException(GatewayError.unknown);
-  }
-
-  // ------------------------------------------------------------ Datenprotokoll
-
-  static const Duration inventoryTimeout = Duration(seconds: 10);
-
-  /// Eigener Anzeigename für das lokale Protokoll (#261): nur aus dem, was lokal liegt, ohne Netzabfrage und ohne
-  /// Zustandsänderung am Raum. Reihenfolge: eigenes `m.room.member` im beigetretenen Familienraum, dann im privaten
-  /// Raum (erst Speicher, dann Datenbank), zuletzt der Profil-Zwischenspeicher des SDK. Der Name im
-  /// `m.room.member` kann ein raumbezogener Name sein (E-89).
-  Future<String?> _localDisplayName(Client c, String me) async {
-    String? clean(String? raw) {
-      final name = TextSanitizer.clean(raw ?? '', max: 80);
-      return name.isEmpty ? null : name;
-    }
-
-    for (final room in [_familyRoom(), _privateRoom()]) {
-      if (room == null) continue;
-      try {
-        final fromState = clean(room.getState(EventTypes.RoomMember, me)?.asUser(room).displayName);
-        if (fromState != null) return fromState;
-        final fromDb = clean((await c.database.getUser(me, room))?.displayName);
-        if (fromDb != null) return fromDb;
-      } catch (e) {
-        AppLog.e('gateway', 'Anzeigename für das lokale Protokoll nicht lesbar', e);
-      }
-    }
-    try {
-      return clean((await c.database.getUserProfile(me))?.displayname);
-    } catch (e) {
-      AppLog.e('gateway', 'Profil-Zwischenspeicher für das lokale Protokoll nicht lesbar', e);
-      return null;
-    }
-  }
-
-  @override
-  Future<OnlineInventory> dataInventory({bool refresh = true}) async {
-    final c = _client;
-    if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
-    final me = c.userID!;
-    String? displayName;
-    var hasAvatar = false;
-    if (refresh) {
-      try {
-        // Frisch vom Server, nicht aus dem Zwischenspeicher.
-        final profile = await c.getUserProfile(me, maxCacheAge: Duration.zero).timeout(inventoryTimeout);
-        final name = TextSanitizer.clean(profile.displayname ?? '', max: 80);
-        displayName = name.isEmpty ? null : name;
-        hasAvatar = profile.avatarUrl != null;
-      } catch (e) {
-        AppLog.e('gateway', 'Profil für das Datenprotokoll nicht abrufbar', e);
-      }
-      try {
-        await refreshSecurity().timeout(inventoryTimeout);
-      } catch (e) {
-        AppLog.e('gateway', 'Geräteliste für das Datenprotokoll nicht abrufbar', e);
-      }
-    } else {
-      displayName = await _localDisplayName(c, me);
-    }
-    final familyId = _familyRoomAnyState()?.id;
-    final privateId = _privateRoom()?.id;
-    final rooms = <InventoryRoom>[];
-    for (final r in c.rooms) {
-      final events = await c.database.getEventList(r);
-      final types = <String, int>{};
-      var attachments = 0;
-      for (final e in events) {
-        types.update(e.type, (n) => n + 1, ifAbsent: () => 1);
-        if (e.type == EventTypes.Message && (e.content['file'] is Map || e.content['url'] is String)) attachments++;
-      }
-      rooms.add(InventoryRoom(
-        id: r.id,
-        kind: r.id == familyId
-            ? InventoryRoomKind.family
-            : r.id == privateId
-                ? InventoryRoomKind.private
-                : r.isDirectChat
-                    ? InventoryRoomKind.direct
-                    : InventoryRoomKind.other,
-        name: TextSanitizer.clean(r.name, max: 80),
-        encrypted: r.encrypted,
-        membership: r.membership.name,
-        joinedMembers: r.summary.mJoinedMemberCount ?? 0,
-        invitedMembers: r.summary.mInvitedMemberCount ?? 0,
-        cachedEvents: events.length,
-        eventTypes: types,
-        attachments: attachments,
-      ));
-    }
-    return OnlineInventory(
-      server: server?.toString() ?? '',
-      homeserver: c.homeserver?.toString(),
-      userId: me,
-      deviceId: c.deviceID ?? '',
-      displayName: displayName,
-      hasAvatar: hasAvatar,
-      devices: devices,
-      crossSigning: c.userDeviceKeys[me]?.masterKey != null,
-      keyBackup: c.encryption?.keyManager.enabled ?? false,
-      accountDataTypes: c.accountData.keys.toList()..sort(),
-      rooms: rooms,
-      family: _family,
-    );
-  }
+  // ------------------------------------------------------------- Freigabe
 
   @override
   void dispose() {
