@@ -63,6 +63,7 @@ part 'gateway/data_inventory.dart';
 part 'gateway/direct_chats.dart';
 part 'gateway/gateway_errors.dart';
 part 'gateway/identities.dart';
+part 'gateway/password_change.dart';
 part 'gateway/invitations.dart';
 part 'gateway/join_diagnostic.dart';
 part 'gateway/registration_session.dart';
@@ -77,7 +78,7 @@ part 'gateway/security_verification.dart';
 /// * Lesebestätigungen sind privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _DirectChatsModule, _IdentitiesModule, _GatewayErrorsModule, _DataInventoryModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _DirectChatsModule, _IdentitiesModule, _GatewayErrorsModule, _DataInventoryModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -1210,58 +1211,6 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   }
 
   // ------------------------------------------------- Passwort ändern (#117)
-
-  @override
-  Future<PasswordChange> passwordChange() async {
-    final c = _client;
-    if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
-    try {
-      if (!await _signedInViaOAuth(c)) return const PasswordChangeInApp();
-      final page = await _accountManagementPage(c, accountManagementPage);
-      return page == null ? const PasswordChangeUnavailable() : PasswordChangeInBrowser(page);
-    } catch (e) {
-      AppLog.e('gateway', 'Kontoseite des Anbieters nicht ermittelt', e);
-      throw _map(e);
-    }
-  }
-
-  @override
-  Future<void> changePassword({required String oldPassword, required String newPassword, required bool logoutOtherDevices}) async {
-    try {
-      final c = _client;
-      if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
-      if (await _signedInViaOAuth(c)) throw const GatewayException(GatewayError.notAllowed);
-      if (newPassword.length < minPasswordLength) throw const GatewayException(GatewayError.weakPassword);
-      if (oldPassword.isEmpty || oldPassword.length > 1024 || newPassword.length > PasswordChange.maxLength) {
-        throw const GatewayException(GatewayError.invalidInput);
-      }
-      // Das SDK schickt `oldPassword` schon im ersten Aufruf und wiederholt nur bei genau einem Flow.
-      // Darum erst ohne Passwort fragen. `logoutDevices` immer senden: Ohne nimmt Synapse `true` an.
-      try {
-        await c.changePassword(newPassword, logoutDevices: logoutOtherDevices).timeout(roomOpTimeout);
-      } on MatrixException catch (e) {
-        final session = e.session;
-        final flows = e.authenticationFlows;
-        if (session == null || flows == null || !_offersPassword(flows)) rethrow;
-        await c
-            .changePassword(
-              newPassword,
-              logoutDevices: logoutOtherDevices,
-              auth: AuthenticationPassword(session: session, password: oldPassword, identifier: AuthenticationUserIdentifier(user: c.userID!)),
-            )
-            .timeout(roomOpTimeout);
-      }
-    } on GatewayException {
-      rethrow;
-    } catch (e) {
-      AppLog.e('gateway', 'Passwortänderung fehlgeschlagen', e);
-      if (e is MatrixException) {
-        final mapped = passwordChangeError(e);
-        if (mapped != null) throw mapped;
-      }
-      throw _map(e);
-    }
-  }
 
   /// Fehler der Passwortänderung; `null` für [_map]. Wertet nur `flows`, `session` und das rohe
   /// `errcode` aus: Der Getter meldet bei UIA-Antworten ohne `errcode` selbst `M_FORBIDDEN`, und den
