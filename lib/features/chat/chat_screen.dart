@@ -25,6 +25,10 @@ import '../presence/presence_view.dart';
 import 'chat_layout.dart';
 import 'sender_name.dart';
 
+part 'widgets/chat_parts.dart';
+part 'widgets/message_bubble.dart';
+part 'widgets/thread_and_lines.dart';
+
 const List<String> _quickReactions = <String>['👍', '❤️', '😂', '🎉', '😮', '🙏'];
 
 class ChatScreen extends StatefulWidget {
@@ -256,6 +260,52 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     );
   }
 
+  /// Verschwindet ein Gespräch (z. B. Mitglied entfernt), geht es zurück zum Familienchat. Ein angefordertes Gespräch,
+  /// das noch nicht erschienen ist, wird dagegen abgewartet (#31).
+  void _followThread(ChatThread? current, {required bool waiting}) {
+    if (current != null && _waitingFor == current.id) {
+      _waitingFor = null;
+      _waitTimer?.cancel();
+    }
+    if (current == null && !waiting && _threadId != ChatThread.familyId) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _threadId = ChatThread.familyId);
+      });
+    }
+  }
+
+  /// Marke „Neue Nachrichten“, Sichtbarkeit und Gelesen-Markierung des Gesprächs [threadId] (#254, #294, E-88).
+  void _trackVisibility(AppServices services, MatrixGateway g, String threadId, int unread) {
+    // Gesperrt gilt nichts als gesehen (E-88, #294): Marke zurücksetzen, beim Entsperren entsteht sie neu (E-42).
+    final locked = services.lock.locked;
+    if (locked) _resetMarker();
+    if (widget.active && !locked && _markerThread != threadId) {
+      // Vor dem Gelesen-Markieren: danach gäbe es keine ungelesene Nachricht mehr.
+      _markerThread = threadId;
+      _unreadFrom = unread > 0 ? g.firstUnreadIdIn(threadId) : null;
+      _scrolledToMarker = false;
+    }
+    // Sichtbar heißt wie bei den Meldungen: Chat-Tab, dieses Gespräch, Vordergrund (#254). Im Hintergrund wird
+    // nichts gelesen markiert; die Rückkehr baut neu und markiert dann.
+    if (widget.active) services.visibleChatThread = threadId;
+    if (widget.active && _foreground && !locked && unread > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!services.lock.locked) g.markChatRead(threadId: threadId).ignore();
+      });
+    }
+  }
+
+  /// Springt einmal zur Marke, sobald sie gebaut ist.
+  void _scrollToMarkerOnce(List<ChatEntry> entries) {
+    if (_scrolledToMarker || !entries.any((e) => e is UnreadMarkerEntry)) return;
+    _scrolledToMarker = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Nur wenn die Marke gebaut ist (Sichtbereich + Vorlauf); weiter oben liegende Marken bleiben, wo sie sind.
+      final ctx = _markerKey.currentContext;
+      if (ctx != null && ctx.mounted) Scrollable.ensureVisible(ctx, alignment: 0.5).ignore();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final services = AppScope.of(context);
@@ -266,195 +316,40 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       builder: (context, _) {
         final blocked = services.settings.settings.blockedUsers;
         final threads = visibleThreads(g.threads, blocked);
-        // Verschwindet ein Gespräch (z. B. Mitglied entfernt), geht es zurück zum Familienchat.
-        // Ein angefordertes Gespräch, das noch nicht erschienen ist, wird dagegen abgewartet.
         final current = threads.where((t) => t.id == _threadId).firstOrNull;
         final waiting = current == null && _waitingFor == _threadId;
-        if (current != null && _waitingFor == current.id) {
-          _waitingFor = null;
-          _waitTimer?.cancel();
-        }
-        if (current == null && !waiting && _threadId != ChatThread.familyId) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) setState(() => _threadId = ChatThread.familyId);
-          });
-        }
+        _followThread(current, waiting: waiting);
         if (waiting) {
           if (widget.active) services.visibleChatThread = null;
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                const CircularProgressIndicator(),
-                const SizedBox(height: 12),
-                Text(l.chatOpening, textAlign: TextAlign.center),
-              ]),
-            ),
-          );
+          return _ChatOpening(text: l.chatOpening);
         }
         final threadId = current?.id ?? ChatThread.familyId;
         final all = g.messagesIn(threadId);
         final msgs = _uniqueById(visibleMessages(all, blocked, myUserId: g.userId));
-        final unread = g.unreadIn(threadId);
-        // Gesperrt gilt nichts als gesehen (E-88, #294): Marke zurücksetzen, beim Entsperren entsteht sie neu (E-42).
-        final locked = services.lock.locked;
-        if (locked) _resetMarker();
-        if (widget.active && !locked && _markerThread != threadId) {
-          // Vor dem Gelesen-Markieren: danach gäbe es keine ungelesene Nachricht mehr.
-          _markerThread = threadId;
-          _unreadFrom = unread > 0 ? g.firstUnreadIdIn(threadId) : null;
-          _scrolledToMarker = false;
-        }
-        // Sichtbar heißt wie bei den Meldungen: Chat-Tab, dieses Gespräch, Vordergrund (#254). Im Hintergrund wird
-        // nichts gelesen markiert; die Rückkehr baut neu und markiert dann.
-        if (widget.active) services.visibleChatThread = threadId;
-        if (widget.active && _foreground && !locked && unread > 0) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!services.lock.locked) g.markChatRead(threadId: threadId).ignore();
-          });
-        }
-        final byId = <String, ChatMessage>{for (final m in msgs) m.id: m};
+        _trackVisibility(services, g, threadId, g.unreadIn(threadId));
         final entries = chatEntries(msgs, unreadFromId: _unreadFrom, allIds: <String>[for (final m in all) m.id]);
-        final positionByKey = <String, int>{for (var i = 0; i < entries.length; i++) entries[i].key: i};
-        if (!_scrolledToMarker && entries.any((e) => e is UnreadMarkerEntry)) {
-          _scrolledToMarker = true;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            // Nur wenn die Marke gebaut ist (Sichtbereich + Vorlauf); weiter oben liegende Marken bleiben, wo sie sind.
-            final ctx = _markerKey.currentContext;
-            if (ctx != null && ctx.mounted) Scrollable.ensureVisible(ctx, alignment: 0.5).ignore();
-          });
-        }
+        _scrollToMarkerOnce(entries);
         return Column(children: <Widget>[
           if (threads.length > 1)
-            _ThreadBar(
-              threads: threads,
-              selected: threadId,
-              onSelect: (id) => setState(() => _select(id)),
-            ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-              const Icon(Icons.lock_outline, size: 14),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  current != null && !current.isFamily ? l.chatDirectNote(current.title) : l.chatEncryptedNote,
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-              ),
-              if (current != null && !current.isFamily && current.peerId != null) ...<Widget>[
-                const SizedBox(width: 12),
-                Flexible(child: PresenceStatusText(userId: current.peerId!, compact: true)),
-              ],
-            ]),
-          ),
+            _ThreadBar(threads: threads, selected: threadId, onSelect: (id) => setState(() => _select(id))),
+          _EncryptionNote(current: current),
           Expanded(
             child: msgs.isEmpty
                 ? Center(child: Text(l.emptyChat))
-                : LayoutBuilder(
-                    // Spaltenbreite einmal je Build der Liste, nicht je Blase (#274): Im Zweispalter ist der Chat schmaler als das Fenster.
-                    builder: (context, box) {
-                      final bubbleWidth = bubbleMaxWidth(box.maxWidth);
-                      return ListView.builder(
-                        controller: _scroll,
-                        reverse: true,
-                        padding: const EdgeInsets.all(12),
-                        itemCount: entries.length,
-                        // Der State einer Blase (geladener Anhang) bleibt an seiner Nachricht, auch wenn neue
-                        // Nachrichten alle Indizes verschieben (#130). Datumszeilen und Marke haben eigene Schlüssel.
-                        findChildIndexCallback: (key) {
-                          final position = positionByKey[(key as ValueKey<String>).value];
-                          return position == null ? null : entries.length - 1 - position;
-                        },
-                        itemBuilder: (context, i) {
-                          final entry = entries[entries.length - 1 - i];
-                          final key = ValueKey<String>(entry.key);
-                          switch (entry) {
-                            case DayEntry(:final day):
-                              return KeyedSubtree(key: key, child: _DayLine(day: day));
-                            case UnreadMarkerEntry():
-                              return KeyedSubtree(key: key, child: _UnreadLine(key: _markerKey));
-                            case MessageEntry(message: final m):
-                              if (m.beforeJoin) return KeyedSubtree(key: key, child: const _BeforeJoinNote());
-                              return _Bubble(
-                                key: key,
-                                message: m,
-                                mine: m.senderId == g.userId,
-                                replied: m.replyToId == null ? null : byId[m.replyToId],
-                                myUserId: g.userId,
-                                maxWidth: bubbleWidth,
-                                collapseQuotes: _collapseQuotes,
-                                gateway: g,
-                                services: services,
-                                threadId: threadId,
-                                onLongPress: () => _actions(g, m),
-                              );
-                          }
-                        },
-                      );
-                    },
+                : _MessageList(
+                    entries: entries,
+                    byId: <String, ChatMessage>{for (final m in msgs) m.id: m},
+                    scroll: _scroll,
+                    markerKey: _markerKey,
+                    collapseQuotes: _collapseQuotes,
+                    gateway: g,
+                    services: services,
+                    threadId: threadId,
+                    onLongPress: (m) => _actions(g, m),
                   ),
           ),
-          if (_replyTo != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: GlassCard(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                child: Row(children: <Widget>[
-                  Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: <Widget>[
-                      Text(l.chatReplyingTo(_replyTo!.senderLabel(l, inSentence: true)), maxLines: 1, overflow: TextOverflow.ellipsis),
-                      // Vorschau des Zitats, einzeilig (#254).
-                      Text(
-                        _quoteText(_replyTo!),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ]),
-                  ),
-                  IconButton(
-                    tooltip: l.chatCancelReply,
-                    icon: const Icon(Icons.close),
-                    onPressed: () => setState(() => _replyTo = null),
-                  ),
-                ]),
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            // Anhängen und Senden gehören zum Eingabefeld: die Tastatur bleibt dabei offen.
-            child: TextFieldTapRegion(child: Row(children: <Widget>[
-              IconButton(tooltip: l.chatAttach, icon: const Icon(Icons.attach_file), onPressed: () => _attach(services)),
-              Expanded(
-                // Desktop: Enter sendet, Umschalt+Enter macht einen Zeilenumbruch (#37).
-                child: CallbackShortcuts(
-                  bindings: <ShortcutActivator, VoidCallback>{
-                    if (PlatformInfo.enterSubmits) const SingleActivator(LogicalKeyboardKey.enter): () => _send(g),
-                    if (PlatformInfo.enterSubmits) const SingleActivator(LogicalKeyboardKey.numpadEnter): () => _send(g),
-                  },
-                  child: TextField(
-                  controller: _ctrl,
-                  minLines: 1,
-                  maxLines: 5,
-                  // Zählt wie die Prüfung im Gateway in UTF-16-Einheiten, nicht nach Graphemen (#236, E-40).
-                  inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(ChatMessage.maxBody, LengthMeasure.utf16)],
-                  maxLength: ChatMessage.maxBody,
-                  buildCounter: (_, {required currentLength, required isFocused, maxLength}) => null,
-                  enableIMEPersonalizedLearning: false,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(hintText: l.chatHint),
-                  onSubmitted: (_) => _send(g),
-                ),
-                ),
-              ),
-              IconButton.filled(
-                tooltip: l.chatSend,
-                icon: const Icon(Icons.send),
-                onPressed: _sending ? null : () => _send(g),
-              ),
-            ])),
-          ),
+          if (_replyTo != null) _ReplyPreview(message: _replyTo!, onCancel: () => setState(() => _replyTo = null)),
+          _Composer(controller: _ctrl, sending: _sending, onAttach: () => _attach(services), onSend: () => _send(g)),
         ]);
       },
     );
@@ -469,532 +364,4 @@ List<ChatMessage> _uniqueById(List<ChatMessage> messages) {
     for (final m in messages)
       if (seen.add(m.id)) m,
   ];
-}
-
-/// Text eines Zitats: Nachricht oder Name des Anhangs.
-String _quoteText(ChatMessage m) => m.body.isEmpty ? (m.attachment?.name ?? '') : m.body;
-
-/// Datum und Uhrzeit in Ortszeit, ausgeschrieben (Tooltip, Screenreader; #254).
-String _fullDateTime(BuildContext context, DateTime t) {
-  final lt = t.toLocal();
-  final locale = Localizations.localeOf(context).toLanguageTag();
-  return '${DateFormat.yMMMMEEEEd(locale).format(lt)}, ${formatClock(context, lt.hour, lt.minute)}';
-}
-
-class _Bubble extends StatelessWidget {
-  const _Bubble({
-    super.key,
-    required this.message,
-    required this.mine,
-    required this.replied,
-    required this.myUserId,
-    required this.maxWidth,
-    required this.collapseQuotes,
-    required this.gateway,
-    required this.services,
-    required this.threadId,
-    required this.onLongPress,
-  });
-
-  final ChatMessage message;
-  final bool mine;
-  final ChatMessage? replied;
-  final String? myUserId;
-  /// Höchste Breite der Blase (Spaltenbreite, nicht Fensterbreite).
-  final double maxWidth;
-  final Listenable collapseQuotes;
-  final MatrixGateway gateway;
-  final AppServices services;
-  final String threadId;
-  final VoidCallback onLongPress;
-
-  static String _time(BuildContext context, DateTime t) {
-    final lt = t.toLocal();
-    return formatClock(context, lt.hour, lt.minute);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = AuroraTokens.of(context);
-    final m = message;
-    return Align(
-      alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Semantics(
-            container: true,
-            // Eigene Nachricht: „von dir“ (Dativ), nicht „von Du“ (#332).
-            label: mine ? l.chatMessageFromYou : l.chatMessageFrom(m.senderLabel(l, inSentence: true)),
-            child: GestureDetector(
-              onLongPress: onLongPress,
-              child: GlassCard(
-                glow: mine ? t.primary : null,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                  if (!mine)
-                    Text(m.senderLabel(l), style: Theme.of(context).textTheme.labelMedium?.copyWith(color: t.primary)),
-                  if (m.replyToId != null) _Quote(replied: replied, myUserId: myUserId, collapse: collapseQuotes),
-                  if (m.blockedAttachment)
-                    Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                      const Icon(Icons.block, size: 16),
-                      const SizedBox(width: 6),
-                      Flexible(child: Text(l.chatAttachmentBlocked)),
-                    ]),
-                  if (m.attachment != null) _AttachmentView(message: m, services: services, threadId: threadId),
-                  if (m.sharedEventId != null) _EventCard(eventId: m.sharedEventId!, services: services),
-                  if (m.undecryptable)
-                    Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                      const Icon(Icons.lock_clock_outlined, size: 16),
-                      const SizedBox(width: 6),
-                      Flexible(child: Text(l.chatUndecryptable)),
-                    ]),
-                  if (m.body.isNotEmpty && m.sharedEventId == null) Text(m.body),
-                  if (m.reactions.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Wrap(spacing: 6, children: <Widget>[
-                        for (final e in m.reactions.entries)
-                          StatusBadge(label: '${e.key} ${e.value.length}', color: t.violet),
-                      ]),
-                    ),
-                  const SizedBox(height: 2),
-                  Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                    Tooltip(
-                      message: _fullDateTime(context, m.time),
-                      excludeFromSemantics: true,
-                      child: Text(
-                        _time(context, m.time),
-                        semanticsLabel: _fullDateTime(context, m.time),
-                        style: monoStyle(context, size: 11, color: t.textSecondary),
-                      ),
-                    ),
-                    if (m.status == MessageStatus.sending) ...<Widget>[
-                      const SizedBox(width: 6),
-                      Icon(Icons.schedule, size: 12, semanticLabel: l.chatSending),
-                    ],
-                  ]),
-                  if (m.status == MessageStatus.failed && !m.retryable)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                        Icon(Icons.error_outline, size: 16, color: t.danger),
-                        const SizedBox(width: 4),
-                        Flexible(child: Text(l.chatNotSent, style: TextStyle(color: t.danger))),
-                      ]),
-                    ),
-                  if (m.status == MessageStatus.failed && m.retryable)
-                    InkWell(
-                      onTap: () => gateway.retryMessage(m.id, threadId: threadId).catchError((Object e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorText(l, e))));
-                        }
-                      }),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        child: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                          Icon(Icons.error_outline, size: 16, color: t.danger),
-                          const SizedBox(width: 4),
-                          Flexible(child: Text(l.chatRetry, style: TextStyle(color: t.danger))),
-                        ]),
-                      ),
-                    ),
-                ]),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Ein Hinweis statt vieler „nicht entschlüsselbar“-Einträge aus der Zeit vor dem Beitritt (#35).
-class _BeforeJoinNote extends StatelessWidget {
-  const _BeforeJoinNote();
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-        const Icon(Icons.lock_clock_outlined, size: 16),
-        const SizedBox(width: 6),
-        Flexible(child: Text(l.chatBeforeJoin, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall)),
-      ]),
-    );
-  }
-}
-
-/// Anhänge werden nie automatisch geladen oder geöffnet.
-class _AttachmentView extends StatefulWidget {
-  const _AttachmentView({required this.message, required this.services, required this.threadId});
-  final ChatMessage message;
-  final AppServices services;
-  final String threadId;
-
-  @override
-  State<_AttachmentView> createState() => _AttachmentViewState();
-}
-
-class _AttachmentViewState extends State<_AttachmentView> {
-  Uint8List? _bytes;
-  bool _loading = false;
-
-  Future<Uint8List?> _load() async {
-    if (_bytes != null) return _bytes;
-    final l = AppLocalizations.of(context);
-    setState(() => _loading = true);
-    try {
-      final b = await widget.services.gateway.loadAttachment(widget.message.id, threadId: widget.threadId);
-      if (mounted) setState(() => _bytes = b);
-      return b;
-    } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorText(l, e))));
-      return null;
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _save() async {
-    final l = AppLocalizations.of(context);
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (c) => AlertDialog(
-        content: Text(l.attachmentSaveWarning),
-        actions: <Widget>[
-          TextButton(onPressed: () => Navigator.pop(c, false), child: Text(l.cancel)),
-          FilledButton(onPressed: () => Navigator.pop(c, true), child: Text(l.save)),
-        ],
-      ),
-    );
-    if (ok != true || !mounted) return;
-    final b = await _load();
-    if (b == null) return;
-    final a = widget.message.attachment!;
-    try {
-      await widget.services.files.saveFile(name: a.name, bytes: b, mimeType: a.mimeType);
-    } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorText(l, e))));
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final a = widget.message.attachment!;
-    if (a.isImage && _bytes != null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: <Widget>[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.memory(
-              _bytes!,
-              height: 200,
-              cacheHeight: 400, // begrenzt den Speicher (Bild-Bomben)
-              fit: BoxFit.cover,
-              semanticLabel: a.name,
-              errorBuilder: (_, _, _) => const Icon(Icons.broken_image),
-            ),
-          ),
-          // Bilder lassen sich wie andere Anhänge speichern (#40).
-          TextButton.icon(onPressed: _save, icon: const Icon(Icons.download_outlined), label: Text(l.chatSaveAttachment)),
-        ]),
-      );
-    }
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-        Icon(a.isImage ? Icons.image_outlined : Icons.insert_drive_file_outlined),
-        const SizedBox(width: 6),
-        Flexible(child: Text(a.name, overflow: TextOverflow.ellipsis)),
-        const SizedBox(width: 6),
-        if (_loading)
-          const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-        else if (a.isImage) ...<Widget>[
-          TextButton(onPressed: _load, child: Text(l.chatLoadAttachment)),
-          TextButton(onPressed: _save, child: Text(l.chatSaveAttachment)),
-        ] else
-          TextButton(onPressed: _save, child: Text(l.chatSaveAttachment)),
-      ]),
-    );
-  }
-}
-
-/// Termin als Karte im Verlauf, mit direkter Zu-/Absage.
-class _EventCard extends StatelessWidget {
-  const _EventCard({required this.eventId, required this.services});
-  final String eventId;
-  final AppServices services;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final c = services.calendar;
-    if (c == null) return const SizedBox.shrink();
-    return ListenableBuilder(
-      listenable: c,
-      builder: (context, _) {
-        final e = c.eventById(eventId);
-        if (e == null || e.deleted || !e.isShared) {
-          return Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Text(l.chatEventMissing));
-        }
-        final fmt = Fmt(context, c.zone);
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-            Row(children: <Widget>[
-              const Icon(Icons.event_outlined, size: 18),
-              const SizedBox(width: 6),
-              Expanded(child: Text(e.title, style: Theme.of(context).textTheme.titleSmall)),
-            ]),
-            Text(fmt.eventSpan(e, l), style: monoStyle(context, size: 12)),
-            const SizedBox(height: 6),
-            RsvpButtons(controller: c, eventId: e.id),
-          ]),
-        );
-      },
-    );
-  }
-}
-
-/// Leiste mit den Gesprächen: Familienchat und Einzelchats (mit Status und Ungelesenem).
-class _ThreadBar extends StatelessWidget {
-  const _ThreadBar({required this.threads, required this.selected, required this.onSelect});
-  final List<ChatThread> threads;
-  final String selected;
-  final void Function(String id) onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final services = AppScope.of(context);
-    return Semantics(
-      container: true,
-      label: l.chatThreads,
-      child: SizedBox(
-        height: 52,
-        child: PresenceBuilder(
-          builder: (context, now) => ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            itemCount: threads.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 8),
-            itemBuilder: (context, i) {
-              final t = threads[i];
-              final online = t.peerId != null && presenceOf(services, t.peerId!, now).status == PresenceStatus.online;
-              final unread = t.unread;
-              final label = t.isFamily ? l.chatThreadFamily(t.title) : l.chatThreadDirect(t.title);
-              final status = t.peerId == null ? null : presenceLabel(l, presenceOf(services, t.peerId!, now), now);
-              return Semantics(
-                button: true,
-                selected: t.id == selected,
-                label: <String>[label, ?status, if (unread > 0) l.chatUnreadCount(unread)].join(', '),
-                excludeSemantics: true,
-                child: ChoiceChip(
-                  selected: t.id == selected,
-                  onSelected: (_) => onSelect(t.id),
-                  avatar: t.isFamily ? const Icon(Icons.groups_outlined, size: 18) : PresenceDot(online: online),
-                  label: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                    // Ungelesenes zusätzlich fett, nicht nur über das Abzeichen (#254).
-                    Text(t.title, style: unread > 0 ? const TextStyle(fontWeight: FontWeight.w700) : null),
-                    if (unread > 0) ...<Widget>[const SizedBox(width: 6), Badge(label: Text('$unread'))],
-                  ]),
-                ),
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Datumszeile vor der ersten Nachricht eines Tages (#254).
-class _DayLine extends StatelessWidget {
-  const _DayLine({required this.day});
-  final DateTime day;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = AuroraTokens.of(context);
-    final label = switch (chatDayOf(day, DateTime.now())) {
-      ChatDay.today => l.chatToday,
-      ChatDay.yesterday => l.chatYesterday,
-      ChatDay.other => DateFormat.yMMMMEEEEd(Localizations.localeOf(context).toLanguageTag()).format(day),
-    };
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Center(
-        child: Semantics(
-          header: true,
-          child: Text(label, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: t.textSecondary)),
-        ),
-      ),
-    );
-  }
-}
-
-/// Marke über der ersten ungelesenen Nachricht: Linie **und** Text, nicht nur Farbe (#254).
-class _UnreadLine extends StatelessWidget {
-  const _UnreadLine({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = AuroraTokens.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(children: <Widget>[
-        Expanded(child: Divider(color: t.primary, thickness: 1)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Text(
-            l.chatNewMessages,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(color: t.primary, fontWeight: FontWeight.w700),
-          ),
-        ),
-        Expanded(child: Divider(color: t.primary, thickness: 1)),
-      ]),
-    );
-  }
-}
-
-/// Zitat einer Antwort (#254): Absender und Text, ab 4 Zeilen eingeklappt. Tippen klappt auf und zu, ohne dem
-/// Eingabefeld den Fokus zu nehmen; jedes Tippen außerhalb (auch ins Eingabefeld oder zum Scrollen), Fokusverlust,
-/// Verlassen des Tabs und Hintergrund klappen zu. Der Zustand wird nicht gespeichert.
-///
-/// Ist das Ziel nicht sichtbar (nicht geladen, blockiert, gelöscht, nicht verschlüsselt angekommen), erscheint ein
-/// neutraler Hinweis. Den Zitattext aus der Antwort selbst zeigen wir nie: Den setzt der Absender frei (E-30, #138).
-class _Quote extends StatefulWidget {
-  const _Quote({required this.replied, required this.myUserId, required this.collapse});
-  final ChatMessage? replied;
-  final String? myUserId;
-  final Listenable collapse;
-
-  /// Ab so vielen Zeilen wird eingeklappt.
-  static const int maxLines = 4;
-
-  @override
-  State<_Quote> createState() => _QuoteState();
-}
-
-class _QuoteState extends State<_Quote> {
-  bool _expanded = false;
-  final FocusNode _focus = FocusNode(debugLabel: 'quote');
-
-  @override
-  void initState() {
-    super.initState();
-    widget.collapse.addListener(_collapseNow);
-    _focus.addListener(_onFocus);
-  }
-
-  @override
-  void didUpdateWidget(_Quote oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (!identical(oldWidget.collapse, widget.collapse)) {
-      oldWidget.collapse.removeListener(_collapseNow);
-      widget.collapse.addListener(_collapseNow);
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.collapse.removeListener(_collapseNow);
-    _focus.dispose();
-    super.dispose();
-  }
-
-  void _onFocus() {
-    if (!_focus.hasFocus) _collapseNow();
-  }
-
-  void _collapseNow() {
-    if (mounted && _expanded) setState(() => _expanded = false);
-  }
-
-  void _toggle() => setState(() => _expanded = !_expanded);
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = AuroraTokens.of(context);
-    final style = Theme.of(context).textTheme.bodySmall;
-    final decoration = BoxDecoration(border: Border(left: BorderSide(color: t.magenta, width: 2)));
-    const margin = EdgeInsets.only(bottom: 4);
-    const padding = EdgeInsets.only(left: 8);
-    final r = widget.replied;
-    if (r == null) {
-      return Container(
-        margin: margin,
-        padding: padding,
-        decoration: decoration,
-        child: Text(l.chatReplyUnavailable, style: style?.copyWith(fontStyle: FontStyle.italic)),
-      );
-    }
-    final text = _quoteText(r);
-    final sender = r.senderId == widget.myUserId ? l.chatYou : r.senderLabel(l);
-    return LayoutBuilder(builder: (context, constraints) {
-      final painter = TextPainter(
-        text: TextSpan(text: text, style: style),
-        maxLines: _Quote.maxLines,
-        textDirection: Directionality.of(context),
-        textScaler: MediaQuery.textScalerOf(context),
-        locale: Localizations.localeOf(context),
-      )..layout(maxWidth: (constraints.maxWidth - padding.horizontal - 2).clamp(0, double.infinity));
-      final long = painter.didExceedMaxLines;
-      painter.dispose();
-      final collapsed = long && !_expanded;
-      final box = Container(
-        margin: margin,
-        padding: padding,
-        decoration: decoration,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: <Widget>[
-          Text(sender, style: Theme.of(context).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700)),
-          Text(
-            text,
-            maxLines: collapsed ? _Quote.maxLines : null,
-            overflow: collapsed ? TextOverflow.ellipsis : null,
-            style: style,
-          ),
-          if (long)
-            Text(
-              _expanded ? l.chatQuoteLess : l.chatQuoteMore,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: t.primary, fontWeight: FontWeight.w600),
-            ),
-        ]),
-      );
-      if (!long) return box;
-      return TapRegion(
-        onTapOutside: (_) => _collapseNow(),
-        // Gehört zum Eingabefeld: Tippen aufs Zitat nimmt ihm den Fokus nicht (auch nicht mit der Maus).
-        child: TextFieldTapRegion(
-          child: Focus(
-            focusNode: _focus,
-            onKeyEvent: (node, event) {
-              if (event is KeyDownEvent &&
-                  (event.logicalKey == LogicalKeyboardKey.enter || event.logicalKey == LogicalKeyboardKey.space)) {
-                _toggle();
-                return KeyEventResult.handled;
-              }
-              return KeyEventResult.ignored;
-            },
-            child: Semantics(
-              button: true,
-              expanded: _expanded,
-              onTap: _toggle,
-              child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: _toggle, child: box),
-            ),
-          ),
-        ),
-      );
-    });
-  }
 }
