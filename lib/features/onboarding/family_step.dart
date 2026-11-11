@@ -14,6 +14,8 @@ import 'family_step_controller.dart';
 
 export 'family_step_controller.dart' show FamilyStepMode;
 
+part 'widgets/family_step_parts.dart';
+
 /// Schritt „Familie“: gründen, per Einladungslink beitreten oder Einladungen annehmen.
 class FamilyStep extends StatefulWidget {
   const FamilyStep({super.key, required this.onFamilyReady, this.mode = FamilyStepMode.choice});
@@ -96,7 +98,16 @@ class _FamilyStepState extends State<FamilyStep> {
           }
         }
         // Eingeladenes Konto: direkt die Einladung zeigen, ohne die Frage „Gründen oder Beitreten“ (E-49).
-        if (invitations.isNotEmpty && !_c.showChoice) return _invitedView(l, g, invitations);
+        if (invitations.isNotEmpty && !_c.showChoice) {
+          return _InvitedView(
+            invitations: invitations,
+            busy: _c.busy,
+            error: _c.errorMessage(l),
+            onDecline: _c.decline,
+            onAccept: _c.accept,
+            onOther: _c.chooseOther,
+          );
+        }
         final pending = _services.pendingInvite.value;
         final List<Widget> body;
         if (g.joinRequestRejected) {
@@ -135,7 +146,7 @@ class _FamilyStepState extends State<FamilyStep> {
         }
         final error = _c.errorMessage(l);
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-          if (invitations.isNotEmpty) ..._invitationCards(l, g, invitations),
+          if (invitations.isNotEmpty) _InvitationCards(invitations: invitations, busy: _c.busy, onDecline: _c.decline, onAccept: _c.accept),
           ...body,
           if (error != null)
             Padding(
@@ -284,81 +295,6 @@ class _FamilyStepState extends State<FamilyStep> {
         ]),
       ),
     ];
-  }
-
-  List<Widget> _invitationCards(AppLocalizations l, MatrixGateway g, List<PendingInvitation> invitations) => <Widget>[
-        Semantics(header: true, child: Text(l.invitationsTitle, style: Theme.of(context).textTheme.titleSmall)),
-        for (final inv in invitations)
-          Card(
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                Text(inv.roomName, style: Theme.of(context).textTheme.titleMedium),
-                Text(l.invitationFrom(inv.inviterLabel), style: Theme.of(context).textTheme.bodySmall),
-                const SizedBox(height: 8),
-                Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-                  TextButton(
-                    onPressed: _c.busy ? null : () => _c.decline(inv),
-                    child: Text(l.decline),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton(onPressed: _c.busy ? null : () => _c.accept(inv), child: Text(l.accept)),
-                ]),
-              ]),
-            ),
-          ),
-        const Divider(),
-      ];
-
-  Widget _invitedView(AppLocalizations l, MatrixGateway g, List<PendingInvitation> invitations) {
-    final theme = Theme.of(context);
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      Semantics(header: true, child: Text(l.onbInvitedTitle, style: theme.textTheme.titleMedium)),
-      const SizedBox(height: 8),
-      for (final inv in invitations)
-        Card(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-              Text(inv.roomName, style: theme.textTheme.titleMedium),
-              Text(l.invitationFrom(inv.inviterLabel), style: theme.textTheme.bodySmall),
-              if (!inv.requested) ...<Widget>[
-                const SizedBox(height: 6),
-                // Unerwartete Einladung: hier bewusst die vollständige ID, damit sich Namen nicht vortäuschen lassen.
-                Text(l.invitationUnexpectedWarning(inv.inviterId), style: theme.textTheme.bodySmall),
-              ],
-              const SizedBox(height: 8),
-              Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-                TextButton(
-                  onPressed: _c.busy ? null : () => _c.decline(inv),
-                  child: Text(l.decline),
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: FilledButton(
-                    onPressed: _c.busy ? null : () => _c.accept(inv),
-                    child: Text(l.onbInvitedJoin(inv.roomName), overflow: TextOverflow.ellipsis),
-                  ),
-                ),
-              ]),
-            ]),
-          ),
-        ),
-      Align(
-        alignment: Alignment.centerLeft,
-        child: TextButton(
-          onPressed: _c.busy ? null : _c.chooseOther,
-          child: Text(l.onbInvitedOther),
-        ),
-      ),
-      if (_c.errorMessage(l) case final error?)
-        Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Semantics(liveRegion: true, child: Text(error, style: TextStyle(color: theme.colorScheme.error))),
-        ),
-    ]);
   }
 
   List<Widget> _createForm(AppLocalizations l) => <Widget>[
