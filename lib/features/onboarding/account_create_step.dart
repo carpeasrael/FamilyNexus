@@ -16,6 +16,8 @@ import 'provider_controller.dart';
 import 'provider_section.dart';
 import 'registration_stage_view.dart';
 
+part 'widgets/account_create_parts.dart';
+
 /// „Konto erstellen“ (E-55): Name, Benutzername (vorgeschlagen und live geprüft) und Passwort. Je nach
 /// Anbieter wird das Konto direkt in der App, auf der Seite des Anbieters (in der App, E-91) oder – falls
 /// die App es nicht kann – auf dessen Webseite angelegt.
@@ -310,7 +312,6 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     return ListenableBuilder(
       listenable: widget.provider,
       builder: (context, _) {
@@ -323,170 +324,61 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
             RegistrationStageView(stage: stage, busy: _busy, onInput: _continue, onCancel: _cancelStage),
           ];
         } else if (_waitingForBrowser) {
-          main = <Widget>[
-            Row(children: <Widget>[
-              const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
-              const SizedBox(width: 12),
-              Expanded(child: Semantics(liveRegion: true, child: Text(l.oauthWaiting(host)))),
-            ]),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton(onPressed: () => _s.oauthRedirect?.cancel(), child: Text(l.cancel)),
-            ),
-          ];
+          main = <Widget>[_BrowserWaiting(host: host, onCancel: () => _s.oauthRedirect?.cancel())];
         } else if (p.ready && p.mode == RegistrationMode.oauth && _s.oauthRedirect != null) {
           main = <Widget>[
-            Text(l.regOAuthIntro(host)),
-            const SizedBox(height: 12),
-            _nameField(l),
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton.icon(
-                icon: const Icon(Icons.open_in_new, size: 18),
-                onPressed: _busy ? null : _createInBrowser,
-                label: Text(l.regOAuthCreate(host)),
-              ),
-            ),
+            _OAuthCreate(host: host, nameField: _nameField(l), busy: _busy, onCreate: _createInBrowser),
           ];
         } else if (p.ready && p.mode != RegistrationMode.inApp) {
           final page = p.options?.webPage;
           main = <Widget>[
-            Text(l.regExternalBody(host)),
-            const SizedBox(height: 12),
-            Wrap(alignment: WrapAlignment.end, spacing: 8, runSpacing: 8, children: <Widget>[
-              if (page != null)
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.open_in_new, size: 18),
-                  onPressed: () => _s.browser.open(page, inApp: true),
-                  label: Text(l.regExternalOpen),
-                ),
-              OutlinedButton(onPressed: _openElement, child: Text(l.regElementOpen)),
-              FilledButton(onPressed: () => widget.onLogin(null), child: Text(l.regExternalLogin)),
-            ]),
-            if (_elementMissing) ...<Widget>[
-              const SizedBox(height: 12),
-              Semantics(liveRegion: true, child: Text(l.regElementMissing(host))),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton(
-                  onPressed: () => _s.browser.open(ElementLauncher.downloadPage),
-                  child: Text(l.regElementDownload),
-                ),
-              ),
-            ],
+            _ExternalCreate(
+              host: host,
+              elementMissing: _elementMissing,
+              onOpenPage: page == null ? null : () => _s.browser.open(page, inApp: true),
+              onOpenElement: _openElement,
+              onLogin: () => widget.onLogin(null),
+              onDownload: () => _s.browser.open(ElementLauncher.downloadPage),
+            ),
           ];
         } else {
           main = <Widget>[
             _nameField(l),
             const SizedBox(height: 12),
-            TextField(
+            _UsernameFields(
               controller: _user,
               focusNode: _userFocus,
-              autocorrect: false,
-              enableSuggestions: false,
-              enableIMEPersonalizedLearning: false,
+              check: _check,
+              suggestion: _suggestion,
+              inputError: _errorAt(_Input.user),
               onChanged: _onUser,
-              decoration: InputDecoration(
-                labelText: l.regUsernameLabel,
-                // Die Hinweise sind lang (Zeichenregeln, Vorschlag bei vergebenem Namen): mehrzeilig, sonst
-                // bricht Flutter nach einer Zeile mit „…“ ab (Issue #44).
-                helperMaxLines: 3,
-                errorMaxLines: 3,
-                helperText: switch (_check) {
-                  UsernameCheck.available => l.regUsernameFree,
-                  null || UsernameCheck.unknown => l.regUsernameHint,
-                  _ => null,
-                },
-                errorText: _errorAt(_Input.user) ?? switch (_check) {
-                  UsernameCheck.taken => _suggestion == null ? l.regUsernameTaken : l.regUsernameTakenSuggest(_suggestion!),
-                  UsernameCheck.invalid => l.regUsernameInvalid,
-                  _ => null,
-                },
-                suffixIcon: _check == UsernameCheck.available ? Icon(Icons.check_circle_outline, color: theme.colorScheme.primary) : null,
-              ),
-            ),
-            if (_suggestion != null)
-              Align(
-                alignment: Alignment.centerLeft,
-                child: ActionChip(label: Text(l.regUseSuggestion(_suggestion!)), onPressed: _useSuggestion),
-              ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _pass,
-              focusNode: _passFocus,
-              obscureText: !_showPassword,
-              autocorrect: false,
-              enableSuggestions: false,
-              enableIMEPersonalizedLearning: false,
-              smartDashesType: SmartDashesType.disabled,
-              smartQuotesType: SmartQuotesType.disabled,
-              textInputAction: TextInputAction.next,
-              onChanged: (_) => setState(_clearInputError),
-              onSubmitted: (_) => _passRepeatFocus.requestFocus(),
-              decoration: InputDecoration(
-                labelText: l.accountPassword,
-                helperText: l.regPasswordHint,
-                helperMaxLines: 3,
-                errorText: _errorAt(_Input.pass),
-                errorMaxLines: 3,
-                suffixIcon: IconButton(
-                  tooltip: _showPassword ? l.passwordHide : l.passwordShow,
-                  icon: Icon(_showPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined),
-                  onPressed: () => setState(() => _showPassword = !_showPassword),
-                ),
-              ),
+              onUseSuggestion: _useSuggestion,
             ),
             const SizedBox(height: 12),
-            TextField(
-              controller: _passRepeat,
-              focusNode: _passRepeatFocus,
-              obscureText: !_showPassword,
-              autocorrect: false,
-              enableSuggestions: false,
-              enableIMEPersonalizedLearning: false,
-              smartDashesType: SmartDashesType.disabled,
-              smartQuotesType: SmartQuotesType.disabled,
-              textInputAction: TextInputAction.done,
-              onChanged: (_) => setState(_clearInputError),
-              onEditingComplete: () {},
-              onSubmitted: (_) => _submit(),
-              decoration: InputDecoration(
-                labelText: l.accountPasswordRepeat,
-                errorMaxLines: 3,
-                // Ein passender Anfang ist noch kein Fehler; den Grund nennt dann erst Enter.
-                errorText: _errorAt(_Input.repeat) ??
-                    (_passRepeat.text.isNotEmpty && !_pass.text.startsWith(_passRepeat.text) ? l.regPasswordMismatch : null),
-              ),
+            _PasswordFields(
+              password: _pass,
+              passwordFocus: _passFocus,
+              repeat: _passRepeat,
+              repeatFocus: _passRepeatFocus,
+              show: _showPassword,
+              passwordError: _errorAt(_Input.pass),
+              repeatError: _errorAt(_Input.repeat),
+              onChanged: () => setState(_clearInputError),
+              onToggleShow: () => setState(() => _showPassword = !_showPassword),
+              onSubmit: _submit,
             ),
             const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton(
-                // `_submit`, nicht `_register`: Ein Tipp im selben Frame wie Enter sieht noch den alten Knopf.
-                onPressed: _busy || !_formOk ? null : _submit,
-                child: Text(_busy ? l.regCreating : l.regCreate),
-              ),
-            ),
+            _SubmitButton(busy: _busy, enabled: _formOk, onSubmit: _submit),
           ];
         }
         final errorLine = _inputError ?? _error;
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
           ...main,
-          if (errorLine != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Semantics(liveRegion: true, child: Text(errorLine, style: TextStyle(color: theme.colorScheme.error))),
-            ),
+          if (errorLine != null) _CreateError(text: errorLine),
           if (stage == null && !_waitingForBrowser) ...<Widget>[
             const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton(
-                onPressed: _busy ? null : () => widget.onLogin(_user.text.trim().isEmpty ? null : _user.text.trim()),
-                child: Text(l.startHaveAccount),
-              ),
+            _HaveAccountButton(
+              onPressed: _busy ? null : () => widget.onLogin(_user.text.trim().isEmpty ? null : _user.text.trim()),
             ),
             const Divider(),
             ProviderSection(controller: p),
