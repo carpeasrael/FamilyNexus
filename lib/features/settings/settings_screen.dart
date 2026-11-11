@@ -17,6 +17,7 @@ import '../common/error_text.dart';
 import '../calendar/event_editor_screen.dart' show kReminderChoices;
 import '../reminders/reminder_coordinator.dart';
 import '../moderation/blocked_users_screen.dart';
+import '../onboarding/intro_tour.dart';
 import '../security/security_panel.dart' show RecoveryKeyRenewScreen;
 import 'account_deletion_dialog.dart';
 import 'data_report.dart';
@@ -138,6 +139,11 @@ class SettingsScreen extends StatelessWidget {
                 onTap: () => _confirmDelete(context),
               ),
               // Version und Build wie in App Store Connect (für Testberichte und Bildschirmaufnahmen, #14).
+              ListTile(
+                leading: const Icon(Icons.tour_outlined),
+                title: Text(l.settingsTourRestart),
+                onTap: () => showIntroTour(context),
+              ),
               const _RecommendTiles(),
               ListTile(leading: const Icon(Icons.info_outline), title: Text(l.menuVersion(appVersionWithBuild))),
               ListTile(title: Text(l.settingsNoTelemetry)),

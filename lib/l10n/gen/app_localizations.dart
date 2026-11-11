@@ -218,6 +218,78 @@ abstract class AppLocalizations {
   /// **'Der Store-Eintrag konnte nicht geöffnet werden.'**
   String get settingsRateAppFailed;
 
+  /// No description provided for @tourStepOf.
+  ///
+  /// In de, this message translates to:
+  /// **'Schritt {step} von {total}'**
+  String tourStepOf(int step, int total);
+
+  /// No description provided for @tourNext.
+  ///
+  /// In de, this message translates to:
+  /// **'Weiter'**
+  String get tourNext;
+
+  /// No description provided for @tourBack.
+  ///
+  /// In de, this message translates to:
+  /// **'Zurück'**
+  String get tourBack;
+
+  /// No description provided for @tourSkip.
+  ///
+  /// In de, this message translates to:
+  /// **'Überspringen'**
+  String get tourSkip;
+
+  /// No description provided for @tourDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Los geht’s'**
+  String get tourDone;
+
+  /// No description provided for @tourCalendarTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kalender'**
+  String get tourCalendarTitle;
+
+  /// No description provided for @tourCalendarBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Trage Termine ein, teile sie mit der Familie oder halte sie privat. „Heute“ zeigt dir, was als Nächstes ansteht.'**
+  String get tourCalendarBody;
+
+  /// No description provided for @tourChatTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Chat'**
+  String get tourChatTitle;
+
+  /// No description provided for @tourChatBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Schreibe der ganzen Familie oder einzelnen Mitgliedern. Termine lassen sich im Chat teilen und direkt zu- oder absagen.'**
+  String get tourChatBody;
+
+  /// No description provided for @tourShoppingTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Einkauf'**
+  String get tourShoppingTitle;
+
+  /// No description provided for @tourShoppingBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Eine gemeinsame Einkaufsliste für alle, auch ohne Netz. Abhaken, ergänzen, erledigt: Jeder sieht den aktuellen Stand.'**
+  String get tourShoppingBody;
+
+  /// No description provided for @settingsTourRestart.
+  ///
+  /// In de, this message translates to:
+  /// **'Einführung erneut ansehen'**
+  String get settingsTourRestart;
+
   /// No description provided for @settingsSectionAbout.
   ///
   /// In de, this message translates to:

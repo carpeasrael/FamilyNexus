@@ -74,6 +74,47 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der Store-Eintrag konnte nicht geöffnet werden.';
 
   @override
+  String tourStepOf(int step, int total) {
+    return 'Schritt $step von $total';
+  }
+
+  @override
+  String get tourNext => 'Weiter';
+
+  @override
+  String get tourBack => 'Zurück';
+
+  @override
+  String get tourSkip => 'Überspringen';
+
+  @override
+  String get tourDone => 'Los geht’s';
+
+  @override
+  String get tourCalendarTitle => 'Kalender';
+
+  @override
+  String get tourCalendarBody =>
+      'Trage Termine ein, teile sie mit der Familie oder halte sie privat. „Heute“ zeigt dir, was als Nächstes ansteht.';
+
+  @override
+  String get tourChatTitle => 'Chat';
+
+  @override
+  String get tourChatBody =>
+      'Schreibe der ganzen Familie oder einzelnen Mitgliedern. Termine lassen sich im Chat teilen und direkt zu- oder absagen.';
+
+  @override
+  String get tourShoppingTitle => 'Einkauf';
+
+  @override
+  String get tourShoppingBody =>
+      'Eine gemeinsame Einkaufsliste für alle, auch ohne Netz. Abhaken, ergänzen, erledigt: Jeder sieht den aktuellen Stand.';
+
+  @override
+  String get settingsTourRestart => 'Einführung erneut ansehen';
+
+  @override
   String get settingsSectionAbout => 'Über die App';
 
   @override

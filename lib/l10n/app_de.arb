@@ -20,6 +20,24 @@
   "settingsRateApp": "App bewerten",
   "settingsRateAppHint": "Öffnet den Eintrag im Play Store.",
   "settingsRateAppFailed": "Der Store-Eintrag konnte nicht geöffnet werden.",
+  "tourStepOf": "Schritt {step} von {total}",
+  "@tourStepOf": {
+    "placeholders": {
+      "step": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "tourNext": "Weiter",
+  "tourBack": "Zurück",
+  "tourSkip": "Überspringen",
+  "tourDone": "Los geht’s",
+  "tourCalendarTitle": "Kalender",
+  "tourCalendarBody": "Trage Termine ein, teile sie mit der Familie oder halte sie privat. „Heute“ zeigt dir, was als Nächstes ansteht.",
+  "tourChatTitle": "Chat",
+  "tourChatBody": "Schreibe der ganzen Familie oder einzelnen Mitgliedern. Termine lassen sich im Chat teilen und direkt zu- oder absagen.",
+  "tourShoppingTitle": "Einkauf",
+  "tourShoppingBody": "Eine gemeinsame Einkaufsliste für alle, auch ohne Netz. Abhaken, ergänzen, erledigt: Jeder sieht den aktuellen Stand.",
+  "settingsTourRestart": "Einführung erneut ansehen",
   "settingsSectionAbout": "Über die App",
   "settingsLanguage": "Sprache",
   "languageSystem": "Gerätesprache",

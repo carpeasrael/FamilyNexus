@@ -8,6 +8,7 @@ import '../../ui/layout/adaptive.dart';
 import '../calendar/calendar_screen.dart';
 import '../chat/chat_screen.dart';
 import '../family/family_screen.dart';
+import '../onboarding/intro_tour.dart';
 import '../settings/privacy_screen.dart';
 import '../settings/settings_screen.dart';
 import '../shopping/shopping_screen.dart';
@@ -49,6 +50,15 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
     _opening = _services.openCalendar();
     _services.chatRequest.addListener(_chatRequested);
     WidgetsBinding.instance.addObserver(this);
+    _opening.then((_) => _maybeShowTour()).ignore();
+  }
+
+  /// Einführung einmal nach der Einrichtung (#347); später nur über die Einstellungen.
+  void _maybeShowTour() {
+    if (!mounted || _services.settings.settings.tourSeen || _services.calendar == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_services.settings.settings.tourSeen) showIntroTour(context).ignore();
+    });
   }
 
   @override

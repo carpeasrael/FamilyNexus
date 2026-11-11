@@ -72,6 +72,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsRateAppFailed => 'The store listing could not be opened.';
 
   @override
+  String tourStepOf(int step, int total) {
+    return 'Step $step of $total';
+  }
+
+  @override
+  String get tourNext => 'Next';
+
+  @override
+  String get tourBack => 'Back';
+
+  @override
+  String get tourSkip => 'Skip';
+
+  @override
+  String get tourDone => 'Let’s go';
+
+  @override
+  String get tourCalendarTitle => 'Calendar';
+
+  @override
+  String get tourCalendarBody =>
+      'Add events, share them with your family or keep them private. “Today” shows what is coming up next.';
+
+  @override
+  String get tourChatTitle => 'Chat';
+
+  @override
+  String get tourChatBody =>
+      'Write to the whole family or to single members. Events can be shared in the chat and answered right there.';
+
+  @override
+  String get tourShoppingTitle => 'Shopping';
+
+  @override
+  String get tourShoppingBody =>
+      'One shared shopping list for everyone, even offline. Check off, add, done: everybody sees the current state.';
+
+  @override
+  String get settingsTourRestart => 'Watch the introduction again';
+
+  @override
   String get settingsSectionAbout => 'About';
 
   @override

@@ -120,9 +120,12 @@ Future<TestApp> buildTestApp({
   OAuthRedirect? oauthRedirect,
   // Test: „App bewerten“ (#350). Standard: Android-Gerät mit Play Store.
   FakeStoreLauncher? storeLauncher,
+  // Test: Einführungstour (#347). Standard: schon gesehen, damit sie Abläufe nach der Einrichtung nicht überdeckt.
+  bool tourSeen = true,
 }) async {
   final store = MemoryKeyValueStore();
   if (lang != null) store.data['language'] = lang;
+  store.data['tourSeen'] = '$tourSeen';
   final fake = server ?? FakeMatrixServer();
   if (server == null) {
     fake.addAccount('anna', 'geheim123', displayName: 'Anna');
