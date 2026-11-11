@@ -17,6 +17,8 @@ import '../reminders/reminder_coordinator.dart';
 import 'calendar_controller.dart';
 import 'formatting.dart';
 
+part 'widgets/event_editor_sections.dart';
+
 /// Reminder-Auswahl (Minuten vor Beginn).
 const List<int> kReminderChoices = <int>[0, 5, 10, 15, 30, 60, 120, 1440, 2880];
 
@@ -402,13 +404,13 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final t = AuroraTokens.of(context);
     final fmt = Fmt(context, _zone);
     final members = (AppScope.of(context).gateway.family?.joined ?? const <FamilyMember>[])
         .where((m) => m.userId != widget.controller.me)
         .toList();
     String sd(DateTime d) => fmt.dateShort(d);
     String st(TimeOfDay x) => x.format(context);
+    const gap = SizedBox(height: 12);
     return Scaffold(
       appBar: AppBar(
         title: Text(_ex == null ? l.eventNew : l.eventEdit),
@@ -420,254 +422,69 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
         child: ContentWidth(child: Form(
           key: _formKey,
           child: ListView(padding: const EdgeInsets.all(16), children: <Widget>[
-            GlassCard(
-              child: Column(children: <Widget>[
-                TextFormField(
-                  controller: _title,
-                  maxLength: CalendarEvent.maxTitle,
-                  inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(CalendarEvent.maxTitle, LengthMeasure.utf16)],
-                  buildCounter: measuredCounter(_title, CalendarEvent.maxTitle, LengthMeasure.utf16),
-                  textCapitalization: TextCapitalization.sentences,
-                  enableIMEPersonalizedLearning: false,
-                  decoration: InputDecoration(labelText: l.eventTitle),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? l.eventTitleRequired : null,
-                ),
-                SwitchListTile(contentPadding: EdgeInsets.zero, title: Text(l.eventAllDay), value: _allDay, onChanged: (v) => setState(() => _setAllDay(v))),
-                _dateRow(l.eventStart, sd(_startDate), _allDay ? null : st(_startTime), () => _pickDate(start: true), () => _pickTime(start: true)),
-                _dateRow(l.eventEnd, sd(_endDate), _allDay ? null : st(_endTime), () => _pickDate(start: false), () => _pickTime(start: false)),
-                if (_timeError != null)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Semantics(liveRegion: true, child: Text(_timeError!, style: TextStyle(color: t.danger))),
-                    ),
-                  ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(l.eventTimeZone(widget.controller.zoneName), style: Theme.of(context).textTheme.bodySmall),
-                ),
-              ]),
+            _TitleTimeCard(
+              title: _title,
+              allDay: _allDay,
+              onAllDay: (v) => setState(() => _setAllDay(v)),
+              startDate: sd(_startDate),
+              startTime: _allDay ? null : st(_startTime),
+              endDate: sd(_endDate),
+              endTime: _allDay ? null : st(_endTime),
+              onStartDate: () => _pickDate(start: true),
+              onStartTime: () => _pickTime(start: true),
+              onEndDate: () => _pickDate(start: false),
+              onEndTime: () => _pickTime(start: false),
+              timeError: _timeError,
+              zoneName: widget.controller.zoneName,
             ),
-            const SizedBox(height: 12),
-            GlassCard(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                Text(l.eventVisibility, style: Theme.of(context).textTheme.titleSmall),
-                SegmentedButton<EventVisibility>(
-                  segments: <ButtonSegment<EventVisibility>>[
-                    ButtonSegment<EventVisibility>(value: EventVisibility.private, icon: const Icon(Icons.lock_outline), label: Text(l.visibilityPrivate)),
-                    ButtonSegment<EventVisibility>(value: EventVisibility.shared, icon: const Icon(Icons.groups_outlined), label: Text(l.visibilityShared)),
-                  ],
-                  selected: <EventVisibility>{_visibility},
-                  onSelectionChanged: (s) => setState(() => _visibility = s.first),
-                ),
-                const SizedBox(height: 8),
-                Text(_visibility == EventVisibility.shared ? l.visibilitySharedHint : l.visibilityPrivateHint, style: Theme.of(context).textTheme.bodySmall),
-                if (_ex != null && _ex!.isShared && _visibility == EventVisibility.private)
-                  Padding(padding: const EdgeInsets.only(top: 6), child: Text(l.visibilityChangeNote, style: TextStyle(color: t.warning))),
-              ]),
+            gap,
+            _VisibilityCard(
+              visibility: _visibility,
+              showChangeNote: _ex != null && _ex!.isShared && _visibility == EventVisibility.private,
+              onChanged: (v) => setState(() => _visibility = v),
             ),
-            const SizedBox(height: 12),
-            GlassCard(
-              child: Column(children: <Widget>[
-                TextFormField(
-                  controller: _location,
-                  maxLength: CalendarEvent.maxLocation,
-                  inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(CalendarEvent.maxLocation, LengthMeasure.utf16)],
-                  buildCounter: measuredCounter(_location, CalendarEvent.maxLocation, LengthMeasure.utf16),
-                  enableIMEPersonalizedLearning: false,
-                  decoration: InputDecoration(labelText: l.eventLocation),
-                ),
-                TextFormField(
-                  controller: _note,
-                  maxLength: CalendarEvent.maxNote,
-                  inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(CalendarEvent.maxNote, LengthMeasure.utf16)],
-                  buildCounter: measuredCounter(_note, CalendarEvent.maxNote, LengthMeasure.utf16),
-                  maxLines: 4,
-                  minLines: 2,
-                  enableIMEPersonalizedLearning: false,
-                  decoration: InputDecoration(labelText: l.eventNote),
-                ),
-              ]),
+            gap,
+            _PlaceNoteCard(location: _location, note: _note),
+            gap,
+            _RepeatCard(
+              frequency: _freq,
+              interval: _interval,
+              weekdays: _weekdays,
+              end: _end,
+              untilLabel: _until == null ? l.repeatUntil : '${l.repeatUntil}: ${fmt.dateShort(_until!)}',
+              count: _count,
+              onFrequency: (f) => setState(() => _freq = f),
+              onWeekday: (day, on) => setState(() => on ? _weekdays.add(day) : _weekdays.remove(day)),
+              onEnd: (e) => setState(() => _end = e),
+              onPickUntil: _pickUntil,
             ),
-            const SizedBox(height: 12),
-            _repeatCard(l),
-            const SizedBox(height: 12),
+            gap,
             if (_visibility == EventVisibility.shared && members.isNotEmpty) ...<Widget>[
-              GlassCard(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                  Text(l.eventAttendees, style: Theme.of(context).textTheme.titleSmall),
-                  Wrap(spacing: 8, children: <Widget>[
-                    for (final m in members)
-                      FilterChip(
-                        label: Text(m.displayName),
-                        selected: _attendees.contains(m.userId),
-                        onSelected: (v) => setState(() => v ? _attendees.add(m.userId) : _attendees.remove(m.userId)),
-                      ),
-                  ]),
-                ]),
+              _AttendeesCard(
+                members: members,
+                selected: _attendees,
+                onToggle: (id, on) => setState(() => on ? _attendees.add(id) : _attendees.remove(id)),
               ),
-              const SizedBox(height: 12),
+              gap,
             ],
-            GlassCard(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                Text(l.eventColor, style: Theme.of(context).textTheme.titleSmall),
-                const SizedBox(height: 8),
-                Wrap(spacing: 10, runSpacing: 10, children: <Widget>[
-                  for (var i = 0; i < AuroraTokens.personColors.length; i++)
-                    Semantics(
-                      label: l.eventColorName(i + 1),
-                      selected: _color == i,
-                      button: true,
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: () => setState(() => _color = i),
-                        child: Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: AuroraTokens.personColors[i],
-                            shape: BoxShape.circle,
-                            border: Border.all(color: _color == i ? t.textPrimary : Colors.transparent, width: 3),
-                          ),
-                          child: _color == i ? const Icon(Icons.check, color: Colors.black) : null,
-                        ),
-                      ),
-                    ),
-                ]),
-              ]),
-            ),
+            _ColorCard(selected: _color, onSelect: (i) => setState(() => _color = i)),
             // Im Browser gibt es keine Erinnerungen (E-53, #145): keine Karte. Gespeicherte Werte bleiben unberührt
             // (`_reminderTouched` wird nur durch die Chips gesetzt).
             if (AppScope.of(context).reminders != null) ...<Widget>[
-              const SizedBox(height: 12),
-              GlassCard(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                  Text(l.remindersTitle, style: Theme.of(context).textTheme.titleSmall),
-                  const SizedBox(height: 8),
-                  Wrap(spacing: 8, runSpacing: 4, children: <Widget>[
-                    for (final m in kReminderChoices)
-                      FilterChip(
-                        label: Text(m == 0 ? l.reminderAtStart : l.reminderBefore(ReminderCoordinator.durationText(l, m))),
-                        selected: _reminders.contains(m),
-                        onSelected: (v) => setState(() {
-                          _reminderTouched = true;
-                          v ? _reminders.add(m) : _reminders.remove(m);
-                        }),
-                      ),
-                  ]),
-                  const SizedBox(height: 6),
-                  Text(l.remindersHint, style: Theme.of(context).textTheme.bodySmall),
-                ]),
+              gap,
+              _ReminderCard(
+                selected: _reminders,
+                onToggle: (m, on) => setState(() {
+                  _reminderTouched = true;
+                  on ? _reminders.add(m) : _reminders.remove(m);
+                }),
               ),
             ],
-            if (_error != null)
-              Padding(
-                key: _errorKey,
-                padding: const EdgeInsets.only(top: 12),
-                child: Semantics(liveRegion: true, child: Text(_error!, style: TextStyle(color: t.danger))),
-              ),
+            if (_error != null) _FormError(key: _errorKey, text: _error!),
             const SizedBox(height: 24),
           ]),
         )),
       ),
-    );
-  }
-
-  Widget _dateRow(String label, String date, String? time, VoidCallback onDate, VoidCallback onTime) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(children: <Widget>[
-          SizedBox(width: 64, child: Text(label)),
-          Expanded(child: OutlinedButton(onPressed: onDate, child: Text(date))),
-          if (time != null) ...<Widget>[
-            const SizedBox(width: 8),
-            OutlinedButton(onPressed: onTime, child: Text(time)),
-          ],
-        ]),
-      );
-
-  Widget _repeatCard(AppLocalizations l) {
-    final labels = <Frequency, String>{
-      Frequency.none: l.repeatNone,
-      Frequency.daily: l.repeatDaily,
-      Frequency.weekly: l.repeatWeekly,
-      Frequency.monthly: l.repeatMonthly,
-      Frequency.yearly: l.repeatYearly,
-    };
-    final weekdayNames = <String>[l.weekdayMon, l.weekdayTue, l.weekdayWed, l.weekdayThu, l.weekdayFri, l.weekdaySat, l.weekdaySun];
-    final unit = switch (_freq) {
-      Frequency.daily => l.repeatUnitDays,
-      Frequency.weekly => l.repeatUnitWeeks,
-      Frequency.monthly => l.repeatUnitMonths,
-      Frequency.yearly => l.repeatUnitYears,
-      Frequency.none => '',
-    };
-    return GlassCard(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-        Text(l.eventRepeat, style: Theme.of(context).textTheme.titleSmall),
-        Wrap(spacing: 8, children: <Widget>[
-          for (final e in labels.entries)
-            ChoiceChip(label: Text(e.value), selected: _freq == e.key, onSelected: (_) => setState(() => _freq = e.key)),
-        ]),
-        if (_freq != Frequency.none) ...<Widget>[
-          const SizedBox(height: 8),
-          Row(children: <Widget>[
-            Text(l.repeatEvery),
-            const SizedBox(width: 12),
-            SizedBox(
-              width: 72,
-              child: TextFormField(
-                controller: _interval,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(isDense: true),
-                validator: (v) {
-                  final n = int.tryParse((v ?? '').trim());
-                  return (n == null || n < 1 || n > Recurrence.maxInterval) ? l.errInvalidInput : null;
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(unit),
-          ]),
-          if (_freq == Frequency.weekly)
-            Wrap(spacing: 6, children: <Widget>[
-              for (var i = 0; i < 7; i++)
-                FilterChip(
-                  label: Text(weekdayNames[i]),
-                  selected: _weekdays.contains(i + 1),
-                  onSelected: (v) => setState(() => v ? _weekdays.add(i + 1) : _weekdays.remove(i + 1)),
-                ),
-            ]),
-          const SizedBox(height: 8),
-          Text(l.repeatEnds, style: Theme.of(context).textTheme.labelMedium),
-          Wrap(spacing: 8, children: <Widget>[
-            ChoiceChip(label: Text(l.repeatEndsNever), selected: _end == _End.never, onSelected: (_) => setState(() => _end = _End.never)),
-            ChoiceChip(label: Text(l.repeatEndsOn), selected: _end == _End.until, onSelected: (_) => setState(() => _end = _End.until)),
-            ChoiceChip(label: Text(l.repeatEndsAfter), selected: _end == _End.count, onSelected: (_) => setState(() => _end = _End.count)),
-          ]),
-          if (_end == _End.until)
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: OutlinedButton(
-                onPressed: _pickUntil,
-                child: Text(_until == null ? l.repeatUntil : '${l.repeatUntil}: ${Fmt(context, _zone).dateShort(_until!)}'),
-              ),
-            ),
-          if (_end == _End.count)
-            SizedBox(
-              width: 140,
-              child: TextFormField(
-                controller: _count,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: l.repeatCount),
-                validator: (v) {
-                  final n = int.tryParse((v ?? '').trim());
-                  return (n == null || n < 1 || n > Recurrence.maxCount) ? l.errInvalidInput : null;
-                },
-              ),
-            ),
-        ],
-      ]),
     );
   }
 }

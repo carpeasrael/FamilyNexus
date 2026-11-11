@@ -1,5 +1,4 @@
 # Bekannte Überschreitungen der Größengrenzen (tool/check_lib_size.dart). Pfade relativ zu lib/.
 # Die Liste wird mit jedem Refactoring kürzer: eine nicht mehr nötige Ausnahme lässt den Wächter fehlschlagen.
 data/matrix/sdk_matrix_gateway.dart datei
-features/calendar/event_editor_screen.dart build
 features/shell/home_shell.dart build
