@@ -13,7 +13,7 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
   LocalSends get _localSends;
   Set<String> get _reactionInFlight;
   void _scheduleRefresh();
-  Future<String?> _sendCalendar(Room room, String type, Map<String, Object?> content);
+  Future<String?> _sendCalendar(Room room, String type, Map<String, Object?> content, {String? txid});
   Timeline? get _timeline;
   GatewayException _map(Object e);
 
@@ -295,6 +295,33 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
       await t.requestHistory();
     } catch (e) {
       AppLog.e('gateway', 'Ältere Nachrichten konnten nicht geladen werden', e);
+    }
+  }
+
+  @override
+  Future<void> shareEventInChat(CalendarEvent event) async {
+    if (!event.isShared || event.deleted) throw const GatewayException(GatewayError.invalidInput);
+    final room = _requireEncryptedRoom();
+    final roomId = room.id;
+    final title = TextSanitizer.clean(event.title, max: 120);
+    final txid = room.client.generateUniqueTransactionId();
+    try {
+      await _sendTracked(
+        txid: txid,
+        threadId: ChatThread.familyId,
+        roomId: roomId,
+        tail: title,
+        send: () => _sendCalendar(
+          _roomForSend(ChatThread.familyId, roomId),
+          EventTypes.Message,
+          <String, Object?>{'msgtype': MessageTypes.Text, 'body': title, SdkMatrixGateway.eventRefKey: event.id},
+          txid: txid,
+        ),
+      );
+    } on GatewayException {
+      rethrow;
+    } catch (e) {
+      throw _map(e);
     }
   }
 }
