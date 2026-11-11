@@ -21,8 +21,9 @@ Eine Konvention, die der Code in der Mehrzahl der Dateien einhält, gilt als Pro
 ## Ablauf
 
 1. `flutter analyze` ausführen. Jede Meldung im Umfang ist ein Beleg.
-2. `dart format --output=none --set-exit-if-changed <Dateien im Umfang>` (Dart liegt neben Flutter). Nicht formatierte Dateien sind ein Fund je Datei, `niedrig`.
-3. Den Rest per Lesen und `grep` prüfen.
+2. Den Rest per Lesen und `grep` prüfen.
+
+`dart format` ist **kein** Projektstandard: Weder `analysis_options.yaml` noch `CLAUDE.md`, `ARCHITEKTUR.md` oder die CI legen Format oder Zeilenbreite fest, der Großteil des Codes wäre betroffen. Nicht formatierte Dateien sind deshalb kein Fund. Legt das Projekt später ein Format fest (zum Beispiel per Eintrag in `analysis_options.yaml` und Wächter in der CI), wird die Prüfung hier wieder aufgenommen.
 
 ## Prüfbereich
 
