@@ -49,7 +49,8 @@ List<String> _semantics(WidgetTester tester) {
       if (d.hasAction(SemanticsAction.tap)) 'tap',
       if (d.hasAction(SemanticsAction.longPress)) 'long',
     ];
-    if (parts.isNotEmpty) out.add(parts.join(' ').replaceAll('\n', ' | '));
+    // Uhrzeiten hängen von der Zeitzone des Rechners ab (Testzeit ist UTC): neutralisieren.
+    if (parts.isNotEmpty) out.add(parts.join(' ').replaceAll('\n', ' | ').replaceAll(RegExp(r'\b\d{1,2}:\d{2}\b'), 'hh:mm'));
     n.visitChildren((c) {
       visit(c);
       return true;
@@ -106,8 +107,8 @@ const List<String> _expectedSemantics = <String>[
   'L=Familienchat Familie Test',
   'L=Einzelchat mit Ben, Status unbekannt',
   'L=Ende-zu-Ende-verschlüsselt',
-  'L=Nachricht von dir | Ich | Mittwoch, 21. Oktober 2026, 14:00 long',
-  'L=Nachricht von Ben | Ben | Wer holt die Kinder ab? | Mittwoch, 21. Oktober 2026, 14:00 long',
+  'L=Nachricht von dir | Ich | Mittwoch, 21. Oktober 2026, hh:mm long',
+  'L=Nachricht von Ben | Ben | Wer holt die Kinder ab? | Mittwoch, 21. Oktober 2026, hh:mm long',
   'L=Neue Nachrichten',
   'L=Mittwoch, 21. Oktober 2026',
   'L=Antwort an Ben',
