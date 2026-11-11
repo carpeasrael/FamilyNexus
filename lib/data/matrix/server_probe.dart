@@ -5,6 +5,7 @@ import 'dart:io' show IOException;
 import 'package:http/http.dart' as http;
 
 import '../../core/app_log.dart';
+import '../../core/json_read.dart';
 import '../../domain/registration.dart';
 import '../../domain/server.dart';
 import '../../domain/text_sanitizer.dart';
@@ -232,8 +233,8 @@ class ServerProbe {
     if (flows is! List<Object?>) return const <List<String>>[];
     return <List<String>>[
       for (final f in flows.take(20))
-        if (f is Map<String, Object?> && f['stages'] is List<Object?>)
-          (f['stages']! as List<Object?>).whereType<String>().where((s) => s.length <= 64).take(10).toList(),
+        if (JsonRead.list(JsonRead.at(f, 'stages')) case final stages?)
+          stages.whereType<String>().where((s) => s.length <= 64).take(10).toList(),
     ];
   }
 

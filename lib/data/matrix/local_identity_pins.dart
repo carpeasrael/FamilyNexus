@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../core/app_log.dart';
+import '../../core/json_read.dart';
 import '../../domain/key_value_store.dart';
 
 /// Lokale Kopie der Identitätsvermerke (#142, E-37): Cross-Signing-Hauptschlüssel der Mitglieder je Konto, in der
@@ -79,7 +80,7 @@ class LocalIdentityPins {
         owner: owner,
         pins: <String, String>{
           for (final e in pins.entries)
-            if (e.value is String) e.key: e.value! as String,
+            e.key: ?JsonRead.string(e.value),
         },
       );
     } on FormatException {

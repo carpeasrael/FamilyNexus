@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 import '../../core/app_log.dart';
+import '../../core/json_read.dart';
 
 /// Eingehende Einladungslinks (`familynexus://join?…`), z. B. nach dem Scannen eines
 /// QR-Codes mit der System-Kamera. Android-Brücke hinter Schnittstelle; Inhalte sind
@@ -18,9 +19,8 @@ abstract class LinkSource {
 class PlatformLinkSource implements LinkSource {
   PlatformLinkSource() {
     _channel.setMethodCallHandler((call) async {
-      if (call.method == 'onLink' && call.arguments is String) {
-        _controller.add(call.arguments as String);
-      }
+      final link = call.method == 'onLink' ? JsonRead.string(call.arguments) : null;
+      if (link != null) _controller.add(link);
     });
   }
 

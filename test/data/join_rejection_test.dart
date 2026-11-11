@@ -684,6 +684,42 @@ void main() {
       expect(leaks.hasMatch(g.joinRequestDiagnostic), isFalse);
     });
 
+    test('AP-6b: Antwort mit falschem Typ (rooms ist keine Map): kein Absturz, Zustand noRoom', () async {
+      final (hs, g) = await _armed();
+      hs.onPoll = (_) => _json(<String, Object?>{'rooms': 'kaputt'});
+      await g.pollRejectionForTest();
+      expect(g.joinRequestDiagnostic, contains('Zustand: noRoom'));
+      expect(g.joinRequestDiagnostic, isNot(contains('failed(')));
+    });
+
+    test('AP-6b: Antwort, die kein Objekt ist: kein Absturz, Zustand noRoom', () async {
+      final (hs, g) = await _armed();
+      hs.onPoll = (_) => _json(<Object?>['x']);
+      await g.pollRejectionForTest();
+      expect(g.joinRequestDiagnostic, contains('Zustand: noRoom'));
+    });
+
+    test('AP-6b: Ereignis mit Zeitstempel als Zeichenkette: wird mit 0 gewertet, kein Absturz', () async {
+      final (hs, g) = await _armed();
+      final body = _kick(prev: 'knock');
+      final events = ((((body['rooms']! as Map<String, Object?>)['leave']! as Map<String, Object?>)[_room]! as Map<String, Object?>)['timeline']!
+          as Map<String, Object?>)['events']! as List<Object?>;
+      (events.single! as Map<String, Object?>)['origin_server_ts'] = 'gestern';
+      hs.onPoll = (_) => _json(body);
+      await g.pollRejectionForTest();
+      expect(g.joinRequestDiagnostic, contains('Zustand: leaveOther'));
+      expect(g.joinRequestDiagnostic, isNot(contains('failed(')));
+    });
+
+    test('AP-6b: isKnockRejection mit Zeitstempel als Zeichenkette wirft nicht', () {
+      final member = <Object?, Object?>{
+        'content': <String, Object?>{'membership': 'leave'},
+        'sender': '@mod:hs.example',
+        'origin_server_ts': '123',
+      };
+      expect(SdkMatrixGateway.isKnockRejection(member, me: _me, requestedAt: 1), isFalse);
+    });
+
     test('MXID in prev_content.membership wird zu other', () async {
       final (hs, g) = await _armed();
       hs.onPoll = (_) => _json(_kick(prev: '@boese:hs.example', sender: _me));

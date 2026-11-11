@@ -21,7 +21,7 @@ mixin _IdentitiesModule on ChangeNotifier implements MatrixGateway {
     return <String, String>{
       if (raw != null)
         for (final e in raw.entries)
-          if (e.value is String && MatrixIds.isUserId(e.key)) e.key: e.value! as String,
+          if (JsonRead.string(e.value) case final v? when MatrixIds.isUserId(e.key)) e.key: v,
     };
   }
 

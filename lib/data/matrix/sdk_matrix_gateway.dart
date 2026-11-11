@@ -14,6 +14,7 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite_sqlcipher/sqflite.dart' as sql;
 
 import '../../core/app_log.dart';
+import '../../core/json_read.dart';
 import '../../core/platform_info.dart';
 import '../../domain/account_deletion.dart';
 import '../../domain/attachment_policy.dart';
@@ -950,10 +951,9 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   static bool isKnockRejection(Map<Object?, Object?> member, {required String me, required int requestedAt}) {
     final content = member['content'];
     if (content is! Map || content['membership'] != 'leave' || member['sender'] == me) return false;
-    final ts = member['origin_server_ts'] as int? ?? 0;
+    final ts = JsonRead.integer(member['origin_server_ts']) ?? 0;
     final unsigned = member['unsigned'];
-    final prevContent = unsigned is Map ? unsigned['prev_content'] : null;
-    final prev = prevContent is Map ? prevContent['membership'] : null;
+    final prev = JsonRead.at(JsonRead.at(unsigned, 'prev_content'), 'membership');
     final tolerance = prev == 'knock' ? rejectionClockSkew.inMilliseconds : 0;
     return ts > requestedAt - tolerance;
   }
@@ -983,7 +983,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   @visibleForTesting
   static String membershipLabel(Object? membership) {
     if (membership == null) return '-';
-    return const <String>{'join', 'knock', 'invite', 'leave', 'ban'}.contains(membership) ? membership as String : 'other';
+    return membership is String && const <String>{'join', 'knock', 'invite', 'leave', 'ban'}.contains(membership) ? membership : 'other';
   }
 
   /// Fehlerklasse für die Diagnose: feste `is`-Prüfungen, nie `toString()` oder `runtimeType`, denn
