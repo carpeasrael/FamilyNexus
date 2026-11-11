@@ -4,19 +4,15 @@ import 'package:flutter/services.dart';
 import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/family.dart';
-import '../../domain/family_code.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/server.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
-import '../common/error_text.dart';
-import '../common/invite_link_text.dart';
 import '../common/syncing_view.dart';
 import '../family/invite_dialog.dart';
+import 'family_step_controller.dart';
 
-/// Was der Familienschritt zuerst zeigt: gründen (Weg „Neue Familie“), beitreten (Weg „Eingeladen“)
-/// oder beides zur Auswahl (bestehendes Konto ohne Familie).
-enum FamilyStepMode { create, join, choice }
+export 'family_step_controller.dart' show FamilyStepMode;
 
 /// Schritt „Familie“: gründen, per Einladungslink beitreten oder Einladungen annehmen.
 class FamilyStep extends StatefulWidget {
@@ -31,156 +27,54 @@ class FamilyStep extends StatefulWidget {
 }
 
 class _FamilyStepState extends State<FamilyStep> {
-  late bool _join = widget.mode == FamilyStepMode.join;
-  bool _busy = false;
-  bool _completing = false;
-
-  /// Gerade gegründet: Erfolgsansicht mit „Jetzt einladen“ statt sofortigem Abschluss.
-  String? _createdName;
-
-  /// Der Nutzer hat trotz Einladung „andere Familie gründen oder beitreten“ gewählt.
-  bool _showChoice = false;
-  final Set<String> _autoAccepted = <String>{};
-  String? _error;
-
-  /// Name des Einladenden der zuletzt gesendeten Anfrage (für „… muss dich noch bestätigen“).
-  String? _waitingFor;
   final TextEditingController _name = TextEditingController();
   final TextEditingController _link = TextEditingController();
   final TextEditingController _code = TextEditingController();
   late final AppServices _services;
+  late final FamilyStepController _c;
 
   @override
   void initState() {
     super.initState();
     _services = AppScope.read(context);
-    _services.pendingInvite.addListener(_onPending);
+    _c = FamilyStepController(
+      gateway: _services.gateway,
+      settings: _services.settings,
+      pendingInvite: _services.pendingInvite,
+      onFamilyReady: widget.onFamilyReady,
+      mode: widget.mode,
+    );
   }
 
   @override
   void dispose() {
-    _services.pendingInvite.removeListener(_onPending);
+    _c.dispose();
     _name.dispose();
     _link.dispose();
     _code.dispose();
     super.dispose();
   }
 
-  /// Ein per Deep Link/QR eingegangener Link wird als Karte gezeigt; gehandelt wird erst auf Tipp.
-  void _onPending() {
-    if (!mounted || _services.pendingInvite.value == null) return;
-    setState(() {
-      _join = true;
-      _showChoice = true;
-      _error = null;
-    });
-  }
-
-  Future<void> _run(Future<void> Function() op) async {
-    final l = AppLocalizations.of(context);
-    setState(() {
-      _busy = true;
-      _error = null;
-    });
-    try {
-      await op();
-    } catch (e) {
-      if (mounted) setState(() => _error = errorText(l, e));
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  /// Während der Gründung meldet das Gateway die neue Familie schon; sie darf dann nicht als
-  /// „bereits vorhanden“ gelten (sonst fehlte die Erfolgsansicht).
-  bool _creating = false;
-
-  Future<void> _create() => _run(() async {
-        _creating = true;
-        try {
-          await _services.gateway.createFamily(_name.text);
-          if (mounted) setState(() => _createdName = _name.text.trim());
-        } finally {
-          _creating = false;
-        }
-      });
-
   Future<void> _inviteNow() async {
     await showInviteDialog(context, _services.gateway);
     await widget.onFamilyReady();
   }
-
-  /// Eingefügter Link: prüfen und als Karte zeigen (gleicher Weg wie ein geöffneter Link).
-  Future<void> _submitLink() async {
-    final l = AppLocalizations.of(context);
-    final check = InviteLink.check(_link.text, now: DateTime.now(), ownHost: MatrixIds.serverName(_services.gateway.userId ?? ''));
-    final problem = check.problem;
-    if (problem != null) {
-      setState(() => _error = inviteLinkProblemText(l, problem));
-      return;
-    }
-    _link.clear();
-    await _services.settings.update((c) => c.copyWith(pendingInvite: check.raw));
-    _services.pendingInvite.value = check.link;
-  }
-
-  /// Anfrage über den Familien-Code (ohne Link): Der Moderator bestätigt ausdrücklich (E-65).
-  Future<void> _sendCode() async {
-    final l = AppLocalizations.of(context);
-    final id = FamilyCode.parse(_code.text);
-    if (id == null) {
-      setState(() => _error = l.joinCodeInvalid);
-      return;
-    }
-    await _run(() async {
-      await _services.gateway.requestToJoinByCode(id);
-      _waitingFor = null;
-      _code.clear();
-    });
-  }
-
-  Future<void> _discard() async {
-    _services.pendingInvite.value = null;
-    await _services.settings.update((c) => c.copyWith(pendingInvite: null));
-    if (mounted) setState(() => _error = null);
-  }
-
-  Future<void> _send(InviteLink link) async {
-    final l = AppLocalizations.of(context);
-    if (!link.isValidAt(DateTime.now())) {
-      setState(() => _error = l.joinLinkExpired);
-      return;
-    }
-    await _run(() async {
-      await _services.gateway.requestToJoin(link);
-      _waitingFor = link.inviterName ?? MatrixIds.localpart(link.inviter);
-      await _discard();
-    });
-  }
-
-  /// Nimmt die Einladung an. Die Karte nennt Familie und Einladenden und warnt bei unerwarteten
-  /// Einladungen (S5); der Tipp auf „Beitreten“ ist die Bestätigung.
-  Future<void> _accept(PendingInvitation inv) => _run(() async {
-        await _services.gateway.acceptInvitation(inv.roomId);
-        await widget.onFamilyReady();
-      });
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final g = _services.gateway;
     return ListenableBuilder(
-      listenable: Listenable.merge(<Listenable>[g, _services.pendingInvite]),
+      listenable: Listenable.merge(<Listenable>[g, _services.pendingInvite, _c]),
       builder: (context, _) {
         if (!g.initialSyncDone) return SyncingView(gateway: g);
-        final created = _createdName;
+        final created = _c.createdName;
         if (created != null) return _createdView(l, created);
         // Das Konto gehört bereits zu einer Familie (z. B. Anmeldung an einem weiteren Gerät):
         // nichts gründen oder beitreten, die Einrichtung ist damit abgeschlossen.
         final existing = g.family;
-        if (existing != null && !_creating) {
-          if (!_completing) {
-            _completing = true;
+        if (existing != null && !_c.creating) {
+          if (_c.beginCompleting()) {
             WidgetsBinding.instance.addPostFrameCallback((_) => widget.onFamilyReady());
           }
           return Semantics(
@@ -195,14 +89,14 @@ class _FamilyStepState extends State<FamilyStep> {
         final invitations = g.invitations;
         // Bestätigte eigene Beitrittsanfrage: der Nutzer hat den Beitritt selbst angefordert, kein weiterer Tipp nötig.
         for (final inv in invitations) {
-          if (inv.requested && _autoAccepted.add(inv.roomId)) {
+          if (inv.requested && _c.beginAutoAccept(inv.roomId)) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) _accept(inv);
+              if (mounted) _c.accept(inv);
             });
           }
         }
         // Eingeladenes Konto: direkt die Einladung zeigen, ohne die Frage „Gründen oder Beitreten“ (E-49).
-        if (invitations.isNotEmpty && !_showChoice) return _invitedView(l, g, invitations);
+        if (invitations.isNotEmpty && !_c.showChoice) return _invitedView(l, g, invitations);
         final pending = _services.pendingInvite.value;
         final List<Widget> body;
         if (g.joinRequestRejected) {
@@ -211,7 +105,7 @@ class _FamilyStepState extends State<FamilyStep> {
           body = _waitingView(l, g);
         } else if (pending != null) {
           body = _joinCard(l, pending);
-        } else if (widget.mode == FamilyStepMode.choice || _showChoice) {
+        } else if (widget.mode == FamilyStepMode.choice || _c.showChoice) {
           body = <Widget>[
             Text(l.onbCreateOrJoin),
             const SizedBox(height: 12),
@@ -221,14 +115,11 @@ class _FamilyStepState extends State<FamilyStep> {
                 ButtonSegment<bool>(value: false, label: Text(l.onbCreateTab)),
                 ButtonSegment<bool>(value: true, label: Text(l.onbJoinTab)),
               ],
-              selected: <bool>{_join},
-              onSelectionChanged: (s) => setState(() {
-                _join = s.first;
-                _error = null;
-              }),
+              selected: <bool>{_c.join},
+              onSelectionChanged: (s) => _c.selectJoin(s.first),
             ),
             const SizedBox(height: 12),
-            if (!_join) ..._createForm(l) else ..._joinForm(l),
+            if (!_c.join) ..._createForm(l) else ..._joinForm(l),
           ];
         } else {
           body = <Widget>[
@@ -236,22 +127,20 @@ class _FamilyStepState extends State<FamilyStep> {
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton(
-                onPressed: () => setState(() {
-                  _showChoice = true;
-                  _join = widget.mode != FamilyStepMode.join;
-                }),
+                onPressed: _c.switchMode,
                 child: Text(widget.mode == FamilyStepMode.create ? l.familySwitchToJoin : l.familySwitchToCreate),
               ),
             ),
           ];
         }
+        final error = _c.errorMessage(l);
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
           if (invitations.isNotEmpty) ..._invitationCards(l, g, invitations),
           ...body,
-          if (_error != null)
+          if (error != null)
             Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: Semantics(liveRegion: true, child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error))),
+              child: Semantics(liveRegion: true, child: Text(error, style: TextStyle(color: Theme.of(context).colorScheme.error))),
             ),
         ]);
       },
@@ -329,9 +218,9 @@ class _FamilyStepState extends State<FamilyStep> {
         ],
       ),
       Wrap(alignment: WrapAlignment.end, spacing: 8, runSpacing: 8, children: <Widget>[
-        TextButton(onPressed: _busy ? null : _discard, child: Text(l.joinDiscard)),
+        TextButton(onPressed: _c.busy ? null : _c.discard, child: Text(l.joinDiscard)),
         if (!unreachable)
-          FilledButton(onPressed: _busy ? null : () => _send(link), child: Text(_busy ? l.joinSending : l.joinSend)),
+          FilledButton(onPressed: _c.busy ? null : () => _c.send(link), child: Text(_c.busy ? l.joinSending : l.joinSend)),
       ]),
     ];
   }
@@ -348,7 +237,7 @@ class _FamilyStepState extends State<FamilyStep> {
           alignment: Alignment.centerRight,
           child: Wrap(spacing: 8, children: <Widget>[
             _joinDiagnosticButton(l, g),
-            FilledButton(onPressed: _busy ? null : () => _run(g.cancelJoinRequest), child: Text(l.joinRejectedOk)),
+            FilledButton(onPressed: _c.busy ? null : _c.cancelJoinRequest, child: Text(l.joinRejectedOk)),
           ]),
         ),
       ];
@@ -379,7 +268,7 @@ class _FamilyStepState extends State<FamilyStep> {
       );
 
   List<Widget> _waitingView(AppLocalizations l, MatrixGateway g) {
-    final who = _waitingFor;
+    final who = _c.waitingFor;
     return <Widget>[
       Row(children: <Widget>[
         Icon(Icons.hourglass_top, color: Theme.of(context).colorScheme.primary),
@@ -391,7 +280,7 @@ class _FamilyStepState extends State<FamilyStep> {
         alignment: Alignment.centerRight,
         child: Wrap(spacing: 8, children: <Widget>[
           _joinDiagnosticButton(l, g),
-          OutlinedButton(onPressed: _busy ? null : () => _run(g.cancelJoinRequest), child: Text(l.joinCancel)),
+          OutlinedButton(onPressed: _c.busy ? null : _c.cancelJoinRequest, child: Text(l.joinCancel)),
         ]),
       ),
     ];
@@ -410,11 +299,11 @@ class _FamilyStepState extends State<FamilyStep> {
                 const SizedBox(height: 8),
                 Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
                   TextButton(
-                    onPressed: _busy ? null : () => _run(() => g.declineInvitation(inv.roomId)),
+                    onPressed: _c.busy ? null : () => _c.decline(inv),
                     child: Text(l.decline),
                   ),
                   const SizedBox(width: 8),
-                  FilledButton(onPressed: _busy ? null : () => _accept(inv), child: Text(l.accept)),
+                  FilledButton(onPressed: _c.busy ? null : () => _c.accept(inv), child: Text(l.accept)),
                 ]),
               ]),
             ),
@@ -443,13 +332,13 @@ class _FamilyStepState extends State<FamilyStep> {
               const SizedBox(height: 8),
               Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
                 TextButton(
-                  onPressed: _busy ? null : () => _run(() => g.declineInvitation(inv.roomId)),
+                  onPressed: _c.busy ? null : () => _c.decline(inv),
                   child: Text(l.decline),
                 ),
                 const SizedBox(width: 8),
                 Flexible(
                   child: FilledButton(
-                    onPressed: _busy ? null : () => _accept(inv),
+                    onPressed: _c.busy ? null : () => _c.accept(inv),
                     child: Text(l.onbInvitedJoin(inv.roomName), overflow: TextOverflow.ellipsis),
                   ),
                 ),
@@ -460,14 +349,14 @@ class _FamilyStepState extends State<FamilyStep> {
       Align(
         alignment: Alignment.centerLeft,
         child: TextButton(
-          onPressed: _busy ? null : () => setState(() => _showChoice = true),
+          onPressed: _c.busy ? null : _c.chooseOther,
           child: Text(l.onbInvitedOther),
         ),
       ),
-      if (_error != null)
+      if (_c.errorMessage(l) case final error?)
         Padding(
           padding: const EdgeInsets.only(top: 8),
-          child: Semantics(liveRegion: true, child: Text(_error!, style: TextStyle(color: theme.colorScheme.error))),
+          child: Semantics(liveRegion: true, child: Text(error, style: TextStyle(color: theme.colorScheme.error))),
         ),
     ]);
   }
@@ -488,8 +377,8 @@ class _FamilyStepState extends State<FamilyStep> {
         Align(
           alignment: Alignment.centerRight,
           child: FilledButton(
-            onPressed: _busy || _name.text.trim().isEmpty ? null : _create,
-            child: Text(_busy ? l.familyCreating : l.familyCreate),
+            onPressed: _c.busy || _name.text.trim().isEmpty ? null : () => _c.create(_name.text),
+            child: Text(_c.busy ? l.familyCreating : l.familyCreate),
           ),
         ),
       ];
@@ -508,7 +397,7 @@ class _FamilyStepState extends State<FamilyStep> {
         const SizedBox(height: 8),
         Align(
           alignment: Alignment.centerRight,
-          child: FilledButton(onPressed: _busy ? null : _submitLink, child: Text(l.next)),
+          child: FilledButton(onPressed: _c.busy ? null : () => _c.submitLink(_link.text, clearInput: _link.clear), child: Text(l.next)),
         ),
         // Ohne Link: Familien-Code, den ein Moderator in der Familienansicht nennt.
         ExpansionTile(
@@ -528,7 +417,7 @@ class _FamilyStepState extends State<FamilyStep> {
             const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerRight,
-              child: FilledButton(onPressed: _busy ? null : _sendCode, child: Text(_busy ? l.joinSending : l.joinSend)),
+              child: FilledButton(onPressed: _c.busy ? null : () => _c.sendCode(_code.text, clearInput: _code.clear), child: Text(_c.busy ? l.joinSending : l.joinSend)),
             ),
           ],
         ),
