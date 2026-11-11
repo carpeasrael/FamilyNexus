@@ -15,6 +15,7 @@ import 'event_detail_screen.dart';
 import 'event_editor_screen.dart';
 import 'event_tile.dart';
 import 'formatting.dart';
+import 'year_progress_card.dart';
 
 enum CalendarMode { day, week, month, agenda }
 
@@ -310,6 +311,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         child: Text('${fmt.dateLong(_focus)} · ${l.calendarEventsOnDay(selected.length)}', style: Theme.of(context).textTheme.titleSmall),
       ),
       for (final o in selected) EventTile(occurrence: o, controller: c, onTap: () => _open(o, c)),
+      YearProgressCard(today: c.today),
     ]);
   }
 

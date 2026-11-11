@@ -637,6 +637,23 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String calendarYearText(int day, int total, int left, int percent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: '$left Tage',
+      one: '1 Tag',
+      zero: '0 Tage',
+    );
+    return 'Tag $day von $total · noch $_temp0 · $percent % des Jahres verstrichen';
+  }
+
+  @override
+  String calendarYearSemantics(int percent) {
+    return 'Jahresfortschritt: $percent Prozent verstrichen';
+  }
+
+  @override
   String get todayNext => 'Nächste Termine';
 
   @override

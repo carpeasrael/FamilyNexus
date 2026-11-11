@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:family_nexus/data/sync/calendar_sync.dart';
 import 'package:family_nexus/domain/time_zones.dart';
 import 'package:flutter_test/flutter_test.dart';

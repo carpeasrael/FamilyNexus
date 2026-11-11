@@ -1136,6 +1136,18 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{Keine Termine} =1{1 Termin} other{{count} Termine}}'**
   String calendarEventsOnDay(int count);
 
+  /// No description provided for @calendarYearText.
+  ///
+  /// In de, this message translates to:
+  /// **'Tag {day} von {total} · noch {left, plural, =0{0 Tage} =1{1 Tag} other{{left} Tage}} · {percent} % des Jahres verstrichen'**
+  String calendarYearText(int day, int total, int left, int percent);
+
+  /// No description provided for @calendarYearSemantics.
+  ///
+  /// In de, this message translates to:
+  /// **'Jahresfortschritt: {percent} Prozent verstrichen'**
+  String calendarYearSemantics(int percent);
+
   /// No description provided for @todayNext.
   ///
   /// In de, this message translates to:
