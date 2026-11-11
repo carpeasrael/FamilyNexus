@@ -1,1 +1,1 @@
-Familienkalender, Chat und Einkaufszettel – verschlüsselt über Matrix.
+Familienplaner: Kalender, Chat und Einkaufsliste – Ende-zu-Ende-verschlüsselt.
