@@ -1,11 +1,10 @@
 Neu in 1.2.3:
 • Identitätsvermerke zusätzlich auf dem Gerät gespeichert.
 • Ladebild folgt der Darstellung des Geräts.
+• Kalender: Jahresfortschritt, Abgleich alle 15 Min.
+• Einführung für neue Nutzer; App teilen und bewerten.
 Neu in 1.2.2:
 • Bitte alle Geräte der Familie aktualisieren.
 • Einkauf: Einträge nach Gruppen ordnen.
-• Heute: Erinnerungen bestätigen.
 • Jeden Beitritt bestätigt ein Moderator; Einladungslinks ohne lesbare Namen.
-• Passwort ändern in den Einstellungen.
 • Reaktionen werden verschlüsselt gesendet.
-• Viele Korrekturen.
