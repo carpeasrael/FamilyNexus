@@ -60,8 +60,12 @@ part 'gateway/app_client.dart';
 part 'gateway/calendar_data.dart';
 part 'gateway/chat.dart';
 part 'gateway/data_inventory.dart';
+part 'gateway/direct_chats.dart';
+part 'gateway/family.dart';
 part 'gateway/gateway_errors.dart';
 part 'gateway/identities.dart';
+part 'gateway/password_change.dart';
+part 'gateway/presence.dart';
 part 'gateway/invitations.dart';
 part 'gateway/join_diagnostic.dart';
 part 'gateway/registration_session.dart';
@@ -76,7 +80,7 @@ part 'gateway/security_verification.dart';
 /// * Lesebestätigungen sind privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _IdentitiesModule, _GatewayErrorsModule, _DataInventoryModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _GatewayErrorsModule, _DataInventoryModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -152,13 +156,18 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   final Map<String, Timeline> _dmTimelines = <String, Timeline>{};
   @override
   final Map<String, String> _dmPeers = <String, String>{};
+  @override
   final Map<String, List<ChatMessage>> _dmMessages = <String, List<ChatMessage>>{};
+  @override
   final Set<String> _dmJoining = <String>{};
+  @override
   List<ChatThread> _threads = const <ChatThread>[];
 
   /// Online-Status der anderen Mitglieder (E-38), nur im Arbeitsspeicher.
+  @override
   final PresenceBoard _presence = PresenceBoard();
   String? _presenceRoomId;
+  @override
   final StreamController<String> _presenceAsks = StreamController<String>.broadcast();
   StreamSubscription<Object?>? _toDeviceSub;
   final StreamController<CalendarSignal> _signals = StreamController<CalendarSignal>.broadcast();
@@ -169,6 +178,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   @override
   Future<void>? _creatingPrivateRoom;
   bool _participantsRequested = false;
+  @override
   bool _participantsLoaded = false;
 
   /// Neuer Versuch, wenn der Abruf der Mitgliederliste gescheitert ist (#135). Leere Syncs lösen seit E-85 keinen
@@ -1206,58 +1216,6 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
 
   // ------------------------------------------------- Passwort ändern (#117)
 
-  @override
-  Future<PasswordChange> passwordChange() async {
-    final c = _client;
-    if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
-    try {
-      if (!await _signedInViaOAuth(c)) return const PasswordChangeInApp();
-      final page = await _accountManagementPage(c, accountManagementPage);
-      return page == null ? const PasswordChangeUnavailable() : PasswordChangeInBrowser(page);
-    } catch (e) {
-      AppLog.e('gateway', 'Kontoseite des Anbieters nicht ermittelt', e);
-      throw _map(e);
-    }
-  }
-
-  @override
-  Future<void> changePassword({required String oldPassword, required String newPassword, required bool logoutOtherDevices}) async {
-    try {
-      final c = _client;
-      if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
-      if (await _signedInViaOAuth(c)) throw const GatewayException(GatewayError.notAllowed);
-      if (newPassword.length < minPasswordLength) throw const GatewayException(GatewayError.weakPassword);
-      if (oldPassword.isEmpty || oldPassword.length > 1024 || newPassword.length > PasswordChange.maxLength) {
-        throw const GatewayException(GatewayError.invalidInput);
-      }
-      // Das SDK schickt `oldPassword` schon im ersten Aufruf und wiederholt nur bei genau einem Flow.
-      // Darum erst ohne Passwort fragen. `logoutDevices` immer senden: Ohne nimmt Synapse `true` an.
-      try {
-        await c.changePassword(newPassword, logoutDevices: logoutOtherDevices).timeout(roomOpTimeout);
-      } on MatrixException catch (e) {
-        final session = e.session;
-        final flows = e.authenticationFlows;
-        if (session == null || flows == null || !_offersPassword(flows)) rethrow;
-        await c
-            .changePassword(
-              newPassword,
-              logoutDevices: logoutOtherDevices,
-              auth: AuthenticationPassword(session: session, password: oldPassword, identifier: AuthenticationUserIdentifier(user: c.userID!)),
-            )
-            .timeout(roomOpTimeout);
-      }
-    } on GatewayException {
-      rethrow;
-    } catch (e) {
-      AppLog.e('gateway', 'Passwortänderung fehlgeschlagen', e);
-      if (e is MatrixException) {
-        final mapped = passwordChangeError(e);
-        if (mapped != null) throw mapped;
-      }
-      throw _map(e);
-    }
-  }
-
   /// Fehler der Passwortänderung; `null` für [_map]. Wertet nur `flows`, `session` und das rohe
   /// `errcode` aus: Der Getter meldet bei UIA-Antworten ohne `errcode` selbst `M_FORBIDDEN`, und den
   /// HTTP-Status hat die Ausnahme hier nicht. Die Reihenfolge ist Teil der Zuordnung.
@@ -1369,54 +1327,6 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   Room? _familyRoom() {
     final room = _familyRoomAnyState();
     return (room != null && room.membership == Membership.join) ? room : null;
-  }
-
-  @override
-  Future<void> createFamily(String name) async {
-    final trimmed = name.trim();
-    if (trimmed.isEmpty || trimmed.length > maxFamilyNameLength) {
-      throw const GatewayException(GatewayError.invalidInput);
-    }
-    final client = _client;
-    if (client == null || !client.isLogged()) throw const GatewayException(GatewayError.notAllowed);
-    if (!client.encryptionEnabled) throw const GatewayException(GatewayError.encryptionUnavailable);
-    // Eine bestehende (oder angefragte) Familie darf nie überschrieben werden.
-    final existing = _familyRoomAnyState();
-    if (existing != null && existing.membership != Membership.leave && existing.membership != Membership.ban) {
-      throw const GatewayException(GatewayError.alreadyExists);
-    }
-    try {
-      final me = client.userID!;
-      final roomId = await client.createRoom(
-        name: trimmed,
-        roomVersion: FamilyRoomSpec.roomVersion,
-        preset: CreateRoomPreset.privateChat,
-        visibility: Visibility.private,
-        initialState: <StateEvent>[
-          for (final s in FamilyRoomSpec.initialState())
-            StateEvent(type: s.type, stateKey: '', content: s.content),
-        ],
-        powerLevelContentOverride: FamilyRoomSpec.powerLevels(me),
-      );
-      // Verweis sofort schreiben (idempotent, 2 Versuche); sonst bliebe ein verwaister Raum.
-      for (var attempt = 0;; attempt++) {
-        try {
-          await client.setAccountData(me, familyAccountData, <String, Object?>{'room_id': roomId});
-          break;
-        } catch (e) {
-          if (attempt >= 1) rethrow;
-        }
-      }
-      try {
-        await client.waitForRoomInSync(roomId, join: true).timeout(roomSyncTimeout);
-      } on TimeoutException {
-        AppLog.w('gateway', 'Raum noch nicht im Sync; Anzeige folgt beim nächsten Abgleich');
-      }
-      await _refresh();
-    } catch (e) {
-      AppLog.e('gateway', 'Familie konnte nicht angelegt werden', e);
-      throw _map(e);
-    }
   }
 
   // ------------------------------------------------- Einladungen und Rollen
@@ -1744,6 +1654,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
 
   /// Stellt eigene Ereignisse wieder her, die das Sync-Echo verdrängt hat (#138), vor jeder Prüfung von [arrivedEncrypted].
   /// Liefert `false`, wenn der Client unterwegs gewechselt hat oder abgemeldet ist.
+  @override
   Future<bool> _repairEchoes(Client client, Timeline t) async {
     final me = client.userID;
     if (me == null) return false;
@@ -1752,31 +1663,19 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
 
   // ------------------------------------------------------ Einzelchats (E-39)
 
-
-  void _resetDirectChats() {
-    for (final t in _dmTimelines.values) {
-      t.cancelSubscriptions();
-    }
-    _dmTimelines.clear();
-    _dmPeers.clear();
-    _dmMessages.clear();
-    _dmJoining.clear();
-    _dmFailed.clear();
-    _dmRetryAfter.clear();
-    _dmCreating.clear();
-    _dmEpoch++;
-    _threads = const <ChatThread>[];
-  }
-
+  @override
   final Set<String> _dmCreating = <String>{};
 
   /// Dauerhaft ungeeignete Räume (z. B. unverschlüsselt, mit Dritten) und Räume mit vorläufigem
   /// Fehler (erneuter Versuch frühestens zur genannten Zeit).
+  @override
   final Set<String> _dmFailed = <String>{};
+  @override
   final Map<String, DateTime> _dmRetryAfter = <String, DateTime>{};
 
   /// Wird bei jedem Zurücksetzen erhöht: Abläufe, die über ein `await` hinweg laufen, verwerfen
   /// ihr Ergebnis, wenn sich die Epoche geändert hat (Abmelden, Familienwechsel).
+  @override
   int _dmEpoch = 0;
 
   /// Ein Einzelchat-Raum hat genau zwei Mitglieder (beigetreten oder eingeladen).
@@ -1786,226 +1685,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     return joined != null && joined + invited <= 2;
   }
 
-  /// Verschlüsselte Einzelchat-Räume mit aktuellen, beigetretenen Familienmitgliedern
-  /// (Raum-ID → Gegenüber). Bei mehreren Räumen für dasselbe Gegenüber gilt der mit der
-  /// kleinsten Raum-ID, damit beide Seiten denselben Raum wählen.
-  Map<String, String> _eligibleDirectRooms(Client client, Family f, Room familyRoom) {
-    final byPeer = <String, String>{};
-    final privateId = _privateRoom()?.id;
-    for (final r in client.rooms) {
-      if (r.membership != Membership.join || r.id == familyRoom.id || r.id == privateId) continue;
-      final peer = r.directChatMatrixID;
-      if (peer == null || peer == f.myUserId || f.member(peer)?.status != MemberStatus.joined) continue;
-      if (!_canEncryptIn(r) || !_isPairRoom(r)) continue;
-      final cur = byPeer[peer];
-      if (cur == null || r.id.compareTo(cur) < 0) byPeer[peer] = r.id;
-    }
-    return <String, String>{for (final e in byPeer.entries) e.value: e.key};
-  }
-
-  Future<void> _syncDirectChats(Client client, Family f, Room familyRoom) async {
-    // Erst nach vollständig geladener Mitgliederliste (Lazy Loading liefert anfangs nur Teile),
-    // sonst würden Einzelchats kurz verschwinden.
-    if (_participantsLoaded) {
-      final eligible = _eligibleDirectRooms(client, f, familyRoom);
-      for (final id in _dmTimelines.keys.toList()) {
-        if (!eligible.containsKey(id)) {
-          _dmTimelines.remove(id)?.cancelSubscriptions();
-          _dmPeers.remove(id);
-          _dmMessages.remove(id);
-        }
-      }
-      for (final e in eligible.entries) {
-        _dmPeers[e.key] = e.value;
-        if (_dmTimelines.containsKey(e.key) || !_dmCreating.add(e.key)) continue;
-        final room = client.getRoomById(e.key);
-        if (room == null) {
-          _dmCreating.remove(e.key);
-          continue;
-        }
-        final epoch = _dmEpoch;
-        try {
-          final t = await room.getTimeline(
-            onUpdate: _scheduleRefresh,
-            onInsert: (_) => _scheduleRefresh(),
-            onChange: (_) => _scheduleRefresh(),
-            onRemove: (_) => _scheduleRefresh(),
-            onNewEvent: _scheduleRefresh,
-          );
-          if (epoch != _dmEpoch || _client != client) {
-            // Zwischenzeitlich abgemeldet oder Familie gewechselt: Ergebnis verwerfen.
-            t.cancelSubscriptions();
-            return;
-          }
-          _dmTimelines[e.key] = t;
-          _backfill(t, pages: dmBackfillPages).ignore();
-        } catch (err) {
-          // Ein defekter Einzelchat darf Kalender- und Einkaufsabgleich nicht blockieren.
-          AppLog.e('gateway', 'Einzelchat konnte nicht geladen werden', err);
-        } finally {
-          _dmCreating.remove(e.key);
-        }
-      }
-      for (final e in _dmTimelines.entries.toList()) {
-        if (!await _repairEchoes(client, e.value)) return;
-        if (!identical(_dmTimelines[e.key], e.value)) continue;
-        _dmMessages[e.key] = ChatMapper.messages(e.value, threadId: e.key, sends: _localSends);
-      }
-    }
-    final dms = <ChatThread>[
-      for (final e in _dmPeers.entries)
-        if (_dmTimelines.containsKey(e.key))
-          ChatThread(
-            id: e.key,
-            kind: ThreadKind.direct,
-            title: f.member(e.value)?.displayName ?? e.value,
-            peerId: e.value,
-            unread: unreadIn(e.key),
-          ),
-    ]..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
-    _threads = <ChatThread>[
-      ChatThread(id: ChatThread.familyId, kind: ThreadKind.family, title: f.name, unread: unreadIn(ChatThread.familyId)),
-      ...dms,
-    ];
-  }
-
-  /// Einladungen in Einzelchats werden nur angenommen, wenn der Einladende ein beigetretenes
-  /// Familienmitglied ist. Alle anderen werden ignoriert (nie angenommen, nie angezeigt).
-  void _acceptDirectInvites(Client client, Family f) {
-    if (!_participantsLoaded) return;
-    final me = f.myUserId;
-    for (final r in client.rooms) {
-      if (r.membership != Membership.invite || _dmFailed.contains(r.id)) continue;
-      final retry = _dmRetryAfter[r.id];
-      if (retry != null && DateTime.now().isBefore(retry)) continue;
-      final inv = r.getState(EventTypes.RoomMember, me);
-      if (inv == null || inv.content['is_direct'] != true) continue;
-      final from = inv.senderId;
-      if (from == me || f.member(from)?.status != MemberStatus.joined || _identityChanged.contains(from)) continue;
-      // Höchstens ein Einzelchat je anderem Mitglied und wenige gleichzeitige Beitritte.
-      if (_dmTimelines.length + _dmJoining.length >= f.joined.length || _dmJoining.length >= 4) continue;
-      // Pro Mitglied nur ein Einzelchat: weitere Einladungen desselben Einladenden werden ignoriert.
-      if (_dmPeers.values.contains(from)) continue;
-      if (!_dmJoining.add(r.id)) continue;
-      _joinDirect(r).whenComplete(() => _dmJoining.remove(r.id)).ignore();
-    }
-  }
-
-  Future<void> _joinDirect(Room r) async {
-    try {
-      await r.join(waitForSync: true).timeout(roomOpTimeout);
-      final joined = _client?.getRoomById(r.id);
-      // Ein nicht verschlüsselter Raum oder einer mit weiteren Mitgliedern wird nie genutzt:
-      // sofort wieder verlassen.
-      if (joined == null || !_canEncryptIn(joined) || !_isPairRoom(joined)) {
-        _dmFailed.add(r.id);
-        await joined?.removeFromDirectChat();
-        await joined?.leave();
-        return;
-      }
-      _scheduleRefresh();
-    } catch (e) {
-      // Vorläufiger Fehler (Netz, Zeitüberschreitung): später erneut versuchen.
-      _dmRetryAfter[r.id] = DateTime.now().add(const Duration(minutes: 1));
-      AppLog.e('gateway', 'Einzelchat konnte nicht angenommen werden', e);
-    }
-  }
-
-  @override
-  Future<String> startDirectChat(String userId) async {
-    final f = _requireFamily();
-    final client = _client;
-    if (client == null || !client.isLogged()) throw const GatewayException(GatewayError.notAllowed);
-    final m = _requireMember(f, userId);
-    if (userId == f.myUserId || m.status != MemberStatus.joined) throw const GatewayException(GatewayError.notAllowed);
-    for (final e in _dmPeers.entries) {
-      if (e.value == userId && _dmTimelines.containsKey(e.key)) return e.key;
-    }
-    if (!client.encryptionEnabled) throw const GatewayException(GatewayError.encryptionUnavailable);
-    try {
-      // Nie einen vorhandenen, womöglich unverschlüsselten Raum wiederverwenden.
-      // Ohne eigene Zeitschranke: ein Abbruch zwischen Anlegen und Eintrag in `m.direct` würde einen
-      // Raum hinterlassen, den nur die Gegenseite sieht.
-      final roomId = await client.startDirectChat(
-        userId,
-        enableEncryption: true,
-        skipExistingChat: true,
-        preset: CreateRoomPreset.privateChat,
-        initialState: <StateEvent>[
-          StateEvent(type: 'm.room.history_visibility', stateKey: '', content: <String, Object?>{'history_visibility': 'shared'}),
-        ],
-      );
-      await _refresh();
-      for (final e in _dmPeers.entries) {
-        if (e.value == userId && _dmTimelines.containsKey(e.key)) return e.key;
-      }
-      return roomId;
-    } catch (e) {
-      AppLog.e('gateway', 'Einzelchat konnte nicht eröffnet werden', e);
-      throw _map(e);
-    }
-  }
-
   // ------------------------------------------------------ Online-Status (E-38)
-
-  @override
-  Map<String, PresenceStamp> get presence => _presence.snapshot();
-
-  @override
-  Stream<String> get presenceAsks => _presenceAsks.stream;
-
-  @override
-  Future<void> announcePresence({required bool online, bool ask = false, String? onlyTo}) async {
-    final client = _client;
-    final f = _family;
-    if (client == null || !client.isLogged() || f == null || !client.encryptionEnabled) {
-      throw const GatewayException(GatewayError.notAllowed);
-    }
-    if (onlyTo != null && !MatrixIds.isUserId(onlyTo)) throw const GatewayException(GatewayError.invalidInput);
-    // Nur an Geräte, die auch Raumschlüssel erhielten (cross-signiert, nicht gesperrt) und nur an
-    // beigetretene Mitglieder – nie an Eingeladene, Anfragende oder Entfernte.
-    final devices = <DeviceKeys>[];
-    for (final m in f.joined) {
-      if (m.userId == f.myUserId || (onlyTo != null && m.userId != onlyTo)) continue;
-      final list = client.userDeviceKeys[m.userId]?.deviceKeys.values;
-      if (list == null) continue;
-      for (final d in list) {
-        if (d.encryptToDevice) devices.add(d);
-      }
-    }
-    if (devices.isEmpty) return;
-    try {
-      await client.sendToDeviceEncryptedChunked(
-        devices,
-        PresenceCodec.type,
-        PresenceCodec.encode(online: online, now: DateTime.now().toUtc(), ask: ask),
-      );
-    } catch (e) {
-      AppLog.e('gateway', 'Online-Status konnte nicht gesendet werden', e);
-      throw _map(e);
-    }
-  }
-
-  void _onToDevice(ToDeviceEvent e) {
-    if (e.type != PresenceCodec.type) return;
-    // Nur Ende-zu-Ende-verschlüsselt Angekommenes zählt: ein unverschlüsseltes Ereignis könnte
-    // der Server im Namen eines Mitglieds erzeugen.
-    if (e.encryptedContent == null) return;
-    final f = _family;
-    if (f == null || e.sender == f.myUserId || f.member(e.sender)?.status != MemberStatus.joined) return;
-    final d = PresenceCodec.decode(Map<String, Object?>.from(e.content), now: DateTime.now().toUtc());
-    if (d == null) return;
-    // Je Gerät führen (Schlüssel des sendenden Geräts): ein Mitglied gilt als online, solange
-    // irgendein Gerät online meldet.
-    final key = e.encryptedContent?['sender_key'];
-    final now = DateTime.now().toUtc();
-    final before = _presence.stampOf(e.sender, now);
-    if (_presence.apply(e.sender, deviceId: key is String ? key : '', online: d.online, at: d.at)) {
-      final after = _presence.stampOf(e.sender, now);
-      if (before == null || after == null || before.online != after.online) notifyListeners();
-    }
-    if (d.ask && !_presenceAsks.isClosed) _presenceAsks.add(e.sender);
-  }
 
   // ------------------------------------------- Identitäten der Mitglieder (S1)
 
