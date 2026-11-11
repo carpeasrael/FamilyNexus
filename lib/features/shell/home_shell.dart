@@ -15,6 +15,8 @@ import '../shopping/shopping_screen.dart';
 import '../tasks/tasks_screen.dart';
 import '../today/today_screen.dart';
 
+part 'widgets/shell_parts.dart';
+
 /// Schlüssel der Hauptnavigation (untere Leiste oder seitliche Rail), für Tests und Bedienhilfen (#274).
 const Key mainNavigationKey = ValueKey<String>('main-navigation');
 
@@ -104,38 +106,13 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.done && snap.hasError) {
           // Die Familiendienste ließen sich nicht öffnen (z. B. Speicher voll): Menü und Neuversuch bleiben (#153).
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(l.appName),
-              actions: <Widget>[
-                Builder(
-                  builder: (context) => IconButton(
-                    tooltip: l.menuOpen,
-                    icon: const Icon(Icons.menu),
-                    onPressed: () => Scaffold.of(context).openEndDrawer(),
-                  ),
-                ),
-              ],
-            ),
-            endDrawer: const _MenuDrawer(limited: true),
-            body: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                  Text(l.homeOpenFailed, textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: () {
-                      final reopening = _services.openCalendar();
-                      setState(() {
-                        _opening = reopening;
-                      });
-                    },
-                    child: Text(l.retry),
-                  ),
-                ]),
-              ),
-            ),
+          return _OpenFailed(
+            onRetry: () {
+              final reopening = _services.openCalendar();
+              setState(() {
+                _opening = reopening;
+              });
+            },
           );
         }
         if (snap.connectionState != ConnectionState.done || services.calendar == null) {
@@ -150,88 +127,37 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
         final split = twoPane && (_index == _calendarTab || _index == _chatTab);
         // Chat sichtbar = gelesen (E-88, #254): im Zweispalter bei Tab Kalender und Chat, sonst nur bei Tab Chat.
         final chatVisible = _index == _chatTab || (twoPane && _index == _calendarTab);
-        final pages = <Widget>[
-          TodayScreen(
-            onOpenChat: () => setState(() => _index = _chatTab),
-            onOpenShopping: () => _go(_shoppingTab),
-            onOpenAgenda: _openAgenda,
-          ),
-          CalendarScreen(modeRequest: _calendarMode),
-          ChatScreen(active: chatVisible),
-          const ShoppingScreen(),
-          const FamilyScreen(),
-        ];
         final destinations = _destinations(l, services);
-        final listWidth = compact ? double.infinity : kContentMaxWidth;
         return Scaffold(
           appBar: AppBar(
             title: Text(split ? l.tabCalendarAndChat : titles[_index]),
-            actions: <Widget>[
-              // Burger-Menü rechts oben: Einstellungen und Datenschutz.
-              Builder(
-                builder: (context) => IconButton(
-                  tooltip: l.menuOpen,
-                  icon: const Icon(Icons.menu),
-                  onPressed: () => Scaffold.of(context).openEndDrawer(),
-                ),
-              ),
-            ],
+            // Burger-Menü rechts oben: Einstellungen und Datenschutz.
+            actions: const <Widget>[_MenuButton()],
           ),
           endDrawer: const _MenuDrawer(),
           // Ein Gerüst für alle Klassen. Der Elementbaum unter [Expanded] bleibt bei jedem Klassenwechsel gleich;
           // nur der Platz links (Leiste oder nichts) und die Rechtecke der Seiten ändern sich.
           body: SafeArea(
             child: Row(children: <Widget>[
-              compact
-                  ? const SizedBox.shrink()
-                  : FocusTraversalGroup(
-                      child: NavigationRail(
-                      key: mainNavigationKey,
-                      selectedIndex: _index,
-                      onDestinationSelected: _go,
-                      labelType: NavigationRailLabelType.all,
-                      scrollable: true,
-                      minWidth: kRailWidth,
-                      destinations: <NavigationRailDestination>[
-                        for (final d in destinations) NavigationRailDestination(icon: d.icon, label: Text(d.label)),
-                      ],
-                    )),
-              // Eigene Fokusgruppe: Tab geht erst durch den Inhalt, nicht quer über die Rail (Lesereihenfolge nach Lage).
+              _SideRail(compact: compact, selected: _index, onSelect: _go, destinations: destinations),
               Expanded(
-                child: FocusTraversalGroup(
-                    child: LayoutBuilder(builder: (context, box) {
-                  final panes = paneWidths(box.maxWidth);
-                  Rect rect(int i) {
-                    if (twoPane && i == _calendarTab) return Rect.fromLTWH(0, 0, panes.calendar, box.maxHeight);
-                    if (twoPane && i == _chatTab) {
-                      return Rect.fromLTWH(panes.calendar + kPaneDivider, 0, panes.chat, box.maxHeight);
-                    }
-                    return Rect.fromLTWH(0, 0, box.maxWidth, box.maxHeight);
-                  }
-
-                  bool visible(int i) => i == _index || (split && (i == _calendarTab || i == _chatTab));
-                  // Ein Stack, feste Reihenfolge, keine GlobalKeys: je Seite ändern sich nur Rechteck und Sichtbarkeit.
-                  return Stack(fit: StackFit.expand, children: <Widget>[
-                    for (var i = 0; i < pages.length; i++)
-                      Positioned.fromRect(
-                        rect: rect(i),
-                        child: Offstage(
-                          offstage: !visible(i),
-                          child: ExcludeFocus(
-                            excluding: !visible(i),
-                            child: (i == _calendarTab || i == _chatTab) ? pages[i] : ContentWidth(maxWidth: listWidth, child: pages[i]),
-                          ),
-                        ),
-                      ),
-                    Positioned(
-                      left: panes.calendar,
-                      top: 0,
-                      bottom: 0,
-                      width: kPaneDivider,
-                      child: Offstage(offstage: !split, child: const VerticalDivider(width: kPaneDivider, thickness: kPaneDivider)),
+                child: _PaneStack(
+                  index: _index,
+                  split: split,
+                  twoPane: twoPane,
+                  listWidth: compact ? double.infinity : kContentMaxWidth,
+                  pages: <Widget>[
+                    TodayScreen(
+                      onOpenChat: () => setState(() => _index = _chatTab),
+                      onOpenShopping: () => _go(_shoppingTab),
+                      onOpenAgenda: _openAgenda,
                     ),
-                  ]);
-                })),
+                    CalendarScreen(modeRequest: _calendarMode),
+                    ChatScreen(active: chatVisible),
+                    const ShoppingScreen(),
+                    const FamilyScreen(),
+                  ],
+                ),
               ),
             ]),
           ),
