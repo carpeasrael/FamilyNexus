@@ -61,6 +61,7 @@ part 'gateway/calendar_data.dart';
 part 'gateway/chat.dart';
 part 'gateway/data_inventory.dart';
 part 'gateway/direct_chats.dart';
+part 'gateway/family.dart';
 part 'gateway/gateway_errors.dart';
 part 'gateway/identities.dart';
 part 'gateway/password_change.dart';
@@ -79,7 +80,7 @@ part 'gateway/security_verification.dart';
 /// * Lesebestätigungen sind privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _DirectChatsModule, _IdentitiesModule, _GatewayErrorsModule, _DataInventoryModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _GatewayErrorsModule, _DataInventoryModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -1326,54 +1327,6 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   Room? _familyRoom() {
     final room = _familyRoomAnyState();
     return (room != null && room.membership == Membership.join) ? room : null;
-  }
-
-  @override
-  Future<void> createFamily(String name) async {
-    final trimmed = name.trim();
-    if (trimmed.isEmpty || trimmed.length > maxFamilyNameLength) {
-      throw const GatewayException(GatewayError.invalidInput);
-    }
-    final client = _client;
-    if (client == null || !client.isLogged()) throw const GatewayException(GatewayError.notAllowed);
-    if (!client.encryptionEnabled) throw const GatewayException(GatewayError.encryptionUnavailable);
-    // Eine bestehende (oder angefragte) Familie darf nie überschrieben werden.
-    final existing = _familyRoomAnyState();
-    if (existing != null && existing.membership != Membership.leave && existing.membership != Membership.ban) {
-      throw const GatewayException(GatewayError.alreadyExists);
-    }
-    try {
-      final me = client.userID!;
-      final roomId = await client.createRoom(
-        name: trimmed,
-        roomVersion: FamilyRoomSpec.roomVersion,
-        preset: CreateRoomPreset.privateChat,
-        visibility: Visibility.private,
-        initialState: <StateEvent>[
-          for (final s in FamilyRoomSpec.initialState())
-            StateEvent(type: s.type, stateKey: '', content: s.content),
-        ],
-        powerLevelContentOverride: FamilyRoomSpec.powerLevels(me),
-      );
-      // Verweis sofort schreiben (idempotent, 2 Versuche); sonst bliebe ein verwaister Raum.
-      for (var attempt = 0;; attempt++) {
-        try {
-          await client.setAccountData(me, familyAccountData, <String, Object?>{'room_id': roomId});
-          break;
-        } catch (e) {
-          if (attempt >= 1) rethrow;
-        }
-      }
-      try {
-        await client.waitForRoomInSync(roomId, join: true).timeout(roomSyncTimeout);
-      } on TimeoutException {
-        AppLog.w('gateway', 'Raum noch nicht im Sync; Anzeige folgt beim nächsten Abgleich');
-      }
-      await _refresh();
-    } catch (e) {
-      AppLog.e('gateway', 'Familie konnte nicht angelegt werden', e);
-      throw _map(e);
-    }
   }
 
   // ------------------------------------------------- Einladungen und Rollen
