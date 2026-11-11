@@ -239,6 +239,10 @@ abstract class MatrixGateway implements Listenable {
   /// Aktualisiert Geräteliste und Schlüsselstatus vom Server.
   Future<void> refreshSecurity();
 
+  /// Gleicht jetzt mit dem Homeserver ab (#358): ein Sync, der einen laufenden abwartet. Fehler (kein Netz, nicht
+  /// angemeldet) werden protokolliert und nicht geworfen; der nächste Abgleich versucht es erneut.
+  Future<void> syncNow();
+
   /// Alle Geräte des eigenen Kontos.
   List<DeviceEntry> get devices;
 

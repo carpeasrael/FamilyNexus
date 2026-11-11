@@ -25,6 +25,7 @@ class CalendarSync {
     required this.store,
     DateTime Function()? clock,
     this.retryInterval = const Duration(seconds: 60),
+    this.reconcileInterval = defaultReconcileInterval,
     Duration backoffBase = const Duration(seconds: 5),
     Duration backoffMax = const Duration(seconds: 60),
   })  : _clock = clock ?? DateTime.now,
@@ -34,6 +35,10 @@ class CalendarSync {
   final CalendarService service;
   final EventStore store;
   final Duration retryInterval;
+
+  /// Regelmäßiger Abgleich mit dem Homeserver (#358), zusätzlich zum Abgleich nach jeder Änderung.
+  static const Duration defaultReconcileInterval = Duration(minutes: 15);
+  final Duration reconcileInterval;
   final DateTime Function() _clock;
   final SendBackoff _backoff;
 
@@ -42,6 +47,7 @@ class CalendarSync {
 
   StreamSubscription<CalendarSignal>? _sub;
   Timer? _timer;
+  Timer? _reconcileTimer;
   Timer? _debounce;
   bool _publishing = false;
   bool _again = false;
@@ -82,6 +88,7 @@ class CalendarSync {
     _room ??= familyRoom;
     _sub ??= gateway.calendarSignals.listen(_enqueue);
     _timer ??= Timer.periodic(retryInterval, (_) => kick());
+    _reconcileTimer ??= Timer.periodic(reconcileInterval, (_) => reconcile().ignore());
     _backoff.changed(_gatewayState()); // Ausgangszustand merken, erst spätere Wechsel heben das Fenster auf
     gateway.addListener(_onGatewayChanged);
     kick();
@@ -101,8 +108,17 @@ class CalendarSync {
   void dispose() {
     _sub?.cancel().ignore();
     _timer?.cancel();
+    _reconcileTimer?.cancel();
     _debounce?.cancel();
     gateway.removeListener(_onGatewayChanged);
+  }
+
+  /// Gleicht mit dem Homeserver ab und stößt danach die Warteschlange an (#358). Nur mit bereiter Sitzung und
+  /// unveränderter Familie; neue Termine treffen als Signale ein und laufen durch [_enqueue].
+  Future<void> reconcile() async {
+    if (!_canPublish) return;
+    await gateway.syncNow();
+    kick();
   }
 
   /// Plant einen Sendeversuch (entprellt).

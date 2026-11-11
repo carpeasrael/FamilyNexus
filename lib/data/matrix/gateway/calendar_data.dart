@@ -21,6 +21,17 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
   Set<String> get _signaled;
   bool get _syncedOnce;
 
+  @override
+  Future<void> syncNow() async {
+    final c = _client;
+    if (c == null || !c.isLogged()) return;
+    try {
+      await c.oneShotSync();
+    } catch (e) {
+      AppLog.w('gateway', 'Abgleich mit dem Homeserver fehlgeschlagen: ${e.runtimeType}');
+    }
+  }
+
   /// Erster Stand der Mitglieder ist die Basis; nur spätere Beitritte lösen den
   /// Resync aus.
   void _emitMemberJoins(Family f) {

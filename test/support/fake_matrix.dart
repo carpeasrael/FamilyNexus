@@ -480,6 +480,14 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<void> refreshSecurity() async {}
 
+  /// Zählt die Abgleiche (#358).
+  int syncNowCalls = 0;
+
+  @override
+  Future<void> syncNow() async {
+    syncNowCalls++;
+  }
+
   @override
   List<DeviceEntry> get devices {
     final uid = _userId;
