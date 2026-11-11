@@ -1,5 +1,19 @@
 part of '../settings_screen.dart';
 
+/// Die Aktionen der Einstellungen mit den Diensten der App (AP-6a); `reminders` wird erst beim Aufruf gelesen, weil der
+/// Koordinator nach dem Öffnen der Familiendienste entsteht.
+SettingsActions _actions(BuildContext context) {
+  final s = AppScope.read(context);
+  final scheduler = s.scheduler;
+  return SettingsActions(
+    settings: s.settings,
+    gateway: s.gateway,
+    inventory: s.dataInventory,
+    requestNotifications: scheduler == null ? null : () => scheduler.requestNotifications(),
+    reschedule: () async => s.reminders?.reschedule(),
+  );
+}
+
 /// Darstellung: Sprache, Design, Akzentfarbe, reduzierte Effekte.
 class _DisplaySection extends StatelessWidget {
   const _DisplaySection({required this.settings, required this.controller});
@@ -201,7 +215,7 @@ class _StorageTilesState extends State<_StorageTiles> {
   @override
   void initState() {
     super.initState();
-    _locations = AppScope.read(context).dataInventory?.locations();
+    _locations = _actions(context).storageLocations();
   }
 
   @override
@@ -309,11 +323,7 @@ class _RemindersSection extends StatelessWidget {
                 FilterChip(
                   label: Text(m == 0 ? l.reminderAtStart : l.reminderBefore(ReminderCoordinator.durationText(l, m))),
                   selected: selected.contains(m),
-                  onSelected: (v) {
-                    final next = <int>{...selected};
-                    v ? next.add(m) : next.remove(m);
-                    settings.update((s) => s.copyWith(defaultReminderMinutes: next.toList()..sort((a, b) => b.compareTo(a))));
-                  },
+                  onSelected: (v) => _actions(context).setDefaultReminder(m, on: v),
                 ),
             ]),
           ),
@@ -344,15 +354,7 @@ class _ActivitySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final services = AppScope.of(context);
-    final controller = services.settings;
-    Future<void> enable(AppSettings Function(AppSettings) change, bool on) async {
-      await controller.update(change);
-      if (!on) return;
-      await services.scheduler?.requestNotifications();
-      await services.reminders?.reschedule();
-    }
-
+    final controller = AppScope.of(context).settings;
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
@@ -365,12 +367,12 @@ class _ActivitySection extends StatelessWidget {
           SwitchListTile(
             title: Text(l.settingsNotifyChat),
             value: s.notifyChat,
-            onChanged: (v) => enable((c) => c.copyWith(notifyChat: v), v),
+            onChanged: (v) => _actions(context).setNotifyChat(on: v),
           ),
           SwitchListTile(
             title: Text(l.settingsNotifyShopping),
             value: s.notifyShopping,
-            onChanged: (v) => enable((c) => c.copyWith(notifyShopping: v), v),
+            onChanged: (v) => _actions(context).setNotifyShopping(on: v),
           ),
           if (PlatformInfo.isIOS || PlatformInfo.isMacOS)
             Padding(
@@ -393,7 +395,7 @@ class _SecuritySectionState extends State<_SecuritySection> {
   void initState() {
     super.initState();
     // Geräteliste beim Öffnen auffrischen.
-    AppScope.read(context).gateway.refreshSecurity().ignore();
+    _actions(context).refreshSecurity();
   }
 
   @override
@@ -431,11 +433,8 @@ class _SecuritySectionState extends State<_SecuritySection> {
                   ? TextButton(
                       onPressed: () async {
                         final m = ScaffoldMessenger.of(context);
-                        try {
-                          await g.startVerification(userId: d.userId, deviceId: d.deviceId);
-                        } catch (e) {
-                          m.showSnackBar(SnackBar(content: Text(errorText(l, e))));
-                        }
+                        final error = await _actions(context).verifyDevice(d);
+                        if (error != null) m.showSnackBar(SnackBar(content: Text(errorText(l, error))));
                       },
                       child: Text(l.securityVerifyDevice),
                     )

@@ -25,6 +25,7 @@ import 'data_report.dart';
 import 'data_report_screen.dart';
 import 'password_change_dialog.dart';
 import 'privacy_screen.dart';
+import 'settings_actions.dart';
 import 'settings_controller.dart';
 
 part 'widgets/settings_parts.dart';
