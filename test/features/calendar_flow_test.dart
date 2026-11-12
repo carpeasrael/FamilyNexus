@@ -815,7 +815,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Erlauben'));
       await tester.pumpAndSettle();
-      expect(find.textContaining('in den Systemeinstellungen ausgeschaltet'), findsOneWidget);
+      expect(find.textContaining('in den Geräteeinstellungen ausgeschaltet'), findsOneWidget);
       await tester.tap(find.text('Einstellungen öffnen'));
       await tester.pumpAndSettle();
       expect(app.scheduler.settingsOpened, 1);

@@ -27,12 +27,12 @@ void main() {
     await tester.tap(find.byTooltip('Als Datei speichern'));
     await tester.pumpAndSettle();
     expect(files.saved, isEmpty);
-    expect(find.text('Protokoll gespeichert.'), findsNothing);
+    expect(find.text('Übersicht gespeichert.'), findsNothing);
 
     files.cancelSave = false;
     await tester.tap(find.byTooltip('Als Datei speichern'));
     await tester.pumpAndSettle();
     expect(files.saved, hasLength(1));
-    expect(find.text('Protokoll gespeichert.'), findsOneWidget);
+    expect(find.text('Übersicht gespeichert.'), findsOneWidget);
   });
 }

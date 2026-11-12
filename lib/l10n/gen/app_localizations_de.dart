@@ -511,7 +511,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsActivityBadgeApple =>
-      'Die Zahl am App-Symbol erlaubst du in den Systemeinstellungen unter Mitteilungen → FamilyNexus → Kennzeichen.';
+      'Die Zahl am App-Symbol erlaubst du in den Geräteeinstellungen unter Mitteilungen → FamilyNexus → Kennzeichen.';
 
   @override
   String get reminderChannelName => 'Erinnerungen';
@@ -587,7 +587,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get remindersPermissionSystem =>
-      'Benachrichtigungen sind in den Systemeinstellungen ausgeschaltet. Erlaube sie dort für FamilyNexus, sonst erscheinen keine Erinnerungen.';
+      'Benachrichtigungen sind in den Geräteeinstellungen ausgeschaltet. Erlaube sie dort für FamilyNexus, sonst erscheinen keine Erinnerungen.';
 
   @override
   String get remindersOpenSettings => 'Einstellungen öffnen';
@@ -632,7 +632,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String remindersFiresAt(String time) {
-    return 'erinnert $time';
+    return 'Erinnerung: $time';
   }
 
   @override
@@ -1283,7 +1283,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy1Body =>
-      'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Verantwortlich für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server); er steht bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.';
+      'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.';
 
   @override
   String get privacy2Title => 'Welche Daten gibt es?';
@@ -1389,7 +1389,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy9Body =>
-      'Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App, dein Konto löschst du unter Einstellungen → Konto → „Konto löschen“; weitere Serverdaten beim Betreiber deines Servers.';
+      'Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App, dein Konto löschst du unter Einstellungen → Konto → „Konto löschen“. Weitere Serverdaten verwaltet der Betreiber deines Servers.';
 
   @override
   String get familyRequestCheckValid => 'Gültiger Einladungslink';
@@ -2853,11 +2853,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsReportLocal =>
-      'Protokoll: alle lokal gespeicherten Daten zeigen';
+      'Datenübersicht: alle lokal gespeicherten Daten zeigen';
 
   @override
   String get settingsReportOnline =>
-      'Protokoll: alle online gespeicherten Daten zeigen';
+      'Datenübersicht: alle online gespeicherten Daten zeigen';
 
   @override
   String get reportLocalTitle => 'Lokal gespeicherte Daten';
@@ -2867,20 +2867,20 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reportWarning =>
-      'Das Protokoll zeigt deine Daten im Klartext. Beim Kopieren oder Speichern verlassen sie den verschlüsselten Speicher der App.';
+      'Die Übersicht zeigt deine Daten im Klartext. Beim Kopieren oder Speichern verlassen sie den verschlüsselten Speicher der App.';
 
   @override
   String get reportCopy => 'Kopieren';
 
   @override
   String get reportCopied =>
-      'Protokoll kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im Zweifel selbst.';
+      'Übersicht kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im Zweifel selbst.';
 
   @override
   String get reportSave => 'Als Datei speichern';
 
   @override
-  String get reportSaved => 'Protokoll gespeichert.';
+  String get reportSaved => 'Übersicht gespeichert.';
 
   @override
   String reportGenerated(String time, String version) {
