@@ -180,7 +180,7 @@ Vorbedingung: Testserver, bei dem die eingegebene Anbieter-Adresse vom Matrix-ID
 | RT-G-01 | alle | Einstellungen → Konto → „Server“ | Zeigt die **eingegebene Anbieter-Adresse**, nicht den Servernamen der Matrix-ID | `RT-G-01_<Pl>.png` | | |
 | RT-G-02 | alle | Einstellungen → Über die App → Speicherorte | „Online beim Matrix-Anbieter …“ nennt die eingegebene Adresse | `RT-G-02_<Pl>.png` | | |
 | RT-G-03 | alle | „Konto löschen“ antippen (Dialog nur ansehen, abbrechen) | Dialogtext nennt die eingegebene Adresse, nicht den aufgelösten Homeserver | `RT-G-03_<Pl>.png` | | |
-| RT-G-04 | alle | Einstellungen → Datenprotokoll anzeigen | Protokoll enthält den **eigenen Anzeigenamen** (nicht nur die Matrix-ID); der aufgelöste Homeserver steht nur hier | `RT-G-04_<Pl>.png` | | |
+| RT-G-04 | alle | Einstellungen → Datenübersicht anzeigen | Die Übersicht enthält den **eigenen Anzeigenamen** (nicht nur die Matrix-ID); der aufgelöste Homeserver steht nur hier | `RT-G-04_<Pl>.png` | | |
 | RT-G-05 | Web | Anbieter-Prüfung mit einem Server, dessen `/.well-known/matrix/support` **ohne CORS** antwortet | Meldung „nicht erreichbar“ erscheint **nicht**; die Prüfung geht weiter, Konto kann angelegt werden | `RT-G-05_Web.png` | | |
 | RT-G-06 | alle | Einstellungen → „Alle lokalen Daten löschen“ bestätigen und dabei den Netzverkehr beobachten (z. B. Proxy oder `tcpdump`; ohne Werkzeug nur Anzeige prüfen) | Danach **direkt** die Willkommensseite, **keine** kurz aufblitzende Anmeldeseite, keine Anfrage an matrix.org | `RT-G-06_<Pl>.png`, Verkehrsprotokoll `RT-G-06_<Pl>.txt` | | |
 
@@ -221,7 +221,7 @@ Vorbedingung: Testserver, bei dem die eingegebene Anbieter-Adresse vom Matrix-ID
 | RT-J-07 | Lin | Einstellungen → Über die App → Speicherorte | Nennt die Ablage im **Secret-Portal** | `RT-J-07_Lin.png` | | |
 | RT-J-08 | Web | Datenschutzerklärung und Einstellungen → Löschen | Datenschutz nennt SQLite3MultipleCiphers und keine Erinnerungen; Hinweis beim Löschen nennt keine Erinnerungen auf diesem Gerät | `RT-J-08_Web.png` | | |
 | RT-J-09 | alle | Einstellungen → Metadaten/eigener Server (Abschnitte zu Metadaten und eigenem Server) | Aussagen stimmen mit der Datenschutzerklärung überein; keine Zusage, die der Text der Erklärung widerspricht | `RT-J-09_<Pl>.png` | | |
-| RT-J-10 | alle | Datenprotokoll kopieren | Hinweis „Protokoll kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im Zweifel selbst.“ | `RT-J-10_<Pl>.png` | | |
+| RT-J-10 | alle | Datenübersicht kopieren | Hinweis „Übersicht kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im Zweifel selbst.“ | `RT-J-10_<Pl>.png` | | |
 
 ### K. Web (#137, #266, #154, #227, #240, #249)
 
