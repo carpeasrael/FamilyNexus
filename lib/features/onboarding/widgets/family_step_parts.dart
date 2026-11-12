@@ -109,3 +109,33 @@ class _InvitedView extends StatelessWidget {
     ]);
   }
 }
+
+/// Das Konto gehört schon zu einer Familie, aber das Speichern am Ende der Einrichtung ist gescheitert (#411): Fehlertext
+/// und „Erneut versuchen“ statt eines endlosen Spinners.
+class _CompletionFailed extends StatelessWidget {
+  const _CompletionFailed({required this.familyName, required this.error, required this.busy, required this.onRetry});
+  final String familyName;
+
+  /// Fehlertext der letzten Aktion; `null`, wenn keiner vorliegt.
+  final String? error;
+  final bool busy;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+      Text(l.onbFamilyFound(familyName)),
+      if (error != null)
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Semantics(liveRegion: true, child: Text(error!, style: TextStyle(color: Theme.of(context).colorScheme.error))),
+        ),
+      const SizedBox(height: 8),
+      Align(
+        alignment: Alignment.centerRight,
+        child: FilledButton(onPressed: busy ? null : onRetry, child: Text(l.retry)),
+      ),
+    ]);
+  }
+}

@@ -12,7 +12,7 @@ import '../common/syncing_view.dart';
 import '../family/invite_dialog.dart';
 import 'family_step_controller.dart';
 
-export 'family_step_controller.dart' show FamilyStepMode;
+export 'family_step_controller.dart' show FamilyStepMode, SetupSaveException;
 
 part 'widgets/family_step_parts.dart';
 
@@ -59,7 +59,8 @@ class _FamilyStepState extends State<FamilyStep> {
 
   Future<void> _inviteNow() async {
     await showInviteDialog(context, _services.gateway);
-    await widget.onFamilyReady();
+    if (!mounted) return;
+    await _c.finish();
   }
 
   @override
@@ -76,8 +77,14 @@ class _FamilyStepState extends State<FamilyStep> {
         // nichts gründen oder beitreten, die Einrichtung ist damit abgeschlossen.
         final existing = g.family;
         if (existing != null && !_c.creating) {
-          if (_c.beginCompleting()) {
-            WidgetsBinding.instance.addPostFrameCallback((_) => widget.onFamilyReady());
+          // Das Speichern am Ende ist gescheitert (#411): Fehler zeigen und einen neuen Versuch anbieten, statt endlos zu drehen.
+          if (_c.completionFailed) {
+            return _CompletionFailed(familyName: existing.name, error: _c.errorMessage(l), busy: _c.busy, onRetry: _c.completeExisting);
+          }
+          if (!_c.completing) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) _c.completeExisting();
+            });
           }
           return Semantics(
             liveRegion: true,
@@ -170,9 +177,18 @@ class _FamilyStepState extends State<FamilyStep> {
       Text(l.familyCreatedBody),
       const SizedBox(height: 16),
       Wrap(alignment: WrapAlignment.end, spacing: 8, runSpacing: 8, children: <Widget>[
-        TextButton(onPressed: widget.onFamilyReady, child: Text(l.later)),
-        FilledButton.icon(icon: const Icon(Icons.person_add_alt_1_outlined), onPressed: _inviteNow, label: Text(l.familyInviteNow)),
+        TextButton(onPressed: _c.busy ? null : _c.finish, child: Text(l.later)),
+        FilledButton.icon(
+          icon: const Icon(Icons.person_add_alt_1_outlined),
+          onPressed: _c.busy ? null : _inviteNow,
+          label: Text(l.familyInviteNow),
+        ),
       ]),
+      if (_c.errorMessage(l) case final error?)
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Semantics(liveRegion: true, child: Text(error, style: TextStyle(color: theme.colorScheme.error))),
+        ),
     ]);
   }
 

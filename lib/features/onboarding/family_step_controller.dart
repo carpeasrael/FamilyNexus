@@ -14,6 +14,11 @@ import '../settings/settings_controller.dart';
 /// oder beides zur Auswahl (bestehendes Konto ohne Familie).
 enum FamilyStepMode { create, join, choice }
 
+/// Das Speichern am Ende der Einrichtung ist gescheitert (#411). Der Fehlertext ist der allgemeine „Unbekannter Fehler“.
+class SetupSaveException implements Exception {
+  const SetupSaveException();
+}
+
 /// Zustand und Aktionen des Familienschritts (AP-6a): gründen, per Link oder Code beitreten, Einladungen annehmen.
 /// Abhängigkeiten kommen über den Konstruktor; Eingabefelder, Dialoge und Texte bleiben in der Oberfläche. Fehler
 /// werden als Text erst beim Anzeigen aufgelöst ([errorMessage]), damit der Controller keinen `BuildContext` braucht.
@@ -43,6 +48,7 @@ class FamilyStepController extends ChangeNotifier {
   bool join;
   bool _busy = false;
   bool _completing = false;
+  bool _completionFailed = false;
   bool _creating = false;
   bool _disposed = false;
 
@@ -71,12 +77,32 @@ class FamilyStepController extends ChangeNotifier {
   /// Der aktuelle Fehlertext in der Sprache von [l]; `null` ohne Fehler.
   String? errorMessage(AppLocalizations l) => _error?.call(l);
 
-  /// Merkt, dass der Abschluss angestoßen wurde; `true` nur beim ersten Aufruf.
-  bool beginCompleting() {
-    if (_completing) return false;
+  /// Der Abschluss läuft oder ist angestoßen (nur ein Auslöser, #411).
+  bool get completing => _completing;
+
+  /// Der Abschluss ist gescheitert (z. B. Speichern der Einstellungen); die Oberfläche zeigt den Fehler und
+  /// „Erneut versuchen“ statt eines endlosen Spinners.
+  bool get completionFailed => _completionFailed;
+
+  /// Schließt die Einrichtung ab, weil das Konto schon zu einer Familie gehört. Idempotent: Solange der Abschluss läuft
+  /// oder gelungen ist, tut ein weiterer Aufruf nichts. Scheitert er, bleibt der Fehler stehen und ein neuer Aufruf
+  /// versucht es erneut.
+  Future<void> completeExisting() async {
+    if (_completing) return;
     _completing = true;
-    return true;
+    _update(() => _completionFailed = false);
+    final ok = await _run(onFamilyReady);
+    if (!ok && !_disposed) {
+      _update(() {
+        _completing = false;
+        _completionFailed = true;
+      });
+    }
   }
+
+  /// Schließt die Einrichtung ab („Später“ und „Jetzt einladen“ nach dem Gründen); ein Fehler wird gezeigt statt
+  /// unbehandelt aus der Schaltfläche zu laufen.
+  Future<bool> finish() => _run(onFamilyReady);
 
   /// Merkt, dass die Einladung [roomId] automatisch angenommen wird; `true` nur beim ersten Aufruf.
   bool beginAutoAccept(String roomId) => _autoAccepted.add(roomId);
@@ -96,18 +122,22 @@ class FamilyStepController extends ChangeNotifier {
     });
   }
 
-  Future<void> _run(Future<void> Function() op) async {
+  /// Führt [op] aus, zeigt einen Fehler und gibt zurück, ob sie ohne Ausnahme endete.
+  Future<bool> _run(Future<void> Function() op) async {
     _update(() {
       _busy = true;
       _error = null;
     });
+    var ok = false;
     try {
       await op();
+      ok = true;
     } catch (e) {
       if (!_disposed) _update(() => _error = (l) => errorText(l, e));
     } finally {
       if (!_disposed) _update(() => _busy = false);
     }
+    return ok;
   }
 
   /// Wechselt zwischen den Reitern „Gründen“ und „Beitreten“.
