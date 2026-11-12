@@ -197,7 +197,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Future<void> _finish() async {
     _s.pendingInvite.value = null;
-    await _s.settings.update((c) => c.copyWith(onboardingDone: true, pendingInvite: null));
+    final saved = await _s.settings.update((c) => c.copyWith(onboardingDone: true, pendingInvite: null));
+    // Ohne gespeichertes Ende bliebe die Einrichtung stehen: Der Familienschritt zeigt den Fehler und bietet einen neuen
+    // Versuch an (#411).
+    if (!saved) throw const SetupSaveException();
   }
 
   @override

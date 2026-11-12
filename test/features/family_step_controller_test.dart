@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/features/onboarding/family_step_controller.dart';
@@ -20,6 +22,10 @@ class _Setup {
   final SettingsController settings;
   final ValueNotifier<InviteLink?> pending;
   int ready = 0;
+
+  /// Wirft `onFamilyReady`, solange gesetzt (Speichern am Ende scheitert, #411).
+  Object? readyError;
+  Completer<void>? readyGate;
   late final FamilyStepController c;
 }
 
@@ -36,7 +42,12 @@ Future<_Setup> _setup({FamilyStepMode mode = FamilyStepMode.choice}) async {
     gateway: gateway,
     settings: s.settings,
     pendingInvite: s.pending,
-    onFamilyReady: () async => s.ready++,
+    onFamilyReady: () async {
+      await s.readyGate?.future;
+      final e = s.readyError;
+      if (e != null) throw e;
+      s.ready++;
+    },
     mode: mode,
     clock: () => _now,
   );
@@ -272,17 +283,112 @@ void main() {
   });
 
   group('Einmalige Auslöser der Oberfläche', () {
-    test('beginCompleting liefert nur beim ersten Aufruf true', () async {
-      final s = await _setup();
-      expect(s.c.beginCompleting(), isTrue);
-      expect(s.c.beginCompleting(), isFalse);
-    });
-
     test('beginAutoAccept liefert je Raum nur beim ersten Aufruf true', () async {
       final s = await _setup();
       expect(s.c.beginAutoAccept('!a:x'), isTrue);
       expect(s.c.beginAutoAccept('!a:x'), isFalse);
       expect(s.c.beginAutoAccept('!b:x'), isTrue);
+    });
+  });
+
+  group('Abschluss der Einrichtung (#411)', () {
+    test('completeExisting ruft onFamilyReady und bleibt danach „abgeschlossen“', () async {
+      final s = await _setup();
+      await s.c.completeExisting();
+      expect((s.ready, s.c.completing, s.c.completionFailed, s.c.hasError, s.c.busy), (1, true, false, false, false));
+    });
+
+    test('ein zweiter Aufruf nach Erfolg löst nichts mehr aus (nur einmal)', () async {
+      final s = await _setup();
+      await s.c.completeExisting();
+      await s.c.completeExisting();
+      expect(s.ready, 1);
+    });
+
+    test('zwei gleichzeitige Aufrufe lösen den Abschluss nur einmal aus', () async {
+      final s = await _setup();
+      s.readyGate = Completer<void>();
+      final first = s.c.completeExisting();
+      final second = s.c.completeExisting();
+      expect(s.c.completing, isTrue, reason: 'schon vor dem ersten await gesetzt');
+      s.readyGate!.complete();
+      await Future.wait(<Future<void>>[first, second]);
+      expect(s.ready, 1);
+    });
+
+    test('Fehlschlag: Fehler bleibt stehen, der Abschluss ist wieder frei, nicht mehr beschäftigt', () async {
+      final s = await _setup();
+      s.readyError = const SetupSaveException();
+      await s.c.completeExisting();
+      expect((s.c.completionFailed, s.c.completing, s.c.busy, s.ready), (true, false, false, 0));
+      expect(s.c.errorMessage(_de), _de.errUnknown);
+    });
+
+    test('Wiederholung nach Fehlschlag gelingt: Fehler weg, onFamilyReady einmal gelungen', () async {
+      final s = await _setup();
+      s.readyError = const SetupSaveException();
+      await s.c.completeExisting();
+      s.readyError = null;
+      await s.c.completeExisting();
+      expect((s.c.completionFailed, s.c.completing, s.c.hasError, s.ready), (false, true, false, 1));
+    });
+
+    test('zwei Fehlschläge hintereinander, dann Erfolg: der Zustand bleibt je Versuch wiederholbar', () async {
+      final s = await _setup();
+      s.readyError = const SetupSaveException();
+      await s.c.completeExisting();
+      await s.c.completeExisting();
+      expect((s.c.completionFailed, s.c.completing, s.c.busy, s.ready), (true, false, false, 0));
+      s.readyError = null;
+      await s.c.completeExisting();
+      expect((s.c.completionFailed, s.c.completing, s.c.hasError, s.ready), (false, true, false, 1));
+    });
+
+    test('beim neuen Versuch ist der Fehlerzustand schon zurückgesetzt (kein Aufblitzen der Fehleransicht)', () async {
+      final s = await _setup();
+      s.readyError = const SetupSaveException();
+      await s.c.completeExisting();
+      s.readyError = null;
+      s.readyGate = Completer<void>();
+      final retry = s.c.completeExisting();
+      expect((s.c.completionFailed, s.c.completing, s.c.busy), (false, true, true));
+      s.readyGate!.complete();
+      await retry;
+    });
+
+    test('finish: Erfolg ruft onFamilyReady und liefert true', () async {
+      final s = await _setup();
+      expect(await s.c.finish(), isTrue);
+      expect((s.ready, s.c.hasError), (1, false));
+    });
+
+    test('finish: Fehler wird gezeigt statt geworfen, liefert false, danach wieder bedienbar', () async {
+      final s = await _setup();
+      s.readyError = const SetupSaveException();
+      expect(await s.c.finish(), isFalse);
+      expect((s.c.errorMessage(_de), s.c.busy), (_de.errUnknown, false));
+      s.readyError = null;
+      expect(await s.c.finish(), isTrue);
+      expect(s.c.hasError, isFalse);
+    });
+
+    test('dispose während des Abschlusses: keine Meldung mehr, kein Absturz', () async {
+      final s = await _setup();
+      final c = FamilyStepController(
+        gateway: s.gateway,
+        settings: s.settings,
+        pendingInvite: ValueNotifier<InviteLink?>(null),
+        onFamilyReady: () async {
+          await s.readyGate?.future;
+          throw const SetupSaveException();
+        },
+      );
+      s.readyGate = Completer<void>();
+      final running = c.completeExisting();
+      c.dispose();
+      s.readyGate!.complete();
+      await running;
+      expect(c.completionFailed, isFalse, reason: 'nach dispose wird nichts mehr gesetzt');
     });
   });
 
