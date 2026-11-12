@@ -16,6 +16,7 @@ mixin _RegistrationModule on ChangeNotifier implements MatrixGateway {
   set _oauthPair(_Entered? value);
   ServerProbe get _probe;
   Future<void> _refresh();
+  void _scheduleRefresh();
   _RegistrationSession? get _registration;
   set _registration(_RegistrationSession? value);
   Future<(GetAuthMetadataResponse?, _Entered?)> _useHomeserver(Client client, ServerUrl server, {bool oauth = false});
@@ -318,6 +319,14 @@ mixin _RegistrationModule on ChangeNotifier implements MatrixGateway {
       }
       await _refresh();
     } catch (e) {
+      // Angemeldet ist angemeldet (#28, #412): Scheitert nur ein Folgeschritt (erster Abgleich, Schlüssel), steht die
+      // Sitzung. Vor `startOAuth` war der Client nicht angemeldet, `isLogged` stammt also aus diesem Vorgang.
+      if (client.isLogged()) {
+        AppLog.e('gateway', 'Nach der Browser-Anmeldung fehlgeschlagen (Anmeldung gilt)', e);
+        _scheduleRefresh();
+        notifyListeners();
+        return;
+      }
       AppLog.e('gateway', 'Anmeldung im Browser fehlgeschlagen', e);
       if (e is OidcException) throw const GatewayException(GatewayError.oauthCancelled);
       throw _map(e, forLogin: true);
