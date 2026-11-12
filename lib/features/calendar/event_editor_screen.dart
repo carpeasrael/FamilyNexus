@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../app/app_services.dart';
+import '../../core/app_log.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_service.dart';
 import '../../domain/family.dart';
@@ -251,6 +252,10 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
       // entsteht eine Kopie mit neuer ID, der Aufrufer muss ihr folgen.
       if (mounted) nav.pop(saved);
     } on CalendarException {
+      if (mounted) _showError(l.eventSaveError);
+    } catch (e) {
+      // Fehler der lokalen Ablage dürfen nicht unbehandelt aus dem Knopf laufen (#409).
+      AppLog.e('calendar', 'Termin speichern fehlgeschlagen', e);
       if (mounted) _showError(l.eventSaveError);
     } finally {
       if (mounted) setState(() => _saving = false);
