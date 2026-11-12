@@ -31,7 +31,7 @@ abstract class AppBadge {
 }
 
 /// Erzeugt lokale Meldungen für neue Chat-Nachrichten und neue Einträge auf dem Einkaufszettel, solange die App läuft
-/// (#254, E-88; kein Push). Neu ist nur, was nach [MatrixGateway.liveSince] liegt (Server-Zeitstempel): Verlauf,
+/// (auf Mobilgeräten nur im Vordergrund zugesagt, #273; #254, E-88; kein Push). Neu ist nur, was nach [MatrixGateway.liveSince] liegt (Server-Zeitstempel): Verlauf,
 /// Nachgeladenes und alles, was bei geschlossener App kam, lösen nichts aus.
 class ActivityNotifier {
   ActivityNotifier({

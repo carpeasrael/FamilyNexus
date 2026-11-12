@@ -498,7 +498,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsActivityHint =>
-      'Notifications without content, only while the app is running. When the app is closed, nothing arrives (there is no push service).';
+      'Notifications without content, only while the app is open. On mobile devices they may not arrive while the app is in the background or closed (there is no push service).';
 
   @override
   String get settingsActivityBadgeApple =>
@@ -1301,7 +1301,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy5Body =>
-      'Reminders are local notifications. They never show title, location or note, only “Event in …” or “The event starts now”. For new messages and shopping items the app only shows “New messages” or “New items on the shopping list”, without sender or content and only while it is running; the number of unread messages may appear on the app icon. There is no third-party push service.';
+      'Reminders are local notifications. They never show title, location or note, only “Event in …” or “The event starts now”. For new messages and shopping items the app only shows “New messages” or “New items on the shopping list”, without sender or content and only while it is open (on mobile devices they may not arrive in the background); the number of unread messages may appear on the app icon. There is no third-party push service.';
 
   @override
   String get privacy6Title => 'Permissions';

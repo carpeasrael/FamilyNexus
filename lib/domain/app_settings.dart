@@ -48,10 +48,10 @@ class AppSettings {
   /// Online-Status an die Familie melden (E-38).
   final bool shareOnlineStatus;
 
-  /// Meldung „Neue Nachrichten“ ohne Inhalt, solange die App läuft (#254, E-88).
+  /// Meldung „Neue Nachrichten“ ohne Inhalt, solange die App geöffnet ist; auf Mobilgeräten im Hintergrund nicht zugesagt (#254, E-88, #273).
   final bool notifyChat;
 
-  /// Meldung „Neue Einträge auf dem Einkaufszettel“ ohne Inhalt, solange die App läuft (#254, E-88).
+  /// Meldung „Neue Einträge auf dem Einkaufszettel“ ohne Inhalt, solange die App geöffnet ist; auf Mobilgeräten im Hintergrund nicht zugesagt (#254, E-88, #273).
   final bool notifyShopping;
 
   /// Neon-Akzentfarbe (Standard: Teal der AURORA-Palette).
