@@ -293,6 +293,10 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   @visibleForTesting
   Future<void> Function()? debugAfterFamilyTimeline;
 
+  /// Nur für Tests: läuft als Erstes in jedem Abgleich (#412: ein scheiternder Abgleich nach der Anmeldung).
+  @visibleForTesting
+  Future<void> Function()? debugBeforeRefresh;
+
   /// Nur für Tests: läuft, wenn die Mitgliederliste da ist, vor der Prüfung der Generation.
   @visibleForTesting
   Future<void> Function()? debugBeforeParticipantsLoaded;
@@ -1137,6 +1141,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   }
 
   Future<void> _refreshOnce() async {
+    await debugBeforeRefresh?.call();
     final client = _client;
     if (client == null || !client.isLogged()) {
       _resetLocal();

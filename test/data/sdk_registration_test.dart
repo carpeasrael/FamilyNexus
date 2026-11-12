@@ -642,17 +642,35 @@ void main() {
       // Ein Abgleich ohne Sitzung (`_resetLocal`) zwischen Start und Rücksprung verliert die offene Anmeldung nicht.
       g.sdkClient!.onLoginStateChanged.add(LoginState.loggedOut);
       await Future<void>.delayed(const Duration(milliseconds: 400));
-      try {
-        await g.completeOAuth(Uri.parse('$redirect?code=echt&state=$state'));
-      } on GatewayException catch (e) {
-        // Kein #28-Zweig: Scheitert nur der Abgleich danach, steht die Sitzung trotzdem.
-        expect(e.error, isNot(GatewayError.oauthCancelled));
-      }
+      await g.completeOAuth(Uri.parse('$redirect?code=echt&state=$state'));
       expect(s.tokenBodies.single['code'], 'echt');
       expect(g.session, SessionState.ready);
       expect(g.userId, '@emil:hs.example');
       expect(g.server?.host, 'provider.example', reason: 'bisher hs.example (aufgelöste Basis)');
       expect(g.sdkClient!.homeserver!.host, 'hs.example');
+    });
+
+    test('#412: Token-Austausch gelingt, der Abgleich danach scheitert: die Sitzung steht, keine Fehlermeldung', () async {
+      final s = _redirecting(version: 'v1.15', meta: _meta);
+      s.token = (req, b) => (200, <String, Object?>{'access_token': 'tok', 'token_type': 'Bearer'});
+      final g = await _gateway(s);
+      final state = (await g.startOAuth(server: _provider, redirectUri: redirect, create: true)).queryParameters['state']!;
+      g.debugBeforeRefresh = () async => throw StateError('Test');
+      addTearDown(() => g.debugBeforeRefresh = null);
+      await g.completeOAuth(Uri.parse('$redirect?code=echt&state=$state'));
+      expect(s.tokenBodies.single['code'], 'echt');
+      expect(g.session, SessionState.ready, reason: 'angemeldet ist angemeldet (#28)');
+      expect(g.userId, '@emil:hs.example');
+    });
+
+    test('#412: Token-Austausch scheitert (invalid_grant): weiter oauthCancelled, keine Sitzung', () async {
+      final s = _Server(version: 'v1.15', meta: _meta);
+      s.token = (req, b) => (400, <String, Object?>{'error': 'invalid_grant'});
+      final g = await _gateway(s);
+      final state = (await g.startOAuth(server: _hs, redirectUri: redirect, create: false)).queryParameters['state']!;
+      await expectLater(g.completeOAuth(Uri.parse('$redirect?code=echt&state=$state')), _error(GatewayError.oauthCancelled));
+      expect(g.session, isNot(SessionState.ready));
+      expect(g.userId, isNull);
     });
 
     test('#259 Wettlauf: Kontoanlage über den Browser, der Schritt verwirft vor der Rückkehr von `oidcLogin`', () async {
