@@ -154,7 +154,7 @@ Erinnerungen werden lokal geplant und enthalten keinen Termintitel, Ort oder
 Notiztext, sondern einen allgemeinen Hinweis wie „Termin in …“. Bei neuen
 Chat-Nachrichten und neuen Einträgen auf dem Einkaufszettel zeigt die App eine
 allgemeine Meldung („Neue Nachrichten“ bzw. „Neue Einträge auf dem
-Einkaufszettel“) ohne Absender, Gespräch oder Inhalt, und nur, solange die App läuft;
+Einkaufszettel“) ohne Absender, Gespräch oder Inhalt, und nur, solange die App geöffnet ist (auf Mobilgeräten können sie im Hintergrund ausbleiben);
 beide Meldungen lassen sich in den Einstellungen abschalten. Die Zahl ungelesener
 Nachrichten kann am App-Symbol erscheinen; sie wird auf dem Gerät aus den bereits
 abgerufenen Daten berechnet. FamilyNexus

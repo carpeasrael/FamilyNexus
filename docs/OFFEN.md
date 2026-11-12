@@ -6,7 +6,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 
 | Punkt | Grund / Hinweis |
 |---|---|
-| Push-Benachrichtigungen für Chat (UnifiedPush/FCM) | Würde Dritt-Infrastruktur oder Telemetrie-SDKs verlangen; „Später denkbar“ im Konzept. Seit E-88 (#254) gibt es lokale, generische Meldungen zu Chat und Einkauf, aber nur, solange die App läuft; bei beendeter App kommt nichts. |
+| Push-Benachrichtigungen für Chat (UnifiedPush/FCM) | Würde Dritt-Infrastruktur oder Telemetrie-SDKs verlangen; „Später denkbar“ im Konzept. Seit E-88 (#254) gibt es lokale, generische Meldungen zu Chat und Einkauf, aber nur, solange die App geöffnet ist; bei beendeter App kommt nichts, und auf Mobilgeräten (gemessen: Android 16 im Emulator, #273) können sie im Hintergrund ausbleiben. |
 | In-App-QR-Scanner | `mobile_scanner`/ML Kit kann Daten an Google senden (E-34). Scan mit der Kamera-App öffnet den Deep Link. Alternative auf ZXing-Basis ohne Google-Dienste prüfen. |
 | ICS-/Archiv-Export | Ein Export wäre unverschlüsselt gespeichert – verstößt gegen „nie unverschlüsselt speichern“. Möglich nur als verschlüsseltes Archiv. |
 | Geräte sperren / fremde Sitzungen abmelden | Benötigt Server-Passwortbestätigung (UIA) für Geräteverwaltung; Verifizierungsstatus wird angezeigt. |

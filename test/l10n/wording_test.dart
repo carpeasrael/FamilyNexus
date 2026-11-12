@@ -116,4 +116,19 @@ void main() {
       expect(t.toLowerCase(), isNot(contains('system settings')));
     }
   });
+
+  test('#273 (a): Meldungen nur bei geöffneter App, auf Mobilgeräten im Hintergrund nicht zugesagt', () {
+    expect(de.settingsActivityHint, contains('nur solange die App geöffnet ist'));
+    expect(de.settingsActivityHint, contains('Auf Mobilgeräten können sie im Hintergrund und bei beendeter App ausbleiben'));
+    expect(de.settingsActivityHint, isNot(contains('solange die App läuft')));
+    expect(enL.settingsActivityHint, contains('only while the app is open'));
+    expect(enL.settingsActivityHint, contains('On mobile devices they may not arrive while the app is in the background or closed'));
+    expect(enL.settingsActivityHint, isNot(contains('is running')));
+    expect(de.privacy5Body, contains('nur, solange sie geöffnet ist (auf Mobilgeräten können sie im Hintergrund ausbleiben)'));
+    expect(de.privacy5Body, isNot(contains('solange sie läuft')));
+    expect(enL.privacy5Body, contains('only while it is open (on mobile devices they may not arrive in the background)'));
+    expect(enL.privacy5Body, isNot(contains('while it is running')));
+    // Desktop läuft im Hintergrund weiter: dieser Satz bleibt.
+    expect(de.privacy6DesktopNote, contains('solange die App läuft'));
+  });
 }

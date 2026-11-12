@@ -29,13 +29,13 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('Schalter sind an, Hinweis „nur solange die App läuft“; Ausschalten speichert, Einschalten fragt nur Benachrichtigungen an',
+  testWidgets('Schalter sind an, Hinweis „nur solange die App geöffnet ist“; Ausschalten speichert, Einschalten fragt nur Benachrichtigungen an',
       (tester) async {
     final app = await buildTestApp(activity: _Platform());
     app.scheduler.current = ReminderPermission.notificationsDenied;
     await open(tester, app);
     expect(find.text('Benachrichtigungen'), findsWidgets);
-    expect(find.textContaining('nur solange die App läuft'), findsOneWidget);
+    expect(find.textContaining('nur solange die App geöffnet ist. Auf Mobilgeräten können sie im Hintergrund und bei beendeter App ausbleiben'), findsOneWidget);
     final chat = find.widgetWithText(SwitchListTile, 'Neue Chat-Nachrichten');
     final shopping = find.widgetWithText(SwitchListTile, 'Neue Einträge auf dem Einkaufszettel');
     expect(tester.widget<SwitchListTile>(chat).value, isTrue);

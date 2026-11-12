@@ -37,7 +37,7 @@ Quelle: letzte Kommentare der offenen Issues. Jeder Punkt schließt nur dann ein
 ## Android-Tablet (echt oder Emulator Tablet-Profil)
 - [ ] **#274 (B-25):** Drehen mit und ohne Rotationssperre, Multi-Window, Bildschirmtastatur (`adjustResize`: Klasse darf beim Tippen nicht wechseln), 200 % Schrift. Ab 1000 dp kein senkrechter Strich auf Heute, Einkauf und Familie (#309).
 - [ ] **#268 (TP-OAUTH-12):** Custom Tab auf frischem AVD oder nach Deinstallation (auf dem vorhandenen AVD ist FamilyNexus mit anderem Zertifikat installiert). Außerdem Geräte mit anderem oder ohne Standardbrowser.
-- [ ] **#254 E-16b Hintergrund:** Meldungen im Hintergrund schlagen fehl, siehe **#273** (Entscheidung a/b/c nötig, bevor ein Nachtest sinnvoll ist).
+- [ ] **#254 E-16b Hintergrund:** Meldungen im Hintergrund auf Mobilgeräten sind nicht zugesagt (**#273**, Entscheidung (a) vom 12.11.2026, Texte angepasst). Nachtest: Hinweistext in den Einstellungen lesen; auf echtem Android 15/16 und iPhone notieren, ob und nach wie vielen Sekunden im Hintergrund eine Meldung kommt (Ausbleiben ist kein Fehler).
 
 ## Neue Fixes: Sichtkontrolle am Gerät
 - [ ] **#317 (Testplan B-02):** Bei blockierten Benachrichtigungen zeigt „Heute“ die Karte „Berechtigung fehlt“ und „Erinnerungen“ nur einmal; dasselbe in der Erinnerungs-Übersicht (AppBar „Erinnerungen“). iPhone und signierter Mac; hell, dunkel, große Schrift. Linux und Windows: keine Karte (Berechtigung gilt dort immer als erteilt). *Lauf 24, Windows bestanden: keine Karte, „Erinnerungen“ genau einmal.* *Widget-Test und CI grün, PR #319.*
@@ -59,5 +59,5 @@ Quelle: letzte Kommentare der offenen Issues. Jeder Punkt schließt nur dann ein
 
 ## Rein manuell / Entscheidungen
 - [ ] **#15 Prüfkonto und Prüfanleitung** auf neuem Build nachtesten.
-- [ ] **#273:** Variante a, b oder c wählen.
+- [ ] **#273:** Entscheidung (a) getroffen (12.11.2026); offen nur der Gerätetest wie bei „#254 E-16b Hintergrund“ und die spätere Frage Push (Sprint 2).
 - [ ] **#119, #120, #121:** v1.3-Entwürfe; #121 ohne rechtliche Freigabe nicht angehen.

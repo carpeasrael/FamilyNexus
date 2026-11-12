@@ -156,7 +156,7 @@ Reminders are scheduled locally and contain no event title, location or
 note text, but a general notice such as "Event in …". For new chat
 messages and new items on the shopping list, the app shows a general notification
 ("New messages" or "New items on the shopping list") without sender, conversation or
-content, and only while the app is running; both notifications can be switched off in the
+content, and only while the app is open (on mobile devices they may not arrive in the background); both notifications can be switched off in the
 settings. The number of unread messages may appear on the app icon; it is calculated
 on the device from data already retrieved. FamilyNexus
 does not integrate its own remote push service and no chat push transmission via

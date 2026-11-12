@@ -507,7 +507,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsActivityHint =>
-      'Meldungen ohne Inhalt, nur solange die App läuft. Ist die App beendet, kommt keine Meldung (es gibt keinen Push-Dienst).';
+      'Meldungen ohne Inhalt, nur solange die App geöffnet ist. Auf Mobilgeräten können sie im Hintergrund und bei beendeter App ausbleiben (es gibt keinen Push-Dienst).';
 
   @override
   String get settingsActivityBadgeApple =>
@@ -1312,7 +1312,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy5Body =>
-      'Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“ oder „Der Termin beginnt jetzt“. Bei neuen Nachrichten und Einkaufseinträgen meldet die App nur „Neue Nachrichten“ bzw. „Neue Einträge auf dem Einkaufszettel“, ohne Absender oder Inhalt und nur, solange sie läuft; die Zahl ungelesener Nachrichten kann am App-Symbol erscheinen. Es gibt keinen Push-Dienst eines Dritten.';
+      'Erinnerungen sind lokale Benachrichtigungen. Sie zeigen nie Titel, Ort oder Notiz, nur „Termin in …“ oder „Der Termin beginnt jetzt“. Bei neuen Nachrichten und Einkaufseinträgen meldet die App nur „Neue Nachrichten“ bzw. „Neue Einträge auf dem Einkaufszettel“, ohne Absender oder Inhalt und nur, solange sie geöffnet ist (auf Mobilgeräten können sie im Hintergrund ausbleiben); die Zahl ungelesener Nachrichten kann am App-Symbol erscheinen. Es gibt keinen Push-Dienst eines Dritten.';
 
   @override
   String get privacy6Title => 'Berechtigungen';

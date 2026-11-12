@@ -33,10 +33,10 @@ void main() {
     'de': {
       'file': 'store/privacy/privacy-policy.de.md',
       'arb': 'lib/l10n/app_de.arb',
-      // Nur im Store-Text (die In-App-Fassung sagt „solange sie läuft“).
-      'store': ['solange die App läuft', 'abschalten'],
+      // Nur im Store-Text (die In-App-Fassung sagt „solange sie geöffnet ist“).
+      'store': ['solange die App geöffnet ist', 'abschalten'],
       // Muss in `privacy5Body` UND im Store-Abschnitt 6 stehen.
-      'shared': ['Neue Nachrichten', 'Einkaufszettel', 'ohne Absender', 'App-Symbol'],
+      'shared': ['Neue Nachrichten', 'Einkaufszettel', 'ohne Absender', 'App-Symbol', 'auf Mobilgeräten können sie im Hintergrund ausbleiben'],
       'cell': 'Benachrichtigungen',
       'row': 'Einkaufseinträge',
       'signout': '**Abmelden:**',
@@ -48,8 +48,8 @@ void main() {
     'en': {
       'file': 'store/privacy/privacy-policy.en.md',
       'arb': 'lib/l10n/app_en.arb',
-      'store': ['while the app is running', 'switched off'],
-      'shared': ['New messages', 'shopping list', 'without sender', 'app icon'],
+      'store': ['while the app is open', 'switched off'],
+      'shared': ['New messages', 'shopping list', 'without sender', 'app icon', 'on mobile devices they may not arrive in the background'],
       'cell': 'Notifications',
       'row': 'shopping items',
       'signout': '**Signing out:**',
