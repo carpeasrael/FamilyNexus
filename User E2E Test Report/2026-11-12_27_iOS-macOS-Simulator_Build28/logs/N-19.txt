@@ -1,0 +1,8 @@
+N-19/N-49 Zustand 20:57:53
+xcrun simctl spawn launchctl list | grep -i familynexus:
+(kein Treffer: kein Prozess)
+20:58:23 SEND shop: Ntf Aus Milch (G1 App beendet)
+20:58:39 SEND: Ntf Aus 1
+60s shot 20:59:24
+N-19: Erinnerung 'Termin in 5 Minuten' sichtbar ab 21:00:00 (Frame 21:00:00 bis 21:00:08), Soll 21:00:00; App beendet seit 20:57:53 (launchctl: kein Treffer)
+180s shot (Zentrale) 21:01:33

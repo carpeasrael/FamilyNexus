@@ -1,0 +1,5 @@
+N-80 2026-11-12 22:07:45
+pgrep -x FamilyNexus: leer
+pkill caffeinate: beendet (danach keine Prozesse)
+/Applications/FamilyNexus.app Version: 1.2.2 (nie gestartet, nicht angefasst)
+Test-App: Wegwerf-Build im Worktree, Worktree entfernt (git worktree list: nur main)

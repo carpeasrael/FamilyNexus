@@ -1,0 +1,3 @@
+N-23 terminate 21:09:21
+(kein Prozess)
+N-23: Banner ab 21:10:00 (Frame 21:10:00-21:10:07), Soll 21:10:00 (Zur Startzeit); App seit 21:09:21 beendet

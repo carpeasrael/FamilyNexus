@@ -1,0 +1,7 @@
+N-81 22:05:04
+fnt-1112-n1 available: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1112-i2 available: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+login N1 (nur HTTP-Code): 403
+login I2 (nur HTTP-Code): 403
+git status --short (Stand 22:07): nur ??-Einträge des Nutzers (Apple-Feedback/, Sprint/, vorhandene Berichtsordner, Testplan) plus neuer Berichtsordner; keine Änderungen an getrackten Dateien
+grep im Berichtsordner nach Passwort/Notfall-Schlüssel-Zuweisungen: leer (siehe N-80-Aufruf)

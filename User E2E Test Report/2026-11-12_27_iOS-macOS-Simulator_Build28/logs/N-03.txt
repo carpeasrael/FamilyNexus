@@ -1,0 +1,8 @@
+== N-03 20:04:51
+GET /_matrix/client/versions:
+HTTP 200
+{"versions":["r0.0.1","r0.1.0","r0.2.0","r0.3.0","r0.4.0","r0.5.0","r0.6.0","r0.
+fnt-1112-n1: {"available":true}
+fnt-1112-i2: {"available":true}
+Zugangsdatei: secure/Lauf_1112_G1.txt (außerhalb von Git, gitignored, chmod 600), Inhalt nicht protokolliert
+Server: matrix-synapse-3ues.srv1348446.hstgr.cloud (Projekt-Testserver, kein matrix.org)
