@@ -125,7 +125,7 @@ Vorbedingung: G1 = N1, G2 = I2 (Familie, Beitritt abgeschlossen, siehe Abschnitt
 
 ### D. Meldungen und Zahl am App-Symbol (#254 Teil B, E-88)
 
-Vorbedingung: Einstellungen → Benachrichtigungen: „Neue Chat-Nachrichten“ und „Neue Einträge auf dem Einkaufszettel“ an. G1 meldet sich so, dass die App **nicht** im sichtbaren Chat ist (anderer Tab oder Hintergrund). G2 sendet. Hinweis in den Einstellungen: „Meldungen ohne Inhalt, nur solange die App läuft. Ist die App beendet, kommt keine Meldung (es gibt keinen Push-Dienst).“
+Vorbedingung: Einstellungen → Benachrichtigungen: „Neue Chat-Nachrichten“ und „Neue Einträge auf dem Einkaufszettel“ an. G1 meldet sich so, dass die App **nicht** im sichtbaren Chat ist (anderer Tab oder Hintergrund). G2 sendet. Hinweis in den Einstellungen: „Meldungen ohne Inhalt, nur solange die App geöffnet ist. Auf Mobilgeräten können sie im Hintergrund und bei beendeter App ausbleiben (es gibt keinen Push-Dienst).“
 
 | ID | Pl. | Schritt | Erwartetes Ergebnis | Screenshot | Beob. | Erg. |
 |---|---|---|---|---|---|---|
@@ -136,7 +136,7 @@ Vorbedingung: Einstellungen → Benachrichtigungen: „Neue Chat-Nachrichten“ 
 | RT-D-05 | iOS, Mac, Win, Lin | Chat öffnen | Zahl am Symbol geht auf 0, Meldung wird zurückgezogen | `RT-D-05_<Pl>.png` | | |
 | RT-D-06 | iOS, Mac, And, AndT, Win, Lin | G2 trägt einen Artikel in den Einkauf ein, G1 steht auf dem Tab „Heute“ | Systemmeldung „Neue Einträge auf dem Einkaufszettel“ ohne Artikelnamen | `RT-D-06_<Pl>.png` | | |
 | RT-D-07 | iOS, Mac, And, AndT, Win, Lin | Schalter „Neue Chat-Nachrichten“ ausschalten, G2 sendet erneut | Keine Meldung, Zahl am Symbol bleibt 0 bzw. steigt nicht (je nach Plattform dokumentieren) | `RT-D-07_<Pl>.png` | | |
-| RT-D-08 | And, AndT | **App im Hintergrund** lassen (Home-Taste), G2 sendet | Meldung erscheint im Hintergrund. **Bekannter Befund #273** (Netz nach 5 s gesperrt, Meldungen im Hintergrund fehlen): Ergebnis genau festhalten, Abweichung als ⚠️/❌ mit Verweis auf #273 | `RT-D-08_<Pl>.png` | | |
+| RT-D-08 | And, AndT | **App im Hintergrund** lassen (Home-Taste), G2 sendet | Auf Android 15/16 ist **keine** Meldung im Hintergrund zu erwarten (#273: Netz nach 5 s gesperrt; Entscheidung (a), kein Fehler), sie erscheint beim Öffnen; Ergebnis genau festhalten (echtes Gerät, Android-Version, Sekunden bis zur Meldung), iPhone ebenso. Kommt die Meldung, ist das ein Gewinn, kein Befund | `RT-D-08_<Pl>.png` | | |
 | RT-D-09 | Web | Einstellungen im Browser | Keine Benachrichtigungsschalter bzw. kein Hinweis auf Systemmeldungen | `RT-D-09_Web.png` | | |
 
 ### E. Beitritt durch Moderator, Einladungslink v4 (#118, #115, E-78, E-79)
@@ -300,7 +300,7 @@ Für jeden Schritt gilt: Fenstergröße/Gerät notieren. Klassen: **compact** (B
 2. **Report:** Ordner `User E2E Test Report/<JJJJ-MM-TT>_<NN>_Release-1.2.2_Build<NN>/` mit `Testreport.md`, `Ergebnisse.tsv` (Schritt-ID, Ergebnis, Beobachtung), `screenshots/`, `logs/`. Eintrag in `User E2E Test Report/README.md`.
 3. **Freigabekriterien:**
    - Kein Schritt ❌ in A bis K und M, N.
-   - Alle ⚠️ sind begründet und mit Issue verlinkt (RT-D-08 verweist auf #273).
+   - Alle ⚠️ sind begründet und mit Issue verlinkt (RT-D-08: Ausbleiben im Hintergrund ist laut #273 erwartet, nur das Ergebnis festhalten).
    - Abschnitt L auf iPad (RT-L-01 bis RT-L-04) und mindestens einem Android-Tablet bestanden, sonst bleibt #274 offen.
    - Nicht durchgeführte Schritte (⏳) stehen mit Grund im Report; was ⏳ ist, gilt **nicht** als bestanden.
    - Pflichtteil (Abschnitt 12) grün (bis auf die dokumentierte Umgebungsausnahme).
