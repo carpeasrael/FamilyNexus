@@ -1,0 +1,20 @@
+== G1 simctl listapps
+    "de.inneso.familynexus" =     {
+        CFBundleIdentifier = "de.inneso.familynexus";
+        CFBundleShortVersionString = "1.2.3";
+        CFBundleVersion = 28;
+== G2 Mac Test-App
+1.2.3
+28
+de.inneso.familynexus.e2e
+Identifier=de.inneso.familynexus.e2e
+Signature=adhoc
+TeamIdentifier=not set
+== pgrep (vor Start)
+(pgrep -x FamilyNexus: leer, kein Prozess der Nutzer-App oder Test-App; erster Treffer war nur der tee-Prozess)
+== Nutzer-App
+1.2.2
+27.3
+2026-11-12 20:04:36 CET
+pgrep -x FamilyNexus => leer
+Mac-Test-App 20:06:03: Start per 'open -a' des Worktree-Builds; Systemdialog 'FamilyNexus möchte deine vertraulichen Informationen verwenden, die in flutter_secure_storage_service in deinem Schlüsselbund gesichert sind ... Passwort für den Schlüsselbund Anmeldung'. Passwort NICHT eingegeben, keine Taste gedrückt. Test-App danach per quit beendet.
