@@ -333,6 +333,17 @@ void main() {
       expect((s.c.completionFailed, s.c.completing, s.c.hasError, s.ready), (false, true, false, 1));
     });
 
+    test('zwei Fehlschläge hintereinander, dann Erfolg: der Zustand bleibt je Versuch wiederholbar', () async {
+      final s = await _setup();
+      s.readyError = const SetupSaveException();
+      await s.c.completeExisting();
+      await s.c.completeExisting();
+      expect((s.c.completionFailed, s.c.completing, s.c.busy, s.ready), (true, false, false, 0));
+      s.readyError = null;
+      await s.c.completeExisting();
+      expect((s.c.completionFailed, s.c.completing, s.c.hasError, s.ready), (false, true, false, 1));
+    });
+
     test('beim neuen Versuch ist der Fehlerzustand schon zurückgesetzt (kein Aufblitzen der Fehleransicht)', () async {
       final s = await _setup();
       s.readyError = const SetupSaveException();
