@@ -171,11 +171,16 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     final text = _ctrl.text.trim();
     if (text.isEmpty || _sending) return;
     final l = AppLocalizations.of(context);
+    // Stand beim Absenden (#410): `_ctrl` gehört allen Gesprächen und bleibt während des Sendens beschreibbar.
+    final sentText = _ctrl.text;
+    final sentReply = _replyTo;
     setState(() => _sending = true);
     try {
-      await g.sendMessage(text, replyToId: _replyTo?.id, threadId: _threadId);
-      _ctrl.clear();
-      setState(() => _replyTo = null);
+      await g.sendMessage(text, replyToId: sentReply?.id, threadId: _threadId);
+      if (!mounted) return;
+      // Nur der unveränderte, schon gesendete Stand wird geleert; Neues (weitergetippt, nach einem Wechsel) bleibt.
+      if (_ctrl.text == sentText) _ctrl.clear();
+      if (identical(_replyTo, sentReply)) setState(() => _replyTo = null);
     } catch (e) {
       _toast(errorText(l, e));
     } finally {
