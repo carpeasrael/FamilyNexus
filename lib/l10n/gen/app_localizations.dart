@@ -1001,7 +1001,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsActivityBadgeApple.
   ///
   /// In de, this message translates to:
-  /// **'Die Zahl am App-Symbol erlaubst du in den Systemeinstellungen unter Mitteilungen → FamilyNexus → Kennzeichen.'**
+  /// **'Die Zahl am App-Symbol erlaubst du in den Geräteeinstellungen unter Mitteilungen → FamilyNexus → Kennzeichen.'**
   String get settingsActivityBadgeApple;
 
   /// No description provided for @reminderChannelName.
@@ -1091,7 +1091,7 @@ abstract class AppLocalizations {
   /// No description provided for @remindersPermissionSystem.
   ///
   /// In de, this message translates to:
-  /// **'Benachrichtigungen sind in den Systemeinstellungen ausgeschaltet. Erlaube sie dort für FamilyNexus, sonst erscheinen keine Erinnerungen.'**
+  /// **'Benachrichtigungen sind in den Geräteeinstellungen ausgeschaltet. Erlaube sie dort für FamilyNexus, sonst erscheinen keine Erinnerungen.'**
   String get remindersPermissionSystem;
 
   /// No description provided for @remindersOpenSettings.
@@ -1151,7 +1151,7 @@ abstract class AppLocalizations {
   /// No description provided for @remindersFiresAt.
   ///
   /// In de, this message translates to:
-  /// **'erinnert {time}'**
+  /// **'Erinnerung: {time}'**
   String remindersFiresAt(String time);
 
   /// No description provided for @remindersPlanned.
@@ -2237,7 +2237,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy1Body.
   ///
   /// In de, this message translates to:
-  /// **'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Verantwortlich für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server); er steht bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.'**
+  /// **'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.'**
   String get privacy1Body;
 
   /// No description provided for @privacy2Title.
@@ -2411,7 +2411,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy9Body.
   ///
   /// In de, this message translates to:
-  /// **'Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App, dein Konto löschst du unter Einstellungen → Konto → „Konto löschen“; weitere Serverdaten beim Betreiber deines Servers.'**
+  /// **'Du kannst jederzeit Auskunft, Berichtigung und Löschung verlangen. Lokale Daten verwaltest du in dieser App, dein Konto löschst du unter Einstellungen → Konto → „Konto löschen“. Weitere Serverdaten verwaltet der Betreiber deines Servers.'**
   String get privacy9Body;
 
   /// No description provided for @familyRequestCheckValid.
@@ -4763,13 +4763,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsReportLocal.
   ///
   /// In de, this message translates to:
-  /// **'Protokoll: alle lokal gespeicherten Daten zeigen'**
+  /// **'Datenübersicht: alle lokal gespeicherten Daten zeigen'**
   String get settingsReportLocal;
 
   /// No description provided for @settingsReportOnline.
   ///
   /// In de, this message translates to:
-  /// **'Protokoll: alle online gespeicherten Daten zeigen'**
+  /// **'Datenübersicht: alle online gespeicherten Daten zeigen'**
   String get settingsReportOnline;
 
   /// No description provided for @reportLocalTitle.
@@ -4787,7 +4787,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportWarning.
   ///
   /// In de, this message translates to:
-  /// **'Das Protokoll zeigt deine Daten im Klartext. Beim Kopieren oder Speichern verlassen sie den verschlüsselten Speicher der App.'**
+  /// **'Die Übersicht zeigt deine Daten im Klartext. Beim Kopieren oder Speichern verlassen sie den verschlüsselten Speicher der App.'**
   String get reportWarning;
 
   /// No description provided for @reportCopy.
@@ -4799,7 +4799,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportCopied.
   ///
   /// In de, this message translates to:
-  /// **'Protokoll kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im Zweifel selbst.'**
+  /// **'Übersicht kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im Zweifel selbst.'**
   String get reportCopied;
 
   /// No description provided for @reportSave.
@@ -4811,7 +4811,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportSaved.
   ///
   /// In de, this message translates to:
-  /// **'Protokoll gespeichert.'**
+  /// **'Übersicht gespeichert.'**
   String get reportSaved;
 
   /// No description provided for @reportGenerated.

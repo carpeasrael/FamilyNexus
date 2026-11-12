@@ -167,7 +167,7 @@ Firebase Cloud Messaging oder Apple Push Notification Service ein.
 | Genaue Alarme und Neustart-Ereignisse unter Android | Erinnerungen zeitgerecht auslösen und nach einem Geräteneustart neu planen. |
 | Geräteauthentifizierung auf unterstützten Plattformen | Freigabe der optionalen App-Sperre. |
 | Systemdialoge für Dateien | Von dir ausgewählte Dateien einlesen oder von dir veranlasste Exporte speichern. |
-| Zwischenablage | Von dir ausgelöstes Kopieren, etwa von Einladungen, Datenprotokollen oder dem Notfall-Schlüssel. |
+| Zwischenablage | Von dir ausgelöstes Kopieren, etwa von Einladungen, Datenübersichten oder dem Notfall-Schlüssel. |
 
 Unter Windows, Linux und im Flatpak werden Erinnerungen und Meldungen über die laufende
 App ausgelöst; dafür fragt die App keine Berechtigung an. Die Web-App bietet keine Erinnerungen und Benachrichtigungen. Die App
@@ -177,26 +177,26 @@ keinen Kamerazugriff. Berechtigungen kannst du, soweit das System dies unterstü
 dort widerrufen; betroffene Funktionen stehen dann gegebenenfalls nicht mehr zur
 Verfügung.
 
-## 7. Schlüsselsicherung, Dateien und Datenprotokolle
+## 7. Schlüsselsicherung, Dateien und Datenübersichten
 
 Bei der Einrichtung wird eine verschlüsselte Matrix-Schlüsselsicherung eingerichtet.
 Sie dient der Wiederherstellung auf weiteren oder neuen Geräten. Der Anbieter
 speichert dabei verschlüsselte Schlüsseldaten. Bewahre deinen **Notfall-Schlüssel**
 sicher auf und gib ihn nicht an Supportstellen oder andere Personen weiter.
 
-Beim ausdrücklichen Speichern von Anhängen, Datenprotokollen oder des
+Beim ausdrücklichen Speichern von Anhängen, Datenübersichten oder des
 Notfall-Schlüssels entstehen **unverschlüsselte Dateien außerhalb der geschützten
 App-Datenbanken**. Der gewählte Ordner kann mit einem Cloudspeicher synchronisiert
 werden. Dann gelten zusätzlich dessen Zugriffs- und Datenschutzbedingungen.
 Ausgewählte Originaldateien bleiben an ihrem bisherigen Speicherort; beim
 Einlesen versucht die App, temporäre Auswahlkopien zu entfernen.
 
-Beim Kopieren des Notfall-Schlüssels oder eines Datenprotokolls versucht die App,
+Beim Kopieren des Notfall-Schlüssels oder einer Datenübersicht versucht die App,
 den entsprechenden Zwischenablageeintrag nach einer Minute zu entfernen. Hintergrundbeschränkungen
 und Zwischenablageverläufe können eine vollständige Entfernung verhindern.
 Andere Apps oder Systemdienste können kopierte Inhalte je nach Plattform verarbeiten.
 
-In den Einstellungen kannst du Protokolle der lokal bzw. online gespeicherten
+In den Einstellungen kannst du Übersichten der lokal bzw. online gespeicherten
 Daten anzeigen, kopieren oder speichern. Sie enthalten unter anderem Speicherorte,
 Kontoinformationen und Datenbestände, aber keine Schlüsselwerte oder Zugriffstoken.
 Sie können dennoch persönliche Angaben enthalten und sind keine vollständige

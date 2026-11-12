@@ -73,4 +73,15 @@ void main() {
       expect(text, isNot(contains('user name')), reason: f);
     }
   });
+
+  test('#326 Gruppe 6 E5: Datenschutzerklärung nennt die Datenansicht „Datenübersicht“ / „data overview“', () {
+    final de = readNormalized('store/privacy/privacy-policy.de.md');
+    final en = readNormalized('store/privacy/privacy-policy.en.md');
+    expect(de, isNot(contains('Datenprotokoll')));
+    expect(de, isNot(contains('Protokolle der lokal')));
+    expect(de, contains('## 7. Schlüsselsicherung, Dateien und Datenübersichten'));
+    expect(en, isNot(contains('data log')));
+    expect(en, isNot(contains('logs of the locally')));
+    expect(en, contains('## 7. Key backup, files and data overviews'));
+  });
 }

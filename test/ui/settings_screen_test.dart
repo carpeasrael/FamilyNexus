@@ -119,8 +119,8 @@ void main() {
     await tester.ensureVisible(find.text(label));
     expect(find.widgetWithText(ListTile, label), findsOneWidget, reason: 'Einstellungen → Über die App');
 
-    await tester.ensureVisible(find.text('Protokoll: alle lokal gespeicherten Daten zeigen'));
-    await tester.tap(find.text('Protokoll: alle lokal gespeicherten Daten zeigen'));
+    await tester.ensureVisible(find.text('Datenübersicht: alle lokal gespeicherten Daten zeigen'));
+    await tester.tap(find.text('Datenübersicht: alle lokal gespeicherten Daten zeigen'));
     await tester.pumpAndSettle();
     expect(find.textContaining('App-Version $appVersion ($appBuild)', findRichText: true), findsOneWidget, reason: 'Datenbericht');
   });
@@ -251,8 +251,8 @@ void main() {
     expect(find.text('Online beim Matrix-Anbieter'), findsOneWidget);
     expect(find.text('https://fake.test'), findsOneWidget);
 
-    await tester.ensureVisible(find.text('Protokoll: alle lokal gespeicherten Daten zeigen'));
-    await tester.tap(find.text('Protokoll: alle lokal gespeicherten Daten zeigen'));
+    await tester.ensureVisible(find.text('Datenübersicht: alle lokal gespeicherten Daten zeigen'));
+    await tester.tap(find.text('Datenübersicht: alle lokal gespeicherten Daten zeigen'));
     await tester.pumpAndSettle();
     expect(find.text('Lokal gespeicherte Daten'), findsOneWidget);
     final report = tester.widget<SelectableText>(find.byType(SelectableText)).data!;
@@ -271,7 +271,7 @@ void main() {
     expect(utf8.decode(files.contents[files.saved.single]!), report);
   });
 
-  testWidgets('Protokoll der online gespeicherten Daten: Konto, Geräte, Räume, Hinweis zur Verschlüsselung', (tester) async {
+  testWidgets('Datenübersicht der online gespeicherten Daten: Konto, Geräte, Räume, Hinweis zur Verschlüsselung', (tester) async {
     tester.view.physicalSize = const Size(900, 3600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -279,8 +279,8 @@ void main() {
     await tester.pumpWidget(FamilyNexusApp(services: app.services));
     await tester.pumpAndSettle();
     await openSettings(tester);
-    await tester.ensureVisible(find.text('Protokoll: alle online gespeicherten Daten zeigen'));
-    await tester.tap(find.text('Protokoll: alle online gespeicherten Daten zeigen'));
+    await tester.ensureVisible(find.text('Datenübersicht: alle online gespeicherten Daten zeigen'));
+    await tester.tap(find.text('Datenübersicht: alle online gespeicherten Daten zeigen'));
     await tester.pumpAndSettle();
     expect(find.text('Online gespeicherte Daten'), findsOneWidget);
     final report = tester.widget<SelectableText>(find.byType(SelectableText)).data!;
@@ -294,7 +294,7 @@ void main() {
     expect(report, contains('nur Ende-zu-Ende-verschlüsselt'));
   });
 
-  testWidgets('#97: Hinweis „in den Systemeinstellungen ausgeschaltet“ nutzt die Breite, Schaltfläche sichtbar', (tester) async {
+  testWidgets('#97: Hinweis „in den Geräteeinstellungen ausgeschaltet“ nutzt die Breite, Schaltfläche sichtbar', (tester) async {
     tester.view.physicalSize = const Size(393, 852);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -307,7 +307,7 @@ void main() {
     await app.services.reminders!.reschedule();
     await app.services.reminders!.requestPermission();
     await openSettings(tester);
-    final hint = find.textContaining('in den Systemeinstellungen ausgeschaltet');
+    final hint = find.textContaining('in den Geräteeinstellungen ausgeschaltet');
     await tester.scrollUntilVisible(hint, 300, scrollable: find.byType(Scrollable).first);
     await tester.pumpAndSettle();
     expect(hint, findsOneWidget);

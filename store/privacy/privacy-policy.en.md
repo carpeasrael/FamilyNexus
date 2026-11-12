@@ -168,7 +168,7 @@ Firebase Cloud Messaging or Apple Push Notification Service.
 | Exact alarms and reboot events on Android | Trigger reminders on time and reschedule them after a device restart. |
 | Device authentication on supported platforms | Approval of the optional app lock. |
 | System dialogs for files | Read in files you have selected or save exports you have initiated. |
-| Clipboard | Copying triggered by you, for example of invitations, data logs or the emergency key. |
+| Clipboard | Copying triggered by you, for example of invitations, data overviews or the emergency key. |
 
 On Windows, Linux and in Flatpak, reminders and notifications are triggered by the running
 app; the app asks for no permission for this. The web app offers no reminders and notifications. The app
@@ -177,26 +177,26 @@ QR code can be read with an external camera app; this does not give FamilyNexus
 camera access. You can revoke permissions there, as far as the system supports it;
 affected functions may then no longer be available.
 
-## 7. Key backup, files and data logs
+## 7. Key backup, files and data overviews
 
 During setup, an encrypted Matrix key backup is set up.
 It is used for restoration on additional or new devices. The provider
 stores encrypted key data in the process. Keep your **emergency key**
 safe and do not pass it on to support staff or other people.
 
-When you expressly save attachments, data logs or the
+When you expressly save attachments, data overviews or the
 emergency key, **unencrypted files are created outside the protected
 app databases**. The chosen folder may be synchronized with a cloud storage service.
 In that case its access and privacy terms additionally apply.
 Selected original files remain in their previous storage location; when
 reading them in, the app tries to remove temporary selection copies.
 
-When copying the emergency key or a data log, the app tries to
+When copying the emergency key or a data overview, the app tries to
 remove the corresponding clipboard entry after one minute. Background restrictions
 and clipboard histories may prevent complete removal.
 Other apps or system services may process copied content depending on the platform.
 
-In the settings you can display, copy or save logs of the locally or online
+In the settings you can display, copy or save overviews of the locally or online
 stored data. They contain, among other things, storage locations,
 account information and data holdings, but no key values or access tokens.
 They may nevertheless contain personal details and are not a complete

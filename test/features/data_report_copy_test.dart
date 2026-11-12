@@ -49,7 +49,7 @@ void main() {
     return (clipboard: () => clipboard, sensitive: sensitive);
   }
 
-  testWidgets('Protokoll wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert', (tester) async {
+  testWidgets('Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert', (tester) async {
     final app = await buildTestApp();
     final m = mock(tester, (_) async => null);
     await open(tester, app);
@@ -63,7 +63,7 @@ void main() {
 
     await tester.pump(const Duration(seconds: 61));
     await tester.pumpAndSettle();
-    expect(m.clipboard(), '', reason: 'Protokoll bleibt nicht in der Zwischenablage');
+    expect(m.clipboard(), '', reason: 'Übersicht bleibt nicht in der Zwischenablage');
   });
 
   testWidgets('Fehler im nativen Adapter: Rückfall auf die normale Zwischenablage, geleert wird trotzdem', (tester) async {
