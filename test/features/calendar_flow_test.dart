@@ -11,9 +11,21 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/shell_finders.dart';
 import '../support/fake_matrix.dart';
+import '../support/memory_event_store.dart';
 import '../support/test_app.dart';
 
 final DateTime _now = DateTime.utc(2026, 3, 20, 10); // 11:00 in Berlin
+
+/// Ablage, die auf Wunsch beim Schreiben scheitert (#409), wie ein voller oder gesperrter Speicher.
+class _FailingEventStore extends MemoryEventStore {
+  bool failing = false;
+
+  @override
+  Future<void> put(CalendarEvent event, {CalendarEvent? replaced, int? publishedVersion}) {
+    if (failing) throw StateError('Ablage nicht beschreibbar');
+    return super.put(event, replaced: replaced, publishedVersion: publishedVersion);
+  }
+}
 
 Future<TestApp> _app() => buildTestApp(clock: () => _now);
 
@@ -94,6 +106,30 @@ void main() {
       expect(app.server.log.where((e) => e.type == 'de.inneso.familynexus.event'), isEmpty);
       expect(app.server.log.where((e) => e.type == 'de.inneso.familynexus.private_event'), hasLength(1));
       expect(find.text('Privat'), findsWidgets);
+    });
+
+    testWidgets('#409: Scheitert die Ablage, zeigt der Editor eine Meldung und bleibt bedienbar', (tester) async {
+      final store = _FailingEventStore();
+      final app = await buildTestApp(clock: () => _now, eventStore: store);
+      await _start(tester, app, tab: 'Kalender');
+      await tester.tap(find.byTooltip('Neuer Termin'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.widgetWithText(TextFormField, 'Titel'), 'Elternabend');
+      store.failing = true;
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull, reason: 'keine unbehandelte Ausnahme aus dem Speichern-Knopf');
+      expect(find.text('Der Termin konnte nicht gespeichert werden.'), findsOneWidget);
+      expect(find.byType(EventEditorScreen), findsOneWidget, reason: 'Eingaben bleiben erhalten');
+      expect(await app.events.all(), isEmpty);
+
+      // Der Knopf ist wieder bedienbar; ein zweiter Versuch ohne Fehler speichert.
+      store.failing = false;
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      expect(find.byType(EventEditorScreen), findsNothing);
+      expect((await app.events.all()).single.title, 'Elternabend');
     });
 
     testWidgets('leerer Titel und Ende vor Beginn werden abgelehnt', (tester) async {
