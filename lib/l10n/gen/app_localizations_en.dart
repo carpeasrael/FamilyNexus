@@ -502,7 +502,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsActivityBadgeApple =>
-      'Allow the number on the app icon in System Settings under Notifications → FamilyNexus → Badges.';
+      'Allow the number on the app icon in device settings under Notifications → FamilyNexus → Badges.';
 
   @override
   String get reminderChannelName => 'Reminders';
@@ -578,7 +578,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remindersPermissionSystem =>
-      'Notifications are switched off in the system settings. Allow them there for FamilyNexus, otherwise no reminders appear.';
+      'Notifications are switched off in the device settings. Allow them there for FamilyNexus, otherwise no reminders appear.';
 
   @override
   String get remindersOpenSettings => 'Open settings';
@@ -623,7 +623,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String remindersFiresAt(String time) {
-    return 'reminds $time';
+    return 'Reminder: $time';
   }
 
   @override
@@ -1272,7 +1272,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy1Body =>
-      'FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. Responsible for processing on the server is the operator of the provider you chose (Matrix server); it is shown during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that have their own sign-in page (e.g. matrix.org) you enter these details directly on their page.';
+      'FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. The operator of the provider you chose (Matrix server) is responsible for processing on the server; you can see it during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that have their own sign-in page (e.g. matrix.org) you enter these details directly on their page.';
 
   @override
   String get privacy2Title => 'What data exists?';
@@ -1377,7 +1377,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy9Body =>
-      'You can request access, correction and deletion at any time. You manage local data in this app and delete your account under Settings → Account → “Delete account”; other server data with your server’s operator.';
+      'You can request access, correction and deletion at any time. You manage local data in this app and delete your account under Settings → Account → “Delete account”. Other server data is managed by your server’s operator.';
 
   @override
   String get familyRequestCheckValid => 'Valid invitation link';
@@ -2830,10 +2830,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Password-protected vault in browser storage (localStorage)';
 
   @override
-  String get settingsReportLocal => 'Report: show all locally stored data';
+  String get settingsReportLocal =>
+      'Data overview: show all locally stored data';
 
   @override
-  String get settingsReportOnline => 'Report: show all data stored online';
+  String get settingsReportOnline =>
+      'Data overview: show all data stored online';
 
   @override
   String get reportLocalTitle => 'Locally stored data';
@@ -2843,20 +2845,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportWarning =>
-      'The report shows your data in plain text. When you copy or save it, the data leaves the app’s encrypted storage.';
+      'The overview shows your data in plain text. When you copy or save it, the data leaves the app’s encrypted storage.';
 
   @override
   String get reportCopy => 'Copy';
 
   @override
   String get reportCopied =>
-      'Report copied. The app tries to clear the clipboard after one minute. If in doubt, clear it yourself.';
+      'Overview copied. The app tries to clear the clipboard after one minute. If in doubt, clear it yourself.';
 
   @override
   String get reportSave => 'Save as file';
 
   @override
-  String get reportSaved => 'Report saved.';
+  String get reportSaved => 'Overview saved.';
 
   @override
   String reportGenerated(String time, String version) {
