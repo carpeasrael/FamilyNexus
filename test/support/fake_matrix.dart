@@ -144,6 +144,9 @@ class FakeMatrixServer {
   /// Hält die Kontoanlage an, bis der Test fortsetzt.
   Completer<void>? registerGate;
 
+  /// Hält `sendMessage` an, bis der Test fortsetzt (#410: Eingabe während des Sendens).
+  Completer<void>? sendGate;
+
   bool hasAccount(String localpart) => _accounts.containsKey('@$localpart:$host');
 
   /// Test-Uhr (für Ablauf von Einladungslinks).
@@ -1273,6 +1276,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> sendMessage(String text, {String? replyToId, String threadId = ChatThread.familyId}) async {
     final room = _chatRoom(threadId);
     if (text.trim().isEmpty) throw const GatewayException(GatewayError.invalidInput);
+    await fake.sendGate?.future;
     fake.post(room, _userId!, 'm.room.message', <String, Object?>{
       'body': text,
       'reply_to': ?replyToId,
