@@ -371,7 +371,32 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (room == null) throw const GatewayException(GatewayError.notFound);
     if (room.membership[_userId] != MemberStatus.joined) throw const GatewayException(GatewayError.notAllowed);
     if (avatarAvailability != AvatarAvailability.settable) throw const GatewayException(GatewayError.notAllowed);
-    room.avatarState[_userId!] = AvatarPresets.content(preset);
+    final error = avatarError;
+    if (error != null) throw error;
+    final content = AvatarPresets.content(preset);
+    if (holdAvatarEcho) {
+      _heldAvatar = content;
+      return;
+    }
+    room.avatarState[_userId!] = content;
+    fake.bumpAvatars(room);
+    fake.notifyAll();
+  }
+
+  /// Test: `setMemberAvatar` scheitert mit diesem Fehler.
+  Object? avatarError;
+
+  /// Test: Die gesetzte Wahl erscheint erst mit [releaseAvatarEcho] im Zustand (wie das Sync-Echo des Servers).
+  bool holdAvatarEcho = false;
+  Map<String, Object?>? _heldAvatar;
+
+  /// Test: spielt die zurückgehaltene Wahl ein.
+  void releaseAvatarEcho() {
+    final room = familyRoom;
+    final held = _heldAvatar;
+    if (room == null || held == null) return;
+    _heldAvatar = null;
+    room.avatarState[_userId!] = held;
     fake.bumpAvatars(room);
     fake.notifyAll();
   }

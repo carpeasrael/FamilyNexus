@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../app/app_scope.dart';
+import '../../app/app_services.dart';
 import '../../domain/family.dart';
 import '../../ui/theme/tokens.dart';
 import '../presence/presence_view.dart';
@@ -41,7 +41,7 @@ class MemberAvatarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gateway = AppScope.maybeOf(context)?.gateway;
-    if (gateway == null) return _build(context, preset: null, letter: '?');
+    if (gateway == null) return AvatarFace(preset: null, letter: '?', size: size, colorIndex: colorIndex, online: online, ring: ring);
     return ListenableBuilder(
       listenable: gateway.avatarRevision,
       builder: (context, _) {
@@ -51,19 +51,45 @@ class MemberAvatarView extends StatelessWidget {
         final joined = family == null || member?.status == MemberStatus.joined;
         final preset = joined ? gateway.avatarOf(userId) : null;
         final name = member?.displayName ?? '';
-        return _build(context, preset: preset, letter: name.isEmpty ? '?' : _initial(name));
+        return AvatarFace(preset: preset, letter: name.isEmpty ? '?' : _initial(name), size: size, colorIndex: colorIndex, online: online, ring: ring);
       },
     );
   }
 
   static String _initial(String name) => name.characters.first.toUpperCase();
+}
 
-  Widget _build(BuildContext context, {required String? preset, required String letter}) {
+/// Personenfarbe (Palettenindex): lokal gespeicherte Farbe des Kalenders, sonst aus der Kennung abgeleitet.
+int personColorOf(AppServices? services, String userId) =>
+    services?.calendar?.colorIndexFor(userId) ?? AuroraTokens.personColorFallback(userId);
+
+/// Gezeichneter Avatar ohne Datenzugriff: der eingebaute Avatar [preset], sonst der Rückfall (Personenfarbe mit
+/// [letter] ab [MemberAvatarView.letterMinSize]). Dekorativ, siehe [MemberAvatarView].
+class AvatarFace extends StatelessWidget {
+  const AvatarFace({
+    super.key,
+    required this.preset,
+    required this.letter,
+    required this.size,
+    required this.colorIndex,
+    this.online,
+    this.ring = false,
+  });
+
+  final String? preset;
+  final String letter;
+  final double size;
+  final int colorIndex;
+  final bool? online;
+  final bool ring;
+
+  @override
+  Widget build(BuildContext context) {
     final person = AuroraTokens.personColors[colorIndex % AuroraTokens.personColors.length];
     final style = preset == null ? null : AvatarPresetsUi.styles[preset];
     final bg = style == null ? person : AvatarPresetsUi.background(style);
     final fg = AvatarPresetsUi.foregroundOn(bg);
-    final borderWidth = size >= letterMinSize ? 2.0 : 1.5;
+    final borderWidth = size >= MemberAvatarView.letterMinSize ? 2.0 : 1.5;
     Widget face = DecoratedBox(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
@@ -73,7 +99,7 @@ class MemberAvatarView extends StatelessWidget {
       child: Center(
         child: style != null
             ? Icon(style.icon, size: size * 0.6, color: fg)
-            : (size >= letterMinSize
+            : (size >= MemberAvatarView.letterMinSize
                 ? Text(letter, style: TextStyle(color: fg, fontSize: size * 0.5, fontWeight: FontWeight.w600, height: 1))
                 : null),
       ),

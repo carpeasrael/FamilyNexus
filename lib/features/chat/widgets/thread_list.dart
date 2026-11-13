@@ -89,12 +89,18 @@ class _ThreadRowTile extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(children: <Widget>[
+              // Einzelchat: Avatar mit Online-Punkt (#422); der Status steht zusätzlich als Text in der Zeile.
               SizedBox(
-                width: 28,
+                width: 40,
                 child: Center(
-                  child: thread.isFamily
-                      ? const Icon(Icons.groups_outlined, size: 24)
-                      : PresenceDot(online: presence?.status == PresenceStatus.online),
+                  child: peer == null
+                      ? const Icon(Icons.groups_outlined, size: 28)
+                      : MemberAvatarView(
+                          userId: peer,
+                          size: 40,
+                          colorIndex: personColorOf(services, peer),
+                          online: presence?.status == PresenceStatus.online,
+                        ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -151,6 +157,10 @@ class _ThreadHeader extends StatelessWidget {
       if (thread != null)
         Expanded(
           child: Row(children: <Widget>[
+            if (peer != null) ...<Widget>[
+              MemberAvatarView(userId: peer, size: 28, colorIndex: personColorOf(AppScope.maybeOf(context), peer)),
+              const SizedBox(width: 8),
+            ],
             Flexible(
               child: Semantics(
                 header: true,

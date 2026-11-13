@@ -6,6 +6,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
+import '../family/member_avatar_view.dart';
 import 'calendar_controller.dart';
 import 'formatting.dart';
 
@@ -61,7 +62,7 @@ class EventTile extends StatelessWidget {
                     ]),
                   if (!mine || theme != null)
                     Row(children: <Widget>[
-                      PersonDot(colorIndex: controller.colorIndexFor(e.ownerId)),
+                      MemberAvatarView(userId: e.ownerId, size: 16, colorIndex: controller.colorIndexFor(e.ownerId), ring: true),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(

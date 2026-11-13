@@ -4,6 +4,7 @@ import '../../domain/data_inventory.dart';
 import '../../domain/event_codec.dart';
 import '../../domain/event_theme_codec.dart';
 import '../../domain/family.dart';
+import '../../domain/member_avatars.dart';
 import '../../domain/reaction_codec.dart';
 import '../../domain/server.dart';
 import '../../domain/shopping.dart';
@@ -60,6 +61,7 @@ class DataReport {
       TaskCodec.listType => l.eventTypeTaskList,
       TaskCodec.logType => l.eventTypeTaskDone,
       EventThemeCodec.type => l.eventTypeEventTheme,
+      AvatarPresets.type => l.eventTypeAvatar,
       _ => null,
     };
     return label == null ? type : '$label ($type)';

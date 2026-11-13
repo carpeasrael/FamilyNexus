@@ -1,5 +1,6 @@
 import 'package:family_nexus/domain/data_inventory.dart';
 import 'package:family_nexus/domain/event_theme_codec.dart';
+import 'package:family_nexus/domain/member_avatars.dart';
 import 'package:family_nexus/domain/reaction_codec.dart';
 import 'package:family_nexus/features/settings/data_report.dart';
 import 'package:family_nexus/l10n/gen/app_localizations.dart';
@@ -31,7 +32,7 @@ void main() {
               joinedMembers: 2,
               invitedMembers: 0,
               cachedEvents: 3,
-              eventTypes: <String, int>{ReactionCodec.type: 2, 'm.reaction': 1, EventThemeCodec.type: 3},
+              eventTypes: <String, int>{ReactionCodec.type: 2, 'm.reaction': 1, EventThemeCodec.type: 3, AvatarPresets.type: 4},
               attachments: 0,
             ),
           ],
@@ -47,6 +48,11 @@ void main() {
   test('E-99: der Ereignistyp der Kalender-Themen hat ein eigenes Label (de und en)', () {
     expect(report('de'), contains('Kalender-Themen (${EventThemeCodec.type}): 3'));
     expect(report('en'), contains('Calendar themes (${EventThemeCodec.type}): 3'));
+  });
+
+  test('E-101: der Zustandstyp der Avatar-Wahl hat ein eigenes Label (de und en)', () {
+    expect(report('de'), contains('Avatar-Wahl (${AvatarPresets.type}): 4'));
+    expect(report('en'), contains('Avatar choice (${AvatarPresets.type}): 4'));
   });
 
   test('#261: lokales Protokoll nennt den eigenen Anzeigenamen, ohne Namen „nicht gesetzt“', () {

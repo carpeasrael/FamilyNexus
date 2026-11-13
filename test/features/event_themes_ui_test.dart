@@ -8,6 +8,7 @@ import 'package:family_nexus/domain/time_zones.dart';
 import 'package:family_nexus/features/calendar/calendar_controller.dart';
 import 'package:family_nexus/features/calendar/event_tile.dart';
 import 'package:family_nexus/features/calendar/themes_screen.dart';
+import 'package:family_nexus/features/family/member_avatar_view.dart';
 import 'package:family_nexus/l10n/gen/app_localizations.dart';
 import 'package:family_nexus/ui/theme/app_theme.dart';
 import 'package:family_nexus/ui/theme/tokens.dart';
@@ -186,7 +187,12 @@ void main() {
           return d is BoxDecoration && d.color == color;
         });
 
-    Finder dot(Color color) => find.byWidgetPredicate((w) => w is PersonDot && AuroraTokens.personColors[w.colorIndex] == color);
+    // Die Personenfarbe des Besitzers steht seit #422 als Ring am Avatar (früher als Punkt).
+    Finder dot(Color color) => find.byWidgetPredicate((w) => w is MemberAvatarView && w.ring && AuroraTokens.personColors[w.colorIndex] == color);
+    Finder ring(Color color) => find.descendant(
+          of: find.byType(MemberAvatarView),
+          matching: find.byWidgetPredicate((w) => w is DecoratedBox && w.decoration is BoxDecoration && (w.decoration as BoxDecoration).border?.top.color == color),
+        );
 
     _testUi('privat: blau, kein Thema im Label', (tester) async {
       final handle = tester.ensureSemantics();
@@ -212,7 +218,7 @@ void main() {
       handle.dispose();
     });
 
-    _testUi('geteilt mit Thema: Themenfarbe, Themenname als Text, Personenpunkt mit Name, Label "Thema Schule"', (tester) async {
+    _testUi('geteilt mit Thema: Themenfarbe, Themenname als Text, Avatar mit Ring und Name, Label "Thema Schule"', (tester) async {
       final handle = tester.ensureSemantics();
       final app = await buildTestApp(clock: () => _now);
       addTearDown(app.services.closeCalendar);
@@ -220,19 +226,20 @@ void main() {
       await pumpTile(tester, c, _event(owner: _ben, themeId: _schule, color: 5));
       expect(bar(_color(2)), findsOneWidget);
       expect(find.text('Schule'), findsOneWidget, reason: 'nie nur Farbe');
-      expect(dot(_color(c.colorIndexFor(_ben))), findsOneWidget, reason: 'Personenfarbe des Besitzers bleibt als Punkt');
+      expect(dot(_color(c.colorIndexFor(_ben))), findsOneWidget, reason: 'Personenfarbe des Besitzers bleibt als Ring am Avatar');
+      expect(ring(_color(c.colorIndexFor(_ben))), findsOneWidget, reason: 'der Ring wird auch gezeichnet');
       expect(find.textContaining('Von '), findsOneWidget, reason: 'Der Punkt steht immer mit Namen');
       expect(find.bySemanticsLabel(RegExp(r'Geteilt, Thema Schule')), findsOneWidget);
       handle.dispose();
     });
 
-    _testUi('eigener geteilter Termin mit Thema: Punkt mit "Von dir"', (tester) async {
+    _testUi('eigener geteilter Termin mit Thema: Avatar mit "Von dir"', (tester) async {
       final app = await buildTestApp(clock: () => _now);
       addTearDown(app.services.closeCalendar);
       final c = await _open(app, themes: [_theme(_schule, 'Schule', 2)]);
       await pumpTile(tester, c, _event(themeId: _schule));
       expect(find.text('Von dir'), findsOneWidget);
-      expect(find.byType(PersonDot), findsOneWidget);
+      expect(find.byType(MemberAvatarView), findsOneWidget);
     });
 
     _testUi('ohne Thema: alte Farbe; geteilter Altbestand in Himmelblau bleibt Himmelblau, Abzeichen "Geteilt" trägt die Unterscheidung', (tester) async {
@@ -242,7 +249,7 @@ void main() {
       final c = await _open(app);
       await pumpTile(tester, c, _event(color: 4));
       expect(bar(_color(4)), findsOneWidget);
-      expect(find.byType(PersonDot), findsNothing);
+      expect(find.byType(MemberAvatarView), findsNothing);
       await pumpTile(tester, c, _event(color: 3));
       expect(bar(_color(3)), findsOneWidget, reason: 'nicht umgefärbt');
       expect(find.text('Geteilt'), findsOneWidget, reason: 'Abzeichen mit Text, nie die Farbe allein');
