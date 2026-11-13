@@ -247,7 +247,7 @@ Chat verlassen, App im Hintergrund → SendPresence(unavailable)
 | Status | Liste nach Kontakten |
 | Einstellungen → WhatsApp | Verbindung, Lesebestätigungen, Online-Status, Verlauf, Trennen und Löschen, letzter Telefon-Kontakt |
 
-- `_ThreadBar` (Chips) trägt keine hunderte Gespräche. WhatsApp bekommt eine Liste mit Paginierung und Lazy Loading.
+- `_ThreadBar` (Chips) trägt keine hunderte Gespräche. WhatsApp bekommt eine Liste mit Paginierung und Lazy Loading. *Hinweis: Chip-Leiste durch Liste ersetzt (E-100, #423); Familien- und Einzelchats haben seitdem eine eigene Gesprächsliste ohne Paginierung, die WhatsApp-Liste bleibt davon getrennt.*
 - `features/whatsapp` nutzt eigene ARB-Dateien mit eigenem `gen-l10n`-Lauf. Texte sind deutsch und englisch vollständig.
 - QR über die vorhandene Anzeige (`qr`), mit rotierenden Codes aus `GetQRChannel` und klarem Zustand bei Zeitablauf.
 - `FLAG_SECURE` schützt den QR-Code unter Android. Unter Linux gilt SA-6.
