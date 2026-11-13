@@ -79,8 +79,14 @@ void main() {
     }
     await shot('2-kalender');
     await tab('Chat');
+    // Der Chat-Tab beginnt mit der Gesprächsliste (#423): „3-chat“ zeigt weiter den Familienchat, „4-einzelchat“
+    // danach das Gespräch mit Ben (über den Zurück-Pfeil und seine Zeile).
+    await tester.tap(find.byKey(const ValueKey<String>('thread-family')));
+    await tester.pumpAndSettle();
     await shot('3-chat');
-    await tester.tap(find.widgetWithText(ChoiceChip, 'Ben'));
+    await tester.tap(find.byTooltip(en ? 'Back to conversations' : 'Zurück zu den Gesprächen'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Ben'));
     await tester.pumpAndSettle();
     await shot('4-einzelchat');
     await tab(en ? 'Shopping' : 'Einkauf');
