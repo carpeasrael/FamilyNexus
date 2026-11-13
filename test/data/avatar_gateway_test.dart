@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart' show GatewayError, GatewayException;
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/server_probe.dart';
+import 'package:family_nexus/domain/family.dart' show MemberStatus, Role;
 import 'package:family_nexus/domain/member_avatars.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -43,7 +44,7 @@ Map<String, Object?> _state(String type, String key, Map<String, Object?> conten
 Map<String, Object?> _member(String user, String name) =>
     _state('m.room.member', user, <String, Object?>{'membership': 'join', 'displayname': name}, sender: user);
 
-Map<String, Object?> _levels({int me = 0, bool permitted = false, int stateDefault = 50}) => <String, Object?>{
+Map<String, Object?> _levels({int me = 0, bool permitted = false, int stateDefault = 50, int powerLevelsNeeded = 50}) => <String, Object?>{
       'users': <String, int>{_me: me, if (me < 100) _ben: 100},
       'users_default': 0,
       'state_default': stateDefault,
@@ -51,7 +52,7 @@ Map<String, Object?> _levels({int me = 0, bool permitted = false, int stateDefau
       'invite': 50,
       'kick': 50,
       'events': <String, int>{
-        'm.room.power_levels': 50,
+        'm.room.power_levels': powerLevelsNeeded,
         'm.room.name': 50,
         if (permitted) _type: 0,
       },
@@ -81,11 +82,17 @@ Map<String, Object?> _syncOf(List<Object?> states, {bool family = true}) => <Str
         },
     };
 
-List<Object?> _baseState({int me = 0, bool permitted = false, int stateDefault = 50, List<Object?> avatars = const <Object?>[]}) =>
+List<Object?> _baseState({
+  int me = 0,
+  bool permitted = false,
+  int stateDefault = 50,
+  int powerLevelsNeeded = 50,
+  List<Object?> avatars = const <Object?>[],
+}) =>
     <Object?>[
       _state('m.room.create', '', <String, Object?>{'room_version': '10', 'creator': _ben}, sender: _ben),
       _state('m.room.encryption', '', <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2'}),
-      _state('m.room.power_levels', '', _levels(me: me, permitted: permitted, stateDefault: stateDefault)),
+      _state('m.room.power_levels', '', _levels(me: me, permitted: permitted, stateDefault: stateDefault, powerLevelsNeeded: powerLevelsNeeded)),
       _member(_me, 'Ich'),
       _member(_ben, 'Ben'),
       _member(_eva, 'Eva'),
@@ -259,6 +266,13 @@ void main() {
       expect(g.avatarOf('ben'), isNull);
     });
 
+    test('Schlüssel ohne gültige Matrix-ID, Absender gleich Schlüssel: null', () async {
+      final hs = await _hsWith(_baseState(avatars: <Object?>[_avatar('ben', 'p03'), _avatar(_ben, 'p04')]));
+      final g = await _loggedIn(hs, dir);
+      expect(g.avatarOf(_ben), 'p04');
+      expect(g.avatarOf('ben'), isNull, reason: 'Eintrag liegt vor, aber die Kennung ist keine Matrix-ID');
+    });
+
     test('500 Müllschlüssel (auch mit fremder Matrix-ID) verdrängen keinen echten Eintrag', () async {
       final junk = <Object?>[
         for (var i = 0; i < 500; i++) _avatar('@junk$i:hs.example', 'p01', sender: _eva),
@@ -346,6 +360,22 @@ void main() {
       expect(hs.avatarPuts, isEmpty);
     });
 
+    test('Person nicht mehr beigetreten: notAllowed und nichts wird gesendet', () async {
+      final hs = await _hsWith(_baseState(permitted: true));
+      final g = await _loggedIn(hs, dir);
+      expect(g.avatarAvailability, AvatarAvailability.settable);
+      await _sync(g, <Object?>[
+        _state('m.room.member', _me, <String, Object?>{'membership': 'leave'}, sender: _ben),
+      ]);
+      await _until(() => g.family?.member(_me)?.status != MemberStatus.joined, what: 'nicht mehr beigetreten');
+      expect(g.avatarAvailability, AvatarAvailability.settable, reason: 'die Freigabe allein genügt nicht');
+      await expectLater(
+        g.setMemberAvatar('p02'),
+        throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.notAllowed)),
+      );
+      expect(hs.avatarPuts, isEmpty);
+    });
+
     test('Moderator (50) kann immer setzen, auch ohne Freigabe', () async {
       final hs = await _hsWith(_baseState(me: 50));
       final g = await _loggedIn(hs, dir);
@@ -374,6 +404,35 @@ void main() {
     test('Nicht-Moderator tut nichts: weder Lesen noch Schreiben', () async {
       final hs = await _hsWith(_baseState());
       final g = await _loggedIn(hs, dir);
+      await g.debugRunAvatarPermission();
+      expect(hs.levelReads, isEmpty);
+      expect(hs.levelPuts, isEmpty);
+    });
+
+    test('Rolle Mitglied, aber Power-Levels änderbar: nichts (nur die Moderator-Bedingung verhindert den Lauf)', () async {
+      final hs = await _hsWith(_baseState(powerLevelsNeeded: 0));
+      final g = await _loggedIn(hs, dir);
+      expect(g.family!.myRole, Role.member);
+      await g.debugRunAvatarPermission();
+      expect(hs.levelReads, isEmpty);
+      expect(hs.levelPuts, isEmpty);
+    });
+
+    test('Moderator ohne Recht, Power-Levels zu ändern: weder Lesen noch Schreiben', () async {
+      final hs = await _hsWith(_baseState(me: 50, powerLevelsNeeded: 100));
+      final g = await _loggedIn(hs, dir);
+      expect(g.family!.myRole, Role.moderator);
+      await g.debugRunAvatarPermission();
+      expect(hs.levelReads, isEmpty);
+      expect(hs.levelPuts, isEmpty);
+    });
+
+    test('Ersteller ohne gespeicherte Power-Levels (Rolle Moderator, Änderung erlaubt): nichts', () async {
+      final states = _baseState()..removeWhere((e) => (e! as Map)['type'] == 'm.room.power_levels');
+      states[0] = _state('m.room.create', '', <String, Object?>{'room_version': '10', 'creator': _me}, sender: _me);
+      final hs = await _hsWith(states);
+      final g = await _loggedIn(hs, dir);
+      expect(g.family!.myRole, Role.moderator, reason: 'Voraussetzung: nur die fehlenden Power-Levels verhindern den Lauf');
       await g.debugRunAvatarPermission();
       expect(hs.levelReads, isEmpty);
       expect(hs.levelPuts, isEmpty);
