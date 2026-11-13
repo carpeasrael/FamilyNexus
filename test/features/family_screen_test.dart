@@ -1,9 +1,12 @@
 import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/app/app_scope.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/platform/mail_launcher.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
+import 'package:family_nexus/features/family/family_screen.dart';
 import 'package:family_nexus/l10n/gen/app_localizations.dart';
+import 'package:family_nexus/ui/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -378,5 +381,47 @@ void main() {
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     expect(app.gateway.family!.name, 'Neue Familie');
+  });
+
+  testWidgets('E-99: Moderator sieht den Eintrag „Kalender-Themen“ und öffnet den Themenbildschirm', (tester) async {
+    final app = await buildTestApp();
+    await _openFamily(tester, app);
+    expect(find.text('Kalender-Themen'), findsOneWidget);
+    await tester.ensureVisible(find.text('Kalender-Themen'));
+    await tester.tap(find.text('Kalender-Themen'));
+    await tester.pumpAndSettle();
+    expect(find.text('Thema anlegen'), findsOneWidget);
+    expect(find.text('Noch keine Themen. Lege das erste an.'), findsOneWidget);
+  });
+
+  testWidgets('E-99: Mitglied sieht den Eintrag „Kalender-Themen“ nicht', (tester) async {
+    final app = await buildTestApp();
+    final room = app.gateway.familyRoom!;
+    room.power['@anna:fake.test'] = 0;
+    room.membership['@ben:fake.test'] = MemberStatus.joined;
+    room.power['@ben:fake.test'] = 50;
+    await _openFamily(tester, app);
+    expect(find.text('Nur Moderatoren verwalten die Familie.'), findsOneWidget);
+    expect(find.text('Kalender-Themen'), findsNothing);
+    expect(find.byIcon(Icons.palette_outlined), findsNothing);
+  });
+
+  testWidgets('E-99: ohne Kalender-Controller ist der Eintrag ausgeblendet, nicht deaktiviert', (tester) async {
+    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final app = await buildTestApp();
+    expect(app.services.calendar, isNull, reason: 'der Kalender wurde nicht geöffnet');
+    await tester.pumpWidget(MaterialApp(
+      locale: const Locale('de'),
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      theme: buildTheme(Brightness.light),
+      home: AppScope(services: app.services, child: const Scaffold(body: FamilyScreen())),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('Mitglied einladen'), findsOneWidget, reason: 'Kontrolle: Moderator, Verwaltung sichtbar');
+    expect(find.text('Kalender-Themen'), findsNothing);
+    expect(find.byIcon(Icons.palette_outlined), findsNothing);
   });
 }

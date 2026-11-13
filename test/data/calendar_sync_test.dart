@@ -2,6 +2,8 @@ import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/event_codec.dart';
+import 'package:family_nexus/domain/event_theme_codec.dart';
+import 'package:family_nexus/domain/event_themes.dart';
 import 'package:family_nexus/domain/time_zones.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -466,6 +468,22 @@ void main() {
       await anna.sync.idle();
       expect(await anna.store.all(), isEmpty);
     });
+  });
+
+  test('E-99: ein Themen-Signal gehört EventThemeSync; die Kalender-Synchronisation ignoriert es ohne Fehler', () async {
+    final before = anna.sync.rejected;
+    final theme = EventTheme(
+      id: '00000000-0000-4000-8000-0000000000a1',
+      name: 'Schule',
+      colorIndex: 2,
+      by: anna.userId,
+      updatedAt: DateTime.utc(2026, 10, 21),
+    );
+    anna.gateway.injectSignal(EventThemeSignal(anna.userId, DateTime.utc(2026), EventThemeCodec.encode(theme)));
+    anna.gateway.injectSignal(EventThemeSignal(anna.userId, DateTime.utc(2026), const <String, Object?>{'müll': 1}));
+    await anna.sync.idle();
+    expect(anna.sync.rejected, before, reason: 'weder angenommen noch als ungültiger Termin gezählt');
+    expect(await anna.store.all(), isEmpty);
   });
 }
 

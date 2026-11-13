@@ -5,6 +5,8 @@ import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_service.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/event_codec.dart';
+import 'package:family_nexus/domain/event_theme_codec.dart';
+import 'package:family_nexus/domain/event_themes.dart';
 import 'package:family_nexus/domain/shopping.dart';
 import 'package:family_nexus/domain/tasks.dart';
 import 'package:family_nexus/domain/time_zones.dart';
@@ -12,6 +14,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/memory_event_store.dart';
+import '../support/memory_event_theme_store.dart';
 import '../support/memory_shopping_store.dart';
 import '../support/memory_task_store.dart';
 import '../support/test_app.dart';
@@ -61,6 +64,16 @@ class _HoldingTasks extends MemoryTaskStore {
   }
 }
 
+class _HoldingThemes extends MemoryEventThemeStore {
+  final _Hold hold = _Hold();
+
+  @override
+  Future<EventTheme?> get(String id) async {
+    await hold.pass();
+    return super.get(id);
+  }
+}
+
 /// #140: `AppServices` öffnet die Dienste für genau eine Familie, beansprucht die lokalen Daten vor dem Aufbau und lässt
 /// einen veralteten Öffnungslauf nichts mehr starten. Ein hängender Lauf hält keinen neuen auf (#153).
 void main() {
@@ -87,6 +100,7 @@ void main() {
     MemoryEventStore? events,
     MemoryShoppingStore? shopping,
     MemoryTaskStore? tasks,
+    MemoryEventThemeStore? themes,
   }) async {
     final app = await buildTestApp(
       beforeCalendarBuild: beforeCalendarBuild,
@@ -96,6 +110,7 @@ void main() {
       eventStore: events,
       shoppingItems: shopping,
       taskItems: tasks,
+      themeItems: themes,
     );
     roomA = app.gateway.familyRoom!.id;
     roomB = app.server.addFamilyRoom('Familie B', _anna).id;
@@ -462,6 +477,47 @@ void main() {
       await run(app, store.hold, () => app.gateway.injectSignal(RsvpSignal('@ben:fake.test', at, EventCodec.encodeRsvp(e.id, RsvpStatus.accepted, at))));
       expect(log, <String>['Anspruch', 'Anspruch']);
       expect(atClaim, <String, RsvpStatus>{'@ben:fake.test': RsvpStatus.accepted}, reason: 'der Nachzügler ist vor dem Löschen fertig');
+    });
+
+    test('Kalender-Themen (E-99): Anspruch und Aufbau laufen erst nach dem Durchlauf der Themen-Warteschlange; kein Thema der alten Familie bleibt', () async {
+      final store = _HoldingThemes();
+      List<EventTheme>? atClaim;
+      final claims = <String>[];
+      final app = await make(
+        themes: store,
+        claim: (o) async {
+          claims.add(o);
+          // Wie `AppServices.claimFamilyData`: Der Anspruch einer anderen Familie leert die Ablage.
+          if (claims.length == 2) {
+            atClaim = await store.all();
+            await store.wipe();
+          }
+        },
+      );
+      final theme = EventTheme(
+        id: '00000000-0000-4000-8000-0000000000e1',
+        name: 'Schule',
+        colorIndex: 2,
+        by: _anna,
+        updatedAt: at,
+      );
+      await app.services.openCalendar();
+      store.hold.gate = Completer<void>();
+      app.gateway.injectSignal(EventThemeSignal(_anna, at, EventThemeCodec.encode(theme)));
+      await store.hold.entered.future;
+      app.services.closeCalendar();
+      app.gateway.attachFamilyRoom(roomB);
+      final open = app.services.openCalendar();
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(app.calendarRooms, hasLength(1), reason: 'der Aufbau wartet auf die Themen-Warteschlange der alten Familie');
+      expect(claims, hasLength(1));
+      final gate = store.hold.gate!;
+      store.hold.gate = null;
+      gate.complete();
+      await open;
+      expect(app.calendarRooms, <String>[roomA, roomB]);
+      expect(atClaim?.map((t) => t.id), [theme.id], reason: 'der Nachzügler ist vor dem Leeren fertig');
+      expect(await store.all(), isEmpty, reason: 'nach dem Wechsel liegt kein Thema der alten Familie im Bestand');
     });
 
     test('Einkauf: Aufbau erst nach dem Durchlauf der alten Warteschlange', () async {

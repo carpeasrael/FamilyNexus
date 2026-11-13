@@ -26,6 +26,7 @@ class EventThemePeer {
     String? familyRoomId,
     Set<String> moderators = const <String>{'@anna:fake.test'},
     MemoryEventThemeStore? store,
+    bool Function(FakeMatrixGateway gateway, String userId)? isModerator,
   }) async {
     final gw = server.newDevice();
     await gw.login(server: ServerUrl.tryParse(server.host)!, username: user, password: password);
@@ -34,7 +35,7 @@ class EventThemePeer {
     final svc = EventThemeService(
       store: themeStore,
       myUserId: gw.userId!,
-      isModerator: moderators.contains,
+      isModerator: isModerator == null ? moderators.contains : (id) => isModerator(gw, id),
       // Gleiche Uhr wie das Ereigniswesen des Fake-Servers.
       clock: () => server.now(),
       idGenerator: () => '00000000-0000-4000-8000-${(++_ids).toString().padLeft(12, '1')}',

@@ -1,4 +1,5 @@
 import 'package:family_nexus/domain/data_inventory.dart';
+import 'package:family_nexus/domain/event_theme_codec.dart';
 import 'package:family_nexus/domain/reaction_codec.dart';
 import 'package:family_nexus/features/settings/data_report.dart';
 import 'package:family_nexus/l10n/gen/app_localizations.dart';
@@ -30,7 +31,7 @@ void main() {
               joinedMembers: 2,
               invitedMembers: 0,
               cachedEvents: 3,
-              eventTypes: <String, int>{ReactionCodec.type: 2, 'm.reaction': 1},
+              eventTypes: <String, int>{ReactionCodec.type: 2, 'm.reaction': 1, EventThemeCodec.type: 3},
               attachments: 0,
             ),
           ],
@@ -41,6 +42,11 @@ void main() {
     expect(report('de'), contains('Reaktionen (${ReactionCodec.type}): 2'));
     expect(report('de'), contains('Reaktionen (m.reaction): 1'));
     expect(report('en'), contains('Reactions (${ReactionCodec.type}): 2'));
+  });
+
+  test('E-99: der Ereignistyp der Kalender-Themen hat ein eigenes Label (de und en)', () {
+    expect(report('de'), contains('Kalender-Themen (${EventThemeCodec.type}): 3'));
+    expect(report('en'), contains('Calendar themes (${EventThemeCodec.type}): 3'));
   });
 
   test('#261: lokales Protokoll nennt den eigenen Anzeigenamen, ohne Namen „nicht gesetzt“', () {
