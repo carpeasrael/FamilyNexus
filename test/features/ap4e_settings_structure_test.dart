@@ -1,4 +1,5 @@
 import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/app/app_version.dart';
 import 'package:family_nexus/features/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -81,7 +82,7 @@ const List<String> _expectedSettings = <String>[
   'L=Einführung erneut ansehen button tap',
   'L=App teilen | Kopiert den Link zum Store-Eintrag, damit du ihn weitergeben kannst. Es werden keine Familiendaten geteilt. button tap',
   'L=App bewerten | Öffnet den Eintrag im Play Store. button tap',
-  'L=Version 1.2.3 (28)',
+  'L=Version $appVersion ($appBuild)',
   'L=Keine Telemetrie, keine Werbung, keine Analyse.',
   'L=Lizenz: AGPL-3.0-or-later',
   'L=Zurück T=Zurück button tap',
