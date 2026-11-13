@@ -23,6 +23,10 @@ Future<void> _tab(WidgetTester tester, String label) async {
   await tester.pumpAndSettle();
 }
 
+/// Gesprächsliste (#423): Zeile des Gesprächs [id] und Zurück-Pfeil der Kopfzeile.
+Finder _row(String id) => find.byKey(ValueKey<String>('thread-$id'));
+Finder get _back => find.byTooltip('Zurück zu den Gesprächen');
+
 void main() {
   group('Gateway (Fake): Einzelchats', () {
     test('nur mit beigetretenen Familienmitgliedern, ohne Doppel', () async {
@@ -86,19 +90,45 @@ void main() {
   });
 
   group('Oberfläche', () {
-    testWidgets('ohne Einzelchats keine Gesprächsleiste; mit Ben erscheint sie', (tester) async {
+    testWidgets('ohne Einzelchats kein Kopf; kommt Ben dazu, bleibt der Familienchat mit Pfeil, die Liste folgt nach Zurück', (tester) async {
       final app = await buildTestApp();
       await tester.pumpWidget(FamilyNexusApp(services: app.services));
       await tester.pumpAndSettle();
       await _tab(tester, 'Chat');
-      expect(find.byType(ChoiceChip), findsNothing);
+      expect(_back, findsNothing);
+      expect(find.text('Gespräche'), findsNothing);
+      expect(find.byType(TextField), findsOneWidget, reason: 'nur der Familienchat, direkt der Chat');
       final ben = await _joinBen(app);
-      await app.gateway.startDirectChat(ben.userId!);
+      final id = await app.gateway.startDirectChat(ben.userId!);
       app.server.notifyAll();
       await tester.pumpAndSettle();
-      expect(find.byType(ChoiceChip), findsNWidgets(2));
-      expect(find.widgetWithText(ChoiceChip, 'Familie Test'), findsOneWidget);
-      expect(find.widgetWithText(ChoiceChip, 'Ben'), findsOneWidget);
+      // Wer den Familienchat sieht, wird nicht herausgerissen (Pinnen, E-100).
+      expect(_back, findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
+      expect(_row(ChatThread.familyId), findsNothing);
+      await tester.tap(_back);
+      await tester.pumpAndSettle();
+      expect(find.text('Gespräche'), findsOneWidget);
+      expect(_row(ChatThread.familyId), findsOneWidget);
+      expect(_row(id), findsOneWidget);
+      expect(find.descendant(of: _row(id), matching: find.text('Ben')), findsOneWidget);
+      expect(find.descendant(of: _row(ChatThread.familyId), matching: find.text('Familie Test')), findsOneWidget);
+      expect(find.byType(TextField), findsNothing, reason: 'auf der Liste kein Eingabefeld');
+    });
+
+    testWidgets('ist Ben schon da, beginnt der Chat-Tab mit der Liste', (tester) async {
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      final id = await app.gateway.startDirectChat(ben.userId!);
+      await tester.pumpWidget(FamilyNexusApp(services: app.services));
+      await tester.pumpAndSettle();
+      await _tab(tester, 'Chat');
+      expect(find.text('Gespräche'), findsOneWidget);
+      expect(_row(ChatThread.familyId), findsOneWidget);
+      expect(_row(id), findsOneWidget);
+      expect(_back, findsNothing);
+      expect(find.byType(TextField), findsNothing);
+      expect(find.byType(ChoiceChip), findsNothing, reason: 'keine Chip-Leiste mehr');
     });
 
     testWidgets('Schreiben im Einzelchat landet nur dort; Hinweis nennt das Gegenüber', (tester) async {
@@ -108,7 +138,7 @@ void main() {
       await tester.pumpWidget(FamilyNexusApp(services: app.services));
       await tester.pumpAndSettle();
       await _tab(tester, 'Chat');
-      await tester.tap(find.widgetWithText(ChoiceChip, 'Ben'));
+      await tester.tap(_row(id));
       await tester.pumpAndSettle();
       expect(find.text('Nur zwischen dir und Ben, Ende-zu-Ende-verschlüsselt'), findsOneWidget);
       await tester.enterText(find.byType(TextField), 'Hallo Ben');
@@ -120,7 +150,7 @@ void main() {
       expect(ben.messagesIn(id).single.body, 'Hallo Ben');
     });
 
-    testWidgets('Ungelesene Nachrichten werden in der Leiste gezeigt und beim Öffnen gelesen', (tester) async {
+    testWidgets('Ungelesene Nachrichten werden in der Liste gezeigt und beim Öffnen gelesen', (tester) async {
       final app = await buildTestApp();
       final ben = await _joinBen(app);
       final id = await ben.startDirectChat(app.gateway.userId!);
@@ -128,8 +158,10 @@ void main() {
       await tester.pumpWidget(FamilyNexusApp(services: app.services));
       await tester.pumpAndSettle();
       await _tab(tester, 'Chat');
-      expect(app.gateway.unreadIn(id), 1);
-      await tester.tap(find.widgetWithText(ChoiceChip, 'Ben'));
+      expect(app.gateway.unreadIn(id), 1, reason: 'die Liste markiert nichts als gelesen');
+      expect(find.descendant(of: _row(id), matching: find.text('1')), findsOneWidget, reason: 'Zähler an der Zeile');
+      expect(find.descendant(of: _row(id), matching: find.text('Hast du Zeit?')), findsOneWidget, reason: 'Vorschau');
+      await tester.tap(_row(id));
       await tester.pumpAndSettle();
       expect(find.text('Hast du Zeit?'), findsOneWidget);
       expect(app.gateway.unreadIn(id), 0);
@@ -153,15 +185,17 @@ void main() {
     testWidgets('verschwindet das Gespräch, geht es zurück zum Familienchat', (tester) async {
       final app = await buildTestApp();
       final ben = await _joinBen(app);
-      await app.gateway.startDirectChat(ben.userId!);
+      final id = await app.gateway.startDirectChat(ben.userId!);
       await tester.pumpWidget(FamilyNexusApp(services: app.services));
       await tester.pumpAndSettle();
       await _tab(tester, 'Chat');
-      await tester.tap(find.widgetWithText(ChoiceChip, 'Ben'));
+      await tester.tap(_row(id));
       await tester.pumpAndSettle();
       await app.gateway.removeMember(ben.userId!);
       await tester.pumpAndSettle();
-      expect(find.byType(ChoiceChip), findsNothing);
+      expect(_row(id), findsNothing);
+      expect(_row(ChatThread.familyId), findsNothing, reason: 'der Familienchat, nicht die Liste');
+      expect(_back, findsNothing, reason: 'nur noch ein Gespräch');
       expect(find.text('Ende-zu-Ende-verschlüsselt'), findsOneWidget);
     });
     group('#31: „Nachricht schreiben“, wenn der Einzelchat erst später erscheint', () {
