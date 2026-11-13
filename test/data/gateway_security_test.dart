@@ -6,6 +6,7 @@ import 'package:family_nexus/data/matrix/family_room_spec.dart';
 import 'package:family_nexus/data/matrix/https_only_client.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/domain/family.dart';
+import 'package:family_nexus/domain/member_avatars.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -119,6 +120,16 @@ void main() {
         final needed = ev[s.type] ?? (pl['state_default']! as int);
         expect(needed, lessThanOrEqualTo(PowerLevels.admin), reason: s.type);
         expect(needed, lessThanOrEqualTo(PowerLevels.moderator), reason: '${s.type} (auch Moderatoren)');
+      }
+    });
+
+    test('Avatar-Zustand: Mitglieder (0) dürfen ihn setzen, sonst bleibt alles bei 50 (#422, E-101)', () {
+      final ev = pl['events']! as Map<String, int>;
+      expect(ev[AvatarPresets.type], PowerLevels.member);
+      expect(AvatarPresets.isPermitted(pl), isTrue);
+      // keine zweite Ausnahme: alle übrigen Einträge liegen bei 50 oder unerreichbar
+      for (final e in ev.entries.where((e) => e.key != AvatarPresets.type)) {
+        expect(e.value, anyOf(PowerLevels.moderator, PowerLevels.unreachable), reason: e.key);
       }
     });
 
