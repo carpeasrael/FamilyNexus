@@ -121,6 +121,9 @@ ChatThread _thread(String id, String title, {bool family = false}) => ChatThread
       peerId: family ? null : '@$id:fake.test',
     );
 
+/// Etwas mehr als `ChatScreen.openTimeout` (20 s).
+const Duration _openTimeoutPlus = Duration(seconds: 21);
+
 void main() {
   group('Ansichtsmodell: feste Rangfolge', () {
     final family = _thread(ChatThread.familyId, 'Familie', family: true);
@@ -868,6 +871,43 @@ void main() {
       expect(headerLabels().where((l) => l == 'Gespräche'), isEmpty);
       expect(headerLabels().length, shell + 1 + dayHeaders, reason: 'Shell, Kopfzeile und Datumszeilen, nichts doppelt');
       handle.dispose();
+    });
+
+    testWidgets('Timeout bei mehreren Gesprächen: Familienchat mit Kopfzeile und Pfeil plus Hinweis, nichts ging an ein anderes Gespräch', (tester) async {
+      _wide(tester);
+      final app = await buildTestApp();
+      final cara = await _member(app, 'cara', 'Cara');
+      final ben = await _member(app, 'ben', 'Ben');
+      final dmCara = await app.gateway.startDirectChat(cara.userId!);
+      app.gateway.delayNewDirectChats = true;
+      final dm = await app.gateway.startDirectChat(ben.userId!);
+      await _start(tester, app);
+      expect(_row(dmCara), findsOneWidget);
+      expect(_row(dm), findsNothing, reason: 'das angeforderte Gespräch erscheint nie');
+      app.services.chatRequest.value = dm;
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('Einzelchat wird geöffnet …'), findsOneWidget);
+      expect(find.byType(TextField), findsNothing, reason: 'während des Wartens keine Eingabe');
+
+      await tester.pump(_openTimeoutPlus);
+      await tester.pumpAndSettle();
+      expect(find.text('Der Einzelchat konnte nicht geöffnet werden. Bitte versuche es erneut.'), findsOneWidget);
+      expect(find.text('Einzelchat wird geöffnet …'), findsNothing);
+      expect(_back, findsOneWidget, reason: 'bei mehreren Gesprächen mit Kopfzeile und Pfeil');
+      final headerRow = find.ancestor(of: _back, matching: find.byType(Row)).first;
+      expect(find.descendant(of: headerRow, matching: find.text('Familie Test')), findsOneWidget);
+      expect(find.text('Ende-zu-Ende-verschlüsselt'), findsOneWidget, reason: 'Familienchat');
+      expect(app.services.visibleChatThread, ChatThread.familyId);
+
+      await tester.pump(const Duration(seconds: 10)); // Der Hinweis (Snackbar) verschwindet, er verdeckt sonst das Eingabefeld
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'nur an die Familie');
+      await tester.tap(find.byTooltip('Senden'));
+      await tester.pumpAndSettle();
+      expect(app.gateway.messages.map((m) => m.body), contains('nur an die Familie'));
+      expect(app.gateway.messagesIn(dm), isEmpty, reason: 'nichts an das nie erschienene Gespräch');
+      expect(app.gateway.messagesIn(dmCara), isEmpty, reason: 'nichts an ein anderes Gespräch');
     });
   });
 
