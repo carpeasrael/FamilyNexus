@@ -787,6 +787,43 @@ void main() {
     });
   });
 
+  group('Lücken Teststärke #423', () {
+    testWidgets('Eintritt in die Liste: Familienchat war sichtbar, danach kein Gespräch sichtbar, nichts gelesen markiert, Marke neu', (tester) async {
+      _wide(tester);
+      final app = await buildTestApp();
+      final ben = await _member(app, 'ben', 'Ben');
+      await ben.sendMessage('alt');
+      app.gateway.syncDone = false;
+      await _start(tester, app);
+      expect(app.services.visibleChatThread, ChatThread.familyId, reason: 'ein Gespräch: der Familienchat ist sichtbar');
+      expect(app.gateway.markedRead, <String>[ChatThread.familyId]);
+      expect(app.gateway.unreadIn(ChatThread.familyId), 0);
+
+      // Zweites Gespräch ohne Pinnen (erster Sync noch nicht fertig): die Liste erscheint.
+      final dm = await ben.startDirectChat(app.gateway.userId!);
+      app.server.notifyAll();
+      await tester.pumpAndSettle();
+      expect(find.text('Gespräche'), findsOneWidget);
+      expect(app.services.visibleChatThread, isNull, reason: 'die Liste zeigt kein Gespräch');
+
+      // Neu eintreffende Nachrichten bei offener Liste bleiben ungelesen.
+      app.gateway.markedRead.clear();
+      await ben.sendMessage('neu');
+      await ben.sendMessage('privat', threadId: dm);
+      await tester.pumpAndSettle();
+      expect(find.text('Gespräche'), findsOneWidget);
+      expect(app.gateway.markedRead, isEmpty, reason: 'auf der Liste wird nichts gelesen markiert');
+      expect(app.gateway.unreadIn(ChatThread.familyId), 1);
+      expect(app.gateway.unreadIn(dm), 1);
+      expect(app.services.visibleChatThread, isNull);
+
+      await _open(tester, ChatThread.familyId);
+      expect(app.services.visibleChatThread, ChatThread.familyId);
+      expect(find.text('Neue Nachrichten'), findsOneWidget, reason: 'die Marke wird beim Öffnen neu bestimmt');
+      expect(app.gateway.markedRead, <String>[ChatThread.familyId], reason: 'erst das Öffnen markiert, und nur dieses Gespräch');
+    });
+  });
+
   group('Englisch', () {
     testWidgets('Liste, Vorschau „You:“, „Yesterday“, Pfeil und Kopfzeile', (tester) async {
       _wide(tester);
