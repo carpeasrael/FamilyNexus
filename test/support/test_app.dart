@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:family_nexus/app/app_services.dart';
@@ -281,8 +282,14 @@ class FakeFileAccess implements FileAccess {
     await onClear?.call();
   }
 
+  /// Test (#423): Hält die Dateiauswahl offen, bis das Gate abgeschlossen wird.
+  Completer<void>? pickGate;
+
   @override
-  Future<PickedFile?> pickFile() async => next;
+  Future<PickedFile?> pickFile() async {
+    await pickGate?.future;
+    return next;
+  }
 
   @override
   Future<bool> saveFile({required String name, required Uint8List bytes, required String mimeType}) async {

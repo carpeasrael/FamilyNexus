@@ -368,8 +368,9 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
           _waitingFor = null;
           _waitTimer?.cancel();
         }
-        // Zurück-Taste nur im offenen Gespräch des aktiven Tabs bei mehreren Gesprächen; sonst unverändert.
-        final canPop = !(widget.active && threads.length > 1 && _open != null);
+        // Zurück-Taste nur im offenen Gespräch des aktiven Tabs bei mehreren Gesprächen; sonst unverändert, auch
+        // bei App-Sperre (die Sperre liegt über der App, ihr Zurück gehört nicht dem Chat).
+        final canPop = !(widget.active && threads.length > 1 && _open != null && !services.lock.locked);
         return PopScope(
           canPop: canPop,
           onPopInvokedWithResult: (didPop, _) {

@@ -43,25 +43,6 @@ class _ThreadRowTile extends StatelessWidget {
   final DateTime now;
   final void Function(String id) onTap;
 
-  /// Eine Zeile Vorschau: Zeilenumbrüche werden zu Leerzeichen.
-  static String _previewText(AppLocalizations l, ChatMessage m, bool mine) {
-    final String text;
-    if (m.undecryptable) {
-      text = l.chatUndecryptable;
-    } else if (m.blockedAttachment) {
-      text = l.chatAttachmentBlocked;
-    } else if (m.body.trim().isNotEmpty) {
-      text = m.body.trim().replaceAll(RegExp(r'\s*[\r\n]+\s*'), ' ');
-    } else if (m.attachment != null) {
-      text = l.chatPreviewAttachment;
-    } else if (m.sharedEventId != null) {
-      text = l.chatPreviewEvent;
-    } else {
-      text = '';
-    }
-    return mine && text.isNotEmpty ? l.chatPreviewYou(text) : text;
-  }
-
   /// Heute die Uhrzeit, gestern „Gestern“, sonst das Datum (Ortszeit).
   static String _timeText(BuildContext context, AppLocalizations l, DateTime time) {
     final t = time.toLocal();
@@ -83,7 +64,7 @@ class _ThreadRowTile extends StatelessWidget {
     final peer = thread.peerId;
     final presence = peer == null ? null : presenceOf(services, peer, now);
     final status = presence == null ? null : presenceLabel(l, presence, now);
-    final preview = last == null ? '' : _previewText(l, last, last.senderId == services.gateway.userId);
+    final preview = last == null ? '' : threadPreviewText(l, last, mine: last.senderId == services.gateway.userId);
     final hasPreview = preview.isNotEmpty;
     // Ohne Nachricht: Online-Status (Einzelchat) bzw. „Noch keine Nachrichten“ (Familienchat).
     final second = hasPreview ? preview : (status ?? l.emptyChat);

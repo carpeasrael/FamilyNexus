@@ -463,6 +463,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   @override
   Future<void> markChatRead({String threadId = ChatThread.familyId}) async {
+    markedRead.add(threadId);
     _read[threadId] = messagesIn(threadId).length;
     notifyListeners();
   }
@@ -916,7 +917,13 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   @override
-  Future<void> loadOlderMessages({String threadId = ChatThread.familyId}) async {}
+  Future<void> loadOlderMessages({String threadId = ChatThread.familyId}) async {
+    loadedOlder.add(threadId);
+  }
+
+  /// Test (#423): Gespräche, für die gelesen markiert bzw. nachgeladen wurde, in der Reihenfolge der Aufrufe.
+  final List<String> markedRead = <String>[];
+  final List<String> loadedOlder = <String>[];
 
   @override
   Future<void> restore() async {}

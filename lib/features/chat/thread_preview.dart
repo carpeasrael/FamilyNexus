@@ -1,4 +1,5 @@
 import '../../domain/chat.dart';
+import '../../l10n/gen/app_localizations.dart';
 
 /// Die Nachricht, die die Gesprächsliste als letzte zeigt (#423): die sichtbare mit dem **größten Zeitstempel**,
 /// nicht die an letzter Stelle (die Zeitleiste ist nicht nach Zeit sortiert, #295). Bei gleichem Zeitstempel gewinnt
@@ -50,4 +51,25 @@ List<ThreadRow> orderedThreadRows(
     return byTitle(a, b);
   });
   return rows;
+}
+
+/// Eine Zeile Vorschau zu [m] (Zeilenumbrüche werden zu Leerzeichen): nicht Lesbares und blockierte Anhänge mit
+/// ihrem Hinweis, sonst der Text; ohne Text „Anhang“ bzw. „Termin“. Eigene Nachrichten mit „Du: “. Leer, wenn
+/// nichts anzuzeigen ist.
+String threadPreviewText(AppLocalizations l, ChatMessage m, {required bool mine}) {
+  final String text;
+  if (m.undecryptable) {
+    text = l.chatUndecryptable;
+  } else if (m.blockedAttachment) {
+    text = l.chatAttachmentBlocked;
+  } else if (m.body.trim().isNotEmpty) {
+    text = m.body.trim().replaceAll(RegExp(r'\s*[\r\n]+\s*'), ' ');
+  } else if (m.attachment != null) {
+    text = l.chatPreviewAttachment;
+  } else if (m.sharedEventId != null) {
+    text = l.chatPreviewEvent;
+  } else {
+    text = '';
+  }
+  return mine && text.isNotEmpty ? l.chatPreviewYou(text) : text;
 }
