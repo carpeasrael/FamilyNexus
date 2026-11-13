@@ -93,7 +93,9 @@ List<String> _allLabels(WidgetTester tester) {
     });
   }
 
-  visit(tester.binding.pipelineOwner.semanticsOwner!.rootSemanticsNode!);
+  SemanticsNode? root;
+  tester.binding.rootPipelineOwner.visitChildren((o) => root ??= o.semanticsOwner?.rootSemanticsNode);
+  visit(root!);
   return out;
 }
 
