@@ -25,11 +25,22 @@ Future<({TestApp app, FakeMatrixGateway ben, String dm, Completer<void> gate})> 
   await tester.pumpAndSettle();
   await tester.tap(navTab('Chat'));
   await tester.pumpAndSettle();
+  // Die Gesprächsliste ist die Startseite (#423): der Familienchat wird wie bisher geöffnet.
+  await tester.tap(find.byKey(const ValueKey<String>('thread-family')));
+  await tester.pumpAndSettle();
   final gate = Completer<void>();
   addTearDown(() {
     if (!gate.isCompleted) gate.complete();
   });
   return (app: app, ben: ben, dm: dm, gate: gate);
+}
+
+/// Wechselt über den Zurück-Pfeil und die Zeile ins Gespräch [id] (früher ein Tipp auf den Chip, #423).
+Future<void> _switchTo(WidgetTester tester, String id, {bool settle = false}) async {
+  await tester.tap(find.byTooltip('Zurück zu den Gesprächen'));
+  await tester.pump();
+  await tester.tap(find.byKey(ValueKey<String>('thread-$id')));
+  settle ? await tester.pumpAndSettle() : await tester.pump();
 }
 
 String _field(WidgetTester tester) => tester.widget<TextField>(find.byType(TextField)).controller!.text;
@@ -59,8 +70,7 @@ void main() {
   testWidgets('F2 Gespräch gewechselt und dort getippt: der Text bleibt', (tester) async {
     final t = await _open(tester);
     await _sendHeld(tester, t.gate, t.app.server, 'hallo');
-    await tester.tap(find.widgetWithText(ChoiceChip, 'Ben'));
-    await tester.pump();
+    await _switchTo(tester, t.dm);
     await tester.enterText(find.byType(TextField), 'für Ben');
     await _release(tester, t.gate);
     expect(_field(tester), 'für Ben');
@@ -69,8 +79,7 @@ void main() {
   testWidgets('F2b Gespräch gewechselt, nichts getippt: der gesendete Text bleibt nicht im neuen Gespräch', (tester) async {
     final t = await _open(tester);
     await _sendHeld(tester, t.gate, t.app.server, 'hallo');
-    await tester.tap(find.widgetWithText(ChoiceChip, 'Ben'));
-    await tester.pump();
+    await _switchTo(tester, t.dm);
     await _release(tester, t.gate);
     expect(_field(tester), isEmpty);
   });
@@ -78,8 +87,7 @@ void main() {
   testWidgets('F2c Gespräch gewechselt und dort eine Antwort gewählt: die Antwortvorschau bleibt', (tester) async {
     final t = await _open(tester);
     await _sendHeld(tester, t.gate, t.app.server, 'hallo');
-    await tester.tap(find.widgetWithText(ChoiceChip, 'Ben'));
-    await tester.pumpAndSettle();
+    await _switchTo(tester, t.dm, settle: true);
     await tester.longPress(find.text('Hallo Anna'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Antworten'));
@@ -91,8 +99,7 @@ void main() {
 
   testWidgets('F3 unverändert: Feld leer, Antwortvorschau weg', (tester) async {
     final t = await _open(tester);
-    await tester.tap(find.widgetWithText(ChoiceChip, 'Ben'));
-    await tester.pumpAndSettle();
+    await _switchTo(tester, t.dm, settle: true);
     await tester.longPress(find.text('Hallo Anna'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Antworten'));

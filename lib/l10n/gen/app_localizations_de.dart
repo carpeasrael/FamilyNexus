@@ -1522,6 +1522,20 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get chatBackToList => 'Zurück zu den Gesprächen';
+
+  @override
+  String chatPreviewYou(String text) {
+    return 'Du: $text';
+  }
+
+  @override
+  String get chatPreviewAttachment => 'Anhang';
+
+  @override
+  String get chatPreviewEvent => 'Termin';
+
+  @override
   String chatDirectNote(String name) {
     return 'Nur zwischen dir und $name, Ende-zu-Ende-verschlüsselt';
   }

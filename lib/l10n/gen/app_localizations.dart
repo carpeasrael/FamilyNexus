@@ -2612,6 +2612,30 @@ abstract class AppLocalizations {
   /// **'{count} ungelesen'**
   String chatUnreadCount(int count);
 
+  /// No description provided for @chatBackToList.
+  ///
+  /// In de, this message translates to:
+  /// **'Zurück zu den Gesprächen'**
+  String get chatBackToList;
+
+  /// No description provided for @chatPreviewYou.
+  ///
+  /// In de, this message translates to:
+  /// **'Du: {text}'**
+  String chatPreviewYou(String text);
+
+  /// No description provided for @chatPreviewAttachment.
+  ///
+  /// In de, this message translates to:
+  /// **'Anhang'**
+  String get chatPreviewAttachment;
+
+  /// No description provided for @chatPreviewEvent.
+  ///
+  /// In de, this message translates to:
+  /// **'Termin'**
+  String get chatPreviewEvent;
+
   /// No description provided for @chatDirectNote.
   ///
   /// In de, this message translates to:

@@ -768,6 +768,17 @@
       }
     }
   },
+  "chatBackToList": "Zurück zu den Gesprächen",
+  "chatPreviewYou": "Du: {text}",
+  "@chatPreviewYou": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "chatPreviewAttachment": "Anhang",
+  "chatPreviewEvent": "Termin",
   "chatDirectNote": "Nur zwischen dir und {name}, Ende-zu-Ende-verschlüsselt",
   "@chatDirectNote": {
     "placeholders": {

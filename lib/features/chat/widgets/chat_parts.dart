@@ -20,7 +20,7 @@ class _ChatOpening extends StatelessWidget {
   }
 }
 
-/// Hinweis zur Verschlüsselung, im Einzelchat mit dem Status des Gegenübers.
+/// Hinweis zur Verschlüsselung. Der Status des Gegenübers steht in der Kopfzeile (`_ThreadHeader`, #423).
 class _EncryptionNote extends StatelessWidget {
   const _EncryptionNote({required this.current});
   final ChatThread? current;
@@ -40,10 +40,6 @@ class _EncryptionNote extends StatelessWidget {
             style: Theme.of(context).textTheme.labelSmall,
           ),
         ),
-        if (current != null && !current.isFamily && current.peerId != null) ...<Widget>[
-          const SizedBox(width: 12),
-          Flexible(child: PresenceStatusText(userId: current.peerId!, compact: true)),
-        ],
       ]),
     );
   }

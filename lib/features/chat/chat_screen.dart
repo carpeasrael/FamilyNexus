@@ -23,12 +23,15 @@ import '../common/error_text.dart';
 import '../moderation/moderation_actions.dart';
 import '../presence/presence_view.dart';
 import 'chat_layout.dart';
+import 'chat_view_model.dart';
 import 'sender_name.dart';
+import 'thread_preview.dart';
 
 part 'widgets/attachment_view.dart';
 part 'widgets/chat_parts.dart';
 part 'widgets/message_bubble.dart';
 part 'widgets/thread_and_lines.dart';
+part 'widgets/thread_list.dart';
 
 const List<String> _quickReactions = <String>['👍', '❤️', '😂', '🎉', '😮', '🙏'];
 
@@ -47,7 +50,17 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   final ScrollController _scroll = ScrollController();
   ChatMessage? _replyTo;
   bool _sending = false;
-  String _threadId = ChatThread.familyId;
+
+  /// Vom Nutzer gewähltes Gespräch (#423): `null` = keines geöffnet, dann zeigt der Tab die Gesprächsliste (bei
+  /// mehreren Gesprächen). Nur der **Wunsch**: Was gezeigt wird, entscheidet [resolveChatView] in `build`.
+  String? _open;
+
+  /// Gezeigte Gesprächs-ID, in jedem Aufbau aus der Ansicht abgeleitet (`null` bei Liste und Warten). Verlauf,
+  /// Nachladen, Lesen und Senden nutzen sie, nie [_open]; die Behandler lesen sie **vor jedem `await`**.
+  String? _shown;
+
+  /// Eigener Controller der Liste; [_scroll] gehört nur dem Verlauf.
+  final ScrollController _listScroll = ScrollController();
   late final AppServices _services;
 
   /// Angefordertes Gespräch, das noch nicht in der Liste steht (z. B. gerade eröffneter
@@ -98,7 +111,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     _scroll.addListener(() {
       // Liste ist umgekehrt: Ende = älteste geladene Nachricht.
       if (_scroll.hasClients && _scroll.position.extentAfter < 200) {
-        AppScope.of(context).gateway.loadOlderMessages(threadId: _threadId).ignore();
+        final id = _shown;
+        if (id != null) AppScope.of(context).gateway.loadOlderMessages(threadId: id).ignore();
       }
     });
   }
@@ -108,7 +122,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     final id = _services.chatRequest.value;
     if (id == null) return;
     _services.chatRequest.value = null;
-    if (mounted && id != _threadId) setState(() => _select(id));
+    // Immer öffnen, auch bei schon gewähltem Gespräch oder offener Liste (#423).
+    if (mounted) setState(() => _select(id));
   }
 
   @override
@@ -133,7 +148,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   }
 
   void _select(String id) {
-    _threadId = id;
+    _open = id;
     _replyTo = null;
     _resetMarker();
     _waitTimer?.cancel();
@@ -144,7 +159,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       if (!mounted || _waitingFor != id) return;
       setState(() {
         _waitingFor = null;
-        _threadId = ChatThread.familyId;
+        _open = ChatThread.familyId;
       });
       _toast(AppLocalizations.of(context).chatOpenFailed);
     });
@@ -158,6 +173,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     _services.visibleChatThread = null;
     _collapseQuotes.dispose();
     _scroll.dispose();
+    _listScroll.dispose();
     _ctrl.dispose();
     super.dispose();
   }
@@ -167,16 +183,35 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
   }
 
+  /// Zurück zur Gesprächsliste (#423). Ein offener Endrawer schließt zuerst und nur er: `PopScope(canPop: false)`
+  /// lässt auch dann nichts zu, wenn der Drawer offen ist.
+  void _backToList() {
+    final scaffold = Scaffold.maybeOf(context);
+    if (scaffold != null && scaffold.isEndDrawerOpen) {
+      scaffold.closeEndDrawer();
+      return;
+    }
+    setState(() {
+      _open = null;
+      _replyTo = null;
+      _waitTimer?.cancel();
+      _waitingFor = null;
+      _resetMarker();
+    });
+    _services.visibleChatThread = null;
+  }
+
   Future<void> _send(MatrixGateway g) async {
     final text = _ctrl.text.trim();
-    if (text.isEmpty || _sending) return;
+    final threadId = _shown;
+    if (text.isEmpty || _sending || threadId == null) return;
     final l = AppLocalizations.of(context);
     // Stand beim Absenden (#410): `_ctrl` gehört allen Gesprächen und bleibt während des Sendens beschreibbar.
     final sentText = _ctrl.text;
     final sentReply = _replyTo;
     setState(() => _sending = true);
     try {
-      await g.sendMessage(text, replyToId: sentReply?.id, threadId: _threadId);
+      await g.sendMessage(text, replyToId: sentReply?.id, threadId: threadId);
       if (!mounted) return;
       // Nur der unveränderte, schon gesendete Stand wird geleert; Neues (weitergetippt, nach einem Wechsel) bleibt.
       if (_ctrl.text == sentText) _ctrl.clear();
@@ -190,10 +225,13 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
   Future<void> _attach(AppServices s) async {
     final l = AppLocalizations.of(context);
+    // Gespräch vor der Dateiauswahl festhalten: ein Wechsel währenddessen darf das Ziel nicht ändern (#423).
+    final threadId = _shown;
+    if (threadId == null) return;
     try {
       final file = await s.files.pickFile();
       if (file == null) return;
-      await s.gateway.sendAttachment(fileName: file.name, bytes: file.bytes, replyToId: _replyTo?.id, threadId: _threadId);
+      await s.gateway.sendAttachment(fileName: file.name, bytes: file.bytes, replyToId: _replyTo?.id, threadId: threadId);
       if (mounted) setState(() => _replyTo = null);
     } on FileTooLargeException {
       _toast(l.errAttachmentRejected);
@@ -204,6 +242,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
   Future<void> _actions(MatrixGateway g, ChatMessage m) async {
     final l = AppLocalizations.of(context);
+    final threadId = _shown;
+    if (threadId == null) return;
     final foreign = m.senderId != g.userId;
     await showModalBottomSheet<void>(
       context: context,
@@ -233,7 +273,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                       onTap: () async {
                         Navigator.pop(c);
                         try {
-                          await g.sendReaction(m.id, e, threadId: _threadId);
+                          await g.sendReaction(m.id, e, threadId: threadId);
                         } catch (err) {
                           _toast(errorText(l, err));
                         }
@@ -249,7 +289,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
               title: Text(l.chatReport),
               onTap: () {
                 Navigator.pop(c);
-                ModerationActions.report(context, _services, message: m, threadId: _threadId).ignore();
+                ModerationActions.report(context, _services, message: m, threadId: threadId).ignore();
               },
             ),
             ListTile(
@@ -266,18 +306,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     );
   }
 
-  /// Verschwindet ein Gespräch (z. B. Mitglied entfernt), geht es zurück zum Familienchat. Ein angefordertes Gespräch,
-  /// das noch nicht erschienen ist, wird dagegen abgewartet (#31).
-  void _followThread(ChatThread? current, {required bool waiting}) {
-    if (current != null && _waitingFor == current.id) {
-      _waitingFor = null;
-      _waitTimer?.cancel();
-    }
-    if (current == null && !waiting && _threadId != ChatThread.familyId) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) setState(() => _threadId = ChatThread.familyId);
-      });
-    }
+  /// Das geöffnete Gespräch ist verschwunden (z. B. Mitglied entfernt, blockiert): zurück zum Familienchat, nicht
+  /// zur Liste. Der Frame davor zeigt ihn schon (Rang 2 in [resolveChatView]); `_open` wird danach nachgezogen.
+  void _followFamily(String vanished) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _open == vanished) setState(() => _open = ChatThread.familyId);
+    });
   }
 
   /// Marke „Neue Nachrichten“, Sichtbarkeit und Gelesen-Markierung des Gesprächs [threadId] (#254, #294, E-88).
@@ -316,49 +350,88 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final services = AppScope.of(context);
     final g = services.gateway;
-    final l = AppLocalizations.of(context);
     return ListenableBuilder(
       listenable: Listenable.merge(<Listenable>[g, services.settings, services.lock]),
       builder: (context, _) {
-        final blocked = services.settings.settings.blockedUsers;
-        final threads = visibleThreads(g.threads, blocked);
-        final current = threads.where((t) => t.id == _threadId).firstOrNull;
-        final waiting = current == null && _waitingFor == _threadId;
-        _followThread(current, waiting: waiting);
-        if (waiting) {
-          if (widget.active) services.visibleChatThread = null;
-          return _ChatOpening(text: l.chatOpening);
+        final threads = visibleThreads(g.threads, services.settings.settings.blockedUsers);
+        final view = resolveChatView(
+          threads: threads,
+          open: _open,
+          waitingFor: _waitingFor,
+          active: widget.active,
+          initialSyncDone: g.initialSyncDone,
+        );
+        _shown = view.shownId;
+        if (view.followFamily) _followFamily(_open!);
+        if (view.pin) _open = ChatThread.familyId;
+        if (view.endWaiting) {
+          _waitingFor = null;
+          _waitTimer?.cancel();
         }
-        final threadId = current?.id ?? ChatThread.familyId;
-        final all = g.messagesIn(threadId);
-        final msgs = _uniqueById(visibleMessages(all, blocked, myUserId: g.userId));
-        _trackVisibility(services, g, threadId, g.unreadIn(threadId));
-        final entries = chatEntries(msgs, unreadFromId: _unreadFrom, allIds: <String>[for (final m in all) m.id]);
-        _scrollToMarkerOnce(entries);
-        return Column(children: <Widget>[
-          if (threads.length > 1)
-            _ThreadBar(threads: threads, selected: threadId, onSelect: (id) => setState(() => _select(id))),
-          _EncryptionNote(current: current),
-          Expanded(
-            child: msgs.isEmpty
-                ? Center(child: Text(l.emptyChat))
-                : _MessageList(
-                    entries: entries,
-                    byId: <String, ChatMessage>{for (final m in msgs) m.id: m},
-                    scroll: _scroll,
-                    markerKey: _markerKey,
-                    collapseQuotes: _collapseQuotes,
-                    gateway: g,
-                    services: services,
-                    threadId: threadId,
-                    onLongPress: (m) => _actions(g, m),
-                  ),
-          ),
-          if (_replyTo != null) _ReplyPreview(message: _replyTo!, onCancel: () => setState(() => _replyTo = null)),
-          _Composer(controller: _ctrl, sending: _sending, onAttach: () => _attach(services), onSend: () => _send(g)),
-        ]);
+        // Zurück-Taste nur im offenen Gespräch des aktiven Tabs bei mehreren Gesprächen; sonst unverändert, auch
+        // bei App-Sperre (die Sperre liegt über der App, ihr Zurück gehört nicht dem Chat).
+        final canPop = !(widget.active && threads.length > 1 && _open != null && !services.lock.locked);
+        return PopScope(
+          canPop: canPop,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop) _backToList();
+          },
+          child: _body(context, services, view, threads),
+        );
       },
     );
+  }
+
+  Widget _body(BuildContext context, AppServices services, ChatView view, List<ChatThread> threads) {
+    final l = AppLocalizations.of(context);
+    switch (view.kind) {
+      case ChatViewKind.opening:
+        if (widget.active) services.visibleChatThread = null;
+        return Column(children: <Widget>[
+          if (view.showHeader) _ThreadHeader(thread: null, onBack: _backToList),
+          Expanded(child: _ChatOpening(text: l.chatOpening)),
+        ]);
+      case ChatViewKind.list:
+        // Jeder Aufbau der Liste: Marke frei, kein Gespräch sichtbar (nichts wird gelesen markiert).
+        _resetMarker();
+        services.visibleChatThread = null;
+        return _ThreadList(threads: threads, scroll: _listScroll, onOpen: (id) => setState(() => _select(id)));
+      case ChatViewKind.conversation:
+        return _conversation(context, services, view);
+    }
+  }
+
+  Widget _conversation(BuildContext context, AppServices services, ChatView view) {
+    final l = AppLocalizations.of(context);
+    final g = services.gateway;
+    final blocked = services.settings.settings.blockedUsers;
+    final threadId = view.shownId!;
+    final all = g.messagesIn(threadId);
+    final msgs = _uniqueById(visibleMessages(all, blocked, myUserId: g.userId));
+    _trackVisibility(services, g, threadId, g.unreadIn(threadId));
+    final entries = chatEntries(msgs, unreadFromId: _unreadFrom, allIds: <String>[for (final m in all) m.id]);
+    _scrollToMarkerOnce(entries);
+    return Column(children: <Widget>[
+      if (view.showHeader) _ThreadHeader(thread: view.current, onBack: _backToList),
+      _EncryptionNote(current: view.current),
+      Expanded(
+        child: msgs.isEmpty
+            ? Center(child: Text(l.emptyChat))
+            : _MessageList(
+                entries: entries,
+                byId: <String, ChatMessage>{for (final m in msgs) m.id: m},
+                scroll: _scroll,
+                markerKey: _markerKey,
+                collapseQuotes: _collapseQuotes,
+                gateway: g,
+                services: services,
+                threadId: threadId,
+                onLongPress: (m) => _actions(g, m),
+              ),
+      ),
+      if (_replyTo != null) _ReplyPreview(message: _replyTo!, onCancel: () => setState(() => _replyTo = null)),
+      _Composer(controller: _ctrl, sending: _sending, onAttach: () => _attach(services), onSend: () => _send(g)),
+    ]);
   }
 }
 

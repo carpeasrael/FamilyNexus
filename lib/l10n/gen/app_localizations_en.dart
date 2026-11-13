@@ -1509,6 +1509,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get chatBackToList => 'Back to conversations';
+
+  @override
+  String chatPreviewYou(String text) {
+    return 'You: $text';
+  }
+
+  @override
+  String get chatPreviewAttachment => 'Attachment';
+
+  @override
+  String get chatPreviewEvent => 'Event';
+
+  @override
   String chatDirectNote(String name) {
     return 'Only between you and $name, end-to-end encrypted';
   }

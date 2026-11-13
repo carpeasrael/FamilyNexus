@@ -768,6 +768,17 @@
       }
     }
   },
+  "chatBackToList": "Back to conversations",
+  "chatPreviewYou": "You: {text}",
+  "@chatPreviewYou": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "chatPreviewAttachment": "Attachment",
+  "chatPreviewEvent": "Event",
   "chatDirectNote": "Only between you and {name}, end-to-end encrypted",
   "@chatDirectNote": {
     "placeholders": {

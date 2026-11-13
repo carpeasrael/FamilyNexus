@@ -53,7 +53,7 @@ sind **Pflichtbestandteil** der Umsetzung.
 | B6 | `_participantsLoaded` | Solange die Mitgliederliste nur teilweise geladen ist, sähe ein Mitglied wie ein Fremder aus; seine Einladung würde zur Kontaktanfrage. | Einstufung erst nach vollständiger Liste (wie `_syncDirectChats`). |
 | B7 | `unreadCount`, Heute, Abzeichen | `unreadCount` summiert alle Gespräche, auch ausgeblendete. Ein blockierter Spammer hielte das Abzeichen aktiv; die Karte auf „Heute“ zählte Kontaktnachrichten mit. | Neu `familyUnreadCount` für „Heute“; das Chat-Abzeichen summiert über `visibleThreads`. |
 | B8 | `_onIncomingVerification`, `acceptIdentityChange` | Beide lassen nur beigetretene Mitglieder zu. | Auf bestätigte Kontakte erweitern, sonst sind Kontakte nicht prüfbar und ein Identitätswechsel nicht auflösbar. Fremde bleiben abgelehnt. |
-| B9 | `presence`, `PresenceStatusText`, `_ThreadBar` | Chatkopf und Leiste zeigen für jedes `peerId` einen Status. | Für Kontakte keinen Status anzeigen statt „Offline“ (sonst falsche Aussage). |
+| B9 | `presence`, `PresenceStatusText`, `_ThreadBar` | Chatkopf und Leiste zeigen für jedes `peerId` einen Status. *Hinweis: Chip-Leiste durch Liste ersetzt (E-100, #423); die Leiste `_ThreadBar` gibt es nicht mehr, den Status zeigen Kopfzeile und Gesprächsliste.* | Für Kontakte keinen Status anzeigen statt „Offline“ (sonst falsche Aussage). |
 | B10 | `Client.ignoreUser` | Naheliegend für Blockieren, leert aber den gesamten Zwischenspeicher und filtert den Nutzer in **allen** Räumen. | Nicht verwenden. Blockieren bleibt lokal (E-48), Abschnitt 9.3. |
 | B11 | `store/metadata/*/review_notes.txt`, Datenschutz, STORE.md | Sagen aus, dass Nachrichten nur an eingeladene Familienmitglieder gehen. Mit V1.4 unwahr. | Abschnitt 12. |
 
@@ -259,7 +259,7 @@ Umbenennen (Admin), Verlassen, Blockieren einzelner Personen. Entfernen lässt d
 letzte Admin die Gruppe, warnt die App vorher.
 
 ### 8.6 Chat-Oberfläche
-- Der Chat-Tab zeigt über der Gesprächsleiste den Umschalter **Familie | Kontakte** mit getrennten Abzeichen, nur wenn
+- *Hinweis: Chip-Leiste durch Liste ersetzt (E-100, #423); der Umschalter wäre jetzt über der Gesprächsliste anzuordnen.* Der Chat-Tab zeigt über der Gesprächsleiste den Umschalter **Familie | Kontakte** mit getrennten Abzeichen, nur wenn
   Kontakte eingeschaltet sind. Sonst ist der Tab pixelgleich zu 1.2.1. Die fünf Tabs bleiben.
 - Kopfzeile außerhalb der Familie, dauerhaft: „Außerhalb der Familie. Termine, Listen und Online-Status werden hier nicht
   geteilt.“ Eigenes Symbol, abweichender Glasrand; Text und Form tragen die Aussage (WCAG, Concept).
