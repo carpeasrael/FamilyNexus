@@ -18,6 +18,13 @@ final RegExp _badDescription = RegExp(
 /// Leer oder nur Leerraum und Verbinder (ZWNJ/ZWJ): sonst wäre ein Titel unsichtbar (#161).
 bool _blank(String s) => s.replaceAll(RegExp('[\\u200C\\u200D]'), '').trim().isEmpty;
 
+/// Textprüfung für kurze Titel und Namen (Aufgabenlisten, Kalender-Themen E-99): enthält Steuer- oder
+/// Bidi-Zeichen.
+bool hasBadTitleText(String s) => _badText.hasMatch(s);
+
+/// Titel/Name ist leer oder nur Leerraum und Verbinder (siehe [hasBadTitleText]).
+bool isBlankTitleText(String s) => _blank(s);
+
 /// Ein Punkt einer Aufgabenliste.
 class TaskItem {
   const TaskItem({required this.id, required this.title});

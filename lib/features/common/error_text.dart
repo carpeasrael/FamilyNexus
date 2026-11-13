@@ -1,4 +1,6 @@
 import '../../data/matrix/matrix_gateway.dart';
+import '../../domain/event_theme_service.dart';
+import '../../domain/event_themes.dart';
 import '../../domain/shopping.dart';
 import '../../domain/tasks.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -41,6 +43,14 @@ String errorText(AppLocalizations l, Object error) {
       TaskError.notFound => l.errNotFound,
       TaskError.limit => l.tasksLimit,
       TaskError.notAllowed => l.errNotAllowed,
+    };
+  }
+  if (error is EventThemeException) {
+    return switch (error.error) {
+      EventThemeError.invalid => l.themeInvalid(EventTheme.maxName),
+      EventThemeError.notFound => l.errNotFound,
+      EventThemeError.limit => l.themeLimit(EventTheme.maxActive),
+      EventThemeError.notAllowed => l.errNotAllowed,
     };
   }
   return l.errUnknown;

@@ -9,6 +9,8 @@ class _EventSummaryCard extends StatelessWidget {
     required this.dateLong,
     required this.owner,
     required this.mine,
+    required this.theme,
+    required this.ownerColorIndex,
   });
   final CalendarEvent event;
   final Color glow;
@@ -20,6 +22,12 @@ class _EventSummaryCard extends StatelessWidget {
 
   /// Der Termin gehört der angemeldeten Person (bearbeitbar).
   final bool mine;
+
+  /// Thema des geteilten Termins (E-99); `null` ohne Thema.
+  final EventTheme? theme;
+
+  /// Personenfarbe des Besitzers (Punkt neben dem Namen).
+  final int ownerColorIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +56,22 @@ class _EventSummaryCard extends StatelessWidget {
         ],
         if (e.note.isNotEmpty) ...<Widget>[const SizedBox(height: 10), Text(e.note)],
         const SizedBox(height: 10),
-        Text(owner, style: Theme.of(context).textTheme.bodySmall),
+        if (theme case final th?) ...<Widget>[
+          Semantics(
+            label: l.eventThemeSemantics(th.name),
+            excludeSemantics: true,
+            child: Row(children: <Widget>[
+              Icon(Icons.label_outline, size: 16, color: glow),
+              const SizedBox(width: 6),
+              Expanded(child: Text(th.name, style: Theme.of(context).textTheme.bodyMedium)),
+            ]),
+          ),
+          const SizedBox(height: 4),
+        ],
+        Row(children: <Widget>[
+          if (theme != null) ...<Widget>[PersonDot(colorIndex: ownerColorIndex), const SizedBox(width: 6)],
+          Expanded(child: Text(owner, style: Theme.of(context).textTheme.bodySmall)),
+        ]),
         if (!mine) Padding(padding: const EdgeInsets.only(top: 4), child: Text(l.eventReadOnly, style: Theme.of(context).textTheme.bodySmall)),
       ]),
     );

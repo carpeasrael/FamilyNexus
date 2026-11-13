@@ -162,6 +162,8 @@ class CalendarSync {
         case TaskListSignal():
         case TaskLogSignal():
           break; // gehört dem Einkaufszettel (ShoppingSync)
+        case EventThemeSignal():
+          break; // gehört EventThemeSync (E-99)
         case MemberJoinedSignal():
           // Zuverlässig: erneut zum Senden vormerken; die Warteschlange (mit Wiederholung)
           // erledigt den Rest, auch nach Neustart.

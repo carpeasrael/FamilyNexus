@@ -5,6 +5,7 @@ import '../core/app_log.dart';
 import '../data/db/app_database.dart';
 import '../data/db/key_value_store.dart';
 import '../data/db/sql_event_store.dart';
+import '../data/db/sql_event_theme_store.dart';
 import '../data/db/sql_shopping_store.dart';
 import '../data/db/sql_task_store.dart';
 import '../data/matrix/matrix_gateway.dart';
@@ -312,6 +313,7 @@ class AppServices {
     await SqlEventStore(db).wipe();
     await SqlShoppingStore(db).wipe();
     await SqlTaskStore(db).wipe();
+    await SqlEventThemeStore(db).wipe();
     // Bestätigte Erinnerungen gehören zu den Familiendaten (E-87); der Besitzer fällt zuletzt bzw. zugleich.
     await kv.apply(deletes: <String>[ReminderCoordinator.acknowledgedKey, calendarOwnerKey]);
   }
@@ -327,6 +329,7 @@ class AppServices {
       await SqlEventStore(db).wipe();
       await SqlShoppingStore(db).wipe();
       await SqlTaskStore(db).wipe();
+      await SqlEventThemeStore(db).wipe();
       await kv.delete(ReminderCoordinator.acknowledgedKey);
       await onWiped?.call();
     }
@@ -364,7 +367,7 @@ class AppServices {
     final idle = <Future<void>>[
       if (shopping case final s?) s.sync.idle(),
       if (tasks case final t?) t.sync.idle(),
-      if (calendar case final c?) c.sync.idle(),
+      if (calendar case final c?) c.idle(),
     ];
     if (idle.isNotEmpty) {
       _closing = Future.wait<void>(<Future<void>>[_closing, ...idle]).then<void>((_) {}, onError: (Object _) {});

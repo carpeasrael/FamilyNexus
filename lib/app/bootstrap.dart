@@ -9,6 +9,7 @@ import '../data/db/app_database.dart';
 import '../data/db/key_value_store.dart';
 import '../data/db/sql_data_inventory.dart';
 import '../data/db/sql_event_store.dart';
+import '../data/db/sql_event_theme_store.dart';
 import '../data/db/sql_shopping_store.dart';
 import '../data/db/sql_task_store.dart';
 import '../data/matrix/matrix_gateway.dart';
@@ -175,7 +176,14 @@ Future<AppServices> bootstrap({
     calendarBuilder: (userId, familyRoom) async {
       final store = SqlEventStore(database.db);
       final zone = await SystemDeviceTimeZone().current();
-      return buildCalendarController(store: store, gateway: gateway, userId: userId, zoneName: zone);
+      return buildCalendarController(
+        store: store,
+        gateway: gateway,
+        userId: userId,
+        zoneName: zone,
+        themeStore: SqlEventThemeStore(database.db),
+        isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
+      );
     },
     shoppingBuilder: (userId, familyRoom) async {
       final store = SqlShoppingStore(database.db);

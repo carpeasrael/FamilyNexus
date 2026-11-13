@@ -217,4 +217,49 @@ void main() {
     expect(svc.canEdit(ev(owner: kOther)), isFalse);
     expect(const Recurrence().isRecurring, isFalse);
   });
+
+  group('Kalender-Thema (E-99)', () {
+    const theme = '00000000-0000-4000-8000-0000000000a1';
+
+    Future<CalendarEvent> withTheme(EventVisibility v) => svc.create(
+          title: 'Elternabend',
+          start: DateTime.utc(2026, 3, 20, 8),
+          end: DateTime.utc(2026, 3, 20, 9),
+          timeZone: 'Europe/Berlin',
+          visibility: v,
+          themeId: theme,
+        );
+
+    test('geteilter Termin behält das Thema, privater bekommt nie eines', () async {
+      expect((await withTheme(EventVisibility.shared)).themeId, theme);
+      expect((await withTheme(EventVisibility.private)).themeId, isNull);
+    });
+
+    test('Aktualisieren erhält das Thema, ersetzt oder entfernt es', () async {
+      final e = await withTheme(EventVisibility.shared);
+      expect((await svc.update(e.copyWith(title: 'Neu'))).themeId, theme);
+      const other = '00000000-0000-4000-8000-0000000000a2';
+      expect((await svc.update((await store.get(e.id))!.copyWith(themeId: other))).themeId, other);
+      expect((await svc.update((await store.get(e.id))!.copyWith(clearTheme: true))).themeId, isNull);
+    });
+
+    test('Aktualisieren eines privaten Termins setzt nie ein Thema', () async {
+      final e = await make(v: EventVisibility.private);
+      expect((await svc.update(e.copyWith(themeId: theme))).themeId, isNull);
+    });
+
+    test('Wechsel geteilt -> privat setzt das Thema auf null (Kopie mit neuer ID)', () async {
+      final e = await withTheme(EventVisibility.shared);
+      final p = await svc.changeVisibility(e.id, EventVisibility.private);
+      expect(p.themeId, isNull);
+      expect((await store.get(e.id))!.themeId, isNull, reason: 'auch die Löschmarke trägt keines');
+    });
+
+    test('Wechsel privat -> geteilt: ein Thema kommt erst mit dem Speichern dazu', () async {
+      final e = await make(v: EventVisibility.private);
+      final s = await svc.changeVisibility(e.id, EventVisibility.shared);
+      expect(s.themeId, isNull);
+      expect((await svc.update(s.copyWith(themeId: theme))).themeId, theme);
+    });
+  });
 }

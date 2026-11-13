@@ -46,3 +46,9 @@ class TaskLogSignal extends CalendarSignal {
   const TaskLogSignal(super.sender, super.timestamp, this.content);
   final Map<String, Object?> content;
 }
+
+/// Kalender-Thema (ein Datensatz je Thema) aus dem Familienraum (E-99).
+class EventThemeSignal extends CalendarSignal {
+  const EventThemeSignal(super.sender, super.timestamp, this.content);
+  final Map<String, Object?> content;
+}

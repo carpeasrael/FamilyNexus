@@ -54,8 +54,12 @@ void main() {
 
   tearDown(() => db.close());
 
-  test('Migration v4 legt die Tabellen an; schemaVersion ist 4', () {
-    expect(AppDatabase.schemaVersion, 4);
+  test('Migrationen legen die Tabellen an; schemaVersion ist 5', () async {
+    // v5 (E-99) ergänzt die Tabelle der Kalender-Themen; die Version bleibt gleich der Zahl der Migrationen.
+    expect(AppDatabase.schemaVersion, 5);
+    expect(AppDatabase.schemaVersion, AppDatabase.migrations.length);
+    final names = (await db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'table'")).map((r) => r['name']).toSet();
+    expect(names, containsAll(<String>['task_lists', 'task_log', 'event_themes']));
   });
 
   test('Liste: speichern, lesen, Version überschreibt, ausstehend/veröffentlicht', () async {

@@ -194,4 +194,49 @@ void main() {
       expect(ok.validate(), isEmpty);
     });
   });
+
+  group('Kalender-Thema (E-99)', () {
+    const theme = '00000000-0000-4000-8000-0000000000a1';
+
+    test('Rundlauf mit themeId; der Schlüssel "theme" ist nur gesetzt kodiert, das Schema bleibt v1', () {
+      final withTheme = ev().copyWith(themeId: theme);
+      final m = _shared(withTheme);
+      expect(m['v'], 1);
+      expect(m['theme'], theme);
+      expect(_dec(m).event, withTheme);
+      expect(_dec(m).event!.themeId, theme);
+      final without = _shared();
+      expect(without.containsKey('theme'), isFalse);
+      expect(_dec(without).event!.themeId, isNull);
+    });
+
+    test('Altformat ohne "theme" bleibt gültig', () {
+      final old = _shared()..remove('theme');
+      expect(_dec(old).isOk, isTrue);
+    });
+
+    test('ungültiges Format oder Typ von "theme" ist ein Fehler', () {
+      for (final bad in <Object?>['kein-uuid', 5, '', null, <Object?>[theme], true]) {
+        final m = _shared(ev().copyWith(themeId: theme))..['theme'] = bad;
+        final r = _dec(m);
+        expect(r.isOk, isFalse, reason: '$bad');
+      }
+      expect(ev().copyWith(themeId: 'kein-uuid').validate(), contains('theme'));
+    });
+
+    test('gespeicherte Form enthält theme und liest es zurück; copyWith kann es löschen', () {
+      final e = ev().copyWith(themeId: theme);
+      final stored = EventCodec.encodeStored(e);
+      expect(stored['theme'], theme);
+      expect(EventCodec.decodeStored(stored, owner: kOwner, visibility: EventVisibility.shared).event, e);
+      expect(e.copyWith(clearTheme: true).themeId, isNull);
+      expect(e.copyWith(title: 'x').themeId, theme, reason: 'copyWith erhält das Thema');
+      expect(e == e.copyWith(themeId: '00000000-0000-4000-8000-0000000000a2'), isFalse);
+    });
+
+    test('Löschmarke trägt kein Thema', () {
+      final t = ev().copyWith(themeId: theme).tombstone(DateTime.utc(2026, 4));
+      expect(t.themeId, isNull);
+    });
+  });
 }

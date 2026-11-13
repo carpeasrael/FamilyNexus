@@ -23,6 +23,8 @@ import '../../domain/calendar_signal.dart';
 import '../../domain/chat.dart';
 import '../../domain/data_inventory.dart';
 import '../../domain/event_codec.dart';
+import '../../domain/event_theme_codec.dart';
+import '../../domain/event_themes.dart';
 import '../../domain/family.dart';
 import '../../domain/family_code.dart';
 import '../../domain/invite_link.dart';

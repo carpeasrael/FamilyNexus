@@ -7,6 +7,7 @@ import '../../app/app_services.dart';
 import '../../core/app_log.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_service.dart';
+import '../../domain/event_themes.dart';
 import '../../domain/family.dart';
 import '../../domain/recurrence.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -16,6 +17,7 @@ import '../../ui/widgets/glass.dart';
 import '../../ui/widgets/length_limit.dart';
 import '../reminders/reminder_coordinator.dart';
 import 'calendar_controller.dart';
+import 'event_tile.dart';
 import 'event_times.dart';
 import 'formatting.dart';
 
@@ -47,7 +49,11 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
   /// Beginn und Ende samt den Zeitregeln (Ganztägig, Ende wandert mit dem Beginn).
   late EventTimes _times;
   late EventVisibility _visibility;
+  /// Unveränderter Altwert der Terminfarbe (E-99): wird weitergeschrieben, aber nicht mehr gewählt.
   late int _color;
+
+  /// Gewähltes Kalender-Thema; nur für geteilte Termine (E-99).
+  String? _themeId;
   late Frequency _freq;
   late Set<int> _weekdays;
   _End _end = _End.never;
@@ -80,6 +86,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
       _times = EventTimes.fromEvent(e, _zone);
       _visibility = e.visibility;
       _color = e.colorIndex;
+      _themeId = e.themeId;
       _freq = e.recurrence.frequency;
       _weekdays = <int>{...e.recurrence.weekdays};
       _interval = TextEditingController(text: '${e.recurrence.interval}');
@@ -228,6 +235,7 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
           recurrence: _recurrence(),
           attendees: _attendees.toList()..sort(),
           reminders: reminders,
+          themeId: _visibility == EventVisibility.shared ? _themeId : null,
         );
       } else {
         saved = await c.update(
@@ -243,6 +251,8 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
             colorIndex: _color,
             recurrence: _recurrence(),
             attendees: _attendees.toList()..sort(),
+            themeId: _themeId,
+            clearTheme: _themeId == null || _visibility != EventVisibility.shared,
           ),
           reminders: _reminderTouched ? reminders : null,
           visibility: _visibility,
@@ -331,7 +341,14 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
               ),
               gap,
             ],
-            _ColorCard(selected: _color, onSelect: (i) => setState(() => _color = i)),
+            if (_visibility == EventVisibility.shared)
+              _ThemeCard(
+                controller: widget.controller,
+                selected: _themeId,
+                onSelect: (id) => setState(() => _themeId = id),
+              )
+            else
+              const _PrivateColorHint(),
             // Im Browser gibt es keine Erinnerungen (E-53, #145): keine Karte. Gespeicherte Werte bleiben unberührt
             // (`_reminderTouched` wird nur durch die Chips gesetzt).
             if (AppScope.of(context).reminders != null) ...<Widget>[

@@ -3114,4 +3114,91 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get syncSlow =>
       'This is taking longer than usual. Check your internet connection or try again.';
+
+  @override
+  String get eventTheme => 'Theme';
+
+  @override
+  String get eventThemeNone => 'No theme';
+
+  @override
+  String eventThemeSemantics(String name) {
+    return 'Theme $name';
+  }
+
+  @override
+  String get eventThemePrivateHint => 'Private: always blue';
+
+  @override
+  String get eventTypeEventTheme => 'Calendar themes';
+
+  @override
+  String get familyThemes => 'Calendar themes';
+
+  @override
+  String get familyThemesHint =>
+      'Themes give shared events a color, e.g. purple for school.';
+
+  @override
+  String get themesEmpty => 'No themes yet. Create the first one.';
+
+  @override
+  String get themeAdd => 'Add theme';
+
+  @override
+  String get themeEdit => 'Edit theme';
+
+  @override
+  String get themeName => 'Name';
+
+  @override
+  String get themeColor => 'Color';
+
+  @override
+  String get themeDelete => 'Delete theme';
+
+  @override
+  String themeDeleteBody(String name) {
+    return 'Delete “$name”? Shared events with this theme will show their previous color again.';
+  }
+
+  @override
+  String get themeSaved => 'Theme saved.';
+
+  @override
+  String get themeDeleted => 'Theme deleted.';
+
+  @override
+  String themeLimit(int count) {
+    return 'At most $count active themes are possible.';
+  }
+
+  @override
+  String themeInvalid(int count) {
+    return 'Please enter a name (at most $count characters).';
+  }
+
+  @override
+  String get themeColorTeal => 'Teal';
+
+  @override
+  String get themeColorPink => 'Pink';
+
+  @override
+  String get themeColorViolet => 'Purple';
+
+  @override
+  String get themeColorAmber => 'Yellow';
+
+  @override
+  String get themeColorGreen => 'Green';
+
+  @override
+  String get themeColorOrange => 'Orange';
+
+  @override
+  String get themeColorRed => 'Red';
+
+  @override
+  String get themeColorSky => 'Sky blue';
 }

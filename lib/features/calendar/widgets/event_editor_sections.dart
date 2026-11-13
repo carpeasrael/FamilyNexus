@@ -299,42 +299,55 @@ class _AttendeesCard extends StatelessWidget {
   }
 }
 
-/// Farbe des Termins.
-class _ColorCard extends StatelessWidget {
-  const _ColorCard({required this.selected, required this.onSelect});
-  final int selected;
-  final ValueChanged<int> onSelect;
+/// Thema eines geteilten Termins (E-99): Chips mit Farbpunkt und Name, plus „Ohne Thema“. Nur Moderatoren legen
+/// Themen an; jedes Mitglied wählt eines für den eigenen Termin.
+class _ThemeCard extends StatelessWidget {
+  const _ThemeCard({required this.controller, required this.selected, required this.onSelect});
+  final CalendarController controller;
+  final String? selected;
+  final ValueChanged<String?> onSelect;
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final t = AuroraTokens.of(context);
+    final themes = controller.eventThemes;
+    // Ein unbekanntes oder gelöschtes Thema gilt als „Ohne Thema“ (die gespeicherte ID bleibt unberührt).
+    final current = controller.themeOf(selected)?.id;
     return GlassCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-        Text(l.eventColor, style: Theme.of(context).textTheme.titleSmall),
+        Text(l.eventTheme, style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
-        Wrap(spacing: 10, runSpacing: 10, children: <Widget>[
-          for (var i = 0; i < AuroraTokens.personColors.length; i++)
-            Semantics(
-              label: l.eventColorName(i + 1),
-              selected: selected == i,
-              button: true,
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: () => onSelect(i),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AuroraTokens.personColors[i],
-                    shape: BoxShape.circle,
-                    border: Border.all(color: selected == i ? t.textPrimary : Colors.transparent, width: 3),
-                  ),
-                  child: selected == i ? const Icon(Icons.check, color: Colors.black) : null,
-                ),
-              ),
+        Wrap(spacing: 8, runSpacing: 4, children: <Widget>[
+          ChoiceChip(
+            label: Text(l.eventThemeNone),
+            selected: current == null,
+            onSelected: (_) => onSelect(null),
+          ),
+          for (final th in themes)
+            ChoiceChip(
+              avatar: PersonDot(colorIndex: th.colorIndex),
+              label: Text(th.name),
+              selected: current == th.id,
+              onSelected: (_) => onSelect(th.id),
             ),
         ]),
+      ]),
+    );
+  }
+}
+
+/// Privat: Die Farbe ist fest Himmelblau, es gibt keine Auswahl (E-99).
+class _PrivateColorHint extends StatelessWidget {
+  const _PrivateColorHint();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return GlassCard(
+      child: Row(children: <Widget>[
+        const PersonDot(colorIndex: EventTheme.privateColorIndex),
+        const SizedBox(width: 10),
+        Expanded(child: Text(l.eventThemePrivateHint)),
       ]),
     );
   }

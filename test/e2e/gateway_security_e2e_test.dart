@@ -8,6 +8,7 @@ import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/event_codec.dart';
+import 'package:family_nexus/domain/event_theme_codec.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/invite_ticket.dart';
@@ -566,7 +567,7 @@ void main() {
       final raw = t.peer.sdkClient!;
       final own = t.g.sdkClient!;
       const junk = <String, Object?>{'x': 'KLARTEXT'};
-      for (final type in <String>[EventCodec.sharedType, EventCodec.rsvpType, ShoppingCodec.type, TaskCodec.listType, TaskCodec.logType]) {
+      for (final type in <String>[EventCodec.sharedType, EventCodec.rsvpType, ShoppingCodec.type, TaskCodec.listType, TaskCodec.logType, EventThemeCodec.type]) {
         await raw.sendMessage(t.roomId, type, raw.generateUniqueTransactionId(), junk);
       }
       await own.sendMessage(privateId, EventCodec.privateType, own.generateUniqueTransactionId(), junk);

@@ -33,6 +33,7 @@ class CalendarEvent {
     this.recurrence = Recurrence.none,
     this.attendees = const <String>[],
     this.deleted = false,
+    this.themeId,
   });
 
   static const int maxTitle = 200;
@@ -64,6 +65,9 @@ class CalendarEvent {
   final DateTime updatedAt;
   final bool deleted;
 
+  /// Kalender-Thema (E-99) eines geteilten Termins; `null` = ohne Thema. Private Termine haben keines.
+  final String? themeId;
+
   bool get isShared => visibility == EventVisibility.shared;
 
   Duration get duration => allDay ? Duration(days: end.difference(start).inDays + 1) : end.difference(start);
@@ -93,6 +97,8 @@ class CalendarEvent {
     if (_badText.hasMatch(title) || _badText.hasMatch(location)) p.add('text');
     if (_badNote.hasMatch(note)) p.add('text');
     if (colorIndex < 0 || colorIndex >= colorCount) p.add('color');
+    final theme = themeId;
+    if (theme != null && !isValidId(theme)) p.add('theme');
     if (!start.isUtc || !end.isUtc || !updatedAt.isUtc) p.add('utc');
     if (start.isBefore(minDate) || start.isAfter(maxDate) || end.isBefore(minDate) || end.isAfter(maxDate)) p.add('range');
     if (end.isBefore(start)) p.add('end-before-start');
@@ -127,6 +133,8 @@ class CalendarEvent {
     List<String>? attendees,
     DateTime? updatedAt,
     bool? deleted,
+    String? themeId,
+    bool clearTheme = false,
   }) =>
       CalendarEvent(
         id: id,
@@ -145,6 +153,7 @@ class CalendarEvent {
         attendees: attendees ?? this.attendees,
         updatedAt: updatedAt ?? this.updatedAt,
         deleted: deleted ?? this.deleted,
+        themeId: clearTheme ? null : (themeId ?? this.themeId),
       );
 
   /// Löschmarke (Tombstone): behält nur die ID und erhöht die Version. Zeitpunkt, Zeitzone und
@@ -180,7 +189,8 @@ class CalendarEvent {
       other.recurrence == recurrence &&
       _listEq(other.attendees, attendees) &&
       other.updatedAt == updatedAt &&
-      other.deleted == deleted;
+      other.deleted == deleted &&
+      other.themeId == themeId;
 
   @override
   int get hashCode => Object.hash(id, ownerId, version, title, start, end, timeZone, allDay, updatedAt, deleted);

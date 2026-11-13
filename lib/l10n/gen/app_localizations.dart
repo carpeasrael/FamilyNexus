@@ -5245,6 +5245,162 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Das dauert länger als üblich. Prüfe die Internetverbindung oder versuche es erneut.'**
   String get syncSlow;
+
+  /// No description provided for @eventTheme.
+  ///
+  /// In de, this message translates to:
+  /// **'Thema'**
+  String get eventTheme;
+
+  /// No description provided for @eventThemeNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Ohne Thema'**
+  String get eventThemeNone;
+
+  /// No description provided for @eventThemeSemantics.
+  ///
+  /// In de, this message translates to:
+  /// **'Thema {name}'**
+  String eventThemeSemantics(String name);
+
+  /// No description provided for @eventThemePrivateHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Privat: immer blau'**
+  String get eventThemePrivateHint;
+
+  /// No description provided for @eventTypeEventTheme.
+  ///
+  /// In de, this message translates to:
+  /// **'Kalender-Themen'**
+  String get eventTypeEventTheme;
+
+  /// No description provided for @familyThemes.
+  ///
+  /// In de, this message translates to:
+  /// **'Kalender-Themen'**
+  String get familyThemes;
+
+  /// No description provided for @familyThemesHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Themen geben geteilten Terminen eine Farbe, z. B. Lila für Schule.'**
+  String get familyThemesHint;
+
+  /// No description provided for @themesEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Themen. Lege das erste an.'**
+  String get themesEmpty;
+
+  /// No description provided for @themeAdd.
+  ///
+  /// In de, this message translates to:
+  /// **'Thema anlegen'**
+  String get themeAdd;
+
+  /// No description provided for @themeEdit.
+  ///
+  /// In de, this message translates to:
+  /// **'Thema ändern'**
+  String get themeEdit;
+
+  /// No description provided for @themeName.
+  ///
+  /// In de, this message translates to:
+  /// **'Name'**
+  String get themeName;
+
+  /// No description provided for @themeColor.
+  ///
+  /// In de, this message translates to:
+  /// **'Farbe'**
+  String get themeColor;
+
+  /// No description provided for @themeDelete.
+  ///
+  /// In de, this message translates to:
+  /// **'Thema löschen'**
+  String get themeDelete;
+
+  /// No description provided for @themeDeleteBody.
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“ löschen? Geteilte Termine mit diesem Thema zeigen danach wieder ihre bisherige Farbe.'**
+  String themeDeleteBody(String name);
+
+  /// No description provided for @themeSaved.
+  ///
+  /// In de, this message translates to:
+  /// **'Thema gespeichert.'**
+  String get themeSaved;
+
+  /// No description provided for @themeDeleted.
+  ///
+  /// In de, this message translates to:
+  /// **'Thema gelöscht.'**
+  String get themeDeleted;
+
+  /// No description provided for @themeLimit.
+  ///
+  /// In de, this message translates to:
+  /// **'Es sind höchstens {count} aktive Themen möglich.'**
+  String themeLimit(int count);
+
+  /// No description provided for @themeInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte einen Namen eingeben (höchstens {count} Zeichen).'**
+  String themeInvalid(int count);
+
+  /// No description provided for @themeColorTeal.
+  ///
+  /// In de, this message translates to:
+  /// **'Türkis'**
+  String get themeColorTeal;
+
+  /// No description provided for @themeColorPink.
+  ///
+  /// In de, this message translates to:
+  /// **'Rosa'**
+  String get themeColorPink;
+
+  /// No description provided for @themeColorViolet.
+  ///
+  /// In de, this message translates to:
+  /// **'Lila'**
+  String get themeColorViolet;
+
+  /// No description provided for @themeColorAmber.
+  ///
+  /// In de, this message translates to:
+  /// **'Gelb'**
+  String get themeColorAmber;
+
+  /// No description provided for @themeColorGreen.
+  ///
+  /// In de, this message translates to:
+  /// **'Grün'**
+  String get themeColorGreen;
+
+  /// No description provided for @themeColorOrange.
+  ///
+  /// In de, this message translates to:
+  /// **'Orange'**
+  String get themeColorOrange;
+
+  /// No description provided for @themeColorRed.
+  ///
+  /// In de, this message translates to:
+  /// **'Rot'**
+  String get themeColorRed;
+
+  /// No description provided for @themeColorSky.
+  ///
+  /// In de, this message translates to:
+  /// **'Himmelblau'**
+  String get themeColorSky;
 }
 
 class _AppLocalizationsDelegate

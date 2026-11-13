@@ -3136,4 +3136,91 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get syncSlow =>
       'Das dauert länger als üblich. Prüfe die Internetverbindung oder versuche es erneut.';
+
+  @override
+  String get eventTheme => 'Thema';
+
+  @override
+  String get eventThemeNone => 'Ohne Thema';
+
+  @override
+  String eventThemeSemantics(String name) {
+    return 'Thema $name';
+  }
+
+  @override
+  String get eventThemePrivateHint => 'Privat: immer blau';
+
+  @override
+  String get eventTypeEventTheme => 'Kalender-Themen';
+
+  @override
+  String get familyThemes => 'Kalender-Themen';
+
+  @override
+  String get familyThemesHint =>
+      'Themen geben geteilten Terminen eine Farbe, z. B. Lila für Schule.';
+
+  @override
+  String get themesEmpty => 'Noch keine Themen. Lege das erste an.';
+
+  @override
+  String get themeAdd => 'Thema anlegen';
+
+  @override
+  String get themeEdit => 'Thema ändern';
+
+  @override
+  String get themeName => 'Name';
+
+  @override
+  String get themeColor => 'Farbe';
+
+  @override
+  String get themeDelete => 'Thema löschen';
+
+  @override
+  String themeDeleteBody(String name) {
+    return '„$name“ löschen? Geteilte Termine mit diesem Thema zeigen danach wieder ihre bisherige Farbe.';
+  }
+
+  @override
+  String get themeSaved => 'Thema gespeichert.';
+
+  @override
+  String get themeDeleted => 'Thema gelöscht.';
+
+  @override
+  String themeLimit(int count) {
+    return 'Es sind höchstens $count aktive Themen möglich.';
+  }
+
+  @override
+  String themeInvalid(int count) {
+    return 'Bitte einen Namen eingeben (höchstens $count Zeichen).';
+  }
+
+  @override
+  String get themeColorTeal => 'Türkis';
+
+  @override
+  String get themeColorPink => 'Rosa';
+
+  @override
+  String get themeColorViolet => 'Lila';
+
+  @override
+  String get themeColorAmber => 'Gelb';
+
+  @override
+  String get themeColorGreen => 'Grün';
+
+  @override
+  String get themeColorOrange => 'Orange';
+
+  @override
+  String get themeColorRed => 'Rot';
+
+  @override
+  String get themeColorSky => 'Himmelblau';
 }
