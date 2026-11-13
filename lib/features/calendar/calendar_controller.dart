@@ -232,8 +232,7 @@ class CalendarController extends ChangeNotifier {
   }
 
   /// Neonfarbe (Palettenindex) einer Person: gespeichert oder aus der ID abgeleitet.
-  int colorIndexFor(String userId) =>
-      _colors[userId] ?? (userId.codeUnits.fold<int>(7, (a, b) => (a * 31 + b) & 0x7fffffff) % AuroraTokens.personColors.length);
+  int colorIndexFor(String userId) => _colors[userId] ?? AuroraTokens.personColorFallback(userId);
 
   List<int> remindersOf(CalendarEvent e, List<int> defaults) => _reminders[e.id] ?? defaults;
   bool hasCustomReminders(String eventId) => _reminders.containsKey(eventId);

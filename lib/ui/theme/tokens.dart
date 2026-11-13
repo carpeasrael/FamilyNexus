@@ -105,6 +105,11 @@ class AuroraTokens extends ThemeExtension<AuroraTokens> {
     Color(0xFFF87171),
   ];
 
+  /// Palettenindex einer Person aus ihrer Kennung (Hash), wenn keine Farbe gespeichert ist. Reine Funktion: dieselbe
+  /// Kennung ergibt immer denselben Index (Kalender-Controller und Avatar nutzen sie gemeinsam).
+  static int personColorFallback(String userId) =>
+      userId.codeUnits.fold<int>(7, (a, b) => (a * 31 + b) & 0x7fffffff) % personColors.length;
+
   static AuroraTokens of(BuildContext context) =>
       Theme.of(context).extension<AuroraTokens>()!;
 
