@@ -89,7 +89,7 @@ Person ausdrücklich als Kontakt hinzufügt und sie zustimmt.
 | Rechte in Gruppen | Wie `FamilyRoomSpec.powerLevels`: Ersteller 100, Schwellen 50 für `invite`, `kick`, `ban`, `redact`, Zustände; Tombstone und Server-ACL unerreichbar. In der App: **Gruppen-Admin** (ab 50) und Mitglied. |
 | Kontaktliste | Datensätze im **privaten Raum** (E-09) als `de.inneso.familynexus.contact`, Megolm, nur eigene Geräte; lokal in SQLCipher. Nie im Familienraum. |
 | Familie im Raum | Kontakträume tragen keinerlei Familienbezug (kein Name, keine Familien-ID, keine eigenen Ereignistypen). |
-| Klartext-Metadaten | Gruppenname (`m.room.name`) ist wie der Familienname für Server lesbar. Die App sagt das beim Anlegen. |
+| Klartext-Metadaten | Gruppenname (`m.room.name`) ist wie der Familienname für Server lesbar. Die App sagt das beim Anlegen. Im Familienraum ist zusätzlich die Avatar-Wahl sichtbar (E-101); Kontakt- und Gruppenräume tragen sie nicht. |
 
 `invited` als Verlauf: Neu Hinzugefügte sehen nichts aus der Zeit vor ihrer Einladung. Das SDK verteilt neue
 Sitzungsschlüssel auch an Eingeladene (`Room.getUserDeviceKeys`, SA-2): Wer in eine Gruppe eingeladen ist, kann ab der
@@ -283,7 +283,7 @@ weiter für die Einrichtung; TP-L10N-01 bleibt unverändert.
 | Gruppe wird zur Familie gemacht | B1, Prüfung in `acceptInvitation` | Fremde Matrix-Apps sind außerhalb der App |
 | Schädliche Anhänge von Fremden | E-19/E-28 unverändert, kein automatisches Laden, keine Linkvorschau, Text wird nicht als Link dargestellt | Lücke im Bilddecoder nach Tipp |
 | Server-Metadaten | Transparenz in Datenschutz | Server sehen, wer mit wem in welchem Raum ist und den Gruppennamen; `m.direct` und `identity_pins` nennen Partner dem eigenen Server (SA-11); `identity_pins` ist nur noch Spiegel, maßgeblich ist die lokale Kopie je Gerät (#142) |
-| Föderation | Inhalte E2EE | Fremde Server sehen Metadaten und Klartext-Gruppennamen |
+| Föderation | Inhalte E2EE | Fremde Server sehen Metadaten und Klartext-Gruppennamen (im Familienraum auch die Avatar-Wahl, E-101) |
 | Großräume als Ressourcenangriff | Obergrenze 50, Prüfung nach Beitritt, Zeitleisten bei Bedarf | Beitritt kurzzeitig nötig, um die Größe sicher zu kennen |
 
 ### 9.2 Abweichung SA-11 (vorgeschlagen)

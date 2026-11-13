@@ -2,7 +2,7 @@
 
 FamilyNexus funktioniert mit jedem Matrix-Homeserver, der die Client-Server-API ab **v1.1** unterstützt
 (Raumversion 10, Anklopfen/„knock“, Anmeldung mit Passwort). Mit einem eigenen Server bestimmst du selbst,
-wer die **Metadaten** (wer schreibt wann mit wem, Raum- und Profilnamen wie der Familienname) sieht; sie verschwinden dadurch nicht. Inhalte sind ohnehin Ende-zu-Ende-verschlüsselt.
+wer die **Metadaten** (wer schreibt wann mit wem, Raum- und Profilnamen wie der Familienname, die Wahl des Avatars) sieht; sie verschwinden dadurch nicht. Inhalte sind ohnehin Ende-zu-Ende-verschlüsselt; die Avatar-Wahl (ein Wert aus zwölf eingebauten Avataren) ist als Raumzustand eine bewusste, unverschlüsselte Ausnahme (E-101).
 
 > Diese Anleitung ist eine Ausgangsbasis, kein Ersatz für die Dokumentation von Synapse bzw. deines
 > Reverse-Proxys. Nimm aktuelle Versionen und halte sie aktuell.

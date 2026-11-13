@@ -81,7 +81,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
   - **Alte Reaktionen:** Vorhandene und von älteren App-Versionen gesendete `m.reaction` bleiben auf dem Server im Klartext. Für neue Reaktionen stimmt die Aussage der Datenschutzerklärungen, für diese nicht. Eine Bereinigung wäre eine Redaktion je Ereignis und ist nicht vorgesehen.
   - **Andere Versionen:** Ältere App-Versionen und andere Matrix-Clients zeigen neue Reaktionen nicht.
   - **Gefälschte Reaktionen:** Da `m.reaction` lesbar bleibt, kann der Server weiter Klartext-Reaktionen im Namen eines Mitglieds zeigen (nur Emoji, kein Inhalt). Über die Restrisiken aus #138 (Herkunft der Sitzung) gilt das auch für den neuen Typ.
-  - **Metadaten:** Der Server sieht weiter Absender, Zeitpunkt und Größe. Kurze Ereignisse in zeitlicher Nähe zu einer Nachricht lassen vermuten, dass es Reaktionen sind.
+  - **Metadaten:** Der Server sieht weiter Absender, Zeitpunkt und Größe. Kurze Ereignisse in zeitlicher Nähe zu einer Nachricht lassen vermuten, dass es Reaktionen sind. Die Aufzählung gilt für Nachrichten und Reaktionen; die Avatar-Wahl ist ein eigener, sichtbarer Raumzustand (E-101).
   - **Nicht entschlüsselbar:** Solche Reaktionen erscheinen als „nicht entschlüsselbar“ oder im Sammelhinweis (#35); bei Reaktionen ist das häufiger als bei Terminen.
   - **Hängende Sendung:** Eine durch App-Abbruch hängende Reaktion im Zustand `sending` zählt als gültig und blockiert die Wiederholung, bis das SDK sie beim nächsten Neustart nach Ablauf einer Minute auf Fehler setzt.
   - **Störung der Doppelprüfung:** Der eigene Homeserver kann mit gefälschtem Klartext die Doppelprüfung auslösen, sodass die echte Reaktion nicht gesendet wird. Das stört nur das eigene Gerät.
@@ -215,3 +215,10 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 - Rust-Toolchain ist Build-Voraussetzung (vodozemac wird aus Quelltext gebaut).
 - Dart-AOT-Symbole: `flutter build --obfuscate` warnt vor unobfuskierten DWARF-Informationen in der ELF-Bibliothek;
   Android-Release verwendet `--split-debug-info`, Code ist per R8 minimiert.
+
+## Avatare (E-101, #422)
+
+- **Server sieht die Wahl:** Der Avatar (ein Wert aus zwölf) ist ein nicht verschlüsselter Raumzustand; er bleibt nach dem Entfernen oder der Kontolöschung im Familienraum stehen, die Anzeige blendet Nicht-Mitglieder aus.
+- **Aufblähen des Raumzustands:** Jedes Mitglied kann weitere Schlüssel dieses Typs anlegen (der Server verhindert es nicht); die App liest nur den Schlüssel der jeweiligen Person.
+- **Freischaltung bestehender Familien:** erst nach dem Öffnen der App auf einem Moderator-Gerät; ein gleichzeitiges `promote` auf veraltetem Stand kann sie still entfernen (wird nach der Pause ergänzt); ein Ersteller auf Stufe 100 kann dabei einen frisch ernannten Moderator still herabstufen (Grenze aus E-60).
+- **Hochladen eigener Fotos:** nicht umgesetzt, eigenes Issue (braucht Bildverarbeitung, Dekodiersicherheit, Moderation und Verschlüsselung).
