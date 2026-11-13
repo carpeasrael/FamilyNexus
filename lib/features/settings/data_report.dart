@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../../domain/data_inventory.dart';
 import '../../domain/event_codec.dart';
+import '../../domain/event_theme_codec.dart';
 import '../../domain/family.dart';
 import '../../domain/reaction_codec.dart';
 import '../../domain/server.dart';
@@ -58,6 +59,7 @@ class DataReport {
       ShoppingCodec.type => l.eventTypeShopping,
       TaskCodec.listType => l.eventTypeTaskList,
       TaskCodec.logType => l.eventTypeTaskDone,
+      EventThemeCodec.type => l.eventTypeEventTheme,
       _ => null,
     };
     return label == null ? type : '$label ($type)';

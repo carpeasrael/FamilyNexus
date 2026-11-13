@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/app_services.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_service.dart';
+import '../../domain/event_themes.dart';
 import '../../domain/occurrence.dart';
 import '../../domain/recurrence.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -165,7 +166,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             child: ContentWidth(child: ListView(padding: const EdgeInsets.all(16), children: <Widget>[
               _EventSummaryCard(
                 event: e,
-                glow: AuroraTokens.personColors[c.displayColorIndex(e) % AuroraTokens.personColors.length],
+                glow: AuroraTokens.personColors[c.displayColor(e) % AuroraTokens.personColors.length],
+                theme: c.themeFor(e),
+                ownerColorIndex: c.colorIndexFor(e.ownerId),
                 range: fmt.range(occurrence, l),
                 dateLong: fmt.dateLong(DateTime.parse(occurrence.dateKey)),
                 owner: e.ownerId == c.me ? l.eventOwnerYou : l.eventOwner(memberLabel(l, family, e.ownerId, me: c.me, inSentence: true)),

@@ -24,13 +24,15 @@ class EventTile extends StatelessWidget {
     final t = AuroraTokens.of(context);
     final fmt = Fmt(context, controller.zone);
     final e = occurrence.event;
-    final color = AuroraTokens.personColors[controller.displayColorIndex(e) % AuroraTokens.personColors.length];
+    final color = AuroraTokens.personColors[controller.displayColor(e) % AuroraTokens.personColors.length];
+    final theme = controller.themeFor(e);
     final mine = e.ownerId == controller.me;
     final owner = mine ? '' : ', ${l.eventOwner(controller.displayNameOf(e.ownerId) ?? l.chatFormerMemberQuoted)}';
     final repeat = e.recurrence.isRecurring ? ', ${l.eventRecurring}' : '';
     final privateLabel = e.isShared ? l.visibilityShared : l.visibilityPrivate;
     final range = fmt.range(occurrence, l);
-    final semanticLabel = '${e.title}, $range, $privateLabel$owner$repeat';
+    final themeLabel = theme == null ? '' : ', ${l.eventThemeSemantics(theme.name)}';
+    final semanticLabel = '${e.title}, $range, $privateLabel$themeLabel$owner$repeat';
     return Semantics(
       label: semanticLabel,
       button: true,
@@ -50,8 +52,24 @@ class EventTile extends StatelessWidget {
                   Text(e.title, style: Theme.of(context).textTheme.titleMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 2),
                   Text(range, style: monoStyle(context, size: 13, color: t.textSecondary)),
-                  if (!mine)
-                    Text(l.eventOwner(controller.displayNameOf(e.ownerId) ?? l.chatFormerMemberQuoted), style: Theme.of(context).textTheme.bodySmall),
+                  // Thema immer als Text; die Personenfarbe bleibt als kleiner Punkt vor dem Namen (E-99).
+                  if (theme != null)
+                    Row(children: <Widget>[
+                      Icon(Icons.label_outline, size: 14, color: color),
+                      const SizedBox(width: 4),
+                      Expanded(child: Text(theme.name, style: Theme.of(context).textTheme.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                    ]),
+                  if (!mine || theme != null)
+                    Row(children: <Widget>[
+                      PersonDot(colorIndex: controller.colorIndexFor(e.ownerId)),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          mine ? l.eventOwnerYou : l.eventOwner(controller.displayNameOf(e.ownerId) ?? l.chatFormerMemberQuoted),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    ]),
                   if (e.location.isNotEmpty)
                     Row(children: <Widget>[
                       Icon(Icons.place_outlined, size: 14, color: t.textSecondary),

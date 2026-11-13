@@ -10,6 +10,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
+import '../calendar/themes_screen.dart';
 import '../common/error_text.dart';
 import '../common/prompt_dialog.dart';
 import '../moderation/moderation_actions.dart';
@@ -30,6 +31,10 @@ class FamilyScreen extends StatelessWidget {
         if (f == null) return Center(child: Text(l.emptyFamily));
         final t = AuroraTokens.of(context);
         final mod = Permissions.isModerator(f);
+        // Kalender-Themen (E-99): nur für Moderatoren und nur, wenn ein Kalender-Controller mit Themen besteht;
+        // sonst ausgeblendet, nie deaktiviert angezeigt.
+        final calendar = AppScope.of(context).calendar;
+        final showThemes = mod && calendar?.themes != null;
         return ListView(padding: const EdgeInsets.all(16), children: <Widget>[
           GlassCard(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
@@ -52,6 +57,19 @@ class FamilyScreen extends StatelessWidget {
           if (mod) ...<Widget>[
             const SizedBox(height: 12),
             _InvitePanel(gateway: g, roomId: f.roomId),
+            if (showThemes) ...<Widget>[
+              const SizedBox(height: 12),
+              GlassCard(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                child: ListTile(
+                  leading: const Icon(Icons.palette_outlined),
+                  title: Text(l.familyThemes),
+                  subtitle: Text(l.familyThemesHint),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ThemesScreen(controller: calendar!))),
+                ),
+              ),
+            ],
             if (f.requests.isNotEmpty) ...<Widget>[
               const SizedBox(height: 16),
               Semantics(header: true, child: Text(l.familyRequests, style: Theme.of(context).textTheme.titleLarge)),

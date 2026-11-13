@@ -318,7 +318,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget _dayCell(CalendarController c, AppLocalizations l, AuroraTokens t, DateTime d, List<Occurrence> list, {required bool inMonth, required bool selected}) {
     final today = _isToday(d);
     final todaySuffix = today ? ', ${l.calendarToday}' : '';
-    final colors = list.map((o) => AuroraTokens.personColors[c.displayColorIndex(o.event) % AuroraTokens.personColors.length]).toSet().take(3).toList();
+    final colors = list.map((o) => AuroraTokens.personColors[c.displayColor(o.event) % AuroraTokens.personColors.length]).toSet().take(3).toList();
     return Semantics(
       button: true,
       selected: selected,
