@@ -1,6 +1,6 @@
 part of '../sdk_matrix_gateway.dart';
 
-/// Daten (AP-5): Kalender, Einkaufszettel und Aufgabenlisten im privaten und im Familienraum. Die Felder
+/// Daten (AP-5): Kalender, Kalender-Themen, Einkaufszettel und Aufgabenlisten im privaten und im Familienraum. Die Felder
 /// `_privateRoomIdCache` und `_privateVerified` liegen hier, die Klasse setzt sie in `_resetLocal` zurück.
 mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
   _AppClient? get _client;
@@ -113,6 +113,8 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
         _emit(TaskListSignal(e.senderId, e.originServerTs, c));
       } else if (shared && e.type == TaskCodec.logType) {
         _emit(TaskLogSignal(e.senderId, e.originServerTs, c));
+      } else if (shared && e.type == EventThemeCodec.type) {
+        _emit(EventThemeSignal(e.senderId, e.originServerTs, c));
       } else if (!shared && e.type == EventCodec.privateType) {
         _emit(PrivateEventSignal(e.senderId, e.originServerTs, c));
       } else if (e.type == EventTypes.Encrypted) {
@@ -129,6 +131,7 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
     ShoppingCodec.type,
     TaskCodec.listType,
     TaskCodec.logType,
+    EventThemeCodec.type,
     InviteTicket.type,
   };
 
@@ -322,6 +325,26 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
       rethrow;
     } catch (e) {
       AppLog.e('gateway', 'Protokolleintrag konnte nicht gesendet werden', e);
+      throw _map(e);
+    }
+  }
+
+  @override
+  Future<void> publishEventTheme(EventTheme theme) async {
+    final room = _requireEncryptedRoom();
+    if (theme.by != _client?.userID) throw const GatewayException(GatewayError.invalidInput);
+    final Map<String, Object?> content;
+    try {
+      content = EventThemeCodec.encode(theme);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    try {
+      await _sendCalendar(room, EventThemeCodec.type, content);
+    } on GatewayException {
+      rethrow;
+    } catch (e) {
+      AppLog.e('gateway', 'Kalender-Thema konnte nicht gesendet werden', e);
       throw _map(e);
     }
   }

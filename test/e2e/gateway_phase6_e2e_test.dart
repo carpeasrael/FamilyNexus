@@ -4,6 +4,7 @@ import 'package:family_nexus/data/sync/activity_notifier.dart';
 import 'package:family_nexus/domain/app_settings.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/chat.dart';
+import 'package:family_nexus/domain/event_theme_codec.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/presence.dart';
@@ -427,7 +428,7 @@ void main() {
       for (final secret in <String>['GEHEIME-LISTE', 'GEHEIMER-PUNKT', 'GEHEIMER-KOMMENTAR']) {
         expect(dump, isNot(contains(secret)));
       }
-      expect(raw.chunk.where((e) => e.type == TaskCodec.listType || e.type == TaskCodec.logType), isEmpty);
+      expect(raw.chunk.where((e) => e.type == TaskCodec.listType || e.type == TaskCodec.logType || e.type == EventThemeCodec.type), isEmpty);
     });
   });
 }

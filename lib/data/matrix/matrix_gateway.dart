@@ -5,6 +5,7 @@ import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/chat.dart';
 import '../../domain/data_inventory.dart';
+import '../../domain/event_themes.dart';
 import '../../domain/family.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/moderation.dart';
@@ -375,6 +376,11 @@ abstract class MatrixGateway implements Listenable {
 
   /// Sendet einen Protokolleintrag einer Aufgabenliste verschlüsselt in den Familienraum (E-51).
   Future<void> publishTaskLog(TaskLogEntry entry);
+
+  // ------------------------------------------------------------ Kalender-Themen
+
+  /// Sendet ein Kalender-Thema (ein Ereignis je Thema) verschlüsselt in den Familienraum (E-99).
+  Future<void> publishEventTheme(EventTheme theme);
 
   // ------------------------------------------------------------ Datenprotokoll
 

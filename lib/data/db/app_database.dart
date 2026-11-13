@@ -113,6 +113,18 @@ class AppDatabase {
         )''');
       await db.execute('CREATE INDEX task_log_list ON task_log (list_id, at_ms)');
     },
+    // v5: Kalender-Themen, ein Datensatz je Thema (E-99)
+    (db) async {
+      await db.execute('''
+        CREATE TABLE event_themes (
+          id TEXT PRIMARY KEY NOT NULL,
+          version INTEGER NOT NULL,
+          published INTEGER NOT NULL DEFAULT 0,
+          deleted INTEGER NOT NULL,
+          author TEXT NOT NULL,
+          data TEXT NOT NULL
+        )''');
+    },
   ];
 
   static int get schemaVersion => migrations.length;

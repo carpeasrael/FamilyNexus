@@ -27,6 +27,7 @@ import 'fake_matrix.dart';
 import 'fake_scheduler.dart';
 import 'fake_store.dart';
 import 'memory_event_store.dart';
+import 'memory_event_theme_store.dart';
 import 'memory_shopping_store.dart';
 import 'memory_stores.dart';
 import 'memory_task_store.dart';
@@ -41,6 +42,7 @@ class TestApp {
     required this.events,
     required this.shoppingStore,
     required this.taskStore,
+    required this.themeStore,
     required this.scheduler,
     required this.links,
     required this.auth,
@@ -66,6 +68,7 @@ class TestApp {
   final MemoryEventStore events;
   final MemoryShoppingStore shoppingStore;
   final MemoryTaskStore taskStore;
+  final MemoryEventThemeStore themeStore;
   final FakeReminderScheduler scheduler;
   final FakeLinkSource links;
   final FakeDeviceAuth auth;
@@ -113,6 +116,7 @@ Future<TestApp> buildTestApp({
   MemoryEventStore? eventStore,
   MemoryShoppingStore? shoppingItems,
   MemoryTaskStore? taskItems,
+  MemoryEventThemeStore? themeItems,
   // Test: Meldungen zu Chat und Einkauf und Zahl am App-Symbol (#254). Ohne Angabe wie im Browser: keine.
   ActivityPlatform? activity,
   AppBadge? badge,
@@ -144,6 +148,7 @@ Future<TestApp> buildTestApp({
   final events = eventStore ?? MemoryEventStore();
   final shoppingStore = shoppingItems ?? MemoryShoppingStore();
   final taskStore = taskItems ?? MemoryTaskStore();
+  final themeStore = themeItems ?? MemoryEventThemeStore();
   final scheduler = FakeReminderScheduler();
   final links = FakeLinkSource();
   final auth = FakeDeviceAuth();
@@ -220,6 +225,8 @@ Future<TestApp> buildTestApp({
         zoneName: 'Europe/Berlin',
         clock: clock,
         retryInterval: const Duration(hours: 1),
+        themeStore: themeStore,
+        isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
       );
       builtCalendars.add(controller);
       return controller;
@@ -234,6 +241,7 @@ Future<TestApp> buildTestApp({
     events: events,
     shoppingStore: shoppingStore,
     taskStore: taskStore,
+    themeStore: themeStore,
     scheduler: scheduler,
     links: links,
     auth: auth,

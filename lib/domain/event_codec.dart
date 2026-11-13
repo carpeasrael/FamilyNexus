@@ -79,6 +79,8 @@ class EventCodec {
       },
       'attendees': e.attendees,
       'updated_at': e.updatedAt.toIso8601String(),
+      // Optional (E-99): nur gesetzt kodiert; ältere App-Versionen ignorieren den Schlüssel.
+      if (e.themeId != null) 'theme': e.themeId,
     };
   }
 
@@ -134,6 +136,7 @@ class EventCodec {
         recurrence: recurrence,
         attendees: _strList(c, 'attendees'),
         updatedAt: _date(c['updated_at']),
+        themeId: _optId(c, 'theme'),
       );
       final problems = event.validate();
       if (problems.isNotEmpty) return DecodeResult.failure(problems.first);
@@ -186,6 +189,14 @@ class EventCodec {
   static int _int(Map<String, Object?> m, String k) {
     final v = m[k];
     if (v is! int) throw FormatException(k);
+    return v;
+  }
+
+  /// Optionales Feld: fehlt es, ist es `null`; ist es vorhanden, muss es eine gültige ID sein.
+  static String? _optId(Map<String, Object?> m, String k) {
+    if (!m.containsKey(k)) return null;
+    final v = m[k];
+    if (v is! String || !CalendarEvent.isValidId(v)) throw FormatException(k);
     return v;
   }
 

@@ -8,6 +8,8 @@ import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/data_inventory.dart';
 import 'package:family_nexus/domain/event_codec.dart';
+import 'package:family_nexus/domain/event_theme_codec.dart';
+import 'package:family_nexus/domain/event_themes.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/family_code.dart';
 import 'package:family_nexus/domain/invite_link.dart';
@@ -215,6 +217,7 @@ class FakeMatrixServer {
           ShoppingCodec.type => ShoppingSignal(e.sender, e.time, e.content),
           TaskCodec.listType => TaskListSignal(e.sender, e.time, e.content),
           TaskCodec.logType => TaskLogSignal(e.sender, e.time, e.content),
+          EventThemeCodec.type => EventThemeSignal(e.sender, e.time, e.content),
           _ => null,
         };
       }
@@ -1450,6 +1453,26 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       throw const GatewayException(GatewayError.invalidInput);
     }
     fake.post(room, _userId!, TaskCodec.listType, content);
+  }
+
+  // ---------------------------------------------------------- Kalender-Themen
+
+  @override
+  Future<void> publishEventTheme(EventTheme theme) async {
+    _requireSession();
+    _require();
+    publishAttempts++;
+    if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
+    final room = familyRoom;
+    if (room == null) throw const GatewayException(GatewayError.notFound);
+    if (theme.by != _userId) throw const GatewayException(GatewayError.invalidInput);
+    final Map<String, Object?> content;
+    try {
+      content = EventThemeCodec.encode(theme);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    fake.post(room, _userId!, EventThemeCodec.type, content);
   }
 
   @override

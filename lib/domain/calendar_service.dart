@@ -55,6 +55,7 @@ class CalendarService {
     Recurrence recurrence = Recurrence.none,
     List<String> attendees = const <String>[],
     List<int>? reminders,
+    String? themeId,
   }) =>
       _serial(() => _create(
             title: title,
@@ -69,6 +70,7 @@ class CalendarService {
             recurrence: recurrence,
             attendees: attendees,
             reminders: reminders,
+            themeId: themeId,
           ));
 
   Future<CalendarEvent> _create({
@@ -84,6 +86,7 @@ class CalendarService {
     Recurrence recurrence = Recurrence.none,
     List<String> attendees = const <String>[],
     List<int>? reminders,
+    String? themeId,
   }) async {
     final e = CalendarEvent(
       id: _newId(),
@@ -100,6 +103,8 @@ class CalendarService {
       recurrence: recurrence,
       attendees: attendees,
       updatedAt: _now,
+      // Nur geteilte Termine haben ein Thema (E-99).
+      themeId: visibility == EventVisibility.shared ? themeId : null,
     );
     _check(e);
     await store.put(e, publishedVersion: 0);
@@ -118,6 +123,8 @@ class CalendarService {
       version: current.version + 1,
       updatedAt: _now,
       visibility: current.visibility,
+      // Ein privater Termin hat nie ein Thema (E-99); ein geteilter behält das gewählte.
+      clearTheme: !current.isShared,
     );
     _check(next);
     await store.put(next, replaced: current);
