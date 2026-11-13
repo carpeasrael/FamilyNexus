@@ -93,12 +93,12 @@ class _ThreadRowTile extends StatelessWidget {
       label,
       ?(hasPreview ? status : null),
       second,
-      ?(timeText),
       if (unread > 0) l.chatUnreadCount(unread),
     ].join(', ');
     return Semantics(
       button: true,
       label: semantic,
+      onTap: () => onTap(thread.id),
       excludeSemantics: true,
       child: InkWell(
         key: ValueKey<String>('thread-${thread.id}'),

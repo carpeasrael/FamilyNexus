@@ -61,17 +61,38 @@ List<String> _semantics(WidgetTester tester) {
   return out;
 }
 
+Future<(TestApp, String)> _setup(WidgetTester tester) async {
+  final app = await buildTestApp();
+  final ben = await _joinBen(app);
+  await ben.sendMessage('Wer holt die Kinder ab?');
+  await app.gateway.sendMessage('Ich');
+  final dm = await app.gateway.startDirectChat(ben.userId!);
+  await tester.pumpWidget(FamilyNexusApp(services: app.services));
+  await tester.pumpAndSettle();
+  await tester.tap(navTab('Chat'));
+  await tester.pumpAndSettle();
+  return (app, dm);
+}
+
 void main() {
-  testWidgets('Chat: Schlüssel und Semantik unverändert (Familienchat, Einzelchat-Leiste, Antwortvorschau)', (tester) async {
+  // #423: Der Chat-Tab beginnt bei mehreren Gesprächen mit der Liste. Der frühere Schnappschuss (Familienchat mit
+  // Leiste und Antwortvorschau) gilt unverändert für das geöffnete Gespräch, nur die Leiste wird zur Kopfzeile.
+  testWidgets('Chat: Schlüssel und Semantik der Gesprächsliste', (tester) async {
     final handle = tester.ensureSemantics();
-    final app = await buildTestApp();
-    final ben = await _joinBen(app);
-    await ben.sendMessage('Wer holt die Kinder ab?');
-    await app.gateway.sendMessage('Ich');
-    await app.gateway.startDirectChat(ben.userId!);
-    await tester.pumpWidget(FamilyNexusApp(services: app.services));
-    await tester.pumpAndSettle();
-    await tester.tap(navTab('Chat'));
+    final (app, dm) = await _setup(tester);
+    final ids = <String, String>{
+      for (var i = 0; i < app.gateway.messages.length; i++) app.gateway.messages[i].id: 'm$i',
+      'thread-$dm': 'thread-dm',
+    };
+    expect(_keys(tester, ids), _expectedListKeys);
+    expect(_semantics(tester), _expectedListSemantics);
+    handle.dispose();
+  });
+
+  testWidgets('Chat: Schlüssel und Semantik unverändert (Familienchat mit Kopfzeile, Antwortvorschau)', (tester) async {
+    final handle = tester.ensureSemantics();
+    final (app, _) = await _setup(tester);
+    await tester.tap(find.byKey(const ValueKey<String>('thread-family')));
     await tester.pumpAndSettle();
     await tester.longPress(find.text('Wer holt die Kinder ab?'));
     await tester.pumpAndSettle();
@@ -89,6 +110,21 @@ void main() {
   });
 }
 
+const List<String> _expectedListKeys = <String>['V:thread-family', 'V:thread-dm'];
+
+const List<String> _expectedListSemantics = <String>[
+  'L=Heute | Tab 1 von 5 tap',
+  'L=Kalender | Tab 2 von 5 tap',
+  'L=1 | Chat | Tab 3 von 5 tap',
+  'L=Einkauf | Tab 4 von 5 tap',
+  'L=Familie | Tab 5 von 5 tap',
+  'L=Gespräche',
+  'L=Familienchat Familie Test, Du: Ich, 1 ungelesen tap',
+  'L=Einzelchat mit Ben, Status unbekannt tap',
+  'L=Chat',
+  'T=Menü öffnen tap',
+];
+
 const List<String> _expectedKeys = <String>[
   'V:m1',
   'V:m0',
@@ -103,9 +139,8 @@ const List<String> _expectedSemantics = <String>[
   'L=Chat | Tab 3 von 5 tap',
   'L=Einkauf | Tab 4 von 5 tap',
   'L=Familie | Tab 5 von 5 tap',
-  'L=Gespräche',
-  'L=Familienchat Familie Test',
-  'L=Einzelchat mit Ben, Status unbekannt',
+  'T=Zurück zu den Gesprächen tap',
+  'L=Familie Test',
   'L=Ende-zu-Ende-verschlüsselt',
   'L=Nachricht von dir | Ich | Mittwoch, 21. Oktober 2026, hh:mm long',
   'L=Nachricht von Ben | Ben | Wer holt die Kinder ab? | Mittwoch, 21. Oktober 2026, hh:mm long',
