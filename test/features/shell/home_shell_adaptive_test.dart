@@ -373,7 +373,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Chat: Entwurf, gewähltes Gespräch und Scrollposition über expanded ↔ medium bei Tab Kalender', (tester) async {
+    testWidgets('Chat: Entwurf, geöffnetes Gespräch und Scrollposition über expanded ↔ medium bei Tab Kalender', (tester) async {
       final app = await buildTestApp(clock: () => _now);
       final ben = await _joinBen(app);
       final id = await app.gateway.startDirectChat(ben.userId!);
@@ -382,7 +382,9 @@ void main() {
       }
       await _start(tester, const Size(1000, 900), existing: app);
       await _tab(tester, 'Kalender');
-      await tester.tap(find.widgetWithText(ChoiceChip, 'Ben'));
+      // Der Chat beginnt bei mehreren Gesprächen mit der Liste (#423): Ben über seine Zeile öffnen.
+      expect(find.byKey(ValueKey<String>('thread-$id')), findsOneWidget);
+      await tester.tap(find.byKey(ValueKey<String>('thread-$id')));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), 'Entwurf an Ben');
       await tester.pump();
@@ -399,8 +401,12 @@ void main() {
         final chat = find.byType(ChatScreen, skipOffstage: false);
         final field = find.descendant(of: chat, matching: find.byType(TextField, skipOffstage: false), skipOffstage: false);
         expect(tester.widget<TextField>(field).controller!.text, 'Entwurf an Ben', reason: '$size');
-        final chip = tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'Ben', skipOffstage: false));
-        expect(chip.selected, isTrue, reason: 'Gespräch Ben bleibt gewählt, $size');
+        expect(
+          find.descendant(of: chat, matching: find.byTooltip('Zurück zu den Gesprächen', skipOffstage: false), skipOffstage: false),
+          findsOneWidget,
+          reason: 'Gespräch Ben bleibt geöffnet (Kopfzeile statt Liste), $size',
+        );
+        expect(find.byKey(ValueKey<String>('thread-$id'), skipOffstage: false), findsNothing, reason: 'keine Liste, $size');
         expect(identical(_state(tester, ChatScreen), state), isTrue, reason: '$size');
         expect(_chatActive(tester), size.width >= kExpandedMin, reason: 'active folgt der Sichtbarkeit, $size');
       }
