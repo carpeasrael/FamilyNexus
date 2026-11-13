@@ -575,6 +575,33 @@ void main() {
       await _systemBack(tester);
       expect(exits.count, 1);
     });
+
+    testWidgets('Zurück bei offenem Nachrichtenblatt schließt nur das Blatt, ein zweites Zurück führt zur Liste', (tester) async {
+      _wide(tester);
+      final app = await buildTestApp();
+      final ben = await _member(app, 'ben', 'Ben');
+      final dm = await ben.startDirectChat(app.gateway.userId!);
+      await ben.sendMessage('Hallo Anna', threadId: dm);
+      final exits = _trackExits(tester);
+      await _start(tester, app);
+      await _open(tester, dm);
+      await tester.longPress(find.text('Hallo Anna'));
+      await tester.pumpAndSettle();
+      expect(find.text('Nachricht melden'), findsOneWidget, reason: 'Blatt offen');
+
+      await _systemBack(tester);
+      expect(find.text('Nachricht melden'), findsNothing, reason: 'das Blatt ist zu');
+      expect(_back, findsOneWidget, reason: 'das Gespräch bleibt offen');
+      expect(find.byType(TextField), findsOneWidget);
+      expect(find.text('Gespräche'), findsNothing);
+      expect(app.services.visibleChatThread, dm);
+      expect(exits.count, 0);
+
+      await _systemBack(tester);
+      expect(find.text('Gespräche'), findsOneWidget, reason: 'zweites Zurück: Liste');
+      expect(_row(dm), findsOneWidget);
+      expect(exits.count, 0);
+    });
   });
 
   group('Übergänge', () {
