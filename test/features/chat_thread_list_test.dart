@@ -822,6 +822,53 @@ void main() {
       expect(find.text('Neue Nachrichten'), findsOneWidget, reason: 'die Marke wird beim Öffnen neu bestimmt');
       expect(app.gateway.markedRead, <String>[ChatThread.familyId], reason: 'erst das Öffnen markiert, und nur dieses Gespräch');
     });
+
+    testWidgets('genau eine Überschrift je Ansicht: Liste „Gespräche“, Gespräch der Titel der Kopfzeile', (tester) async {
+      _wide(tester);
+      final handle = tester.ensureSemantics();
+      final app = await buildTestApp();
+      final ben = await _member(app, 'ben', 'Ben');
+      final dm = await ben.startDirectChat(app.gateway.userId!);
+      await ben.sendMessage('Hallo Anna', threadId: dm);
+      await _start(tester, app);
+
+      Finder headers(Finder within) => find.descendant(of: within, matching: find.byWidgetPredicate((w) => w is Semantics && w.properties.header == true));
+      // Beschriftungen aller Semantik-Header (die Shell hat eigene, etwa den Titel der App-Leiste).
+      List<String> headerLabels() {
+        final n = <String>[];
+        void visit(SemanticsNode node) {
+          final d = node.getSemanticsData();
+          if (d.flagsCollection.isHeader) n.add(d.label);
+          node.visitChildren((c) {
+            visit(c);
+            return true;
+          });
+        }
+
+        SemanticsNode? root;
+        tester.binding.rootPipelineOwner.visitChildren((o) => root ??= o.semanticsOwner?.rootSemanticsNode);
+        visit(root!);
+        return n;
+      }
+
+      // Liste: genau ein Header im Widgetbaum der Liste und im Semantikbaum.
+      expect(headers(find.byType(ListView)), findsOneWidget);
+      expect(tester.widget<Text>(find.descendant(of: headers(find.byType(ListView)), matching: find.byType(Text))).data, 'Gespräche');
+      expect(headerLabels().where((l) => l == 'Gespräche'), hasLength(1), reason: 'Liste: ein Semantik-Header „Gespräche“');
+      final shell = headerLabels().length - 1;
+
+      // Gespräch: genau ein Header in der Kopfzeile (Datumszeilen im Verlauf sind eigene Header und zählen nicht).
+      await _open(tester, dm);
+      final headerRow = find.ancestor(of: _back, matching: find.byType(Row)).first;
+      expect(headers(headerRow), findsOneWidget);
+      expect(tester.widget<Text>(find.descendant(of: headers(headerRow), matching: find.byType(Text))).data, 'Ben');
+      expect(find.text('Gespräche'), findsNothing, reason: 'die Listenüberschrift ist weg');
+      final dayHeaders = headers(find.byType(ListView)).evaluate().length;
+      expect(headerLabels().where((l) => l == 'Ben'), hasLength(1), reason: 'ein Semantik-Header mit dem Titel');
+      expect(headerLabels().where((l) => l == 'Gespräche'), isEmpty);
+      expect(headerLabels().length, shell + 1 + dayHeaders, reason: 'Shell, Kopfzeile und Datumszeilen, nichts doppelt');
+      handle.dispose();
+    });
   });
 
   group('Englisch', () {
