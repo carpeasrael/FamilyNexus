@@ -1,7 +1,7 @@
 part of '../chat_screen.dart';
 
 /// Gesprächsliste, Startseite des Chat-Tabs bei mehreren Gesprächen (#423): Familienchat zuerst, danach die
-/// Einzelchats mit Vorschau, Zeit, Ungelesen-Zähler und Online-Status. Nur bei sichtbarer Liste berechnet.
+/// Einzelchats mit Vorschau, Zeit, Ungelesen-Zähler und Online-Status. Wird nur in der Listenansicht aufgebaut (ein Durchlauf je Gespräch und Aufbau; `Offstage` baut den Tab auch, wenn er nicht sichtbar ist, die Kosten sind klein).
 class _ThreadList extends StatelessWidget {
   const _ThreadList({required this.threads, required this.scroll, required this.onOpen});
   final List<ChatThread> threads;
