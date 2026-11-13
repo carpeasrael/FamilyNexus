@@ -5425,6 +5425,144 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Himmelblau'**
   String get themeColorSky;
+
+  /// No description provided for @avatarTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Avatar'**
+  String get avatarTitle;
+
+  /// No description provided for @avatarChange.
+  ///
+  /// In de, this message translates to:
+  /// **'Avatar ändern'**
+  String get avatarChange;
+
+  /// No description provided for @avatarInitials.
+  ///
+  /// In de, this message translates to:
+  /// **'Initialen (kein Avatar)'**
+  String get avatarInitials;
+
+  /// No description provided for @avatarNeedsModerator.
+  ///
+  /// In de, this message translates to:
+  /// **'Ein Moderator muss die Avatar-Funktion für diese Familie erst freischalten. Das geschieht, sobald ein Moderator die App öffnet.'**
+  String get avatarNeedsModerator;
+
+  /// No description provided for @avatarLoading.
+  ///
+  /// In de, this message translates to:
+  /// **'Avatar-Funktion wird geprüft …'**
+  String get avatarLoading;
+
+  /// No description provided for @avatarSelected.
+  ///
+  /// In de, this message translates to:
+  /// **'Ausgewählt'**
+  String get avatarSelected;
+
+  /// No description provided for @avatarPreview.
+  ///
+  /// In de, this message translates to:
+  /// **'Vorschau'**
+  String get avatarPreview;
+
+  /// No description provided for @avatarPending.
+  ///
+  /// In de, this message translates to:
+  /// **'Wird übernommen …'**
+  String get avatarPending;
+
+  /// No description provided for @avatarSaved.
+  ///
+  /// In de, this message translates to:
+  /// **'Avatar gespeichert'**
+  String get avatarSaved;
+
+  /// No description provided for @avatarVisibility.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Familienmitglieder sehen deinen Avatar, auch im Chat. Der Server sieht, welches der zwölf Symbole du gewählt hast: Diese Wahl ist nicht Ende-zu-Ende-verschlüsselt. Sie bleibt im Familienraum stehen, auch wenn du entfernt oder dein Konto gelöscht wird.'**
+  String get avatarVisibility;
+
+  /// No description provided for @avatarPreset01.
+  ///
+  /// In de, this message translates to:
+  /// **'Pfote'**
+  String get avatarPreset01;
+
+  /// No description provided for @avatarPreset02.
+  ///
+  /// In de, this message translates to:
+  /// **'Hase'**
+  String get avatarPreset02;
+
+  /// No description provided for @avatarPreset03.
+  ///
+  /// In de, this message translates to:
+  /// **'Vogel'**
+  String get avatarPreset03;
+
+  /// No description provided for @avatarPreset04.
+  ///
+  /// In de, this message translates to:
+  /// **'Blume'**
+  String get avatarPreset04;
+
+  /// No description provided for @avatarPreset05.
+  ///
+  /// In de, this message translates to:
+  /// **'Baum'**
+  String get avatarPreset05;
+
+  /// No description provided for @avatarPreset06.
+  ///
+  /// In de, this message translates to:
+  /// **'Segelboot'**
+  String get avatarPreset06;
+
+  /// No description provided for @avatarPreset07.
+  ///
+  /// In de, this message translates to:
+  /// **'Fahrrad'**
+  String get avatarPreset07;
+
+  /// No description provided for @avatarPreset08.
+  ///
+  /// In de, this message translates to:
+  /// **'Pizza'**
+  String get avatarPreset08;
+
+  /// No description provided for @avatarPreset09.
+  ///
+  /// In de, this message translates to:
+  /// **'Eis'**
+  String get avatarPreset09;
+
+  /// No description provided for @avatarPreset10.
+  ///
+  /// In de, this message translates to:
+  /// **'Musik'**
+  String get avatarPreset10;
+
+  /// No description provided for @avatarPreset11.
+  ///
+  /// In de, this message translates to:
+  /// **'Fußball'**
+  String get avatarPreset11;
+
+  /// No description provided for @avatarPreset12.
+  ///
+  /// In de, this message translates to:
+  /// **'Rakete'**
+  String get avatarPreset12;
+
+  /// No description provided for @eventTypeAvatar.
+  ///
+  /// In de, this message translates to:
+  /// **'Avatar-Wahl'**
+  String get eventTypeAvatar;
 }
 
 class _AppLocalizationsDelegate

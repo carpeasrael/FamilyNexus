@@ -3237,4 +3237,75 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get themeColorSky => 'Himmelblau';
+
+  @override
+  String get avatarTitle => 'Avatar';
+
+  @override
+  String get avatarChange => 'Avatar ändern';
+
+  @override
+  String get avatarInitials => 'Initialen (kein Avatar)';
+
+  @override
+  String get avatarNeedsModerator =>
+      'Ein Moderator muss die Avatar-Funktion für diese Familie erst freischalten. Das geschieht, sobald ein Moderator die App öffnet.';
+
+  @override
+  String get avatarLoading => 'Avatar-Funktion wird geprüft …';
+
+  @override
+  String get avatarSelected => 'Ausgewählt';
+
+  @override
+  String get avatarPreview => 'Vorschau';
+
+  @override
+  String get avatarPending => 'Wird übernommen …';
+
+  @override
+  String get avatarSaved => 'Avatar gespeichert';
+
+  @override
+  String get avatarVisibility =>
+      'Alle Familienmitglieder sehen deinen Avatar, auch im Chat. Der Server sieht, welches der zwölf Symbole du gewählt hast: Diese Wahl ist nicht Ende-zu-Ende-verschlüsselt. Sie bleibt im Familienraum stehen, auch wenn du entfernt oder dein Konto gelöscht wird.';
+
+  @override
+  String get avatarPreset01 => 'Pfote';
+
+  @override
+  String get avatarPreset02 => 'Hase';
+
+  @override
+  String get avatarPreset03 => 'Vogel';
+
+  @override
+  String get avatarPreset04 => 'Blume';
+
+  @override
+  String get avatarPreset05 => 'Baum';
+
+  @override
+  String get avatarPreset06 => 'Segelboot';
+
+  @override
+  String get avatarPreset07 => 'Fahrrad';
+
+  @override
+  String get avatarPreset08 => 'Pizza';
+
+  @override
+  String get avatarPreset09 => 'Eis';
+
+  @override
+  String get avatarPreset10 => 'Musik';
+
+  @override
+  String get avatarPreset11 => 'Fußball';
+
+  @override
+  String get avatarPreset12 => 'Rakete';
+
+  @override
+  String get eventTypeAvatar => 'Avatar-Wahl';
 }
