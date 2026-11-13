@@ -304,7 +304,8 @@ mixin _RegistrationModule on ChangeNotifier implements MatrixGateway {
     if (state != session.state) throw const GatewayException(GatewayError.oauthStateMismatch);
     if (params.containsKey('error') || code == null) {
       _dropOAuth();
-      throw const GatewayException(GatewayError.oauthCancelled);
+      // Die Person lehnt beim Anbieter ab (RFC 6749 4.1.2.1): ein Abbruch, kein Fehler (#430).
+      throw GatewayException(params['error'] == 'access_denied' ? GatewayError.oauthAborted : GatewayError.oauthCancelled);
     }
     _oauth = null;
     _oauthPair = null;

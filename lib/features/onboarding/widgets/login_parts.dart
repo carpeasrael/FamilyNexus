@@ -39,7 +39,7 @@ class _LoginOAuth extends StatelessWidget {
       Align(
         alignment: Alignment.centerRight,
         child: FilledButton.icon(
-          icon: const Icon(Icons.open_in_new, size: 18),
+          icon: Icon(providerPageIcon(context, Icons.login), size: 18),
           onPressed: busy ? null : onLogin,
           label: Text(l.loginOAuth(host)),
         ),
@@ -116,19 +116,5 @@ class _LoginPasswordForm extends StatelessWidget {
         child: FilledButton(onPressed: busy || !canLogin ? null : onLogin, child: Text(busy ? l.accountLoggingIn : l.accountLogin)),
       ),
     ]);
-  }
-}
-
-/// Fehlerzeile (Screenreader liest sie vor).
-class _LoginError extends StatelessWidget {
-  const _LoginError({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Semantics(liveRegion: true, child: Text(text, style: TextStyle(color: Theme.of(context).colorScheme.error))),
-    );
   }
 }

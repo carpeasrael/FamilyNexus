@@ -8,6 +8,7 @@ import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/registration.dart';
 import 'package:family_nexus/domain/security.dart';
 import 'package:family_nexus/domain/server.dart';
+import 'package:family_nexus/ui/theme/tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,6 +25,19 @@ Future<void> _pump(WidgetTester tester, TestApp app) async {
   addTearDown(tester.view.reset);
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
+}
+
+/// Meldung unter dem Formular als Hinweis (zweite Textfarbe, Info-Symbol) bzw. als Fehler (Fehlerfarbe, kein Symbol), #430.
+void _expectMessage(WidgetTester tester, String text, {required bool notice}) {
+  final color = tester.widget<Text>(find.text(text)).style!.color;
+  final context = tester.element(find.text(text));
+  if (notice) {
+    expect(find.byIcon(Icons.info_outline), findsOneWidget, reason: 'Hinweis trägt ein Symbol, nicht nur eine Farbe');
+    expect(color, AuroraTokens.of(context).textSecondary);
+  } else {
+    expect(find.byIcon(Icons.info_outline), findsNothing);
+    expect(color, Theme.of(context).colorScheme.error);
+  }
 }
 
 Future<void> _tap(WidgetTester tester, String text, {bool settle = true}) async {
@@ -366,11 +380,13 @@ void main() {
       await _tap(tester, 'Neue Familie gründen');
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
       await _tap(tester, 'Abbrechen');
-      expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.'), findsOneWidget);
+      expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Du kannst es jederzeit noch einmal versuchen.'), findsOneWidget);
+      _expectMessage(tester, 'Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Du kannst es jederzeit noch einmal versuchen.', notice: true);
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
       app.oauth.deliver(app.gateway.oauthCallback('x', denied: true));
       await tester.pumpAndSettle();
       expect(app.gateway.session, SessionState.loggedOut);
+      _expectMessage(tester, 'Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Du kannst es jederzeit noch einmal versuchen.', notice: true); // Ablehnung beim Anbieter (access_denied) ist ebenfalls ein Hinweis
       expect(app.browser.opened, hasLength(2));
     });
 
@@ -382,6 +398,7 @@ void main() {
       await _tap(tester, 'Neue Familie gründen');
       await _tap(tester, 'Konto bei fake.test erstellen');
       expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.'), findsOneWidget);
+      _expectMessage(tester, 'Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.', notice: false);
     });
 
     testWidgets('TP-OAUTH-05 Anmelden mit bestehendem Konto über den Browser (ohne prompt=create)', (tester) async {
@@ -431,7 +448,8 @@ void main() {
       await _tap(tester, 'Bei fake.test anmelden', settle: false);
       session.finish(null);
       await tester.pumpAndSettle();
-      expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.'), findsOneWidget);
+      expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Du kannst es jederzeit noch einmal versuchen.'), findsOneWidget);
+      _expectMessage(tester, 'Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Du kannst es jederzeit noch einmal versuchen.', notice: true);
       expect(app.gateway.session, SessionState.loggedOut);
       await _tap(tester, 'Bei fake.test anmelden', settle: false);
       expect(session.starts, hasLength(2));
@@ -449,6 +467,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
       expect(app.gateway.session, SessionState.loggedOut, reason: 'fremder Rücksprung meldet nie an');
       expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.'), findsOneWidget);
+      _expectMessage(tester, 'Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.', notice: false);
       expect(find.textContaining('Bitte auf der Seite von fake.test fortfahren'), findsNothing);
     });
   });

@@ -53,5 +53,14 @@ void main() {
       expect(notes, contains('in der App'));
       if (platform == 'macos') expect(notes, isNot(contains('network.server')));
     });
+
+    if (platform == 'macos') {
+      test('Review-Notizen macos: Darstellung der Sitzung als Safari-gehostetes Fenster erklärt (#430)', () {
+        final notes = File('store/metadata/macos/review_notes.txt').readAsStringSync();
+        expect(notes, contains('private Safari-hosted window without toolbar or tabs'));
+        expect(notes, contains('von Safari gehostetes Fenster ohne Werkzeugleiste und Tabs'));
+        expect(notes.length, lessThanOrEqualTo(4000));
+      });
+    }
   }
 }

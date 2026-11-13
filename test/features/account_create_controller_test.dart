@@ -375,6 +375,17 @@ void main() {
       s.c.dispose();
     });
 
+    test('#430: Abbruch beim Anbieter ist ein Hinweis, ein echter Fehler nicht', () async {
+      final s = await _setup();
+      s.signInError = const GatewayException(GatewayError.oauthAborted);
+      await s.c.createInBrowser();
+      expect((s.c.errorLine(_de) != null, s.c.errorIsNotice), (true, true));
+      s.signInError = const GatewayException(GatewayError.oauthCancelled);
+      await s.c.createInBrowser();
+      expect((s.c.errorLine(_de) != null, s.c.errorIsNotice), (true, false));
+      s.c.dispose();
+    });
+
     test('Anzeigename scheitert: kein Abbruch, kein Fehler', () async {
       final s = await _setup();
       s.c.name.text = 'Emil'; // ohne Sitzung wirft setDisplayName

@@ -4406,6 +4406,12 @@ abstract class AppLocalizations {
   /// **'Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.'**
   String get errOAuthCancelled;
 
+  /// No description provided for @errOAuthAborted.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Du kannst es jederzeit noch einmal versuchen.'**
+  String get errOAuthAborted;
+
   /// No description provided for @joinCardServerMismatch.
   ///
   /// In de, this message translates to:
