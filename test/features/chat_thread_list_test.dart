@@ -909,6 +909,51 @@ void main() {
       expect(app.gateway.messagesIn(dm), isEmpty, reason: 'nichts an das nie erschienene Gespräch');
       expect(app.gateway.messagesIn(dmCara), isEmpty, reason: 'nichts an ein anderes Gespräch');
     });
+
+    testWidgets('viele Gespräche: Reihenfolge, jede Zeile erreichbar und mindestens 56 dp hoch, jede öffnet das richtige Gespräch', (tester) async {
+      _wide(tester, width: 900, height: 500);
+      final app = await buildTestApp();
+      // Name, Minuten nach t0 der jüngsten Nachricht: bewusst nicht in Anlegereihenfolge.
+      const people = <(String, String, int)>[('ben', 'Ben', 10), ('cara', 'Cara', 50), ('dora', 'Dora', 30), ('emil', 'Emil', 40), ('finn', 'Finn', 20)];
+      final t0 = DateTime.utc(2026, 10, 21, 12);
+      final ids = <String, String>{};
+      app.server.nextTime = t0;
+      await app.gateway.sendMessage('Familie alt');
+      for (final (name, display, minutes) in people) {
+        final device = await _member(app, name, display);
+        final dm = await device.startDirectChat(app.gateway.userId!);
+        ids[name] = dm;
+        app.server.nextTime = t0.add(Duration(minutes: minutes));
+        await device.sendMessage('Hallo von $display', threadId: dm);
+      }
+      await _start(tester, app);
+
+      final expectedOrder = <String>[ChatThread.familyId, ids['cara']!, ids['emil']!, ids['dora']!, ids['finn']!, ids['ben']!];
+      final titles = <String, String>{ChatThread.familyId: 'Familie Test', for (final (name, display, _) in people) ids[name]!: display};
+      final scrollable = find.descendant(of: find.byType(ListView), matching: find.byType(Scrollable)).first;
+
+      for (final id in expectedOrder) {
+        await tester.scrollUntilVisible(_row(id), 100, scrollable: scrollable);
+        await tester.pumpAndSettle();
+        expect(_row(id), findsOneWidget, reason: 'Zeile $id erreichbar');
+        expect(tester.getSize(find.ancestor(of: find.descendant(of: _row(id), matching: find.byType(Row)).first, matching: find.byType(ConstrainedBox)).first).height, greaterThanOrEqualTo(56), reason: 'Zeilenhöhe $id');
+        expect(tester.getSize(_row(id)).height, greaterThanOrEqualTo(56), reason: 'Zeilenhöhe $id');
+        await tester.tap(_row(id));
+        await tester.pumpAndSettle();
+        expect(app.services.visibleChatThread, id, reason: 'öffnet das richtige Gespräch');
+        final headerRow = find.ancestor(of: _back, matching: find.byType(Row)).first;
+        expect(find.descendant(of: headerRow, matching: find.text(titles[id]!)), findsOneWidget);
+        await _toList(tester);
+        expect(app.services.visibleChatThread, isNull);
+      }
+
+      // Reihenfolge: von oben nach unten (alle Zeilen untereinander, die Ordnung folgt aus der Position).
+      _wide(tester, width: 900, height: 3000);
+      await tester.pumpAndSettle();
+      final tops = <String, double>{for (final id in expectedOrder) id: tester.getTopLeft(_row(id)).dy};
+      final sorted = tops.keys.toList()..sort((a, b) => tops[a]!.compareTo(tops[b]!));
+      expect(sorted, expectedOrder, reason: 'Familienchat zuerst, dann nach jüngster Nachricht');
+    });
   });
 
   group('Englisch', () {
