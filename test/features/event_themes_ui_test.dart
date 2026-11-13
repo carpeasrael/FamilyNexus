@@ -168,10 +168,10 @@ void main() {
   });
 
   group('Kachel', () {
-    Future<void> pumpTile(WidgetTester tester, CalendarController c, CalendarEvent e) async {
+    Future<void> pumpTile(WidgetTester tester, CalendarController c, CalendarEvent e, {String lang = 'de'}) async {
       final occ = Occurrence(event: e, start: e.start, end: e.end, dateKey: '2026-03-21');
       await tester.pumpWidget(MaterialApp(
-        locale: const Locale('de'),
+        locale: Locale(lang),
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         theme: buildTheme(Brightness.light),
@@ -197,6 +197,18 @@ void main() {
       expect(bar(_color(3)), findsOneWidget);
       expect(find.bySemanticsLabel(RegExp('Privat')), findsOneWidget);
       expect(find.bySemanticsLabel(RegExp('Thema')), findsNothing);
+      handle.dispose();
+    });
+
+    _testUi('en: geteilt mit Thema: Label "Theme Schule", Themenname als Text (l10n en)', (tester) async {
+      final handle = tester.ensureSemantics();
+      final app = await buildTestApp(lang: 'en', clock: () => _now);
+      addTearDown(app.services.closeCalendar);
+      final c = await _open(app, themes: [_theme(_schule, 'Schule', 2)]);
+      await pumpTile(tester, c, _event(owner: _ben, themeId: _schule, color: 5), lang: 'en');
+      expect(find.text('Schule'), findsOneWidget, reason: 'nie nur Farbe');
+      expect(find.bySemanticsLabel(RegExp(r'Shared, Theme Schule')), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp('Thema')), findsNothing, reason: 'kein deutscher Text in der englischen App');
       handle.dispose();
     });
 
@@ -326,6 +338,33 @@ void main() {
       await tester.pumpAndSettle();
       return (app, c);
     }
+
+    _testUi('en: Titel, Farbname und Dialog sind englisch, Himmelblau fehlt (l10n en)', (tester) async {
+      tester.view.physicalSize = const Size(900, 3000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final app = await buildTestApp(lang: 'en', clock: () => _now);
+      addTearDown(app.services.closeCalendar);
+      final c = await _open(app, themes: [_theme(_schule, 'Schule', 2)]);
+      await tester.pumpWidget(MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        theme: buildTheme(Brightness.light),
+        home: AppScope(services: app.services, child: ThemesScreen(controller: c)),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.text('Calendar themes'), findsOneWidget);
+      expect(find.text('Schule'), findsOneWidget);
+      expect(find.text('Purple'), findsOneWidget);
+      expect(find.text('Kalender-Themen'), findsNothing);
+      await tester.tap(find.text('Add theme'));
+      await tester.pumpAndSettle();
+      for (final n in <String>['Teal', 'Pink', 'Purple', 'Yellow', 'Green', 'Orange', 'Red']) {
+        expect(find.descendant(of: find.byType(AlertDialog), matching: find.text(n)), findsOneWidget, reason: n);
+      }
+      expect(find.text('Sky blue'), findsNothing, reason: 'belongs to “private”');
+    });
 
     _testUi('listet Themen mit Name und Farbname (nie nur Farbe)', (tester) async {
       await pumpScreen(tester);
