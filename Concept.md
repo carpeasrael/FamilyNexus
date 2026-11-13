@@ -8,7 +8,7 @@ Oct 20, 2026 · @CarpeAsrael
 
 ## Vision & Goals
 
-The app (working title "FamilyNexus") combines a family calendar, a messenger and a shared shopping list in one application whose data lives exclusively on the family's devices and travels only end-to-end encrypted via the Matrix protocol.
+The app (working title "FamilyNexus") combines a family calendar, a messenger and a shared shopping list in one application whose data lives exclusively on the family's devices and travels only end-to-end encrypted via the Matrix protocol (one exception: the choice of one of twelve built-in avatars is an unencrypted room state, E-101).
 
 **Target audience:** Families and households who want to coordinate appointments without entrusting their data to a central provider.
 
