@@ -383,6 +383,14 @@ void main() {
       s.signInError = const GatewayException(GatewayError.oauthCancelled);
       await s.c.createInBrowser();
       expect((s.c.errorLine(_de) != null, s.c.errorIsNotice), (true, false));
+      // Ein Eingabegrund hat Vorrang vor dem Hinweis und ist nie ein Hinweis.
+      s.signInError = const GatewayException(GatewayError.oauthAborted);
+      await s.c.createInBrowser();
+      expect(s.c.errorIsNotice, isTrue);
+      s.c.name.text = '';
+      s.c.submit(_de, 'de');
+      expect(s.c.errorIsNotice, isFalse);
+      expect(s.c.errorLine(_de), isNot(_de.errOAuthAborted));
       s.c.dispose();
     });
 

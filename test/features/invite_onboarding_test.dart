@@ -383,6 +383,7 @@ void main() {
       expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Du kannst es jederzeit noch einmal versuchen.'), findsOneWidget);
       _expectMessage(tester, 'Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Du kannst es jederzeit noch einmal versuchen.', notice: true);
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
+      expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Du kannst es jederzeit noch einmal versuchen.'), findsNothing, reason: 'der Hinweis verschwindet mit dem nächsten Versuch');
       app.oauth.deliver(app.gateway.oauthCallback('x', denied: true));
       await tester.pumpAndSettle();
       expect(app.gateway.session, SessionState.loggedOut);

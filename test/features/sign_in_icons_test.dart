@@ -81,7 +81,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    for (final platform in <TargetPlatform>[TargetPlatform.iOS, TargetPlatform.macOS]) {
+    for (final platform in <TargetPlatform>[TargetPlatform.iOS, TargetPlatform.macOS, TargetPlatform.android]) {
       testWidgets('$platform: „Anmelden“ mit Anmelde-Symbol, „Konto erstellen“ mit Konto-Symbol', (tester) async {
         try {
           await openFlow(tester, platform, 'Ich habe schon ein Konto');

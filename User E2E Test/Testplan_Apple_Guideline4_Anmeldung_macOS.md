@@ -1,6 +1,6 @@
 # Testplan Apple-Rückmeldung Guideline 4 (Design): Anmeldung auf macOS
 
-**Dokument-ID** `TP-FN-A4-MAC v02` · 13.11.2026 · Soll-Version **1.2.3 (29)**, Stand `main` @ `ac61696`
+**Dokument-ID** `TP-FN-A4-MAC v02` · 13.11.2026 · Soll-Version **1.2.3 (29)**, Stand `main` @ `e4bc0b4` + #430
 
 Bezug: App-Review-Rückmeldung vom 12.11.2026 (Submission `2caec11f-cf19-4664-8200-97fcc20b86b2`, MacBook Pro, „1.2.1 (27)“): *Der Nutzer wird zum Standardbrowser geführt, um sich anzumelden oder ein Konto anzulegen.* Apple akzeptiert den Browser nur mit `ASWebAuthenticationSession`. Issue #268, `docs/ENTSCHEIDUNGEN.md` E-91, `macos/Runner/MainFlutterWindow.swift:93-150`, `lib/data/platform/browser_launcher.dart:78-100`.
 
