@@ -13,6 +13,7 @@ import 'package:family_nexus/domain/event_themes.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/family_code.dart';
 import 'package:family_nexus/domain/invite_link.dart';
+import 'package:family_nexus/domain/member_avatars.dart';
 import 'package:family_nexus/domain/moderation.dart';
 import 'package:family_nexus/domain/password_change.dart';
 import 'package:family_nexus/domain/permissions.dart';
@@ -47,6 +48,14 @@ class FakeRoom {
   /// Zählt Schlüsselrotationen (Entfernen von Mitgliedern).
   int keyEpoch = 0;
   final Map<String, int> power = <String, int>{};
+
+  /// Power-Levels: Schwellen je Zustandstyp (`events`) und `state_default`. Neue Familien geben den Avatar-Typ für
+  /// Mitglieder frei (E-101); Tests für Familien von vor dem Update entfernen den Eintrag.
+  final Map<String, int> eventPower = <String, int>{AvatarPresets.type: PowerLevels.member};
+  int stateDefault = PowerLevels.moderator;
+
+  /// Avatar-Raumzustand: Zustandsschlüssel (Matrix-ID) → Inhalt. Nicht verschlüsselt, ein Wert aus zwölf.
+  final Map<String, Map<String, Object?>> avatarState = <String, Map<String, Object?>>{};
   final Map<String, MemberStatus> membership = <String, MemberStatus>{};
 
   /// Ausgegebene Link-IDs (`nonce` → Ablauf) und die je Anfrage genannte ID.
@@ -254,6 +263,13 @@ class FakeMatrixServer {
     }
   }
 
+  /// Der Avatar-Zustand eines Raums hat sich geändert: alle Geräte mit diesem Familienraum zählen hoch.
+  void bumpAvatars(FakeRoom room) {
+    for (final g in _gateways) {
+      if (g._familyRoomId == room.id) g._bumpAvatars();
+    }
+  }
+
   /// Test: Zeitstempel des nächsten Ereignisses (einmalig), sonst fortlaufend ab 21.10.2026 12:00 UTC.
   DateTime? nextTime;
 
@@ -311,6 +327,54 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   /// Hört noch ein gestarteter Dienst zu?
   bool get debugHasListeners => hasListeners;
+
+  final ValueNotifier<int> _avatarRevision = ValueNotifier<int>(0);
+  bool _avatarRevisionDisposed = false;
+
+  void _bumpAvatars() {
+    if (!_avatarRevisionDisposed) _avatarRevision.value++;
+  }
+
+  @override
+  void dispose() {
+    _avatarRevisionDisposed = true;
+    _avatarRevision.dispose();
+    super.dispose();
+  }
+
+  @override
+  ValueListenable<int> get avatarRevision => _avatarRevision;
+
+  @override
+  String? avatarOf(String userId) {
+    final room = familyRoom;
+    if (room == null || _userId == null) return null;
+    final content = room.avatarState[userId];
+    return content == null ? null : AvatarPresets.fromContent(content);
+  }
+
+  @override
+  AvatarAvailability get avatarAvailability {
+    final room = familyRoom;
+    if (room == null || _userId == null) return AvatarAvailability.unknown;
+    final mine = room.power[_userId] ?? 0;
+    return mine >= (room.eventPower[AvatarPresets.type] ?? room.stateDefault)
+        ? AvatarAvailability.settable
+        : AvatarAvailability.needsModerator;
+  }
+
+  @override
+  Future<void> setMemberAvatar(String? preset) async {
+    _requireSession();
+    if (!AvatarPresets.isValid(preset)) throw const GatewayException(GatewayError.notAllowed);
+    final room = familyRoom;
+    if (room == null) throw const GatewayException(GatewayError.notFound);
+    if (room.membership[_userId] != MemberStatus.joined) throw const GatewayException(GatewayError.notAllowed);
+    if (avatarAvailability != AvatarAvailability.settable) throw const GatewayException(GatewayError.notAllowed);
+    room.avatarState[_userId!] = AvatarPresets.content(preset);
+    fake.bumpAvatars(room);
+    fake.notifyAll();
+  }
 
   RequestCheck _check(FakeRoom room, String user) {
     final n = room.knockNonce[user];

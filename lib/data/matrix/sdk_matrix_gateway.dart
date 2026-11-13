@@ -30,6 +30,7 @@ import '../../domain/family_code.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/invite_ticket.dart';
 import '../../domain/key_value_store.dart';
+import '../../domain/member_avatars.dart';
 import '../../domain/moderation.dart';
 import '../../domain/password_change.dart';
 import '../../domain/permissions.dart';
@@ -60,6 +61,7 @@ import 'sync_relevance.dart';
 
 part 'gateway/account_deletion.dart';
 part 'gateway/app_client.dart';
+part 'gateway/avatars.dart';
 part 'gateway/calendar_data.dart';
 part 'gateway/chat.dart';
 part 'gateway/connection.dart';
@@ -86,7 +88,7 @@ part 'gateway/security_verification.dart';
 /// * Lesebestätigungen sind privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _AvatarsModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -100,11 +102,35 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     @visibleForTesting this._joinPollInterval = rejectionPollInterval,
     @visibleForTesting this._participantsRetryBase = participantsRetryDelay,
     this._accountStore,
+    @visibleForTesting bool ensureAvatarPermission = true,
+    @visibleForTesting DateTime Function()? now,
   })  : assert(_participantsRetryBase > Duration.zero),
+        _ensureAvatarPermissionEnabled = ensureAvatarPermission,
+        _now = now ?? DateTime.now,
         _probe = probe ?? ServerProbe(),
         _http = HttpsOnlyClient(httpClient);
 
   final Future<sql.Database> Function(String path, String key)? _databaseOpener;
+
+  // ------------------------------------------------------------ Avatare (#422, E-101)
+
+  /// `false`: die Freischaltung für Mitglieder läuft nie automatisch (nur E2E-Gateways, die bewusst nicht freischalten).
+  @override
+  final bool _ensureAvatarPermissionEnabled;
+
+  /// Uhr der Pausen der Freischaltung; nur dafür, nie für die Entscheidung.
+  @override
+  final DateTime Function() _now;
+
+  /// Zählt hoch, wenn sich Avatar, Anzeigename oder Beitrittsstatus eines Mitglieds ändert (nicht bei jedem Sync).
+  @override
+  final ValueNotifier<int> _avatarRevision = ValueNotifier<int>(0);
+  @override
+  Map<String, String> _avatarSnapshot = const <String, String>{};
+  @override
+  Future<void>? _avatarRun;
+  @override
+  DateTime? _avatarPauseUntil;
 
   /// Nur für Tests: der zugrunde liegende SDK-Client.
   @visibleForTesting
@@ -193,6 +219,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   final Duration _participantsRetryBase;
   Timer? _participantsRetry;
   int _participantsFailures = 0;
+  @override
   bool _disposed = false;
 
   static const Duration participantsRetryDelay = Duration(minutes: 1);
@@ -283,6 +310,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   }
 
   /// Zu welchem Familienraum die Zustände dieses Gateways gehören (#140).
+  @override
   final FamilyScope _scope = FamilyScope();
 
   /// Nur für Tests: läuft im Abgleich vor `room.getTimeline`. Dann zeigt `_familyRoom()` schon auf den neuen Raum,
@@ -861,6 +889,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     _joinDiagnostic = _JoinDiagnostic();
     _stopWatchingJoinRequest();
     _knownJoined = null;
+    _avatarPauseUntil = null;
     _verification = null;
     _identityChanged.clear();
     _pinBook.clear();
@@ -870,6 +899,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     _scope.clear();
     _syncedOnce = false;
     _family = null;
+    _updateAvatarSnapshot();
     _messages = const <ChatMessage>[];
     _localSends.clear();
     _reactionInFlight.clear();
@@ -883,6 +913,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   /// die Mitglieder der neuen Familie als neu, und Link-Vermerke aus A machten Anfragen in B gültig. `_signaled`
   /// gehört dazu: `claimFamilyData` löscht auch private Termine, sie müssen beim nächsten Scan wiederkommen.
   void _leaveFamilyScope() {
+    _avatarPauseUntil = null;
     _signalHistory.clear();
     _signaled.clear();
     _roomTickets.clear();
@@ -1164,6 +1195,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
       _participantsRequested = false;
       _cancelParticipantsRetry();
       _family = null;
+      _updateAvatarSnapshot();
       _messages = const <ChatMessage>[];
       _resetDirectChats();
       _presence.clear();
@@ -1219,6 +1251,8 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     if (!await _repairEchoes(client, timeline) || stale()) return;
     _readTickets(room, timeline);
     _family = _buildFamily(room, client.userID!);
+    _updateAvatarSnapshot();
+    _ensureAvatarPermission();
     _messages = ChatMapper.messages(timeline, threadId: ChatThread.familyId, sends: _localSends);
     if (_presenceRoomId != room.id) {
       // Andere Familie: der Status der alten gilt nicht weiter.
@@ -1366,6 +1400,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     }
     _signals.close().ignore();
     _presenceAsks.close().ignore();
+    _avatarRevision.dispose();
     _client?.dispose().ignore();
     _http.close();
     super.dispose();
