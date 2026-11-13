@@ -35,6 +35,18 @@ Future<void> _openChat(WidgetTester tester, TestApp app) async {
   await tester.pumpAndSettle();
 }
 
+/// Öffnet in der Gesprächsliste (Startseite bei mehreren Gesprächen, #423) die Zeile [id].
+Future<void> _openThread(WidgetTester tester, String id) async {
+  await tester.tap(find.byKey(ValueKey<String>('thread-$id')));
+  await tester.pumpAndSettle();
+}
+
+/// Zurück zur Gesprächsliste über den Pfeil der Kopfzeile.
+Future<void> _backToList(WidgetTester tester) async {
+  await tester.tap(find.byTooltip('Zurück zu den Gesprächen'));
+  await tester.pumpAndSettle();
+}
+
 Future<void> _openChatEn(WidgetTester tester, TestApp app, {required bool use24h}) async {
   // Plattformwerte kommen aus der übergeordneten MediaQuery (siehe clock_format_test.dart).
   await tester.pumpWidget(MediaQuery(
@@ -96,8 +108,7 @@ void main() {
       final id = app.gateway.messagesIn(dm).single.id;
       app.gateway.sendStates[id] = (status: MessageStatus.failed, retryable: true);
       await _openChat(tester, app);
-      await tester.tap(find.text('Ben'));
-      await tester.pumpAndSettle();
+      await _openThread(tester, dm);
 
       await tester.tap(find.text('Senden fehlgeschlagen – tippen zum Wiederholen'));
       await tester.pumpAndSettle();
@@ -387,12 +398,13 @@ void main() {
       await app.gateway.sendAttachment(fileName: 'nur-ben.png', bytes: pngWith(2), threadId: direct);
       await ben.sendAttachment(fileName: 'familie.png', bytes: pngWith(1));
       await _openChat(tester, app);
+      await _openThread(tester, ChatThread.familyId);
       await tester.tap(find.widgetWithText(TextButton, 'Anhang laden'));
       await tester.pumpAndSettle();
       expect(image('familie.png'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(ChoiceChip, 'Ben'));
-      await tester.pumpAndSettle();
+      await _backToList(tester);
+      await _openThread(tester, direct);
 
       expect(find.byType(Image), findsNothing);
       expect(find.widgetWithText(TextButton, 'Anhang laden'), findsOneWidget);
@@ -516,15 +528,16 @@ void main() {
       await app.gateway.markChatRead();
       await ben.sendMessage('neu');
       await _openChat(tester, app);
+      await _openThread(tester, ChatThread.familyId);
       expect(find.text('Neue Nachrichten'), findsOneWidget);
 
-      await tester.tap(find.descendant(of: find.byType(ChoiceChip), matching: find.text('Ben')));
-      await tester.pumpAndSettle();
+      await _backToList(tester);
+      await _openThread(tester, dm);
       expect(find.text('Neue Nachrichten'), findsNothing, reason: 'Einzelchat ohne Ungelesenes');
       expect(app.gateway.unreadIn(dm), 0);
 
-      await tester.tap(find.byType(ChoiceChip).first);
-      await tester.pumpAndSettle();
+      await _backToList(tester);
+      await _openThread(tester, ChatThread.familyId);
       expect(find.text('neu'), findsOneWidget);
       expect(find.text('Neue Nachrichten'), findsNothing, reason: 'beim ersten Öffnen gelesen, keine neue Marke');
     });
