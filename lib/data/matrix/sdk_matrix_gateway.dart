@@ -151,7 +151,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   static const int backfillPages = 20;
   static const int dmBackfillPages = 3;
   static const int maxMessageLength = ChatMessage.maxBody;
-  static const int maxFamilyNameLength = 60;
+  static const int maxFamilyNameLength = FamilyRoomSpec.nameMax;
   static const int maxRetriesPerEvent = 5;
   static const int maxPlaintextWarnings = 2000;
   static const Duration roomSyncTimeout = Duration(seconds: 30);

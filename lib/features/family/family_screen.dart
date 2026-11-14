@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../app/app_services.dart';
+import '../../data/matrix/family_room_spec.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/family.dart';
 import '../../domain/permissions.dart';
@@ -10,6 +11,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
+import '../../ui/widgets/length_limit.dart';
 import '../calendar/themes_screen.dart';
 import '../common/error_text.dart';
 import '../common/prompt_dialog.dart';
@@ -92,7 +94,8 @@ class FamilyScreen extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final name = await TextPromptDialog.show(
       context,
-      TextPromptDialog(title: l.familyRename, label: l.familyName, confirmLabel: l.save, initial: f.name, maxLength: 60),
+      TextPromptDialog(title: l.familyRename, label: l.familyName, confirmLabel: l.save, initial: f.name,
+          maxLength: FamilyRoomSpec.nameMax, lengthMeasure: LengthMeasure.utf16),
     );
     if (name == null || !context.mounted) return;
     try {
