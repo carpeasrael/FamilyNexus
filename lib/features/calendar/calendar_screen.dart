@@ -10,6 +10,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
+import '../family/member_avatar_view.dart';
 import 'calendar_controller.dart';
 import 'event_detail_screen.dart';
 import 'event_editor_screen.dart';
@@ -201,7 +202,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             Padding(
               padding: const EdgeInsets.only(right: 8),
               child: FilterChip(
-                avatar: PersonDot(colorIndex: c.colorIndexFor(m.userId)),
+                avatar: MemberAvatarView(userId: m.userId, size: 20, colorIndex: c.colorIndexFor(m.userId), ring: true),
                 label: Text(m.userId == c.me ? '${m.displayName} ✓' : m.displayName),
                 tooltip: l.calendarFilterPerson,
                 selected: _persons.contains(m.userId),

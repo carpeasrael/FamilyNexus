@@ -14,6 +14,9 @@ class AppScope extends InheritedWidget {
     return scope!.services;
   }
 
+  /// Wie [of], aber ohne `assert`: `null`, wenn kein [AppScope] im Baum steht (z. B. Widget-Tests ohne Scope).
+  static AppServices? maybeOf(BuildContext context) => context.dependOnInheritedWidgetOfExactType<AppScope>()?.services;
+
   /// Wie [of], aber ohne Abhängigkeit zu registrieren (z. B. in `initState`).
   static AppServices read(BuildContext context) {
     final scope = context.getInheritedWidgetOfExactType<AppScope>();

@@ -8,14 +8,14 @@ Oct 20, 2026 · @CarpeAsrael
 
 ## Vision & Goals
 
-The app (working title "FamilyNexus") combines a family calendar, a messenger and a shared shopping list in one application whose data lives exclusively on the family's devices and travels only end-to-end encrypted via the Matrix protocol.
+The app (working title "FamilyNexus") combines a family calendar, a messenger and a shared shopping list in one application whose data lives exclusively on the family's devices and travels only end-to-end encrypted via the Matrix protocol (one exception: the choice of one of twelve built-in avatars is an unencrypted room state, E-101).
 
 **Target audience:** Families and households who want to coordinate appointments without entrusting their data to a central provider.
 
 **Guiding principles**
 
 - **Local-first:** All data is stored encrypted on the device; the app also works offline.
-- **E2EE by default:** No plaintext leaves the device, neither chat nor appointments.
+- **E2EE by default:** No plaintext leaves the device, neither chat nor appointments (the only exception is the avatar choice, one value out of twelve, E-101).
 - **Replaceable server:** A public Matrix server by default, optionally your own homeserver.
 - **Data minimization:** No telemetry, no advertising, no analytics SDKs.
 - **One codebase:** Android, Windows, Linux, macOS, iOS and iPadOS.
@@ -83,7 +83,7 @@ Each family is an encrypted Matrix room: the devices hold the data, the server o
 
 &#91;embedded content: Architecture · two devices and one homeserver\]
 
-Local database and Matrix layer live on each device; the homeserver forwards encrypted events and cannot read them.
+Local database and Matrix layer live on each device; the homeserver forwards encrypted events and cannot read them (one exception: the choice of one of twelve built-in avatars is an unencrypted room state, E-101).
 
 ### Matrix Model
 
@@ -120,7 +120,7 @@ Security takes precedence over convenience: encryption cannot be turned off, and
 
 ### End-to-End Encryption
 
-- Matrix E2EE with Olm (1:1) and Megolm (rooms) for chat **and** appointments; the server cannot read the content of events, but it sees metadata (including room and profile names).
+- Matrix E2EE with Olm (1:1) and Megolm (rooms) for chat **and** appointments; the server cannot read the content of events, but it sees metadata (including room and profile names and the avatar choice, one value out of twelve, kept as unencrypted room state).
 - Appointments are transmitted as encrypted room events in the family room.
 - Device verification via cross-signing; unverified devices receive no keys.
 - When a member is removed, the room keys are rotated so that departed persons cannot read new content.
@@ -130,7 +130,7 @@ Security takes precedence over convenience: encryption cannot be turned off, and
 
 | Risk | Countermeasure | Residual risk |
 | --- | --- | --- |
-| Eavesdropping on the server | E2EE, server sees only ciphertext | Metadata (who, when, room size, room and profile names, rhythm of status messages) remains visible |
+| Eavesdropping on the server | E2EE, server sees only ciphertext for content | Metadata (who, when, room size, room and profile names, rhythm of status messages) and the avatar choice (one value out of twelve, unencrypted room state, E-101) remain visible |
 | Forged online status | Only encrypted messages received from current family members count; format strictly validated | A member can only misreport their own status |
 | Loss or theft of the device | Database encryption, app lock, remote sign-out of the session | A weak PIN weakens the protection |
 | Foreign device in the family | Verification, moderator can block devices | Users skip verification |

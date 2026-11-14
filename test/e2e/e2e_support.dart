@@ -67,6 +67,8 @@ class E2e {
     E2eDevice? device,
     Duration joinPollInterval = SdkMatrixGateway.rejectionPollInterval,
     Duration participantsRetryBase = SdkMatrixGateway.participantsRetryDelay,
+    // #422: `false` startet das Gateway ohne die automatische Freischaltung des Avatar-Zustands für Mitglieder.
+    bool ensureAvatarPermission = true,
   }) async {
     final d = device ?? await newDevice();
     return SdkMatrixGateway(
@@ -77,6 +79,7 @@ class E2e {
       httpClient: httpClient ?? lenientClient(),
       joinPollInterval: joinPollInterval,
       participantsRetryBase: participantsRetryBase,
+      ensureAvatarPermission: ensureAvatarPermission,
     );
   }
 
@@ -89,10 +92,16 @@ class E2e {
     E2eDevice? device,
     Duration joinPollInterval = SdkMatrixGateway.rejectionPollInterval,
     Duration participantsRetryBase = SdkMatrixGateway.participantsRetryDelay,
+    bool ensureAvatarPermission = true,
   }) async {
     await init();
     final acc = await registerUser(prefix);
-    final g = await newGateway(device: device, joinPollInterval: joinPollInterval, participantsRetryBase: participantsRetryBase);
+    final g = await newGateway(
+      device: device,
+      joinPollInterval: joinPollInterval,
+      participantsRetryBase: participantsRetryBase,
+      ensureAvatarPermission: ensureAvatarPermission,
+    );
     await g.restore();
     await g.login(server: server, username: acc.user, password: acc.password);
     return (gateway: g, user: acc.user, password: acc.password);

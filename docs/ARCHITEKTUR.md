@@ -33,7 +33,7 @@ und `android/`. Für eine zweite Plattform sind nur die Adapter in `data/platfor
 
 ## Matrix-Anbindung
 Alles geht durch `MatrixGateway`. Zusicherungen: Familienraum immer E2E-verschlüsselt (Raumversion 10, `knock`,
-Power-Levels 0/50, Ersteller 100 = Administrator, in der App Moderator, E-61), Senden nur bei nachweisbarer Megolm-Verschlüsselung, Rechte im Gateway **und** serverseitig,
+Power-Levels 0/50, Ersteller 100 = Administrator, in der App Moderator, E-61; einzige Ausnahme: der unverschlüsselte Raumzustand `de.inneso.familynexus.avatar`, den Mitglieder mit dem eigenen Schlüssel setzen dürfen, E-101), Senden nur bei nachweisbarer Megolm-Verschlüsselung, Rechte im Gateway **und** serverseitig,
 Schlüsselweitergabe nur an cross-signierte Geräte (`ShareKeysWith.crossVerified`), Identitätsvermerke der Mitglieder,
 Einladungen mit Zufalls-ID. `FakeMatrixGateway` (test/support) bildet das Verhalten für Widget-/Integrationstests nach;
 `test/e2e` prüft das echte Gateway gegen Synapse.
@@ -59,6 +59,7 @@ geteilt: Familienraum, privat: nur privater Raum des eigenen Kontos (Geräte-Syn
 - **Reaktionen (E-86):** `MatrixGateway.sendReaction` → Familien- oder Einzelchat-Raum
   (`de.inneso.familynexus.reaction`, E2EE, ohne `m.relates_to`); eingehend: `ReactionCodec` (Format v1, `sender` = Absender)
   → `ChatMapper`, zusammen mit lesbaren alten `m.reaction`.
+- **Avatare (E-101):** `AvatarPresets` (zwölf Kennungen) → `MatrixGateway.setMemberAvatar` → Raumzustand `de.inneso.familynexus.avatar` im Familienraum (Schlüssel = eigene Matrix-ID, nicht verschlüsselt); lesen: `avatarOf` (direktes Nachschlagen in `room.states`), Änderungsmeldung `avatarRevision`; `MemberAvatarView` in `features/family`. Freischaltung für Mitglieder bestehender Familien durch Moderator-Geräte (`avatars.dart`, liest die Power-Levels vom Server, E-60).
 - **Aufgabenlisten (E-51):** `TaskService` (Rechte, Versionen, Grenzen) → `TaskStore` (SQLCipher: Listen + anfügendes Protokoll) → `TaskSync` → Familienraum (`tasklist`, `taskdone`). Der Reset ist abgeleitet: `TaskPeriod` bildet Periodenschlüssel in der Zeitzone der Liste, `TaskProgress` wertet das Protokoll für die laufende Periode aus. Oberfläche: `TasksController`, `TasksScreen`.
 
 ## Einrichtung und Kontoanlage (E-55–E-57)

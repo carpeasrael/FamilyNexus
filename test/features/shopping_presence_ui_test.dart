@@ -1,7 +1,10 @@
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/domain/family.dart';
+import 'package:family_nexus/domain/member_avatars.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/domain/shopping.dart';
+import 'package:family_nexus/features/family/avatar_presets_ui.dart';
+import 'package:family_nexus/features/presence/presence_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -222,6 +225,20 @@ void main() {
       await ben.announcePresence(online: true);
       await tester.pumpAndSettle();
       expect(find.text('Ben – Online'), findsOneWidget);
+    });
+
+    testWidgets('Heute: Avatar mit Online-Punkt ersetzt den Punkt, Text „Ben – Online“ bleibt (#422)', (tester) async {
+      final app = await buildTestApp();
+      final ben = await _joinBen(app);
+      app.gateway.familyRoom!.avatarState['@ben:fake.test'] = AvatarPresets.content('p04');
+      await _open(tester, app);
+      await ben.announcePresence(online: true);
+      await tester.pumpAndSettle();
+      final avatar = find.byKey(const ValueKey<String>('avatar-@ben:fake.test'));
+      expect(avatar, findsOneWidget);
+      expect(find.descendant(of: avatar, matching: find.byType(PresenceDot)), findsOneWidget, reason: 'Punkt am Avatar');
+      expect(find.byIcon(AvatarPresetsUi.styles['p04']!.icon), findsOneWidget);
+      expect(find.text('Ben – Online'), findsOneWidget, reason: 'Punkt und Text, nie nur der Punkt');
     });
 
     testWidgets('Einstellung „Online-Status teilen“ steuert die Meldungen', (tester) async {

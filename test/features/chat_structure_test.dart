@@ -89,7 +89,7 @@ void main() {
     handle.dispose();
   });
 
-  testWidgets('Chat: Schlüssel und Semantik unverändert (Familienchat mit Kopfzeile, Antwortvorschau)', (tester) async {
+  testWidgets('Chat: Schlüssel und Semantik (Familienchat mit Kopfzeile, Antwortvorschau; Avatar innerhalb der Blase, Semantik unverändert)', (tester) async {
     final handle = tester.ensureSemantics();
     final (app, _) = await _setup(tester);
     await tester.tap(find.byKey(const ValueKey<String>('thread-family')));
@@ -110,7 +110,8 @@ void main() {
   });
 }
 
-const List<String> _expectedListKeys = <String>['V:thread-family', 'V:thread-dm'];
+// #422: Die Zeile des Einzelchats trägt den Avatar des Gegenübers (Schlüssel `avatar-<userId>`, hinter der Zeile).
+const List<String> _expectedListKeys = <String>['V:thread-family', 'V:thread-dm', 'V:avatar-@ben:fake.test'];
 
 const List<String> _expectedListSemantics = <String>[
   'L=Heute | Tab 1 von 5 tap',
@@ -125,9 +126,12 @@ const List<String> _expectedListSemantics = <String>[
   'T=Menü öffnen tap',
 ];
 
+// #422: Der Avatar von Ben steht innerhalb seiner Blase `m0`; der Schlüssel `m<n>` bleibt an der Wurzel der Blase (#130).
+// Die Reihenfolge ist die des Baums (erst das Element, dann seine Kinder), der Avatar steht daher hinter `V:m0`.
 const List<String> _expectedKeys = <String>[
   'V:m1',
   'V:m0',
+  'V:avatar-@ben:fake.test',
   'V:~fn-unread',
   'G:unread-marker',
   'V:~fn-day-2026-10-21',

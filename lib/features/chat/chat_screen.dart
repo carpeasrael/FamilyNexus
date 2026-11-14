@@ -20,6 +20,7 @@ import '../../ui/widgets/length_limit.dart';
 import '../calendar/event_detail_screen.dart' show RsvpButtons;
 import '../calendar/formatting.dart';
 import '../common/error_text.dart';
+import '../family/member_avatar_view.dart';
 import '../moderation/moderation_actions.dart';
 import '../presence/presence_view.dart';
 import 'chat_layout.dart';

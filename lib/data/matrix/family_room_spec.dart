@@ -1,4 +1,5 @@
 import '../../domain/family.dart';
+import '../../domain/member_avatars.dart';
 
 /// Reine Beschreibung des Familienraums (E-12), getrennt vom SDK, damit sie
 /// testbar ist. Das Gateway reicht diese Werte an `createRoom` weiter.
@@ -19,7 +20,9 @@ class FamilyRoomSpec {
 
   /// Power-Levels: Ersteller = Administrator (100, in der App ein Moderator), alle anderen 0;
   /// ernannte Moderatoren haben 50. Alle Schwellen liegen bei 50, damit Moderatoren und Ersteller
-  /// dasselbe dürfen. Zustandsereignisse, die niemand ändern soll, liegen auf 101 (unerreichbar).
+  /// dasselbe dürfen; einzige Ausnahme ist der Avatar-Zustand (#422, E-101): jedes Mitglied darf ihn setzen, der
+  /// Server erlaubt es nur mit dem eigenen Zustandsschlüssel. Zustandsereignisse, die niemand ändern soll, liegen
+  /// auf 101 (unerreichbar).
   static Map<String, Object?> powerLevels(String creatorId) => <String, Object?>{
         'users': <String, int>{creatorId: PowerLevels.admin},
         'users_default': PowerLevels.member,
@@ -35,6 +38,7 @@ class FamilyRoomSpec {
           'm.room.encryption': PowerLevels.moderator,
           'm.room.history_visibility': PowerLevels.moderator,
           'm.room.join_rules': PowerLevels.moderator,
+          AvatarPresets.type: PowerLevels.member,
           'm.room.tombstone': PowerLevels.unreachable,
           'm.room.server_acl': PowerLevels.unreachable,
         },

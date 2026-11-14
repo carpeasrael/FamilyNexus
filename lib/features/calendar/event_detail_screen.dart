@@ -13,6 +13,7 @@ import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../chat/sender_name.dart';
 import '../common/error_text.dart';
+import '../family/member_avatar_view.dart';
 import '../reminders/reminder_coordinator.dart';
 import 'calendar_controller.dart';
 import 'event_editor_screen.dart';
@@ -168,6 +169,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 event: e,
                 glow: AuroraTokens.personColors[c.displayColor(e) % AuroraTokens.personColors.length],
                 theme: c.themeFor(e),
+                ownerId: e.ownerId,
                 ownerColorIndex: c.colorIndexFor(e.ownerId),
                 range: fmt.range(occurrence, l),
                 dateLong: fmt.dateLong(DateTime.parse(occurrence.dateKey)),
