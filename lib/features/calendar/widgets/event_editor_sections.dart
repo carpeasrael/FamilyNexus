@@ -69,31 +69,6 @@ class _TitleTimeCard extends StatelessWidget {
   }
 }
 
-/// Eine Zeile „Beginn“ oder „Ende“: Datum und, falls nicht ganztägig, Uhrzeit.
-class _DateRow extends StatelessWidget {
-  const _DateRow({required this.label, required this.date, required this.time, required this.onDate, required this.onTime});
-  final String label;
-  final String date;
-  final String? time;
-  final VoidCallback onDate;
-  final VoidCallback onTime;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(children: <Widget>[
-        SizedBox(width: 64, child: Text(label)),
-        Expanded(child: OutlinedButton(onPressed: onDate, child: Text(date))),
-        if (time != null) ...<Widget>[
-          const SizedBox(width: 8),
-          OutlinedButton(onPressed: onTime, child: Text(time!)),
-        ],
-      ]),
-    );
-  }
-}
-
 /// Sichtbarkeit: privat oder mit der Familie geteilt.
 class _VisibilityCard extends StatelessWidget {
   const _VisibilityCard({required this.visibility, required this.showChangeNote, required this.onChanged});

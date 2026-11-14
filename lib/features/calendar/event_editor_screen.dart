@@ -21,6 +21,7 @@ import 'event_tile.dart';
 import 'event_times.dart';
 import 'formatting.dart';
 
+part 'widgets/event_editor_date_row.dart';
 part 'widgets/event_editor_sections.dart';
 part 'widgets/event_editor_support.dart';
 
