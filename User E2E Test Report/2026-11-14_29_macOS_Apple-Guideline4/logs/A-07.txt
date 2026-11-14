@@ -1,0 +1,8 @@
+== A-07 Kontoanlage 02:09:25 ==
+"Safari" ASN:0x0-0xfcafca: (in front) 
+8073|Safari||317,460,270,89|layer 0
+8072|Safari|matrix-authentication-service|1,124,1024,768|layer 0
+8027|FamilyNexus|FamilyNexus|335,174,800,632|layer 0
+matrix-authentication-service, „Privates Surfen“, AXStandardWindow
+Vivaldi-Fenster: 0 Firefox-Fenster: 1
+Hinweis: A-07.png auf Kopf der Seite zugeschnitten (Rand eines Schlüsselbund-Popups unterhalb nicht abgelegt, nicht bedient). Das zweite Safari-Fenster 8073 (270x89) ist dieses Popup. Eingegeben wurde nur der Name 'Pruefung' in der App, nichts im Anbieterfenster.

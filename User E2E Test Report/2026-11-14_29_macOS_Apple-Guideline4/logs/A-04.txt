@@ -1,0 +1,40 @@
+== vor Klick 02:07:34 ==
+front: ASN:0x0-0x479378f:
+"FamilyNexus" ASN:0x0-0x479378f: (in front) 
+    bundleID=[ NULL ] 
+    bundle path=[ NULL ] 
+    executable path=[ NULL ] 
+ !cgsConnection !signalled type=[ NULL ]  flavor=[ NULL ]  Version=[ NULL ]  Arch=!!none 
+
+Safari-Fenster (System Events): 0
+Fenster:
+8027|FamilyNexus|FamilyNexus|335,174,800,632|layer 0
+Vivaldi-Fenster: 0
+Firefox-Fenster: 1
+
+== 6 s nach Klick 02:07:41 ==
+front: ASN:0x0-0xfcafca:
+"Safari" ASN:0x0-0xfcafca: (in front) 
+    bundleID=[ NULL ] 
+    bundle path=[ NULL ] 
+    executable path=[ NULL ] 
+ !cgsConnection !signalled type=[ NULL ]  flavor=[ NULL ]  Version=[ NULL ]  Arch=!!none 
+
+Safari-Fenster: 1
+Fenster:
+8046|Safari||317,502,242,89|layer 0
+8045|Safari|matrix-authentication-service|1,124,1024,768|layer 0
+8027|FamilyNexus|FamilyNexus|335,174,800,632|layer 0
+Vivaldi-Fenster: 0
+Firefox-Fenster: 1
+matrix-authentication-service, „Privates Surfen“, 1, 124, 1024, 768, AXStandardWindow
+Hinweis: A-04.png ist auf Titelleiste und Kopf der Seite zugeschnitten; unterhalb zeigte die Seite einen Schlüsselbund-Autofill-Vorschlag mit Kontoname des Nutzers, der bewusst nicht abgelegt und nicht bedient wurde. Zweites Fenster 8046 (242x89) war dieser Vorschlag.
+== A-06 Sitzung offen 02:08:52 ==
+"Safari" ASN:0x0-0xfcafca: (in front) 
+8062|Safari||317,502,242,89|layer 0
+8061|Safari|matrix-authentication-service|1,124,1024,768|layer 0
+8027|FamilyNexus|FamilyNexus|335,174,800,632|layer 0
+matrix-authentication-service, „Privates Surfen“, AXStandardWindow
+== A-06 nach Abbruch ==
+"FamilyNexus" ASN:0x0-0x479378f: (in front) 
+8027|FamilyNexus|FamilyNexus|335,174,800,632|layer 0

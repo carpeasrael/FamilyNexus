@@ -1,0 +1,98 @@
+== A-08 nach Abbruch Kontoanlage 02:09:36 ==
+"FamilyNexus" ASN:0x0-0x479378f: (in front) 
+8027|FamilyNexus|FamilyNexus|335,174,800,632|layer 0
+== Prozess FamilyNexus nach Beenden: 37097 /opt/homebrew/share/flutter/bin/cache/artifacts/engine/darwin-x64/flutter_tester --disable-vm-service --enable-checked-mode --verify-entry-points --enable-software-rendering --skia-deterministic-rendering --enable-dart-profiling --non-interactive --use-test-fonts --disable-asset-fonts --packages=/private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/4d1afe1b-b7ae-4fb7-8a15-d73762796609/scratchpad/wt_mut/.dart_tool/package_config.json --flutter-assets-dir=/private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/4d1afe1b-b7ae-4fb7-8a15-d73762796609/scratchpad/wt_mut/build/unit_test_assets /var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/flutter_tools.50SDcK/flutter_test_listener.UWi58k/listener.dart.dill
+37098 /opt/homebrew/share/flutter/bin/cache/artifacts/engine/darwin-x64/flutter_tester --disable-vm-service --enable-checked-mode --verify-entry-points --enable-software-rendering --skia-deterministic-rendering --enable-dart-profiling --non-interactive --use-test-fonts --disable-asset-fonts --packages=/private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/4d1afe1b-b7ae-4fb7-8a15-d73762796609/scratchpad/wt_mut/.dart_tool/package_config.json --flutter-assets-dir=/private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/4d1afe1b-b7ae-4fb7-8a15-d73762796609/scratchpad/wt_mut/build/unit_test_assets /var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/flutter_tools.50SDcK/flutter_test_listener.gsji8f/listener.dart.dill
+== Container ==
+total 72
+drwx------@   4 carpeasrael  staff  -   128 Nov 14 02:06 .
+drwx------  817 carpeasrael  staff  - 26144 Nov 13 23:46 ..
+-rw-------    1 carpeasrael  staff  - 36397 Nov 14 02:06 .com.apple.containermanagerd.metadata.plist
+drwx------   12 carpeasrael  staff  -   384 Nov 14 02:06 Data
+rm: /Users/carpeasrael/Library/Containers/de.inneso.familynexus.apple4/.com.apple.containermanagerd.metadata.plist: Operation not permitted
+rm: /Users/carpeasrael/Library/Containers/de.inneso.familynexus.apple4: Operation not permitted
+/Users/carpeasrael/Library/Containers/de.inneso.familynexus.apple4
+add_l10n.py
+arb_edit.py
+comment_422.md
+comment_422_done.md
+comment_423.md
+comment_423_done.md
+comment_424.md
+docs_edit.py
+docs_edit2.py
+docs_testplan.py
+e2e.log
+e2e2.log
+e2e_423stack.log
+e2e_base.log
+e2e_note.md
+fix_sync_test.py
+ft.log
+full.log
+full.txt
+full_mut.log
+issue_upload.md
+last_out.txt
+msg1.txt
+msg2.txt
+msg3.txt
+msg4.txt
+mut.log
+mut.py
+mut.py.bak
+mut.py.bak2
+mut.sh
+pkgparts
+pkgparts29
+policy_edit.py
+pr_422.md
+pr_423.md
+pr_424.md
+pr_pdf.md
+probe.sh
+proposal_422_light_v1.md
+proposal_422_light_v2.md
+proposal_422_light_v3.md
+proposal_422_light_v4.md
+proposal_422_light_v5.md
+proposal_422_light_v6.md
+proposal_422_light_v7.md
+proposal_422_state_v1.md
+proposal_422_state_v2.md
+proposal_422_state_v3.md
+proposal_422_state_v4.md
+proposal_422_state_v5.md
+proposal_422_v1.md
+proposal_422_v2.md
+proposal_422_v3.md
+proposal_422_v4.md
+proposal_422_v5.md
+proposal_423_v1.md
+proposal_423_v2.md
+proposal_423_v3.md
+proposal_423_v4.md
+proposal_423_v5.md
+proposal_424_v1.md
+proposal_424_v2.md
+proposal_424_v3.md
+proposal_424_v4.md
+proposal_424_v5.md
+proposal_424_v6.md
+result_424.md
+runall.sh
+summ.py
+synapse_pl50_probe.py
+synapse_state_probe.py
+t1.txt
+t2.txt
+t3.txt
+test1.log
+test2.json
+test_all.log
+testplan_422.md
+testplan_423.md
+testplan_424.md
+testplan_edit.py
+Nutzer-Container de.inneso.familynexus vorhanden: /Users/carpeasrael/Library/Containers/de.inneso.familynexus
+Safari-Fenster danach: 0
