@@ -55,10 +55,10 @@ void main() {
     });
 
     if (platform == 'macos') {
-      test('Review-Notizen macos: Darstellung der Sitzung als Safari-gehostetes Fenster erklärt (#430)', () {
+      test('Review-Notizen macos: Darstellung der Sitzung je nach Standard-App erklärt (#430)', () {
         final notes = File('store/metadata/macos/review_notes.txt').readAsStringSync();
-        expect(notes, contains('private Safari-hosted window without toolbar or tabs'));
-        expect(notes, contains('von Safari gehostetes Fenster ohne Werkzeugleiste und Tabs'));
+        expect(notes, contains("default web app's window (Safari: private, no toolbar; others may add an address bar"));
+        expect(notes, contains('Fenster der Standard-Web-App (Safari: privat, ohne Werkzeugleiste; andere evtl. mit Adressleiste'));
         expect(notes.length, lessThanOrEqualTo(4000));
       });
     }
