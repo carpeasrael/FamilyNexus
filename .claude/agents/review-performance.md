@@ -1,6 +1,7 @@
 ---
 name: review-performance
 description: Prüft den App-Code von FamilyNexus vor einem Build-Release auf Performance-Probleme. Wird vom Skill release-review gestartet.
+model: opus
 tools: Read, Grep, Glob, Bash
 ---
 

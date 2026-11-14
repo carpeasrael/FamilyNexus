@@ -1,6 +1,7 @@
 ---
 name: review-security
 description: Prüft den App-Code von FamilyNexus vor einem Build-Release auf Sicherheitsprobleme. Wird vom Skill release-review gestartet.
+model: opus
 tools: Read, Grep, Glob, Bash
 effort: high
 ---

@@ -1,6 +1,6 @@
 ---
 name: release-review
-description: Pflicht vor jedem Build-Release von FamilyNexus. Fünf Agenten prüfen den App-Code auf Performance, Qualität, Coding Standards, Sicherheit und Konsistenz, ein Control-Agent prüft die Observations nach, bestätigte werden zu gh-Issues. Verwenden, wenn ein Build, Release, Tag, Upload oder eine neue Build-Nummer ansteht, am Ende jedes Sprints (Milestone) oder wenn nach dem Release-Review gefragt wird. Argument "voll" erzwingt die Prüfung des ganzen App-Codes.
+description: Pflicht vor jedem Build-Release von FamilyNexus. Fünf Agenten (Opus) prüfen den App-Code auf Performance, Qualität, Coding Standards, Sicherheit und Konsistenz, ein Control-Agent prüft jede Observation nach, bei Uneinigkeit entscheidet ein Verifier, bestätigte werden zu gh-Issues. Verwenden, wenn ein Build, Release, Tag, Upload oder eine neue Build-Nummer ansteht, am Ende jedes Sprints (Milestone) oder wenn nach dem Release-Review gefragt wird. Argument "voll" erzwingt die Prüfung des ganzen App-Codes.
 ---
 
 # Release-Review
@@ -38,18 +38,31 @@ In **einer** Nachricht fünf `Agent`-Aufrufe: `review-performance`, `review-qual
 
 Warten, bis alle fünf fertig sind. Fehlt ein Ergebnis, ist es kein gültiges JSON oder steht unter `nicht_geprueft` ein wesentlicher Teil des Umfangs: diesen Reviewer einmal neu starten. Scheitert er erneut, abbrechen.
 
-## 4. Control-Agent
+## 4. Control-Agent (jede Observation)
 
-Einen `review-control` mit frischem Kontext starten. Er bekommt alle Observations als JSON und den Issue-Auszug, sonst nichts. Sind es mehr als 30, Observations je Bereich auf eigene `review-control`-Läufe aufteilen und Dubletten über die Bereiche danach anhand der `schluessel` prüfen.
+**Keine Observation wird ohne Gegenprüfung zum Issue.** Einen `review-control` (Opus) mit frischem Kontext starten. Er bekommt alle Observations als JSON und den Issue-Auszug, sonst nichts. Sind es mehr als 30, Observations je Bereich auf eigene `review-control`-Läufe aufteilen und Dubletten über die Bereiche danach anhand der `schluessel` prüfen.
 
-- Das Urteil ist bindend. Abgelehntes wird nicht wiederbelebt, Bestätigtes nicht verworfen, Schwere nicht umgestuft.
-- Fehlt zu einer Observation ein Urteil, einen neuen Lauf nur für diese Observations starten.
+- Fehlt zu einer Observation ein Urteil, einen neuen Lauf nur für diese Observations starten. Fehlt es danach weiter, gilt sie als uneins (Schritt 4a).
 - `BESTÄTIGT` ohne Datei- und Zeilenangabe in der Begründung zählt als `UNKLAR`.
 - Gibt es keine Observations, entfällt dieser Schritt.
 
+Der Review-Agent behauptet den Mangel immer. Einig sind beide nur bei `BESTÄTIGT` mit derselben Schwere und bei `DUPLIKAT` (dort endet die Prüfung). Alles andere ist uneins: `ABGELEHNT`, `UNKLAR`, fehlendes Urteil und jede `BESTÄTIGT`-Observation, deren Schwere der Control-Agent gegenüber dem Review-Agenten ändert.
+
+## 4a. Verifier (nur bei Uneinigkeit)
+
+Für uneinige Observations einen `review-verifier` (Opus) mit frischem Kontext starten. Er bekommt je Observation: die Observation des Review-Agenten mit Beleg, das Urteil mit Begründung des Control-Agenten und den Issue-Auszug, sonst nichts. Er investigiert selbst, bewertet beide Begründungen einzeln und entscheidet **endgültig** (`BESTÄTIGT`, `ABGELEHNT`, `UNKLAR`) samt Schwere. Bei mehr als 15 Observations auf mehrere Läufe aufteilen.
+
+- Sein Urteil ersetzt das des Control-Agenten. Es wird nicht angefochten und nicht umgestuft.
+- Fehlt ein Urteil oder fehlen Datei und Zeile bei `BESTÄTIGT`, einmal neu starten; danach gilt `UNKLAR`.
+- Der Verifier läuft nicht für einig bestätigte Observations und nicht für `DUPLIKAT`.
+
+Endurteil je Observation: bei Einigkeit das des Control-Agenten, sonst das des Verifiers. Nur `BESTÄTIGT` wird zum Issue.
+
 ## 5. Issues anlegen
 
-Nur für `BESTÄTIGT`. Vorher die Labels sicherstellen (`gh label create <name> --force`): `code-review`, `review:performance`, `review:qualitaet`, `review:standards`, `review:sicherheit`, `review:konsistenz`.
+Milestone: Version aus `pubspec.yaml` ohne Build-Nummer (`1.2.3+29` → `1.2.3`), Titel `Release v<Version>`. Fehlt er, vorher anlegen (`gh api repos/:owner/:repo/milestones -f title="Release v<Version>"`). Jedes Issue bekommt ihn.
+
+Nur für Observations mit Endurteil `BESTÄTIGT` (Control-Agent einig oder Verifier). Vorher die Labels sicherstellen (`gh label create <name> --force`): `code-review`, `review:performance`, `review:qualitaet`, `review:standards`, `review:sicherheit`, `review:konsistenz`.
 
 Abgleich über `Review-Schlüssel` in den bestehenden Issues:
 
@@ -58,18 +71,19 @@ Abgleich über `Review-Schlüssel` in den bestehenden Issues:
 - Geschlossen als `COMPLETED`: neues Issue mit Hinweis „Regression von #n“.
 
 ```sh
-gh issue create --title "[Review/<Bereich>] <titel>" --label code-review --label review:<bereich> --body-file <datei>
+gh issue create --title "[Review/<Bereich>] <titel>" --label code-review --label review:<bereich> --milestone "Release v<Version ohne Build>" --body-file <datei>
 ```
 
 Text in `<datei>`, die im Scratchpad liegt:
 
 ```markdown
-**Schwere:** <laut Control-Agent> · **Stand:** <Version>, `<Commit>`
+**Schwere:** <laut Endurteil> · **Stand:** <Version>, `<Commit>`
 **Stelle:** `<datei>:<zeile>`
 
 ## Befund
 ## Szenario
-## Nachprüfung durch den Control-Agenten
+## Nachprüfung
+(Control-Agent; bei Uneinigkeit zusätzlich Entscheidung des Verifiers mit Begründung beider Seiten)
 ## Vorschlag
 
 Review-Schlüssel: `<schluessel>`
@@ -94,14 +108,14 @@ Die Bearbeitung der Issues folgt dem Standardablauf für GitHub-Issues und ist n
 
 Umfang: VOLL | seit <Basis> (<Anzahl> Dateien)
 
-| Bereich | Observations | Bestätigt | Abgelehnt | Unklar | Duplikat |
+| Bereich | Observations | Einig bestätigt | Vom Verifier entschieden | Bestätigt gesamt | Abgelehnt | Unklar | Duplikat |
 |---|---|---|---|---|---|
 
 ### Bestätigt
 | ID | Schwere | Titel | Issue |
 
 ### Nicht bestätigt
-| ID | Urteil | Titel | Begründung |
+| ID | Endurteil (Control / Verifier) | Titel | Begründung |
 ```
 
 Bestehende `Nicht geprüft`-Angaben der Reviewer in den Lauf übernehmen.
