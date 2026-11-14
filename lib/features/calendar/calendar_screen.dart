@@ -303,7 +303,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         childAspectRatio: 0.95 / math.max(1.0, 1 + (MediaQuery.textScalerOf(context).scale(14) / 14 - 1) * 0.5),
         children: <Widget>[
           for (final d in grid)
-            _dayCell(c, l, t, d, CalendarView.forDay(occ, c.zone, d), inMonth: d.month == _focus.month, selected: d == _focus),
+            _dayCell(c, l, fmt, t, d, CalendarView.forDay(occ, c.zone, d), inMonth: d.month == _focus.month, selected: d == _focus),
         ],
       ),
       const SizedBox(height: 12),
@@ -316,14 +316,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
     ]);
   }
 
-  Widget _dayCell(CalendarController c, AppLocalizations l, AuroraTokens t, DateTime d, List<Occurrence> list, {required bool inMonth, required bool selected}) {
+  Widget _dayCell(CalendarController c, AppLocalizations l, Fmt fmt, AuroraTokens t, DateTime d, List<Occurrence> list, {required bool inMonth, required bool selected}) {
     final today = _isToday(d);
     final todaySuffix = today ? ', ${l.calendarToday}' : '';
     final colors = list.map((o) => AuroraTokens.personColors[c.displayColor(o.event) % AuroraTokens.personColors.length]).toSet().take(3).toList();
     return Semantics(
       button: true,
       selected: selected,
-      label: '${d.day}. ${l.calendarEventsOnDay(list.length)}$todaySuffix',
+      // Volles Datum über fmt.dateLong nach App-Sprache, nicht d.day: Monat und Nachbarmonat bleiben hörbar (#463).
+      label: '${fmt.dateLong(d)}, ${l.calendarEventsOnDay(list.length)}$todaySuffix',
       excludeSemantics: true,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
