@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Testbericht Apple Guideline 4 macOS Lauf 29</title>
+<style>
+@font-face{font-family:"Space Grotesk";src:url("fonts/SpaceGrotesk-Variable.ttf");font-weight:300 700}
+@font-face{font-family:"IBM Plex Sans";src:url("fonts/IBMPlexSans-Variable.ttf");font-weight:100 700}
+@font-face{font-family:"IBM Plex Mono";src:url("fonts/IBMPlexMono-Regular.ttf");font-weight:400}
+@font-face{font-family:"IBM Plex Mono";src:url("fonts/IBMPlexMono-Medium.ttf");font-weight:500}
+:root{
+ --primary:#0f766e;--primary-dark:#0b5f58;--primary-light:#14b8a6;
+ --success:#15803d;--warning:#b45309;--danger:#b91c1c;--info:#0284c7;--neutral:#475569;
+ --success-bg:rgba(21,128,61,.12);--warning-bg:rgba(180,83,9,.12);--danger-bg:rgba(185,28,28,.12);--info-bg:rgba(2,132,199,.12);--neutral-bg:rgba(71,85,105,.12);
+ --bg-body:#f6f7fb;--bg-primary:#ffffff;--bg-secondary:#eff3f8;--bg-tertiary:#e6edf6;
+ --text-primary:#0f172a;--text-secondary:#334155;--text-muted:#64748b;--text-inverse:#f8fafc;
+ --border-primary:#d7e0ea;--border-secondary:#c1cbd8;
+ --font-display:"Space Grotesk","IBM Plex Sans",system-ui,sans-serif;--font-sans:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;--font-mono:"IBM Plex Mono",Consolas,monospace;
+ --radius-sm:8px;--radius-md:12px;--radius-lg:18px;--radius-full:9999px;
+ --shadow-sm:0 1px 2px rgba(15,23,42,.08);--shadow-md:0 8px 16px rgba(15,23,42,.12);
+ --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;
+}
+@page{size:A4;margin:16mm 14mm}
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;background:var(--bg-body);color:var(--text-primary);font-family:var(--font-sans);font-size:10.5pt;line-height:1.55}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;letter-spacing:-.01em;line-height:1.2;margin:0}
+h2{break-after:avoid}h1{font-size:26pt}h2{font-size:16pt;margin:var(--space-6) 0 var(--space-3);color:var(--primary-dark)}h3{font-size:12pt;margin:var(--space-4) 0 var(--space-2);break-after:avoid}
+p{margin:0 0 var(--space-3)}
+code,.mono{font-family:var(--font-mono);font-size:9pt}
+.hero{background:var(--bg-primary);border:1px solid var(--border-primary);border-radius:var(--radius-lg);padding:var(--space-8);box-shadow:var(--shadow-md);border-top:6px solid var(--primary)}
+.eyebrow{font-family:var(--font-mono);font-size:8.5pt;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--space-2)}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);margin-top:var(--space-5)}
+.kv{background:var(--bg-secondary);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4)}
+.kv b{display:block;font-size:8pt;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em}
+.kv span{font-family:var(--font-mono);font-size:9pt}
+.card{background:var(--bg-primary);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-5);margin:var(--space-4) 0;break-inside:avoid}
+.card.warn{border-left:5px solid var(--warning)}.card.ok{border-left:5px solid var(--success)}.card.info{border-left:5px solid var(--info)}
+.badge{display:inline-block;border-radius:var(--radius-full);padding:2px 10px;font-size:8.5pt;font-weight:600;white-space:nowrap}
+.b-ok{color:var(--success);background:var(--success-bg)}.b-warn{color:var(--warning);background:var(--warning-bg)}.b-fail{color:var(--danger);background:var(--danger-bg)}.b-skip{color:var(--neutral);background:var(--neutral-bg)}.b-info{color:var(--info);background:var(--info-bg)}
+table{width:100%;border-collapse:collapse;background:var(--bg-primary);border:1px solid var(--border-primary);border-radius:var(--radius-md);font-size:9.5pt}
+th{background:var(--bg-tertiary);text-align:left;font-weight:600;padding:8px 10px;border-bottom:1px solid var(--border-secondary)}
+td{padding:8px 10px;border-bottom:1px solid var(--border-primary);vertical-align:top}
+tr{break-inside:avoid}tr:nth-child(even) td{background:var(--bg-secondary)}
+td.id{font-family:var(--font-mono);white-space:nowrap}
+figure{margin:var(--space-3) 0;break-inside:avoid}
+figure img{width:100%;border:1px solid var(--border-secondary);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);display:block}
+figure.narrow img{width:72%}
+figcaption{font-size:8.5pt;color:var(--text-muted);margin-top:var(--space-2)}
+figcaption b{font-family:var(--font-mono);font-weight:500;color:var(--text-secondary)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+ul{margin:0 0 var(--space-3);padding-left:var(--space-5)}li{margin-bottom:var(--space-1)}
+.pb{break-before:page}
+.foot{margin-top:var(--space-8);padding-top:var(--space-3);border-top:1px solid var(--border-primary);font-size:8.5pt;color:var(--text-muted)}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);margin-top:var(--space-5)}
+.stat{border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);text-align:center}
+.stat strong{display:block;font-family:var(--font-display);font-size:22pt;line-height:1.1}
+.stat span{font-size:8.5pt;font-weight:600}
+
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+.cmp figure img{width:100%}
+.tag{font-family:var(--font-mono);font-size:8pt;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)}
+
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="eyebrow">Testbericht · TP-FN-A4-MAC v02 · Lauf 29</div>
+  <h1>Apple-Rückmeldung Guideline 4: Anmeldung auf macOS (Wiederholung)</h1>
+  <p style="margin-top:12px;color:var(--text-secondary)">Erneuter Durchlauf des Plans nach dem Fix #430. Geprüft wird, ob Anmeldung und Kontoanlage bei matrix.org in einer System-Sitzung (<code>ASWebAuthenticationSession</code>) laufen, ob die Knöpfe nicht mehr „extern öffnen“ zeigen und ob ein Abbruch einen neutralen Hinweis statt eines roten Fehlers zeigt.</p>
+  <div class="meta">
+    <div class="kv"><b>Datum</b><span>14.11.2026, 02:06–02:10</span></div>
+    <div class="kv"><b>Testobjekt</b><span>FamilyNexus 1.2.3 (29), Release-Konfiguration, <code>main</code> @ bd6f25d</span></div>
+    <div class="kv"><b>System</b><span>macOS 27.3, Mac des Entwicklers</span></div>
+    <div class="kv"><b>Signatur</b><span>ad hoc, Prüfkopie mit eigener Bundle-ID</span></div>
+    <div class="kv"><b>Standardbrowser</b><span>Safari</span></div>
+    <div class="kv"><b>Apple-Referenz</b><span>Submission 2caec11f-…-8b86b2</span></div>
+  </div>
+  <div class="summary">
+    <div class="stat b-ok"><strong>7</strong><span>✓ bestanden</span></div>
+    <div class="stat b-warn"><strong>1</strong><span>⚠ mit Befund</span></div>
+    <div class="stat b-fail"><strong>0</strong><span>✕ fehlgeschlagen</span></div>
+    <div class="stat b-skip"><strong>1</strong><span>○ nicht durchgeführt</span></div>
+  </div>
+</section>
+
+<h2>1. Ergebnis in Kürze</h2>
+<div class="card ok">
+  <p><b>Die beiden Änderungen aus #430 wirken.</b> Der Knopf „Bei matrix.org anmelden“ trägt ein Anmelde-Symbol (Pfeil in Tür), der Knopf der Kontoanlage „Person mit Plus“; „extern öffnen“ steht nur noch auf Linux, Windows und Web. Nach einem Abbruch zeigt die App einen <b>neutralen Hinweis</b> mit Info-Symbol in der zweiten Textfarbe („… Du kannst es jederzeit noch einmal versuchen.“), nicht mehr den roten Fehler aus Lauf 28.</p>
+</div>
+<div class="card ok">
+  <p><b>Anmeldung und Kontoanlage öffnen weiterhin in der System-Sitzung, nicht im normalen Browser.</b> Das Fenster trägt „Privates Surfen“, hat keine Werkzeugleiste und keine Tabs und heißt für Safari <span class="mono">matrix-authentication-service</span> (1024×768). In Vivaldi und Firefox entstand kein neues Fenster. Abbruch und Wiederholung hinterlassen keinen hängenden Zustand.</p>
+</div>
+<div class="card warn">
+  <p><b>Safari bleibt der Vordergrundprozess.</b> macOS hostet die Sitzung in Safari, die Menüleiste zeigt währenddessen „Safari“. Das ist nach Plan v02 zulässig (Kriterium 2), erklärt aber weiterhin Apples Formulierung „taken to the default web browser“. Der Befund aus Lauf 28 zur Darstellung bleibt als Hinweis für die Antwort an App Review bestehen (Abschnitt 5).</p>
+</div>
+<div class="card info">
+  <p><b>Offen:</b> Die Unabhängigkeit vom Standardbrowser (A-09) wurde wie in Lauf 28 nicht geprüft, die echte Anmeldung mit Rücksprung ebenso nicht (kein eigenes matrix.org-Konto, CLAUDE.md). Details in Abschnitt 4.</p>
+</div>
+
+<h2>2. Ergebnisse je Schritt</h2>
+<table>
+<thead><tr><th>Nr.</th><th>Schritt</th><th>Ergebnis</th><th>Beobachtung</th></tr></thead>
+<tbody>
+<tr><td class="id">A-01</td><td>Versionen, Signatur, Entitlements, Standardbrowser erfassen</td><td><span class="badge b-ok">✓ bestanden</span></td><td>1.2.3 (29); Kanal <code>de.inneso.familynexus/webauth</code> im Binary; Sandbox und <code>network.client</code>, kein <code>network.server</code>; Standardbrowser Safari. Vor dem Test liefen Firefox, Vivaldi und Safari-Hilfsprozesse, Safari hatte 0 Fenster. Die Anmelde-Symbole stehen im Quelltext (<code>Icons.login</code>, <code>Icons.person_add_alt_1</code>).</td></tr>
+<tr><td class="id">A-02</td><td>Prüfkopie starten</td><td><span class="badge b-ok">✓ bestanden</span></td><td>Willkommensseite mit „Neue Familie gründen“, „Ich wurde eingeladen“, „Ich habe schon ein Konto“ (Abb. 1). Eine Schlüsselbund-Abfrage erschien kurz nach dem Start und war nach unter 10 s weg (Lauf 28: rund 45 s); es wurde nichts eingegeben.</td></tr>
+<tr><td class="id">A-03</td><td>„Ich habe schon ein Konto“</td><td><span class="badge b-ok">✓ bestanden</span></td><td>matrix.org vorbelegt („Dein Konto liegt bei matrix.org“). Der Knopf trägt das Anmelde-Symbol, <b>kein</b> „extern öffnen“ (Abb. 2).</td></tr>
+<tr><td class="id">A-04</td><td>„Bei matrix.org anmelden“, 6 s warten</td><td><span class="badge b-ok">✓ bestanden</span></td><td><span class="mono">account.matrix.org</span> in der System-Sitzung (Abb. 3). Safari ist Vordergrundprozess, Safari-Fenster 0 → 1, Titel „Privates Surfen“, keine Werkzeugleiste, keine Tabs; Vivaldi 0 → 0, Firefox 1 → 1, also kein Tab in einem anderen Browser (Safari-Tabs wurden nicht gezählt).</td></tr>
+<tr><td class="id">A-05</td><td>Sitzung schließen (Abbruch)</td><td><span class="badge b-ok">✓ bestanden</span></td><td>FamilyNexus ist wieder vorn, Safari ohne Fenster. Die App zeigt den Hinweis mit Info-Symbol, ohne Fehlerfarbe (Abb. 4). Der Knopf bleibt bedienbar.</td></tr>
+<tr><td class="id">A-06</td><td>A-04/A-05 wiederholen</td><td><span class="badge b-ok">✓ bestanden</span></td><td>Zweiter Durchlauf mit gleichem Ergebnis; Beleg sind die Fensterlisten am Ende von <code>logs/A-04.txt</code>. Die Aufnahme <code>A-06.png</code> ist Byte für Byte gleich <code>A-05.png</code>, weil beide denselben Oberflächenstand nach dem Abbruch zeigen; sie belegt den Zustand, nicht den zweiten Ablauf.</td></tr>
+<tr><td class="id">A-07</td><td>Kontoanlage über „Neue Familie gründen“</td><td><span class="badge b-ok">✓ bestanden</span></td><td>Name „Pruefung“ nur in der App-Maske eingetragen. „Konto bei matrix.org erstellen“ (Symbol „Person mit Plus“) öffnet die Seite „Konto erstellen“ in derselben System-Sitzung (Abb. 6). Im Anbieterfenster wurde nichts eingegeben, nur geöffnet und geschlossen.</td></tr>
+<tr><td class="id">A-08</td><td>Aufräumen</td><td><span class="badge b-warn">⚠ mit Befund</span></td><td>Nach Abbruch der Kontoanlage Rückkehr mit Hinweis (Namensfeld blieb gefüllt). App beendet, Prüfkopie gelöscht. Der Container <span class="mono">de.inneso.familynexus.apple4</span> lässt sich nicht ganz löschen (macOS: „Operation not permitted“ für die geschützte Metadatendatei), der Datenordner ist weg. Nutzer-Container unberührt.</td></tr>
+<tr><td class="id">A-09</td><td>Anderer Standardbrowser</td><td><span class="badge b-skip">○ nicht durchgeführt</span></td><td>Standardbrowser ist Safari; die Systemeinstellung des Nutzers wurde nicht verändert. Keine Aussage zur Unabhängigkeit vom Standardbrowser.</td></tr>
+</tbody>
+</table>
+
+<h2 class="pb">3. Belege</h2>
+<p>Alle Aufnahmen stammen von der Prüfkopie des Builds. Im Anmeldefenster erschien beim Öffnen ein Autofill-Popup des Systems (eigenes kleines Safari-Fenster, siehe <code>logs/A-04.txt</code>). Es wurde nicht bedient. Die Aufnahmen <code>A-04</code> und <code>A-07</code> sind deshalb auf Titelleiste und Seitenkopf zugeschnitten; frühere Vollaufnahmen wurden verworfen und nicht abgelegt.</p>
+
+<figure class="narrow"><img src="screenshots/A-02.png"><figcaption><b>Abb. 1 · A-02</b> Willkommensseite der Prüfkopie.</figcaption></figure>
+<figure class="narrow"><img src="screenshots/A-03.png"><figcaption><b>Abb. 2 · A-03</b> „Anmelden“ mit vorbelegtem Anbieter matrix.org. Der Knopf trägt das Anmelde-Symbol (Lauf 28: „extern öffnen“).</figcaption></figure>
+<figure class="pb"><img src="screenshots/A-04.png"><figcaption><b>Abb. 3 · A-04 (Hauptbeleg)</b> Anmeldeseite in der System-Sitzung: Titel „account.matrix.org — Privates Surfen“, keine Werkzeugleiste. Safari ist währenddessen Vordergrundprozess (<code>logs/A-04.txt</code>). Zugeschnitten.</figcaption></figure>
+<div class="cols">
+<figure><img src="screenshots/A-05.png"><figcaption><b>Abb. 4 · A-05</b> Rückkehr nach Abbruch: neutraler Hinweis mit Info-Symbol.</figcaption></figure>
+<figure><img src="screenshots/A-08.png"><figcaption><b>Abb. 5 · A-08</b> Rückkehr nach Abbruch der Kontoanlage in die App.</figcaption></figure>
+</div>
+<figure><img src="screenshots/A-07.png"><figcaption><b>Abb. 6 · A-07</b> „Konto erstellen“ in derselben System-Sitzung. Zugeschnitten; es wurde nichts ausgefüllt.</figcaption></figure>
+
+<h3 class="pb">Vergleich mit Lauf 28 (vor #430)</h3>
+<div class="cmp">
+<figure><div class="tag">Lauf 28 · A-03</div><img src="screenshots/Lauf28_A-03.png"><figcaption>Symbol „extern öffnen“ am Anmeldeknopf.</figcaption></figure>
+<figure><div class="tag">Lauf 29 · A-03</div><img src="screenshots/A-03.png"><figcaption>Anmelde-Symbol.</figcaption></figure>
+<figure><div class="tag">Lauf 28 · A-05</div><img src="screenshots/Lauf28_A-05.png"><figcaption>Roter Fehler nach Abbruch.</figcaption></figure>
+<figure><div class="tag">Lauf 29 · A-05</div><img src="screenshots/A-05.png"><figcaption>Neutraler Hinweis.</figcaption></figure>
+</div>
+
+<h2 class="pb">4. Bewertung</h2>
+<h3>Abnahmekriterien</h3>
+<table>
+<thead><tr><th>Nr.</th><th>Kriterium (Kurzform)</th><th>Ergebnis</th><th>Begründung</th></tr></thead>
+<tbody>
+<tr><td class="id">1</td><td>Seite erscheint als Fenster der System-Sitzung vor der App, nicht im Browser</td><td><span class="badge b-ok">✓ erfüllt</span></td><td>Für Anmeldung (A-04, A-06) und Kontoanlage (A-07) an Fensterliste und Aufnahme belegt.</td></tr>
+<tr><td class="id">2</td><td>Fenster ist toolbarlos und „Privates Surfen“; Safari darf Vordergrund sein</td><td><span class="badge b-ok">✓ erfüllt</span></td><td>Kein neues Fenster in Vivaldi oder Firefox. Die Anzahl der Safari-Tabs wurde nicht gezählt, es fehlt die Tab-Leiste.</td></tr>
+<tr><td class="id">3</td><td>Abbruch führt zurück mit Hinweis (kein roter Fehler); Wiederholen funktioniert</td><td><span class="badge b-ok">✓ erfüllt</span></td><td>Hinweis in A-05, A-06 und A-08; Wiederholung in A-06.</td></tr>
+<tr><td class="id">4</td><td>Gilt für Anmeldung und Kontoanlage, unabhängig vom Standardbrowser</td><td><span class="badge b-warn">⚠ teilweise</span></td><td>Anmeldung und Kontoanlage belegt, Unabhängigkeit vom Standardbrowser nicht (A-09).</td></tr>
+</tbody>
+</table>
+
+<h3>Was nicht belegt ist</h3>
+<ul>
+<li><b>Direkter Nachweis des Codepfads fehlt.</b> Der Schluss auf <code>ASWebAuthenticationSession</code> beruht auf Darstellung und Kanalname im Binary; es gibt keine Logzeile dazu.</li>
+<li>Anmeldung mit echten Zugangsdaten und <b>Rücksprung per Callback</b> in die App (kein eigenes matrix.org-Konto, CLAUDE.md).</li>
+<li>Kontolöschung und Passwortseite auf dem Mac; signierter App-Store-Build; Prüfer-Mac von Apple; iOS.</li>
+<li>Andere Standardbrowser (A-09); Safari-Tabs wurden nicht gezählt.</li>
+</ul>
+
+<h3>Einschränkungen und Auffälligkeiten dieses Laufs</h3>
+<ul>
+<li><b>Der getestete Build ist ein Neubau</b> (<code>flutter build macos --release</code> am 14.11. um 02:06 aus <code>main</code> @ bd6f25d), kein signierter Store-Build. Der vorhandene Build vom 13.11. war älter als #430. Die Build-Nummer blieb unverändert.</li>
+<li><b>Autofill-Popup des Systems</b> im Anbieterfenster: ein eigenes kleines Safari-Fenster, deshalb zählten die Fensterlisten zeitweise zwei Safari-Fenster. Es kommt vom System, nicht von der App. Es wurde nicht bedient; Aufnahmen, die es zeigten, sind zugeschnitten.</li>
+<li><b>Schlüsselbund-Abfrage bei A-02:</b> erschien kurz nach dem Start, nach unter 10 s weg, nichts eingegeben. Bekannte Ursache bei ad hoc signierten Builds.</li>
+<li>Ein <code>System Events</code>-Aufruf zum Auslesen der Fensterposition schlug einmal fehl (Fehler −1728); danach wurde mit CoreGraphics gearbeitet. Das Zuschneiden mit <code>sips</code> ging zweimal schief, die endgültigen Aufnahmen entstanden mit <code>screencapture -R</code>.</li>
+</ul>
+
+<h2>5. Vorschlag für die Antwort an App Review (Entwurf)</h2>
+<div class="card">
+<p class="mono" style="white-space:pre-wrap;font-size:8.8pt">Thank you for the feedback. FamilyNexus uses ASWebAuthenticationSession on macOS and iOS for sign-in and account creation with the identity provider (matrix.org). The app does not open the default browser for these flows.
+
+On macOS the system presents the session in a Safari-hosted window titled "account.matrix.org – Private Browsing" without toolbar or tabs, which can look like Safari. The attached screenshot shows this window above the app. After closing or completing it, the session returns to FamilyNexus.
+
+The build you reviewed is stated as 1.2.1 (27); our build 27 is version 1.2.2, the current submission is 1.2.3 (29). If you still see the default browser, could you tell us at which step and attach a screenshot or recording?</p>
+</div>
+<p style="color:var(--text-muted);font-size:9pt">Der Text ist ein Entwurf und wird nicht abgeschickt. Ein Nachtest auf einem signierten Build und mit echter Anmeldung ist vorher sinnvoll (siehe „Was nicht belegt ist“).</p>
+
+<h2>6. Stand der Verbesserungsvorschläge aus Lauf 28</h2>
+<table>
+<thead><tr><th>Nr.</th><th>Vorschlag (Lauf 28)</th><th>Stand</th></tr></thead>
+<tbody>
+<tr><td class="id">1</td><td>Symbol der Knöpfe von „extern öffnen“ auf ein Anmelde-Symbol ändern</td><td><span class="badge b-ok">✓ umgesetzt</span> (#430), in A-03 und A-07 belegt</td></tr>
+<tr><td class="id">2</td><td>Review-Notizen für macOS um den Satz zur Safari-gehosteten Sitzung ergänzen</td><td><span class="badge b-skip">○ nicht geprüft</span> (Teil von #430 laut Titel, in diesem Lauf nicht kontrolliert)</td></tr>
+<tr><td class="id">3</td><td>Abbruchhinweis als neutrale Info statt Fehlerfarbe</td><td><span class="badge b-ok">✓ umgesetzt</span> (#430), in A-05, A-06 und A-08 belegt</td></tr>
+<tr><td class="id">4</td><td>Testplan v02: Kriterium 2 für macOS anpassen</td><td><span class="badge b-ok">✓ umgesetzt</span>, dieser Lauf folgt Plan v02</td></tr>
+<tr><td class="id">5</td><td>Codepfad der Sitzung direkt belegbar machen (Debug-Anzeige oder Test-Hook)</td><td><span class="badge b-warn">○ offen</span>, weiterhin nur indirekt belegt</td></tr>
+</tbody>
+</table>
+<p><b>Neu vorgeschlagen:</b> A-09 auf einem zweiten Mac-Konto mit Chrome oder Firefox als Standardbrowser nachholen (die Systemeinstellung des Nutzers wird in diesem Projekt nicht umgestellt).</p>
+
+<div class="foot">
+Ablage: <span class="mono">User E2E Test Report/2026-11-14_29_macOS_Apple-Guideline4/</span> (Screenshots, Logs, diese Datei) · Testplan: <span class="mono">User E2E Test/Testplan_Apple_Guideline4_Anmeldung_macOS.md</span> (v02) · Bezug: Issue #268, #430, E-91.<br>
+Rollen nach CLAUDE.md Abschnitt 5: Der Plan stammt von einem früheren Agenten, die Durchführung von einem getrennten Tester-Agenten, der keinen Code geändert hat; die Auswertung (Abgleich der Aufnahmen und Protokolle mit dem Bericht des Testers) erfolgte durch den Hauptagenten, der die Schritte nicht selbst ausgeführt hat.
+</div>
+</body>
+</html>

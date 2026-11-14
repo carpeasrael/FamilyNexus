@@ -1,0 +1,126 @@
+== Build ==
+Commit: bd6f25d 2026-11-14T01:26:19+01:00 Merge pull request #435 from carpeasrael/docs/export-pdfs
+HEAD: bd6f25d
+Build gebaut: 2026-11-14T02:06:11
+Lauf: 2026-11-14T02:06:23
+1.2.3
+29
+de.inneso.familynexus.apple4
+== codesign ==
+Executable=/private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/4d1afe1b-b7ae-4fb7-8a15-d73762796609/scratchpad/FamilyNexus.app/Contents/MacOS/FamilyNexus
+Identifier=de.inneso.familynexus.apple4
+Format=app bundle with Mach-O universal (x86_64 arm64)
+CodeDirectory v=20400 size=1653 flags=0x2(adhoc) hashes=41+7 location=embedded
+Signature=adhoc
+Info.plist entries=27
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=22
+Internal requirements count=0 size=12
+Total signatures=1
+Chosen signature=1
+verify-ok
+== Entitlements ==
+[Dict]
+	[Key] com.apple.security.app-sandbox
+	[Value]
+		[Bool] true
+	[Key] com.apple.security.files.user-selected.read-write
+	[Value]
+		[Bool] true
+	[Key] com.apple.security.network.client
+	[Value]
+		[Bool] true
+network.server: 0
+== strings Kanal ==
+de.inneso.familynexus/webauth
+de.inneso.familynexus/webauth
+== Standardbrowser ==
+== Browser-Prozesse vor Test ==
+  535 /usr/libexec/searchpartyd
+  626 /usr/libexec/knowledge-agent
+  806 /usr/libexec/searchpartyuseragent
+ 1180 /System/Library/PrivateFrameworks/SafariSafeBrowsing.framework/com.apple.Safari.SafeBrowsing.Service
+ 2869 Firefox.app/Contents/MacOS/firefox
+ 2875 Firefox.app/Contents/MacOS/crashhelper
+ 2876 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+ 2877 Firefox.app/Contents/MacOS/gpu-helper.app/Contents/MacOS/Firefox GPU Helper
+ 2878 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+ 2879 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+ 2885 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+ 4283 /usr/libexec/spotlightknowledged.importer
+ 4291 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper
+ 4907 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+ 4908 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper
+ 4910 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+ 4927 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+ 7624 /System/Library/PrivateFrameworks/IntelligencePlatformCore.framework/Versions/A/knowledgeconstructiond
+ 8655 /System/Library/PrivateFrameworks/TrialServer.framework/Versions/A/XPCServices/TrialArchivingService.xpc/Contents/MacOS/TrialArchivingService
+ 8720 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper
+ 9413 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+ 9801 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+14372 Bitwarden.app/Contents/PlugIns/safari.appex/Contents/MacOS/safari
+14409 /System/Library/PrivateFrameworks/SafariFoundation.framework/Versions/A/XPCServices/CredentialProviderExtensionHelper.xpc/Contents/MacOS/CredentialProviderExtensionHelper
+14411 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper
+14412 /System/Library/PrivateFrameworks/SafariFoundation.framework/Versions/A/XPCServices/CredentialProviderExtensionHelper.xpc/Contents/MacOS/CredentialProviderExtensionHelper
+17587 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper
+17646 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper
+21335 /System/Cryptexes/App/usr/libexec/com.apple.Safari.History
+24849 /System/Library/PrivateFrameworks/TrialServer.framework/Versions/A/XPCServices/TrialArchivingService.xpc/Contents/MacOS/TrialArchivingService
+25622 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+26148 /usr/libexec/spotlightknowledged.updater
+29624 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+30411 /System/Library/PrivateFrameworks/SafariFoundation.framework/Versions/A/XPCServices/SafariConfigurationSubscriber.xpc/Contents/MacOS/SafariConfigurationSubscriber
+34859 /System/Cryptexes/App/usr/libexec/SafariLaunchAgent
+41505 /private/var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/AppTranslocation/8DF1590B-0A6A-4785-89C5-9AD8350C5FC3/d/Vivaldi.app/Contents/MacOS/Vivaldi
+41509 /var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/AppTranslocation/8DF1590B-0A6A-4785-89C5-9AD8350C5FC3/d/Vivaldi.app/Contents/Frameworks/Vivaldi Framework.framework/Versions/8.2.4133.94/Helpers/chrome_crashpad_handler
+41512 /private/var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/AppTranslocation/8DF1590B-0A6A-4785-89C5-9AD8350C5FC3/d/Vivaldi.app/Contents/Frameworks/Vivaldi Framework.framework/Versions/8.2.4133.94/Helpers/Vivaldi Helper.app/Contents/MacOS/Vivaldi Helper
+41513 /private/var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/AppTranslocation/8DF1590B-0A6A-4785-89C5-9AD8350C5FC3/d/Vivaldi.app/Contents/Frameworks/Vivaldi Framework.framework/Versions/8.2.4133.94/Helpers/Vivaldi Helper.app/Contents/MacOS/Vivaldi Helper
+41515 /private/var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/AppTranslocation/8DF1590B-0A6A-4785-89C5-9AD8350C5FC3/d/Vivaldi.app/Contents/Frameworks/Vivaldi Framework.framework/Versions/8.2.4133.94/Helpers/Vivaldi Helper.app/Contents/MacOS/Vivaldi Helper
+41518 /private/var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/AppTranslocation/8DF1590B-0A6A-4785-89C5-9AD8350C5FC3/d/Vivaldi.app/Contents/Frameworks/Vivaldi Framework.framework/Versions/8.2.4133.94/Helpers/Vivaldi Helper (Renderer).app/Contents/MacOS/Vivaldi Helper (Renderer)
+41523 /private/var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/AppTranslocation/8DF1590B-0A6A-4785-89C5-9AD8350C5FC3/d/Vivaldi.app/Contents/Frameworks/Vivaldi Framework.framework/Versions/8.2.4133.94/Helpers/Vivaldi Helper (Renderer).app/Contents/MacOS/Vivaldi Helper (Renderer)
+41525 /private/var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/AppTranslocation/8DF1590B-0A6A-4785-89C5-9AD8350C5FC3/d/Vivaldi.app/Contents/Frameworks/Vivaldi Framework.framework/Versions/8.2.4133.94/Helpers/Vivaldi Helper (Renderer).app/Contents/MacOS/Vivaldi Helper (Renderer)
+42986 /usr/libexec/hybridsearchd
+44075 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+47762 Claude.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler
+48958 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+49489 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+49694 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+49927 /System/Cryptexes/App/usr/libexec/SafariNotificationAgent
+75332 /System/Cryptexes/App/usr/libexec/SafariBookmarksSyncAgent
+77687 /System/Library/PrivateFrameworks/CoreFP.framework/Versions/A/XPCServices/com.apple.fpsd.arcadeservice.xpc/Contents/MacOS/com.apple.fpsd.arcadeservice
+81630 /usr/libexec/siriknowledged
+84337 /System/Volumes/Preboot/Cryptexes/App/SystemSafari.app/Contents/MacOS/Safari
+== Symbol im Quelltext ==
+lib/features/onboarding/welcome_step.dart:51:      choice(OnboardingPath.login, Icons.login, l.startLoginTitle, l.startLoginBody),
+lib/features/onboarding/widgets/account_create_parts.dart:46:          icon: Icon(providerPageIcon(context, Icons.person_add_alt_1), size: 18),
+lib/features/onboarding/family_step.dart:182:          icon: const Icon(Icons.person_add_alt_1_outlined),
+lib/features/onboarding/widgets/login_parts.dart:42:          icon: Icon(providerPageIcon(context, Icons.login), size: 18),
+lib/features/onboarding/widgets/sign_in_icons.dart:16:      OAuthFlow.loopback || OAuthFlow.none => Icons.open_in_new,
+== Standardbrowser (https-Handler) ==
+== Safari-Fenster vor Test ==
+0
+== lsappinfo front ==
+ASN:0x0-0x8c08c:
+43) "Firefox" ASN:0x0-0x60060: 
+44) "FirefoxCP Socket Process" ASN:0x0-0x61061: 
+45) "FirefoxCP WebExtensions" ASN:0x0-0x62062: 
+46) "FirefoxCP RDD Process" ASN:0x0-0x63063: 
+47) "FirefoxCP Isolated Web Content" ASN:0x0-0x66066: 
+53) "FirefoxCP Privileged Content" ASN:0x0-0xa30a3: 
+55) "FirefoxCP Utility Process" ASN:0x0-0xa50a5: 
+56) "FirefoxCP Utility Process" ASN:0x0-0xa80a8: 
+63) "FirefoxCP Isolated Web Content" ASN:0x0-0x200200: 
+67) "Safari" ASN:0x0-0xfcafca: 
+71) "Safari Networking" ASN:0x0-0x130a309: 
+72) "Safari Graphics and Media" ASN:0x0-0x130b30a: 
+91) "FirefoxCP Isolated Web Content" ASN:0x0-0x3616613: 
+92) "Vivaldi" ASN:0x0-0x385284f: 
+108) "FirefoxCP Isolated Web Content" ASN:0x0-0x443d439: 
+109) "FirefoxCP Isolated Web Content" ASN:0x0-0x443e43a: 
+123) "SafariLaunchAgent" ASN:0x0-0x45a059c: 
+124) "Safari-Webinhalt" ASN:0x0-0x45a259e: 
+128) "FirefoxCP file:// Content" ASN:0x0-0x472271e: 
+131) "FirefoxCP Web Content" ASN:0x0-0x477f77b: 
+132) "FirefoxCP Web Content" ASN:0x0-0x478077c: 
+133) "FirefoxCP Web Content" ASN:0x0-0x478177d: 
+Standardbrowser (NSWorkspace urlForApplication https): /System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app
