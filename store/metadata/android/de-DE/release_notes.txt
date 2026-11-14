@@ -1,10 +1,9 @@
 Neu in 1.2.3:
-• Identitätsvermerke zusätzlich auf dem Gerät gespeichert.
-• Ladebild folgt der Darstellung des Geräts.
-• Kalender: Jahresfortschritt, Abgleich alle 15 Min.
-• Einführung für neue Nutzer; App teilen und bewerten.
-Neu in 1.2.2:
+• Kalender-Themen (Name, Farbe), Gesprächsliste, zwölf Avatare.
 • Bitte alle Geräte der Familie aktualisieren.
-• Einkauf: Einträge nach Gruppen ordnen.
+• Identitätsvermerke auch auf dem Gerät; Ladebild folgt der Darstellung.
+• Kalender: Jahresfortschritt, Abgleich alle 15 Min.
+• Einführung; App teilen und bewerten.
+Neu in 1.2.2:
 • Jeden Beitritt bestätigt ein Moderator; Einladungslinks ohne lesbare Namen.
-• Reaktionen werden verschlüsselt gesendet.
+• Einkauf: Einträge nach Gruppen ordnen.
