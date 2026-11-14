@@ -1,6 +1,6 @@
 # Datenschutzerklärung für FamilyNexus
 
-**Stand: 14. November 2026**
+**Stand: 15. November 2026**
 
 **Plattform: native Apps für iOS, macOS, Windows, Linux, Flatpak und Android sowie Web-App.**
 

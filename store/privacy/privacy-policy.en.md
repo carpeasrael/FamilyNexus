@@ -2,7 +2,7 @@
 
 **This is a translation of the German original (`privacy-policy.de.md`). If the two versions differ, the German version prevails.**
 
-**Last updated: 14 November 2026**
+**Last updated: 15 November 2026**
 
 **Platform: native apps for iOS, macOS, Windows, Linux, Flatpak and Android as well as web app.**
 
