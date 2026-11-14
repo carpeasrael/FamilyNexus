@@ -1027,15 +1027,18 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     final req = http.Request('GET', uri)..headers['authorization'] = 'Bearer $accessToken';
     final res = await client.send(req).timeout(timeout);
     if (res.statusCode != 200) {
-      await res.stream.drain<void>();
+      // Körper wird nicht gebraucht; abbrechen statt ohne Schranke lesen.
+      unawaited(res.stream.listen(null).cancel());
       throw const GatewayException(GatewayError.notFound);
     }
     final declared = res.contentLength;
     if (declared != null && declared > AttachmentPolicy.maxBytes + 1024) {
+      unawaited(res.stream.listen(null).cancel());
       throw const GatewayException(GatewayError.attachmentRejected);
     }
     final buf = BytesBuilder(copy: false);
-    await for (final chunk in res.stream) {
+    // `timeout` am Strom ist eine Leerlauf-Schranke und beendet beim Auslösen das Abo (wie invitations.dart, E-81).
+    await for (final chunk in res.stream.timeout(timeout)) {
       buf.add(chunk);
       if (buf.length > AttachmentPolicy.maxBytes + 1024) {
         throw const GatewayException(GatewayError.attachmentRejected);

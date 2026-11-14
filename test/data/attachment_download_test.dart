@@ -18,6 +18,8 @@ const Duration _guard = Duration(seconds: 3);
 
 /// Antwort, deren Kopfzeilen da sind, deren Körper aber nie endet. [first] wird beim Abonnieren noch geliefert.
 http.StreamedResponse _hanging(int status, {int? contentLength, void Function()? onCancel, List<int>? first}) {
+  // Der Körper endet absichtlich nie (Kern von #458).
+  // ignore: close_sinks
   late final StreamController<List<int>> ctrl;
   ctrl = StreamController<List<int>>(
     onListen: first == null ? null : () => ctrl.add(first),
