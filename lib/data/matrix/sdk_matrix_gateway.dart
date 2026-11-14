@@ -1016,6 +1016,37 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
         },
       });
 
+  /// Zeitschranke für Anhang-Downloads: bis zu den Kopfzeilen und danach je Datenblock (Leerlauf, nicht Gesamtdauer).
+  static const Duration attachmentTimeout = Duration(seconds: 60);
+
+  /// Begrenzter Download eines Anhangs (E-28): bricht ab, sobald mehr als das Limit ankommt (der im Ereignis
+  /// behauptete Wert ist nicht vertrauenswürdig) oder [timeout] lang nichts kommt (#458).
+  @visibleForTesting
+  static Future<Uint8List> boundedDownload(http.Client client, Uri uri,
+      {required String? accessToken, Duration timeout = attachmentTimeout}) async {
+    final req = http.Request('GET', uri)..headers['authorization'] = 'Bearer $accessToken';
+    final res = await client.send(req).timeout(timeout);
+    if (res.statusCode != 200) {
+      // Körper wird nicht gebraucht; abbrechen statt ohne Schranke lesen.
+      unawaited(res.stream.listen(null).cancel());
+      throw const GatewayException(GatewayError.notFound);
+    }
+    final declared = res.contentLength;
+    if (declared != null && declared > AttachmentPolicy.maxBytes + 1024) {
+      unawaited(res.stream.listen(null).cancel());
+      throw const GatewayException(GatewayError.attachmentRejected);
+    }
+    final buf = BytesBuilder(copy: false);
+    // `timeout` am Strom ist eine Leerlauf-Schranke und beendet beim Auslösen das Abo (wie invitations.dart, E-81).
+    await for (final chunk in res.stream.timeout(timeout)) {
+      buf.add(chunk);
+      if (buf.length > AttachmentPolicy.maxBytes + 1024) {
+        throw const GatewayException(GatewayError.attachmentRejected);
+      }
+    }
+    return buf.takeBytes();
+  }
+
   /// Mitgliedschaft für Diagnose und Log: nur die feste Liste, nie der Wert aus dem Ereignis.
   @visibleForTesting
   static String membershipLabel(Object? membership) {

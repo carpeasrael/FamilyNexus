@@ -148,6 +148,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
 
 ## E-28 Anhänge eingehend
 - Endung und behaupteter MIME-Typ müssen übereinstimmen, Größe muss bekannt und ≤ 25 MB sein; der Download ist hart auf das Limit begrenzt (nicht auf den behaupteten Wert vertraut); Bilder werden verkleinert dekodiert (`cacheHeight`). Eingehende Namen/Anzeigenamen/Reaktionen werden bereinigt (Bidi-/Steuerzeichen, Länge, nur Emoji, max. 12 Arten).
+- **Nachtrag (#458, 14.11.2026):** Der Download hat eine Zeitschranke von 60 s bis zu den Kopfzeilen und 60 s Leerlauf je Datenblock (`res.stream.timeout`, wie E-81); eine Gesamtdauer ist nicht begrenzt (langsame, aber fortlaufende Downloads bleiben möglich). Bei Status ≠ 200 und bei zu großem `contentLength` wird der Körper nicht gelesen, sondern das Abo abgebrochen. Abbruch wegen Zeitüberschreitung erscheint als „Server nicht erreichbar“. Prüfung: `test/data/attachment_download_test.dart`.
 
 ## E-29 Privater Raum später
 - Der private Raum (E-09) wird mit der Kalender-Synchronisation in Phase 3 umgesetzt (PLAN 3.3); Phase 2 enthielt ihn irrtümlich.
