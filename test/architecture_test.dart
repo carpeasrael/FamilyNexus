@@ -59,6 +59,15 @@ void main() {
     }
   });
 
+  test('numerische Daten nur über formatDateNumeric (#260, #460)', () {
+    // E-20: Tag und Monat zweistellig. DateFormat.yMd lässt die führende Null weg
+    // und kam schon einmal zurück (#260, #460), weil die Regel nur in der Doku stand.
+    final re = RegExp(r'DateFormat\.yMd\(');
+    for (final f in _dartFiles('lib')) {
+      expect(re.hasMatch(f.readAsStringSync()), isFalse, reason: f.path);
+    }
+  });
+
   test('Android-spezifische Dart-Brücken liegen nur in data/platform', () {
     for (final f in _dartFiles('lib')) {
       if (posix(f.path).contains('lib/data/platform/')) continue;

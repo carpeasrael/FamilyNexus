@@ -43,13 +43,14 @@ class _ThreadRowTile extends StatelessWidget {
   final DateTime now;
   final void Function(String id) onTap;
 
-  /// Heute die Uhrzeit, gestern „Gestern“, sonst das Datum (Ortszeit).
+  /// Heute die Uhrzeit, gestern „Gestern“, sonst das Datum numerisch mit
+  /// führender Null (`formatDateNumeric`, E-20/#260; Ortszeit).
   static String _timeText(BuildContext context, AppLocalizations l, DateTime time) {
     final t = time.toLocal();
     return switch (chatDayOf(t, DateTime.now())) {
       ChatDay.today => formatClock(context, t.hour, t.minute),
       ChatDay.yesterday => l.chatYesterday,
-      ChatDay.other => DateFormat.yMd(Localizations.localeOf(context).toLanguageTag()).format(t),
+      ChatDay.other => formatDateNumeric(t, Localizations.localeOf(context).toLanguageTag()),
     };
   }
 

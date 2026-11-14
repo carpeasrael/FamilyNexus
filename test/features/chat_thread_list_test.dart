@@ -351,6 +351,8 @@ void main() {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day, 10, 5);
       final yesterday = DateTime(now.year, now.month, now.day - 1, 10, 5);
+      // Einstelliger Tag und Monat, 12 Uhr Ortszeit: zeigt die führende Null (#460, E-20).
+      final older = DateTime(now.year - 1, 3, 5, 12);
       for (final use24h in <bool>[true, false]) {
         final app = await buildTestApp();
         final ben = await _member(app, 'ben', 'Ben');
@@ -363,13 +365,13 @@ void main() {
         await ben.sendMessage('heute', threadId: dmB);
         app.server.nextTime = yesterday.toUtc();
         await cara.sendMessage('gestern', threadId: dmC);
+        app.server.nextTime = older.toUtc();
         await dora.sendMessage('früher', threadId: dmD);
         await _start(tester, app, media: (m) => m.copyWith(alwaysUse24HourFormat: use24h));
         final clock = (use24h ? DateFormat.Hm('de') : DateFormat.jm('de')).format(DateTime(2000, 1, 1, 10, 5));
         expect(find.descendant(of: _row(dmB), matching: find.text(clock)), findsOneWidget, reason: 'heute, 24h=$use24h');
         expect(find.descendant(of: _row(dmC), matching: find.text('Gestern')), findsOneWidget);
-        final dateText = DateFormat.yMd('de').format(app.gateway.messagesIn(dmD).single.time.toLocal());
-        expect(find.descendant(of: _row(dmD), matching: find.text(dateText)), findsOneWidget);
+        expect(find.descendant(of: _row(dmD), matching: find.text('05.03.${older.year}')), findsOneWidget);
         await tester.pumpWidget(const SizedBox());
       }
     });
@@ -1000,6 +1002,19 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byTooltip('Back to conversations'), findsOneWidget);
       expect(find.text('Only between you and Ben, end-to-end encrypted'), findsOneWidget);
+    });
+
+    testWidgets('Datum älter als gestern mit führender Null (#460, E-20)', (tester) async {
+      _wide(tester);
+      final app = await buildTestApp(lang: 'en');
+      final ben = await _member(app, 'ben', 'Ben');
+      final dm = await ben.startDirectChat(app.gateway.userId!);
+      final older = DateTime(DateTime.now().year - 1, 3, 5, 12);
+      app.server.nextTime = older.toUtc();
+      await ben.sendMessage('Long ago', threadId: dm);
+      await _start(tester, app);
+      expect(find.descendant(of: _row(dm), matching: find.text('03/05/${older.year}')), findsOneWidget);
+      expect(find.descendant(of: _row(dm), matching: find.text('3/5/${older.year}')), findsNothing);
     });
   });
 }
