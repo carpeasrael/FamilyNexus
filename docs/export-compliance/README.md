@@ -52,7 +52,7 @@ lassen). Welche Unterlagen ein Einzelentwickler ohne Firma braucht, klärt die A
 1. **Entscheiden:** Weg A oder B (oben).
 2. **Platzhalter ausfüllen** in `encryption-description-en.md` (Herausgeber, Anschrift, Kontakt, Vertriebsländer, ECCN-Einschätzung) und die mit
    **[verify]** markierten Punkte prüfen (TLS-Suiten der Dart-Laufzeit; Krypto-Anbieter von SQLCipher im Pod).
-3. **PDF erzeugen:** `encryption-description-en.pdf` ist im AURORA-Design gesetzt (Quelle: `encryption-description-en.md`; erzeugt mit Chrome headless, Schriften aus `assets/fonts`). Das französische PDF liegt ebenfalls bei.
+3. **PDF erzeugen:** `python3 tool/build_export_pdfs.py` (braucht das Python-Paket `markdown` und Google Chrome) setzt beide Markdown-Dateien mit den Schriften aus `assets/fonts` und den AURORA-Farben zu `encryption-description-en.pdf` und `description-chiffrement-fr.pdf`. Nach jeder Änderung an einer der beiden `.md`-Dateien neu ausführen und die PDFs mit einchecken.
 4. **App Store Connect:** App öffnen → *App-Informationen* → neben *App-Verschlüsselungsdokumentation* auf **+** → Fragen beantworten →
    *Datei auswählen* → *Sichern*. Vorher müssen App-Beschreibung und Verfügbarkeit gepflegt sein. Rollen: Account-Inhaber, Admin
    oder App-Manager. Apple nennt etwa zwei Werktage Prüfdauer. Alternativ: Bei einem Build mit fehlender Angabe (Tab *TestFlight*
