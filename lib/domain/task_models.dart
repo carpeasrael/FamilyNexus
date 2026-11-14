@@ -203,6 +203,11 @@ class TaskLogEntry {
   static const int keepPerList = 500;
   static const int maxTotal = 5000;
 
+  /// Flüchtiger Puffer für empfangene Einträge, die vor ihrer Liste oder vor der passenden Zuweisung
+  /// eintreffen (#464): höchstens so viele je Absender und insgesamt. Nicht gespeichert.
+  static const int maxPendingPerSender = keepPerList;
+  static const int maxPendingTotal = maxTotal;
+
   /// Größte Abweichung zwischen gemeldetem Zeitpunkt und Zeit des Matrix-Ereignisses.
   static const Duration maxSkew = Duration(days: 2);
 

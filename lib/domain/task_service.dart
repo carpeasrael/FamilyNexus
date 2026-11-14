@@ -40,6 +40,10 @@ class TaskService {
 
   Future<void> _tail = Future<void>.value();
 
+  /// Empfangene, noch nicht zuordenbare Protokolleinträge (#464): Absender → Eintrags-ID → Eintrag.
+  /// Nur im Arbeitsspeicher; nach einem Neustart kommen sie erneut über die Zeitleiste.
+  final Map<String, Map<String, TaskLogEntry>> _pending = <String, Map<String, TaskLogEntry>>{};
+
   Future<T> _serial<T>(Future<T> Function() op) {
     final next = _tail.then((_) => op());
     _tail = next.then<void>((_) {}, onError: (Object _) {});
@@ -147,6 +151,7 @@ class TaskService {
         );
         _check(next);
         await store.putList(next);
+        await _drain(next);
         return next;
       });
 
@@ -224,19 +229,76 @@ class TaskService {
         }
         if (!TaskMerge.incomingWins(current, incoming)) return false;
         await store.putList(incoming, publishedVersion: incoming.version);
+        await _drain(incoming);
         return true;
       });
 
-  /// Nimmt einen empfangenen Protokolleintrag an. [serverTime] ist die Zeit des Matrix-Ereignisses;
-  /// weicht der gemeldete Zeitpunkt stark davon ab, wird der Eintrag verworfen.
+  /// Nimmt einen empfangenen Protokolleintrag an; `true`, wenn er gespeichert wurde. [serverTime] ist
+  /// die Zeit des Matrix-Ereignisses; weicht der gemeldete Zeitpunkt stark davon ab, wird der Eintrag
+  /// verworfen.
+  ///
+  /// Rechteprüfung vor dem Speichern (E-51, #464): Gespeichert wird nur ein Eintrag zu einer bekannten,
+  /// nicht gelöschten Liste, dessen Autor die aktuell zugewiesene Person ist. Andere Einträge (Liste
+  /// noch unbekannt, z. B. im Backfill, gelöscht oder andere Zuweisung) liegen in einem flüchtigen
+  /// Puffer und werden bei jeder Änderung ihrer Liste erneut geprüft; dann ist das Ergebnis `false`.
   Future<bool> applyIncomingLog(TaskLogEntry incoming, {required DateTime serverTime}) => _serial(() async {
         if ((incoming.at.difference(serverTime.toUtc())).abs() > TaskLogEntry.maxSkew) return false;
         if (await store.hasLog(incoming.id)) return false;
-        if (await store.logTotal() >= TaskLogEntry.maxTotal) return false;
-        if (await store.logCount(incoming.listId) >= TaskLogEntry.keepPerList) {
-          await store.pruneLog(incoming.listId, keep: TaskLogEntry.keepPerList - 1);
+        final list = await store.getList(incoming.listId);
+        if (list == null || list.deleted || incoming.by != list.assignee) {
+          // Noch nicht zuordenbar: Eine Löschmarke kann durch eine gleichzeitige Änderung überholt werden.
+          _hold(incoming);
+          return false;
         }
-        await store.addLog(incoming, published: true);
-        return true;
+        return _store(incoming);
       });
+
+  void _hold(TaskLogEntry e) {
+    final mine = _pending[e.by];
+    if (mine != null && mine.containsKey(e.id)) return;
+    final full = mine != null && mine.length >= TaskLogEntry.maxPendingPerSender;
+    if (!full) {
+      final total = _pending.values.fold<int>(0, (sum, m) => sum + m.length);
+      if (total >= TaskLogEntry.maxPendingTotal) return;
+    }
+    final m = _pending.putIfAbsent(e.by, () => <String, TaskLogEntry>{});
+    m[e.id] = e;
+    if (m.length > TaskLogEntry.maxPendingPerSender) {
+      // Es fällt der älteste Zeitpunkt dieses Absenders, nicht der zuerst angekommene Eintrag:
+      // Im Backfill kommen die jüngsten zuerst. Eine Flut verdrängt nur eigene Einträge.
+      final oldest = m.values.reduce((a, b) {
+        final c = a.at.compareTo(b.at);
+        return c < 0 || (c == 0 && a.id.compareTo(b.id) < 0) ? a : b;
+      });
+      m.remove(oldest.id);
+    }
+  }
+
+  /// Prüft die gepufferten Einträge einer geänderten Liste erneut (nur innerhalb von [_serial]).
+  Future<void> _drain(TaskList list) async {
+    if (list.deleted) return;
+    final mine = _pending[list.assignee];
+    if (mine == null) return;
+    final ready = mine.values.where((e) => e.listId == list.id).toList()..sort((a, b) => a.at.compareTo(b.at));
+    for (final e in ready) {
+      mine.remove(e.id);
+      if (!await store.hasLog(e.id)) await _store(e);
+    }
+    if (mine.isEmpty) _pending.remove(list.assignee);
+  }
+
+  /// Speichert einen berechtigten Eintrag unter Beachtung der Grenzen je Liste und gesamt.
+  Future<bool> _store(TaskLogEntry e) async {
+    // Erst prüfen, ob nach dem Kürzen der Liste Platz wäre, damit kein echter alter Eintrag gelöscht
+    // und der neue danach doch abgelehnt wird.
+    final full = await store.logCount(e.listId) >= TaskLogEntry.keepPerList;
+    if (await store.logTotal() - (full ? 1 : 0) >= TaskLogEntry.maxTotal) return false;
+    if (full) {
+      await store.pruneLog(e.listId, keep: TaskLogEntry.keepPerList - 1);
+      // pruneLog löscht nur veröffentlichte Einträge; die Gesamtgrenze bleibt hart.
+      if (await store.logTotal() >= TaskLogEntry.maxTotal) return false;
+    }
+    await store.addLog(e, published: true);
+    return true;
+  }
 }

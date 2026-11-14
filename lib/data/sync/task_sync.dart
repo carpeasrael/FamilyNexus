@@ -125,6 +125,7 @@ class TaskSync {
             AppLog.w('tasks', 'Ungültigen Protokolleintrag verworfen');
             return;
           }
+          // `false` kann auch „gepuffert“ bedeuten (Liste noch unbekannt, #464); daher kein `rejected`.
           if (await service.applyIncomingLog(entry, serverTime: s.timestamp)) onChanged?.call();
         case MemberJoinedSignal():
           await store.requeueLastEditedBy(_me);
