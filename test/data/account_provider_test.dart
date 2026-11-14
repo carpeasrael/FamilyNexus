@@ -30,6 +30,7 @@ http.StreamedResponse _json(Object body, [int status = 200]) => http.StreamedRes
 class _Hs {
   bool failAfterLogin = false;
   bool revoked = false;
+  bool tokenGone = false;
   bool _loggedIn = false;
   final Completer<void> _hold = Completer<void>();
   int syncs = 0;
@@ -69,6 +70,10 @@ class _Hs {
           await _hold.future;
           if (revoked) return _json(<String, Object?>{'errcode': 'M_UNKNOWN_TOKEN', 'error': 'ungültig'}, 401);
           return _json(<String, Object?>{'next_batch': 's${n + 1}'});
+        }
+        if (path == '/_matrix/client/v3/account/deactivate') return _json(<String, Object?>{'id_server_unbind_result': 'success'});
+        if (path == '/_matrix/client/v3/account/whoami' && tokenGone) {
+          return _json(<String, Object?>{'errcode': 'M_UNKNOWN_TOKEN', 'error': 'ungültig'}, 401);
         }
         if (req.method == 'PUT' || req.method == 'POST') return _json(<String, Object?>{});
         return _json(<String, Object?>{'errcode': 'M_UNRECOGNIZED', 'error': 'nicht vorhanden'}, 404);
@@ -358,6 +363,33 @@ void main() {
       expect(g2.session, SessionState.ready);
       expect(g2.localIdentityPins, isEmpty);
       expect(kv.data.containsKey(pinsKey), isTrue, reason: 'der unlesbare Eintrag bleibt unberührt');
+    });
+
+    test('deleteAccount löscht die lokale Kopie', () async {
+      await _seedSession(dir, keys);
+      final kv = MemoryKeyValueStore()..data[pinsKey] = pins(_me, <String, String>{'@ben:hs.example': 'A'});
+      final g = await _gateway(_Hs(), dir, keys, kv: kv);
+      await g.restore();
+      await g.login(server: _provider, username: 'n1', password: 'geheim123');
+      expect(g.localIdentityPins, isNotEmpty);
+      expect(kv.data.containsKey(pinsKey), isTrue);
+      await g.deleteAccount(password: 'geheim123');
+      expect(kv.data.containsKey(pinsKey), isFalse);
+      expect(g.localIdentityPins, isEmpty);
+    });
+
+    test('checkAccountDeleted bei gelöschtem Konto löscht die lokale Kopie', () async {
+      await _seedSession(dir, keys);
+      final hs = _Hs();
+      final kv = MemoryKeyValueStore()..data[pinsKey] = pins(_me, <String, String>{'@ben:hs.example': 'A'});
+      final g = await _gateway(hs, dir, keys, kv: kv);
+      await g.restore();
+      await g.login(server: _provider, username: 'n1', password: 'geheim123');
+      expect(g.localIdentityPins, isNotEmpty);
+      hs.tokenGone = true;
+      expect(await g.checkAccountDeleted(), isTrue);
+      expect(kv.data.containsKey(pinsKey), isFalse);
+      expect(g.localIdentityPins, isEmpty);
     });
   });
 }
