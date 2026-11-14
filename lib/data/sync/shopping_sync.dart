@@ -148,7 +148,7 @@ class ShoppingSync {
   bool get _canPublish => gateway.session == SessionState.ready && gateway.initialSyncDone && gateway.family != null && _sameFamily;
 
   /// Sendet alle noch nicht gesendeten eigenen Änderungen. Läuft nie parallel; bei Fehlern bleibt
-  /// alles für den nächsten Versuch erhalten.
+  /// alles für den nächsten Versuch erhalten. Unerwartete Fehler werden protokolliert und zählen als Fehlversuch (#459).
   Future<void> publishPending() async {
     if (_publishing) {
       _again = true;
@@ -180,6 +180,11 @@ class ShoppingSync {
         }
         _backoff.success();
       } while (_again);
+    } catch (e) {
+      // Unerwarteter Fehler (z. B. lokale Datenbank, #459): protokollieren und als Fehlversuch zählen;
+      // die Warteschlange bleibt erhalten, der nächste Anstoß oder der Timer versucht es erneut.
+      AppLog.e('shopping', 'Sendedurchlauf gescheitert', e);
+      _backoff.failure();
     } finally {
       _publishing = false;
     }

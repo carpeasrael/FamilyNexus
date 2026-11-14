@@ -63,7 +63,7 @@ Two roles govern the family: members use calendar and chat, moderators additiona
 
 ### Online Status
 
-- The family sees who is online right now: **Online** (app in the foreground, heartbeat every 2 minutes), **Offline** (with "last online … ago") or **Status unknown**. Shown in the member list, in the chat (conversation bar, direct chat) and on "Today"; always as text and shape, never by color alone.
+- The family sees who is online right now: **Online** (app in the foreground, heartbeat every 2 minutes), **Offline** (with "last online … ago") or **Status unknown**. Shown in the member list, in the chat (conversation list and conversation header) and on "Today"; always as text and shape, never by color alone.
 - The status is sent only as an end-to-end encrypted device message to devices of joined family members and is never stored. It can be turned off in the settings ("Share online status"); others then see you as offline.
 
 ### Shopping List
@@ -195,7 +195,7 @@ The interface combines glass (glassmorphism) with neon accents on a dark backgro
 | Today | Next appointments, upcoming reminders, who is online, open shopping items, unread messages |
 | Calendar | Day, week, month and agenda view, filter by person |
 | Appointment | Create and edit, Private/Shared switch, reminders, participants |
-| Chat | Family room and direct chats (conversation bar with online status and unread), appointments as cards in the history |
+| Chat | Family room and direct chats (conversation list with latest message, online status and unread; shown when there is more than one conversation), appointments as cards in the history |
 | Shopping | Shared shopping list: open and completed items, quantity, edit, "Remove completed" |
 | Family | Member list with online status and "Send message", roles, invitations, device verification (moderator) |
 | Settings | Language, server, lock, share online status, notifications, backup, design incl. accent color; reachable via the burger menu at the top right (not in the bottom navigation bar) |

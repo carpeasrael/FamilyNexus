@@ -238,30 +238,9 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
     }
   }
 
-  /// Begrenzter Download: bricht ab, sobald mehr als das Limit ankommt (der im
-  /// Ereignis behauptete Wert ist nicht vertrauenswürdig).
-  Future<Uint8List> _boundedDownload(Uri uri) async {
-    final client = _client!;
-    final req = http.Request('GET', uri)
-      ..headers['authorization'] = 'Bearer ${client.accessToken}';
-    final res = await _http.send(req).timeout(const Duration(seconds: 60));
-    if (res.statusCode != 200) {
-      await res.stream.drain<void>();
-      throw const GatewayException(GatewayError.notFound);
-    }
-    final declared = res.contentLength;
-    if (declared != null && declared > AttachmentPolicy.maxBytes + 1024) {
-      throw const GatewayException(GatewayError.attachmentRejected);
-    }
-    final buf = BytesBuilder(copy: false);
-    await for (final chunk in res.stream) {
-      buf.add(chunk);
-      if (buf.length > AttachmentPolicy.maxBytes + 1024) {
-        throw const GatewayException(GatewayError.attachmentRejected);
-      }
-    }
-    return buf.takeBytes();
-  }
+  /// Begrenzter Download (Größe und Zeit), siehe [SdkMatrixGateway.boundedDownload].
+  Future<Uint8List> _boundedDownload(Uri uri) =>
+      SdkMatrixGateway.boundedDownload(_http, uri, accessToken: _client!.accessToken);
 
   @override
   Future<Uint8List> loadAttachment(String messageId, {String threadId = ChatThread.familyId}) async {

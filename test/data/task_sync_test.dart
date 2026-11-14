@@ -112,9 +112,60 @@ void main() {
     );
     await cara.gateway.publishTaskLog(e);
     await TaskPeer.pumpAll([anna, ben, cara]);
-    // Der Eintrag kommt an (er ist ein gültiges Ereignis), zählt aber nicht.
+    // Das Ereignis ist gültig geformt, wird aber nicht gespeichert (#464) und zählt nicht.
+    expect(await ben.store.log(), isEmpty);
     expect(TaskProgress.doneNow(l, await ben.store.log(), server.now()), isEmpty);
     expect(TaskProgress.history(l, await ben.store.log()), isEmpty);
+  });
+
+  test('#464: Abhak-Ereignis vor der Liste (Backfill-Reihenfolge) geht nicht verloren', () async {
+    final room = anna.gateway.familyRoom!;
+    final l = TaskList(
+      id: '00000000-0000-4000-8000-0000000000d1',
+      title: 'Haushalt',
+      assignee: ben.userId,
+      interval: TaskInterval.daily,
+      timeZone: 'Europe/Berlin',
+      items: const <TaskItem>[TaskItem(id: '00000000-0000-4000-8000-0000000000d2', title: 'Müll raus')],
+      by: anna.userId,
+      updatedAt: server.now(),
+    );
+    final e = TaskLogEntry(
+      id: '00000000-0000-4000-8000-0000000000d3',
+      listId: l.id,
+      itemId: l.items.first.id,
+      periodKey: '2026-10-21',
+      doneOn: '2026-10-21',
+      at: server.now(),
+      by: ben.userId,
+    );
+    server.post(room, ben.userId, TaskCodec.logType, TaskCodec.encodeLog(e));
+    server.post(room, anna.userId, TaskCodec.listType, TaskCodec.encodeList(l));
+    await TaskPeer.pumpAll([anna, ben, cara]);
+    expect((await cara.store.log()).map((x) => x.id), [e.id]);
+    expect(TaskProgress.doneNow(l, await cara.store.log(), server.now()).keys, [l.items.first.id]);
+  });
+
+  test('#464: Einträge einer nicht zugewiesenen Person werden nicht gespeichert', () async {
+    final l = await newList();
+    await anna.flush(others(anna));
+    final mine = await ben.service.complete(l.id, l.items.first.id);
+    await ben.flush(others(ben));
+    for (var i = 0; i < 3; i++) {
+      await cara.gateway.publishTaskLog(TaskLogEntry(
+        id: '00000000-0000-4000-8000-0000000000e$i',
+        listId: l.id,
+        itemId: l.items.first.id,
+        periodKey: '2026-10-21',
+        doneOn: '2026-10-21',
+        at: server.now(),
+        by: cara.userId,
+      ));
+    }
+    await TaskPeer.pumpAll([anna, ben, cara]);
+    for (final p in [anna, ben]) {
+      expect((await p.store.log()).map((x) => x.id), [mine.id]);
+    }
   });
 
   test('gefälschtes by wird verworfen', () async {

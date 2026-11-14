@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../l10n/gen/app_localizations.dart';
+import '../../ui/widgets/length_limit.dart';
 
 /// Einfacher Texteingabe-Dialog. Der Controller gehört dem Dialog und wird erst nach
 /// dem vollständigen Schließen (inkl. Ausblend-Animation) freigegeben.
@@ -14,6 +16,7 @@ class TextPromptDialog extends StatefulWidget {
     this.hint,
     this.obscure = false,
     this.maxLength,
+    this.lengthMeasure,
   });
 
   final String title;
@@ -23,6 +26,9 @@ class TextPromptDialog extends StatefulWidget {
   final String? hint;
   final bool obscure;
   final int? maxLength;
+
+  /// Maß der Prüfung für [maxLength] (#461); ohne Angabe zählt das Feld wie Flutter sichtbare Zeichen.
+  final LengthMeasure? lengthMeasure;
 
   static Future<String?> show(BuildContext context, TextPromptDialog dialog) =>
       showDialog<String>(context: context, builder: (_) => dialog);
@@ -45,6 +51,9 @@ class _TextPromptDialogState extends State<TextPromptDialog> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final max = widget.maxLength;
+    final measure = widget.lengthMeasure;
+    final measured = max != null && measure != null;
     return AlertDialog(
       title: Text(widget.title),
       content: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
@@ -54,6 +63,8 @@ class _TextPromptDialogState extends State<TextPromptDialog> {
           autofocus: true,
           obscureText: widget.obscure,
           maxLength: widget.maxLength,
+          inputFormatters: measured ? <TextInputFormatter>[MeasuredLengthFormatter(max, measure)] : null,
+          buildCounter: measured ? measuredCounter(_ctrl, max, measure) : null,
           autocorrect: false,
           enableSuggestions: !widget.obscure,
           enableIMEPersonalizedLearning: false,
