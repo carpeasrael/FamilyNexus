@@ -1,6 +1,7 @@
 ---
 name: review-quality
 description: Prüft den App-Code von FamilyNexus vor einem Build-Release auf Code-Qualität (Korrektheit, Fehlerbehandlung, Lebenszyklus). Wird vom Skill release-review gestartet.
+model: opus
 tools: Read, Grep, Glob, Bash
 ---
 

@@ -1,6 +1,7 @@
 ---
 name: review-control
 description: Prüft die Observations der Review-Agenten von FamilyNexus unabhängig gegen den Code nach. Nur bestätigte Observations werden zu Issues. Wird vom Skill release-review gestartet.
+model: opus
 tools: Read, Grep, Glob, Bash
 effort: high
 ---

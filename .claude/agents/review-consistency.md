@@ -1,6 +1,7 @@
 ---
 name: review-consistency
 description: Prüft den App-Code von FamilyNexus vor einem Build-Release auf Konsistenz zwischen Code, Dokumentation und Plattformen. Wird vom Skill release-review gestartet.
+model: opus
 tools: Read, Grep, Glob, Bash
 ---
 

@@ -1,6 +1,7 @@
 ---
 name: review-standards
 description: Prüft den App-Code von FamilyNexus auf Einhaltung der Coding Standards (Dart-Stil, Namensgebung, Projektregeln, Teststruktur). Wird vom Skill release-review gestartet, vor jedem Build-Release und am Ende jedes Sprints.
+model: opus
 tools: Read, Grep, Glob, Bash
 ---
 
