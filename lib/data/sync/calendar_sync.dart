@@ -204,7 +204,8 @@ class CalendarSync {
       do {
         _again = false;
         if (!_canPublish) break;
-        // Beide Teile laufen immer; der Durchlauf zählt höchstens einen Fehler (#132).
+        // Beide Teile laufen bei Sendefehlern immer; der Durchlauf zählt höchstens einen Fehler (#132). Eine
+        // unerwartete Ausnahme beendet ihn sofort und wird unten gezählt (#444).
         final eventsOk = await _publishEvents();
         final rsvpsOk = await _publishRsvps();
         // Abgebrochen (#140): zählt weder als Erfolg noch als Fehler.
@@ -216,6 +217,11 @@ class CalendarSync {
           break;
         }
       } while (_again);
+    } catch (e) {
+      // Unerwarteter Fehler (z. B. lokale Datenbank, #444): protokollieren und als Fehlversuch zählen; die
+      // Warteschlange bleibt erhalten, der nächste Anstoß oder der Timer versucht es erneut.
+      AppLog.e('sync', 'Sendedurchlauf gescheitert', e);
+      _backoff.failure();
     } finally {
       _publishing = false;
     }
