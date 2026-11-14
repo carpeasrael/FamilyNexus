@@ -58,6 +58,8 @@ pubspec_overrides.yaml
 
 # Testunterlagen mit echten Konto- und Zugangsdaten nicht committen
 secure/
+# Apple-Feedback: Antworten und Review-Notizen für App Review, lokal (nicht auf GitHub ablegen)
+Apple-Feedback/
 User E2E Test/*.local.md
 User E2E Test/Testreport_Einladung_Zweiter_Nutzer.pdf
 User E2E Test/Testreport_Pruefanleitung_Build15.pdf
