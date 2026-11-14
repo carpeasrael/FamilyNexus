@@ -1,3 +1,0 @@
-Testfamilie 1030: 1
-Test geteilt 2: 1
-Test N1: 0

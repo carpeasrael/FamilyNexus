@@ -1,3 +1,0 @@
-OK      b: 5 Anfragen
-OK      c: geschlossener Port -> Exit 1
-Alle Fälle bestanden
