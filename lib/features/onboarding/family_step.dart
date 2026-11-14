@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../app/app_services.dart';
+import '../../data/matrix/family_room_spec.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/family.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/server.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/app_theme.dart';
+import '../../ui/widgets/length_limit.dart';
 import '../common/syncing_view.dart';
 import '../family/invite_dialog.dart';
 import 'family_step_controller.dart';
@@ -320,7 +322,10 @@ class _FamilyStepState extends State<FamilyStep> {
         const SizedBox(height: 12),
         TextField(
           controller: _name,
-          maxLength: 60,
+          // Zählt UTF-16-Einheiten wie createFamily (#461).
+          maxLength: FamilyRoomSpec.nameMax,
+          inputFormatters: <TextInputFormatter>[MeasuredLengthFormatter(FamilyRoomSpec.nameMax, LengthMeasure.utf16)],
+          buildCounter: measuredCounter(_name, FamilyRoomSpec.nameMax, LengthMeasure.utf16),
           textCapitalization: TextCapitalization.words,
           onChanged: (_) => setState(() {}),
           decoration: InputDecoration(labelText: l.familyName, hintText: l.familyNameHint),
