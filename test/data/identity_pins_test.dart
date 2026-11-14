@@ -200,4 +200,10 @@ void main() {
       expect(book.pinned(ben, <String, String>{ben: k1}), k1);
     });
   });
+  test('Rangfolge accepted vor local', () {
+    final r = resolvePin(accepted: 'K2', local: 'K1', account: 'K0', pub: 'K2', anyBlocked: false);
+    expect(r.pinned, 'K2');
+    expect(r.decision, IdentityDecision.ok);
+    expect(resolvePin(accepted: 'K2', local: 'K1', account: 'K0', pub: 'K1', anyBlocked: false).decision, IdentityDecision.changed);
+  });
 }
