@@ -268,7 +268,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get serverMetadataNote =>
-      'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.';
+      'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt, die Wahl deines Avatars (eines von zwölf Symbolen, als Raumzustand nicht Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.';
 
   @override
   String get onbTitleAccount => 'Anmelden';
@@ -1290,7 +1290,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String privacy2Body(String keyStore, String cipher) {
-    return 'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ($cipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: $keyStore – nicht in der Datenbankdatei.';
+    return 'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ($cipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: $keyStore – nicht in der Datenbankdatei.';
   }
 
   @override
@@ -1298,7 +1298,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy3Body =>
-      'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.';
+      'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.';
 
   @override
   String get privacy4Title => 'Private Termine';
@@ -1667,11 +1667,12 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get privacy10Title => 'Online-Status, Einzelchats, Einkaufszettel';
+  String get privacy10Title =>
+      'Online-Status, Einzelchats, Einkaufszettel, Avatar';
 
   @override
   String get privacy10Body =>
-      'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).';
+      'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Dein Avatar ist eine Ausnahme: Die Wahl eines der zwölf eingebauten Avatare liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. Der Server und alle Familienmitglieder sehen, welches Symbol du gewählt hast; die Wahl bleibt im Raum stehen, auch wenn du entfernt wirst oder dein Konto gelöscht wird. Der Server sieht sonst nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).';
 
   @override
   String onbFamilyFound(String name) {
@@ -1963,7 +1964,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy12Body =>
-      'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).';
+      'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“), dazu die Wahl deines Avatars (Raumzustand, nicht Ende-zu-Ende-verschlüsselt).';
 
   @override
   String get webUnlockTitleCreate => 'Browser-Tresor einrichten';
@@ -3038,7 +3039,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reportOnlineNote =>
-      'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.';
+      'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), die Wahl des Avatars (ein Wert aus zwölf, Raumzustand im Klartext), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.';
 
   @override
   String get eventTypeMessage => 'Nachrichten';
@@ -3099,7 +3100,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String accountDeleteBody(String userId, String server) {
-    return 'Dein Konto $userId wird bei $server dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar. Anschließend werden alle Daten auf diesem Gerät gelöscht.';
+    return 'Dein Konto $userId wird bei $server dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar, ebenso die Wahl deines Avatars (ein Wert aus zwölf), die im Familienraum stehen bleibt. Anschließend werden alle Daten auf diesem Gerät gelöscht.';
   }
 
   @override
@@ -3241,4 +3242,75 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get themeColorSky => 'Himmelblau';
+
+  @override
+  String get avatarTitle => 'Avatar';
+
+  @override
+  String get avatarChange => 'Avatar ändern';
+
+  @override
+  String get avatarInitials => 'Initialen (kein Avatar)';
+
+  @override
+  String get avatarNeedsModerator =>
+      'Ein Moderator muss die Avatar-Funktion für diese Familie erst freischalten. Das geschieht, sobald ein Moderator die App öffnet.';
+
+  @override
+  String get avatarLoading => 'Avatar-Funktion wird geprüft …';
+
+  @override
+  String get avatarSelected => 'Ausgewählt';
+
+  @override
+  String get avatarPreview => 'Vorschau';
+
+  @override
+  String get avatarPending => 'Wird übernommen …';
+
+  @override
+  String get avatarSaved => 'Avatar gespeichert';
+
+  @override
+  String get avatarVisibility =>
+      'Alle Familienmitglieder sehen deinen Avatar, auch im Chat. Der Server sieht, welches der zwölf Symbole du gewählt hast: Diese Wahl ist nicht Ende-zu-Ende-verschlüsselt. Sie bleibt im Familienraum stehen, auch wenn du entfernt oder dein Konto gelöscht wird.';
+
+  @override
+  String get avatarPreset01 => 'Pfote';
+
+  @override
+  String get avatarPreset02 => 'Hase';
+
+  @override
+  String get avatarPreset03 => 'Vogel';
+
+  @override
+  String get avatarPreset04 => 'Blume';
+
+  @override
+  String get avatarPreset05 => 'Baum';
+
+  @override
+  String get avatarPreset06 => 'Segelboot';
+
+  @override
+  String get avatarPreset07 => 'Fahrrad';
+
+  @override
+  String get avatarPreset08 => 'Pizza';
+
+  @override
+  String get avatarPreset09 => 'Eis';
+
+  @override
+  String get avatarPreset10 => 'Musik';
+
+  @override
+  String get avatarPreset11 => 'Fußball';
+
+  @override
+  String get avatarPreset12 => 'Rakete';
+
+  @override
+  String get eventTypeAvatar => 'Avatar-Wahl';
 }

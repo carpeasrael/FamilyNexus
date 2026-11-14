@@ -43,7 +43,7 @@ AES (FIPS 197), modes CBC/CTR (NIST SP 800-38A), HMAC (RFC 2104), SHA-256/512 (F
 ## 4. Flux de données
 
 1. L'utilisateur se connecte à un serveur Matrix de son choix en HTTPS.
-2. Messages, entrées d'agenda partagées et listes de courses sont chiffrés sur l'appareil avant l'envoi ; le serveur ne stocke que du texte chiffré.
+2. Messages, entrées d'agenda partagées et listes de courses sont chiffrés sur l'appareil avant l'envoi ; le serveur ne stocke que du texte chiffré. Exception : un état de salon non chiffré contenant le choix d'avatar de l'utilisateur (une valeur parmi douze avatars intégrés ; ni image, ni texte, ni matériel de clés). Les algorithmes décrits restent inchangés.
 3. Les entrées d'agenda privées ne quittent les appareils de l'utilisateur que dans un salon chiffré privé de son propre compte.
 4. Les données locales sont stockées dans une base SQLCipher ; la clé reste dans le trousseau de l'appareil.
 5. L'éditeur n'exploite aucun serveur, ne reçoit aucune donnée et n'utilise aucune télémétrie.

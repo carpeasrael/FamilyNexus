@@ -55,7 +55,7 @@ The Olm and Megolm protocols are openly specified by the Matrix.org Foundation (
 ## 4. Data flow summary
 
 1. The user signs in to a Matrix homeserver of their choice over HTTPS.
-2. Messages, shared calendar entries and shopping list entries are encrypted on the device (Megolm/Olm) before they are sent; the homeserver stores only ciphertext.
+2. Messages, shared calendar entries and shopping list entries are encrypted on the device (Megolm/Olm) before they are sent; the homeserver stores only ciphertext. One exception: an unencrypted room state holding the user's avatar choice (one value out of twelve built-in avatars; no image, no text, no key material). The algorithms described in this document are unchanged.
 3. Private calendar entries never leave the user's own devices except over an encrypted private room of the user's own account.
 4. All local data is stored in a SQLCipher-encrypted database; the database key never leaves the device key store.
 5. The publisher operates no server and receives no data; there is no telemetry.

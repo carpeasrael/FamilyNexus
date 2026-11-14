@@ -37,6 +37,11 @@ class _Bubble extends StatelessWidget {
   final String threadId;
   final VoidCallback onLongPress;
 
+  /// Avatar fremder Nachrichten (#422): 28 dp Avatar + 8 dp Abstand; die Blase ist so viel schmaler als `maxWidth`.
+  static const double avatarSize = 28;
+  static const double avatarGap = 8;
+  static const double avatarSpace = avatarSize + avatarGap;
+
   static String _time(BuildContext context, DateTime t) {
     final lt = t.toLocal();
     return formatClock(context, lt.hour, lt.minute);
@@ -47,13 +52,25 @@ class _Bubble extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final t = AuroraTokens.of(context);
     final m = message;
+    // Nachrichten anderer: Avatar links neben der Blase (#422); die Blase nimmt den Platz des Avatars aus `maxWidth`.
+    // Eigene Blasen behalten `maxWidth` unverändert.
+    Widget wrap(Widget card) => mine
+        ? ConstrainedBox(constraints: BoxConstraints(maxWidth: maxWidth), child: Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: card))
+        : Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: MemberAvatarView(userId: m.senderId, size: avatarSize, colorIndex: personColorOf(services, m.senderId)),
+              ),
+              const SizedBox(width: avatarGap),
+              Flexible(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: maxWidth - avatarSpace), child: card)),
+            ]),
+          );
     return Align(
       alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Semantics(
+      child: wrap(
+          Semantics(
             container: true,
             // Eigene Nachricht: „von dir“ (Dativ), nicht „von Du“ (#332).
             label: mine ? l.chatMessageFromYou : l.chatMessageFrom(m.senderLabel(l, inSentence: true)),
@@ -134,7 +151,6 @@ class _Bubble extends StatelessWidget {
               ),
             ),
           ),
-        ),
       ),
     );
   }

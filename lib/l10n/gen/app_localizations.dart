@@ -563,7 +563,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverMetadataNote.
   ///
   /// In de, this message translates to:
-  /// **'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.'**
+  /// **'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt, die Wahl deines Avatars (eines von zwölf Symbolen, als Raumzustand nicht Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.'**
   String get serverMetadataNote;
 
   /// No description provided for @onbTitleAccount.
@@ -2249,7 +2249,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy2Body.
   ///
   /// In de, this message translates to:
-  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.'**
+  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.'**
   String privacy2Body(String keyStore, String cipher);
 
   /// No description provided for @privacy3Title.
@@ -2261,7 +2261,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy3Body.
   ///
   /// In de, this message translates to:
-  /// **'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.'**
+  /// **'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.'**
   String get privacy3Body;
 
   /// No description provided for @privacy4Title.
@@ -2819,13 +2819,13 @@ abstract class AppLocalizations {
   /// No description provided for @privacy10Title.
   ///
   /// In de, this message translates to:
-  /// **'Online-Status, Einzelchats, Einkaufszettel'**
+  /// **'Online-Status, Einzelchats, Einkaufszettel, Avatar'**
   String get privacy10Title;
 
   /// No description provided for @privacy10Body.
   ///
   /// In de, this message translates to:
-  /// **'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).'**
+  /// **'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Dein Avatar ist eine Ausnahme: Die Wahl eines der zwölf eingebauten Avatare liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. Der Server und alle Familienmitglieder sehen, welches Symbol du gewählt hast; die Wahl bleibt im Raum stehen, auch wenn du entfernt wirst oder dein Konto gelöscht wird. Der Server sieht sonst nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).'**
   String get privacy10Body;
 
   /// No description provided for @onbFamilyFound.
@@ -3311,7 +3311,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy12Body.
   ///
   /// In de, this message translates to:
-  /// **'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).'**
+  /// **'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“), dazu die Wahl deines Avatars (Raumzustand, nicht Ende-zu-Ende-verschlüsselt).'**
   String get privacy12Body;
 
   /// No description provided for @webUnlockTitleCreate.
@@ -5069,7 +5069,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportOnlineNote.
   ///
   /// In de, this message translates to:
-  /// **'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.'**
+  /// **'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), die Wahl des Avatars (ein Wert aus zwölf, Raumzustand im Klartext), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.'**
   String get reportOnlineNote;
 
   /// No description provided for @eventTypeMessage.
@@ -5183,7 +5183,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleteBody.
   ///
   /// In de, this message translates to:
-  /// **'Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar. Anschließend werden alle Daten auf diesem Gerät gelöscht.'**
+  /// **'Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar, ebenso die Wahl deines Avatars (ein Wert aus zwölf), die im Familienraum stehen bleibt. Anschließend werden alle Daten auf diesem Gerät gelöscht.'**
   String accountDeleteBody(String userId, String server);
 
   /// No description provided for @accountDeleteSoleModerator.
@@ -5431,6 +5431,144 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Himmelblau'**
   String get themeColorSky;
+
+  /// No description provided for @avatarTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Avatar'**
+  String get avatarTitle;
+
+  /// No description provided for @avatarChange.
+  ///
+  /// In de, this message translates to:
+  /// **'Avatar ändern'**
+  String get avatarChange;
+
+  /// No description provided for @avatarInitials.
+  ///
+  /// In de, this message translates to:
+  /// **'Initialen (kein Avatar)'**
+  String get avatarInitials;
+
+  /// No description provided for @avatarNeedsModerator.
+  ///
+  /// In de, this message translates to:
+  /// **'Ein Moderator muss die Avatar-Funktion für diese Familie erst freischalten. Das geschieht, sobald ein Moderator die App öffnet.'**
+  String get avatarNeedsModerator;
+
+  /// No description provided for @avatarLoading.
+  ///
+  /// In de, this message translates to:
+  /// **'Avatar-Funktion wird geprüft …'**
+  String get avatarLoading;
+
+  /// No description provided for @avatarSelected.
+  ///
+  /// In de, this message translates to:
+  /// **'Ausgewählt'**
+  String get avatarSelected;
+
+  /// No description provided for @avatarPreview.
+  ///
+  /// In de, this message translates to:
+  /// **'Vorschau'**
+  String get avatarPreview;
+
+  /// No description provided for @avatarPending.
+  ///
+  /// In de, this message translates to:
+  /// **'Wird übernommen …'**
+  String get avatarPending;
+
+  /// No description provided for @avatarSaved.
+  ///
+  /// In de, this message translates to:
+  /// **'Avatar gespeichert'**
+  String get avatarSaved;
+
+  /// No description provided for @avatarVisibility.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Familienmitglieder sehen deinen Avatar, auch im Chat. Der Server sieht, welches der zwölf Symbole du gewählt hast: Diese Wahl ist nicht Ende-zu-Ende-verschlüsselt. Sie bleibt im Familienraum stehen, auch wenn du entfernt oder dein Konto gelöscht wird.'**
+  String get avatarVisibility;
+
+  /// No description provided for @avatarPreset01.
+  ///
+  /// In de, this message translates to:
+  /// **'Pfote'**
+  String get avatarPreset01;
+
+  /// No description provided for @avatarPreset02.
+  ///
+  /// In de, this message translates to:
+  /// **'Hase'**
+  String get avatarPreset02;
+
+  /// No description provided for @avatarPreset03.
+  ///
+  /// In de, this message translates to:
+  /// **'Vogel'**
+  String get avatarPreset03;
+
+  /// No description provided for @avatarPreset04.
+  ///
+  /// In de, this message translates to:
+  /// **'Blume'**
+  String get avatarPreset04;
+
+  /// No description provided for @avatarPreset05.
+  ///
+  /// In de, this message translates to:
+  /// **'Baum'**
+  String get avatarPreset05;
+
+  /// No description provided for @avatarPreset06.
+  ///
+  /// In de, this message translates to:
+  /// **'Segelboot'**
+  String get avatarPreset06;
+
+  /// No description provided for @avatarPreset07.
+  ///
+  /// In de, this message translates to:
+  /// **'Fahrrad'**
+  String get avatarPreset07;
+
+  /// No description provided for @avatarPreset08.
+  ///
+  /// In de, this message translates to:
+  /// **'Pizza'**
+  String get avatarPreset08;
+
+  /// No description provided for @avatarPreset09.
+  ///
+  /// In de, this message translates to:
+  /// **'Eis'**
+  String get avatarPreset09;
+
+  /// No description provided for @avatarPreset10.
+  ///
+  /// In de, this message translates to:
+  /// **'Musik'**
+  String get avatarPreset10;
+
+  /// No description provided for @avatarPreset11.
+  ///
+  /// In de, this message translates to:
+  /// **'Fußball'**
+  String get avatarPreset11;
+
+  /// No description provided for @avatarPreset12.
+  ///
+  /// In de, this message translates to:
+  /// **'Rakete'**
+  String get avatarPreset12;
+
+  /// No description provided for @eventTypeAvatar.
+  ///
+  /// In de, this message translates to:
+  /// **'Avatar-Wahl'**
+  String get eventTypeAvatar;
 }
 
 class _AppLocalizationsDelegate

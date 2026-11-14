@@ -51,6 +51,7 @@ share with you or that your provider supplies for synchronization.
 | Task lists, assignments, recurrence rules, completions, times and voluntary comments | Distribute tasks and display the completion history. The history is retained even after a periodic reset of the list. |
 | Family and room names, memberships, roles, invitations and join requests | Manage the family and control access to shared content. |
 | Online/offline status with time | Optionally show other family members your availability. |
+| Choice of one of the twelve built-in avatars (only the identifier, no image, no text) | Show the avatar to other family members, including in the chat. The choice is kept as room state in the family room and is not end-to-end encrypted. |
 | Language, appearance, reminder, notification and security settings, locally blocked accounts and pending invitations | Configure the app and continue processes already begun. |
 | IP address, connection times, account, room and device identifiers as well as technical transmission data | Connection, delivery and operation at the server being contacted; its logging is governed by its privacy notices. |
 
@@ -116,7 +117,10 @@ End-to-end encryption does **not hide all metadata**. The provider
 can process, among other things, account and device identifiers, profile details, room names,
 memberships and roles, times, IP addresses as well as sizes and assignments of
 encrypted events. In particular, room state and
-account management are not end-to-end encrypted like message content.
+account management are not end-to-end encrypted like message content. This includes
+the choice of your avatar (one of the twelve built-in avatars): it is kept as room state
+in the family room, is expressly not end-to-end encrypted and is visible to the provider
+and to all family members.
 
 With communication across servers, the homeservers of other accounts involved
 may also receive encrypted events and the metadata required for
@@ -324,7 +328,9 @@ requests an account deactivation with a deletion request (`erase`). With account
 on the provider's page, confirmation takes place on the provider's page. After confirmed
 completion, the local account data is cleaned up. Which server data is actually
 deleted or retained further depends on the provider and
-any statutory obligations.
+any statutory obligations. The choice of your avatar (one value out of twelve) stays
+in the family room as room state even after you are removed from the family or your
+account is deleted; the app hides it for people who are no longer members.
 
 **Remaining copies:** Neither local deletion nor account deletion guarantees
 the removal of content already delivered on other people's devices, federated

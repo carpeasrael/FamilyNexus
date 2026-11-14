@@ -584,10 +584,18 @@ void main() {
   group('Blasenbreite je Spalte', () {
     final longText = List<String>.filled(60, 'lang').join(' ');
 
-    Future<double> bubbleWidth(WidgetTester tester, Size size) async {
+    // Fremde Blasen tragen links den Avatar (28 dp + 8 dp Abstand, #422) und sind um diesen Platz schmaler als die
+    // Obergrenze der Spalte; eigene Blasen behalten die Obergrenze unverändert.
+    const avatarSpace = 36.0;
+
+    Future<double> bubbleWidth(WidgetTester tester, Size size, {bool mine = false}) async {
       final app = await buildTestApp(clock: () => _now);
       final ben = await _joinBen(app);
-      await ben.sendMessage(longText);
+      if (mine) {
+        await app.gateway.sendMessage(longText);
+      } else {
+        await ben.sendMessage(longText);
+      }
       await _start(tester, size, existing: app);
       await _tab(tester, size.width >= kExpandedMin ? 'Kalender' : 'Chat');
       final bubble = find.descendant(
@@ -604,20 +612,33 @@ void main() {
       final pane = tester.getSize(find.byType(ChatScreen)).width;
       final rail = tester.getSize(findNavigation()).width;
       expect(pane, closeTo(paneWidths(1366 - rail).chat, 0.5), reason: 'Spaltenbreite aus der tatsächlichen Rail-Breite');
+      expect(w, lessThanOrEqualTo(pane * 0.82 - avatarSpace + 0.5), reason: 'fremde Blase: Obergrenze minus Avatar-Platz');
+      expect(w, greaterThan(pane * 0.82 - avatarSpace - 4), reason: 'lange Nachricht füllt die Obergrenze');
+    });
+
+    testWidgets('Zweispalter 1366: eigene Blase bleibt bei 82 % der Chatspalte (ohne Avatar-Abzug)', (tester) async {
+      final w = await bubbleWidth(tester, const Size(1366, 1024), mine: true);
+      final pane = tester.getSize(find.byType(ChatScreen)).width;
       expect(w, lessThanOrEqualTo(pane * 0.82 + 0.5));
-      expect(w, greaterThan(pane * 0.82 - 40), reason: 'lange Nachricht füllt die Obergrenze');
+      expect(w, greaterThan(pane * 0.82 - 4), reason: 'eigene Blase füllt die volle Obergrenze');
     });
 
     testWidgets('einspaltig 800: Obergrenze 560', (tester) async {
       final w = await bubbleWidth(tester, const Size(800, 1280));
-      expect(w, lessThanOrEqualTo(560.5));
-      expect(w, greaterThan(500));
+      expect(w, lessThanOrEqualTo(560.5 - avatarSpace));
+      expect(w, greaterThan(500 - avatarSpace));
+      final mine = await bubbleWidth(tester, const Size(800, 1280), mine: true);
+      expect(mine, lessThanOrEqualTo(560.5));
+      expect(mine, greaterThan(556), reason: 'eigene Blase unverändert');
     });
 
     testWidgets('Handy 360: 82 % der Breite', (tester) async {
       final w = await bubbleWidth(tester, const Size(360, 800));
-      expect(w, lessThanOrEqualTo(360 * 0.82 + 0.5));
-      expect(w, greaterThan(360 * 0.82 - 40));
+      expect(w, lessThanOrEqualTo(360 * 0.82 - avatarSpace + 0.5));
+      expect(w, greaterThan(360 * 0.82 - avatarSpace - 4));
+      final mine = await bubbleWidth(tester, const Size(360, 800), mine: true);
+      expect(mine, lessThanOrEqualTo(360 * 0.82 + 0.5));
+      expect(mine, greaterThan(360 * 0.82 - 4), reason: 'eigene Blase unverändert');
     });
   });
 

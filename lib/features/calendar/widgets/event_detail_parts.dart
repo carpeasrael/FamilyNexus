@@ -10,6 +10,7 @@ class _EventSummaryCard extends StatelessWidget {
     required this.owner,
     required this.mine,
     required this.theme,
+    required this.ownerId,
     required this.ownerColorIndex,
   });
   final CalendarEvent event;
@@ -26,7 +27,8 @@ class _EventSummaryCard extends StatelessWidget {
   /// Thema des geteilten Termins (E-99); `null` ohne Thema.
   final EventTheme? theme;
 
-  /// Personenfarbe des Besitzers (Punkt neben dem Namen).
+  /// Besitzer des Termins (Avatar neben dem Namen) und seine Personenfarbe (Ring).
+  final String ownerId;
   final int ownerColorIndex;
 
   @override
@@ -69,7 +71,7 @@ class _EventSummaryCard extends StatelessWidget {
           const SizedBox(height: 4),
         ],
         Row(children: <Widget>[
-          if (theme != null) ...<Widget>[PersonDot(colorIndex: ownerColorIndex), const SizedBox(width: 6)],
+          if (theme != null) ...<Widget>[MemberAvatarView(userId: ownerId, size: 20, colorIndex: ownerColorIndex, ring: true), const SizedBox(width: 6)],
           Expanded(child: Text(owner, style: Theme.of(context).textTheme.bodySmall)),
         ]),
         if (!mine) Padding(padding: const EdgeInsets.only(top: 4), child: Text(l.eventReadOnly, style: Theme.of(context).textTheme.bodySmall)),
@@ -100,7 +102,7 @@ class _RsvpCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 2),
             child: Row(children: <Widget>[
-              PersonDot(colorIndex: controller.colorIndexFor(entry.key)),
+              MemberAvatarView(userId: entry.key, size: 24, colorIndex: controller.colorIndexFor(entry.key), ring: true),
               const SizedBox(width: 8),
               Expanded(child: Text(nameOf(entry.key))),
               Text(rsvpLabel(l, entry.value)),

@@ -10,6 +10,7 @@ import '../calendar/calendar_screen.dart' show SectionCard;
 import '../calendar/event_detail_screen.dart';
 import '../calendar/event_editor_screen.dart';
 import '../calendar/event_tile.dart';
+import '../family/member_avatar_view.dart';
 import '../presence/presence_view.dart';
 import '../reminders/permission_hint.dart';
 import '../reminders/reminders_screen.dart';
@@ -141,7 +142,7 @@ class _OnlineList extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 2),
           child: Row(children: <Widget>[
-            const PresenceDot(online: true),
+            MemberAvatarView(userId: m.userId, size: 28, colorIndex: personColorOf(services, m.userId), online: true),
             const SizedBox(width: 8),
             Flexible(child: Text('${m.displayName} – ${l.presenceOnline}')),
           ]),

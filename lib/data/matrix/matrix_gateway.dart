@@ -8,6 +8,7 @@ import '../../domain/data_inventory.dart';
 import '../../domain/event_themes.dart';
 import '../../domain/family.dart';
 import '../../domain/invite_link.dart';
+import '../../domain/member_avatars.dart';
 import '../../domain/moderation.dart';
 import '../../domain/password_change.dart';
 import '../../domain/presence.dart';
@@ -386,6 +387,22 @@ abstract class MatrixGateway implements Listenable {
 
   /// Sendet ein Kalender-Thema (ein Ereignis je Thema) verschlüsselt in den Familienraum (E-99).
   Future<void> publishEventTheme(EventTheme theme);
+
+  // ------------------------------------------------------------ Avatare
+
+  /// Gültige Avatar-Kennung (`p01`…`p12`) der Person oder `null` („kein Avatar“, unbekannt, vor dem ersten Aufbau der
+  /// Familie). Direktes Nachschlagen im Raumzustand des Familienraums (E-101); Nicht-Mitglieder blendet die Anzeige aus.
+  String? avatarOf(String userId);
+
+  /// Zählt nur hoch, wenn sich Avatar, Anzeigename oder Beitrittsstatus eines Mitglieds ändert (nicht bei jedem Sync).
+  ValueListenable<int> get avatarRevision;
+
+  /// Ob die eigene Person ihren Avatar setzen darf (E-101): `unknown` vor dem ersten Aufbau der Familie.
+  AvatarAvailability get avatarAvailability;
+
+  /// Setzt den eigenen Avatar als Raumzustand im Familienraum (nicht Ende-zu-Ende-verschlüsselt, ein Wert aus
+  /// zwölf); `null` = kein Avatar (leerer Inhalt). Wirft `notAllowed` ohne Berechtigung oder bei ungültiger Kennung.
+  Future<void> setMemberAvatar(String? preset);
 
   // ------------------------------------------------------------ Datenprotokoll
 

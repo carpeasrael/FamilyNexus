@@ -62,6 +62,9 @@ void main() {
     expect(de.accountDeleteBody('@a:b.c', 'b.c'), isNot(contains('Matrix-ID')));
     expect(enL.accountDeleteBody('@a:b.c', 'b.c'), contains('The user ID cannot be used again'));
     expect(enL.accountDeleteBody('@a:b.c', 'b.c'), isNot(contains('Matrix ID')));
+    // #422, E-101: die Avatar-Wahl bleibt im Familienraum stehen
+    expect(de.accountDeleteBody('@a:b.c', 'b.c'), contains('Avatars'));
+    expect(enL.accountDeleteBody('@a:b.c', 'b.c'), contains('avatar'));
     expect(de.presenceSeenJustNow, 'Eben noch online');
     expect(enL.presenceSeenJustNow, 'Last online just now');
     expect(de.reminderBodyNow, 'Der Termin beginnt jetzt');

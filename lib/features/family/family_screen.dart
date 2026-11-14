@@ -15,7 +15,9 @@ import '../common/error_text.dart';
 import '../common/prompt_dialog.dart';
 import '../moderation/moderation_actions.dart';
 import '../presence/presence_view.dart';
+import 'avatar_screen.dart';
 import 'invite_dialog.dart';
+import 'member_avatar_view.dart';
 
 class FamilyScreen extends StatelessWidget {
   const FamilyScreen({super.key});
@@ -155,6 +157,14 @@ class _MemberTile extends StatelessWidget {
       child: GlassCard(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: MemberAvatarView(
+              userId: m.userId,
+              size: 40,
+              colorIndex: personColorOf(services, m.userId),
+            ),
+          ),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
               Text(m.displayName, style: Theme.of(context).textTheme.titleMedium),
@@ -190,6 +200,13 @@ class _MemberTile extends StatelessWidget {
             color: m.role == Role.moderator ? t.primary : t.textMuted,
             icon: m.role == Role.moderator ? Icons.shield_outlined : null,
           ),
+          if (m.userId == family.myUserId && m.status == MemberStatus.joined)
+            IconButton(
+              tooltip: l.avatarChange,
+              icon: const Icon(Icons.face_outlined),
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => AvatarScreen(services: services))),
+            ),
           if (canWrite)
             IconButton(
               tooltip: '${l.familyWriteMessage}: ${m.displayName}',
@@ -291,7 +308,12 @@ class _RequestTile extends StatelessWidget {
       child: GlassCard(
         glow: t.warning,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-          Text(l.familyRequestFrom(member.displayName), style: Theme.of(context).textTheme.titleMedium),
+          // Anfragende sind keine beigetretenen Mitglieder: nur der Rückfall (#422).
+          Row(children: <Widget>[
+            MemberAvatarView(userId: member.userId, size: 32, colorIndex: personColorOf(AppScope.maybeOf(context), member.userId)),
+            const SizedBox(width: 12),
+            Expanded(child: Text(l.familyRequestFrom(member.displayName), style: Theme.of(context).textTheme.titleMedium)),
+          ]),
           const SizedBox(height: 4),
           Row(children: <Widget>[
             Icon(valid ? Icons.check_circle_outline : Icons.warning_amber_outlined, size: 18, color: valid ? t.success : t.warning),

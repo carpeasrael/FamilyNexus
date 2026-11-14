@@ -264,7 +264,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverMetadataNote =>
-      'The server cannot see content, but it does see metadata such as who writes to whom and when, as well as room and profile names (for example the family name). Your own server decides who sees them – it does not remove them.';
+      'The server cannot see content, but it does see metadata such as who writes to whom and when, the choice of your avatar (one of twelve symbols, room state, not end-to-end encrypted), as well as room and profile names (for example the family name). Your own server decides who sees them – it does not remove them.';
 
   @override
   String get onbTitleAccount => 'Sign in';
@@ -1279,7 +1279,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String privacy2Body(String keyStore, String cipher) {
-    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, family members and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
+    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, family members including the choice of their avatar (only the ID of one of the twelve built-in avatars) and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
   }
 
   @override
@@ -1287,7 +1287,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy3Body =>
-      'Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships and room and profile names (for example the family name). With your own server you decide who sees this information.';
+      'Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted) and room and profile names (for example the family name). With your own server you decide who sees this information.';
 
   @override
   String get privacy4Title => 'Private events';
@@ -1653,11 +1653,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get privacy10Title => 'Online status, direct chats, shopping list';
+  String get privacy10Title =>
+      'Online status, direct chats, shopping list, avatar';
 
   @override
   String get privacy10Body =>
-      'The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. The server only sees the metadata it always sees (see “What does the server see?”).';
+      'The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. Your avatar is an exception: the choice of one of the twelve built-in avatars is kept as room state in the family room and is not end-to-end encrypted. The server and all family members see which symbol you chose; the choice stays in the room even if you are removed or your account is deleted. Otherwise the server only sees the metadata it always sees (see “What does the server see?”).';
 
   @override
   String onbFamilyFound(String name) {
@@ -1948,7 +1949,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy12Body =>
-      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. The server only sees the metadata it always sees (see “What does the server see?”).';
+      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. The server only sees the metadata it always sees (see “What does the server see?”), plus the choice of your avatar (room state, not end-to-end encrypted).';
 
   @override
   String get webUnlockTitleCreate => 'Set up the browser vault';
@@ -3016,7 +3017,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportOnlineNote =>
-      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), time and size of events and the types of account data. Event counts are based on this device’s sync; the provider may hold older events as well.';
+      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), the choice of avatar (one value out of twelve, room state in plain text), time and size of events and the types of account data. Event counts are based on this device’s sync; the provider may hold older events as well.';
 
   @override
   String get eventTypeMessage => 'Messages';
@@ -3077,7 +3078,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String accountDeleteBody(String userId, String server) {
-    return 'Your account $userId will be permanently deleted at $server. The user ID cannot be used again. Messages you sent remain visible to the other family members. Afterwards all data on this device is deleted.';
+    return 'Your account $userId will be permanently deleted at $server. The user ID cannot be used again. Messages you sent remain visible to the other family members, and so does the choice of your avatar (one value out of twelve), which stays in the family room. Afterwards all data on this device is deleted.';
   }
 
   @override
@@ -3219,4 +3220,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themeColorSky => 'Sky blue';
+
+  @override
+  String get avatarTitle => 'Avatar';
+
+  @override
+  String get avatarChange => 'Change avatar';
+
+  @override
+  String get avatarInitials => 'Initials (no avatar)';
+
+  @override
+  String get avatarNeedsModerator =>
+      'A moderator has to enable the avatar feature for this family first. This happens as soon as a moderator opens the app.';
+
+  @override
+  String get avatarLoading => 'Checking the avatar feature …';
+
+  @override
+  String get avatarSelected => 'Selected';
+
+  @override
+  String get avatarPreview => 'Preview';
+
+  @override
+  String get avatarPending => 'Being applied …';
+
+  @override
+  String get avatarSaved => 'Avatar saved';
+
+  @override
+  String get avatarVisibility =>
+      'All family members see your avatar, including in the chat. The server sees which of the twelve symbols you chose: this choice is not end-to-end encrypted. It stays in the family room even if you are removed or your account is deleted.';
+
+  @override
+  String get avatarPreset01 => 'Paw';
+
+  @override
+  String get avatarPreset02 => 'Bunny';
+
+  @override
+  String get avatarPreset03 => 'Bird';
+
+  @override
+  String get avatarPreset04 => 'Flower';
+
+  @override
+  String get avatarPreset05 => 'Tree';
+
+  @override
+  String get avatarPreset06 => 'Sailboat';
+
+  @override
+  String get avatarPreset07 => 'Bicycle';
+
+  @override
+  String get avatarPreset08 => 'Pizza';
+
+  @override
+  String get avatarPreset09 => 'Ice cream';
+
+  @override
+  String get avatarPreset10 => 'Music';
+
+  @override
+  String get avatarPreset11 => 'Soccer ball';
+
+  @override
+  String get avatarPreset12 => 'Rocket';
+
+  @override
+  String get eventTypeAvatar => 'Avatar choice';
 }

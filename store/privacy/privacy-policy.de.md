@@ -49,6 +49,7 @@ teilen oder die dein Anbieter zur Synchronisierung bereitstellt.
 | Aufgabenlisten, Zuordnungen, Wiederholungsregeln, Erledigungen, Zeitpunkte und freiwillige Kommentare | Aufgaben verteilen und den Erledigungsverlauf anzeigen. Der Verlauf bleibt auch nach einem periodischen Neustart der Liste erhalten. |
 | Familien- und Raumnamen, Mitgliedschaften, Rollen, Einladungen und Beitrittsanfragen | Familie verwalten und den Zugriff auf gemeinsame Inhalte steuern. |
 | Online-/Offline-Status mit Zeitpunkt | Optional anderen Familienmitgliedern die Erreichbarkeit anzeigen. |
+| Wahl eines der zwölf eingebauten Avatare (nur die Kennung, kein Bild, kein Text) | Den Avatar bei anderen Familienmitgliedern anzeigen, auch im Chat. Die Wahl liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. |
 | Sprache, Darstellung, Erinnerungs-, Meldungs- und Sicherheitseinstellungen, lokal blockierte Konten und vorgemerkte Einladungen | App konfigurieren und begonnene Abläufe fortsetzen. |
 | IP-Adresse, Verbindungszeitpunkte, Konto-, Raum- und Gerätekennungen sowie technische Übertragungsdaten | Verbindung, Zustellung und Betrieb beim jeweils angesprochenen Server; dessen Protokollierung richtet sich nach seinen Datenschutzhinweisen. |
 
@@ -114,7 +115,10 @@ Ende-zu-Ende-Verschlüsselung verbirgt **nicht sämtliche Metadaten**. Der Anbie
 kann unter anderem Konto- und Gerätekennungen, Profilangaben, Raumnamen,
 Mitgliedschaften und Rollen, Zeitpunkte, IP-Adressen sowie Größen und Zuordnungen
 verschlüsselter Ereignisse verarbeiten. Insbesondere Raumzustand und
-Kontoverwaltung sind nicht wie Nachrichteninhalte Ende-zu-Ende-verschlüsselt.
+Kontoverwaltung sind nicht wie Nachrichteninhalte Ende-zu-Ende-verschlüsselt. Dazu
+gehört die Wahl deines Avatars (eines der zwölf eingebauten Avatare): Sie liegt als
+Raumzustand im Familienraum, ist ausdrücklich nicht Ende-zu-Ende-verschlüsselt und
+für den Anbieter sowie alle Familienmitglieder sichtbar.
 
 Bei serverübergreifender Kommunikation können über die Matrix-Föderation auch
 Homeserver anderer beteiligter Konten verschlüsselte Ereignisse und die für die
@@ -324,7 +328,10 @@ eine Kontodeaktivierung mit Löschwunsch (`erase`) an. Bei Kontoverwaltung
 auf der Seite des Anbieters erfolgt die Bestätigung auf der Anbieterseite. Nach bestätigtem
 Abschluss werden die lokalen Kontodaten bereinigt. Welche Serverdaten tatsächlich
 gelöscht oder weiter aufbewahrt werden, richtet sich nach dem Anbieter und
-gegebenenfalls bestehenden gesetzlichen Pflichten.
+gegebenenfalls bestehenden gesetzlichen Pflichten. Die Wahl deines Avatars (ein Wert
+aus zwölf) bleibt auch nach dem Entfernen aus der Familie oder der Kontolöschung als
+Raumzustand im Familienraum stehen; die App blendet sie für Personen aus, die nicht
+mehr Mitglied sind.
 
 **Verbleibende Kopien:** Weder lokale Löschung noch Kontolöschung garantieren die
 Entfernung bereits zugestellter Inhalte auf Geräten anderer Personen, föderierten

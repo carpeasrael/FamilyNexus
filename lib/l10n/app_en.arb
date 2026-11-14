@@ -106,7 +106,7 @@
     }
   },
   "serverNoPassword": "This provider does not allow signing in with a password.",
-  "serverMetadataNote": "The server cannot see content, but it does see metadata such as who writes to whom and when, as well as room and profile names (for example the family name). Your own server decides who sees them – it does not remove them.",
+  "serverMetadataNote": "The server cannot see content, but it does see metadata such as who writes to whom and when, the choice of your avatar (one of twelve symbols, room state, not end-to-end encrypted), as well as room and profile names (for example the family name). Your own server decides who sees them – it does not remove them.",
   "onbTitleAccount": "Sign in",
   "accountUsername": "Username",
   "accountPassword": "Password",
@@ -599,7 +599,7 @@
   "privacy1Title": "Who processes your data?",
   "privacy1Body": "FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. The operator of the provider you chose (Matrix server) is responsible for processing on the server; you can see it during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that have their own sign-in page (e.g. matrix.org) you enter these details directly on their page.",
   "privacy2Title": "What data exists?",
-  "privacy2Body": "Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, family members and your settings. Events and messages are stored encrypted ({cipher}) on your device. The key is held here: {keyStore} – not in the database file.",
+  "privacy2Body": "Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, family members including the choice of their avatar (only the ID of one of the twelve built-in avatars) and your settings. Events and messages are stored encrypted ({cipher}) on your device. The key is held here: {keyStore} – not in the database file.",
   "@privacy2Body": {
     "placeholders": {
       "keyStore": {
@@ -612,7 +612,7 @@
     }
   },
   "privacy3Title": "What does the server see?",
-  "privacy3Body": "Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships and room and profile names (for example the family name). With your own server you decide who sees this information.",
+  "privacy3Body": "Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted) and room and profile names (for example the family name). With your own server you decide who sees this information.",
   "privacy4Title": "Private events",
   "privacy4Body": "Private events are never sent to the family. Between your own devices they are synchronized through a private, encrypted room that only your account belongs to.",
   "privacy5Title": "Reminders and notifications",
@@ -896,8 +896,8 @@
       }
     }
   },
-  "privacy10Title": "Online status, direct chats, shopping list",
-  "privacy10Body": "The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. The server only sees the metadata it always sees (see “What does the server see?”).",
+  "privacy10Title": "Online status, direct chats, shopping list, avatar",
+  "privacy10Body": "The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. Your avatar is an exception: the choice of one of the twelve built-in avatars is kept as room state in the family room and is not end-to-end encrypted. The server and all family members see which symbol you chose; the choice stays in the room even if you are removed or your account is deleted. Otherwise the server only sees the metadata it always sees (see “What does the server see?”).",
   "onbFamilyFound": "Found family “{name}” – you are already a member. Finishing setup.",
   "@onbFamilyFound": {
     "placeholders": {
@@ -1133,7 +1133,7 @@
     }
   },
   "privacy12Title": "Task lists",
-  "privacy12Body": "Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. The server only sees the metadata it always sees (see “What does the server see?”).",
+  "privacy12Body": "Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. The server only sees the metadata it always sees (see “What does the server see?”), plus the choice of your avatar (room state, not end-to-end encrypted).",
   "webUnlockTitleCreate": "Set up the browser vault",
   "webUnlockBodyCreate": "This browser stores your data encrypted. Choose a password for it. It is not stored anywhere and cannot be recovered; if you forget it, the only way out is to delete all local data and sign in again.",
   "webUnlockTitle": "Unlock FamilyNexus",
@@ -1776,7 +1776,7 @@
     }
   },
   "reportFamilyMembers": "Family members",
-  "reportOnlineNote": "Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), time and size of events and the types of account data. Event counts are based on this device’s sync; the provider may hold older events as well.",
+  "reportOnlineNote": "Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), the choice of avatar (one value out of twelve, room state in plain text), time and size of events and the types of account data. Event counts are based on this device’s sync; the provider may hold older events as well.",
   "eventTypeMessage": "Messages",
   "eventTypeReaction": "Reactions",
   "eventTypeSharedEvent": "Events (shared)",
@@ -1800,7 +1800,7 @@
   "accountDelete": "Delete account",
   "accountDeleteHint": "Permanently delete your Matrix account at the provider",
   "accountDeleteTitle": "Delete account?",
-  "accountDeleteBody": "Your account {userId} will be permanently deleted at {server}. The user ID cannot be used again. Messages you sent remain visible to the other family members. Afterwards all data on this device is deleted.",
+  "accountDeleteBody": "Your account {userId} will be permanently deleted at {server}. The user ID cannot be used again. Messages you sent remain visible to the other family members, and so does the choice of your avatar (one value out of twelve), which stays in the family room. Afterwards all data on this device is deleted.",
   "@accountDeleteBody": {
     "placeholders": {
       "userId": {"type": "String"},
@@ -1851,5 +1851,28 @@
   "themeColorGreen": "Green",
   "themeColorOrange": "Orange",
   "themeColorRed": "Red",
-  "themeColorSky": "Sky blue"
+  "themeColorSky": "Sky blue",
+  "avatarTitle": "Avatar",
+  "avatarChange": "Change avatar",
+  "avatarInitials": "Initials (no avatar)",
+  "avatarNeedsModerator": "A moderator has to enable the avatar feature for this family first. This happens as soon as a moderator opens the app.",
+  "avatarLoading": "Checking the avatar feature …",
+  "avatarSelected": "Selected",
+  "avatarPreview": "Preview",
+  "avatarPending": "Being applied …",
+  "avatarSaved": "Avatar saved",
+  "avatarVisibility": "All family members see your avatar, including in the chat. The server sees which of the twelve symbols you chose: this choice is not end-to-end encrypted. It stays in the family room even if you are removed or your account is deleted.",
+  "avatarPreset01": "Paw",
+  "avatarPreset02": "Bunny",
+  "avatarPreset03": "Bird",
+  "avatarPreset04": "Flower",
+  "avatarPreset05": "Tree",
+  "avatarPreset06": "Sailboat",
+  "avatarPreset07": "Bicycle",
+  "avatarPreset08": "Pizza",
+  "avatarPreset09": "Ice cream",
+  "avatarPreset10": "Music",
+  "avatarPreset11": "Soccer ball",
+  "avatarPreset12": "Rocket",
+  "eventTypeAvatar": "Avatar choice"
 }

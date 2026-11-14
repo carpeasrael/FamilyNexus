@@ -106,7 +106,7 @@
     }
   },
   "serverNoPassword": "Bei diesem Anbieter ist keine Anmeldung mit Passwort möglich.",
-  "serverMetadataNote": "Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.",
+  "serverMetadataNote": "Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt, die Wahl deines Avatars (eines von zwölf Symbolen, als Raumzustand nicht Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.",
   "onbTitleAccount": "Anmelden",
   "accountUsername": "Benutzername",
   "accountPassword": "Passwort",
@@ -599,7 +599,7 @@
   "privacy1Title": "Wer verarbeitet deine Daten?",
   "privacy1Body": "FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.",
   "privacy2Title": "Welche Daten gibt es?",
-  "privacy2Body": "Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Familienmitglieder und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.",
+  "privacy2Body": "Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.",
   "@privacy2Body": {
     "placeholders": {
       "keyStore": {
@@ -612,7 +612,7 @@
     }
   },
   "privacy3Title": "Was sieht der Server?",
-  "privacy3Body": "Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.",
+  "privacy3Body": "Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.",
   "privacy4Title": "Private Termine",
   "privacy4Body": "Private Termine werden nie an die Familie gesendet. Zwischen deinen eigenen Geräten werden sie über einen privaten, verschlüsselten Raum abgeglichen, dem nur dein Konto angehört.",
   "privacy5Title": "Erinnerungen und Benachrichtigungen",
@@ -896,8 +896,8 @@
       }
     }
   },
-  "privacy10Title": "Online-Status, Einzelchats, Einkaufszettel",
-  "privacy10Body": "Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).",
+  "privacy10Title": "Online-Status, Einzelchats, Einkaufszettel, Avatar",
+  "privacy10Body": "Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Dein Avatar ist eine Ausnahme: Die Wahl eines der zwölf eingebauten Avatare liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. Der Server und alle Familienmitglieder sehen, welches Symbol du gewählt hast; die Wahl bleibt im Raum stehen, auch wenn du entfernt wirst oder dein Konto gelöscht wird. Der Server sieht sonst nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).",
   "onbFamilyFound": "Familie „{name}“ gefunden – du bist bereits Mitglied. Die Einrichtung wird abgeschlossen.",
   "@onbFamilyFound": {
     "placeholders": {
@@ -1133,7 +1133,7 @@
     }
   },
   "privacy12Title": "Aufgabenlisten",
-  "privacy12Body": "Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).",
+  "privacy12Body": "Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“), dazu die Wahl deines Avatars (Raumzustand, nicht Ende-zu-Ende-verschlüsselt).",
   "webUnlockTitleCreate": "Browser-Tresor einrichten",
   "webUnlockBodyCreate": "Dieser Browser speichert deine Daten verschlüsselt. Wähle dafür ein Passwort. Es wird nirgends gespeichert und kann nicht wiederhergestellt werden; wer es vergisst, kann nur alle lokalen Daten löschen und sich neu anmelden.",
   "webUnlockTitle": "FamilyNexus entsperren",
@@ -1785,7 +1785,7 @@
     }
   },
   "reportFamilyMembers": "Mitglieder der Familie",
-  "reportOnlineNote": "Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.",
+  "reportOnlineNote": "Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), die Wahl des Avatars (ein Wert aus zwölf, Raumzustand im Klartext), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.",
   "eventTypeMessage": "Nachrichten",
   "eventTypeReaction": "Reaktionen",
   "eventTypeSharedEvent": "Termine (geteilt)",
@@ -1809,7 +1809,7 @@
   "accountDelete": "Konto löschen",
   "accountDeleteHint": "Matrix-Konto beim Anbieter dauerhaft löschen",
   "accountDeleteTitle": "Konto löschen?",
-  "accountDeleteBody": "Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar. Anschließend werden alle Daten auf diesem Gerät gelöscht.",
+  "accountDeleteBody": "Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar, ebenso die Wahl deines Avatars (ein Wert aus zwölf), die im Familienraum stehen bleibt. Anschließend werden alle Daten auf diesem Gerät gelöscht.",
   "@accountDeleteBody": {
     "placeholders": {
       "userId": {"type": "String"},
@@ -1860,5 +1860,28 @@
   "themeColorGreen": "Grün",
   "themeColorOrange": "Orange",
   "themeColorRed": "Rot",
-  "themeColorSky": "Himmelblau"
+  "themeColorSky": "Himmelblau",
+  "avatarTitle": "Avatar",
+  "avatarChange": "Avatar ändern",
+  "avatarInitials": "Initialen (kein Avatar)",
+  "avatarNeedsModerator": "Ein Moderator muss die Avatar-Funktion für diese Familie erst freischalten. Das geschieht, sobald ein Moderator die App öffnet.",
+  "avatarLoading": "Avatar-Funktion wird geprüft …",
+  "avatarSelected": "Ausgewählt",
+  "avatarPreview": "Vorschau",
+  "avatarPending": "Wird übernommen …",
+  "avatarSaved": "Avatar gespeichert",
+  "avatarVisibility": "Alle Familienmitglieder sehen deinen Avatar, auch im Chat. Der Server sieht, welches der zwölf Symbole du gewählt hast: Diese Wahl ist nicht Ende-zu-Ende-verschlüsselt. Sie bleibt im Familienraum stehen, auch wenn du entfernt oder dein Konto gelöscht wird.",
+  "avatarPreset01": "Pfote",
+  "avatarPreset02": "Hase",
+  "avatarPreset03": "Vogel",
+  "avatarPreset04": "Blume",
+  "avatarPreset05": "Baum",
+  "avatarPreset06": "Segelboot",
+  "avatarPreset07": "Fahrrad",
+  "avatarPreset08": "Pizza",
+  "avatarPreset09": "Eis",
+  "avatarPreset10": "Musik",
+  "avatarPreset11": "Fußball",
+  "avatarPreset12": "Rakete",
+  "eventTypeAvatar": "Avatar-Wahl"
 }
