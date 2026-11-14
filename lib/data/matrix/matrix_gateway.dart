@@ -43,8 +43,13 @@ enum GatewayError {
   registrationDisabled,
   emailInUse,
 
-  /// Die Anmeldung im Browser wurde abgebrochen oder ist abgelaufen.
+  /// Die Anmeldung beim Anbieter ist gescheitert: keine Seite geöffnet, fehlender Code oder anderer Fehler des
+  /// Anbieters. Wird als Fehler angezeigt.
   oauthCancelled,
+
+  /// Die Anmeldung beim Anbieter wurde nicht abgeschlossen: Abbruch durch die Person (Seite geschlossen, Ablehnung
+  /// `access_denied`), Zeitablauf oder Ende der Sitzung ohne Rücksprung. Kein Fehler; wird als Hinweis angezeigt (#430).
+  oauthAborted,
 
   /// Rücksprung gehört nicht zur laufenden Anmeldung (fremder `state`); sie läuft weiter.
   oauthStateMismatch,
@@ -201,8 +206,8 @@ abstract class MatrixGateway implements Listenable {
   Future<Uri> startOAuth({required ServerUrl server, required Uri redirectUri, required bool create});
 
   /// Schließt die Anmeldung mit der Rücksprungadresse ab, zu der die Seite des Anbieters zurückgesprungen ist.
-  /// Fremder `state`: `oauthStateMismatch` (die Anmeldung bleibt offen); Abbruch beim Anbieter oder
-  /// fehlender Code: `oauthCancelled`.
+  /// Fremder `state`: `oauthStateMismatch` (die Anmeldung bleibt offen); Ablehnung beim Anbieter
+  /// (`error=access_denied`): `oauthAborted`; anderer Fehler des Anbieters oder fehlender Code: `oauthCancelled`.
   Future<void> completeOAuth(Uri callback);
 
   /// Setzt den eigenen Anzeigenamen.

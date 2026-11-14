@@ -616,11 +616,18 @@ void main() {
       await expectLater(g.completeOAuth(Uri.parse('$redirect?code=echt&state=$state')), _error(GatewayError.oauthCancelled), reason: 'einmalig');
     });
 
+    test('anderer Fehler des Anbieters (error=server_error) bleibt ein Fehler, kein Hinweis (#430)', () async {
+      final s = _Server(version: 'v1.15', meta: _meta);
+      final g = await _gateway(s);
+      final state = (await g.startOAuth(server: _hs, redirectUri: redirect, create: false)).queryParameters['state']!;
+      await expectLater(g.completeOAuth(Uri.parse('$redirect?error=server_error&state=$state')), _error(GatewayError.oauthCancelled));
+    });
+
     test('Ablehnung beim Anbieter (error=access_denied) beendet die Anmeldung', () async {
       final s = _Server(version: 'v1.15', meta: _meta);
       final g = await _gateway(s);
       final state = (await g.startOAuth(server: _hs, redirectUri: redirect, create: false)).queryParameters['state']!;
-      await expectLater(g.completeOAuth(Uri.parse('$redirect?error=access_denied&state=$state')), _error(GatewayError.oauthCancelled));
+      await expectLater(g.completeOAuth(Uri.parse('$redirect?error=access_denied&state=$state')), _error(GatewayError.oauthAborted));
       await expectLater(g.completeOAuth(Uri.parse('$redirect?code=x&state=$state')), _error(GatewayError.oauthCancelled));
     });
 
@@ -771,7 +778,7 @@ void main() {
 
         // Abbruch beim Anbieter (error=): aufgehoben.
         (s, g, state) = await started();
-        await expectLater(g.completeOAuth(Uri.parse('$redirect?error=access_denied&state=$state')), _error(GatewayError.oauthCancelled));
+        await expectLater(g.completeOAuth(Uri.parse('$redirect?error=access_denied&state=$state')), _error(GatewayError.oauthAborted));
         before = s.metaFetches;
         await g.sdkClient!.getAuthMetadata();
         expect(s.metaFetches, before + 1, reason: 'nach error= aufgehoben');

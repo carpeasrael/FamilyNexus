@@ -43,7 +43,7 @@ class _OAuthCreate extends StatelessWidget {
       Align(
         alignment: Alignment.centerRight,
         child: FilledButton.icon(
-          icon: const Icon(Icons.open_in_new, size: 18),
+          icon: Icon(providerPageIcon(context, Icons.person_add_alt_1), size: 18),
           onPressed: busy ? null : onCreate,
           label: Text(l.regOAuthCreate(host)),
         ),
@@ -80,7 +80,7 @@ class _ExternalCreate extends StatelessWidget {
       Wrap(alignment: WrapAlignment.end, spacing: 8, runSpacing: 8, children: <Widget>[
         if (onOpenPage != null)
           OutlinedButton.icon(
-            icon: const Icon(Icons.open_in_new, size: 18),
+            icon: Icon(providerPageIcon(context, Icons.language), size: 18),
             onPressed: onOpenPage,
             label: Text(l.regExternalOpen),
           ),
@@ -256,23 +256,6 @@ class _SubmitButton extends StatelessWidget {
         // `_submit`, nicht `_register`: Ein Tipp im selben Frame wie Enter sieht noch den alten Knopf.
         onPressed: busy || !enabled ? null : onSubmit,
         child: Text(busy ? l.regCreating : l.regCreate),
-      ),
-    );
-  }
-}
-
-/// Fehlerzeile unter dem Formular (Screenreader liest sie vor).
-class _CreateError extends StatelessWidget {
-  const _CreateError({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Semantics(
-        liveRegion: true,
-        child: Text(text, style: TextStyle(color: Theme.of(context).colorScheme.error)),
       ),
     );
   }

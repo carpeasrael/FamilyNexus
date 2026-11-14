@@ -3,7 +3,7 @@ FamilyNexus connects to a Matrix server (default: matrix.org, checked automatica
 
 Review account (username and password: see "Sign-in information"):
 1. Welcome screen → "I already have an account".
-2. "Sign in at matrix.org" → a secure sign-in sheet of the provider opens within the app → enter username and password → "Continue".
+2. "Sign in at matrix.org" → a secure sign-in sheet of the provider opens within the app → enter username and password → "Continue". On macOS the system shows this sheet as a private Safari-hosted window without toolbar or tabs (ASWebAuthenticationSession).
 3. Back in the app: "Unlock this device" → enter the emergency key below → "Unlock".
 4. Main view with the tabs Today, Calendar, Chat, Shopping, Family. The review account is moderator of a sample family with a second member and sample data.
 Emergency key of the review account: <EMERGENCY KEY OF THE REVIEW ACCOUNT>
@@ -21,7 +21,7 @@ FamilyNexus verbindet sich mit einem Matrix-Server (Standard: matrix.org, wird a
 
 Prüfkonto (Benutzername und Passwort: siehe „Anmeldeinformationen“):
 1. Willkommen → „Ich habe schon ein Konto“.
-2. „Bei matrix.org anmelden“ → ein sicheres Anmeldefenster des Anbieters öffnet sich in der App → Benutzername und Passwort eingeben → „Weiter“.
+2. „Bei matrix.org anmelden“ → ein sicheres Anmeldefenster des Anbieters öffnet sich in der App → Benutzername und Passwort eingeben → „Weiter“. Auf dem Mac zeigt das System es als privates, von Safari gehostetes Fenster ohne Werkzeugleiste und Tabs (ASWebAuthenticationSession).
 3. Zurück in der App: „Dieses Gerät freischalten“ → Notfall-Schlüssel (oben) eingeben → „Freischalten“.
 4. Hauptansicht mit Heute, Kalender, Chat, Einkauf, Familie. Das Prüfkonto ist Moderator einer Beispielfamilie mit zweitem Mitglied und Beispieldaten.
 

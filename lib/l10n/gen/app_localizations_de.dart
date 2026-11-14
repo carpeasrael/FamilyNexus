@@ -2625,6 +2625,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.';
 
   @override
+  String get errOAuthAborted =>
+      'Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Du kannst es jederzeit noch einmal versuchen.';
+
+  @override
   String joinCardServerMismatch(String family, String inviter) {
     return 'Achtung: Die Familie liegt bei $family, die einladende Person aber bei $inviter. Tritt nur bei, wenn du diese Einladung wirklich erwartet hast.';
   }

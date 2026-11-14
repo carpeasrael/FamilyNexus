@@ -60,7 +60,7 @@ class AccountCreateController extends ChangeNotifier {
   bool _waitingForBrowser = false;
   bool _elementMissing = false;
   bool _disposed = false;
-  String Function(AppLocalizations l)? _error;
+  ({String Function(AppLocalizations l) text, bool notice})? _error;
 
   /// Warum Enter nicht abgeschickt hat. Getrennt von [_error]: Eingaben löschen nur diesen Grund, Serverfehler bleiben
   /// bis zum nächsten Absenden stehen.
@@ -83,7 +83,11 @@ class AccountCreateController extends ChangeNotifier {
   String? get suggestion => _suggestion;
 
   /// Der Text der Fehlerzeile: Grund der Verweigerung vor dem Serverfehler; `null` ohne beides.
-  String? errorLine(AppLocalizations l) => _inputError ?? _error?.call(l);
+  String? errorLine(AppLocalizations l) => _inputError ?? _error?.text(l);
+
+  /// Die Fehlerzeile ist ein Hinweis (Vorgang beim Anbieter nicht abgeschlossen), kein Fehler (#430). Ein Eingabegrund hat
+  /// Vorrang und ist nie ein Hinweis.
+  bool get errorIsNotice => _inputError == null && (_error?.notice ?? false);
 
   /// Der Eingabegrund, wenn er zu [field] gehört.
   String? errorAt(AccountField field) => _inputField == field ? _inputError : null;
@@ -190,7 +194,7 @@ class AccountCreateController extends ChangeNotifier {
       await op();
     } catch (e) {
       if (_disposed) return;
-      _update(() => _error = (l) => errorText(l, e));
+      _update(() => _error = (text: (l) => errorText(l, e), notice: isNotice(e)));
       if (e is GatewayException && e.error == GatewayError.usernameTaken) _scheduleCheck();
     } finally {
       if (!_disposed) _update(() => _busy = false);

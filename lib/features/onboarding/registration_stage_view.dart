@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/app_services.dart';
 import '../../domain/registration.dart';
 import '../../l10n/gen/app_localizations.dart';
+import 'widgets/sign_in_icons.dart';
 
 /// Zusatzschritt, den der Anbieter bei der Kontoanlage verlangt (E-55): Bedingungen, E-Mail,
 /// Einladungscode oder „kein Roboter“ auf der Seite des Anbieters (in der App, E-91). Jede Antwort geht über [onInput] an das Gateway.
@@ -112,7 +113,7 @@ class _RegistrationStageViewState extends State<RegistrationStageView> with Widg
           for (final p in policies)
             Align(
               alignment: Alignment.centerLeft,
-              child: TextButton.icon(icon: const Icon(Icons.open_in_new, size: 18), onPressed: () => _open(p.url), label: Text(p.name)),
+              child: TextButton.icon(icon: Icon(providerPageIcon(context, Icons.article_outlined), size: 18), onPressed: () => _open(p.url), label: Text(p.name)),
             ),
           CheckboxListTile(
             contentPadding: EdgeInsets.zero,
@@ -168,7 +169,7 @@ class _RegistrationStageViewState extends State<RegistrationStageView> with Widg
           if (notDoneYet) ...<Widget>[const SizedBox(height: 8), Semantics(liveRegion: true, child: Text(l.regCaptchaNotYet, style: err))],
           const SizedBox(height: 12),
           FilledButton.icon(
-            icon: const Icon(Icons.open_in_new, size: 18),
+            icon: Icon(providerPageIcon(context, Icons.verified_user_outlined), size: 18),
             onPressed: busy ? null : () => _openCaptcha(page),
             label: Text(l.regCaptchaOpen),
           ),

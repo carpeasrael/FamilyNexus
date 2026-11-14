@@ -7,8 +7,10 @@ import '../../domain/server.dart';
 /// Linux/Windows im Browser), auf den passenden Rücksprung warten, Anmeldung abschließen.
 ///
 /// Rücksprünge mit fremdem `state` werden verworfen; auf Android, Linux und Windows wird weiter gewartet,
-/// auf iOS/macOS endet der Versuch (die Sitzung liefert nur eine Antwort). Wirft `oauthCancelled`, wenn
-/// keine Seite öffnet, die Person abbricht oder die Zeit abläuft.
+/// auf iOS/macOS endet der Versuch (die Sitzung liefert nur eine Antwort). Wirft `oauthCancelled`, wenn keine
+/// Seite öffnet, und `oauthAborted`, wenn die Person abbricht, die Zeit abläuft oder die Sitzung ohne Rücksprung
+/// endet (ein Hinweis, kein Fehler, #430). Wurde zuvor ein Rücksprung mit fremdem `state` verworfen, ist das Ende
+/// ohne Rücksprung `oauthStateMismatch`: ein gefälschter Rücksprung bleibt ein Fehler.
 Future<void> signInWithBrowser(
   AppServices s,
   ServerUrl server, {
@@ -22,14 +24,18 @@ Future<void> signInWithBrowser(
     final uri = await s.gateway.startOAuth(server: server, redirectUri: attempt.redirectUri, create: create);
     if (!await attempt.open(uri)) throw const GatewayException(GatewayError.oauthCancelled);
     final deadline = DateTime.now().add(timeout);
+    var sawMismatch = false;
     while (true) {
       final callback = await attempt.next(deadline: deadline);
-      if (callback == null) throw const GatewayException(GatewayError.oauthCancelled);
+      if (callback == null) {
+        throw GatewayException(sawMismatch ? GatewayError.oauthStateMismatch : GatewayError.oauthAborted);
+      }
       try {
         await s.gateway.completeOAuth(callback);
         return;
       } on GatewayException catch (e) {
         if (e.error != GatewayError.oauthStateMismatch) rethrow;
+        sawMismatch = true;
       }
     }
   } finally {

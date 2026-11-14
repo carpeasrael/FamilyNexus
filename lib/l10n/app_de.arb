@@ -1503,6 +1503,7 @@
   "errRegistrationDisabled": "Bei diesem Anbieter kann die App kein Konto anlegen. Erstelle es auf seiner Webseite.",
   "errEmailInUse": "Diese E-Mail-Adresse wird schon für ein anderes Konto verwendet.",
   "errOAuthCancelled": "Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.",
+  "errOAuthAborted": "Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Du kannst es jederzeit noch einmal versuchen.",
   "joinCardServerMismatch": "Achtung: Die Familie liegt bei {family}, die einladende Person aber bei {inviter}. Tritt nur bei, wenn du diese Einladung wirklich erwartet hast.",
   "@joinCardServerMismatch": {
     "placeholders": {

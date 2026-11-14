@@ -1185,7 +1185,9 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     // Wie das echte Gateway: fremder state wird verworfen, die Anmeldung bleibt offen.
     if (p['state'] != expected) throw const GatewayException(GatewayError.oauthStateMismatch);
     _oauthState = null;
-    if (p.containsKey('error') || code == null) throw const GatewayException(GatewayError.oauthCancelled);
+    if (p.containsKey('error') || code == null) {
+      throw GatewayException(p['error'] == 'access_denied' ? GatewayError.oauthAborted : GatewayError.oauthCancelled);
+    }
     final id = '@$code:${fake.host}';
     if (!fake._accounts.containsKey(id)) {
       if (!_oauthCreate) throw const GatewayException(GatewayError.invalidCredentials);

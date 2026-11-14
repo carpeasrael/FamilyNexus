@@ -1494,6 +1494,7 @@
   "errRegistrationDisabled": "The app cannot create an account with this provider. Create it on their website.",
   "errEmailInUse": "This email address is already used by another account.",
   "errOAuthCancelled": "The sign-in at the provider was not completed. Please try again.",
+  "errOAuthAborted": "The sign-in at the provider was not completed. You can try again at any time.",
   "joinCardServerMismatch": "Caution: the family is hosted at {family}, but the inviting person at {inviter}. Only join if you really expected this invitation.",
   "@joinCardServerMismatch": {
     "placeholders": {

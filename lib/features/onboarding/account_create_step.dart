@@ -9,6 +9,7 @@ import 'browser_sign_in.dart';
 import 'provider_controller.dart';
 import 'provider_section.dart';
 import 'registration_stage_view.dart';
+import 'widgets/sign_in_icons.dart';
 
 part 'widgets/account_create_parts.dart';
 
@@ -141,7 +142,7 @@ class _AccountCreateStepState extends State<AccountCreateStep> {
         final errorLine = _c.errorLine(l);
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
           ...main,
-          if (errorLine != null) _CreateError(text: errorLine),
+          if (errorLine != null) OnboardingMessage(text: errorLine, notice: _c.errorIsNotice),
           if (stage == null && !_c.waitingForBrowser) ...<Widget>[
             const SizedBox(height: 8),
             _HaveAccountButton(

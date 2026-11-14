@@ -2604,6 +2604,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The sign-in at the provider was not completed. Please try again.';
 
   @override
+  String get errOAuthAborted =>
+      'The sign-in at the provider was not completed. You can try again at any time.';
+
+  @override
   String joinCardServerMismatch(String family, String inviter) {
     return 'Caution: the family is hosted at $family, but the inviting person at $inviter. Only join if you really expected this invitation.';
   }

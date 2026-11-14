@@ -10,6 +10,7 @@ import '../common/error_text.dart';
 import 'browser_sign_in.dart';
 import 'provider_controller.dart';
 import 'provider_section.dart';
+import 'widgets/sign_in_icons.dart';
 
 part 'widgets/login_parts.dart';
 
@@ -36,6 +37,9 @@ class _LoginStepState extends State<LoginStep> {
   bool _busy = false;
   bool _waitingForBrowser = false;
   String? _error;
+
+  /// Der Vorgang beim Anbieter wurde nicht abgeschlossen (Abbruch): ein Hinweis, kein Fehler (#430).
+  bool _errorNotice = false;
   Timer? _idTimer;
 
   late final AppServices _s;
@@ -69,11 +73,17 @@ class _LoginStepState extends State<LoginStep> {
     setState(() {
       _busy = true;
       _error = null;
+      _errorNotice = false;
     });
     try {
       await op();
     } catch (e) {
-      if (mounted) setState(() => _error = errorText(l, e));
+      if (mounted) {
+        setState(() {
+          _error = errorText(l, e);
+          _errorNotice = isNotice(e);
+        });
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -139,7 +149,7 @@ class _LoginStepState extends State<LoginStep> {
         }
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
           ...main,
-          if (_error != null) _LoginError(text: _error!),
+          if (_error != null) OnboardingMessage(text: _error!, notice: _errorNotice),
           if (!_waitingForBrowser) ...<Widget>[
             const SizedBox(height: 8),
             Align(

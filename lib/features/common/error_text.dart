@@ -5,6 +5,9 @@ import '../../domain/shopping.dart';
 import '../../domain/tasks.dart';
 import '../../l10n/gen/app_localizations.dart';
 
+/// Ob [error] nur ein Hinweis ist, kein Fehler: Die Anmeldung beim Anbieter wurde nicht abgeschlossen (#430).
+bool isNotice(Object error) => error is GatewayException && error.error == GatewayError.oauthAborted;
+
 /// Lokalisierter Text zu einem Fehler. Zeigt nie Rohtexte von Servern oder Ausnahmen.
 String errorText(AppLocalizations l, Object error) {
   if (error is GatewayException) {
@@ -26,6 +29,7 @@ String errorText(AppLocalizations l, Object error) {
       GatewayError.registrationDisabled => l.errRegistrationDisabled,
       GatewayError.emailInUse => l.errEmailInUse,
       GatewayError.oauthCancelled || GatewayError.oauthStateMismatch => l.errOAuthCancelled,
+      GatewayError.oauthAborted => l.errOAuthAborted,
       GatewayError.passwordChangeUnavailable => l.passwordChangeUnavailable,
       GatewayError.unknown => l.errUnknown,
     };
