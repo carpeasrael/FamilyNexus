@@ -21,6 +21,7 @@ TaskList _list({
   String by = kAnna,
   int version = 1,
   bool deleted = false,
+  DateTime? updatedAt,
 }) =>
     TaskList(
       id: id,
@@ -32,7 +33,7 @@ TaskList _list({
       by: by,
       version: version,
       deleted: deleted,
-      updatedAt: DateTime.utc(2026, 10, 21, 12),
+      updatedAt: updatedAt ?? DateTime.utc(2026, 10, 21, 12),
     );
 
 TaskLogEntry _entry({
@@ -44,10 +45,11 @@ TaskLogEntry _entry({
   TaskLogKind kind = TaskLogKind.done,
   String comment = '',
   String by = kBen,
+  String listId = _id1,
 }) =>
     TaskLogEntry(
       id: id,
-      listId: _id1,
+      listId: listId,
       itemId: item,
       periodKey: period ?? on,
       doneOn: on,
@@ -307,11 +309,184 @@ void main() {
 
     test('Empfang: Protokoll-Duplikat, Zeitabweichung', () async {
       final s = svc(kAnna);
+      await s.applyIncomingList(_list());
       final e = _entry();
       expect(await s.applyIncomingLog(e, serverTime: e.at), isTrue);
       expect(await s.applyIncomingLog(e, serverTime: e.at), isFalse, reason: 'Duplikat');
       final far = _entry(id: '00000000-0000-4000-8000-0000000000b1');
       expect(await s.applyIncomingLog(far, serverTime: far.at.add(const Duration(days: 3))), isFalse, reason: 'Uhr stimmt nicht');
+    });
+
+    // #464: Rechteprüfung beim Empfang des Protokolls, mit flüchtigem Puffer.
+    String uuid(String block, int i) => '00000000-0000-4000-$block-${i.toString().padLeft(12, '0')}';
+    final base = DateTime.utc(2026, 10, 22, 10);
+    Future<bool> receive(TaskService s, TaskLogEntry e) => s.applyIncomingLog(e, serverTime: e.at);
+    final tombstone = _list(version: 2, deleted: true, title: '', items: const <TaskItem>[]);
+
+    test('#464: Einträge Nicht-Zugewiesener verdrängen keine Erledigung', () async {
+      final s = svc(kAnna);
+      expect(await s.applyIncomingList(_list()), isTrue);
+      final legit = _entry(at: base);
+      expect(await receive(s, legit), isTrue);
+      for (var i = 0; i < TaskLogEntry.keepPerList; i++) {
+        await receive(s, _entry(id: uuid('a000', i), by: kCara, at: base.add(Duration(minutes: i + 1))));
+      }
+      final log = await store.log(listId: _id1);
+      expect(log.map((e) => e.id), contains(legit.id));
+      expect(log.where((e) => e.by == kCara), isEmpty);
+      expect(TaskProgress.doneNow(_list(), log, DateTime.utc(2026, 10, 22, 19)).keys, [_id2]);
+    });
+
+    test('#464: Einträge zu unbekannten Listen füllen die Gesamtgrenze nicht', () async {
+      final s = svc(kAnna);
+      for (var i = 0; i < TaskLogEntry.maxTotal; i++) {
+        await receive(s, _entry(id: uuid('a000', i), listId: uuid('9000', i), by: kCara));
+      }
+      expect(await s.applyIncomingList(_list()), isTrue);
+      expect(await receive(s, _entry()), isTrue);
+      expect(await store.logTotal(), 1);
+    });
+
+    test('#464: Eintrag vor seiner Liste wird nachgetragen', () async {
+      final s = svc(kAnna);
+      final e = _entry();
+      expect(await receive(s, e), isFalse);
+      expect(await store.log(), isEmpty);
+      expect(await s.applyIncomingList(_list()), isTrue);
+      expect((await store.log()).map((x) => x.id), [e.id]);
+      expect(TaskProgress.doneNow(_list(), await store.log(), base).keys, [_id2]);
+    });
+
+    test('#464: Neuzuweisung (a) Eintrag wartet auf die passende Fassung', () async {
+      final s = svc(kAnna);
+      await s.applyIncomingList(_list(assignee: kCara));
+      final e = _entry();
+      expect(await receive(s, e), isFalse);
+      expect(await store.log(), isEmpty);
+      expect(await s.applyIncomingList(_list(version: 2)), isTrue);
+      expect((await store.log()).map((x) => x.id), [e.id]);
+    });
+
+    test('#464: Neuzuweisung (b) gespeicherte Einträge bleiben und zählen bei Rückzuweisung wieder', () async {
+      final s = svc(kAnna);
+      await s.applyIncomingList(_list());
+      final e = _entry();
+      expect(await receive(s, e), isTrue);
+      final toCara = _list(assignee: kCara, version: 2);
+      expect(await s.applyIncomingList(toCara), isTrue);
+      expect((await store.log()).map((x) => x.id), [e.id]);
+      expect(TaskProgress.doneNow(toCara, await store.log(), base), isEmpty);
+      final back = _list(version: 3);
+      expect(await s.applyIncomingList(back), isTrue);
+      expect(TaskProgress.doneNow(back, await store.log(), base).keys, [_id2]);
+    });
+
+    test('#464: Neuzuweisung (c) lokal durch die Moderatorin trägt gepufferte Einträge nach', () async {
+      final a = svc(kAnna);
+      await a.applyIncomingList(_list(assignee: kCara));
+      final e = _entry();
+      expect(await receive(a, e), isFalse);
+      final next = await a.updateList(_id1, title: 'Haushalt', assignee: kBen, items: ['Müll raus', 'Spülmaschine']);
+      expect((await store.log()).map((x) => x.id), [e.id]);
+      expect(TaskProgress.doneNow(next, await store.log(), base).keys, [_id2]);
+    });
+
+    test('#464: gelöschte Liste (Empfang): Verlauf bleibt, neue Einträge werden nicht gespeichert', () async {
+      final s = svc(kAnna);
+      await s.applyIncomingList(_list());
+      final old = _entry();
+      expect(await receive(s, old), isTrue);
+      expect(await s.applyIncomingList(tombstone), isTrue);
+      expect((await store.log()).map((x) => x.id), [old.id]);
+      final later = _entry(id: uuid('b000', 1), at: base.add(const Duration(minutes: 5)));
+      expect(await receive(s, later), isFalse);
+      expect((await store.log()).map((x) => x.id), [old.id]);
+    });
+
+    test('#464: gelöschte Liste (lokal): Verlauf bleibt, neue Einträge werden nicht gespeichert', () async {
+      final a = svc(kAnna);
+      await a.applyIncomingList(_list());
+      final old = _entry();
+      expect(await receive(a, old), isTrue);
+      await a.deleteList(_id1);
+      expect((await store.log()).map((x) => x.id), [old.id]);
+      final later = _entry(id: uuid('b000', 1), at: base.add(const Duration(minutes: 5)));
+      expect(await receive(a, later), isFalse);
+      expect((await store.log()).map((x) => x.id), [old.id]);
+    });
+
+    test('#464: Löschen und gleichzeitiges Ändern: beide Reihenfolgen kommen zum selben Ergebnis', () async {
+      final change = _list(version: 2, title: 'Haushalt neu', updatedAt: DateTime.utc(2026, 10, 21, 13));
+      final e = _entry();
+
+      // Reihenfolge 1: Löschmarke, Eintrag (gepuffert), dann die gewinnende Änderung.
+      final s1 = svc(kAnna);
+      await s1.applyIncomingList(_list());
+      expect(await s1.applyIncomingList(tombstone), isTrue);
+      expect(await receive(s1, e), isFalse);
+      expect(await s1.applyIncomingList(change), isTrue);
+      expect((await store.getList(_id1))!.deleted, isFalse);
+      expect((await store.log()).map((x) => x.id), [e.id]);
+      expect(TaskProgress.doneNow(change, await store.log(), base).keys, [_id2]);
+
+      // Reihenfolge 2 (anderes Gerät): Änderung vor der Löschmarke.
+      store = MemoryTaskStore();
+      final s2 = svc(kAnna);
+      await s2.applyIncomingList(_list());
+      expect(await s2.applyIncomingList(change), isTrue);
+      expect(await s2.applyIncomingList(tombstone), isFalse);
+      expect(await receive(s2, e), isTrue);
+      expect((await store.getList(_id1))!.deleted, isFalse);
+      expect((await store.log()).map((x) => x.id), [e.id]);
+      expect(TaskProgress.doneNow(change, await store.log(), base).keys, [_id2]);
+    });
+
+    test('#464: Puffer je Absender begrenzt: eine Flut verdrängt fremde Einträge nicht', () async {
+      final s = svc(kAnna);
+      for (var i = 0; i <= TaskLogEntry.maxPendingPerSender; i++) {
+        await receive(s, _entry(id: uuid('a000', i), by: kCara, at: base.add(Duration(minutes: i))));
+      }
+      final e = _entry(id: uuid('b000', 1));
+      expect(await receive(s, e), isFalse);
+      expect(await s.applyIncomingList(_list()), isTrue);
+      expect((await store.log()).map((x) => x.id), [e.id], reason: 'Caras Flut verdrängt Bens Eintrag nicht');
+    });
+
+    test('#464: Überlauf je Absender verwirft den Eintrag mit dem ältesten Zeitpunkt', () async {
+      final s = svc(kAnna);
+      // Backfill-Reihenfolge: jüngste zuerst, der älteste Eintrag kommt zuletzt.
+      for (var i = 0; i <= TaskLogEntry.maxPendingPerSender; i++) {
+        expect(await receive(s, _entry(id: uuid('a000', i), at: base.subtract(Duration(minutes: i)))), isFalse);
+      }
+      expect(await s.applyIncomingList(_list()), isTrue);
+      final ids = (await store.log()).map((x) => x.id).toSet();
+      expect(ids, hasLength(TaskLogEntry.maxPendingPerSender));
+      expect(ids, isNot(contains(uuid('a000', TaskLogEntry.maxPendingPerSender))), reason: 'ältester Zeitpunkt fällt weg');
+      expect(ids, contains(uuid('a000', 0)), reason: 'zuerst angekommen und jüngster: bleibt');
+    });
+
+    test('#464: volle Liste bei voller Gesamtgrenze nimmt den neuen Eintrag an', () async {
+      final s = svc(kAnna);
+      await s.applyIncomingList(_list());
+      final otherLists = (TaskLogEntry.maxTotal - TaskLogEntry.keepPerList) ~/ TaskLogEntry.keepPerList;
+      var k = 0;
+      for (var l = 0; l < otherLists; l++) {
+        final listId = uuid('9000', l);
+        await store.putList(_list(id: listId), publishedVersion: 1);
+        for (var i = 0; i < TaskLogEntry.keepPerList; i++) {
+          await store.addLog(_entry(id: uuid('c000', k++), listId: listId, at: base.subtract(Duration(minutes: i + 1))),
+              published: true);
+        }
+      }
+      for (var i = 0; i < TaskLogEntry.keepPerList; i++) {
+        await store.addLog(_entry(id: uuid('d000', i), at: base.subtract(Duration(minutes: i + 1))), published: true);
+      }
+      expect(await store.logTotal(), TaskLogEntry.maxTotal);
+      final e = _entry(id: uuid('b000', 1));
+      expect(await receive(s, e), isTrue);
+      expect(await store.logTotal(), TaskLogEntry.maxTotal);
+      expect(await store.logCount(_id1), TaskLogEntry.keepPerList);
+      expect((await store.log(listId: _id1)).map((x) => x.id), contains(e.id));
     });
   });
 }
