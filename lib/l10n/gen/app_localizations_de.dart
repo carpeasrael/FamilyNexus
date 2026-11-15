@@ -946,6 +946,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get eventDeleteAll => 'Alle';
 
   @override
+  String get eventDeleteError => 'Der Termin konnte nicht gelöscht werden.';
+
+  @override
   String get eventShareInChat => 'Im Chat teilen';
 
   @override

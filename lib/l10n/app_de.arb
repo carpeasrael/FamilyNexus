@@ -449,6 +449,7 @@
   "eventDeleteSeriesConfirm": "Alle Vorkommen oder nur dieses löschen?",
   "eventDeleteThis": "Nur dieses",
   "eventDeleteAll": "Alle",
+  "eventDeleteError": "Der Termin konnte nicht gelöscht werden.",
   "eventShareInChat": "Im Chat teilen",
   "eventShared": "Im Chat geteilt",
   "eventOwner": "Von {name}",

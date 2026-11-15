@@ -1616,6 +1616,12 @@ abstract class AppLocalizations {
   /// **'Alle'**
   String get eventDeleteAll;
 
+  /// No description provided for @eventDeleteError.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Termin konnte nicht gelöscht werden.'**
+  String get eventDeleteError;
+
   /// No description provided for @eventShareInChat.
   ///
   /// In de, this message translates to:
