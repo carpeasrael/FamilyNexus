@@ -197,7 +197,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsShareAppCopied.
   ///
   /// In de, this message translates to:
-  /// **'Link zum Store-Eintrag kopiert'**
+  /// **'Link kopiert'**
   String get settingsShareAppCopied;
 
   /// No description provided for @settingsRateApp.

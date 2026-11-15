@@ -41,7 +41,8 @@ void main() {
     expect(clip, contains('https://play.google.com/store/apps/details?id=de.inneso.familynexus'));
     expect(clip, isNot(contains('Familie Test')));
     expect(clip, isNot(contains('anna')));
-    expect(find.text('Link zum Store-Eintrag kopiert'), findsOneWidget);
+    expect(find.text('Link kopiert'), findsOneWidget, reason: '#503');
+    expect(find.text('Link zum Store-Eintrag kopiert'), findsNothing);
   });
 
   testWidgets('App bewerten öffnet den Store-Eintrag; ohne Store: Hinweis statt Absturz', (tester) async {
@@ -80,5 +81,11 @@ void main() {
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Share app'), 200, scrollable: find.byType(Scrollable).last);
     expect(find.text('Rate app'), findsOneWidget);
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async => null);
+    addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+    await tester.tap(find.text('Share app'));
+    await tester.pumpAndSettle();
+    expect(find.text('Link copied'), findsOneWidget, reason: '#503');
+    expect(find.text('Store link copied'), findsNothing);
   });
 }
