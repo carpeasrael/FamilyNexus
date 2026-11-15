@@ -61,7 +61,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ich nutze FamilyNexus, den Familienplaner mit Kalender, Chat und Einkaufsliste. Hier gibt es die App:';
 
   @override
-  String get settingsShareAppCopied => 'Link zum Store-Eintrag kopiert';
+  String get settingsShareAppCopied => 'Link kopiert';
 
   @override
   String get settingsRateApp => 'App bewerten';

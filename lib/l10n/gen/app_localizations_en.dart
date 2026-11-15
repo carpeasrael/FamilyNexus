@@ -60,7 +60,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'I use FamilyNexus, the family planner with calendar, chat and shopping list. Get the app here:';
 
   @override
-  String get settingsShareAppCopied => 'Store link copied';
+  String get settingsShareAppCopied => 'Link copied';
 
   @override
   String get settingsRateApp => 'Rate app';

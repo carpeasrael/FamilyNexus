@@ -16,7 +16,7 @@
   "settingsShareApp": "Share app",
   "settingsShareAppHint": "Copies the link to the store listing so you can pass it on. No family data is shared.",
   "settingsShareAppText": "I use FamilyNexus, the family planner with calendar, chat and shopping list. Get the app here:",
-  "settingsShareAppCopied": "Store link copied",
+  "settingsShareAppCopied": "Link copied",
   "settingsRateApp": "Rate app",
   "settingsRateAppHint": "Opens the listing in the Play Store.",
   "settingsRateAppFailed": "The store listing could not be opened.",
