@@ -47,3 +47,7 @@ if __name__ == '__main__':
         raise SystemExit('Sprache (de|en) als drittes Argument angeben oder im Namen der Logdatei führen')
     out, names = decode(log, out_root, lang)
     print(f'{len(names)} Bilder nach {out}: {", ".join(names)}')
+    if not names:
+        raise SystemExit('keine PNG-Zeilen im Log gefunden (Lauf abgebrochen oder abgeschnitten?)')
+    if len(names) != 7:
+        print(f'WARNUNG: erwartet werden 7 Bilder, gefunden {len(names)}', file=sys.stderr)

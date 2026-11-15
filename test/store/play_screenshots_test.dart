@@ -70,6 +70,8 @@ void main() {
           expect(h.getUint8(9), 2, reason: 'Farbtyp 2 = RGB ohne Alpha');
           expect(h.getUint8(12), 0, reason: 'kein Interlace');
           expect(chunks.map((c) => c.type), isNot(contains('tRNS')), reason: 'Transparenz-Chunk');
+          expect(chunks.map((c) => c.type).toSet().difference(<String>{'IHDR', 'IDAT', 'IEND'}), isEmpty,
+              reason: 'nur IHDR, IDAT und IEND: keine Metadaten-Chunks (tEXt, iTXt, eXIf, …) mit Autor oder Pfad');
         });
       }
     });
@@ -94,7 +96,7 @@ void main() {
 
     final price = RegExp(r'[€$£]|\b(free|gratis|kostenlos|price|preis|euro|usd)\b', caseSensitive: false);
     final url = RegExp(r'http|www|\.com|\.de|\.org|://', caseSensitive: false);
-    final award = RegExp(r'\bbest(e|en|er|es)?\b|#\s?1|award|auszeichnung|preisgekr|nummer 1|number one|\btop\b|führend|leading|world|weltweit', caseSensitive: false);
+    final award = RegExp(r'\bbest(e|en|er|es)?\b|#\s?1|award|auszeichnung|preisgekr|nummer 1|number one|\btop\b|führend|leading|world|weltweit|einzigartig|unique|schnell(er|e|ste|sten)?\b|fast(er|est)?\b|am sichersten|most secure|100\s?%|sekunden|seconds', caseSensitive: false);
     // Liste wie in test/store/store_wording_test.dart.
     final british = RegExp(r'colour|synchronis|cancell|licence|authoris|organis|behaviour|centre|whilst|amongst|defence|\btick(s|ed)?\b', caseSensitive: false);
     for (final lang in <String>['de', 'en']) {

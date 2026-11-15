@@ -31,6 +31,8 @@ Alle Aufnahmen zeigen **erfundene Beispieldaten** (Fake-Server, siehe `tool/prev
 
 - `macos-2560x1600/` – Mac App Store (2560×1600): dieselben Motive, Kalender in der Agenda-Ansicht (die Monatsansicht streckt sich auf der breiten Fläche). Reine Flutter-Oberfläche ohne Fensterrahmen.
 
+**Hinweis macOS:** Das neue Motiv `7-datenschutz` (Menü → Datenschutzerklärung) ist auf macOS nicht geprüft; es zeigt dort den Text mit dem Schlüsselbund statt der Android-Variante und gehört nicht in das Play-Paket.
+
 Neu erzeugen macOS: `flutter test integration_test/store_screenshots_test.dart -d macos > log.txt`; der Test gibt die PNGs als Zeilen
 `PNG <name> <base64>` aus (die Sandbox der App ist von außen nicht lesbar, Bildschirmaufnahme-Recht ist nicht nötig).
 

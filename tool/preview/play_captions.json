@@ -7,6 +7,6 @@
     {"raw": "7-datenschutz", "name": "datenschutz", "de": "Kein Tracking, keine Werbung", "en": "No tracking, no ads"},
     {"raw": "1-heute", "name": "heute", "de": "Der Tag der Familie im Blick", "en": "Your family’s day at a glance"},
     {"raw": "4-einzelchat", "name": "einzelchat", "de": "Auch persönlich: Einzelchats", "en": "Private one-to-one chats"},
-    {"raw": "6-familie", "name": "familie", "de": "Familie einfach einladen", "en": "Invite your family in seconds"}
+    {"raw": "6-familie", "name": "familie", "de": "Familie per Link oder QR einladen", "en": "Invite your family by link or QR"}
   ]
 }
