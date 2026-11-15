@@ -148,6 +148,38 @@ void main() {
       expect(find.text('1 Erinnerung fällig'), findsOneWidget);
     });
 
+    testWidgets('#498 nichts mehr geplant, aber fällig: nur die Fälligzeile, kein „Keine Erinnerung geplant“', (tester) async {
+      final app = await open(tester);
+      await make(tester, app, 'A', DateTime.utc(2026, 3, 20, 10, 5));
+      await make(tester, app, 'B', DateTime.utc(2026, 3, 20, 10, 8));
+      expect(find.text('2 Erinnerungen fällig'), findsOneWidget);
+      expect(find.text('Keine Erinnerung geplant'), findsNothing);
+    });
+
+    testWidgets('#498 weder geplant noch fällig: „Keine Erinnerung geplant“ bleibt', (tester) async {
+      await open(tester);
+      expect(find.text('Keine Erinnerung geplant'), findsOneWidget);
+      expect(find.textContaining('fällig'), findsNothing);
+    });
+
+    testWidgets('#498 eine geplant, eine fällig: beide Zeilen', (tester) async {
+      final app = await open(tester);
+      await make(tester, app, 'A', DateTime.utc(2026, 3, 20, 10, 5));
+      await make(tester, app, 'B', DateTime.utc(2026, 3, 20, 14));
+      expect(find.text('1 Erinnerung geplant'), findsOneWidget);
+      expect(find.text('1 Erinnerung fällig'), findsOneWidget);
+    });
+
+    testWidgets('#498 die letzte geplante wird mit der Zeit fällig: danach nur noch die Fälligzeile', (tester) async {
+      final app = await open(tester);
+      await make(tester, app, 'Arzt', DateTime.utc(2026, 3, 20, 10, 20));
+      expect(find.text('1 Erinnerung geplant'), findsOneWidget);
+      now = DateTime.utc(2026, 3, 20, 10, 11);
+      await tester.pump(const Duration(seconds: 31));
+      expect(find.text('1 Erinnerung fällig'), findsOneWidget);
+      expect(find.text('Keine Erinnerung geplant'), findsNothing);
+    });
+
     testWidgets('die offene Übersicht wird mit der Zeit aktualisiert', (tester) async {
       final app = await open(tester);
       await make(tester, app, 'Arzt', DateTime.utc(2026, 3, 20, 10, 20));

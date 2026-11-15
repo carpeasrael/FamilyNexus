@@ -85,7 +85,8 @@ class TodayScreen extends StatelessWidget {
                 child: ClockTick(builder: (context) {
                   final due = reminders.dueCount;
                   return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                    Text(l.remindersPlanned(reminders.plannedCount)),
+                    // „Keine Erinnerung geplant“ neben „n fällig“ liest sich als Widerspruch (#498).
+                    if (reminders.plannedCount > 0 || due == 0) Text(l.remindersPlanned(reminders.plannedCount)),
                     if (due > 0) Text(l.remindersDueCount(due)),
                   ]);
                 }),
