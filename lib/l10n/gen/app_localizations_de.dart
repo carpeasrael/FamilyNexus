@@ -1290,7 +1290,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String privacy2Body(String keyStore, String cipher) {
-    return 'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ($cipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: $keyStore – nicht in der Datenbankdatei.';
+    return 'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ($cipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: $keyStore – nicht in der Datenbankdatei.';
   }
 
   @override

@@ -4,6 +4,10 @@ Neu in 1.2.3:
 • Kalender: Anzeige, wie weit das Jahr ist (Tag, verbleibende Tage, Prozent); der Kalender gleicht zusätzlich alle 15 Minuten mit dem Server ab.
 • Neue Nutzer bekommen eine kurze Einführung in Kalender, Chat und Einkauf; sie lässt sich in den Einstellungen erneut ansehen.
 • Einstellungen: „App teilen“ kopiert den Link zum Store-Eintrag, „App bewerten“ öffnet ihn (Android).
+• Kalender-Themen: Moderatoren legen Themen mit Name und Farbe an, jedes Mitglied wählt eines für den eigenen geteilten Termin.
+• Chat: Eine Gesprächsliste zeigt Familienchat und Einzelchats, sobald es Einzelchats gibt.
+• Zwölf eingebaute Avatare; in bestehenden Familien lassen sie sich wählen, sobald ein Moderator die App geöffnet hat.
+• Bitte alle Geräte der Familie aktualisieren: Wer einen Termin mit einer älteren App-Version bearbeitet, verliert dessen Thema.
 
 Neu in 1.2.2:
 • Bitte alle Geräte der Familie aktualisieren. Ältere App-Versionen zeigen Gruppen, Einträge mit zusammengesetzten Emojis und neue Reaktionen nicht; ändert oder hakt jemand dort einen Eintrag ab, geht dessen Gruppe für alle verloren.

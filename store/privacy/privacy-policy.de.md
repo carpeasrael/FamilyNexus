@@ -1,6 +1,6 @@
 # Datenschutzerklärung für FamilyNexus
 
-**Stand: 7. November 2026**
+**Stand: 15. November 2026**
 
 **Plattform: native Apps für iOS, macOS, Windows, Linux, Flatpak und Android sowie Web-App.**
 
@@ -49,6 +49,7 @@ teilen oder die dein Anbieter zur Synchronisierung bereitstellt.
 | Aufgabenlisten, Zuordnungen, Wiederholungsregeln, Erledigungen, Zeitpunkte und freiwillige Kommentare | Aufgaben verteilen und den Erledigungsverlauf anzeigen. Der Verlauf bleibt auch nach einem periodischen Neustart der Liste erhalten. |
 | Familien- und Raumnamen, Mitgliedschaften, Rollen, Einladungen und Beitrittsanfragen | Familie verwalten und den Zugriff auf gemeinsame Inhalte steuern. |
 | Online-/Offline-Status mit Zeitpunkt | Optional anderen Familienmitgliedern die Erreichbarkeit anzeigen. |
+| Kalender-Themen (frei gewählter Name bis 30 Zeichen, Farbe) | Termine einem Thema zuordnen und farbig anzeigen. Themen werden wie Termine Ende-zu-Ende-verschlüsselt an die Familie gesendet. |
 | Wahl eines der zwölf eingebauten Avatare (nur die Kennung, kein Bild, kein Text) | Den Avatar bei anderen Familienmitgliedern anzeigen, auch im Chat. Die Wahl liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. |
 | Sprache, Darstellung, Erinnerungs-, Meldungs- und Sicherheitseinstellungen, lokal blockierte Konten und vorgemerkte Einladungen | App konfigurieren und begonnene Abläufe fortsetzen. |
 | IP-Adresse, Verbindungszeitpunkte, Konto-, Raum- und Gerätekennungen sowie technische Übertragungsdaten | Verbindung, Zustellung und Betrieb beim jeweils angesprochenen Server; dessen Protokollierung richtet sich nach seinen Datenschutzhinweisen. |

@@ -11,10 +11,10 @@ lib/
                        (Modell, Format, Konfliktregel, Dienst), Server/Matrix-IDs, Anhangsrichtlinie,
                        Textbereinigung, Einstellungen
   data/
-    db/                SQLCipher-Datenbank, Migrationen (v1 settings, v2 Kalender, v3 Einkaufszettel, v4 Aufgabenlisten), SqlEventStore, SqlShoppingStore, SqlTaskStore, KeyValueStore
+    db/                SQLCipher-Datenbank, Migrationen (v1 settings, v2 Kalender, v3 Einkaufszettel, v4 Aufgabenlisten, v5 Kalender-Themen), SqlEventStore, SqlShoppingStore, SqlTaskStore, SqlEventThemeStore, KeyValueStore
     matrix/            MatrixGateway (Schnittstelle) + SdkMatrixGateway (matrix-SDK, vodozemac), HttpsOnlyClient,
                        ServerProbe, ChatMapper, FamilyRoomSpec
-    sync/              CalendarSync, ShoppingSync (Signale ↔ Dienst/Gateway, Warteschlange, Resync),
+    sync/              CalendarSync, ShoppingSync, TaskSync, EventThemeSync (Signale ↔ Dienst/Gateway, Warteschlange, Resync),
                        PresenceSync (eigene Statusmeldungen nach App-Lebenszyklus und Einstellung)
     platform/          Android-Adapter hinter Schnittstellen: KeyStore, ScreenProtection, FileAccess,
                        DeviceTimeZone, ReminderScheduler, LinkSource (Deep Links), DeviceAuth (App-Sperre)
@@ -61,6 +61,7 @@ geteilt: Familienraum, privat: nur privater Raum des eigenen Kontos (Geräte-Syn
   → `ChatMapper`, zusammen mit lesbaren alten `m.reaction`.
 - **Avatare (E-101):** `AvatarPresets` (zwölf Kennungen) → `MatrixGateway.setMemberAvatar` → Raumzustand `de.inneso.familynexus.avatar` im Familienraum (Schlüssel = eigene Matrix-ID, nicht verschlüsselt); lesen: `avatarOf` (direktes Nachschlagen in `room.states`), Änderungsmeldung `avatarRevision`; `MemberAvatarView` in `features/family`. Freischaltung für Mitglieder bestehender Familien durch Moderator-Geräte (`avatars.dart`, liest die Power-Levels vom Server, E-60).
 - **Aufgabenlisten (E-51):** `TaskService` (Rechte, Versionen, Grenzen) → `TaskStore` (SQLCipher: Listen + anfügendes Protokoll) → `TaskSync` → Familienraum (`tasklist`, `taskdone`). Der Reset ist abgeleitet: `TaskPeriod` bildet Periodenschlüssel in der Zeitzone der Liste, `TaskProgress` wertet das Protokoll für die laufende Periode aus. Oberfläche: `TasksController`, `TasksScreen`.
+- **Kalender-Themen (E-99):** `EventThemeService` (Rechte: nur Moderatoren, Grenzen: Name bis 30 Zeichen) → `SqlEventThemeStore` (Tabelle `event_themes`, Migration 5) → `EventThemeSync` → Familienraum (`de.inneso.familynexus.eventtheme`, E2EE, Format v1); eingehend: `EventThemeCodec`. Die Themen werden bei Abmeldung und Familienwechsel lokal gelöscht.
 
 ## Einrichtung und Kontoanlage (E-55–E-57)
 - `features/onboarding/onboarding_screen.dart` ist der Rahmen mit drei Wegen (`OnboardingPath`) und der Schrittanzeige je Weg;

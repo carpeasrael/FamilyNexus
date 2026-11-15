@@ -2,7 +2,7 @@
 
 **This is a translation of the German original (`privacy-policy.de.md`). If the two versions differ, the German version prevails.**
 
-**Last updated: 7 November 2026**
+**Last updated: 15 November 2026**
 
 **Platform: native apps for iOS, macOS, Windows, Linux, Flatpak and Android as well as web app.**
 
@@ -51,6 +51,7 @@ share with you or that your provider supplies for synchronization.
 | Task lists, assignments, recurrence rules, completions, times and voluntary comments | Distribute tasks and display the completion history. The history is retained even after a periodic reset of the list. |
 | Family and room names, memberships, roles, invitations and join requests | Manage the family and control access to shared content. |
 | Online/offline status with time | Optionally show other family members your availability. |
+| Calendar themes (freely chosen name up to 30 characters, color) | Assign events to a theme and show them in color. Like events, themes are sent end-to-end encrypted to the family. |
 | Choice of one of the twelve built-in avatars (only the identifier, no image, no text) | Show the avatar to other family members, including in the chat. The choice is kept as room state in the family room and is not end-to-end encrypted. |
 | Language, appearance, reminder, notification and security settings, locally blocked accounts and pending invitations | Configure the app and continue processes already begun. |
 | IP address, connection times, account, room and device identifiers as well as technical transmission data | Connection, delivery and operation at the server being contacted; its logging is governed by its privacy notices. |
