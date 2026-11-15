@@ -19,6 +19,7 @@ void main() {
   test('anderer Host, nicht lokal, kein https, kein Homeserver: null', () {
     expect(srv('https://matrix.example.org:8448', 'example.org'), isNull, reason: 'Delegierung, nicht lokal');
     expect(srv('https://nas:8448', 'localhost'), isNull, reason: 'anderer Host');
+    expect(srv('https://example.org:8448', 'example.org'), isNull, reason: 'gleicher Host, aber nicht im Heimnetz');
     expect(srv('http://localhost:18448', 'localhost'), isNull);
     expect(SdkMatrixGateway.defaultAccountServer(null, 'localhost'), isNull);
   });
