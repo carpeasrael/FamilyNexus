@@ -1,0 +1,12 @@
+{
+  "_hinweis": "Play-Bilderpaket (compose_store_images.py --play): Reihenfolge = Reihenfolge der Bilder (01-<name>.png …); raw = Name der Rohaufnahme (integration_test/store_screenshots_test.dart). Überschriften: kurz, wahr, ohne Preise, URLs, Auszeichnungen, Superlative; US-Englisch. Geprüft von test/store/play_screenshots_test.dart.",
+  "shots": [
+    {"raw": "2-kalender", "name": "kalender", "de": "Der Familienkalender für alle", "en": "One calendar for the whole family"},
+    {"raw": "3-chat", "name": "chat", "de": "Verschlüsselter Familienchat", "en": "Chat, end-to-end encrypted"},
+    {"raw": "5-einkauf", "name": "einkauf", "de": "Einkaufszettel, den alle sehen", "en": "A shopping list everyone shares"},
+    {"raw": "7-datenschutz", "name": "datenschutz", "de": "Kein Tracking, keine Werbung", "en": "No tracking, no ads"},
+    {"raw": "1-heute", "name": "heute", "de": "Der Tag der Familie im Blick", "en": "Your family’s day at a glance"},
+    {"raw": "4-einzelchat", "name": "einzelchat", "de": "Auch persönlich: Einzelchats", "en": "Private one-to-one chats"},
+    {"raw": "6-familie", "name": "familie", "de": "Familie per Link oder QR einladen", "en": "Invite your family by link or QR"}
+  ]
+}

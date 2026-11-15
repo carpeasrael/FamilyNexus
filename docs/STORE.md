@@ -34,7 +34,7 @@ tun muss, steht in Abschnitt 1. Rechtliche Angaben sind Hinweise, keine Rechtsbe
 
 1. **Schlüssel:** `tool/create_upload_key.sh`. Play App Signing aktivieren (Google verwaltet den App-Signaturschlüssel, du lädst mit dem Upload-Schlüssel hoch).
 2. **Bauen:** `tool/build_release.sh aab` → `build/app/outputs/bundle/release/app-release.aab`. Obfuskierungs-Symbole aus `debug-info/` aufbewahren und in der Play Console hochladen (Deobfuskierungsdatei: `build/app/outputs/mapping/release/mapping.txt`).
-3. **Store-Eintrag:** Texte aus `store/metadata/android/`, Symbol/Funktionsgrafik aus `store/graphics/`, Screenshots (mind. 2, Telefon, 16:9–9:16).
+3. **Store-Eintrag:** Texte aus `store/metadata/android/`, Symbol/Funktionsgrafik aus `store/graphics/`, Screenshots: das fertige Play-Bilderpaket `store/screenshots/android/<de-DE|en-US>/phoneScreenshots/` (7 Telefonbilder je Sprache, 1080×1920, PNG ohne Alpha, mit Überschrift; Play verlangt mind. 2, Telefon, Seitenverhältnis höchstens 2:1; **Vorgaben aus dem Kenntnisstand, nicht gegen die Konsole geprüft**), Hochladen von Hand je Sprache.
 4. **App-Inhalt (Fragebögen):**
    - *Datenschutzerklärung:* URL aus Punkt 1.3.
    - *Werbung:* enthält keine Werbung.
@@ -101,7 +101,7 @@ Stand der Vorbereitung (ohne Signatur geprüft, 2026-10-22): iOS-Release 30 MB, 
 
 ## 5. Screenshots
 
-`store/screenshots/ios/` ist das **fertige Bilderpaket** für den App Store (de-DE und en-US, 1206×2622 und 1320×2868, mit kurzen Bildunterschriften nach den Asset-Best-Practices von Apple); die Rohaufnahmen liegen daneben. `store/screenshots/` enthält je sechs Aufnahmen für iPhone (6,9″ `ios-6.9/`, 6,3″ `ios-6.3/`) und Android-Telefon (`android-phone/`) mit **erfundenen Beispieldaten** (Fake-Server, kein Netzwerk), erzeugt mit `tool/preview/` (siehe `store/screenshots/README.md`). Tablet-Aufnahmen (nicht nötig, solange iPad nicht unterstützt wird; Play verlangt sie nur optional). Für die Veröffentlichung prüfen oder durch eigene ersetzen; Pflichtgrößen siehe oben.
+`store/screenshots/ios/` ist das **fertige Bilderpaket** für den App Store (de-DE und en-US, 1206×2622 und 1320×2868, mit kurzen Bildunterschriften nach den Asset-Best-Practices von Apple); die Rohaufnahmen liegen daneben. `store/screenshots/android/` ist das **fertige Play-Bilderpaket** (de-DE und en-US, je 7 Bilder 1080×1920 mit kurzer Überschrift, Reihenfolge Kalender, Chat, Einkauf, Datenschutz, Heute, Einzelchat, Familie; Emulator-Aufnahmen, erzeugt mit `tool/preview/decode_shots.py` und `compose_store_images.py --play`, Anleitung in `store/screenshots/README.md`; Play-Vorgaben aus dem Kenntnisstand, nicht gegen die Konsole geprüft). `store/screenshots/` enthält außerdem je sechs Rohaufnahmen für iPhone (6,9″ `ios-6.9/`, 6,3″ `ios-6.3/`) und Android-Telefon (`android-phone/`, Rohbestand, nicht hochladen) mit **erfundenen Beispieldaten** (Fake-Server, kein Netzwerk), erzeugt mit `tool/preview/` (siehe `store/screenshots/README.md`). Tablet-Aufnahmen (nicht nötig, solange iPad nicht unterstützt wird; Play verlangt sie nur optional). Für die Veröffentlichung prüfen oder durch eigene ersetzen; Pflichtgrößen siehe oben.
 
 ## 6. Rechtlicher Hinweis zur Lizenz (AGPL-3.0)
 
