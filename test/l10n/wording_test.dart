@@ -33,6 +33,15 @@ void main() {
     expect(bad, isEmpty, reason: 'britische Form in: $bad');
   });
 
+  test('#486: privacy7Rest nennt den Website-Datenspeicher und die Grenzen (iOS, macOS, Android)', () {
+    expect(de.privacy7Rest, contains('auf iOS und macOS auch den übrigen Website-Datenspeicher (z. B. IndexedDB) und dort beim vollständigen Zurücksetzen'));
+    expect(de.privacy7Rest, contains('beendest du die App während der Seite'));
+    expect(de.privacy7Rest, isNot(contains('lässt sich damit nicht vollständig entfernen')));
+    expect(enL.privacy7Rest, contains('on iOS and macOS also the remaining website data store (e.g. IndexedDB) and there on a full reset'));
+    expect(enL.privacy7Rest, contains('If you quit the app while the page is open'));
+    expect(enL.privacy7Rest, isNot(contains('cannot be removed completely')));
+  });
+
   test('#326 D4/D5/D7: deutsche Grammatik', () {
     expect(de.privacy7Rest, contains('technisch nicht zwangsweise löschen'));
     expect(de.privacy7Rest, isNot(contains('nicht erzwungen')));

@@ -25,6 +25,7 @@ import '../data/platform/link_source.dart';
 import '../data/platform/reminder_scheduler.dart';
 import '../data/platform/screen_protection.dart';
 import '../data/platform/vault_key_store.dart';
+import '../data/platform/website_data.dart';
 import '../data/sync/shopping_sync.dart';
 import '../data/sync/task_sync.dart';
 import '../domain/key_value_store.dart';
@@ -247,6 +248,8 @@ Future<void> resetLocalData({
   @visibleForTesting Future<void> Function()? destroyAll,
 }) async {
   await (files ?? SystemFileAccess()).clearTemporary();
+  // Website-Datenspeicher der eingebetteten Ansicht (iOS, macOS; #486): best effort, höchstens `kWebsiteDataTimeout`.
+  await const ChannelWebsiteData().clear();
   if (destroyAll != null) return destroyAll();
   await AppReminderCleanup.cancelAll();
   await AppDatabase.destroy();

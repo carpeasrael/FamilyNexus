@@ -1,6 +1,7 @@
 import AuthenticationServices
 import Cocoa
 import FlutterMacOS
+import WebKit
 
 class MainFlutterWindow: NSWindow {
   /// Anmeldesitzung für Anbieterseiten (#268, E-91); nur auf dem Main-Thread gelesen und geschrieben.
@@ -82,6 +83,13 @@ class MainFlutterWindow: NSWindow {
         let count = max(0, (call.arguments as? Int) ?? 0)
         NSApp.dockTile.badgeLabel = count == 0 ? nil : (count > 99 ? "99+" : String(count))
         result(nil)
+      } else if call.method == "clearWebsiteData" {
+        // Gesamter Website-Datenspeicher der eingebetteten Ansicht (IndexedDB, Service Worker, CacheStorage u. a.;
+        // #486). Das Paket löscht nur Cookies, Cache und localStorage des persistenten Standardspeichers.
+        WKWebsiteDataStore.default().removeData(
+          ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+          modifiedSince: Date(timeIntervalSince1970: 0)
+        ) { result(nil) }
       } else {
         result(FlutterMethodNotImplemented)
       }
