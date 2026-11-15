@@ -13,7 +13,9 @@ name: Release
 #   APPLE_API_KEY_ID          its key ID
 #   APPLE_API_ISSUER_ID       issuer ID (App Store Connect -> Users and Access -> Integrations)
 # Without the Apple secrets the apple job only builds an unsigned DMG (workflow artifact, for testing).
-# Every build job first checks that docs/release-reviews/<version>.md matches the code (skill release-review, E-75). The
+# Every build job first checks that docs/release-reviews/<version>.md matches the code (skill release-review, E-75) and that
+# docs/release-e2e/<version>.md proves a passed E2E test with screenshots on its platform for exactly this code (E-103;
+# apk -> android, flatpak/appimage -> linux, windows -> windows, apple -> ios + macos, web -> web). The
 # check sits in each job, not in a job of its own: the other jobs also run when `apk` was skipped.
 on:
   push:
@@ -33,6 +35,10 @@ on:
         required: false
       skip_review:
         description: Build without a matching release review (only to rebuild an old stand; see tool/check_release_review.sh)
+        type: boolean
+        default: false
+      skip_e2e:
+        description: Build without a matching E2E proof with screenshots for the platform (only to rebuild an old stand; see tool/check_release_e2e.sh)
         type: boolean
         default: false
 
@@ -57,6 +63,10 @@ jobs:
       - name: Check release review
         if: github.event.inputs.skip_review != 'true'
         run: tool/check_release_review.sh
+
+      - name: Check release E2E proof (platform test with screenshots)
+        if: github.event.inputs.skip_e2e != 'true'
+        run: tool/check_release_e2e.sh android
 
       - name: Check signing secrets
         env:
@@ -196,6 +206,10 @@ jobs:
         if: github.event.inputs.skip_review != 'true'
         run: tool/check_release_review.sh
 
+      - name: Check release E2E proof (platform test with screenshots)
+        if: github.event.inputs.skip_e2e != 'true'
+        run: tool/check_release_e2e.sh linux
+
       - name: Check tag matches pubspec version
         run: |
           name=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
@@ -238,6 +252,10 @@ jobs:
       - name: Check release review
         if: github.event.inputs.skip_review != 'true'
         run: tool/check_release_review.sh
+
+      - name: Check release E2E proof (platform test with screenshots)
+        if: github.event.inputs.skip_e2e != 'true'
+        run: tool/check_release_e2e.sh linux
 
       - name: Check tag matches pubspec version
         run: |
@@ -297,6 +315,10 @@ jobs:
       - name: Check release review
         if: github.event.inputs.skip_review != 'true'
         run: tool/check_release_review.sh
+
+      - name: Check release E2E proof (platform test with screenshots)
+        if: github.event.inputs.skip_e2e != 'true'
+        run: tool/check_release_e2e.sh windows
 
       - name: Check tag matches pubspec version
         run: |
@@ -384,6 +406,10 @@ jobs:
       - name: Check release review
         if: github.event.inputs.skip_review != 'true'
         run: tool/check_release_review.sh
+
+      - name: Check release E2E proof (platform test with screenshots)
+        if: github.event.inputs.skip_e2e != 'true'
+        run: tool/check_release_e2e.sh ios macos
 
       - name: Check tag matches pubspec version
         run: |
@@ -532,6 +558,10 @@ jobs:
       - name: Check release review
         if: github.event.inputs.skip_review != 'true'
         run: tool/check_release_review.sh
+
+      - name: Check release E2E proof (platform test with screenshots)
+        if: github.event.inputs.skip_e2e != 'true'
+        run: tool/check_release_e2e.sh web
 
       - name: Check tag matches pubspec version
         run: |
