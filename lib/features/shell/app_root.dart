@@ -27,6 +27,9 @@ class _AppRootState extends State<AppRoot> {
   StreamSubscription<String>? _linkSub;
   bool _wasReady = false;
 
+  /// Es gab im vorigen Aufbau eine Sitzung: Der Übergang zu „keine Sitzung“ ist das Ende einer Sitzung (#450).
+  bool _hadSession = false;
+
   /// Post-Frame der vollständigen Löschung ist eingeplant (einmal je Übergang, #272).
   bool _resetScheduled = false;
 
@@ -91,6 +94,8 @@ class _AppRootState extends State<AppRoot> {
       listenable: Listenable.merge(<Listenable>[services.settings, services.gateway, services.resetting]),
       builder: (context, _) {
         final session = services.gateway.session == SessionState.ready;
+        final sessionEnded = _hadSession && !session;
+        _hadSession = session;
         if (session && services.keepAccountData) {
           WidgetsBinding.instance.addPostFrameCallback((_) => services.sessionConfirmed().ignore());
         }
@@ -136,6 +141,10 @@ class _AppRootState extends State<AppRoot> {
             // Sitzung beendet (Abmelden, Konto wechseln, auf einem anderen Gerät entfernt): Familiendaten vom Gerät.
             if (!session && !services.accountDeletionPending) {
               services.wipeAccountData().catchError((Object e) => AppLog.e('app', 'Lokale Familiendaten nicht gelöscht', e)).ignore();
+              // Nur beim Ende einer Sitzung, nie in der Einrichtung vor der Anmeldung (E-56, #450).
+              if (sessionEnded && !services.keepAccountData) {
+                services.forgetPendingInvite().catchError((Object e) => AppLog.e('app', 'Vorgemerkter Link nicht entfernt', e)).ignore();
+              }
             }
             // Beim Verlassen der Hauptansicht geöffnete Seiten (z. B. Einstellungen) schließen, sonst
             // blieben sie über der Einrichtung stehen. Dialoge der Einrichtung bleiben unberührt.

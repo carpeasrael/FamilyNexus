@@ -172,7 +172,11 @@ Future<AppServices> bootstrap({
     scheduler: scheduler,
     activityPlatform: activity,
     badge: PlatformInfo.isWeb ? null : PlatformAppBadge(),
-    familyDataClaim: (owner) => AppServices.claimFamilyData(database.db, owner, onWiped: scheduler?.cancelAll),
+    familyDataClaim: (owner) async {
+      final wiped = await AppServices.claimFamilyData(database.db, owner, onWiped: scheduler?.cancelAll);
+      // Die Blockierliste ist mit den Familiendaten aus der Ablage entfernt (#450); gezielt auch im Speicher.
+      if (wiped) await settings.update((c) => c.copyWith(blockedUsers: const <String>[]));
+    },
     calendarBuilder: (userId, familyRoom) async {
       final store = SqlEventStore(database.db);
       final zone = await SystemDeviceTimeZone().current();

@@ -21,6 +21,7 @@ import '../data/platform/screen_protection.dart';
 import '../data/platform/store_launcher.dart';
 import '../data/sync/activity_notifier.dart';
 import '../data/sync/presence_sync.dart';
+import '../domain/app_settings.dart';
 import '../domain/data_inventory.dart';
 import '../domain/invite_link.dart';
 import '../domain/server.dart';
@@ -276,8 +277,22 @@ class AppServices {
     final db = database?.db;
     await files.clearTemporary(); // auch bei `keep`: Temp-Dateien sind keine Familiendaten (#141)
     if (keep) return;
-    if (wipe != null) return wipe();
-    if (db != null) await wipeAccountDataIn(db);
+    if (wipe != null) {
+      await wipe();
+    } else if (db != null) {
+      await wipeAccountDataIn(db);
+    }
+    // Die Blockierliste gehört zu den lokalen Familiendaten (#450). Gezielt und ohne Neulesen: `AppRoot` ruft diese
+    // Methode bei jedem Aufbau ohne Sitzung auf, auch in der Einrichtung; ein Neulesen überschriebe dort einen eben
+    // gesetzten Einladungslink. Bei leerer Liste ändert sich nichts und niemand wird benachrichtigt.
+    await settings.update((c) => c.copyWith(blockedUsers: const <String>[]));
+  }
+
+  /// Verwirft den vorgemerkten Einladungslink (Ablage und Speicher). Nur beim Ende einer Sitzung (#450): Der Link
+  /// eines Neulings vor der Anmeldung (E-56) bleibt, er hatte nie eine Sitzung.
+  Future<void> forgetPendingInvite() async {
+    pendingInvite.value = null;
+    await settings.update((c) => c.copyWith(pendingInvite: null));
   }
 
   /// `true`: Das SDK kann die Sitzung beim Start wegen eines eigenen Fehlers gelöscht haben. Das ist kein gewolltes
@@ -315,25 +330,31 @@ class AppServices {
     await SqlTaskStore(db).wipe();
     await SqlEventThemeStore(db).wipe();
     // Bestätigte Erinnerungen gehören zu den Familiendaten (E-87); der Besitzer fällt zuletzt bzw. zugleich.
-    await kv.apply(deletes: <String>[ReminderCoordinator.acknowledgedKey, calendarOwnerKey]);
+    await kv.apply(deletes: <String>[ReminderCoordinator.acknowledgedKey, AppSettings.blockedUsersKey, calendarOwnerKey]);
   }
 
   /// Beansprucht die lokalen Familiendaten für [owner]: Gehörten sie jemand anderem (Nutzer oder Familie), werden sie
   /// vollständig entfernt, damit sich Daten verschiedener Familien nie vermischen (S7). [onWiped] entfernt das, was
   /// zu den gelöschten Daten geplant war. Der Besitzer wird zuletzt geschrieben: Nach einem Fehler löscht der nächste
   /// Aufruf erneut.
-  static Future<void> claimFamilyData(Database db, String owner, {Future<void> Function()? onWiped}) async {
+  ///
+  /// Liefert `true`, wenn Daten einer anderen Familie entfernt wurden; die Blockierliste gehört dazu (#450) und ist
+  /// dann ebenfalls aus der Ablage entfernt (der Aufrufer bereinigt den Speicher der Einstellungen).
+  static Future<bool> claimFamilyData(Database db, String owner, {Future<void> Function()? onWiped}) async {
     final kv = SqlKeyValueStore(db);
     final previous = (await kv.readAll())[calendarOwnerKey];
+    var wiped = false;
     if (previous != null && previous != owner) {
       await SqlEventStore(db).wipe();
       await SqlShoppingStore(db).wipe();
       await SqlTaskStore(db).wipe();
       await SqlEventThemeStore(db).wipe();
-      await kv.delete(ReminderCoordinator.acknowledgedKey);
+      await kv.apply(deletes: <String>[ReminderCoordinator.acknowledgedKey, AppSettings.blockedUsersKey]);
       await onWiped?.call();
+      wiped = true;
     }
     await kv.write(calendarOwnerKey, owner);
+    return wiped;
   }
 
   /// Einstellungsschlüssel: Konto und Familie, denen die lokalen Familiendaten gehören.
