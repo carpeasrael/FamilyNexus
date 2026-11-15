@@ -16,6 +16,7 @@ import 'package:matrix/matrix.dart' show CrossSigningKey, DeviceKeysList, SyncUp
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../support/memory_stores.dart';
+import '../support/sync_requests.dart';
 
 /// #440: Verdrahtung der Identitätsvermerke im Gateway (`_identityOf`, `_persistPins`, `acceptIdentityChange`) gegen
 /// einen nachgestellten Homeserver. Die Hauptschlüssel der Mitglieder setzt der Test im SDK-Client; ohne `local:` im
@@ -103,7 +104,7 @@ class _Hs {
         }
         if (path.endsWith('/filter')) return _json(<String, Object?>{'filter_id': '1'});
         if (path == '/_matrix/client/v3/sync') {
-          if (req.url.queryParameters['set_presence'] == 'offline') return _json(<String, Object?>{'next_batch': 'p'});
+          if (isRejectionPoll(req.url)) return _json(<String, Object?>{'next_batch': 'p'});
           final n = syncs++;
           if (n == 0) return _json(<String, Object?>{'next_batch': 's1', ...firstSync});
           await _hold.future;
