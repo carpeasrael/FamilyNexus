@@ -58,6 +58,9 @@ class AppSettings {
   final AccentChoice accent;
   final List<int> defaultReminderMinutes;
 
+  /// Schlüssel in der Ablage (`settings`); die Liste gehört zu den lokalen Familiendaten und wird mit ihnen gelöscht (#450).
+  static const String blockedUsersKey = 'blockedUsers';
+
   /// Lokal blockierte Matrix-IDs (E-48).
   final List<String> blockedUsers;
 
@@ -121,7 +124,7 @@ class AppSettings {
         'notifyShopping': '$notifyShopping',
         'accent': accent.name,
         'defaultReminders': defaultReminderMinutes.join(','),
-        if (blockedUsers.isNotEmpty) 'blockedUsers': BlockedUsers.encode(blockedUsers),
+        if (blockedUsers.isNotEmpty) blockedUsersKey: BlockedUsers.encode(blockedUsers),
         'pendingInvite': ?pendingInvite,
       };
 
@@ -156,7 +159,7 @@ class AppSettings {
       notifyShopping: m['notifyShopping'] != 'false',
       accent: AccentChoice.values.firstWhere((e) => e.name == m['accent'], orElse: () => d.accent),
       defaultReminderMinutes: m.containsKey('defaultReminders') ? reminders : d.defaultReminderMinutes,
-      blockedUsers: BlockedUsers.parse(m['blockedUsers']),
+      blockedUsers: BlockedUsers.parse(m[blockedUsersKey]),
       pendingInvite: _validInvite(m['pendingInvite']),
     );
   }

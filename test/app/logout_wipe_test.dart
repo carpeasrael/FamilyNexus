@@ -1,5 +1,6 @@
 import 'package:family_nexus/app/app_services.dart';
 import 'package:family_nexus/data/db/app_database.dart';
+import 'package:family_nexus/domain/app_settings.dart';
 import 'package:family_nexus/features/reminders/reminder_coordinator.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -60,5 +61,23 @@ void main() {
     final keys = {for (final r in await db.query('settings')) r['key']};
     expect(keys, isNot(contains(ReminderCoordinator.acknowledgedKey)));
     expect(keys, contains('languageCode'));
+  });
+
+  test('#450 entfernt die Blockierliste, Sprache bleibt', () async {
+    await fill();
+    await db.insert('settings', <String, Object?>{'key': AppSettings.blockedUsersKey, 'value': '["@ben:example.org"]'});
+    await AppServices.wipeAccountDataIn(db);
+    final settings = {for (final r in await db.query('settings')) r['key']: r['value']};
+    expect(settings, isNot(contains(AppSettings.blockedUsersKey)));
+    expect(settings['languageCode'], 'de');
+  });
+
+  test('#450 ohne Besitzer bleibt auch die Blockierliste unangetastet', () async {
+    await fill();
+    await db.delete('settings', where: 'key = ?', whereArgs: <Object>[AppServices.calendarOwnerKey]);
+    await db.insert('settings', <String, Object?>{'key': AppSettings.blockedUsersKey, 'value': '["@ben:example.org"]'});
+    await AppServices.wipeAccountDataIn(db);
+    final keys = {for (final r in await db.query('settings')) r['key']};
+    expect(keys, contains(AppSettings.blockedUsersKey));
   });
 }

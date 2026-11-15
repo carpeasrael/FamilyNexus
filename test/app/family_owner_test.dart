@@ -1,5 +1,6 @@
 import 'package:family_nexus/app/app_services.dart';
 import 'package:family_nexus/data/db/app_database.dart';
+import 'package:family_nexus/domain/app_settings.dart';
 import 'package:family_nexus/features/reminders/reminder_coordinator.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -142,5 +143,51 @@ void main() {
     expect(await has(), isTrue);
     await AppServices.claimFamilyData(db, annaB);
     expect(await has(), isFalse);
+  });
+
+  group('#450 Blockierliste gehört zu den lokalen Familiendaten', () {
+    const annaX = '@anna:example.org|!a:example.org';
+    const benX = '@ben:example.org|!a:example.org';
+
+    Future<void> block() => db.insert('settings', <String, Object?>{'key': AppSettings.blockedUsersKey, 'value': '["@carla:example.org"]'}, conflictAlgorithm: ConflictAlgorithm.replace);
+
+    Future<bool> blocked() async => (await db.query('settings', where: 'key = ?', whereArgs: <Object>[AppSettings.blockedUsersKey])).isNotEmpty;
+
+    test('anderes Konto: Blockierliste weg, Rückgabe true', () async {
+      await own(annaX);
+      await block();
+      expect(await AppServices.claimFamilyData(db, benX), isTrue);
+      expect(await blocked(), isFalse);
+    });
+
+    test('anderer Besitzer (gleiches Konto, andere Familie): Blockierliste weg, Rückgabe true', () async {
+      await own(annaA);
+      await block();
+      expect(await AppServices.claimFamilyData(db, annaB), isTrue);
+      expect(await blocked(), isFalse);
+    });
+
+    test('gleicher Besitzer: Blockierliste bleibt, Rückgabe false', () async {
+      await own(annaA);
+      await block();
+      expect(await AppServices.claimFamilyData(db, annaA), isFalse);
+      expect(await blocked(), isTrue);
+    });
+
+    test('erster Anspruch ohne früheren Besitzer: Blockierliste bleibt, Rückgabe false', () async {
+      await block();
+      expect(await AppServices.claimFamilyData(db, annaA), isFalse);
+      expect(await blocked(), isTrue);
+    });
+
+    test('Wiederholung nach einem Fehler in onWiped löscht erneut, auch die Blockierliste', () async {
+      await own(annaA);
+      await block();
+      await expectLater(AppServices.claimFamilyData(db, annaB, onWiped: () async => throw StateError('Planung')), throwsA(anything));
+      expect(await owner(), annaA, reason: 'Besitzer erst nach erfolgreichem Löschen');
+      await block();
+      expect(await AppServices.claimFamilyData(db, annaB), isTrue);
+      expect(await blocked(), isFalse);
+    });
   });
 }
