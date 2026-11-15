@@ -259,7 +259,7 @@ Umbenennen (Admin), Verlassen, Blockieren einzelner Personen. Entfernen lässt d
 letzte Admin die Gruppe, warnt die App vorher.
 
 ### 8.6 Chat-Oberfläche
-- *Hinweis: Chip-Leiste durch Liste ersetzt (E-100, #423); der Umschalter wäre jetzt über der Gesprächsliste anzuordnen.* Der Chat-Tab zeigt über der Gesprächsleiste den Umschalter **Familie | Kontakte** mit getrennten Abzeichen, nur wenn
+- *Hinweis: Chip-Leiste durch Liste ersetzt (E-100, #423); der Umschalter wäre jetzt über der Gesprächsliste anzuordnen.* Der Chat-Tab zeigt über der Gesprächsliste den Umschalter **Familie | Kontakte** mit getrennten Abzeichen, nur wenn
   Kontakte eingeschaltet sind. Sonst ist der Tab pixelgleich zu 1.2.1. Die fünf Tabs bleiben.
 - Kopfzeile außerhalb der Familie, dauerhaft: „Außerhalb der Familie. Termine, Listen und Online-Status werden hier nicht
   geteilt.“ Eigenes Symbol, abweichender Glasrand; Text und Form tragen die Aussage (WCAG, Concept).
