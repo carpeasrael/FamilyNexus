@@ -1,0 +1,106 @@
+# Code-Testplan der offenen Issues (TP-FN-CODE-OFFEN v01)
+
+Stand: 2026-11-15, `main` + Branch `fix/497-einladung-server-mit-port`, 1.2.3+30. Regel: `CLAUDE.md`, Abschnitt „Abnahme und Schließen (Code-Test)“, Entscheidung E-103.
+
+**Grundsatz:** Ist der Code-Test eines Issues positiv, darf das Issue schließen (PR mit `Closes`, Merge durch den Nutzer). Was nur auf dem Gerät belegbar ist, steht in der Spalte „Plattform-Pflichtschritt“ und wird im Release-Test je Plattform mit Screenshots geführt (`docs/release-e2e/<Version>.md`, Gate in `release.yml`), nicht mehr am Issue.
+
+## Pflichtteil für jedes Issue
+
+| Schritt | Befehl | Erwartung |
+|---|---|---|
+| P-1 | `flutter analyze` | keine Befunde |
+| P-2 | Regressionstest des Issues (Spalte „Code-Test“): ohne Fix rot (Rot-Gegenprobe, z. B. Fix lokal zurücknehmen), mit Fix grün | beide Zustände belegt, Ausgabe im Issue |
+| P-3 | `flutter test` | alles grün, kein bestehender Test abgeschwächt |
+| P-4 | nur bei Matrix-Abläufen: `tool/e2e.sh` (Docker, lokaler Synapse) | alles grün; ein Einzelfall mit Zeitüberschreitung unter Last einzeln wiederholen und beides vermerken |
+| P-5 | nur bei Web: `tool/web_selftest.sh` | grün |
+| P-6 | CI auf dem PR (`dart.yml`) | alle Jobs grün |
+
+Schließen darf das Issue, wenn P-1 bis P-3 (und P-4/P-5 falls zutreffend) und P-6 belegt sind **und** der Regressionstest das beschriebene Verhalten prüft (nicht nur „läuft ohne Fehler“).
+
+Ausgangslage heute: die unten genannten vorhandenen Testdateien und -ordner laufen zusammen mit **946 bestanden, 0 fehlgeschlagen** (`flutter test` auf dem Mac, 2026-11-15). Das belegt nur den Ist-Zustand, nicht die Abnahme eines Issues.
+
+## Gruppe A: Fix liegt vor oder Verhalten ist umgesetzt, Test vorhanden
+
+| Issue | Code-Test (vorhanden) | Lücke / zusätzlich zu schreiben | Plattform-Pflichtschritt (Release-Gate) |
+|---|---|---|---|
+| #497 Einladungslink Server mit Port | `test/domain/invite_link_test.dart`, `test/data/default_account_server_test.dart`, `test/e2e/gateway_registration_e2e_test.dart` (+ P-4) | keine; Commits `ed3e173`, `8b195fb`, `9af5414` auf dem Branch | Beitritt per Link zu einem Server mit Port: iOS, Android |
+| #498 Heute: „Keine Erinnerung geplant“ und „2 fällig“ | `test/features/today_reminders_ui_test.dart` | Regressionstest für den Fall „geplant 0, fällig 2“ (Analyse im Issue, `today_screen.dart:88-89`) | Karte auf „Heute“: iPad, iPhone |
+| #486 Datenspeicher eingebettete Anmeldeseite | `test/features/embedded_browser_page_test.dart`, `test/data/website_data_test.dart`, `test/l10n/wording_test.dart`, `test/store/store_wording_test.dart` | keine (Swift-Teil nicht per Dart prüfbar) | **G-12 iOS und macOS**: Speicher nach Abbruch leer (`AppDelegate.swift`, `MainFlutterWindow.swift`) |
+| #458 Anhang laden hängt | `test/data/attachment_download_test.dart` (+ P-4: Anhang-Download-Test lief grün) | keine | – |
+| #463 Monatszellen Screenreader | `test/features/calendar/month_cell_semantics_test.dart` | keine | TalkBack/VoiceOver: Monatszelle (Android, iOS) |
+| #451 Präsenz im Sync | `test/data/sync_presence_test.dart` | E2E-Test `set_presence` gegen Synapse (fehlt, Bericht Lauf 31) | – |
+| #450 Abmelden löscht Blockierliste/Einladung | `test/app/account_bound_settings_test.dart`, `test/app/logout_wipe_test.dart`, `test/app/family_owner_test.dart` | keine | – |
+| #445 Fehlertext beim Löschen eines Termins | `test/features/event_delete_error_test.dart` | keine | – |
+| #441 Anmeldung matrix.org eingebettet | `test/features/embedded_nav_test.dart`, `embedded_browser_page_test.dart`, `registration_test.dart`, `sign_in_icons_test.dart`, `test/l10n/apple_cancel_hint_test.dart` | keine | **TP-OAUTH-11/-12** echte Anbieterseite (iPhone, Mac, Android); ohne echtes matrix.org-Konto nicht ausführbar, bleibt Release-Pflicht |
+| #422 Avatare | `test/features/avatar_calendar_test.dart`, `avatar_ui_test.dart`, `test/ui/person_color_test.dart`, `test/data/avatar_gateway_test.dart`, `test/l10n/metadata_claims_test.dart` (+ P-4) | – | Avatar-Auswahl: Android, iOS |
+| #423 Gesprächsliste im Chat-Tab | `test/features/chat_test.dart`, `chat_structure_test.dart`, `direct_chat_test.dart`, `chat_send_race_test.dart`, `chat_thread_list_test.dart` (+ P-4) | – | Gespräch bleibt beim Tab-Wechsel: Android, iOS |
+| #424 Farben im Kalender (Themen) | `test/features/event_themes_ui_test.dart`, `test/data/event_theme_sync_test.dart`, `sql_event_theme_store_test.dart` (+ P-4) | Themen-Chips im Termin-Editor unter „Geteilt“ (Befund B2, Lauf 31) als Widget-Test | Chips mit echtem Server: Android, iOS |
+| #381 Benachrichtigung | `test/data/activity_notifications_test.dart`, `activity_notifier_test.dart`, `test/features/activity_settings_test.dart`, `reminder_coordinator_test.dart`, `test/data/local_reminder_scheduler_test.dart` | – | Plan `Testplan_Benachrichtigungen_macOS-iOS.md` je Plattform (Systemdialog, Zustellung); Mac-Teil von Lauf 27 nicht ausgeführt |
+| #350 „App bewerten“ / #351 „App teilen“ | `test/features/settings_recommend_test.dart` | Befund B1: Tap löst auf Android nichts aus; Test, der den Launcher-Aufruf mit der Store-URL belegt | I-03 Android (Play Store öffnet) |
+| #349 Play-Store-Screenshots | `test/store/play_screenshots_test.dart` | – | – |
+| #348 Play-Store-Beschreibung | `test/store/description_test.dart` | – | – |
+| #345 Startbild folgt App-Thema | `test/app/bootstrapper_test.dart` | – | A-01 Mac, iOS: kein heller Blitz im Dunkel-Thema |
+| #332 „Nachricht von dir“ | `test/features/chat_test.dart` | – | Screenreader Android |
+| #326 Text-Audit DE/EN | `test/l10n/wording_test.dart`, `plural_counts_test.dart`, `test/features/presence_label_test.dart`, `sender_name_test.dart` | – | – |
+| #297 Hinweis „iPhone und Mac“ | `test/l10n/apple_cancel_hint_test.dart` | – | – |
+| #274 Anzeige auf Tablets | `test/ui/adaptive_test.dart`, `test/platform/tablet_config_test.dart`, `test/features/shell/adaptive_screens_test.dart`, `test/features/calendar/section_card_test.dart` | Wortumbruch bei Schrift 200 % (Befund B3) | J-04 Schrift 200 % Telefon, iPad |
+| #266 Web: Matrix-Datenbank „memory access out of bounds“ | `tool/web_selftest.sh`, `tool/web_selftest.dart`, `tool/web_smoke.py` (P-5) | – | Web: Start nach Tresor-Anlage mit Screenshot |
+| #142 Identitätsvermerke | `test/data/identity_pins_test.dart`, `local_identity_pins_test.dart`, `account_provider_test.dart` (+ P-4) | Gateway-Verdrahtung `merged(..., local:)` ist #440 | – |
+
+## Gruppe B: Test fehlt, zu schreiben (Rot-Gegenprobe Pflicht)
+
+| Issue | Zu prüfendes Verhalten | Testdatei (neu oder erweitern) | Plattform-Pflichtschritt |
+|---|---|---|---|
+| #501 Statusleisten-Symbole auf hellem Design | `SystemUiOverlayStyle` je App-Thema (`lib/app/app.dart`): hell → dunkle Symbole, dunkel → helle | `test/app/system_overlay_test.dart` (neu): `AnnotatedRegion<SystemUiOverlayStyle>` je Thema | R-07 Android, iOS: Statusleiste lesbar (Screenshot) |
+| #502 Tour: „Let's go“ statt „Überspringen“ | Entscheidung zuerst (Text oder Plan), dann Wortlaut de/en | `test/features/intro_tour_test.dart` (erweitern), `test/l10n/wording_test.dart` | H-03 Tour |
+| #503 „Link zum Store-Eintrag kopiert“ | Wortlaut festlegen (Plan: „Link kopiert“), de/en | `test/features/settings_recommend_test.dart` | I-01 |
+| #506 Profilbild-Dialog schließt nach „Speichern“ nicht | Dialog schließt, Avatar erscheint | `test/features/avatar_ui_test.dart` (erweitern) | D-01 iOS: Dialog schließt |
+| #507 Tour nach erneuter Anmeldung desselben Kontos | Entscheidung (gewollt wegen #450 oder Fehler) in `ENTSCHEIDUNGEN.md`; Test belegt die gewählte Regel | `test/features/intro_tour_test.dart`, `test/app/logout_wipe_test.dart` | H-02 |
+| #508 P-14: Editor-Text statt „nicht gespeichert“ | Entscheidung (Verhalten oder Plan), Test belegt das gewählte | `test/features/event_editor_structure_test.dart` o. ä. | P-14 |
+| #504 Testpflege `ui_tour_test.dart`, `store_screenshots_test.dart` | beide Skripte laufen gegen die aktuelle Oberfläche, nicht abgeschwächt | `integration_test/manual/…`; Desktop-Integrationstests laufen auf Linux-Host nicht (kein clang), auf dem Mac/Simulator ja: `flutter test integration_test/manual/ui_tour_test.dart -d <Simulator>` | Lauf im Release-Test iOS/Android mit Screenshots |
+| #505 Doku #485, „Gesprächsleiste“ | `docs/ENTSCHEIDUNGEN.md` enthält Eintrag zu #485; „Gesprächsleiste“ kommt in `docs/KONTAKTE.md` und `docs/ENTSCHEIDUNGEN.md` nur noch als Verweis auf E-100 vor | `test/store/docs_consistency_test.dart` (neu, Dateisuche) | – |
+| #446 Release Notes nennen Themen, Avatare, Gesprächsliste | `test/store/release_notes_test.dart` (vorhanden, PR #474) | Rot-Gegenprobe im Issue vermerkt | – |
+| #447 Datenschutzerklärung: Kalender-Themen | `test/store/privacy_policy_parity_test.dart`, `privacy_policy_notifications_test.dart` | Test für „Kalender-Themen“ als Datenkategorie (de, en, `privacy2Body`) | – |
+| #448 Flatpak-Metainfo kennt 1.2.3 nicht | `pubspec.yaml`-Version steht als `<release version>` in `flatpak/de.inneso.familynexus.metainfo.xml`; Datum plausibel | `test/store/flatpak_metainfo_test.dart` (neu) | Linux: `appstreamcli validate` (macOS nicht ausführbar) |
+| #449 ARCHITEKTUR.md: Migrationen | Zahl der Migrationen in der Doku = `migrations.length` in `app_database.dart`; `SqlEventThemeStore` genannt | `test/store/docs_consistency_test.dart` | – |
+
+Für #446 bis #449 gilt der Text im Issue (PR #474, `Refs`): Nach neuer Regel genügt der grüne Code-Test, die Store-Texte werden mit der Release-Freigabe veröffentlicht.
+
+## Gruppe C: Sammel-Issues
+
+| Issue | Code-Test | Schließen, wenn |
+|---|---|---|
+| #453 Review-Observations Performance 1.2.3+29 | keiner (alle Urteile ABGELEHNT) | Kommentar belegt, dass kein bestätigter Befund offen ist |
+| #455 Observations Sicherheit | die Tests von #450 und #451 | #450 und #451 geschlossen |
+| #456 Observations Konsistenz | die Tests von #445 bis #449 | #445 bis #449 geschlossen |
+| #254 Features 1.2.2 (Sammel) | `test/features/activity_*`, `chat_*`, `test/data/activity_*` (Pflichtlauf P-1 bis P-3) | alle darin genannten Punkte entweder durch Tests in Gruppe A belegt oder einzeln aufgelistet |
+| #326 Text-Audit (Sammel, siehe Gruppe A) | `wording_test.dart`, `plural_counts_test.dart` | Pflichtlauf grün und im Issue gelistet, welche Texte geprüft sind |
+
+## Gruppe D: Plattform-Fix ohne Dart-Code-Test (Beleg im Release-Gate)
+
+| Issue | Fix / Stand | Code-seitig belegbar | Schließen mit Beleg aus |
+|---|---|---|---|
+| #330 Windows „9+“ am Rand | PR #342 auf `main` (`windows/runner/taskbar_badge.cpp`) | CI-Job `windows` baut den Runner | Release-E2E `windows`: „9+“ bei 100/125/150/200 %, Screenshot |
+| #325 Tests auf Windows: Pfadtrenner, CRLF | `test/support/text_norm_test.dart` | `flutter test` auf Windows-Host (nicht hier ausführbar) | Release-E2E `windows`: Testlauf auf Windows, 0 Fehler |
+| #263 Zeitwähler Windows | `test/features/calendar_flow_test.dart` | Dart-Teil | Release-E2E `windows`: Tastatureingabe der Stunde (physische Tastatur) |
+| #317 App macOS, Linux, Windows | `calendar_flow_test.dart` u. a. | Dart-Teil | Release-E2E `macos`, `linux`, `windows` |
+| #316 Start Performance iPhone | `test/app/bootstrapper_test.dart` | Dart-Teil | Release-E2E `ios`: Startzeit am Release-Build, Screenshot |
+| #144 Screenshots-Schalter | `test/features/settings_secure_screen_hint_test.dart` | Dart-Teil | Release-E2E `windows` (Bildschirmaufnahme), `android` (`FLAG_SECURE` belegt) |
+
+Nach neuer Regel darf ein Issue dieser Gruppe schließen, wenn der Dart-Teil grün ist **und** der zugehörige Plattformschritt im Release-Test als „bestanden“ mit Screenshot im Bericht steht. Ein Issue ohne jeden Code-Test bleibt bis dahin offen (`Refs`).
+
+## Nicht Teil dieses Plans (kein Code-Test möglich oder nicht umgesetzt)
+
+| Issue | Grund |
+|---|---|
+| #15 Prüfkonto vorbereiten | rein manuell: Apple, echte Konten, Testperson |
+| #268 Registrierung über matrix.org | echtes Konto bei matrix.org nötig (verboten ohne Freigabe); Teile in #441 und `invite_onboarding_test.dart` |
+| #273 Android-Hintergrundmeldungen (v1.3) | nur am Gerät belegbar, Milestone v1.3 |
+| #119, #120, #121, #311, #431, #434 (v1.3) | Entwürfe bzw. nicht umgesetzt; Plan erst mit der Umsetzung |
+
+## Durchführung
+
+1. Je Issue läuft der Standardablauf aus `CLAUDE.md` (Schritte 1 bis 6); dieser Plan ersetzt dort nur die Frage „was belegt die Abnahme“.
+2. Testplan-Agent und Tester-Agent bekommen die Zeile des Issues aus diesem Plan als Ausgangspunkt; der Tester meldet je Schritt bestanden/fehlgeschlagen mit Befehl und Ausgabe.
+3. Der Plan wird je Lauf nachgezogen (Spalte „Lücke“ wird zu „vorhanden“); erledigte Zeilen bleiben stehen, bis das Issue geschlossen ist.
+4. Plattform-Pflichtschritte fließen in den Release-Test (`User E2E Test/Release_1.2.3_v01/`) und werden dort mit Screenshots belegt; der Beleg je Plattform steht in `docs/release-e2e/<Version>.md`.

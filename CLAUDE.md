@@ -37,13 +37,15 @@ Erst wenn **beide** `OK` melden: Lösung als Kommentar ins Issue schreiben (Ursa
 ### 6. Auswertung und Abschluss
 
 - Ergebnis selbst analysieren, nicht nur das Fazit des Testers übernehmen.
-- **Erfolgreich:** PR mit `Closes #<nr>` erstellen, CI abwarten, Testergebnis im Issue vermerken. Dann das nächste Issue. Der Merge ist die Review-Entscheidung des Nutzers, Agenten mergen nicht selbst; das Issue schließt sich beim Merge. Ein Issue nie von Hand schließen, solange der Fix nicht auf `main` ist. Baut das nächste Issue auf einem offenen PR auf, den Branch darauf stapeln und das im PR nennen.
+- **Erfolgreich (Code-Test positiv):** PR mit `Closes #<nr>` erstellen, CI abwarten, Testergebnis im Issue vermerken. Dann das nächste Issue. Der Merge ist die Review-Entscheidung des Nutzers, Agenten mergen nicht selbst; das Issue schließt sich beim Merge. Ein Issue nie von Hand schließen, solange der Fix nicht auf `main` ist. Baut das nächste Issue auf einem offenen PR auf, den Branch darauf stapeln und das im PR nennen.
 - **Fehlgeschlagen:** Ursache klären, Fix nachbessern und ab Schritt 5 wiederholen. Ändert sich dabei die Lösung, ab Schritt 2. Auch hier höchstens 5 Iterationen, dann eskalieren.
 
-### Nicht lösbar oder nicht testbar
+### Abnahme und Schließen (Code-Test), nicht Code-testbar (E-103)
 
-- Ein Issue wird nur geschlossen, wenn der Test die Abnahme des Issues wirklich belegt. Was hier nicht ausführbar ist (macOS, iOS, echtes iPhone, Windows, matrix.org, Testperson), gilt als **nicht getestet**, nicht als bestanden.
-- Ist der Code-Teil getestet, aber die Abnahme nur auf dem Zielgerät möglich: Fix mergen (PR mit `Refs #<nr>`, nicht `Closes`), Issue offen lassen und im Kommentar genau benennen, welcher Nachtest fehlt.
+- **Code-Test positiv = Issue darf schließen.** Maßgeblich ist der Code-Testplan des Issues (Kommentar im Issue, Sammelplan `User E2E Test/Codetestplan_Offene_Issues.md`): Regressionstest rot ohne und grün mit dem Fix, `flutter analyze`, `flutter test`, bei Matrix-Abläufen `tool/e2e.sh`. Sind diese Schritte vom Tester-Agenten belegt und die CI grün, kommt der PR mit `Closes #<nr>` und das Issue schließt sich beim Merge. Eine Geräteabnahme ist **keine** Bedingung zum Schließen mehr.
+- **Gerätenachtest wandert ins Release-Gate:** Was nur auf dem Zielgerät belegbar ist (Swift, C++, Systemdialoge, Schriftgrößen, echtes iPhone, Windows, matrix.org), nennt der Kommentar als „Plattform-Pflichtschritt“ und der Release-Test führt ihn je Plattform mit Screenshots. Ohne bestandenen E2E-Beleg mit Screenshots für die Plattform und den Build (`docs/release-e2e/<Version>.md`, `tool/check_release_e2e.sh`) bricht `release.yml` ab. Ein offener Plattform-Pflichtschritt hält also das Release auf, nicht das Issue.
+- Was hier nicht ausführbar ist, gilt weiter als **nicht getestet**, nicht als bestanden: im Code-Testplan als nicht ausführbar vermerken, nie als Beleg zählen. Hat ein Issue **keinen** Code-Test (nur Gerät, Konto, Apple, Testperson), bleibt es offen: PR mit `Refs #<nr>`, Kommentar nennt den fehlenden Beleg.
+- Ein Issue nie von Hand schließen, solange der Fix nicht auf `main` ist. Code-Test und Merge genügen; ein Test, der das Verhalten nicht prüft (nur „läuft ohne Fehler“), zählt nicht.
 - Rein manuelle Punkte werden nicht bearbeitet: Stand im Issue kommentieren, weiter zum nächsten Issue und den Punkt am Ende melden.
 
 ### Grenzen ohne ausdrückliche Freigabe
@@ -56,6 +58,10 @@ Erst wenn **beide** `OK` melden: Lösung als Kommentar ins Issue schreiben (Ursa
 ## Release-Review vor jedem Build und am Sprint-Ende
 
 Vor jedem Build-Release **und am Ende jedes Sprints** (Milestone abgeschlossen) läuft der Skill `release-review`: fünf Agenten (Performance, Qualität, Coding Standards, Sicherheit, Konsistenz) prüfen den App-Code, der Control-Agent prüft ihre Observations nach, bestätigte werden gh-Issues. Ohne passenden Bericht unter `docs/release-reviews/` bricht `release.yml` ab (E-75). Der Skill selbst ist kein Release: Er setzt keine Tags, ändert keine Build-Nummer und startet keinen Build. Bestätigte Issues folgen dem Standardablauf oben.
+
+## E2E-Beleg je Plattform vor jedem Plattform-Build und beim Veröffentlichen
+
+Für **jeden** Build und jedes veröffentlichte Release gehört zu jeder gebauten Plattform ein bestandener E2E-Test mit Screenshots, ausgeführt auf genau diesem Code-Stand (Android, iOS, macOS, Linux, Windows, Web; iOS und macOS zusammen für den Apple-Job). Der Beleg liegt als `docs/release-e2e/<Version>.md` (Format: `docs/release-e2e/README.md`), verweist auf den Testlauf unter `User E2E Test Report/` und nennt mindestens drei Screenshots je Plattform. `tool/check_release_e2e.sh` prüft ihn in jedem Build-Job von `release.yml`; die Build-Nummer gehört zum Fingerabdruck, jeder neue Build braucht einen neuen Lauf. Wer ein Release veröffentlicht, prüft vorher, dass alle Plattformen belegt sind. Das Skript selbst ist kein Release. `skip_e2e` ist nur für den Neubau alter Stände da.
 
 ## Lokale Testumgebung
 
