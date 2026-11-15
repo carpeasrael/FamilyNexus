@@ -54,6 +54,22 @@ void main() {
     // Ehrlich zu den Grenzen: nicht ephemer, nicht vollständig löschbar.
     expect(text, contains('nicht ephemer'));
     expect(text, contains('nicht vollständig löschen'));
+    // #486: Website-Datenspeicher auf iOS/macOS gelöscht; die Grenzen stehen im Wortlaut.
+    expect(text, contains('auf iOS und macOS zusätzlich, soweit WebKit es zulässt, den gesamten Website-Datenspeicher'));
+    expect(text, contains('und dort auch beim vollständigen Zurücksetzen der App'));
+    expect(text, contains('Beendest du die App während der Seite'));
+    expect(text, contains('Unter Android ist die vollständige Löschung am Gerät nicht bestätigt'));
+    expect(text, isNot(contains('bis zum Ende des App-Prozesses')), reason: 'die Reste überdauern das Prozessende (#486)');
+  });
+
+  test('#486: Die englische Erklärung nennt Website-Datenspeicher und Grenzen', () {
+    final text = readNormalized('store/privacy/privacy-policy.en.md').replaceAll(RegExp(r'\s+'), ' ');
+    expect(text, contains('not ephemeral'));
+    expect(text, contains('on iOS and macOS additionally, as far as WebKit allows, the entire website data store'));
+    expect(text, contains('and there also when the app is fully reset'));
+    expect(text, contains('if you quit the app while the page is open'));
+    expect(text, contains('On Android, complete deletion is not confirmed on the device'));
+    expect(text, isNot(contains('until the app process ends')), reason: 'the remnants outlive the process end (#486)');
   });
 
   test('#326 D40: „Einladungslinks“ in den Android-Release-Notes (de-DE)', () {

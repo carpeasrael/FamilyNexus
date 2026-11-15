@@ -216,9 +216,12 @@ embedded view (WebView) inside the app; the page then runs in the process of the
 app, not in a browser. The app shows the host and path of the page but no
 certificate details, and does not allow the page access to the camera, the
 microphone or the location. The app deletes the cookies, cache and local storage of
-this view before loading and when closing it. The data store of the view is not
-ephemeral: further remnants (e.g. IndexedDB or service workers) cannot be deleted
-completely and remain until the app process ends. In case of an error you can
+this view before loading and when closing it, on iOS and macOS additionally, as far as WebKit
+allows, the entire website data store (including IndexedDB and service workers) and there also when
+the app is fully reset. The data store of the view is not ephemeral: if you quit the app while the
+page is open, a remainder stays until the next embedded page (on iOS and macOS also until the full
+reset) and cannot be deleted completely until then. On Android, complete deletion is not
+confirmed on the device. In case of an error you can
 continue the page in the browser; the app then opens it in a sign-in sheet of the
 system (iOS and macOS, ASWebAuthenticationSession; in its standard implementation
 without shared browser data) or, on Android, usually in a Custom Tab of the default

@@ -216,9 +216,12 @@ sie in einer eingebetteten Ansicht (WebView) innerhalb der App; die Seite läuft
 im Prozess der App, nicht in einem Browser. Die App zeigt Host und Pfad der Seite,
 aber keine Zertifikatsdetails, und erlaubt der Seite keinen Zugriff auf Kamera,
 Mikrofon oder Standort. Cookies, Zwischenspeicher und lokalen Speicher dieser
-Ansicht löscht die App vor dem Laden und beim Schließen. Der Datenspeicher der Ansicht
-ist nicht ephemer: Weitere Reste (z. B. IndexedDB oder Service Worker) lassen sich
-nicht vollständig löschen und bleiben bis zum Ende des App-Prozesses bestehen.
+Ansicht löscht die App vor dem Laden und beim Schließen, auf iOS und macOS zusätzlich, soweit WebKit
+es zulässt, den gesamten Website-Datenspeicher (auch IndexedDB und Service Worker) und dort auch
+beim vollständigen Zurücksetzen der App. Der Datenspeicher der Ansicht ist nicht ephemer: Beendest
+du die App während der Seite, bleibt ein Rest bis zur nächsten eingebetteten Seite (auf iOS und
+macOS auch bis zum vollständigen Zurücksetzen) bestehen und lässt sich bis dahin nicht vollständig
+löschen. Unter Android ist die vollständige Löschung am Gerät nicht bestätigt.
 Setzt du die Seite bei einem Fehler im Browser fort, öffnet die App sie dann in einem
 Anmeldefenster des Systems (iOS und macOS, ASWebAuthenticationSession; dessen
 Standardausführung ohne gemeinsame Browserdaten) bzw. auf Android in der Regel

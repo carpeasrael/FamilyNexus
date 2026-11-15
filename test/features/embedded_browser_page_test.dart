@@ -5,7 +5,9 @@ import 'package:family_nexus/app/app_scope.dart';
 import 'package:family_nexus/app/embedded_opener.dart';
 import 'package:family_nexus/data/platform/embedded_auth.dart';
 import 'package:family_nexus/l10n/gen/app_localizations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
 
@@ -243,6 +245,49 @@ void main() {
     await tester.pumpAndSettle();
     expect(calls, 2);
     expect(res, isA<EmbeddedContinueExternally>());
+  });
+
+  group('#486: Website-Datenspeicher (iOS, macOS)', () {
+    const channel = MethodChannel('de.inneso.familynexus/window');
+    late List<bool> loadedAtCall;
+
+    void mockChannel() {
+      loadedAtCall = <bool>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call) async {
+        if (call.method == 'clearWebsiteData') {
+          loadedAtCall.add(FakePlatform.last!.calls.any((c) => c.startsWith('load:')));
+        }
+        return null;
+      });
+    }
+
+    tearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, null);
+    });
+
+    testWidgets('iOS: vor dem Laden und beim Schließen wird der Website-Datenspeicher gelöscht', (tester) async {
+      mockChannel();
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      try {
+        await boot(tester);
+        await open(tester);
+        expect(loadedAtCall, <bool>[false], reason: 'einmal, bevor die Seite geladen wird');
+        await tester.tap(find.byKey(const Key('cancel')));
+        await tester.pumpAndSettle();
+        expect(loadedAtCall, <bool>[false, true], reason: 'ein zweites Mal beim Schließen');
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+    });
+
+    testWidgets('Android: kein Aufruf', (tester) async {
+      mockChannel();
+      await boot(tester);
+      await open(tester);
+      await tester.tap(find.byKey(const Key('cancel')));
+      await tester.pumpAndSettle();
+      expect(loadedAtCall, isEmpty);
+    });
   });
 
   testWidgets('Sperre schliesst die Seite; Abbruchsignal ebenso', (tester) async {

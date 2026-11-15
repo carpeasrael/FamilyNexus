@@ -7,6 +7,7 @@ import '../../app/app_scope.dart';
 import '../../core/app_log.dart';
 import '../../data/platform/browser_launcher.dart';
 import '../../data/platform/embedded_auth.dart';
+import '../../data/platform/website_data.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../lock/app_lock_controller.dart';
 
@@ -82,6 +83,7 @@ enum _Banner { none, problem, loop }
 class _EmbeddedBrowserPageState extends State<EmbeddedBrowserPage> {
   late final WebViewController _c;
   final WebViewCookieManager _cookies = WebViewCookieManager();
+  final ChannelWebsiteData _websiteData = const ChannelWebsiteData();
   late final NavigationLoopGuard _guard = NavigationLoopGuard(clock: widget.clock);
 
   /// Angezeigt wird nur die zuletzt **übernommene** Adresse (`onUrlChange`), nie eine blockierte oder noch
@@ -218,13 +220,15 @@ class _EmbeddedBrowserPageState extends State<EmbeddedBrowserPage> {
     }
   }
 
-  /// Löscht Cookies, Cache und lokalen Speicher. Alle drei Aufrufe starten sofort (solange der Controller lebt);
-  /// der Speicher ist damit nicht vollständig geleert (IndexedDB, sessionStorage, Service Worker: E-102).
+  /// Löscht Cookies, Cache und lokalen Speicher. Alle Aufrufe starten sofort (solange der Controller lebt). Auf
+  /// iOS und macOS löscht ein vierter Aufruf zusätzlich den gesamten Website-Datenspeicher (IndexedDB, Service
+  /// Worker u. a., soweit WebKit es zulässt, #486); sonst bleiben diese Reste (E-102).
   Future<void> _clear() async {
     await Future.wait(<Future<void>>[
       _safe('Cookies', _cookies.clearCookies),
       _safe('Cache', _c.clearCache),
       _safe('Speicher', _c.clearLocalStorage),
+      _safe('Datenspeicher', _websiteData.clear),
     ]);
   }
 

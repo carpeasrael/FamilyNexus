@@ -2,6 +2,7 @@ import AuthenticationServices
 import Flutter
 import UIKit
 import UserNotifications
+import WebKit
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
@@ -101,6 +102,13 @@ import UserNotifications
           UIApplication.shared.applicationIconBadgeNumber = count
         }
         result(nil)
+      } else if call.method == "clearWebsiteData" {
+        // Gesamter Website-Datenspeicher der eingebetteten Ansicht (IndexedDB, Service Worker, CacheStorage u. a.;
+        // #486). Das Paket löscht nur Cookies, Cache und localStorage des persistenten Standardspeichers.
+        WKWebsiteDataStore.default().removeData(
+          ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+          modifiedSince: Date(timeIntervalSince1970: 0)
+        ) { result(nil) }
       } else {
         result(FlutterMethodNotImplemented)
       }
