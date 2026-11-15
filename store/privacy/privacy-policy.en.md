@@ -208,16 +208,25 @@ disclosure of all server logs or backups of your provider.
 
 ## 8. External pages, stores and other providers
 
-With providers that have their own sign-in page, the app opens the page provided by the
-chosen provider for sign-in, account creation, account deletion and password change.
-On iOS and macOS it opens in a sign-in sheet of the system
-(ASWebAuthenticationSession); in its standard implementation without shared
-browser data. On Android it usually opens in a Custom Tab of the
-default browser if that browser offers Custom Tabs (with the cookies of this
-browser), otherwise in the default browser itself; on Linux and Windows in the browser.
-Further services for sign-in, email confirmation or CAPTCHA may be
-involved there. This processing is governed by the notices of the respective
-provider.
+With providers that have their own sign-in page, the app shows the page provided by the
+chosen provider for sign-in, account creation, account deletion and password change
+as well as for terms and CAPTCHA. On iOS, macOS and Android the app shows it in an
+embedded view (WebView) inside the app; the page then runs in the process of the
+app, not in a browser. The app shows the host and path of the page but no
+certificate details, and does not allow the page access to the camera, the
+microphone or the location. The app deletes the cookies, cache and local storage of
+this view before loading and when closing it. The data store of the view is not
+ephemeral: further remnants (e.g. IndexedDB or service workers) cannot be deleted
+completely and remain until the app process ends. In case of an error you can
+continue the page in the browser; the app then opens it in a sign-in sheet of the
+system (iOS and macOS, ASWebAuthenticationSession; in its standard implementation
+without shared browser data) or, on Android, usually in a Custom Tab of the default
+browser if that browser offers Custom Tabs (with the cookies of this browser),
+otherwise in the default browser itself; on Linux and Windows the app always opens
+the page in the browser. Further services for sign-in, email confirmation or CAPTCHA
+may be involved in the view and in the browser; a CAPTCHA loads scripts of a third
+party into the view of the app. This processing is governed by the notices of the
+respective provider.
 
 Invitation links can open the GitHub Pages page
 `https://carpeasrael.github.io/FamilyNexus/join/`. When the page is retrieved,

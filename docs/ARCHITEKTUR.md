@@ -73,12 +73,15 @@ geteilt: Familienraum, privat: nur privater Raum des eigenen Kontos (Geräte-Syn
   `domain/username_suggestion.dart`.
 - Daten: `ServerProbe.registrationOptions`/`oauthIssuer`/`checkUsername`; `SdkMatrixGateway.register`/`continueRegistration`
   (eigene UIA-Schleife, Passwort nur in `_RegistrationSession`), `startOAuth`/`completeOAuth` (SDK-Erweiterungen MSC2964/2966),
-  `setDisplayName`. Plattform (E-91): `BrowserLauncher` (nur https; mit `inApp` in der App, sonst bzw. als Rückfall extern),
+  `setDisplayName`. Plattform (E-91, E-102): `BrowserLauncher` (nur https; mit `inApp` in der App, sonst bzw. als Rückfall extern),
   `WebAuthSession` (iOS/macOS: ASWebAuthenticationSession über den Kanal `de.inneso.familynexus/webauth`), `OAuthRedirect`
-  in drei Arten (`SessionOAuthRedirect` iOS/macOS: Ergebnis der Sitzung; `AppLinkOAuthRedirect` Android: Custom Tab, App-Schema
-  über `OAuthRedirectActivity` → `MainActivity` → `LinkSource`; `LoopbackOAuthRedirect` Linux/Windows: Empfänger auf
+  in vier Arten (`EmbeddedOAuthRedirect` iOS/macOS/Android: eingebettete Ansicht, fängt den Rücksprung ab; die alten Wege sind
+  deren Rückfall und Ausweg: `SessionOAuthRedirect` iOS/macOS: Ergebnis der Sitzung; `AppLinkOAuthRedirect` Android: Custom Tab,
+  App-Schema über `OAuthRedirectActivity` → `MainActivity` → `LinkSource`; `LoopbackOAuthRedirect` Linux/Windows: Empfänger auf
   `127.0.0.1`), gebaut allein von `buildInAppAuth` in `bootstrap()`; `features/onboarding/browser_sign_in.dart` verbindet
-  Gateway und Rücksprung.
+  Gateway und Rücksprung. Eingebettete Ansicht (E-102): `data/platform/embedded_auth.dart` (Opener-Vertrag,
+  `EmbeddedBrowserLauncher`), `features/onboarding/embedded_browser_page.dart` (Seite, `decideNavigation`), `app/embedded_opener.dart`
+  (schiebt die Seite auf `AppServices.navigatorKey`, der je Start in `bootstrap()` entsteht).
 - Einladung vor der Anmeldung: `AppRoot` merkt geprüfte Links in `AppSettings.pendingInvite` vor und stellt sie beim Start
   wieder her; OAuth-Rücksprünge (`AppLinkOAuthRedirect.isCallback`) werden dort nicht als Einladung behandelt.
 
