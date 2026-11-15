@@ -301,6 +301,30 @@ void main() {
     expect(find.textContaining('accounts.google.com'), findsWidgets);
   });
 
+  testWidgets('#485: Hinweis bei Host mit dem Anbieter-Host als Präfix; kein Hinweis bei gleichem Host (Pfad, Port)', (tester) async {
+    await boot(tester);
+    await open(tester);
+    final nav = FakePlatform.last!.nav!;
+    nav.onUrl!(const UrlChange(url: 'https://anbieter.test.example.net/login'));
+    await tester.pump();
+    expect(find.byKey(const Key('foreign')), findsOneWidget, reason: 'ohne Fix: startsWith("anbieter.test") ist wahr, kein Hinweis');
+    expect(tester.widget<Text>(find.byKey(const Key('foreign'))).data, contains('anbieter.test.example.net'), reason: 'der Hinweis nennt den vollen Host');
+    nav.onUrl!(const UrlChange(url: 'https://anbieter.test/andere/seite'));
+    await tester.pump();
+    expect(find.byKey(const Key('foreign')), findsNothing);
+    nav.onUrl!(const UrlChange(url: 'https://anbieter.test:8443/x'));
+    await tester.pump();
+    expect(find.byKey(const Key('foreign')), findsNothing, reason: 'der Port gehört nicht zum Host');
+  });
+
+  testWidgets('#485: hostlose Adresse (about:blank) zeigt weiter den Hinweis', (tester) async {
+    await boot(tester);
+    await open(tester);
+    FakePlatform.last!.nav!.onUrl!(const UrlChange(url: 'about:blank'));
+    await tester.pump();
+    expect(find.byKey(const Key('foreign')), findsOneWidget);
+  });
+
   testWidgets('Unterframe-Blockade zeigt keinen Hinweis; Seite und Banner bleiben unberührt', (tester) async {
     await boot(tester);
     await open(tester);
