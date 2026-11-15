@@ -6,7 +6,14 @@ Aufruf:  python3 tool/preview/compose_store_images.py <Roh-Ordner> <Ausgabe-Ordn
          <Roh-Ordner> enthält <breite>-<sprache>/ (z. B. 1206-de/, 1320-en/).
 Ausgabe: <Ausgabe-Ordner>/<de-DE|en-US>/<breite>x<höhe>/<nn>-<name>.png (PNG, ohne Alpha).
 Apple-Vorgaben (docs/STORE.md): höchstens 10 Bilder je Größe, Text knapp, Motiv mittig, keine Preise/URLs/Auszeichnungen.
+
+Play-Modus: python3 tool/preview/compose_store_images.py --play <Roh-Ordner> [<Ausgabe-Ordner>]
+         <Roh-Ordner> enthält <de|en>/<nr>-<motiv>.png (Ausgabe von tool/preview/decode_shots.py, 1-heute … 7-datenschutz).
+Ausgabe: <Ausgabe-Ordner>/<de-DE|en-US>/phoneScreenshots/<nn>-<name>.png, 1080×1920, PNG RGB ohne Alpha
+         (Standard-Ausgabe: store/screenshots/android). Motive, Reihenfolge und Überschriften: tool/preview/play_captions.json;
+         Überschriften höchstens 2 Zeilen. Der iOS-Modus (ohne --play) bleibt unverändert.
 """
+import json
 import os
 import sys
 
@@ -50,7 +57,13 @@ def wrap(draw, text, font, max_w):
     return lines + [cur]
 
 
-def compose(raw_path, caption, size):
+PLAY_SIZE = (1080, 1920)   # 9:16, innerhalb der Play-Grenzen (320–3840 px, Seitenverhältnis höchstens 2:1)
+PLAY_CAPTIONS = os.path.join(os.path.dirname(__file__), 'play_captions.json')
+REPO_ROOT = os.path.join(os.path.dirname(__file__), '..', '..')
+
+
+def compose(raw_path, caption, size, max_lines=None):
+    """max_lines=None: bisheriges Verhalten (iOS). Sonst wird die Schrift verkleinert, bis die Überschrift in max_lines Zeilen passt."""
     w, h = size
     canvas = gradient(w, h)
     d = ImageDraw.Draw(canvas)
@@ -58,16 +71,24 @@ def compose(raw_path, caption, size):
     while True:   # Schrift verkleinern, bis auch das längste Wort in die Breite passt
         font = ImageFont.truetype(FONT, size_px)
         font.set_variation_by_name('Bold')
-        if max(d.textlength(word, font=font) for word in caption.split()) <= w * 0.86:
+        fits = max(d.textlength(word, font=font) for word in caption.split()) <= w * 0.86
+        if fits and max_lines is not None:
+            fits = len(wrap(d, caption, font, w * 0.86)) <= max_lines
+        if fits:
             break
         size_px -= 2
     lines = wrap(d, caption, font, w * 0.86)
     line_h = round(font.size * 1.18)
     cap_h = round(h * 0.075) + round(w * 0.075 * 1.18) * 2   # feste Höhe, damit alle Bilder gleich aufgebaut sind
     y = round(h * 0.055)
+    if max_lines is not None:   # Play: Überschrift mittig in einem Block aus max_lines Zeilen, Akzentstrich immer an derselben Stelle
+        y0 = y
+        y += round((max_lines - len(lines)) * line_h / 2)
     for line in lines:
         d.text((w / 2, y), line, font=font, fill=(255, 255, 255), anchor='ma')
         y += line_h
+    if max_lines is not None:
+        y = y0 + max_lines * line_h
     d.rounded_rectangle([w / 2 - w * 0.06, y + w * 0.012, w / 2 + w * 0.06, y + w * 0.012 + 8], 4, fill=ACCENT)
 
     shot = Image.open(raw_path).convert('RGB')
@@ -98,5 +119,26 @@ def main(raw_root, out_root):
         print(out, size)
 
 
+def play_shots():
+    with open(PLAY_CAPTIONS, encoding='utf-8') as f:
+        return json.load(f)['shots']
+
+
+def main_play(raw_root, out_root):
+    shots = play_shots()
+    for lang, locale in LOCALES.items():
+        src = os.path.join(raw_root, lang)
+        out = os.path.join(out_root, locale, 'phoneScreenshots')
+        os.makedirs(out, exist_ok=True)
+        for i, shot in enumerate(shots, 1):
+            img = compose(os.path.join(src, shot['raw'] + '.png'), shot[lang], PLAY_SIZE, max_lines=2)
+            img.save(os.path.join(out, f'{i:02d}-{shot["name"]}.png'), optimize=True)
+        print(out, PLAY_SIZE)
+
+
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2])
+    args = sys.argv[1:]
+    if args and args[0] == '--play':
+        main_play(args[1], args[2] if len(args) > 2 else os.path.join(REPO_ROOT, 'store', 'screenshots', 'android'))
+    else:
+        main(args[0], args[1])
