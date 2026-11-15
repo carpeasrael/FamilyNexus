@@ -87,6 +87,8 @@ class _EmbeddedBrowserPageState extends State<EmbeddedBrowserPage> {
   /// Angezeigt wird nur die zuletzt **übernommene** Adresse (`onUrlChange`), nie eine blockierte oder noch
   /// ausstehende.
   String _shown = '';
+  // Nur der Host der angezeigten Adresse (leer bei hostlosen Adressen wie about:blank), für den Fremd-Host-Hinweis (#485).
+  String _shownHost = '';
 
   /// Letzte bekannte Hauptseite: Start-URL, erlaubte Hauptframe-Navigationen und `onPageStarted`. [_mainKey] (ohne
   /// Fragment) dient dem Vergleich bei HTTP-Fehlern, [_mainLoad] ist das Ziel von „Neu laden“.
@@ -120,7 +122,12 @@ class _EmbeddedBrowserPageState extends State<EmbeddedBrowserPage> {
         },
         onUrlChange: (c) {
           final u = Uri.tryParse(c.url ?? '');
-          if (u != null && mounted) setState(() => _shown = '${u.host}${u.path}');
+          if (u != null && mounted) {
+            setState(() {
+              _shown = '${u.host}${u.path}';
+              _shownHost = u.host;
+            });
+          }
         },
         onWebResourceError: (e) {
           if (!(e.isForMainFrame ?? true)) return;
@@ -335,7 +342,7 @@ class _EmbeddedBrowserPageState extends State<EmbeddedBrowserPage> {
             // Immer der vollständige Host (mehrzeilig, nie abgeschnitten).
             Expanded(child: Text(_shown, key: const Key('host'))),
           ]),
-          if (foreign) Text(l.embeddedForeignHost(_shown.split('/').first), key: const Key('foreign')),
+          if (foreign) Text(l.embeddedForeignHost(_shownHost.isEmpty ? _shown.split('/').first : _shownHost), key: const Key('foreign')),
         ]),
       ),
     );
@@ -344,7 +351,8 @@ class _EmbeddedBrowserPageState extends State<EmbeddedBrowserPage> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final foreign = _shown.isNotEmpty && !_shown.startsWith(widget.request.url.host);
+    // Exakter Vergleich der Hosts (kein Präfix): `anbieter.test.example.net` ist nicht `anbieter.test` (#485).
+    final foreign = _shown.isNotEmpty && _shownHost.toLowerCase() != widget.request.url.host.toLowerCase();
     final signIn = widget.request.kind == EmbeddedKind.signIn;
     return PopScope(
       canPop: false,
