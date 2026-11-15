@@ -167,18 +167,25 @@ class _PasswordChangeDialogState extends State<PasswordChangeDialog> {
   Future<void> _openPage(Uri page) async {
     final l = AppLocalizations.of(context);
     final s = AppScope.read(context);
+    // Vor den `await`s lesen: Der Dialog schließt sich gezielt über seine eigene Route (#483). Ein blindes `pop()`
+    // entfernte die eingebettete Seite, die auf demselben Navigator liegt (E-102), statt des Dialogs.
     final navigator = Navigator.of(context);
+    final route = ModalRoute.of(context);
     setState(() {
       _busy = true;
       _error = null;
     });
-    final opened = await s.browser.open(page, inApp: true);
+    final opening = await s.browser.openInApp(page);
     if (!mounted) return;
     setState(() {
       _busy = false;
-      if (!opened) _error = l.accountDeleteNoBrowser;
+      if (!opening.opened) _error = l.accountDeleteNoBrowser;
     });
-    if (opened) navigator.pop();
+    if (!opening.opened) return;
+    // Eingebettete Ansicht und iOS/macOS-Sitzung: bis zum Ende der Seite; Android-Custom-Tab und externer Browser:
+    // sofort (`waited` ist dann `false`), wie bisher.
+    await opening.waited;
+    if (mounted && route != null && route.isActive) navigator.removeRoute(route);
   }
 
   Widget _errorLine(ThemeData theme) => Padding(
