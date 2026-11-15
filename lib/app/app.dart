@@ -92,10 +92,7 @@ class _FamilyNexusAppState extends State<FamilyNexusApp> {
               // Systemleisten passend zum Design: helle Symbole auf dunklem, dunkle auf hellem Grund.
               final dark = Theme.of(context).brightness == Brightness.dark;
               return AnnotatedRegion<SystemUiOverlayStyle>(
-                value: (dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark).copyWith(
-                  statusBarColor: Colors.transparent,
-                  systemNavigationBarColor: Colors.transparent,
-                ),
+                value: overlayStyleFor(dark ? Brightness.dark : Brightness.light),
                 child: DismissKeyboardOnTapOutside(
                   child: AuroraBackground(child: LockGate(child: child ?? const SizedBox.shrink())),
                 ),

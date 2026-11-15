@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../domain/app_settings.dart';
 import 'tokens.dart';
@@ -12,6 +13,14 @@ TextStyle monoStyle(BuildContext context, {double size = 14, Color? color}) =>
       fontFamily: fontMono,
       fontSize: size,
       color: color ?? AuroraTokens.of(context).textPrimary,
+    );
+
+/// Systemleisten passend zum Design: helle Symbole auf dunklem, dunkle auf hellem Grund, Leisten durchsichtig (#501).
+/// Die `AppBar` setzt sonst aus ihrem durchsichtigen Hintergrund helle Symbole und überstimmt `app.dart`.
+SystemUiOverlayStyle overlayStyleFor(Brightness brightness) =>
+    (brightness == Brightness.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark).copyWith(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
     );
 
 ThemeData buildTheme(Brightness brightness, {bool reduceEffects = false, AccentChoice accent = AccentChoice.teal}) {
@@ -36,6 +45,7 @@ ThemeData buildTheme(Brightness brightness, {bool reduceEffects = false, AccentC
       elevation: 0,
       scrolledUnderElevation: 0,
       foregroundColor: t.textPrimary,
+      systemOverlayStyle: overlayStyleFor(brightness),
       titleTextStyle: _display(t, 20),
     ),
     inputDecorationTheme: InputDecorationTheme(
