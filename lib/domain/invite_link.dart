@@ -108,6 +108,15 @@ class InviteLink {
     return !host.contains('.');
   }
 
+  /// [srv] ist der eigene Server im Heimnetz: derselbe Name wie [ownHost] oder derselbe Host mit anderem
+  /// Port (Servername `localhost`, erreichbar unter `localhost:18448`; #497). Ohne [ownHost] nie.
+  static bool _isOwnLocal(String srv, String? ownHost) {
+    if (ownHost == null) return false;
+    if (srv == ownHost) return true;
+    String hostOf(String s) => (s.contains(':') ? s.substring(0, s.lastIndexOf(':')) : s).toLowerCase();
+    return hostOf(srv) == hostOf(ownHost);
+  }
+
   static const List<String> _localSuffixes = <String>['.local', '.lan', '.home.arpa', '.internal', '.box', '.localdomain'];
 
   static final RegExp _viaRe = RegExp(r'^[A-Za-z0-9.\-]{1,253}(:\d{1,5})?$');
@@ -154,7 +163,7 @@ class InviteLink {
     }
     final srv = accountServer ?? inviter.substring(inviter.indexOf(':') + 1);
     if (!_viaRe.hasMatch(srv)) throw ArgumentError('ungültiger Konto-Server');
-    if (isLocalServer(srv) && srv != ownHost) throw ArgumentError('Konto-Server im Heimnetz ist nicht der eigene');
+    if (isLocalServer(srv) && !_isOwnLocal(srv, ownHost)) throw ArgumentError('Konto-Server im Heimnetz ist nicht der eigene');
     if (validity <= Duration.zero || validity > maxValidity) throw ArgumentError('ungültige Gültigkeitsdauer');
     if (!viaMatchesRoom(roomId, via, ownHost: ownHost)) throw ArgumentError('Server passt nicht zum Raum');
     final exp = now.toUtc().add(validity).millisecondsSinceEpoch ~/ 1000;
@@ -256,7 +265,7 @@ class InviteLink {
     final srv = q['srv'];
     if (linkVersion == '3' || linkVersion == '4') {
       if (srv == null || !_viaRe.hasMatch(srv)) return null;
-      if (isLocalServer(srv) && srv != ownHost && !allowLocal) return null;
+      if (isLocalServer(srv) && !_isOwnLocal(srv, ownHost) && !allowLocal) return null;
     }
     var local = false;
     if (!viaMatchesRoom(room, via, ownHost: ownHost)) {

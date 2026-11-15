@@ -1076,6 +1076,20 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
 
   static String _ownHostOf(String userId) => userId.substring(userId.indexOf(':') + 1);
 
+  /// Konto-Server für Einladungslinks, wenn der Servername nicht der Erreichbarkeits-Adresse entspricht
+  /// (#497): Servername `localhost`, erreichbar unter `https://localhost:18448`. Nur für Server im Heimnetz
+  /// mit ausdrücklichem Port ungleich 443 und demselben Host wie das eigene Konto; sonst `null`
+  /// (der Servername aus der Matrix-ID gilt).
+  @visibleForTesting
+  static String? defaultAccountServer(Uri? homeserver, String ownHost) {
+    if (homeserver == null || homeserver.scheme != 'https' || !homeserver.hasPort || homeserver.port == 443 || homeserver.port <= 0) return null;
+    final host = homeserver.host.toLowerCase();
+    final own = (ownHost.contains(':') ? ownHost.substring(0, ownHost.lastIndexOf(':')) : ownHost).toLowerCase();
+    if (host != own) return null;
+    final authority = '$host:${homeserver.port}';
+    return InviteLink.isLocalServer(authority) ? authority : null;
+  }
+
   static String _randomNonce() {
     final r = Random.secure();
     return List<String>.generate(16, (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
