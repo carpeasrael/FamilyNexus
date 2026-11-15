@@ -449,6 +449,7 @@
   "eventDeleteSeriesConfirm": "Delete all occurrences or just this one?",
   "eventDeleteThis": "Only this one",
   "eventDeleteAll": "All",
+  "eventDeleteError": "The event could not be deleted.",
   "eventShareInChat": "Share in chat",
   "eventShared": "Shared in chat",
   "eventOwner": "By {name}",

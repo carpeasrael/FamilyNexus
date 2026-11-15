@@ -126,7 +126,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       }
       nav.pop();
     } catch (err) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err is CalendarException ? l.eventSaveError : errorText(l, err))));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err is CalendarException ? l.eventDeleteError : errorText(l, err))));
     }
   }
 
