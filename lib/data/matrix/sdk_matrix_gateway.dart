@@ -1082,7 +1082,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   /// (der Servername aus der Matrix-ID gilt).
   @visibleForTesting
   static String? defaultAccountServer(Uri? homeserver, String ownHost) {
-    if (homeserver == null || homeserver.scheme != 'https' || !homeserver.hasPort || homeserver.port == 443) return null;
+    if (homeserver == null || homeserver.scheme != 'https' || !homeserver.hasPort || homeserver.port == 443 || homeserver.port <= 0) return null;
     final host = homeserver.host.toLowerCase();
     final own = (ownHost.contains(':') ? ownHost.substring(0, ownHost.lastIndexOf(':')) : ownHost).toLowerCase();
     if (host != own) return null;

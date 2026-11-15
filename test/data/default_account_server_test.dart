@@ -14,6 +14,7 @@ void main() {
   test('kein Port oder Standardport: Servername aus der Matrix-ID gilt', () {
     expect(srv('https://localhost', 'localhost'), isNull);
     expect(srv('https://localhost:443', 'localhost'), isNull);
+    expect(srv('https://localhost:0', 'localhost'), isNull, reason: 'Port 0 ist kein gültiger Port');
   });
 
   test('anderer Host, nicht lokal, kein https, kein Homeserver: null', () {

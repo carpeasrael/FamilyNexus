@@ -336,6 +336,9 @@ void main() {
       // Grenzen: anderer Host, andere IP, ohne eigenen Server bleibt abgelehnt
       expect(() => make('nas:8448'), throwsArgumentError);
       expect(() => make('192.168.0.5'), throwsArgumentError);
+      // Nur ein gleicher Host zählt, kein bloßer Namensanfang
+      expect(() => make('localhost2:1'), throwsArgumentError);
+      expect(() => make('localhost.lan:18448'), throwsArgumentError);
       expect(() => make('localhost:18448', own: null), throwsArgumentError);
       expect(InviteLink.tryParse(s, now: now), isNull, reason: 'ohne eigenen Server nicht still annehmen');
       expect(InviteLink.tryParse(s, now: now, ownHost: 'nas'), isNull);
