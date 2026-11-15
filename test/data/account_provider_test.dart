@@ -13,6 +13,7 @@ import 'package:matrix/matrix.dart' show MatrixSdkDatabase;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../support/memory_stores.dart';
+import '../support/sync_requests.dart';
 
 /// #259, E-90: Die App zeigt die eingegebene Anbieter-Adresse, nicht den über `.well-known` aufgelösten Homeserver.
 const String _me = '@n1:hs.example';
@@ -64,7 +65,7 @@ class _Hs {
         if (failAfterLogin && _loggedIn) return _json(<String, Object?>{'errcode': 'M_UNKNOWN', 'error': 'kaputt'}, 500);
         if (path.endsWith('/filter')) return _json(<String, Object?>{'filter_id': '1'});
         if (path == '/_matrix/client/v3/sync') {
-          if (req.url.queryParameters['set_presence'] == 'offline') return _json(<String, Object?>{'next_batch': 'p'});
+          if (isRejectionPoll(req.url)) return _json(<String, Object?>{'next_batch': 'p'});
           final n = syncs++;
           if (n == 0) return _json(<String, Object?>{'next_batch': 's1'});
           await _hold.future;

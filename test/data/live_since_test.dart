@@ -12,6 +12,7 @@ import 'package:matrix/matrix.dart' show Client, Event, EventStatus, EventStatus
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../support/memory_stores.dart';
+import '../support/sync_requests.dart';
 
 /// #254, E-88: Grundlinie für Meldungen (`liveSince`) mit echtem SDK-Client.
 const String _me = '@n1:hs.example';
@@ -80,7 +81,7 @@ class _Hs {
         }
         if (path.endsWith('/filter')) return _json(<String, Object?>{'filter_id': '1'});
         if (path == '/_matrix/client/v3/sync') {
-          if (req.url.queryParameters['set_presence'] == 'offline') return _json(<String, Object?>{'next_batch': 'p'});
+          if (isRejectionPoll(req.url)) return _json(<String, Object?>{'next_batch': 'p'});
           final n = syncs++;
           if (n == 0) {
             await firstGate.future;
