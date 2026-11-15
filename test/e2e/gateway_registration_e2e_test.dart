@@ -95,7 +95,7 @@ void main() {
       expect(link.familyName, isNull, reason: 'E-79: kein Familienname im Link');
       expect(link.inviterName, 'Erika');
       expect(link.inviterServer, 'localhost', reason: 'Neulinge legen das Konto beim Anbieter des Einladenden an');
-      expect(link.accountServer, 'localhost', reason: 'Der Link nennt den Server für Konto und Anmeldung ausdrücklich (E-63)');
+      expect(link.accountServer, 'localhost:18448', reason: 'Der Link nennt den Server für Konto und Anmeldung ausdrücklich (E-63); der Testserver heißt localhost, ist aber nur unter Port 18448 erreichbar (#497)');
 
       final guest = await _registered('gast', 'Gustav');
       await guest.requestToJoin(link);

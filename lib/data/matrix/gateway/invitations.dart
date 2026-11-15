@@ -317,6 +317,7 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
     final f = _requireFamily();
     if (!Permissions.canInvite(f)) throw const GatewayException(GatewayError.notAllowed);
     final via = f.roomId.substring(f.roomId.indexOf(':') + 1);
+    final ownHost = SdkMatrixGateway._ownHostOf(f.myUserId);
     final now = DateTime.now();
     final nonce = SdkMatrixGateway._randomNonce();
     final String link;
@@ -328,9 +329,9 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
         now: now,
         validity: validity,
         nonce: nonce,
-        ownHost: SdkMatrixGateway._ownHostOf(f.myUserId),
+        ownHost: ownHost,
         inviterName: f.member(f.myUserId)?.displayName,
-        accountServer: accountServer,
+        accountServer: accountServer ?? SdkMatrixGateway.defaultAccountServer(_client?.homeserver, ownHost),
       );
     } on ArgumentError {
       throw const GatewayException(GatewayError.invalidInput);

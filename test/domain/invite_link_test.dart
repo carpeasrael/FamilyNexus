@@ -322,6 +322,25 @@ void main() {
       expect(InviteLink.isLocalServer(c.link!.accountServer), isTrue, reason: 'Oberfläche fragt vor dem Verbinden nach');
     });
 
+    test('#497 Konto-Server im Heimnetz: derselbe Host mit anderem Port ist der eigene', () {
+      String make(String srv, {String? own = 'localhost', String inviter = '@a:localhost', String room = '!a:localhost', String via = 'localhost'}) =>
+          InviteLink.create(roomId: room, via: via, inviter: inviter, now: now, nonce: nonce, ownHost: own, accountServer: srv);
+      final s = make('localhost:18448');
+      expect(InviteLink.tryParse(s, now: now, ownHost: 'localhost')!.accountServer, 'localhost:18448');
+      expect(InviteLink.check(s, now: now).link!.accountServer, 'localhost:18448');
+      expect(InviteLink.isLocalServer('localhost:18448'), isTrue, reason: 'Oberfläche fragt vor dem Verbinden nach');
+      // Groß-/Kleinschreibung des Hosts
+      expect(make('LocalHost:18448'), isNotEmpty);
+      // Servername mit Port, anderer Port desselben Hosts
+      expect(make('localhost:9999', own: 'localhost:8448', inviter: '@a:localhost:8448', room: '!a:localhost:8448', via: 'localhost:8448'), isNotEmpty);
+      // Grenzen: anderer Host, andere IP, ohne eigenen Server bleibt abgelehnt
+      expect(() => make('nas:8448'), throwsArgumentError);
+      expect(() => make('192.168.0.5'), throwsArgumentError);
+      expect(() => make('localhost:18448', own: null), throwsArgumentError);
+      expect(InviteLink.tryParse(s, now: now), isNull, reason: 'ohne eigenen Server nicht still annehmen');
+      expect(InviteLink.tryParse(s, now: now, ownHost: 'nas'), isNull);
+    });
+
     test('TP-INV-04 Namen werden bereinigt und begrenzt; leere Namen entfallen', () {
       final l = InviteLink.tryParse(v3(family: '\u202Egefährlich\u0000 ${'x' * 80}', by: '   '), now: now)!;
       expect(l.familyName!.contains('\u202E'), isFalse);
