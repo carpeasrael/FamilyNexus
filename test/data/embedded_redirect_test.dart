@@ -234,6 +234,41 @@ void main() {
       expect(waited, isTrue);
     });
 
+    test('#484: Seite endet, während der Ausweg noch öffnet: kein StateError, Ausweg zählt nicht, waited bleibt true', () async {
+      final fb = _SlowBrowser();
+      final l = EmbeddedBrowserLauncher(opener, fb);
+      final o = await l.openInApp(page);
+      var waited = false;
+      unawaited(o.waited.then((v) => waited = v));
+      final ext = requests.single.continueExternally();
+      await Future<void>.delayed(Duration.zero);
+      // „Fertig“ in der Seite, solange der Rückfall noch öffnet.
+      results.single.complete(const EmbeddedCancelled());
+      await Future<void>.delayed(Duration.zero);
+      expect(waited, isTrue, reason: 'Seite beendet: waited schließt mit true');
+      fb.opening.complete((opened: true, waited: Future<bool>.value(false)));
+      expect(await ext, isFalse, reason: 'ohne Fix: StateError (Future already completed)');
+      expect(waited, isTrue);
+    });
+
+    test('#484: Ausweg zuerst fertig: waited folgt dem alten Weg (bisheriges Verhalten)', () async {
+      final fb = _SlowBrowser();
+      final l = EmbeddedBrowserLauncher(opener, fb);
+      final o = await l.openInApp(page);
+      var waited = false;
+      unawaited(o.waited.then((v) => waited = v));
+      final ext = requests.single.continueExternally();
+      final session = Completer<bool>();
+      fb.opening.complete((opened: true, waited: session.future));
+      expect(await ext, isTrue);
+      results.single.complete(const EmbeddedContinueExternally());
+      await Future<void>.delayed(Duration.zero);
+      expect(waited, isFalse, reason: 'Seite zu, alter Weg offen');
+      session.complete(true);
+      await Future<void>.delayed(Duration.zero);
+      expect(waited, isTrue);
+    });
+
     test('nicht-https wird abgelehnt', () async {
       final l = EmbeddedBrowserLauncher(opener, FakeBrowser());
       expect((await l.openInApp(Uri.parse('http://x.test/'))).opened, isFalse);
@@ -287,4 +322,12 @@ class _CountingAttempt implements OAuthAttempt {
     cancelled = true;
     if (!_end.isCompleted) _end.complete();
   }
+}
+
+/// Rückfall, dessen `openInApp` an [opening] hängt (der Test bestimmt, wann das Öffnen fertig ist).
+class _SlowBrowser extends FakeBrowser {
+  final Completer<InAppOpening> opening = Completer<InAppOpening>();
+
+  @override
+  Future<InAppOpening> openInApp(Uri uri) => opening.future;
 }

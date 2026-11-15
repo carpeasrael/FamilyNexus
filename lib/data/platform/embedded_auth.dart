@@ -79,6 +79,12 @@ class EmbeddedBrowserLauncher implements BrowserLauncher {
       continueExternally: () async {
         final r = await _fallback.openInApp(uri);
         if (!r.opened) return false;
+        // Die Seite endete schon („Fertig“ während der Rückfall öffnete): `waited` ist abgeschlossen. Der Ausweg
+        // zählt nicht (#484); das externe Fenster ist offen, wird aber nicht mehr überwacht.
+        if (waited.isCompleted) {
+          AppLog.w('browser', 'Seite war schon beendet, Ausweg nicht mehr gewertet');
+          return false;
+        }
         external = true;
         waited.complete(r.waited);
         return true;

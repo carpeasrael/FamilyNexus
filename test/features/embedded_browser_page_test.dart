@@ -197,6 +197,30 @@ void main() {
     expect(find.byKey(const Key('banner')), findsOneWidget);
   });
 
+  testWidgets('#484: „Fertig“, während der Ausweg noch öffnet: danach kein Fehlerbanner', (tester) async {
+    await boot(tester);
+    final pending = Completer<bool>();
+    final (_, handle) = await open(tester, ext: () => pending.future);
+    final nav = FakePlatform.last!.nav!;
+    nav.onResErr!(const WebResourceError(errorCode: -2, description: 'x', isForMainFrame: true));
+    await tester.pump();
+    EmbeddedResult? res;
+    track(handle, (r) => res = r);
+    await tester.tap(find.byKey(const Key('external')));
+    await tester.pump();
+    // Das Löschen beim Schließen hängt: Die Seite bleibt nach „Fertig“ noch (kurz) im Baum.
+    final gate = FakePlatform.last!.clearGate = Completer<void>();
+    await tester.tap(find.byKey(const Key('cancel')));
+    await tester.pump();
+    pending.complete(false);
+    await tester.pump();
+    expect(find.byKey(const Key('cancel')), findsOneWidget, reason: 'Seite noch offen');
+    expect(find.byKey(const Key('open-failed')), findsNothing, reason: 'ohne Fix: Banner trotz „Fertig“');
+    gate.complete();
+    await tester.pumpAndSettle();
+    expect(res, isA<EmbeddedCancelled>());
+  });
+
   testWidgets('Ausweg: false lässt Seite offen (mit Hinweis), Wiederholung true schließt mit continueExternally', (tester) async {
     await boot(tester);
     var ok = false;

@@ -274,7 +274,8 @@ class _EmbeddedBrowserPageState extends State<EmbeddedBrowserPage> {
     }
     if (ok) {
       _finish(const EmbeddedContinueExternally());
-    } else if (mounted) {
+    } else if (mounted && !_done) {
+      // Nach „Fertig“ (`_done`) kein Fehlerbanner mehr: Die Seite schließt gerade (#484).
       setState(() => _openFailed = true);
     }
   }
