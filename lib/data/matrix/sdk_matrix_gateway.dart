@@ -587,6 +587,9 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
       // Vorschaubilder entstehen in reinem Dart; im UI-Isolate fröre die Oberfläche beim Senden ein (#129).
       customImageResizer: resizeImageInBackground,
     );
+    // Der Sync-Loop meldet das Konto nicht als online (#451): Ohne `set_presence` gälte es am Server als online,
+    // auch wenn „Online-Status teilen“ aus ist. Der Familienstatus läuft über Gerätenachrichten (E-38).
+    client.syncPresence = PresenceType.offline;
     _client = client;
     _syncSub = client.onSync.stream.listen((update) {
       _trackLive(client, update);

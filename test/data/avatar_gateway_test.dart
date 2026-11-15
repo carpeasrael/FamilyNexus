@@ -15,6 +15,7 @@ import 'package:matrix/matrix.dart' show SyncUpdate;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../support/memory_stores.dart';
+import '../support/sync_requests.dart';
 
 /// #422, E-101: Avatar als Raumzustand im Gateway (Lesen, Setzen, Änderungsmeldung) und die Freischaltung für
 /// Mitglieder in bestehenden Familien (Lesen vom Server, Wächter, Wiederholung) gegen einen nachgestellten Homeserver.
@@ -144,7 +145,7 @@ class _Hs {
         }
         if (path.endsWith('/filter')) return _json(<String, Object?>{'filter_id': '1'});
         if (path == '/_matrix/client/v3/sync') {
-          if (req.url.queryParameters['set_presence'] == 'offline') return _json(<String, Object?>{'next_batch': 'p'});
+          if (isRejectionPoll(req.url)) return _json(<String, Object?>{'next_batch': 'p'});
           final n = syncs++;
           if (n == 0) return _json(<String, Object?>{'next_batch': 's1', ...firstSync});
           await _hold.future;

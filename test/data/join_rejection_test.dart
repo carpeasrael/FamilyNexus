@@ -1,6 +1,6 @@
 // Ablehnungs-Erkennung des SdkMatrixGateway gegen nachgestellte Serverantworten (#116, #75, E-81).
 // Läuft ohne vodozemac in der CI. Echtzeit mit kurzen Werten statt `fakeAsync`, weil die FFI-Datenbank
-// dort nicht fortschreitet. `set_presence=offline` trennt die Abfragen von der Sync-Schleife des SDK.
+// dort nicht fortschreitet. Der inline übergebene Filter (mit `timeout=0`) trennt die Abfragen von der Sync-Schleife des SDK (`isRejectionPoll`).
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -17,6 +17,7 @@ import 'package:matrix/matrix.dart' show MatrixException, SyncUpdate;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../support/memory_stores.dart';
+import '../support/sync_requests.dart';
 
 const String _me = '@n2:hs.example';
 const String _room = '!familie:hs.example';
@@ -112,7 +113,7 @@ class _Hs {
         if (path == '/_matrix/client/v3/refresh' && onRefresh != null) return onRefresh!;
         if (path.endsWith('/filter')) return _json(<String, Object?>{'filter_id': '1'});
         if (path == '/_matrix/client/v3/sync') {
-          if (req.url.queryParameters['set_presence'] == 'offline') {
+          if (isRejectionPoll(req.url)) {
             polls.add(req);
             return await onPoll(req);
           }
