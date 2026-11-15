@@ -209,16 +209,25 @@ Auskunft über sämtliche Serverprotokolle oder Backups deines Anbieters.
 
 ## 8. Externe Seiten, Stores und weitere Anbieter
 
-Bei Anbietern mit eigener Anmeldeseite öffnet die App für Anmeldung, Kontoanlage,
-Kontolöschung und Passwortänderung die vom gewählten Anbieter bereitgestellte
-Seite. Auf iOS und macOS öffnet die App sie in einem Anmeldefenster des Systems
-(ASWebAuthenticationSession); bei dessen Standardausführung ohne gemeinsame
-Browserdaten. Auf Android öffnet die App sie in der Regel in einem Custom Tab des
-Standardbrowsers, wenn dieser Custom Tabs anbietet (mit den Cookies dieses
-Browsers), sonst im Standardbrowser selbst; auf Linux und Windows im Browser.
-Dort können weitere Dienste für Anmeldung, E-Mail-Bestätigung oder CAPTCHA
-beteiligt sein. Diese Verarbeitung richtet sich nach den Hinweisen des jeweiligen
-Anbieters.
+Bei Anbietern mit eigener Anmeldeseite zeigt die App für Anmeldung, Kontoanlage,
+Kontolöschung und Passwortänderung sowie für Bedingungen und CAPTCHA die vom
+gewählten Anbieter bereitgestellte Seite. Auf iOS, macOS und Android zeigt die App
+sie in einer eingebetteten Ansicht (WebView) innerhalb der App; die Seite läuft dabei
+im Prozess der App, nicht in einem Browser. Die App zeigt Host und Pfad der Seite,
+aber keine Zertifikatsdetails, und erlaubt der Seite keinen Zugriff auf Kamera,
+Mikrofon oder Standort. Cookies, Zwischenspeicher und lokalen Speicher dieser
+Ansicht löscht die App vor dem Laden und beim Schließen. Der Datenspeicher der Ansicht
+ist nicht ephemer: Weitere Reste (z. B. IndexedDB oder Service Worker) lassen sich
+nicht vollständig löschen und bleiben bis zum Ende des App-Prozesses bestehen.
+Setzt du die Seite bei einem Fehler im Browser fort, öffnet die App sie dann in einem
+Anmeldefenster des Systems (iOS und macOS, ASWebAuthenticationSession; dessen
+Standardausführung ohne gemeinsame Browserdaten) bzw. auf Android in der Regel
+in einem Custom Tab des Standardbrowsers, wenn dieser Custom Tabs anbietet (mit den
+Cookies dieses Browsers), sonst im Standardbrowser selbst; auf Linux und Windows
+öffnet die App die Seite immer im Browser. In der Ansicht und im Browser können
+weitere Dienste für Anmeldung, E-Mail-Bestätigung oder CAPTCHA beteiligt sein; ein
+CAPTCHA lädt dabei Skripte eines Drittanbieters in die Ansicht der App. Diese
+Verarbeitung richtet sich nach den Hinweisen des jeweiligen Anbieters.
 
 Einladungslinks können die GitHub-Pages-Seite
 `https://carpeasrael.github.io/FamilyNexus/join/` öffnen. Beim Seitenabruf werden

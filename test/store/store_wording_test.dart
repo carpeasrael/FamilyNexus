@@ -43,11 +43,17 @@ void main() {
     );
   });
 
-  test('#326 D34: Die deutsche Erklärung sagt, wer die Seite öffnet', () {
+  test('#326 D34 (angepasst für #441, E-102): Die deutsche Erklärung sagt, wer die Seite zeigt bzw. öffnet', () {
     final text = readNormalized('store/privacy/privacy-policy.de.md').replaceAll(RegExp(r'\s+'), ' ');
-    expect(text, isNot(contains('öffnet sie')));
-    expect(text, contains('öffnet die App sie in einem Anmeldefenster'));
-    expect(text, contains('öffnet die App sie in der Regel in einem Custom Tab'));
+    expect(text, isNot(contains('öffnet sie')), reason: 'das Subjekt „die App“ muss genannt sein');
+    // Standardweg seit E-102: eingebettete Ansicht in der App, nicht mehr das Anmeldefenster des Systems.
+    expect(text, contains('zeigt die App sie in einer eingebetteten Ansicht'));
+    // Rückfall und „Im Browser fortsetzen“: der alte Weg (E-91) steht weiter in der Erklärung.
+    expect(text, contains('öffnet die App sie dann in einem Anmeldefenster des Systems'));
+    expect(text, contains('in der Regel in einem Custom Tab'));
+    // Ehrlich zu den Grenzen: nicht ephemer, nicht vollständig löschbar.
+    expect(text, contains('nicht ephemer'));
+    expect(text, contains('nicht vollständig löschen'));
   });
 
   test('#326 D40: „Einladungslinks“ in den Android-Release-Notes (de-DE)', () {

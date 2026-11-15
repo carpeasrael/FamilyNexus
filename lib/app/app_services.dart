@@ -69,7 +69,8 @@ class AppServices {
     this.element = const SystemElementLauncher(),
     this.oauthRedirect,
     this.defaultProvider,
-  });
+    GlobalKey<NavigatorState>? navigatorKey,
+  }) : navigatorKey = navigatorKey ?? GlobalKey<NavigatorState>();
 
   final SettingsController settings;
   final ScreenProtection screenProtection;
@@ -96,6 +97,11 @@ class AppServices {
   /// Rücksprung der Anmeldung auf der Anbieterseite (OAuth, E-91); `null` = auf dieser Plattform nicht
   /// verfügbar (Browser-App).
   final OAuthRedirect? oauthRedirect;
+
+  /// Schlüssel des App-Navigators (`MaterialApp.navigatorKey`), je Instanz und nie statisch: Die eingebettete
+  /// Anbieterseite (#441, E-102) wird darauf geschoben. Neue Dienste (nach „Konto löschen“) bringen einen neuen
+  /// Schlüssel mit einem neuen Navigator mit; der alte hat dann keinen `currentState` mehr.
+  final GlobalKey<NavigatorState> navigatorKey;
 
   /// Wird vom Start-Widget gesetzt: löscht alle lokalen Daten und startet neu.
   Future<void> Function()? onFullReset;

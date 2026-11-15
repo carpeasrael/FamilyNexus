@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart' show TargetPlatform;
 import '../../core/app_log.dart';
 import '../matrix/sdk_matrix_gateway.dart';
 import 'browser_launcher.dart';
+import 'embedded_auth.dart';
 import 'link_source.dart';
 import 'web_auth_session.dart';
 
@@ -14,28 +15,36 @@ enum OAuthFlow {
   /// Keine OAuth-Anmeldung (Web-App).
   none,
 
-  /// Anmeldesitzung des Systems (iOS, macOS); der Rücksprung ist ihr Ergebnis.
+  /// Anmeldesitzung des Systems (iOS, macOS); der Rücksprung ist ihr Ergebnis. Seit #441 nur noch Rückfall
+  /// und Ausweg der eingebetteten Ansicht ([embedded]).
   authSession,
 
-  /// Custom Tab (Android, Rückfall extern); Rücksprung über das App-Schema.
+  /// Custom Tab (Android, Rückfall extern); Rücksprung über das App-Schema. Seit #441 nur noch Rückfall und
+  /// Ausweg der eingebetteten Ansicht ([embedded]).
   customTab,
 
   /// Externer Browser, Rücksprung über `127.0.0.1` (Linux, Windows).
   loopback,
+
+  /// Eingebettete WebView in der App (iOS, macOS, Android; #441); Rückfall und Ausweg: der alte Weg.
+  embedded,
 }
 
-/// Ablauf je Plattform (E-91).
+/// Ablauf je Plattform (E-91, E-102): iOS, macOS und Android zeigen die Seite eingebettet, Linux/Windows im
+/// externen Browser, die Web-App meldet nicht über OAuth an. Dies ist der Plattformschalter (Entwicklungszeit).
 OAuthFlow oauthFlowFor({required bool isWeb, required TargetPlatform platform}) {
   if (isWeb) return OAuthFlow.none;
   return switch (platform) {
-    TargetPlatform.iOS || TargetPlatform.macOS => OAuthFlow.authSession,
-    TargetPlatform.android => OAuthFlow.customTab,
+    TargetPlatform.iOS || TargetPlatform.macOS || TargetPlatform.android => OAuthFlow.embedded,
     TargetPlatform.linux || TargetPlatform.windows || TargetPlatform.fuchsia => OAuthFlow.loopback,
   };
 }
 
-/// Empfängt den Rücksprung nach der Anmeldung beim Anbieter (OAuth, E-55, E-91). Drei Arten:
+/// Empfängt den Rücksprung nach der Anmeldung beim Anbieter (OAuth, E-55, E-91, E-102). Vier Arten:
 ///
+/// * [EmbeddedOAuthRedirect] (iOS/macOS/Android, #441): Die Seite öffnet eingebettet in der App und fängt den
+///   Rücksprung ab, ohne ihn auszuführen. Rückfall und Ausweg sind der alte Weg der Plattform (die nächsten
+///   beiden Arten).
 /// * [SessionOAuthRedirect] (iOS/macOS): Die Seite öffnet in einer Anmeldesitzung des Systems; deren
 ///   Ergebnis ist der Rücksprung (`io.github.carpeasrael.familynexus:/oauth`). Eine Sitzung liefert höchstens
 ///   eine Antwort: Ein Rücksprung mit fremdem `state` beendet den Versuch.
@@ -245,6 +254,109 @@ class SessionOAuthRedirect implements OAuthRedirect {
         return true;
       },
     );
+  }
+
+  @override
+  void cancel() => _current?.cancel();
+}
+
+/// Rücksprung in der eingebetteten Ansicht (iOS, macOS, Android; #441). Die Seite fängt den Rücksprung ab;
+/// der alte Weg [_fallback] ([SessionOAuthRedirect] bzw. [AppLinkOAuthRedirect]) dient als Rückfall zur
+/// Aufrufzeit (Opener meldet „nicht verfügbar“) und als Ziel von „Im Browser fortsetzen“ (gleiche
+/// Rücksprungadresse, also derselbe `state`).
+class EmbeddedOAuthRedirect implements OAuthRedirect {
+  EmbeddedOAuthRedirect(this._opener, this._fallback, {this.pumpTimeout = const Duration(minutes: 15)});
+
+  final EmbeddedOpener _opener;
+  final OAuthRedirect _fallback;
+
+  /// Frist der Pumpe (länger als der Zeitablauf von `signInWithBrowser`).
+  final Duration pumpTimeout;
+  _Queue? _current;
+
+  @override
+  Future<OAuthAttempt> prepare() async {
+    _current?.cancel();
+    final cancelPage = Completer<void>();
+    OAuthAttempt? old;
+    late final _Queue q;
+
+    Future<bool> external(Uri url) async {
+      old?.cancel();
+      old = null;
+      final a = await _fallback.prepare();
+      if (q.finished) {
+        a.cancel();
+        return false;
+      }
+      old = a;
+      if (!await a.open(url)) {
+        // Der Versuch des alten Weges ist beendet; ein neuer Ausweg beginnt mit prepare().
+        a.cancel();
+        old = null;
+        return false;
+      }
+      unawaited(_pump(q, a, () => identical(old, a)));
+      return true;
+    }
+
+    q = _Queue(
+      SdkMatrixGateway.oauthMobileRedirect,
+      onClose: () {
+        if (!cancelPage.isCompleted) cancelPage.complete();
+        old?.cancel();
+      },
+      opener: (q, uri) async {
+        final request = EmbeddedRequest(
+          url: uri,
+          redirectUri: q.redirectUri,
+          kind: EmbeddedKind.signIn,
+          cancel: cancelPage,
+          // Immer die Original-Autorisierungs-Adresse (nur so bleibt es derselbe `state`).
+          continueExternally: () => external(uri),
+        );
+        EmbeddedHandle? handle;
+        try {
+          handle = await _opener(request);
+        } catch (e) {
+          AppLog.w('oauth', 'Eingebettete Ansicht nicht verfügbar');
+        }
+        if (handle == null) return external(uri);
+        if (q.finished) {
+          if (!cancelPage.isCompleted) cancelPage.complete();
+          return false;
+        }
+        unawaited(handle.result.then((r) {
+          switch (r) {
+            case EmbeddedCallback(:final uri):
+              q
+                ..add(uri)
+                ..close();
+            case EmbeddedCancelled():
+              q.cancel();
+            case EmbeddedContinueExternally():
+              break;
+          }
+        }));
+        return true;
+      },
+    );
+    return _current = q;
+  }
+
+  /// Leitet die Rücksprünge des alten Weges in die eigene Queue; endet mit [pumpTimeout], mit dem Ende der
+  /// eigenen Queue oder dem Ende des alten Versuchs (`close`, nicht `cancel`: vorhandene Einträge bleiben).
+  /// Leitet die Rücksprünge des alten Weges in [q]. Ein durch einen neuen Ausweg abgelöster Versuch ([isCurrent] ist
+  /// `false`) ist beendet, ohne die gemeinsame Warteschlange zu schließen: Sonst endete mit dem Abbruch des alten
+  /// Versuchs der ganze eingebettete Versuch.
+  Future<void> _pump(_Queue q, OAuthAttempt a, bool Function() isCurrent) async {
+    final deadline = DateTime.now().add(pumpTimeout);
+    while (!q.finished && isCurrent()) {
+      final u = await a.next(deadline: deadline);
+      if (u == null || !isCurrent()) break;
+      q.add(u);
+    }
+    if (isCurrent()) q.close();
   }
 
   @override

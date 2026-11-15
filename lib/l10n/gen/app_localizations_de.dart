@@ -1286,7 +1286,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy1Body =>
-      'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.';
+      'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein. Die App zeigt diese Seite in einer eingebetteten Ansicht (iOS, macOS, Android) oder im Browser (Linux, Windows); die Seite läuft dann im Prozess der App.';
 
   @override
   String get privacy2Title => 'Welche Daten gibt es?';
@@ -1378,7 +1378,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy7Rest =>
-      'Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht zwangsweise löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.';
+      'Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Cookies, Zwischenspeicher und lokalen Speicher der eingebetteten Seite löscht die App beim Schließen; ein Rest des Datenspeichers der Systemansicht (z. B. IndexedDB) lässt sich damit nicht vollständig entfernen. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht zwangsweise löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.';
 
   @override
   String get privacy8Title => 'Kinder';
@@ -2244,7 +2244,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get regCaptchaBody =>
-      'Bitte bestätige auf der Seite des Anbieters kurz, dass du kein Roboter bist. Schließe die Seite danach (auf iPhone, iPad und Mac über „Abbrechen“); es geht hier automatisch weiter.';
+      'Bitte bestätige auf der Seite des Anbieters kurz, dass du kein Roboter bist. Schließe die Seite danach (in der App über „Fertig“, im Browser einfach das Fenster); es geht hier automatisch weiter.';
 
   @override
   String get regCaptchaOpen => 'Seite öffnen';
@@ -3122,7 +3122,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get accountDeleteBrowserWait =>
-      'Bestätige die Löschung auf der Seite des Anbieters, schließe sie (auf iPhone, iPad und Mac über „Abbrechen“) und kehre dann hierher zurück.';
+      'Bestätige die Löschung auf der Seite des Anbieters, schließe sie (in der App über „Fertig“, im Browser einfach das Fenster) und kehre dann hierher zurück.';
 
   @override
   String get accountDeleteOpen => 'Zur Löschseite';
@@ -3316,4 +3316,51 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get eventTypeAvatar => 'Avatar-Wahl';
+
+  @override
+  String get embeddedTitleSignIn => 'Anmeldung beim Anbieter';
+
+  @override
+  String get embeddedTitlePage => 'Seite des Anbieters';
+
+  @override
+  String get embeddedCancel => 'Abbrechen';
+
+  @override
+  String get embeddedDone => 'Fertig';
+
+  @override
+  String get embeddedReload => 'Neu laden';
+
+  @override
+  String get embeddedContinueExternally => 'Im Browser fortsetzen';
+
+  @override
+  String get embeddedDismiss => 'Hinweis schließen';
+
+  @override
+  String get embeddedProblem =>
+      'Die Seite meldet ein Problem oder lässt sich nicht vollständig laden. Du kannst sie neu laden oder im Browser fortsetzen.';
+
+  @override
+  String get embeddedLoopBlocked =>
+      'Die Seite hat sich immer wieder selbst aufgerufen; die App hat das angehalten. Du kannst neu laden oder im Browser fortsetzen.';
+
+  @override
+  String get embeddedOpenFailed =>
+      'Die Seite konnte nicht im Browser geöffnet werden.';
+
+  @override
+  String embeddedForeignHost(String host) {
+    return 'Diese Seite gehört zu einem anderen Anbieter: $host';
+  }
+
+  @override
+  String get embeddedBlocked => 'Dieser Link wurde nicht geöffnet.';
+
+  @override
+  String get embeddedSecure => 'Verbindung über https';
+
+  @override
+  String get embeddedLoading => 'Seite lädt';
 }

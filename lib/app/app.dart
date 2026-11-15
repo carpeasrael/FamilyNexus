@@ -67,6 +67,8 @@ class _FamilyNexusAppState extends State<FamilyNexusApp> {
             // Neue Dienste = neuer Zustand der ganzen Oberfläche: sonst blieben Navigator und Einrichtung der
             // alten Sitzung stehen (nach „Konto löschen“ „Anmelden“ statt „Willkommen“, B-1).
             key: ObjectKey(widget.services),
+            // Für die eingebettete Anbieterseite (#441): je Dienste-Instanz, passend zum `ObjectKey`.
+            navigatorKey: widget.services.navigatorKey,
             onGenerateTitle: (c) => AppLocalizations.of(c).appName,
             debugShowCheckedModeBanner: false,
             locale: s.languageCode == null ? null : Locale(s.languageCode!),

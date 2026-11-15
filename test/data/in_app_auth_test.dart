@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:family_nexus/data/platform/browser_launcher.dart';
+import 'package:family_nexus/data/platform/embedded_auth.dart';
 import 'package:family_nexus/data/platform/in_app_auth.dart';
 import 'package:family_nexus/data/platform/oauth_redirect.dart';
 import 'package:flutter/foundation.dart';
@@ -9,7 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/fake_browser.dart';
 import '../support/fake_links.dart';
 
-/// Ablauf je Plattform und Fabrik `buildInAppAuth` (#268, E-91).
+/// Ablauf je Plattform und Fabrik `buildInAppAuth` (#268, E-91; #441, E-102: iOS, macOS und Android zeigen die
+/// Seite eingebettet, der alte Weg bleibt als Rückfall und Ausweg).
 class _FakeTab implements CustomTabLauncher {
   _FakeTab(this.result);
   final bool result;
@@ -26,9 +28,10 @@ void main() {
   final page = Uri.parse('https://anbieter.test/authorize');
 
   test('oauthFlowFor: Zuordnung je Plattform', () {
-    expect(oauthFlowFor(isWeb: false, platform: TargetPlatform.android), OAuthFlow.customTab);
-    expect(oauthFlowFor(isWeb: false, platform: TargetPlatform.iOS), OAuthFlow.authSession);
-    expect(oauthFlowFor(isWeb: false, platform: TargetPlatform.macOS), OAuthFlow.authSession);
+    // #441, E-102: eingebettete Ansicht statt Anmeldesitzung (iOS, macOS) und Custom Tab (Android).
+    expect(oauthFlowFor(isWeb: false, platform: TargetPlatform.android), OAuthFlow.embedded);
+    expect(oauthFlowFor(isWeb: false, platform: TargetPlatform.iOS), OAuthFlow.embedded);
+    expect(oauthFlowFor(isWeb: false, platform: TargetPlatform.macOS), OAuthFlow.embedded);
     expect(oauthFlowFor(isWeb: false, platform: TargetPlatform.linux), OAuthFlow.loopback);
     expect(oauthFlowFor(isWeb: false, platform: TargetPlatform.windows), OAuthFlow.loopback);
     expect(oauthFlowFor(isWeb: false, platform: TargetPlatform.fuchsia), OAuthFlow.loopback);
@@ -37,8 +40,62 @@ void main() {
     }
   });
 
+  Future<EmbeddedHandle?> noPage(EmbeddedRequest r) async => null;
+
+  for (final p in <TargetPlatform>[TargetPlatform.iOS, TargetPlatform.macOS, TargetPlatform.android]) {
+    test('${p.name}: mit Opener eingebettet, der alte Weg der Plattform bleibt Rückfall', () {
+      final auth = buildInAppAuth(links: FakeLinkSource(), platform: p, isWeb: false, newSession: FakeWebAuthSession.new, embeddedOpener: noPage);
+      expect(auth.browser, isA<EmbeddedBrowserLauncher>());
+      expect(auth.oauthRedirect, isA<EmbeddedOAuthRedirect>());
+    });
+  }
+
+  for (final p in <TargetPlatform>[TargetPlatform.linux, TargetPlatform.windows]) {
+    test('${p.name}: ein übergebener Opener ändert nichts (externer Browser, Loopback)', () {
+      final auth = buildInAppAuth(links: FakeLinkSource(), platform: p, isWeb: false, embeddedOpener: noPage);
+      expect(auth.browser, isA<SystemBrowserLauncher>());
+      expect(auth.oauthRedirect, isA<LoopbackOAuthRedirect>());
+    });
+  }
+
+  test('Web: ein übergebener Opener ändert nichts (keine OAuth-Anmeldung)', () {
+    final auth = buildInAppAuth(links: FakeLinkSource(), platform: TargetPlatform.iOS, isWeb: true, embeddedOpener: noPage);
+    expect(auth.oauthRedirect, isNull);
+    expect(auth.browser, isA<SystemBrowserLauncher>());
+  });
+
+  test('iOS/macOS mit Opener: Rückfall teilt genau eine Sitzung mit Launcher und Rücksprung', () async {
+    var built = 0;
+    final session = FakeWebAuthSession();
+    final auth = buildInAppAuth(
+      links: FakeLinkSource(),
+      platform: TargetPlatform.iOS,
+      isWeb: false,
+      newSession: () {
+        built++;
+        return session;
+      },
+      embeddedOpener: noPage,
+    );
+    expect(built, 1);
+    // Opener meldet „nicht verfügbar“: der Versuch öffnet dieselbe URL über die Sitzung (Rückfall zur Aufrufzeit).
+    final attempt = await auth.oauthRedirect!.prepare();
+    expect(await attempt.open(page), isTrue);
+    expect(session.starts.single.uri, page);
+    attempt.cancel();
+  });
+
+  test('Android mit Opener: Rückfall öffnet im Custom Tab', () async {
+    final tab = _FakeTab(true);
+    final auth = buildInAppAuth(links: FakeLinkSource(), platform: TargetPlatform.android, isWeb: false, customTab: tab, embeddedOpener: noPage);
+    final attempt = await auth.oauthRedirect!.prepare();
+    expect(await attempt.open(page), isTrue);
+    expect(tab.calls, 1);
+    attempt.cancel();
+  });
+
   for (final p in <TargetPlatform>[TargetPlatform.iOS, TargetPlatform.macOS]) {
-    test('${p.name}: genau eine Sitzung, die Launcher und Rücksprung teilen', () {
+    test('${p.name} ohne Opener: genau eine Sitzung, die Launcher und Rücksprung teilen', () {
       var built = 0;
       final session = FakeWebAuthSession();
       final auth = buildInAppAuth(
@@ -58,7 +115,7 @@ void main() {
     });
   }
 
-  test('Android: AppLinkOAuthRedirect; Custom Tab true → kein launch, false → genau ein launch', () async {
+  test('Android ohne Opener: AppLinkOAuthRedirect; Custom Tab true → kein launch, false → genau ein launch', () async {
     for (final (tabResult, launches) in <(bool, int)>[(true, 0), (false, 1)]) {
       final launched = <Uri>[];
       final tab = _FakeTab(tabResult);

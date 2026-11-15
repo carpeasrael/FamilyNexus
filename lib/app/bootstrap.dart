@@ -38,6 +38,7 @@ import '../features/tasks/tasks_controller.dart';
 import '../l10n/gen/app_localizations.dart';
 import 'app_services.dart';
 import 'calendar_factory.dart';
+import 'embedded_opener.dart';
 
 /// Leitet alle unbehandelten Fehler in den redigierenden [AppLog] um, damit
 /// Fehlertexte nicht ungefiltert in logcat landen.
@@ -142,8 +143,10 @@ Future<AppServices> bootstrap({
     rethrow;
   }
   final links = PlatformLinkSource();
-  // Anbieterseiten und Rücksprung der Anmeldung je Plattform (E-91): eine Sitzung für beide.
-  final auth = buildInAppAuth(links: links);
+  // Anbieterseiten und Rücksprung der Anmeldung je Plattform (E-91, E-102): iOS, macOS und Android zeigen sie
+  // eingebettet. Der Navigator-Schlüssel entsteht je Start vor `buildInAppAuth` und gehört danach den Diensten.
+  final navigatorKey = GlobalKey<NavigatorState>();
+  final auth = buildInAppAuth(links: links, embeddedOpener: embeddedOpenerFor(navigatorKey));
   // Browser: keine Erinnerungen (E-53); ohne Scheduler gibt es auch keinen Koordinator.
   final LocalReminderScheduler? scheduler = PlatformInfo.isWeb ? null : LocalReminderScheduler();
   final lang = settings.settings.languageCode ?? WidgetsBinding.instance.platformDispatcher.locale.languageCode;
@@ -219,6 +222,7 @@ Future<AppServices> bootstrap({
     links: links,
     browser: auth.browser,
     oauthRedirect: auth.oauthRedirect,
+    navigatorKey: navigatorKey,
     lock: AppLockController(settings: settings, auth: PlatformInfo.hasNoDeviceAuth ? const UnavailableDeviceAuth() : LocalDeviceAuth()),
     screenProtection: PlatformScreenProtection(),
     database: database,

@@ -1,9 +1,14 @@
 import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/app/embedded_opener.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
+import 'package:family_nexus/data/platform/embedded_auth.dart';
 import 'package:family_nexus/domain/registration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
 
+import '../support/fake_browser.dart';
+import '../support/fake_webview_platform.dart';
 import '../support/registration_form.dart';
 import '../support/test_app.dart';
 
@@ -136,7 +141,7 @@ void main() {
     await _pump(tester, app);
     await _fillAndSubmit(tester);
     expect(find.textContaining('auf der Seite des Anbieters kurz, dass du kein Roboter bist'), findsOneWidget);
-    expect(find.textContaining('(auf iPhone, iPad und Mac über „Abbrechen“)'), findsOneWidget, reason: 'iPad nennen (#297, E-92)');
+    expect(find.textContaining('(in der App über „Fertig“, im Browser einfach das Fenster)'), findsOneWidget, reason: 'eingebettete Ansicht (#441, E-102)');
     await _tap(tester, 'Ich bin fertig');
     expect(find.text('Noch nicht abgeschlossen. Bitte beende die Bestätigung auf der Seite des Anbieters.'), findsOneWidget);
 
@@ -172,6 +177,35 @@ void main() {
     app.browser.finishSession();
     await tester.pumpAndSettle();
     expect(app.gateway.userId, '@emil:fake.test');
+  });
+
+  testWidgets('TP-REG-08d „Kein Roboter“ in der eingebetteten Ansicht (#441): „Fertig“ prüft ohne resumed, resumed während der Seite nicht',
+      (tester) async {
+    final key = GlobalKey<NavigatorState>();
+    final fakeExternal = FakeBrowser();
+    final app = await buildTestApp(
+      loggedIn: false,
+      navigatorKey: key,
+      browserLauncher: EmbeddedBrowserLauncher(embeddedOpenerFor(key), fakeExternal),
+    );
+    WebViewPlatform.instance = FakePlatform();
+    app.server.registrationFlows = <List<String>>[
+      <String>[RegistrationFlows.recaptcha],
+    ];
+    await _pump(tester, app);
+    await _fillAndSubmit(tester);
+    await _tap(tester, 'Seite öffnen');
+    expect(find.byKey(const Key('cancel')), findsOneWidget, reason: 'Seite in der App');
+    expect(find.text('Fertig'), findsOneWidget, reason: 'Kontoseite/Captcha: „Fertig“ statt „Abbrechen“');
+    expect(fakeExternal.opened, isEmpty, reason: 'kein externer Browser');
+    app.server.captchaSolved = true;
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+    expect(app.gateway.userId, isNull, reason: 'keine Prüfung, solange die Seite offen ist');
+    await tester.tap(find.byKey(const Key('cancel')));
+    await tester.pumpAndSettle();
+    expect(app.gateway.userId, '@emil:fake.test', reason: 'Seitenende prüft automatisch');
   });
 
   testWidgets('TP-REG-08c Captcha-Seite öffnet nicht: Hinweis, resumed prüft nicht; erneutes Tippen bzw. Stufenwechsel entfernt ihn',

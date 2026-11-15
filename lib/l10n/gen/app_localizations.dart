@@ -2243,7 +2243,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy1Body.
   ///
   /// In de, this message translates to:
-  /// **'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein.'**
+  /// **'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein. Die App zeigt diese Seite in einer eingebetteten Ansicht (iOS, macOS, Android) oder im Browser (Linux, Windows); die Seite läuft dann im Prozess der App.'**
   String get privacy1Body;
 
   /// No description provided for @privacy2Title.
@@ -2393,7 +2393,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy7Rest.
   ///
   /// In de, this message translates to:
-  /// **'Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht zwangsweise löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.'**
+  /// **'Mit „Konto löschen“ (Einstellungen → Konto) löschst du dein Konto dauerhaft beim Anbieter und danach alle Daten auf diesem Gerät; bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) bestätigst du die Löschung auf dessen Seite. Cookies, Zwischenspeicher und lokalen Speicher der eingebetteten Seite löscht die App beim Schließen; ein Rest des Datenspeichers der Systemansicht (z. B. IndexedDB) lässt sich damit nicht vollständig entfernen. Nachrichten auf Geräten anderer Mitglieder lassen sich technisch nicht zwangsweise löschen. Dein Notfall-Schlüssel ist das einzige Mittel, Nachrichten nach Verlust aller Geräte zu retten – bewahre ihn sicher auf. Kopierst du ihn, versucht die App, die Zwischenablage nach einer Minute zu leeren; bleibst du nicht in der App, kann der Schlüssel dort liegen bleiben – lösche sie dann selbst. Speicherst du ihn als Datei, liegt er unverschlüsselt an dem von dir gewählten Ort.'**
   String get privacy7Rest;
 
   /// No description provided for @privacy8Title.
@@ -3803,7 +3803,7 @@ abstract class AppLocalizations {
   /// No description provided for @regCaptchaBody.
   ///
   /// In de, this message translates to:
-  /// **'Bitte bestätige auf der Seite des Anbieters kurz, dass du kein Roboter bist. Schließe die Seite danach (auf iPhone, iPad und Mac über „Abbrechen“); es geht hier automatisch weiter.'**
+  /// **'Bitte bestätige auf der Seite des Anbieters kurz, dass du kein Roboter bist. Schließe die Seite danach (in der App über „Fertig“, im Browser einfach das Fenster); es geht hier automatisch weiter.'**
   String get regCaptchaBody;
 
   /// No description provided for @regCaptchaOpen.
@@ -3824,7 +3824,7 @@ abstract class AppLocalizations {
   /// **'Noch nicht abgeschlossen. Bitte beende die Bestätigung auf der Seite des Anbieters.'**
   String get regCaptchaNotYet;
 
-  /// Captcha bei der Kontoanlage: Die Seite des Anbieters ließ sich weder in der App noch extern öffnen (#268, E-91).
+  /// Captcha bei der Kontoanlage: Die Seite des Anbieters ließ sich weder in der App noch extern öffnen (#268, E-91, E-102).
   ///
   /// In de, this message translates to:
   /// **'Die Seite konnte nicht geöffnet werden. Bitte versuche es noch einmal.'**
@@ -3998,7 +3998,7 @@ abstract class AppLocalizations {
   /// **'Das ist keine gültige Server-Adresse.'**
   String get familyInviteServerInvalid;
 
-  /// Während der Anmeldung auf der Seite des Anbieters (OAuth; in der App bzw. auf Linux/Windows im Browser, E-91).
+  /// Während der Anmeldung auf der Seite des Anbieters (OAuth; auf iOS, macOS und Android eingebettet in der App, auf Linux/Windows im Browser, E-91, E-102).
   ///
   /// In de, this message translates to:
   /// **'Bitte auf der Seite von {host} fortfahren … Danach geht es hier automatisch weiter.'**
@@ -5219,7 +5219,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleteBrowserWait.
   ///
   /// In de, this message translates to:
-  /// **'Bestätige die Löschung auf der Seite des Anbieters, schließe sie (auf iPhone, iPad und Mac über „Abbrechen“) und kehre dann hierher zurück.'**
+  /// **'Bestätige die Löschung auf der Seite des Anbieters, schließe sie (in der App über „Fertig“, im Browser einfach das Fenster) und kehre dann hierher zurück.'**
   String get accountDeleteBrowserWait;
 
   /// No description provided for @accountDeleteOpen.
@@ -5575,6 +5575,90 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Avatar-Wahl'**
   String get eventTypeAvatar;
+
+  /// Titel der eingebetteten Seite bei der Anmeldung (#441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Anmeldung beim Anbieter'**
+  String get embeddedTitleSignIn;
+
+  /// Titel der eingebetteten Seite für Kontoseiten und Captcha (#441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Seite des Anbieters'**
+  String get embeddedTitlePage;
+
+  /// Schaltfläche der eingebetteten Seite bei der Anmeldung: beendet den Versuch (#441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Abbrechen'**
+  String get embeddedCancel;
+
+  /// Schaltfläche der eingebetteten Seite für Kontoseiten und Captcha: schließt die Seite (#441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Fertig'**
+  String get embeddedDone;
+
+  /// Schaltfläche im Hinweis der eingebetteten Seite: lädt die zuletzt bekannte Seite neu (#441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Neu laden'**
+  String get embeddedReload;
+
+  /// Schaltfläche im Hinweis der eingebetteten Seite: öffnet dieselbe Seite im Browser bzw. in der Systemsitzung (#441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Im Browser fortsetzen'**
+  String get embeddedContinueExternally;
+
+  /// Tooltip des Schließen-Knopfs im Hinweis der eingebetteten Seite (#441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Hinweis schließen'**
+  String get embeddedDismiss;
+
+  /// Neutraler Hinweis über der eingebetteten Seite bei HTTP- oder Ladefehlern (#441, E-102); die Seite bleibt sichtbar.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Seite meldet ein Problem oder lässt sich nicht vollständig laden. Du kannst sie neu laden oder im Browser fortsetzen.'**
+  String get embeddedProblem;
+
+  /// Hinweis über der eingebetteten Seite, wenn der Schleifenschutz eine wiederholte Navigation blockierte (#441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Die Seite hat sich immer wieder selbst aufgerufen; die App hat das angehalten. Du kannst neu laden oder im Browser fortsetzen.'**
+  String get embeddedLoopBlocked;
+
+  /// Hinweis im Banner der eingebetteten Seite, wenn „Im Browser fortsetzen“ scheiterte (#441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Die Seite konnte nicht im Browser geöffnet werden.'**
+  String get embeddedOpenFailed;
+
+  /// Neutraler Hinweis, wenn der Host der eingebetteten Seite vom Anbieter der Anmeldung abweicht (z. B. Anmeldung über einen Fremdanbieter; #441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Seite gehört zu einem anderen Anbieter: {host}'**
+  String embeddedForeignHost(String host);
+
+  /// Kurzer Hinweis, wenn die eingebettete Seite eine Navigation nicht erlaubte (z. B. http oder unbekanntes Schema; #441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Link wurde nicht geöffnet.'**
+  String get embeddedBlocked;
+
+  /// Beschriftung (Semantik) des Schloss-Symbols vor dem Host der eingebetteten Seite (#441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Verbindung über https'**
+  String get embeddedSecure;
+
+  /// Beschriftung (Semantik) der Ladeanzeige der eingebetteten Seite (#441, E-102).
+  ///
+  /// In de, this message translates to:
+  /// **'Seite lädt'**
+  String get embeddedLoading;
 }
 
 class _AppLocalizationsDelegate

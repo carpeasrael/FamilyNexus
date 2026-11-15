@@ -28,11 +28,13 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `url_launcher` | direct main | 6.3.3 | 2026-10-02 | bsd-3-clause | 160 | ok |
 | `uuid` | direct main | 4.6.0 | 2026-07-15 | mit | 160 | ok |
 | `web` | direct main | 1.1.1 | — | bsd-3-clause | — | Browser: WebCrypto, Web Locks (E-53), vorher nur transitiv |
+| `webview_flutter` | direct main | 4.14.1 | 2026-07-07 | bsd-3-clause | 160 | Eingebettete Anmeldeseite auf iOS, macOS und Android (#441, E-102); nicht per Skript erzeugt |
 | `flutter_lints` | direct dev | 6.0.0 | 2025-05-27 | bsd-3-clause | 160 | ok |
 | `flutter_test` | direct dev | 0.0.0 | — | — | — | SDK/lokal |
 | `integration_test` | direct dev | 0.0.0 | — | — | — | SDK/lokal |
 | `path_provider` | direct dev | 2.1.6 | 2026-06-15 | bsd-3-clause | 160 | ok |
 | `vodozemac` | direct dev | 0.9.0 | 2026-10-19 | agpl-3.0 | 150 | ok |
+| `webview_flutter_platform_interface` | direct dev | 2.15.1 | 2026-03-25 | bsd-3-clause | 150 | Fake-Plattform im Test (#441); nicht per Skript erzeugt |
 | `android_file_picker` | transitive | 2.1.1 | 2026-10-15 | mit | 160 | ok |
 | `archive` | transitive | 4.5.2 | 2026-10-13 | mit | 160 | ok |
 | `args` | transitive | 2.7.0 | 2025-03-12 | bsd-3-clause | 150 | ok |
@@ -140,6 +142,8 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `web` | transitive | 1.1.1 | 2025-02-26 | bsd-3-clause | 150 | ok |
 | `webdriver` | transitive | 3.2.0 | 2026-09-09 | apache-2.0 | 130 | ok |
 | `webrtc_interface` | transitive | 1.5.1 | 2026-03-16 | mit | 130 | ok |
+| `webview_flutter_android` | transitive | 4.14.1 | 2026-08-28 | bsd-3-clause | 160 | über `webview_flutter` (#441); nicht per Skript erzeugt |
+| `webview_flutter_wkwebview` | transitive | 3.27.2 | 2026-10-20 | bsd-3-clause | 160 | über `webview_flutter` (#441); nicht per Skript erzeugt |
 | `win32` | transitive | 6.4.0 | 2026-08-05 | bsd-3-clause | 160 | ok |
 | `windows_file_picker` | transitive | 2.0.1 | 2026-10-06 | mit | 160 | ok |
 | `xdg_directories` | transitive | 1.1.0 | 2024-10-04 | bsd-3-clause | 160 | ok |

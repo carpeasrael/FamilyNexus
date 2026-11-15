@@ -9,9 +9,12 @@ import 'web_auth_session.dart';
 /// wenn die Plattform das Ende der Seite meldet (iOS/macOS: Sitzung endet), sonst sofort mit `false`.
 typedef InAppOpening = ({bool opened, Future<bool> waited});
 
-/// Öffnet Seiten des Anbieters (Anmeldung, Kontoanlage, Bedingungen, Captcha, Kontoseiten; E-55, E-91):
+/// Öffnet Seiten des Anbieters (Anmeldung, Kontoanlage, Bedingungen, Captcha, Kontoseiten; E-55, E-91, E-102):
 /// mit `inApp` in der App (iOS/macOS: Anmeldesitzung des Systems, Android: Custom Tab des Standardbrowsers),
-/// sonst bzw. als Rückfall extern im Standardbrowser. Nie in einer eingebetteten WebView.
+/// sonst bzw. als Rückfall extern im Standardbrowser. [SystemBrowserLauncher] zeigt keine Seite selbst in einer
+/// WebView. Seit #441 ist er auf iOS, macOS und Android der alte Weg, den [EmbeddedBrowserLauncher]
+/// (`embedded_auth.dart`) als Rückfall und für „Im Browser fortsetzen“ benutzt; die eingebettete Ansicht
+/// selbst liegt in `features/onboarding/embedded_browser_page.dart`.
 ///
 /// Nur https-Adressen ohne Zugangsdaten; alles andere wird verweigert. Gibt `false` zurück, wenn sich keine
 /// Seite öffnen ließ.

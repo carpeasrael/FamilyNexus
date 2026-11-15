@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:family_nexus/app/app_services.dart';
 import 'package:family_nexus/app/calendar_factory.dart';
+import 'package:family_nexus/data/platform/browser_launcher.dart';
 import 'package:family_nexus/data/platform/file_access.dart';
 import 'package:family_nexus/data/platform/oauth_redirect.dart';
 import 'package:family_nexus/data/platform/screen_protection.dart';
@@ -19,6 +20,7 @@ import 'package:family_nexus/features/lock/app_lock_controller.dart';
 import 'package:family_nexus/features/settings/settings_controller.dart';
 import 'package:family_nexus/features/shopping/shopping_controller.dart';
 import 'package:family_nexus/features/tasks/tasks_controller.dart';
+import 'package:flutter/widgets.dart' show GlobalKey, NavigatorState;
 
 import 'fake_browser.dart';
 import 'fake_device_auth.dart';
@@ -123,6 +125,10 @@ Future<TestApp> buildTestApp({
   AppBadge? badge,
   // Test: eigener Rücksprung statt des Fakes (z. B. `SessionOAuthRedirect`, #268). `TestApp.oauth` bleibt der Fake.
   OAuthRedirect? oauthRedirect,
+  // Test: eigener Öffner für Anbieterseiten statt des Fakes (z. B. `EmbeddedBrowserLauncher`, #441) und der
+  // zugehörige Navigator-Schlüssel der Dienste. `TestApp.browser` bleibt der Fake.
+  BrowserLauncher? browserLauncher,
+  GlobalKey<NavigatorState>? navigatorKey,
   // Test: „App bewerten“ (#350). Standard: Android-Gerät mit Play Store.
   FakeStoreLauncher? storeLauncher,
   // Test: Einführungstour (#347). Standard: schon gesehen, damit sie Abläufe nach der Einrichtung nicht überdeckt.
@@ -178,7 +184,8 @@ Future<TestApp> buildTestApp({
     badge: badge,
     mail: mail,
     store: storeFake,
-    browser: browser,
+    browser: browserLauncher ?? browser,
+    navigatorKey: navigatorKey,
     element: element,
     oauthRedirect: oauthRedirect ?? oauth,
     // Standard-Anbieter ist im Test der Fake-Server (statt matrix.org), außer ein Test will den echten Standard.

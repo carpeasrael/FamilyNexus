@@ -10,12 +10,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/test_app.dart';
 
-/// Symbole der Schaltflächen, die eine Seite des Anbieters öffnen (#430, E-91): In der Sitzung der App (iOS, macOS,
-/// Android) kein „extern öffnen“, im externen Browser (Linux, Windows, Web) schon.
+/// Symbole der Schaltflächen, die eine Seite des Anbieters öffnen (#430, E-91; #441, E-102): In der App (eingebettet
+/// auf iOS, macOS, Android) kein „extern öffnen“, im externen Browser (Linux, Windows, Web) schon.
 void main() {
   group('providerPageIconFor', () {
     test('Sitzung der App: eigenes Symbol', () {
-      for (final flow in <OAuthFlow>[OAuthFlow.authSession, OAuthFlow.customTab]) {
+      for (final flow in <OAuthFlow>[OAuthFlow.embedded, OAuthFlow.authSession, OAuthFlow.customTab]) {
         expect(providerPageIconFor(flow, Icons.login), Icons.login, reason: '$flow');
       }
     });

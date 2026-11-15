@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import '../../../data/platform/oauth_redirect.dart';
 import '../../../ui/theme/tokens.dart';
 
-/// Symbol für eine Schaltfläche, die eine Seite des Anbieters öffnet (#430, E-91). Öffnet die Seite in der
-/// Sitzung der App (iOS/macOS-Anmeldesitzung, Android-Custom-Tab), steht [inSession]; nur dort, wo wirklich der
-/// externe Browser öffnet (Linux, Windows, Web), bleibt „extern öffnen“.
+/// Symbol für eine Schaltfläche, die eine Seite des Anbieters öffnet (#430, E-91, E-102). Öffnet die Seite in der
+/// App (eingebettete Ansicht auf iOS, macOS und Android), steht [inSession]; nur dort, wo wirklich der externe
+/// Browser öffnet (Linux, Windows, Web), bleibt „extern öffnen“.
 IconData providerPageIcon(BuildContext context, IconData inSession) =>
     providerPageIconFor(oauthFlowFor(isWeb: kIsWeb, platform: Theme.of(context).platform), inSession);
 
 /// Wie [providerPageIcon], aber mit gegebenem Ablauf (für Tests).
 IconData providerPageIconFor(OAuthFlow flow, IconData inSession) => switch (flow) {
-      OAuthFlow.authSession || OAuthFlow.customTab => inSession,
+      OAuthFlow.embedded || OAuthFlow.authSession || OAuthFlow.customTab => inSession,
       OAuthFlow.loopback || OAuthFlow.none => Icons.open_in_new,
     };
 

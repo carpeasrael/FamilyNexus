@@ -1275,7 +1275,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy1Body =>
-      'FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. The operator of the provider you chose (Matrix server) is responsible for processing on the server; you can see it during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that have their own sign-in page (e.g. matrix.org) you enter these details directly on their page.';
+      'FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. The operator of the provider you chose (Matrix server) is responsible for processing on the server; you can see it during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that have their own sign-in page (e.g. matrix.org) you enter these details directly on their page. The app shows this page in an embedded view (iOS, macOS, Android) or in the browser (Linux, Windows); the page then runs in the app’s process.';
 
   @override
   String get privacy2Title => 'What data exists?';
@@ -1366,7 +1366,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy7Rest =>
-      '“Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that have their own sign-in page (e.g. matrix.org) you confirm the deletion on their page. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.';
+      '“Delete account” (Settings → Account) permanently deletes your account at the provider and then all data on this device; with providers that have their own sign-in page (e.g. matrix.org) you confirm the deletion on their page. The app deletes the cookies, cache and local storage of the embedded page when it closes; a remainder of the system view’s data store (e.g. IndexedDB) cannot be removed completely. Messages on other members’ devices cannot be forcibly deleted. Your emergency key is the only way to recover messages after losing all devices – keep it safe. If you copy it, the app tries to clear the clipboard after one minute; if you do not stay in the app, the key may remain there – clear it yourself then. If you save it as a file, it is stored unencrypted in the location you chose.';
 
   @override
   String get privacy8Title => 'Children';
@@ -2226,7 +2226,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regCaptchaBody =>
-      'Please confirm briefly on the provider’s page that you are not a robot. Then close the page (on iPhone, iPad and Mac with “Cancel”); you continue here automatically.';
+      'Please confirm briefly on the provider’s page that you are not a robot. Then close the page (in the app with “Done”, in the browser simply the window); you continue here automatically.';
 
   @override
   String get regCaptchaOpen => 'Open page';
@@ -3100,7 +3100,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountDeleteBrowserWait =>
-      'Confirm the deletion on the provider’s page, close it (on iPhone, iPad and Mac with “Cancel”) and then come back here.';
+      'Confirm the deletion on the provider’s page, close it (in the app with “Done”, in the browser simply the window) and then come back here.';
 
   @override
   String get accountDeleteOpen => 'Open deletion page';
@@ -3294,4 +3294,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventTypeAvatar => 'Avatar choice';
+
+  @override
+  String get embeddedTitleSignIn => 'Sign in with the provider';
+
+  @override
+  String get embeddedTitlePage => 'Provider’s page';
+
+  @override
+  String get embeddedCancel => 'Cancel';
+
+  @override
+  String get embeddedDone => 'Done';
+
+  @override
+  String get embeddedReload => 'Reload';
+
+  @override
+  String get embeddedContinueExternally => 'Continue in the browser';
+
+  @override
+  String get embeddedDismiss => 'Dismiss notice';
+
+  @override
+  String get embeddedProblem =>
+      'The page reports a problem or cannot be loaded completely. You can reload it or continue in the browser.';
+
+  @override
+  String get embeddedLoopBlocked =>
+      'The page kept loading itself again and again; the app stopped that. You can reload or continue in the browser.';
+
+  @override
+  String get embeddedOpenFailed =>
+      'The page could not be opened in the browser.';
+
+  @override
+  String embeddedForeignHost(String host) {
+    return 'This page belongs to a different provider: $host';
+  }
+
+  @override
+  String get embeddedBlocked => 'This link was not opened.';
+
+  @override
+  String get embeddedSecure => 'Connection over https';
+
+  @override
+  String get embeddedLoading => 'Page is loading';
 }

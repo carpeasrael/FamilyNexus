@@ -44,7 +44,7 @@ void main() {
       expect(notes.length, lessThanOrEqualTo(4000));
     });
 
-    test('Review-Notizen $platform: Anmeldung in der App, kein Browser mehr (#268, E-91)', () {
+    test('Review-Notizen $platform: Anmeldung in der App, kein Browser mehr (#268, E-91; eingebettete Ansicht #441, E-102)', () {
       final notes = File('store/metadata/$platform/review_notes.txt').readAsStringSync();
       expect(notes.toLowerCase(), isNot(contains('browser')), reason: 'auch „→ browser →“ und „Browser öffnet sich“');
       expect(notes, isNot(contains('sign out there first')));
@@ -52,6 +52,19 @@ void main() {
       expect(notes, contains('within the app'));
       expect(notes, contains('in der App'));
       if (platform == 'macos') expect(notes, isNot(contains('network.server')));
+    });
+
+    // #441, E-102: Der Standardweg ist die eingebettete Ansicht; die Notizen beschreiben sie und das Schließen der
+    // Kontoseite mit „Fertig“ („Done“, wie die Schaltfläche der App), nicht mehr „Abbrechen“ der Systemsitzung.
+    test('Review-Notizen $platform: eingebettete Ansicht, Löschseite mit „Fertig“ schließen (#441, E-102)', () {
+      final notes = File('store/metadata/$platform/review_notes.txt').readAsStringSync();
+      expect(notes, contains('embedded view'));
+      expect(notes, contains('eingebetteten Ansicht'));
+      expect(notes, contains('close it with "Done"'));
+      expect(notes, contains('diese mit „Fertig“ schließen'));
+      expect(notes, isNot(contains('close it with "Cancel"')));
+      expect(notes, isNot(contains('mit „Abbrechen“ schließen')));
+      expect(notes, isNot(contains('secure sign-in sheet of the provider')), reason: 'nur noch der Ausweichweg nennt das System-Fenster');
     });
 
     if (platform == 'macos') {
