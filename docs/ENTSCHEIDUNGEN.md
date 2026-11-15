@@ -901,7 +901,7 @@ Format: Frage · gewählt · verworfen · Begründung. „**schwer rückholbar**
   - `privacy1Body`, `privacy9Body`: nur Satzbau, Inhalt unverändert.
 - **Löst ab:** In E-89, SA-11 (`docs/OFFEN.md`) und im Testplan-Verlauf (P-84, P-87, Versionszeilen, Anhang F.2) steht weiter „Protokoll“; das ist Historie und nennt dieselbe Funktion. Die Begriffszeile „Datenprotokoll“ unter #165 gilt jetzt als „Datenübersicht“.
 - **Unverändert:** Schlüsselnamen und `DataReport` im Code, „Matrix-Protokoll“ und „Serverprotokolle“ (andere Bedeutung), `privacy-policy.de.md` Zeile „Betriebssystemdiagnosen … Systemeinstellungen“ (Betriebssystemebene), Kommentare und Log-Texte mit „Systemeinstellungen“.
-- **Zurückgestellt:** E9 (Wortlaut Android-Berechtigungen, `privacy_sections_test.dart`), Entscheidung des Eigentümers steht aus.
+- **Verworfen (Entscheidung des Eigentümers, 2026-11-15, Issue #326):** E9 (Wortlaut Android-Berechtigungen). Der Original-Befund war nicht mehr auffindbar und wurde nicht neu formuliert; es gibt keine Textänderung. Offen bleiben in #326 nur die manuellen Nachtests (Screenreader am Gerät, Muttersprachler-Prüfung).
 - **Prüfung:** `test/l10n/wording_test.dart`, `test/store/store_wording_test.dart` (rot ohne Fix), angepasste UI-Tests.
 
 ## E-99 Kalender-Themen (2026-11-13, Issue #424) — ergänzt E-13, E-30, E-51, **schwer rückholbar** (Ereignisformat, Datenmodell)
