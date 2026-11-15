@@ -157,6 +157,8 @@ ThemeData referenceBuildTheme(Brightness brightness, {bool reduceEffects = false
       elevation: 0,
       scrolledUnderElevation: 0,
       foregroundColor: t.textPrimary,
+      // #501: bewusst ergänzt (einzige Abweichung von der Kopie): Die AppBar setzt sonst helle Symbole auf hellem Design.
+      systemOverlayStyle: overlayStyleFor(brightness),
       titleTextStyle: display(20),
     ),
     inputDecorationTheme: InputDecorationTheme(
