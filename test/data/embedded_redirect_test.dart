@@ -99,6 +99,25 @@ void main() {
     expect(await next, cb);
   });
 
+  test('zwei erfolgreiche Ausweg-Aufrufe: der Versuch des ersten wird vom Brückencode selbst abgebrochen', () async {
+    // Ein Rückfall, dessen `prepare()` den alten Versuch NICHT selbst beendet (anders als SessionOAuthRedirect):
+    // Nur so ist beobachtbar, dass die Brücke einen alten Versuch vor dem neuen abbricht.
+    final fallback = _CountingRedirect();
+    final r = EmbeddedOAuthRedirect(opener, fallback);
+    final a = await r.prepare();
+    await a.open(page);
+    expect(await requests.single.continueExternally(), isTrue);
+    expect(fallback.attempts, hasLength(1));
+    expect(fallback.attempts.single.cancelled, isFalse, reason: 'der erste Ausweg läuft');
+    expect(await requests.single.continueExternally(), isTrue);
+    expect(fallback.attempts, hasLength(2), reason: 'jeder Ausweg ruft neu prepare()');
+    expect(fallback.attempts.first.cancelled, isTrue, reason: 'der alte Versuch wird vor dem neuen abgebrochen');
+    expect(fallback.attempts.last.cancelled, isFalse);
+    expect(fallback.attempts.last.opened, <Uri>[page]);
+    a.cancel();
+    expect(fallback.attempts.last.cancelled, isTrue, reason: 'cancel() des eingebetteten Versuchs bricht auch den Ausweg ab');
+  });
+
   test('Ausweg scheitert: Versuch bleibt offen, Seite kann noch Rücksprung liefern', () async {
     final session = FakeWebAuthSession()..startResult = false;
     final r = EmbeddedOAuthRedirect(opener, SessionOAuthRedirect(session));
@@ -222,4 +241,50 @@ void main() {
       expect(BrowserLauncher.isAllowed(page), isTrue);
     });
   });
+}
+
+/// Rückfall-Stub: zählt Versuche und beendet einen früheren Versuch in `prepare()` nicht selbst.
+class _CountingRedirect implements OAuthRedirect {
+  final List<_CountingAttempt> attempts = <_CountingAttempt>[];
+
+  @override
+  Future<OAuthAttempt> prepare() async {
+    final a = _CountingAttempt();
+    attempts.add(a);
+    return a;
+  }
+
+  @override
+  void cancel() {
+    for (final a in attempts) {
+      a.cancel();
+    }
+  }
+}
+
+class _CountingAttempt implements OAuthAttempt {
+  final Completer<void> _end = Completer<void>();
+  final List<Uri> opened = <Uri>[];
+  bool cancelled = false;
+
+  @override
+  Uri get redirectUri => Uri.parse('io.github.carpeasrael.familynexus:/oauth');
+
+  @override
+  Future<bool> open(Uri uri) async {
+    opened.add(uri);
+    return true;
+  }
+
+  @override
+  Future<Uri?> next({required DateTime deadline}) async {
+    await _end.future.timeout(deadline.difference(DateTime.now()), onTimeout: () {});
+    return null;
+  }
+
+  @override
+  void cancel() {
+    cancelled = true;
+    if (!_end.isCompleted) _end.complete();
+  }
 }

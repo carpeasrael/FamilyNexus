@@ -296,7 +296,7 @@ class EmbeddedOAuthRedirect implements OAuthRedirect {
         old = null;
         return false;
       }
-      unawaited(_pump(q, a));
+      unawaited(_pump(q, a, () => identical(old, a)));
       return true;
     }
 
@@ -346,14 +346,17 @@ class EmbeddedOAuthRedirect implements OAuthRedirect {
 
   /// Leitet die Rücksprünge des alten Weges in die eigene Queue; endet mit [pumpTimeout], mit dem Ende der
   /// eigenen Queue oder dem Ende des alten Versuchs (`close`, nicht `cancel`: vorhandene Einträge bleiben).
-  Future<void> _pump(_Queue q, OAuthAttempt a) async {
+  /// Leitet die Rücksprünge des alten Weges in [q]. Ein durch einen neuen Ausweg abgelöster Versuch ([isCurrent] ist
+  /// `false`) ist beendet, ohne die gemeinsame Warteschlange zu schließen: Sonst endete mit dem Abbruch des alten
+  /// Versuchs der ganze eingebettete Versuch.
+  Future<void> _pump(_Queue q, OAuthAttempt a, bool Function() isCurrent) async {
     final deadline = DateTime.now().add(pumpTimeout);
-    while (!q.finished) {
+    while (!q.finished && isCurrent()) {
       final u = await a.next(deadline: deadline);
-      if (u == null) break;
+      if (u == null || !isCurrent()) break;
       q.add(u);
     }
-    q.close();
+    if (isCurrent()) q.close();
   }
 
   @override
