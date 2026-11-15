@@ -1,6 +1,6 @@
 # Release-Test FamilyNexus 1.2.3 (neue Funktionen, Änderungen, offene Nachtests)
 
-**Planversion: v04** (15.11.2026, abends) · Dokument-ID `TP-FN-REL-123` · Stand: `main` @ `531981a` (enthält PR #482 und die Fixes #483 bis #487, PRs #489 bis #493) plus Build-Nummer 30 (PR #495, Branch `chore/build-30`, Commit `7bb3727`); Soll-Version der App **1.2.3 (30)** (`pubspec.yaml`: `1.2.3+30`). **Alle Schritte laufen auf einem Build, der aus dem aktuellen `main`-Stand gebaut wurde (Commit im Report, RT3-V-05), nicht auf dem TestFlight-/APK-Build 29 vom 13.11. (Build 30 ist freigegeben, aber nicht gebaut und nicht hochgeladen).**
+**Planversion: v05** (16.11.2026) · Dokument-ID `TP-FN-REL-123` · Stand: `main` @ `531981a` (enthält PR #482 und die Fixes #483 bis #487, PRs #489 bis #493) plus Build-Nummer 30 (PR #495, Branch `chore/build-30`, Commit `7bb3727`); Soll-Version der App **1.2.3 (30)** (`pubspec.yaml`: `1.2.3+30`). **Alle Schritte laufen auf einem Build, der aus dem aktuellen `main`-Stand gebaut wurde (Commit im Report, RT3-V-05), nicht auf dem TestFlight-/APK-Build 29 vom 13.11. (Build 30 ist freigegeben, aber nicht gebaut und nicht hochgeladen).**
 
 Bezug: Milestone „Release v1.2.3“ (39 offene Issues am 15.11. abends, siehe `Sprint/sprint_1.2.3.md`), Release Notes 1.2.3 (`store/metadata/*/release_notes.txt`), `docs/ENTSCHEIDUNGEN.md` (E-93 bis E-102), Release-Review `docs/release-reviews/1.2.3+29.md` (Läufe 1 bis 5) und `1.2.3+30.md` (Lauf 1, PR #496), Gesamtplan `Testplan_FamilyNexus.md` (TP-FN-001), Benachrichtigungsplan `Testplan_Benachrichtigungen_macOS-iOS.md` (TP-FN-NTF-381 v03), Geräte-Checkliste `Checkliste_Geraetenachtests.md`, Vorgänger `../Release-Test_1.2.2_v01.md` (TP-FN-REL-122).
 
@@ -184,7 +184,7 @@ Spalten: **ID** · **Pl.** (Plattformen, `alle` = alle festgelegten) · **Schrit
 | ID | Pl. | Schritt | Erwartetes Ergebnis | Vertiefung | Screenshot | Beob. | Erg. |
 |---|---|---|---|---|---|---|---|
 | RT3-D-01 | alle (G2) | Tab „Familie“, an der eigenen Kachel „Avatar ändern“ | Auswahl mit zwölf Avataren und „Initialen (kein Avatar)“; Namen sichtbar, Touch-Ziele ≥ 48 dp | E-19b | `RT3-D-01_<Pl>.png` | | |
-| RT3-D-02 | alle (G2) | „Segelboot“ wählen, „Speichern“ | „wird übernommen“ bis zum Echo (längstens 15 s), danach das Segelboot an der eigenen Kachel | E-101 | `RT3-D-02_<Pl>.png` | | |
+| RT3-D-02 | alle (G2) | „Segelboot“ wählen, „Speichern“; mindestens 20 s beobachten, Hinweis „Avatar gespeichert“ abwarten (#506) | Der Avatar-Bildschirm bleibt offen (kein Dialog; Schließen erst nach „Zurück“, Entscheidung zu #506 offen); „Avatar gespeichert“ als Hinweis, „wird übernommen“ bis zum Echo (längstens 15 s), danach das Segelboot an der eigenen Kachel | E-101 | `RT3-D-02_<Pl>.png` | | |
 | RT3-D-03 | alle (G1) | Familie, Chat, Kalender, Heute ansehen | Bei I2 Segelboot: Mitgliederliste, links neben jeder Nachricht von I2 (nicht bei eigenen), Gesprächsliste (40 dp mit Online-Punkt **und** Text), Kalender (Ring in der Personenfarbe: Kachel, Terminkarte nur mit Thema, Zusagenliste, Personenfilter), „Heute“ (online) | E-19b | `RT3-D-03_<Pl>.png` | | |
 | RT3-D-04 | alle (G2→G1) | G2 wechselt zu „Initialen (kein Avatar)“ | G1 sieht den Anfangsbuchstaben in der Personenfarbe, Name unverändert | E-101 | `RT3-D-04_<Pl>.png` | | |
 | RT3-D-05 | alle | Hell, dunkel, Schrift 200 % an Familie und Kalender | Avatar nicht abgeschnitten, Kontrast Buchstabe ≥ 4,5:1, Symbol ≥ 3:1 | E-101 | `RT3-D-05_<Pl>.png` | | |
@@ -257,6 +257,7 @@ Seit E-102 (15.11., PR #479) öffnen Anmeldung und Anbieterseiten auf iOS, macOS
 | RT3-H-03 | alle | Einstellungen → Einführung wiederholen | Tour startet erneut, mit Tastatur bedienbar (Tab, Enter, Escape) | E-95 | `RT3-H-03_<Pl>.png` | | |
 | RT3-H-04 | alle | Einrichtung mit gestörter Ablage am Ende (Speicher voll bzw. Datenbank gesperrt, Wegwerfgerät) | Fehler wird angezeigt, „Erneut versuchen“ möglich, Einrichtung bleibt nicht stehen; bei zweitem Fehlschlag „Später“ und „Jetzt einladen“ erreichbar | #411, E-45 | `RT3-H-04_<Pl>.png` | | |
 | RT3-H-05 | alle | Tour in Englisch und mit Schrift 200 % | Texte vollständig, kein Überlauf; Screenreader liest die Titel | – | `RT3-H-05_<Pl>.png` | | |
+| RT3-H-06 | alle | Konto A: Tour bis „Los geht’s“ beenden, abmelden, mit demselben Konto wieder anmelden (#507) | Die Tour erscheint **nicht** erneut (`tourSeen` bleibt, Abmelden setzt nur `blockedUsers` und den vorgemerkten Link zurück, #450). Erscheint sie doch: Beobachtung mit Angabe, ob die Tour zuvor mit „Los geht’s“ oder mit „Überspringen“ endete, und ob zwischendurch „Alle lokalen Daten löschen“ lief | E-95 | `RT3-H-06_<Pl>.png` | | |
 
 ### I. Einstellungen: App teilen und bewerten, Screenshot-Schutz, Texte (#350, #351, #144, #326, E-95, E-98)
 
@@ -367,7 +368,7 @@ Alle Bildschirme wurden ohne Verhaltensänderung zerlegt (Gateway in Module, Bil
 | RT3-R-04 | alle | Aufgabenliste: anlegen, zuweisen, erledigen | Wie bisher | E-97 | `RT3-R-04_<Pl>.png` | | |
 | RT3-R-05 | alle | Chat: senden, Anhang, Reaktion, Antwort, Zitat, melden, blockieren | Wie bisher | E-97 | `RT3-R-05_<Pl>.png` | | |
 | RT3-R-06 | alle | Einstellungen: Erinnerungen, Geräte, Speicherorte, Datenübersicht, Passwort ändern, Konto löschen (Wegwerfkonto) | Wie bisher | E-97 | `RT3-R-06_<Pl>.png` | | |
-| RT3-R-07 | alle | Theme hell/dunkel umschalten, App-Sperre ein/aus | Farben, Kontrast, Sperre wie bisher | E-97 | `RT3-R-07_<Pl>.png` | | |
+| RT3-R-07 | alle | Theme hell/dunkel umschalten, App-Sperre ein/aus; auf Android und iOS die Statusleiste ansehen (#501) | Farben, Kontrast, Sperre wie bisher; Statusleisten-Symbole (Uhr, Akku) dunkel auf hellem, hell auf dunklem Design, auch auf Seiten mit Titelleiste | E-97 | `RT3-R-07_<Pl>.png` | | |
 | RT3-R-08 | alle | Familienwechsel, Abmelden, erneut anmelden | Wie bisher; `event_themes` und Avatare werden mit gelöscht bzw. neu geladen | E-99 | `RT3-R-08_<Pl>.png` | | |
 
 ## T. Automatische Tests (Pflichtteil, auf Entwicklungsrechner)
@@ -404,8 +405,8 @@ Alle Bildschirme wurden ohne Verhaltensänderung zerlegt (Gateway in Module, Bil
    - Nicht durchgeführte Schritte (⏳) stehen mit Grund im Report; ⏳ gilt **nicht** als bestanden.
    - Pflichtteil T grün (bis auf die dokumentierte Umgebungsausnahme), einschließlich E2E für #458 und #451.
    - **Build-Identität:** Alle Schritte tragen denselben Commit (RT3-V-05); der Commit ist `main` HEAD nach dem letzten Merge (E11: Freeze 18.11., 12:00).
-   - **Abnahme iOS, macOS, Android (v03):** Ein Issue gilt für diese Plattformen als abgenommen, wenn alle ihm in Abschnitt 14 zugeordneten Schritte auf iOS-Simulator (iPhone, bei #274 auch iPad), Mac-App und Android-Emulator (bei #274 Tablet-AVD) ✅ sind. Die Spalte „Rest am Gerät“ benennt, was dann im Issue-Kommentar als nicht getestet stehen bleibt. Ist dort „–“ eingetragen, kann das Issue geschlossen werden; sonst bleibt es mit benanntem Rest offen oder der Nutzer entscheidet über das Schließen.
-4. **Nach dem Lauf:** Ergebnisse in den betroffenen Issues vermerken (Abschnitt 14). Ein Issue schließt, wenn die Abnahme der zugeordneten Schritte bestanden ist, nicht vorher. Der Merge entscheidet der Nutzer; kein Release ohne Freigabe.
+   - **Abnahme iOS, macOS, Android (v03):** Ein Issue gilt für diese Plattformen als abgenommen, wenn alle ihm in Abschnitt 14 zugeordneten Schritte auf iOS-Simulator (iPhone, bei #274 auch iPad), Mac-App und Android-Emulator (bei #274 Tablet-AVD) ✅ sind. Die Spalte „Rest am Gerät“ benennt, was dann im Issue-Kommentar als nicht getestet stehen bleibt. Seit E-103 hängt das Schließen am Code-Test, die Spalte „Rest am Gerät“ benennt den Plattform-Pflichtschritt, der im Release-Beleg steht.
+4. **Nach dem Lauf:** Ergebnisse in den betroffenen Issues vermerken (Abschnitt 14). Ein Issue schließt nach E-103 mit positivem Code-Test (Code-Testplan `Codetestplan_Offene_Issues.md`), nicht erst nach diesen Schritten; die Schritte dieses Plans sind der Plattformbeleg je Build (`docs/release-e2e/<Version>.md`, `tool/check_release_e2e.sh`). Der Merge entscheidet der Nutzer; kein Release ohne Freigabe.
 
 ## 14. Zuordnung Issues → Schritte (alle 39 offenen Issues, Stand 15.11. abends)
 
@@ -449,6 +450,14 @@ Spalte „Sim/Emu“: auf iOS-Simulator, Mac-App und Android-Emulator ausführba
 | #463 | RT3-P-09 | ja (Android TalkBack; iOS/Mac Semantikbaum) | VoiceOver-Sprachausgabe |
 | #486 | RT3-P-18, RT3-G-12 | teilweise (Simulator, Mac-App: Containerinhalt prüfbar) | Wirkung von `removeData` auf dem echten Gerät (TP-OAUTH-14) |
 | #497 | RT3-P-20 | ja (zwei Instanzen, lokaler Synapse) | – |
+| #501 | RT3-R-07 | ja (Android-Emulator, iOS-Simulator) | – |
+| #502 | RT3-H-01 | ja | – |
+| #503 | RT3-I-01 | ja | – |
+| #504 | – (`ui_tour_test.dart`, `store_screenshots_test.dart` laufen auf Simulator/Emulator mit Screenshots, getrennter Lauf) | teilweise | Simulator-Lauf nach Testpflege |
+| #505 | – (Dateiprüfung: `test/store/docs_consistency_test.dart`, Pflichtteil T) | ja (Dev) | – |
+| #506 | RT3-D-02 | ja (zwei Instanzen) | Entscheidung, ob der Bildschirm nach dem Speichern schließt |
+| #507 | RT3-H-06 | ja | Ursache ohne Reproduktion nicht belegt |
+| #508 | RT3-P-14 | ja | – |
 | #453 bis #456 | Sammel-Issues des Release-Reviews, keine Schritte; Schließen nach Entscheidung E9 | – | – |
 
 Bereits geschlossen, Gegenprobe im Plan: #442 (RT3-P-13, RT3-J-04), #444 und #459 (RT3-P-03), #460 (RT3-P-07), #461 (RT3-P-08), #462 (RT3-P-11), #464 (RT3-P-02), #483 (RT3-P-15), #484 (RT3-P-16), #485 (RT3-P-17), #487 (RT3-P-19). #431: nach v1.3 verschoben, kein Schritt.
@@ -465,3 +474,4 @@ Weitere Änderungen ohne eigenes offenes Issue (im Plan abgedeckt): #337 (E-07, 
 | v02 | 14.11.2026 | Nach erneuter Prüfung von gh (45 statt 26 offene Issues): Abschnitt P (13 Schritte) für die Folge-Issues des Release-Reviews 1.2.3+29 (#444 bis #451, #458 bis #464) und #442; Zuordnung in Abschnitt 14 ergänzt; Stand `main` @ `18e3815` |
 | v03 | 15.11.2026 | Nach dritter gh-Prüfung (38 offene Issues) und Sprint-Umsetzung: Build-Regel (nur aktueller `main`, RT3-V-05), Abschnitt 2a (Simulator-/Emulator-Matrix, Abnahmegrenzen), Abschnitt G auf eingebettete Anmeldung (E-102, #441, G-09 bis G-14), Abschnitt P unbedingt und an die Umsetzung angepasst (P-01, P-04, P-07, P-12, neu P-14), N-05 (Bildpaket #349), T-08 (Builds), Abschnitt 14 mit Sim/Emu und Rest am Gerät; #431 nach v1.3; Stand `main` @ `a4594ea` plus PR #482 |
 | v04 | 15.11.2026 | Soll-Version auf 1.2.3 (30) (Build-Nummer PR #495, kein Upload); Stand `main` @ `531981a`; neu P-15 bis P-19 für #483 bis #487 (Review-Lauf 4), Abschnitt 14 mit #486 (39 offene Issues); RT3-V-01, V-02, V-04, V-05 auf Build 30; Bezug auf Review-Berichte `+29` (Lauf 5) und `+30` |
+| v05 | 16.11.2026 | Folge-Issues #501 bis #508 des Release-Tests (Lauf 31): Zuordnung in Abschnitt 14; neu RT3-H-06 (#507, Abmelden und erneutes Anmelden), RT3-D-02 mit Beobachtung 20 s (#506), RT3-R-07 mit Statusleiste (#501); RT3-H-01, RT3-I-01, RT3-P-14 tragen #502, #503, #508 (Planerwartung korrigiert, App unverändert); Abnahme- und Schließregel auf E-103 umgestellt |
