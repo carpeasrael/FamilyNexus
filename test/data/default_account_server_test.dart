@@ -24,4 +24,34 @@ void main() {
     expect(srv('http://localhost:18448', 'localhost'), isNull);
     expect(SdkMatrixGateway.defaultAccountServer(null, 'localhost'), isNull);
   });
+
+  group('effectiveAccountServer (#510)', () {
+    String? eff(String? e, String url, String own) => SdkMatrixGateway.effectiveAccountServer(e, Uri.parse(url), own);
+
+    test('Platzhalter (eigener Servername) gilt wie ein leeres Feld: Standard mit Port', () {
+      expect(eff('localhost', 'https://localhost:18448', 'localhost'), 'localhost:18448');
+      expect(eff(' LocalHost ', 'https://localhost:18448', 'localhost'), 'localhost:18448');
+      expect(eff('', 'https://localhost:18448', 'localhost'), 'localhost:18448');
+      expect(eff(null, 'https://localhost:18448', 'localhost'), 'localhost:18448');
+    });
+
+    test('ausdrückliche andere Eingaben bleiben', () {
+      expect(eff('localhost:9999', 'https://localhost:18448', 'localhost'), 'localhost:9999');
+      expect(eff('localhost:18448', 'https://localhost:18448', 'localhost'), 'localhost:18448');
+      expect(eff('nas.lan', 'https://localhost:18448', 'localhost'), 'nas.lan');
+      expect(eff('example.org', 'https://localhost:18448', 'localhost'), 'example.org');
+    });
+
+    test('ohne Port am Server, Delegation, http oder kein Homeserver: Servername entspricht dem Standard (null)', () {
+      expect(eff('localhost', 'https://localhost', 'localhost'), isNull);
+      expect(eff('example.org', 'https://matrix.example.org:8448', 'example.org'), isNull, reason: 'Delegation: kein Standard, Servername gilt');
+      expect(eff('localhost', 'http://localhost:18448', 'localhost'), isNull);
+      expect(SdkMatrixGateway.effectiveAccountServer('localhost', null, 'localhost'), isNull);
+    });
+
+    test('Servername mit Port: Eingabe gleich Servername gilt als Platzhalter', () {
+      expect(eff('localhost:8448', 'https://localhost:18448', 'localhost:8448'), 'localhost:18448');
+      expect(eff('localhost', 'https://localhost:18448', 'localhost:8448'), 'localhost', reason: 'nicht der Platzhalter, bleibt ausdrücklich');
+    });
+  });
 }
