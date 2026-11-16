@@ -1090,6 +1090,16 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     return InviteLink.isLocalServer(authority) ? authority : null;
   }
 
+  /// Konto-Server für den Link (#510): Eine Eingabe, die nur dem eigenen Servernamen entspricht (der Platzhalter
+  /// im Einladungsdialog), oder leer ist, gilt wie ein leeres Feld und bekommt den Standard samt Port
+  /// ([defaultAccountServer]). Alles andere (anderer Port, anderer Host) bleibt ausdrücklich.
+  @visibleForTesting
+  static String? effectiveAccountServer(String? explicit, Uri? homeserver, String ownHost) {
+    final e = explicit?.trim().toLowerCase();
+    if (e == null || e.isEmpty || e == ownHost.toLowerCase()) return defaultAccountServer(homeserver, ownHost);
+    return explicit!.trim();
+  }
+
   static String _randomNonce() {
     final r = Random.secure();
     return List<String>.generate(16, (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0')).join();

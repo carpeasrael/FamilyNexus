@@ -331,7 +331,7 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
         nonce: nonce,
         ownHost: ownHost,
         inviterName: f.member(f.myUserId)?.displayName,
-        accountServer: accountServer ?? SdkMatrixGateway.defaultAccountServer(_client?.homeserver, ownHost),
+        accountServer: SdkMatrixGateway.effectiveAccountServer(accountServer, _client?.homeserver, ownHost),
       );
     } on ArgumentError {
       throw const GatewayException(GatewayError.invalidInput);

@@ -97,6 +97,9 @@ void main() {
       expect(link.inviterServer, 'localhost', reason: 'Neulinge legen das Konto beim Anbieter des Einladenden an');
       expect(link.accountServer, 'localhost:18448', reason: 'Der Link nennt den Server für Konto und Anmeldung ausdrücklich (E-63); der Testserver heißt localhost, ist aber nur unter Port 18448 erreichbar (#497)');
 
+      final typedPlaceholder = InviteLink.tryParse(await mod.createInviteLink(accountServer: 'localhost'), now: DateTime.now(), ownHost: 'localhost')!;
+      expect(typedPlaceholder.accountServer, 'localhost:18448', reason: 'Der eingetragene Platzhalter (Servername ohne Port) gilt wie ein leeres Feld (#510)');
+
       final guest = await _registered('gast', 'Gustav');
       await guest.requestToJoin(link);
       expect(guest.joinRequestPending, isTrue);
