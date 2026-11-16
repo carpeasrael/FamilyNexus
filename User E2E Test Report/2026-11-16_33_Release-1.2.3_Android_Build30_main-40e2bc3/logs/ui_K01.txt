@@ -1,0 +1,8 @@
+Einkauf [42, 174, 227, 237]
+Menü öffnen [954, 143, 1080, 269]
+Gemeinsam mit der Familie, Ende-zu-Ende-verschlüsselt [153, 290, 974, 334]
+Hinzufügen [922, 502, 1049, 628]
+Zu besorgen (4) [32, 670, 1049, 775]
+Milch als erledigt markieren/Milch/zuletzt von dir/2 Liter [32, 775, 1049, 933]
+Milch [909, 791, 1035, 917]
+Vollkornbrot als erledigt markieren/Vollkornbrot/zuletzt von dir [32, 933, 1049, 1090]
