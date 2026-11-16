@@ -58,16 +58,24 @@ class _AvatarScreenState extends State<AvatarScreen> {
     super.dispose();
   }
 
+  /// #506: Nach dem Speichern schließt der Bildschirm, sobald die Wahl gemeldet ist (oder die Frist um ist).
+  void _close() {
+    if (mounted) Navigator.of(context).maybePop();
+  }
+
   void _onChange() {
     if (!mounted) return;
+    var done = false;
     setState(() {
       final p = _pending;
       if (p != null && _actual == p.preset) {
         _pending = null;
         _dirty = false;
         _timer?.cancel();
+        done = true;
       }
     });
+    if (done) _close();
   }
 
   Future<void> _save() async {
@@ -78,10 +86,12 @@ class _AvatarScreenState extends State<AvatarScreen> {
     try {
       await _g.setMemberAvatar(choice);
       if (!mounted) return;
+      var done = false;
       setState(() {
         _saving = false;
         if (_actual == choice) {
           _dirty = false;
+          done = true;
         } else {
           _pending = (preset: choice);
           _timer?.cancel();
@@ -92,10 +102,12 @@ class _AvatarScreenState extends State<AvatarScreen> {
               _pending = null;
               _dirty = false;
             });
+            _close();
           });
         }
       });
       m.showSnackBar(SnackBar(content: Text(l.avatarSaved)));
+      if (done) _close();
     } catch (e) {
       if (!mounted) return;
       setState(() => _saving = false);

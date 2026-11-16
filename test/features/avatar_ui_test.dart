@@ -114,6 +114,70 @@ void main() {
       expect(find.text('Ausgewählt'), findsOneWidget);
     });
 
+    testWidgets('#506: nach dem Speichern schließt der Bildschirm, sobald die Wahl gemeldet ist', (tester) async {
+      final app = await buildTestApp();
+      await _joinBen(app);
+      await _openFamily(tester, app);
+      await tester.tap(find.byTooltip('Avatar ändern'));
+      await tester.pumpAndSettle();
+      expect(find.byType(AvatarScreen), findsOneWidget);
+      await tester.tap(find.text('Fußball'));
+      await tester.pump();
+      await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+      await tester.pumpAndSettle();
+      expect(find.byType(AvatarScreen), findsNothing, reason: '#506: geschlossen');
+      expect(find.text('Avatar gespeichert'), findsOneWidget, reason: 'Hinweis bleibt sichtbar');
+      expect(find.descendant(of: _avatar(_anna), matching: find.byIcon(AvatarPresetsUi.styles['p11']!.icon)), findsOneWidget);
+    });
+
+    testWidgets('#506: bleibt das Echo aus, bleibt der Bildschirm bis zur Meldung offen und schließt dann', (tester) async {
+      final app = await buildTestApp();
+      await _joinBen(app);
+      app.gateway.holdAvatarEcho = true;
+      await _openFamily(tester, app);
+      await tester.tap(find.byTooltip('Avatar ändern'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Rakete'));
+      await tester.pump();
+      await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+      await tester.pump();
+      expect(find.text('Wird übernommen …'), findsOneWidget);
+      expect(find.byType(AvatarScreen), findsOneWidget);
+      app.gateway.releaseAvatarEcho();
+      await tester.pumpAndSettle();
+      expect(find.byType(AvatarScreen), findsNothing);
+    });
+
+    testWidgets('#506: auch nach Ablauf der Frist schließt der Bildschirm (kein Hängen)', (tester) async {
+      final app = await buildTestApp();
+      await _joinBen(app);
+      app.gateway.holdAvatarEcho = true;
+      await _openFamily(tester, app);
+      await tester.tap(find.byTooltip('Avatar ändern'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Rakete'));
+      await tester.pump();
+      await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 16));
+      await tester.pumpAndSettle();
+      expect(find.byType(AvatarScreen), findsNothing);
+    });
+
+    testWidgets('#506: bei einem Fehler bleibt der Bildschirm offen', (tester) async {
+      final app = await buildTestApp();
+      await _joinBen(app);
+      await _openFamily(tester, app);
+      await tester.tap(find.byTooltip('Avatar ändern'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Fußball'));
+      await tester.pump();
+      app.gateway.avatarError = const GatewayException(GatewayError.notAllowed);
+      await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+      await tester.pumpAndSettle();
+      expect(find.byType(AvatarScreen), findsOneWidget);
+    });
+
     testWidgets('„wird übernommen“ hängt nie fest: nach 15 Sekunden gilt der tatsächliche Stand', (tester) async {
       final app = await buildTestApp();
       app.gateway.holdAvatarEcho = true;
@@ -216,8 +280,7 @@ void main() {
       await tester.pump();
       await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(BackButton));
-      await tester.pumpAndSettle();
+      expect(find.byType(AvatarScreen), findsNothing, reason: '#506: schließt von selbst, kein Zurück nötig');
       expect(find.descendant(of: _avatar(_anna), matching: find.byIcon(AvatarPresetsUi.styles['p11']!.icon)), findsOneWidget);
     });
   });
