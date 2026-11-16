@@ -17,4 +17,10 @@ void main() {
       expect(line, contains('E-100'), reason: 'nur als historischer Verweis auf E-100: $line');
     }
   });
+
+  test('E-95 beschreibt „Überspringen“ der Tour genau (#502): nicht auf dem letzten Schritt', () {
+    final e95 = RegExp(r'## E-95 .*?(?=\n## E-\d+ |$)', dotAll: true).firstMatch(decisions)!.group(0)!;
+    expect(e95, isNot(contains('Überspringen jederzeit')));
+    expect(e95, contains('#502'));
+  });
 }
