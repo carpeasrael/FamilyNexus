@@ -1,0 +1,30 @@
+06:21 +2594 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:21 +2595 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2596 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2597 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2598 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2599 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2600 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2601 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2602 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2603 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2604 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2605 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2606 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2607 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2608 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2609 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2610 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2611 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2612 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2613 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2614 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2615 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2616 ~115: test/tool/check_release_e2e_test.dart: Erg
+06:22 +2617 ~115: test/tool/check_release_e2e_test.dart: wen
+06:24 +2618 ~115: test/tool/check_release_e2e_test.dart: gen
+06:25 +2619 ~115: test/tool/check_release_e2e_test.dart: Abs
+06:25 +2620 ~115: test/tool/check_release_e2e_test.dart: meh
+06:26 +2621 ~115: test/tool/check_release_e2e_test.dart: Pfa
+06:26 +2622 ~115: All tests passed!
+exit 0
