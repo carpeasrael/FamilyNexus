@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/app/app_scope.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
@@ -39,6 +41,24 @@ Widget _screen(TestApp app, {String lang = 'de', Duration? pendingLimit}) => App
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         theme: buildTheme(Brightness.light),
         home: pendingLimit == null ? AvatarScreen(services: app.services) : AvatarScreen(services: app.services, pendingLimit: pendingLimit),
+      ),
+    );
+
+Widget _screenOverBase(TestApp app) => AppScope(
+      services: app.services,
+      child: MaterialApp(
+        locale: const Locale('de'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        theme: buildTheme(Brightness.light),
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => AvatarScreen(services: app.services))),
+              child: const Text('Basis-Öffnen'),
+            ),
+          ),
+        ),
       ),
     );
 
@@ -162,6 +182,69 @@ void main() {
       await tester.pump(const Duration(seconds: 16));
       await tester.pumpAndSettle();
       expect(find.byType(AvatarScreen), findsNothing);
+    });
+
+    group('#531: schließt nur die eigene Route', () {
+      Future<void> openOverBase(WidgetTester tester, TestApp app) async {
+        await tester.pumpWidget(_screenOverBase(app));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Basis-Öffnen'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Rakete'));
+        await tester.pump();
+      }
+
+      Future<void> dialogOverScreen(WidgetTester tester) async {
+        unawaited(showDialog<void>(
+          context: tester.element(find.byType(AvatarScreen)),
+          barrierDismissible: false,
+          builder: (_) => const AlertDialog(title: Text('Verifizierung-Dialog')),
+        ));
+        await tester.pumpAndSettle();
+        expect(find.text('Verifizierung-Dialog'), findsOneWidget);
+      }
+
+      testWidgets('Dialog über dem Bildschirm, Echo kommt: Bildschirm schließt, Dialog bleibt', (tester) async {
+        final app = await buildTestApp();
+        app.gateway.holdAvatarEcho = true;
+        await openOverBase(tester, app);
+        await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+        await tester.pump();
+        await dialogOverScreen(tester);
+        app.gateway.releaseAvatarEcho();
+        await tester.pumpAndSettle();
+        expect(find.byType(AvatarScreen), findsNothing, reason: 'der Bildschirm ist zu');
+        expect(find.text('Verifizierung-Dialog'), findsOneWidget, reason: 'der Dialog bleibt');
+      });
+
+      testWidgets('Dialog über dem Bildschirm, Frist läuft ab: Bildschirm schließt, Dialog bleibt', (tester) async {
+        final app = await buildTestApp();
+        app.gateway.holdAvatarEcho = true;
+        await openOverBase(tester, app);
+        await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+        await tester.pump();
+        await dialogOverScreen(tester);
+        await tester.pump(const Duration(seconds: 16));
+        await tester.pumpAndSettle();
+        expect(find.byType(AvatarScreen), findsNothing);
+        expect(find.text('Verifizierung-Dialog'), findsOneWidget);
+      });
+
+      testWidgets('Bildschirm schon geschlossen, dann Echo: kein zweites Schließen, Basisroute bleibt', (tester) async {
+        final app = await buildTestApp();
+        app.gateway.holdAvatarEcho = true;
+        await openOverBase(tester, app);
+        await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+        await tester.pump();
+        await tester.tap(find.byType(BackButton));
+        await tester.pump(); // Animation läuft noch
+        app.gateway.releaseAvatarEcho();
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 16));
+        await tester.pumpAndSettle();
+        expect(find.byType(AvatarScreen), findsNothing);
+        expect(find.text('Basis-Öffnen'), findsOneWidget, reason: 'die Basisroute wurde nicht mitgeschlossen');
+      });
     });
 
     testWidgets('#506: bei einem Fehler bleibt der Bildschirm offen', (tester) async {
