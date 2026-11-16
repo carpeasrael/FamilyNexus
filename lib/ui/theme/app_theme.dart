@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../domain/app_settings.dart';
+import 'page_transitions.dart';
 import 'tokens.dart';
 
 const String fontDisplay = 'SpaceGrotesk';
@@ -36,6 +37,7 @@ ThemeData buildTheme(Brightness brightness, {bool reduceEffects = false, AccentC
     brightness: brightness,
     colorScheme: _colorScheme(brightness, t),
     scaffoldBackgroundColor: Colors.transparent,
+    pageTransitionsTheme: opaquePageTransitionsTheme(),
     canvasColor: t.bgSurface,
     fontFamily: fontSans,
     textTheme: _textTheme(t),
