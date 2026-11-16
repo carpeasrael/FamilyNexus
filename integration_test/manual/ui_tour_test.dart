@@ -85,10 +85,15 @@ void main() {
     await _hold(tester); // 8b Einladungs-QR
     await tester.tap(find.text('Schließen'));
     await tester.pumpAndSettle();
-    await _tab(tester, 'Einstellungen');
+    // Einstellungen liegen seit E-46 im Menü oben rechts, nicht mehr in der Tab-Leiste.
+    await tester.tap(find.byTooltip('Menü öffnen').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Einstellungen'));
+    await tester.pumpAndSettle();
     await _hold(tester); // 9 Einstellungen dunkel
     await tester.drag(find.byType(ListView).last, const Offset(0, -900));
     await _hold(tester); // 9b Sicherheit/Erinnerungen
+    await _back(tester); // Einstellungen schließen, sonst liegt die Tab-Leiste verdeckt
     await app.services.settings.update((s) => s.copyWith(themeMode: AppThemeMode.light));
     await _tab(tester, 'Kalender');
     await _hold(tester); // 10 hell
