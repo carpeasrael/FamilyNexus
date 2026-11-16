@@ -32,6 +32,8 @@ void main() {
       expect(eff('localhost', 'https://localhost:18448', 'localhost'), 'localhost:18448');
       expect(eff(' LocalHost ', 'https://localhost:18448', 'localhost'), 'localhost:18448');
       expect(eff('', 'https://localhost:18448', 'localhost'), 'localhost:18448');
+      expect(eff('   ', 'https://localhost:18448', 'localhost'), 'localhost:18448');
+      expect(eff('localhost', 'https://localhost:18448', 'LocalHost'), 'localhost:18448', reason: 'Servername der Matrix-ID in anderer Schreibweise');
       expect(eff(null, 'https://localhost:18448', 'localhost'), 'localhost:18448');
     });
 
@@ -39,6 +41,7 @@ void main() {
       expect(eff('localhost:9999', 'https://localhost:18448', 'localhost'), 'localhost:9999');
       expect(eff('localhost:18448', 'https://localhost:18448', 'localhost'), 'localhost:18448');
       expect(eff('nas.lan', 'https://localhost:18448', 'localhost'), 'nas.lan');
+      expect(eff(' nas.lan ', 'https://localhost:18448', 'localhost'), 'nas.lan', reason: 'getrimmt');
       expect(eff('example.org', 'https://localhost:18448', 'localhost'), 'example.org');
     });
 
