@@ -1,0 +1,16 @@
+Back | klickbar | 74,206
+Settings | - | 292,205
+About / Storage locations | - | 540,1287
+/home/test/.local/share/de.inneso.familynexus/databases/familynexus_matrix.db | - | 540,335
+System keyring (Secret Service) | - | 540,476
+https://fake.test | - | 540,644
+Data overview: show all locally stored data | klickbar | 540,812
+Data overview: show all data stored online | klickbar | 540,980
+Delete all local data / Signs you out and deletes the database, keys and reminders on this | klickbar | 540,1171
+Watch the introduction again | klickbar | 540,1352
+Share app / Copies the link to the store listing so you can pass it on. No family data is  | klickbar | 540,1533
+Rate app / Opens the listing in the Play Store. | klickbar | 540,1735
+Version 1.2.3 (31) | - | 540,1903
+No telemetry, no ads, no analytics. | - | 540,2050
+License: AGPL-3.0-or-later | - | 540,2197
+Link copied | - | 540,2253
