@@ -97,7 +97,12 @@ void main() {
     await shot('3-chat');
     await tester.tap(find.byTooltip(en ? 'Back to conversations' : 'Zurück zu den Gesprächen'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Ben'));
+    // Die Zeile des Einzelchats (nicht des Familienchats) über ihren Schlüssel: „Ben“ steht auch an anderen Stellen (#504).
+    final direct = find.byWidgetPredicate((w) {
+      final k = w.key;
+      return k is ValueKey<String> && k.value.startsWith('thread-') && k.value != 'thread-family';
+    });
+    await tester.tap(direct.first);
     await tester.pumpAndSettle();
     await shot('4-einzelchat');
     await tab(en ? 'Shopping' : 'Einkauf');
