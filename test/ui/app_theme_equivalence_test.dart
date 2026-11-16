@@ -8,7 +8,9 @@ import 'package:flutter_test/flutter_test.dart';
 /// bleibt: Gegen eine Kopie der Funktion im Stand vor der Zerlegung, für beide Helligkeiten, beide Einstellungen für
 /// reduzierte Effekte und alle Akzentfarben. Die Kopie ist die Referenz und wird nie angepasst.
 /// Ausgabe aller Eigenschaften; die Objektnummern (`#1a2b3`) unterscheiden sich je Aufruf und werden entfernt.
-String _dump(ThemeData t) => t.toDiagnosticsNode().toStringDeep(minLevel: DiagnosticLevel.debug).replaceAll(RegExp(r'#[0-9a-f]{5}'), '#');
+/// Ohne `pageTransitionsTheme`: Das ist seit #525 bewusst neu (eigener Test in `page_transitions_test.dart`); alle übrigen
+/// Eigenschaften werden unverändert verglichen.
+String _dump(ThemeData t) => t.copyWith(pageTransitionsTheme: const PageTransitionsTheme()).toDiagnosticsNode().toStringDeep(minLevel: DiagnosticLevel.debug).replaceAll(RegExp(r'#[0-9a-f]{5}'), '#');
 
 /// Alle Felder der Design-Tokens (die Klasse hat keinen Gleichheitsoperator).
 List<Object> _tokens(AuroraTokens t) => <Object>[
