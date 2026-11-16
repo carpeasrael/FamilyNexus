@@ -1,0 +1,65 @@
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.6 available)
+  archive 4.5.2 (4.7.1 available)
+  code_assets 1.2.1 (2.2.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  dev_build 1.1.15 (1.2.2 available)
+  file_picker 13.1.0 (13.3.3 available)
+  file_picker_darwin 2.3.2 (2.5.1 available)
+  file_picker_linux 2.0.2 (2.0.4 available)
+  file_picker_web 4.2.0 (4.2.1 available)
+  flutter_local_notifications 22.3.2 (23.0.2 available)
+  flutter_local_notifications_linux 8.0.2 (9.0.0 available)
+  flutter_local_notifications_platform_interface 12.2.0 (13.0.0 available)
+  flutter_local_notifications_web 1.0.0 (2.0.0 available)
+  flutter_local_notifications_windows 3.1.1 (4.0.1 available)
+  flutter_vodozemac 0.9.0 (0.9.1 available)
+  image 4.12.0 (4.13.1 available)
+  jni 1.1.0 (1.1.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  matrix 14.2.0 (16.0.4 available)
+  native_toolchain_c 0.19.2 (0.19.6 available)
+  objective_c 9.5.0 (9.6.4 available)
+  petitparser 7.0.2 (7.1.0 available)
+  posix 6.5.2 (6.5.4 available)
+  process_run 1.4.1 (1.4.4 available)
+  qr 4.0.0 (4.0.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common 2.5.14 (2.5.17 available)
+  sqflite_common_ffi 2.4.4 (2.4.7 available)
+  sqflite_common_ffi_web 1.2.0 (1.2.2 available)
+  sqlite3 3.8.0 (3.9.1 available)
+  synchronized 3.5.0 (3.6.1+1 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.4 available)
+  vodozemac 0.9.0 (0.9.1 available)
+  web 1.1.1 (1.1.2 available)
+  windows_file_picker 2.0.1 (2.0.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+38 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/ebd0eda3-fefd-4ebf-8deb-ea89d28596b3/scratchpad/wt-e2e31b/test/features/avatar_ui_test.dart
+00:00 +0: Profilbildschirm Raster mit zwölf Avataren und Initialen, Auswahl mit Häkchen und Beschriftung, Speichern setzt den Avatar
+00:01 +1: Profilbildschirm Initialen wählen setzt {} (kein Avatar)
+00:01 +2: Profilbildschirm kein optimistischer Wert: „wird übernommen“ bis zum Echo
+00:01 +3: Profilbildschirm #506: nach dem Speichern schließt der Bildschirm, sobald die Wahl gemeldet ist
+00:03 +4: Profilbildschirm #506: bleibt das Echo aus, bleibt der Bildschirm bis zur Meldung offen und schließt dann
+00:05 +5: Profilbildschirm #506: auch nach Ablauf der Frist schließt der Bildschirm (kein Hängen)
+00:05 +6: Profilbildschirm #531: schließt nur die eigene Route Dialog über dem Bildschirm, Echo kommt: Bildschirm schließt, Dialog bleibt
+00:06 +7: Profilbildschirm #531: schließt nur die eigene Route Dialog über dem Bildschirm, Frist läuft ab: Bildschirm schließt, Dialog bleibt
+00:06 +8: Profilbildschirm #531: schließt nur die eigene Route Bildschirm schon geschlossen, dann Echo: kein zweites Schließen, Basisroute bleibt
+00:07 +9: Profilbildschirm #506: bei einem Fehler bleibt der Bildschirm offen
+00:07 +10: Profilbildschirm „wird übernommen“ hängt nie fest: nach 15 Sekunden gilt der tatsächliche Stand
+00:07 +11: Profilbildschirm Fehler beim Speichern: Meldung über errorText, nichts „wird übernommen“
+00:07 +12: Profilbildschirm needsModerator: Hinweis statt Raster; unknown: nur Ladezustand ohne Hinweis
+00:07 +13: Profilbildschirm en: Titel, Namen und Hinweis auf Englisch, keine deutschen Texte
+00:08 +14: Familie Avatare in der Mitgliederliste, „Avatar ändern“ nur in der eigenen Kachel (≥ 48 dp)
+00:08 +15: Familie „Avatar ändern“ öffnet den Bildschirm, die Wahl erscheint danach in der eigenen Kachel
+00:09 +16: Chat Avatar bei jeder Nachricht anderer, nicht bei eigenen
+00:09 +17: Gesprächsliste Einzelchat mit Avatar (ersetzt den Punkt), Familienchat behält das Gruppensymbol, Zeile ≥ 56 dp
+00:10 +18: MemberAvatarView reagiert auf die Wahl eines anderen Geräts über das Gateway
+00:10 +19: All tests passed!
+exit 0
