@@ -59,8 +59,19 @@ class _AvatarScreenState extends State<AvatarScreen> {
   }
 
   /// #506: Nach dem Speichern schließt der Bildschirm, sobald die Wahl gemeldet ist (oder die Frist um ist).
+  ///
+  /// #531: Es schließt nur die **eigene** Route. `maybePop` träfe die oberste Route, also auch einen Dialog darüber
+  /// (z. B. die Verifizierung), während der Bildschirm offen bliebe. Ist die Route schon im Schließen oder zu, passiert nichts.
   void _close() {
-    if (mounted) Navigator.of(context).maybePop();
+    if (!mounted) return;
+    final route = ModalRoute.of(context);
+    if (route == null || !route.isActive) return;
+    final nav = Navigator.of(context);
+    if (route.isCurrent) {
+      nav.pop();
+    } else {
+      nav.removeRoute(route);
+    }
   }
 
   void _onChange() {
