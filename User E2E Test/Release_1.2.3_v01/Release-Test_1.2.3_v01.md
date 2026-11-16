@@ -1,6 +1,6 @@
 # Release-Test FamilyNexus 1.2.3 (neue Funktionen, Änderungen, offene Nachtests)
 
-**Planversion: v05** (16.11.2026) · Dokument-ID `TP-FN-REL-123` · Stand: `main` @ `531981a` (enthält PR #482 und die Fixes #483 bis #487, PRs #489 bis #493) plus Build-Nummer 30 (PR #495, Branch `chore/build-30`, Commit `7bb3727`); Soll-Version der App **1.2.3 (30)** (`pubspec.yaml`: `1.2.3+30`). **Alle Schritte laufen auf einem Build, der aus dem aktuellen `main`-Stand gebaut wurde (Commit im Report, RT3-V-05), nicht auf dem TestFlight-/APK-Build 29 vom 13.11. (Build 30 ist freigegeben, aber nicht gebaut und nicht hochgeladen).**
+**Planversion: v06** (16.11.2026) · Dokument-ID `TP-FN-REL-123` · Stand: `main` @ `531981a` (enthält PR #482 und die Fixes #483 bis #487, PRs #489 bis #493) plus Build-Nummer 30 (PR #495, Branch `chore/build-30`, Commit `7bb3727`); Soll-Version der App **1.2.3 (30)** (`pubspec.yaml`: `1.2.3+30`). **Alle Schritte laufen auf einem Build, der aus dem aktuellen `main`-Stand gebaut wurde (Commit im Report, RT3-V-05), nicht auf dem TestFlight-/APK-Build 29 vom 13.11. (Build 30 ist freigegeben, aber nicht gebaut und nicht hochgeladen).**
 
 Bezug: Milestone „Release v1.2.3“ (39 offene Issues am 15.11. abends, siehe `Sprint/sprint_1.2.3.md`), Release Notes 1.2.3 (`store/metadata/*/release_notes.txt`), `docs/ENTSCHEIDUNGEN.md` (E-93 bis E-102), Release-Review `docs/release-reviews/1.2.3+29.md` (Läufe 1 bis 5) und `1.2.3+30.md` (Lauf 1, PR #496), Gesamtplan `Testplan_FamilyNexus.md` (TP-FN-001), Benachrichtigungsplan `Testplan_Benachrichtigungen_macOS-iOS.md` (TP-FN-NTF-381 v03), Geräte-Checkliste `Checkliste_Geraetenachtests.md`, Vorgänger `../Release-Test_1.2.2_v01.md` (TP-FN-REL-122).
 
@@ -184,7 +184,7 @@ Spalten: **ID** · **Pl.** (Plattformen, `alle` = alle festgelegten) · **Schrit
 | ID | Pl. | Schritt | Erwartetes Ergebnis | Vertiefung | Screenshot | Beob. | Erg. |
 |---|---|---|---|---|---|---|---|
 | RT3-D-01 | alle (G2) | Tab „Familie“, an der eigenen Kachel „Avatar ändern“ | Auswahl mit zwölf Avataren und „Initialen (kein Avatar)“; Namen sichtbar, Touch-Ziele ≥ 48 dp | E-19b | `RT3-D-01_<Pl>.png` | | |
-| RT3-D-02 | alle (G2) | „Segelboot“ wählen, „Speichern“; mindestens 20 s beobachten, Hinweis „Avatar gespeichert“ abwarten (#506) | Der Avatar-Bildschirm bleibt offen (kein Dialog; Schließen erst nach „Zurück“, Entscheidung zu #506 offen); „Avatar gespeichert“ als Hinweis, „wird übernommen“ bis zum Echo (längstens 15 s), danach das Segelboot an der eigenen Kachel | E-101 | `RT3-D-02_<Pl>.png` | | |
+| RT3-D-02 | alle (G2) | „Segelboot“ wählen, „Speichern“; höchstens 20 s beobachten, Hinweis „Avatar gespeichert“ abwarten (#506) | Der Avatar-Bildschirm (kein Dialog) schließt von selbst, sobald die Wahl gemeldet ist, spätestens nach 15 s (zwischendurch „Wird übernommen …“); „Avatar gespeichert“ bleibt als Hinweis sichtbar; danach das Segelboot an der eigenen Kachel, ohne „Zurück“ zu tippen (#506, E-101-Nachtrag, PR #522). Bleibt der Bildschirm länger offen, als Fehler festhalten | E-101 | `RT3-D-02_<Pl>.png` | | |
 | RT3-D-03 | alle (G1) | Familie, Chat, Kalender, Heute ansehen | Bei I2 Segelboot: Mitgliederliste, links neben jeder Nachricht von I2 (nicht bei eigenen), Gesprächsliste (40 dp mit Online-Punkt **und** Text), Kalender (Ring in der Personenfarbe: Kachel, Terminkarte nur mit Thema, Zusagenliste, Personenfilter), „Heute“ (online) | E-19b | `RT3-D-03_<Pl>.png` | | |
 | RT3-D-04 | alle (G2→G1) | G2 wechselt zu „Initialen (kein Avatar)“ | G1 sieht den Anfangsbuchstaben in der Personenfarbe, Name unverändert | E-101 | `RT3-D-04_<Pl>.png` | | |
 | RT3-D-05 | alle | Hell, dunkel, Schrift 200 % an Familie und Kalender | Avatar nicht abgeschnitten, Kontrast Buchstabe ≥ 4,5:1, Symbol ≥ 3:1 | E-101 | `RT3-D-05_<Pl>.png` | | |
@@ -455,7 +455,7 @@ Spalte „Sim/Emu“: auf iOS-Simulator, Mac-App und Android-Emulator ausführba
 | #503 | RT3-I-01 | ja | – |
 | #504 | – (`ui_tour_test.dart`, `store_screenshots_test.dart` laufen auf Simulator/Emulator mit Screenshots, getrennter Lauf) | teilweise | Simulator-Lauf nach Testpflege |
 | #505 | – (Dateiprüfung: `test/store/docs_consistency_test.dart`, Pflichtteil T) | ja (Dev) | – |
-| #506 | RT3-D-02 | ja (zwei Instanzen) | Entscheidung, ob der Bildschirm nach dem Speichern schließt |
+| #506 | RT3-D-02 | ja (zwei Instanzen) | Bildschirm schließt nach dem Speichern von selbst (Entscheidung des Herausgebers, PR #522) |
 | #507 | RT3-H-06 | ja | Ursache ohne Reproduktion nicht belegt |
 | #508 | RT3-P-14 | ja | – |
 | #453 bis #456 | Sammel-Issues des Release-Reviews, keine Schritte; Schließen nach Entscheidung E9 | – | – |
@@ -475,3 +475,4 @@ Weitere Änderungen ohne eigenes offenes Issue (im Plan abgedeckt): #337 (E-07, 
 | v03 | 15.11.2026 | Nach dritter gh-Prüfung (38 offene Issues) und Sprint-Umsetzung: Build-Regel (nur aktueller `main`, RT3-V-05), Abschnitt 2a (Simulator-/Emulator-Matrix, Abnahmegrenzen), Abschnitt G auf eingebettete Anmeldung (E-102, #441, G-09 bis G-14), Abschnitt P unbedingt und an die Umsetzung angepasst (P-01, P-04, P-07, P-12, neu P-14), N-05 (Bildpaket #349), T-08 (Builds), Abschnitt 14 mit Sim/Emu und Rest am Gerät; #431 nach v1.3; Stand `main` @ `a4594ea` plus PR #482 |
 | v04 | 15.11.2026 | Soll-Version auf 1.2.3 (30) (Build-Nummer PR #495, kein Upload); Stand `main` @ `531981a`; neu P-15 bis P-19 für #483 bis #487 (Review-Lauf 4), Abschnitt 14 mit #486 (39 offene Issues); RT3-V-01, V-02, V-04, V-05 auf Build 30; Bezug auf Review-Berichte `+29` (Lauf 5) und `+30` |
 | v05 | 16.11.2026 | Folge-Issues #501 bis #508 des Release-Tests (Lauf 31): Zuordnung in Abschnitt 14; neu RT3-H-06 (#507, Abmelden und erneutes Anmelden), RT3-D-02 mit Beobachtung 20 s (#506), RT3-R-07 mit Statusleiste (#501); RT3-H-01, RT3-I-01, RT3-P-14 tragen #502, #503, #508 (Planerwartung korrigiert, App unverändert); Abnahme- und Schließregel auf E-103 umgestellt |
+| v06 | 16.11.2026 | RT3-D-02 (#506): Der Avatar-Bildschirm schließt nach dem Speichern von selbst (Entscheidung des Herausgebers, PR #522, E-101-Nachtrag); Erwartung und Abschnitt 14 angepasst |
