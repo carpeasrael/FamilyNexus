@@ -1,0 +1,16 @@
+Chat | - | 100,205
+Menü öffnen | klickbar | 1017,206
+Zurück zu den Gesprächen | klickbar | 63,342
+Familie Berger | - | 269,342
+Ende-zu-Ende-verschlüsselt | - | 563,438
+Mittwoch, 21. Oktober 2026 | - | 540,1247
+Nachricht von Ben / Ben / Wer holt Lena heute vom Training ab? / Mittwoch, 21. Oktober 202 | - | 480,1402
+Nachricht von dir / Ich übernehme das, ich bin um 16 Uhr dort. / Mittwoch, 21. Oktober 202 | - | 642,1599
+Nachricht von Clara / Clara / Danke! Ich bringe das Abendessen mit &#127837; / Mittwoch, 2 | - | 516,1796
+Datei anhängen | klickbar | 84,2033
+Senden | klickbar | 996,2033
+Heute / Tab 1 von 5 | klickbar | 108,2232
+Kalender / Tab 2 von 5 | klickbar | 324,2232
+1 / Chat / Tab 3 von 5 | klickbar | 540,2232
+Einkauf / Tab 4 von 5 | klickbar | 756,2232
+Familie / Tab 5 von 5 | klickbar | 972,2232

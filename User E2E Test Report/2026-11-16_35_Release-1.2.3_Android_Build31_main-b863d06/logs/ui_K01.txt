@@ -1,0 +1,22 @@
+Einkauf | - | 134,205
+Menü öffnen | klickbar | 1017,206
+Gemeinsam mit der Familie, Ende-zu-Ende-verschlüsselt | - | 563,312
+Hinzufügen | klickbar | 985,565
+Zu besorgen (4) | - | 540,722
+Milch als erledigt markieren / Milch / zuletzt von dir / 2 Liter | klickbar | 540,854
+Milch | klickbar | 972,854
+Vollkornbrot als erledigt markieren / Vollkornbrot / zuletzt von dir | klickbar | 540,1011
+Vollkornbrot | klickbar | 972,1011
+Äpfel als erledigt markieren / Äpfel / zuletzt von dir / 1 kg | klickbar | 540,1169
+Äpfel | klickbar | 972,1169
+Nudeln als erledigt markieren / Nudeln / zuletzt von dir / 500 g | klickbar | 540,1326
+Nudeln | klickbar | 972,1326
+Erledigt (1) | - | 540,1468
+Erledigte entfernen | klickbar | 810,1468
+Tomaten wieder auf die Liste setzen / Tomaten / zuletzt von dir / 6 Stück | klickbar | 540,1610
+Tomaten | klickbar | 972,1610
+Heute / Tab 1 von 5 | klickbar | 108,2232
+Kalender / Tab 2 von 5 | klickbar | 324,2232
+1 / Chat / Tab 3 von 5 | klickbar | 540,2232
+Einkauf / Tab 4 von 5 | klickbar | 756,2232
+Familie / Tab 5 von 5 | klickbar | 972,2232

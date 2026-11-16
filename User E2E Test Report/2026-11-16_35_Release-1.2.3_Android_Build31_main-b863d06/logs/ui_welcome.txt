@@ -1,0 +1,8 @@
+Welcome to FamilyNexus | - | 350,205
+Calendar and chat for your family – private and encrypted. No ads, no data collection. / N | - | 540,1152
+Start a new family / You set everything up and then invite your family. | klickbar | 540,657
+I was invited / You received a link or QR code. | klickbar | 540,911
+I already have an account / You already use FamilyNexus, e.g. on another device. | klickbar | 540,1166
+Device language | klickbar | 300,1749
+Deutsch | klickbar | 649,1749
+English | klickbar | 194,1875

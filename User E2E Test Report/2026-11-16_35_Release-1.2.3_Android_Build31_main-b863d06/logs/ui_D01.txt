@@ -1,0 +1,22 @@
+Familie | - | 127,205
+Menü öffnen | klickbar | 1017,206
+Familie Berger / Empfehlung: Ernenne einen zweiten Moderator. | - | 540,466
+Familienname ändern | klickbar | 930,429
+Mitglied einladen | - | 301,720
+Lade Familienmitglieder ein. Sie bekommen einen Link oder QR-Code und schicken dir eine An | - | 540,855
+Familien-Code | - | 212,997
+Wer deiner Familie ohne Link beitreten will, gibt diesen Code ein. Du musst die Anfrage da | - | 540,1095
+!room2:fake.test | - | 477,1229
+Code kopieren | klickbar | 930,1229
+Jemanden einladen | klickbar | 370,1387
+Minimiert | - | 540,1525
+Erweitert, Minimiert | klickbar | 540,1525
+Kalender-Themen / Themen geben geteilten Terminen eine Farbe, z. B. Lila für Schule. | klickbar | 540,1788
+Mitglieder | - | 540,1972
+Anna / @anna:fake.test / Moderator | - | 540,2076
+Avatar ändern | klickbar | 941,2103
+Heute / Tab 1 von 5 | klickbar | 108,2232
+Kalender / Tab 2 von 5 | klickbar | 324,2232
+1 / Chat / Tab 3 von 5 | klickbar | 540,2232
+Einkauf / Tab 4 von 5 | klickbar | 756,2232
+Familie / Tab 5 von 5 | klickbar | 972,2232

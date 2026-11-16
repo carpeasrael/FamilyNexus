@@ -1,0 +1,15 @@
+Zurück | klickbar | 74,206
+Einstellungen | - | 357,205
+Über die App / Speicherorte | - | 540,1308
+/home/test/.local/share/de.inneso.familynexus/databases | - | 540,322
+/home/test/.local/share/de.inneso.familynexus/databases/familynexus_app.db | - | 540,487
+/home/test/.local/share/de.inneso.familynexus/databases/familynexus_matrix.db | - | 540,702
+Schlüsselbund des Systems (Secret Service) | - | 540,881
+https://fake.test | - | 540,1049
+Datenübersicht: alle lokal gespeicherten Daten zeigen | klickbar | 540,1217
+Datenübersicht: alle online gespeicherten Daten zeigen | klickbar | 540,1385
+Alle lokalen Daten löschen / Meldet dich ab und löscht Datenbank, Schlüssel und Erinnerung | klickbar | 540,1604
+Einführung erneut ansehen | klickbar | 540,1812
+App teilen / Kopiert den Link zum Store-Eintrag, damit du ihn weitergeben kannst. Es werde | klickbar | 540,2021
+App bewerten / Öffnet den Eintrag im Play Store. | klickbar | 540,2247
+Link kopiert | - | 540,2253
