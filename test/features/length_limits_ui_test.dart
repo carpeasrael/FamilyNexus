@@ -68,9 +68,7 @@ void main() {
 
   testWidgets('Aufgaben: Titel aus maxTitle-1 Buchstaben und Familien-Emoji lässt sich speichern', (tester) async {
     final app = await _start(tester);
-    await tester.tap(find.byTooltip('Menü öffnen'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Aufgaben'));
+    await tester.tap(navTab('Aufgaben'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Neue Aufgabenliste'));
     await tester.pumpAndSettle();

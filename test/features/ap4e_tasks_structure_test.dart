@@ -3,6 +3,7 @@ import 'package:family_nexus/features/tasks/tasks_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/shell_finders.dart';
 import '../support/semantics_snapshot.dart';
 import '../support/test_app.dart';
 
@@ -14,9 +15,7 @@ Future<void> _openTasks(WidgetTester tester, TestApp app) async {
   addTearDown(tester.view.reset);
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
-  await tester.tap(find.byTooltip('Menü öffnen'));
-  await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(ListTile, 'Aufgaben'));
+  await tester.tap(navTab('Aufgaben'));
   await tester.pumpAndSettle();
 }
 

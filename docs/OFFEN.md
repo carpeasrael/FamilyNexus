@@ -42,7 +42,7 @@ Stand: 2026-10-21. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 
 - **Beitritt per Einladungslink (E-78):**
   - **Alte Apps:** Links mit `auto: true` kann jede noch laufende alte Moderator-App weiter automatisch bestätigen, auch Links anderer Moderatoren. Lückenlos gilt die Moderator-Bestätigung erst, wenn kein Moderator-Gerät der Familie mehr eine alte Version nutzt. Eine Mindestversion gibt es nicht.
-  - **Keine Benachrichtigung:** Moderatoren sehen offene Anfragen nur am Abzeichen im Tab Familie. Die Einladungsmail bittet deshalb, der einladenden Person Bescheid zu sagen.
+  - **Keine Benachrichtigung:** Moderatoren sehen offene Anfragen nur am Abzeichen am Menüknopf und am Menüeintrag Familie (seit E-105). Die Einladungsmail bittet deshalb, der einladenden Person Bescheid zu sagen.
   - **Zweite Moderatoren hängen am Vermerk:** Scheitert das Senden des Link-Vermerks, kann nur der Aussteller die Anfrage prüfen und bestätigen; andere Moderatoren sehen sie als „unbekannt“.
   - **Abgelaufene Links:** Eine rechtzeitige Anfrage lässt sich nach dem Ablauf nicht mehr bestätigen, nur ablehnen. Danach braucht es einen neuen Link oder die Einladung per Matrix-ID. Nach einem Neustart kann eine abgelaufene Anfrage als „unbekannt“ erscheinen.
   - **Anfragende nach Linkablauf:** Sie bleiben auf „wartet“, bis ein Moderator ablehnt; die Warteansicht gilt längstens 7 Tage.

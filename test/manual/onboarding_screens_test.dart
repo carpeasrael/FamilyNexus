@@ -13,8 +13,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../helpers/shell_finders.dart';
 import '../support/fake_matrix.dart';
+import '../support/nav.dart';
 import '../support/test_app.dart';
 
 final bool _enabled = Platform.environment['FN_SCREENSHOTS'] == '1';
@@ -136,7 +136,7 @@ void main() {
       await _tap(tester, 'Jetzt einladen');
       await _snap(tester, 'einladen-dialog');
       await _tap(tester, 'Schließen');
-      await tester.tap(navTab('Familie'));
+      await openFamily(tester);
       await _snap(tester, 'familie-ansicht');
     });
 
@@ -165,7 +165,7 @@ void main() {
       // Sicht der Moderatorin: Anfrage mit Namen.
       await tester.pumpWidget(const SizedBox());
       await _start(tester, anna);
-      await tester.tap(navTab('Familie'));
+      await openFamily(tester);
       await _snap(tester, 'moderatorin-anfrage');
       await anna.gateway.approveRequest(guest.gateway.userId!);
       expect(anna.gateway.family!.member(guest.gateway.userId!)!.status, MemberStatus.invited);

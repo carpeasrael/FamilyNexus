@@ -127,8 +127,7 @@ void main() {
     _tallView(tester);
     await tester.pumpWidget(FamilyNexusApp(services: app.services));
     await tester.pumpAndSettle();
-    await tester.tap(navTab('Familie'));
-    await tester.pumpAndSettle();
+    await openFamily(tester);
 
     expect(find.byTooltip('Nachricht schreiben: Ben'), findsOneWidget);
     await tester.tap(find.byTooltip('Aktionen für Ben'));

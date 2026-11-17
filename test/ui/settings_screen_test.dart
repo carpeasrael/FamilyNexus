@@ -27,9 +27,10 @@ void main() {
     final (services, _) = await _services(lang: 'de');
     await tester.pumpWidget(FamilyNexusApp(services: services));
     await tester.pumpAndSettle();
-    for (final t in <String>['Heute', 'Kalender', 'Chat', 'Einkauf', 'Familie']) {
+    for (final t in <String>['Heute', 'Kalender', 'Chat', 'Einkauf', 'Aufgaben']) {
       expect(navTab(t), findsOneWidget, reason: t);
     }
+    expect(navTab('Familie'), findsNothing, reason: 'Familie liegt im Menü oben rechts (E-105)');
     expect(navTab('Einstellungen'), findsNothing, reason: 'Einstellungen liegen im Menü oben rechts');
     expect(find.byTooltip('Menü öffnen'), findsOneWidget);
   });

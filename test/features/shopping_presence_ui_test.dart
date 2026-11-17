@@ -25,6 +25,7 @@ Future<FakeMatrixGateway> _joinBen(TestApp app) async {
 }
 
 Future<void> _tab(WidgetTester tester, String label) async {
+  if (label == 'Familie') return openFamily(tester); // seit E-105 im Menü
   await tester.tap(navTab(label));
   await tester.pumpAndSettle();
 }
@@ -266,7 +267,7 @@ void main() {
       final app = await buildTestApp();
       await _open(tester, app);
       expect(tester.takeException(), isNull);
-      for (final label in <String>['Heute', 'Kalender', 'Chat', 'Einkauf', 'Familie']) {
+      for (final label in <String>['Heute', 'Kalender', 'Chat', 'Einkauf', 'Aufgaben']) {
         final f = navTab(label);
         expect(f, findsOneWidget, reason: label);
         final render = tester.renderObject<RenderParagraph>(f);

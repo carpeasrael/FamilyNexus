@@ -16,8 +16,12 @@ Future<TestApp> _open(WidgetTester tester, String tab) async {
   final app = await buildTestApp();
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
-  await tester.tap(navTab(tab));
-  await tester.pumpAndSettle();
+  if (tab == 'Familie') {
+    await openFamily(tester); // Familie liegt seit E-105 im Menü
+  } else {
+    await tester.tap(navTab(tab));
+    await tester.pumpAndSettle();
+  }
   return app;
 }
 
@@ -56,7 +60,7 @@ void main() {
   }, variant: desktop);
 
   testWidgets('#117 Desktop: Enter ändert im letzten Feld das Passwort, vorher springt es weiter', (tester) async {
-    final app = await _open(tester, 'Familie');
+    final app = await _open(tester, 'Heute');
     await openSettings(tester);
     await tester.ensureVisible(find.widgetWithText(ListTile, 'Passwort ändern'));
     await tester.tap(find.widgetWithText(ListTile, 'Passwort ändern'));

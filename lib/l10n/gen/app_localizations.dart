@@ -3974,6 +3974,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{Familie – 1 offene Anfrage} other{Familie – {count} offene Anfragen}}'**
   String tabFamilyRequests(int count);
 
+  /// No description provided for @tabTasksOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{Aufgaben – 1 offene} other{Aufgaben – {count} offene}}'**
+  String tabTasksOpen(int count);
+
   /// No description provided for @familyInviteServerLabel.
   ///
   /// In de, this message translates to:

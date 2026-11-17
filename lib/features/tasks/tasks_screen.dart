@@ -108,23 +108,23 @@ void _toast(BuildContext context, String text) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
 }
 
-/// Übersicht der Aufgabenlisten der Familie (E-51).
-class TasksScreen extends StatelessWidget {
-  const TasksScreen({super.key});
+/// Tab „Aufgaben“: Übersicht der Aufgabenlisten der Familie (E-51, E-105). Titel, Sicherheitsrand und Breite setzt die Shell.
+class TasksTab extends StatelessWidget {
+  const TasksTab({super.key});
 
   @override
   Widget build(BuildContext context) {
     final services = AppScope.of(context);
     final c = services.tasks;
     final l = AppLocalizations.of(context);
-    if (c == null) return Scaffold(appBar: AppBar(title: Text(l.tasksTitle)));
+    if (c == null) return const Scaffold(backgroundColor: Colors.transparent);
     return ListenableBuilder(
       listenable: Listenable.merge(<Listenable>[c, services.gateway]),
       builder: (context, _) {
         final mine = c.mine;
         final others = c.others;
         return Scaffold(
-          appBar: AppBar(title: Text(l.tasksTitle)),
+          backgroundColor: Colors.transparent,
           floatingActionButton: c.canManage
               ? FloatingActionButton(
                   heroTag: 'fab-tasks',
@@ -133,28 +133,26 @@ class TasksScreen extends StatelessWidget {
                   child: const Icon(Icons.add),
                 )
               : null,
-          body: SafeArea(
-            child: ContentWidth(child: ListView(padding: const EdgeInsets.fromLTRB(12, 8, 12, 96), children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-                  const Icon(Icons.lock_outline, size: 14),
-                  const SizedBox(width: 4),
-                  Flexible(child: Text(l.tasksNote, style: Theme.of(context).textTheme.labelSmall)),
-                ]),
-              ),
-              if (mine.isEmpty && others.isEmpty)
-                Padding(padding: const EdgeInsets.all(24), child: Text(l.tasksEmpty, textAlign: TextAlign.center)),
-              if (mine.isNotEmpty) ...<Widget>[
-                _Header(l.tasksSectionMine),
-                for (final t in mine) _ListTile(list: t, controller: c, services: services),
-              ],
-              if (others.isNotEmpty) ...<Widget>[
-                _Header(l.tasksSectionOthers),
-                for (final t in others) _ListTile(list: t, controller: c, services: services),
-              ],
-            ])),
-          ),
+          body: ListView(padding: const EdgeInsets.fromLTRB(12, 8, 12, 96), children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                const Icon(Icons.lock_outline, size: 14),
+                const SizedBox(width: 4),
+                Flexible(child: Text(l.tasksNote, style: Theme.of(context).textTheme.labelSmall)),
+              ]),
+            ),
+            if (mine.isEmpty && others.isEmpty)
+              Padding(padding: const EdgeInsets.all(24), child: Text(l.tasksEmpty, textAlign: TextAlign.center)),
+            if (mine.isNotEmpty) ...<Widget>[
+              _Header(l.tasksSectionMine),
+              for (final t in mine) _ListTile(list: t, controller: c, services: services),
+            ],
+            if (others.isNotEmpty) ...<Widget>[
+              _Header(l.tasksSectionOthers),
+              for (final t in others) _ListTile(list: t, controller: c, services: services),
+            ],
+          ]),
         );
       },
     );

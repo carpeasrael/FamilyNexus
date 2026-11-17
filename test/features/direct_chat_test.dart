@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/shell_finders.dart';
 import '../support/fake_matrix.dart';
+import '../support/nav.dart';
 import '../support/test_app.dart';
 
 Future<FakeMatrixGateway> _joinBen(TestApp app) async {
@@ -19,6 +20,7 @@ Future<FakeMatrixGateway> _joinBen(TestApp app) async {
 }
 
 Future<void> _tab(WidgetTester tester, String label) async {
+  if (label == 'Familie') return openFamily(tester); // seit E-105 im Menü
   await tester.tap(navTab(label));
   await tester.pumpAndSettle();
 }

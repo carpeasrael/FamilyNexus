@@ -2,8 +2,8 @@ import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/domain/time_zones.dart';
 import 'package:family_nexus/features/calendar/calendar_screen.dart';
 import 'package:family_nexus/features/chat/chat_screen.dart';
-import 'package:family_nexus/features/family/family_screen.dart';
 import 'package:family_nexus/features/shopping/shopping_screen.dart';
+import 'package:family_nexus/features/tasks/tasks_screen.dart';
 import 'package:family_nexus/features/today/today_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -40,7 +40,7 @@ void main() {
     ('Kalender', CalendarScreen),
     ('Chat', ChatScreen),
     ('Einkauf', ShoppingScreen),
-    ('Familie', FamilyScreen),
+    ('Aufgaben', TasksTab),
   ];
 
   for (final size in const <Size>[Size(390, 844), Size(800, 1280)]) {
@@ -64,7 +64,7 @@ void main() {
     expect(excluded(tester, ChatScreen), isFalse);
     expect(excluded(tester, TodayScreen), isTrue);
     expect(excluded(tester, ShoppingScreen), isTrue);
-    expect(excluded(tester, FamilyScreen), isTrue);
+    expect(excluded(tester, TasksTab), isTrue);
   });
 
   testWidgets('Fokus: Rail ist eine eigene Gruppe, der Inhalt liegt nicht in ihr', (tester) async {

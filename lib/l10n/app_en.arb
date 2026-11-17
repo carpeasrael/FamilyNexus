@@ -1304,6 +1304,12 @@
       "count": {"type": "int"}
     }
   },
+  "tabTasksOpen": "{count, plural, =1{Tasks – 1 open} other{Tasks – {count} open}}",
+  "@tabTasksOpen": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "familyInviteServerLabel": "Account server for newcomers",
   "familyInviteServerHint": "Newcomers create their account and sign in on this server. Leave empty to use your own server. The family room stays where it is.",
   "familyInviteServerApply": "Create new link",

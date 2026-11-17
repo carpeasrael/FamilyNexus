@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 import '../../test/helpers/shell_finders.dart';
+import '../../test/support/nav.dart';
 import '../../test/support/test_app.dart';
 
 Future<void> _hold(WidgetTester t, [int s = 7]) async {
@@ -79,11 +80,13 @@ void main() {
     await _hold(tester); // 7 Chat
     app.gateway.familyRoom!.membership['@cara:fake.test'] = MemberStatus.requested;
     app.server.notifyAll();
-    await _tab(tester, 'Familie');
+    await openFamily(tester); // Familie liegt seit E-105 im Menü
     await _hold(tester); // 8 Familie
     await tester.tap(find.text('Jemanden einladen'));
     await _hold(tester); // 8b Einladungs-QR
     await tester.tap(find.text('Schließen'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Zurück')); // Familie ist eine eigene Seite
     await tester.pumpAndSettle();
     // Einstellungen liegen seit E-46 im Menü oben rechts, nicht mehr in der Tab-Leiste.
     await tester.tap(find.byTooltip('Menü öffnen').first);

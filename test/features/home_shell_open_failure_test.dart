@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/app/app_services.dart';
+import 'package:family_nexus/domain/family.dart';
+import 'package:family_nexus/domain/permissions.dart';
 import 'package:family_nexus/features/shell/home_shell.dart';
 import 'package:family_nexus/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -40,9 +42,11 @@ void main() {
       expect(find.text(retry), findsOneWidget);
       expect(app.services.calendar, isNull);
 
-      // Menü erreichbar, ohne „Aufgaben“ (braucht die Familiendienste), Einstellungen vorhanden.
+      // Menü erreichbar, ohne „Familie“ (braucht die Familiendienste) und ohne Badge, Einstellungen vorhanden.
+      expect(find.descendant(of: find.byType(AppBar), matching: find.byType(Badge)), findsNothing);
       await tester.tap(find.byIcon(Icons.menu));
       await tester.pumpAndSettle();
+      expect(find.text(de ? 'Familie' : 'Family'), findsNothing);
       expect(find.text(de ? 'Aufgaben' : 'Tasks'), findsNothing);
       expect(find.text(de ? 'Einstellungen' : 'Settings'), findsWidgets);
       await tester.tapAt(const Offset(20, 300)); // Menü schließen
@@ -82,6 +86,21 @@ void main() {
       expect(app.services.reminders, isNotNull);
     });
   }
+
+  testWidgets('Fehlerzustand: Menüknopf ohne Badge, auch bei geladener Familie, Moderator und offenen Anfragen (E-105)', (tester) async {
+    final app = await buildTestApp(beforeCalendarBuild: (_) async => throw StateError('Speicher voll'));
+    app.gateway.familyRoom!.membership['@ben:fake.test'] = MemberStatus.requested;
+    await start(tester, app);
+    expect(find.textContaining('Deine Familiendaten konnten nicht geöffnet werden'), findsOneWidget);
+    expect(app.gateway.family, isNotNull, reason: 'Familie ist geladen');
+    expect(Permissions.isModerator(app.gateway.family!), isTrue);
+    expect(app.gateway.family!.requests, isNotEmpty);
+    expect(find.byTooltip('Menü öffnen'), findsOneWidget);
+    expect(find.descendant(of: find.byType(AppBar), matching: find.byType(Badge)), findsNothing);
+    await tester.tap(find.byTooltip('Menü öffnen'));
+    await tester.pumpAndSettle();
+    expect(find.text('Familie'), findsNothing);
+  });
 
   testWidgets('ein veralteter Fehler baut einen neueren, erfolgreichen Aufruf nicht ab', (tester) async {
     final slowFailure = Completer<void>();

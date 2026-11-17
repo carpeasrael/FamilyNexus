@@ -3,12 +3,14 @@ import 'package:family_nexus/domain/app_settings.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/server.dart';
+import 'package:family_nexus/domain/task_period.dart';
+import 'package:family_nexus/domain/task_rule.dart';
 import 'package:family_nexus/domain/time_zones.dart';
 import 'package:family_nexus/features/calendar/calendar_screen.dart';
 import 'package:family_nexus/features/chat/chat_screen.dart';
-import 'package:family_nexus/features/family/family_screen.dart';
 import 'package:family_nexus/features/shell/home_shell.dart';
 import 'package:family_nexus/features/shopping/shopping_screen.dart';
+import 'package:family_nexus/features/tasks/tasks_screen.dart';
 import 'package:family_nexus/features/today/today_screen.dart';
 import 'package:family_nexus/ui/layout/adaptive.dart';
 import 'package:flutter/material.dart';
@@ -110,7 +112,7 @@ void main() {
           expect(chat.width, greaterThanOrEqualTo(kPaneMinWidth));
           expect(cal.right, lessThan(chat.left), reason: 'Kalender links, Chat rechts');
         }
-        for (final t in <String>['Heute', 'Chat', 'Einkauf', 'Familie', 'Kalender']) {
+        for (final t in <String>['Heute', 'Chat', 'Einkauf', 'Aufgaben', 'Kalender']) {
           await _tab(tester, t);
         }
         expect(tester.takeException(), isNull);
@@ -127,7 +129,7 @@ void main() {
           ('Kalender', CalendarScreen),
           ('Chat', ChatScreen),
           ('Einkauf', ShoppingScreen),
-          ('Familie', FamilyScreen),
+          ('Aufgaben', TasksTab),
         ]) {
           await _tab(tester, label);
           expect(find.byType(screen), findsOneWidget, reason: label);
@@ -204,10 +206,10 @@ void main() {
       expect(title('Kalender'), findsOneWidget, reason: 'einspaltig: Name des Ziels');
     });
 
-    testWidgets('Trenner nur bei zwei sichtbaren Spalten: kein Strich über Heute, Einkauf und Familie (#309)', (tester) async {
+    testWidgets('Trenner nur bei zwei sichtbaren Spalten: kein Strich über Heute, Einkauf und Aufgaben (#309)', (tester) async {
       await _start(tester, const Size(1280, 800));
       final divider = find.descendant(of: find.byType(HomeShell), matching: find.byType(VerticalDivider));
-      for (final t in <String>['Heute', 'Einkauf', 'Familie']) {
+      for (final t in <String>['Heute', 'Einkauf', 'Aufgaben']) {
         await _tab(tester, t);
         expect(divider, findsNothing, reason: '$t ist einspaltig, der Trenner darf nicht über dem Inhalt liegen');
       }
@@ -226,26 +228,37 @@ void main() {
     });
   });
 
-  group('Textgröße 200 %', () {
-    for (final size in const <Size>[Size(390, 844), Size(600, 960), Size(800, 1280), Size(1024, 1366), Size(1366, 1024)]) {
-      testWidgets('${size.width.toInt()} × ${size.height.toInt()}: kein Überlauf, Beschriftungen vollständig', (tester) async {
-        await _start(tester, size, textScale: 2);
-        for (final t in <String>['Heute', 'Kalender', 'Chat', 'Einkauf', 'Familie']) {
-          await _tab(tester, t);
-          expect(tester.takeException(), isNull, reason: t);
-        }
-        for (final label in <String>['Heute', 'Kalender', 'Chat', 'Einkauf', 'Familie']) {
-          final p = tester.renderObject<RenderParagraph>(navTab(label));
-          expect(p.didExceedMaxLines, isFalse, reason: 'Beschriftung $label abgeschnitten');
-          final nav = tester.getRect(findNavigation());
-          expect(tester.getRect(navTab(label)).right, lessThanOrEqualTo(nav.right + 0.5), reason: '$label ragt aus der Leiste');
-          expect(tester.getRect(navTab(label)).left, greaterThanOrEqualTo(nav.left - 0.5), reason: '$label ragt aus der Leiste');
-        }
-        if (size.width >= kExpandedMin) {
-          await _tab(tester, 'Kalender');
-          expect(tester.getSize(find.byType(CalendarScreen)).width, greaterThanOrEqualTo(360), reason: 'Kalender bleibt mindestens so breit wie am Handy');
-        }
-      });
+  group('Textgröße 130 % und 200 %', () {
+    for (final scale in const <double>[1.3, 2.0]) {
+      for (final size in const <Size>[Size(390, 844), Size(600, 960), Size(800, 1280), Size(1024, 1366), Size(1366, 1024)]) {
+        testWidgets('${size.width.toInt()} × ${size.height.toInt()} bei Schrift ${(scale * 100).round()} %: kein Überlauf, Beschriftungen vollständig', (tester) async {
+          final app = await _start(tester, size, textScale: scale);
+          // Badge am Tab „Aufgaben“ sichtbar (offene Aufgaben), damit die Beschriftung samt Zahl geprüft wird (E-105).
+          await app.services.tasks!.create(
+            title: 'Haushalt',
+            assignee: app.services.tasks!.me,
+            rule: TaskRule.fromInterval(TaskInterval.daily),
+            items: <String>['Müll raus', 'Spülmaschine', 'Bad'],
+          );
+          await tester.pumpAndSettle();
+          expect(find.descendant(of: findNavigation(), matching: find.text('3')), findsOneWidget, reason: 'Badge „3“ am Tab Aufgaben');
+          for (final t in <String>['Heute', 'Kalender', 'Chat', 'Einkauf', 'Aufgaben']) {
+            await _tab(tester, t);
+            expect(tester.takeException(), isNull, reason: t);
+          }
+          for (final label in <String>['Heute', 'Kalender', 'Chat', 'Einkauf', 'Aufgaben']) {
+            final p = tester.renderObject<RenderParagraph>(navTab(label));
+            expect(p.didExceedMaxLines, isFalse, reason: 'Beschriftung $label abgeschnitten');
+            final nav = tester.getRect(findNavigation());
+            expect(tester.getRect(navTab(label)).right, lessThanOrEqualTo(nav.right + 0.5), reason: '$label ragt aus der Leiste');
+            expect(tester.getRect(navTab(label)).left, greaterThanOrEqualTo(nav.left - 0.5), reason: '$label ragt aus der Leiste');
+          }
+          if (size.width >= kExpandedMin) {
+            await _tab(tester, 'Kalender');
+            expect(tester.getSize(find.byType(CalendarScreen)).width, greaterThanOrEqualTo(360), reason: 'Kalender bleibt mindestens so breit wie am Handy');
+          }
+        });
+      }
     }
   });
 
@@ -347,7 +360,7 @@ void main() {
 
     testWidgets('alle fünf Seiten behalten ihren State über Hoch ↔ Quer und Klassenwechsel', (tester) async {
       await _start(tester, const Size(400, 800));
-      final screens = <Type>[TodayScreen, CalendarScreen, ChatScreen, ShoppingScreen, FamilyScreen];
+      final screens = <Type>[TodayScreen, CalendarScreen, ChatScreen, ShoppingScreen, TasksTab];
       Element? elementOf(Type t) => find.byType(t, skipOffstage: false).evaluate().firstOrNull;
       final before = <Element?>[for (final t in screens) elementOf(t)];
       expect(before.whereType<Element>(), hasLength(5));
@@ -643,15 +656,15 @@ void main() {
   });
 
   group('Inhaltsbreite', () {
-    testWidgets('Heute, Einkauf und Familie sind ab 800 auf 720 begrenzt und zentriert; Handy unbegrenzt', (tester) async {
+    testWidgets('Heute, Einkauf und Aufgaben sind ab 800 auf 720 begrenzt und zentriert; Handy unbegrenzt', (tester) async {
       await _start(tester, const Size(1366, 1024));
-      for (final (tab, type) in <(String, Type)>[('Heute', TodayScreen), ('Einkauf', ShoppingScreen), ('Familie', FamilyScreen)]) {
+      for (final (tab, type) in <(String, Type)>[('Heute', TodayScreen), ('Einkauf', ShoppingScreen), ('Aufgaben', TasksTab)]) {
         await _tab(tester, tab);
         final r = tester.getRect(find.byType(type));
         expect(r.width, kContentMaxWidth, reason: tab);
       }
       await _resize(tester, const Size(390, 844));
-      for (final (tab, type) in <(String, Type)>[('Heute', TodayScreen), ('Einkauf', ShoppingScreen), ('Familie', FamilyScreen)]) {
+      for (final (tab, type) in <(String, Type)>[('Heute', TodayScreen), ('Einkauf', ShoppingScreen), ('Aufgaben', TasksTab)]) {
         await _tab(tester, tab);
         expect(tester.getSize(find.byType(type)).width, 390, reason: tab);
       }

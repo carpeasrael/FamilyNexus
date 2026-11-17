@@ -13,6 +13,7 @@ import '../helpers/shell_finders.dart';
 import '../support/fake_matrix.dart';
 import '../support/invite_links.dart';
 import '../support/nav.dart';
+import '../support/semantics_snapshot.dart';
 import '../support/test_app.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
@@ -157,7 +158,7 @@ void main() {
       expect(copied, 'Zustand: leaveRejected');
     });
 
-    testWidgets('Moderator-Abzeichen am Tab „Familie“ zählt offene Anfragen', (tester) async {
+    testWidgets('Moderator-Abzeichen am Menüknopf und Menüeintrag „Familie“ zählt offene Anfragen', (tester) async {
       final annaApp = await buildTestApp();
       annaApp.server.now = () => DateTime.now().toUtc();
       final link = await annaApp.gateway.createInviteLink();
@@ -167,13 +168,23 @@ void main() {
       await ben.gateway.requestToJoin(InviteLink.tryParse(link, now: DateTime.now(), ownHost: 'fake.test')!);
       final semantics = tester.ensureSemantics();
       await _pump(tester, annaApp);
-      expect(navTab('1'), findsOneWidget);
-      // #326: Screenreader-Label im Singular („1 offene Anfrage“, nicht „1 offene Anfragen“).
-      expect(find.bySemanticsLabel(RegExp('Familie – 1 offene Anfrage')), findsWidgets);
+      final menuBadge = find.descendant(of: find.byType(AppBar), matching: find.text('1'));
+      expect(menuBadge, findsOneWidget, reason: 'Abzeichen am Menüknopf (seit E-105 nicht mehr am Tab)');
+      expect(navTab('1'), findsNothing);
+      // #326: Screenreader-Hinweis im Singular („1 offene Anfrage“, nicht „1 offene Anfragen“).
+      final bar = semanticsSnapshot(tester, find.byType(AppBar));
+      expect(bar, contains('H=Familie – 1 offene Anfrage T=Menü öffnen button tap'), reason: 'Label und Tooltip bleiben, der Hinweis kommt dazu: $bar');
+      await tester.tap(find.byTooltip('Menü öffnen'));
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel(RegExp('Familie – 1 offene Anfrage')), findsWidgets, reason: 'Menüeintrag Familie');
       expect(find.bySemanticsLabel(RegExp('1 offene Anfragen')), findsNothing);
       await annaApp.gateway.rejectRequest('@ben:fake.test');
       await tester.pumpAndSettle();
-      expect(navTab('1'), findsNothing);
+      expect(find.descendant(of: find.byType(Drawer), matching: find.byType(Badge)).evaluate().where((e) => (e.widget as Badge).isLabelVisible), isEmpty,
+          reason: 'der offene Drawer aktualisiert sich');
+      await tester.tapAt(const Offset(20, 300)); // Menü schließen
+      await tester.pumpAndSettle();
+      expect(menuBadge, findsNothing);
       semantics.dispose();
     });
 

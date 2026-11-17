@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
+import '../../test/helpers/shell_finders.dart';
 import '../../test/support/test_app.dart';
 
 Future<void> _hold(WidgetTester t, [int s = 6]) async {
@@ -53,8 +54,10 @@ void main() {
 
     await _hold(tester); // 1 Heute (Ben)
     await tester.tap(find.byTooltip('Menü öffnen'));
-    await _hold(tester, 3); // 2 Menü
-    await tester.tap(find.widgetWithText(ListTile, 'Aufgaben'));
+    await _hold(tester, 3); // 2 Menü (Familie, Einstellungen, Datenschutz; Aufgaben ist seit E-105 ein Tab)
+    await tester.tapAt(const Offset(20, 300)); // Menü schließen
+    await tester.pumpAndSettle();
+    await tester.tap(navTab('Aufgaben'));
     await _hold(tester); // 3 Übersicht ohne „+“
     await tester.tap(find.text('Annas Steuer'));
     await _hold(tester); // 4 Fremde Liste: Haken gesperrt, kein Bearbeiten/Löschen

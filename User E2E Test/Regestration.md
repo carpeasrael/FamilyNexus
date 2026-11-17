@@ -70,7 +70,7 @@ Device column: where the action happens and where the screenshot is taken.
 | T-02 | G1 | Select **Start a new family**. Open **Advanced → Use another provider**, enter `matrix-synapse-3ues.srv1348446.hstgr.cloud`. | The app shows **Your account is hosted at matrix-synapse-3ues.srv1348446.hstgr.cloud.** | T-02-G1 |
 | T-03 | G1 | Enter `Test N1` under **What is your name?** and `fnt-MMDD-n1` under **Your username**; enter `PW-N1` twice; select **Create account**. | **This username is available.** appears first; afterwards the **Your emergency key** screen opens. | T-03a-G1 (form, password hidden), T-03b-G1 (result) |
 | T-04 | G1 | Select **Create emergency key**, store `KN1` (password manager or **Save as file** into `secure/`), tick **I have stored the emergency key safely.**, select **Next**. | The key is shown once (crop it in the screenshot); the checkbox enables **Next**. | T-04a-G1 (before ticking, key hidden), T-04b-G1 (after) |
-| T-05 | G1 | Enter `Test family MMDD`, select **Create family**; choose **Later** if asked to invite. | The family opens; N1 is listed as moderator under the **Family** tab. | T-05a-G1 (family name entered), T-05b-G1 (Family tab with N1) |
+| T-05 | G1 | Enter `Test family MMDD`, select **Create family**; choose **Later** if asked to invite. | The family opens; N1 is listed as moderator on the **Family** page (menu → **Family**). | T-05a-G1 (family name entered), T-05b-G1 (Family page with N1) |
 | T-06 | – | Server check for N1 (optional but recommended): log in with `curl -s -X POST .../_matrix/client/v3/login` with the password of N1. | HTTP 200 and an `access_token` (do not store the token). | T-06.txt |
 
 ### B. Invite the second user (G1 → G2)
@@ -83,8 +83,8 @@ Device column: where the action happens and where the screenshot is taken.
 | T-13 | G2 | Enter `Test User 2`, username `fnt-MMDD-i2`, `PW-I2` twice; select **Create account**. | **This username is available.**; the **Your emergency key** screen opens. | T-13a-G2, T-13b-G2 |
 | T-14 | G2 | Create the emergency key, store `KI2`, tick the confirmation, select **Next**. | The join card shows the family `Test family MMDD` and the inviter N1. | T-14a-G2 (key step, key hidden), T-14b-G2 (join card) |
 | T-15 | G2 | Select **Request to join**. Wait; record the waiting time. | G2 keeps waiting. **Nothing may happen by itself**: I2 is not admitted without moderator approval. | T-15-G2 |
-| T-16 | G1 | Open the **Family** tab, select **Approve** on the request of Test User 2 and confirm the question. | The confirmation dialog names Test User 2; after confirming, I2 appears in the member list as ordinary member. | T-16a-G1 (request), T-16b-G1 (confirmation), T-16c-G1 (member list) |
-| T-17 | G2 | Observe G2 after approval. | G2 opens the same family; I2 is an ordinary member, the Family tab shows no management actions ("Only moderators manage the family."). | T-17-G2 |
+| T-16 | G1 | Open the menu → **Family**, select **Approve** on the request of Test User 2 and confirm the question. | The confirmation dialog names Test User 2; after confirming, I2 appears in the member list as ordinary member. | T-16a-G1 (request), T-16b-G1 (confirmation), T-16c-G1 (member list) |
+| T-17 | G2 | Observe G2 after approval. | G2 opens the same family; I2 is an ordinary member, the Family page shows no management actions ("Only moderators manage the family."). | T-17-G2 |
 | T-18 | G1, G2 | Send `Hello from N1` on G1 and `Hello from I2` on G2 in the family chat. | Both messages appear on both devices (this also proves keys are shared before block/remove). | T-18a-G1, T-18b-G2 |
 
 ### C. Block I2 (G1)
@@ -103,7 +103,7 @@ Removing a blocked member must work; the block stays a local setting of G1.
 
 | ID | Dev. | Action (what is done) | Expected result | Screenshot |
 |---|---|---|---|---|
-| T-30 | G1 | **Family** tab → open the menu of Test User 2 → **Remove**. | Dialog **Really remove Test User 2 from the family? Room keys are renewed; Test User 2 can no longer read new content.** | T-30-G1 |
+| T-30 | G1 | Menu → **Family** → open the menu of Test User 2 → **Remove**. | Dialog **Really remove Test User 2 from the family? Room keys are renewed; Test User 2 can no longer read new content.** | T-30-G1 |
 | T-31 | G1 | Confirm the removal. | I2 disappears from the member list. Record what **Settings → Blocked members** shows afterwards (entry kept or removed). | T-31a-G1 (member list), T-31b-G1 (blocked list) |
 | T-32 | G1 | Send `After removal` in the family chat. | Message sent without error. | T-32-G1 |
 | T-33 | G2 | Observe G2 (wait up to 60 s, then restart the app once if nothing changes). | I2 no longer has access to the family. `After removal` is **not** readable on G2 (new content is not decryptable). Record the exact screen and text G2 shows. | T-33a-G2, T-33b-G2 |
@@ -119,7 +119,7 @@ I2 is no longer a member, so its account is deleted first (G2); N1 is then the o
 | T-41 | G2 | Enter a **wrong** password, select **Delete account permanently**. | Error message (password wrong); the account is not deleted. | T-41-G2 |
 | T-42 | G2 | Enter the correct `PW-I2`, select **Delete account permanently**. | The app returns to the **Welcome** screen (not "Sign in"). | T-42-G2 |
 | T-43 | – | Server check: log in as `fnt-MMDD-i2` with `PW-I2` (app or `curl`). | `403 M_FORBIDDEN` / "Username or password is wrong." | T-43.txt or T-43-G2 |
-| T-44 | G1 | Open the chat and the **Family** tab on G1. | I2 is not a member; earlier messages show "Test User 2" or "Former member". | T-44-G1 |
+| T-44 | G1 | Open the chat and the menu → **Family** on G1. | I2 is not a member; earlier messages show "Test User 2" or "Former member". | T-44-G1 |
 | T-45 | G1 | **Settings → Account → Delete account**. Read the dialog. | No "only moderator" hint, because N1 is alone. | T-45-G1 |
 | T-46 | G1 | Enter the correct `PW-N1`, select **Delete account permanently**. | The app returns to the **Welcome** screen. | T-46-G1 |
 | T-47 | – | Server check: log in as `fnt-MMDD-n1`. | `403 M_FORBIDDEN` / "Username or password is wrong." | T-47.txt or T-47-G1 |

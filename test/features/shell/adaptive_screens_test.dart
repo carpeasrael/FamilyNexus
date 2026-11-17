@@ -6,6 +6,8 @@ import 'package:family_nexus/data/platform/vault_key_store.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/domain/time_zones.dart';
 import 'package:family_nexus/features/family/family_screen.dart';
+import 'package:family_nexus/features/shell/home_shell.dart' show mainNavigationKey;
+import 'package:family_nexus/features/tasks/tasks_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -94,21 +96,27 @@ void main() {
     testWidgets('Familie und Familienverwaltung$suffix', (tester) async {
       final app = await buildTestApp();
       await _pump(tester, app);
-      await tester.tap(navTab('Familie'));
-      await tester.pumpAndSettle();
+      await openFamily(tester); // eigene Seite über der Shell (E-105)
       expect(find.byType(FamilyScreen), findsOneWidget);
+      expect(find.widgetWithText(AppBar, 'Familie'), findsOneWidget);
       await _acrossSizes(tester, textScale: scale, check: () async {
-        // Die Navigation gehört zum Fenster: nach jedem Wechsel ist genau eine vorhanden.
-        expect(findNavigation(), findsOneWidget);
+        // Die Navigation gehört zum Fenster: nach jedem Wechsel ist genau eine vorhanden (unter der Seite).
+        expect(find.byKey(mainNavigationKey, skipOffstage: false), findsOneWidget);
+        expect(find.byType(FamilyScreen), findsOneWidget);
       });
     });
 
     testWidgets('Aufgaben$suffix', (tester) async {
       final app = await buildTestApp();
       await _pump(tester, app);
-      await _menu(tester, 'Aufgaben');
-      expect(find.text('Aufgaben'), findsWidgets);
-      await _acrossSizes(tester, textScale: scale);
+      await tester.tap(navTab('Aufgaben'));
+      await tester.pumpAndSettle();
+      expect(find.byType(TasksTab), findsOneWidget);
+      expect(find.widgetWithText(AppBar, 'Aufgaben'), findsOneWidget);
+      await _acrossSizes(tester, textScale: scale, check: () async {
+        expect(findNavigation(), findsOneWidget);
+        expect(find.byType(TasksTab), findsOneWidget);
+      });
     });
 
     testWidgets('Terminformular$suffix', (tester) async {

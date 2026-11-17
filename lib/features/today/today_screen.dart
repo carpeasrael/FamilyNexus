@@ -16,13 +16,15 @@ import '../family/member_avatar_view.dart';
 import '../presence/presence_view.dart';
 import '../reminders/permission_hint.dart';
 import '../reminders/reminders_screen.dart';
-import '../tasks/tasks_screen.dart';
 
 /// „Heute“: nächste Termine, Erinnerungen, ungelesene Nachrichten.
 class TodayScreen extends StatelessWidget {
-  const TodayScreen({super.key, required this.onOpenChat, required this.onOpenShopping, required this.onOpenAgenda});
+  const TodayScreen({super.key, required this.onOpenChat, required this.onOpenShopping, required this.onOpenTasks, required this.onOpenAgenda});
   final VoidCallback onOpenChat;
   final VoidCallback onOpenShopping;
+
+  /// Wechselt in den Tab „Aufgaben“ (E-105).
+  final VoidCallback onOpenTasks;
 
   /// Kalender in der Agenda ab heute (#218).
   final VoidCallback onOpenAgenda;
@@ -121,10 +123,7 @@ class TodayScreen extends StatelessWidget {
             if (services.tasks != null)
               SectionCard(
                 title: l.tasksTitle,
-                trailing: TextButton(
-                  onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const TasksScreen())),
-                  child: Text(l.tasksTitle),
-                ),
+                trailing: TextButton(onPressed: onOpenTasks, child: Text(l.tasksTitle)),
                 child: Text(l.todayTasksOpen(services.tasks!.myOpenCount)),
               ),
             SectionCard(

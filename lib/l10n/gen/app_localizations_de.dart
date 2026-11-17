@@ -2355,6 +2355,17 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String tabTasksOpen(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Aufgaben – $count offene',
+      one: 'Aufgaben – 1 offene',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get familyInviteServerLabel => 'Konto-Server für Neue';
 
   @override

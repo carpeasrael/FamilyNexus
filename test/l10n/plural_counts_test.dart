@@ -13,6 +13,8 @@ void main() {
     expect(l.shoppingCleared(2), '2 Einträge entfernt');
     expect(l.tabFamilyRequests(1), 'Familie – 1 offene Anfrage');
     expect(l.tabFamilyRequests(3), 'Familie – 3 offene Anfragen');
+    expect(l.tabTasksOpen(1), 'Aufgaben – 1 offene');
+    expect(l.tabTasksOpen(3), 'Aufgaben – 3 offene');
   });
 
   test('en: shopping clear and requests label in singular and plural', () {
@@ -24,5 +26,7 @@ void main() {
     expect(l.shoppingCleared(2), '2 items removed');
     expect(l.tabFamilyRequests(1), 'Family – 1 open request');
     expect(l.tabFamilyRequests(3), 'Family – 3 open requests');
+    expect(l.tabTasksOpen(1), 'Tasks – 1 open');
+    expect(l.tabTasksOpen(3), 'Tasks – 3 open');
   });
 }
