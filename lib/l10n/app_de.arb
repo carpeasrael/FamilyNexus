@@ -1307,6 +1307,12 @@
       "count": {"type": "int"}
     }
   },
+  "tabTasksOpen": "{count, plural, =1{Aufgaben – 1 offene} other{Aufgaben – {count} offene}}",
+  "@tabTasksOpen": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "familyInviteServerLabel": "Konto-Server für Neue",
   "familyInviteServerHint": "Auf diesem Server legen Neulinge ihr Konto an und melden sich an. Leer lassen = dein Server. Der Familienraum bleibt, wo er ist.",
   "familyInviteServerApply": "Neuen Link erzeugen",

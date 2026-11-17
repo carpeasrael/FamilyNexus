@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/shell_finders.dart';
+import '../support/nav.dart';
 import '../support/test_app.dart';
 
 /// #221: Jedes betroffene Feld begrenzt mit dem Maß der Prüfung; Flutters Begrenzung bleibt auf dem
@@ -35,7 +36,9 @@ Future<TestApp> _start(WidgetTester tester, {String? tab}) async {
   final app = await buildTestApp(clock: () => DateTime.utc(2026, 3, 20, 10));
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
-  if (tab != null) {
+  if (tab == 'Familie') {
+    await openFamily(tester); // seit E-105 im Menü
+  } else if (tab != null) {
     await tester.tap(navTab(tab));
     await tester.pumpAndSettle();
   }
@@ -43,9 +46,7 @@ Future<TestApp> _start(WidgetTester tester, {String? tab}) async {
 }
 
 Future<void> _openTasks(WidgetTester tester) async {
-  await tester.tap(find.byTooltip('Menü öffnen'));
-  await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(ListTile, 'Aufgaben'));
+  await tester.tap(navTab('Aufgaben'));
   await tester.pumpAndSettle();
 }
 

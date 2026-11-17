@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../helpers/shell_finders.dart';
+import '../support/nav.dart';
 import '../support/test_app.dart';
 
 Future<void> _openFamily(WidgetTester tester, TestApp app) async {
@@ -20,8 +20,7 @@ Future<void> _openFamily(WidgetTester tester, TestApp app) async {
   addTearDown(tester.view.reset);
   await tester.pumpWidget(FamilyNexusApp(services: app.services));
   await tester.pumpAndSettle();
-  await tester.tap(navTab('Familie'));
-  await tester.pumpAndSettle();
+  await openFamily(tester);
 }
 
 void main() {

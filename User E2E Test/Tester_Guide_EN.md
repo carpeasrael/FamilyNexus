@@ -75,7 +75,7 @@ Accept the available suggestion, record the actual username, choose a separate p
 3. Use **Copy link** and transfer it privately to G2. Links expire and are valid for one use. Keep G1 open and online.
 4. On G2, open the link, or select **I was invited** and paste it. If a web page opens, select **Open app**. Check that the registration provider is the test server.
 5. Create I2 with display name `Test User 2`, username `fnt-MMDD-i2` and a separate password (entered twice). Create and securely store its emergency key as **KI2**, check the confirmation and continue.
-6. Check the family and inviter on the join card, then select **Request to join**. G2 keeps waiting while G1 is online until a moderator decides: nothing may happen by itself. On G1, open **Family**, select **Approve** on the request and confirm the question. Record the waiting time, and report any admission without this confirmation.
+6. Check the family and inviter on the join card, then select **Request to join**. G2 keeps waiting while G1 is online until a moderator decides: nothing may happen by itself. On G1, open the menu → **Family**, select **Approve** on the request and confirm the question. Record the waiting time, and report any admission without this confirmation.
 7. Confirm that G2 opens the same family as G1. N1 is the moderator and I2 is an ordinary member.
 
 ## What to check together
@@ -87,7 +87,7 @@ Accept the available suggestion, record the actual username, choose a separate p
 | Reminders | Set a near-future reminder and allow notifications. Check that the local notification appears without the event title. |
 | Chat | Send messages from both accounts, reply and send a harmless image or text attachment. Confirm that the other account can receive and open it. |
 | Shopping | Add `Milk`, change its quantity and check it off from the other account. Confirm synchronization. |
-| Tasks | As N1, open **Tasks** from the top-right menu, create a list and assign I2. As I2, complete an item and inspect its history. |
+| Tasks | As N1, open the **Tasks** tab in the bottom bar (since E-105; **Family** moved into the top-right menu), create a list and assign I2. As I2, complete an item and inspect its history. |
 | Roles and invitations | Check moderator controls and ordinary-member permissions. Test family codes and membership changes using the full plan. |
 | Reporting and blocking | Report a test message, block its sender, then unblock under **Settings → Blocked members**. Blocking affects the current device. |
 | Security and offline use | Check app lock where supported, emergency-key recovery and offline changes after reconnecting. Follow section H for the detailed encryption checks. |

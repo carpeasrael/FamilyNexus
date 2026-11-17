@@ -1,17 +1,40 @@
 part of '../home_shell.dart';
 
-/// Burger-Menü rechts oben: öffnet das Seitenmenü des umgebenden Gerüsts.
+/// Offene Beitrittsanfragen: nur Moderatoren können sie entscheiden; ohne geladene Familie 0.
+int _openRequests(AppServices services) {
+  final f = services.gateway.family;
+  return f != null && Permissions.isModerator(f) ? f.requests.length : 0;
+}
+
+/// Burger-Menü rechts oben: öffnet das Seitenmenü des umgebenden Gerüsts. Mit Badge für offene Beitrittsanfragen
+/// (Moderatoren, E-105), solange die Familie geladen ist ([showRequests]); Tooltip und Label bleiben „Menü öffnen“.
 class _MenuButton extends StatelessWidget {
-  const _MenuButton();
+  const _MenuButton({this.showRequests = true});
+
+  /// Im Fehlerzustand (keine Familiendienste) gibt es kein Badge.
+  final bool showRequests;
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final services = AppScope.of(context);
     return Builder(
-      builder: (context) => IconButton(
-        tooltip: l.menuOpen,
-        icon: const Icon(Icons.menu),
-        onPressed: () => Scaffold.of(context).openEndDrawer(),
+      builder: (context) => ListenableBuilder(
+        listenable: services.gateway,
+        builder: (context, _) {
+          final open = showRequests ? _openRequests(services) : 0;
+          final button = IconButton(
+            tooltip: l.menuOpen,
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
+          );
+          if (open == 0) return button;
+          // Der Hinweis nennt die Zahl; das Badge selbst bleibt für Screenreader still. Ein Knoten: Tooltip, Hinweis, Rolle.
+          return Badge(
+            label: ExcludeSemantics(child: Text('$open')),
+            child: MergeSemantics(child: Semantics(hint: l.tabFamilyRequests(open), child: button)),
+          );
+        },
       ),
     );
   }
@@ -28,7 +51,7 @@ class _OpenFailed extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l.appName),
-        actions: const <Widget>[_MenuButton()],
+        actions: const <Widget>[_MenuButton(showRequests: false)],
       ),
       endDrawer: const _MenuDrawer(limited: true),
       body: Center(

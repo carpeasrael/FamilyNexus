@@ -266,7 +266,10 @@ extension on _MemberTile {
     final l = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     try {
-      services.chatRequest.value = await gateway.startDirectChat(member.userId);
+      final id = await gateway.startDirectChat(member.userId);
+      // Familie ist seit E-105 eine eigene Seite über der Shell: erst zurück, damit der Chat sichtbar wird.
+      if (context.mounted) await Navigator.of(context).maybePop();
+      services.chatRequest.value = id;
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(errorText(l, e))));
     }

@@ -20,7 +20,8 @@ part 'widgets/shell_parts.dart';
 /// Schlüssel der Hauptnavigation (untere Leiste oder seitliche Rail), für Tests und Bedienhilfen (#274).
 const Key mainNavigationKey = ValueKey<String>('main-navigation');
 
-/// Hauptgerüst mit fünf Bereichen; Einstellungen liegen im Menü oben rechts.
+/// Hauptgerüst mit fünf Bereichen (Heute, Kalender, Chat, Einkauf, Aufgaben); Familie, Einstellungen und Datenschutz
+/// liegen im Menü oben rechts (E-105).
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
@@ -32,6 +33,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   static const int _chatTab = 2;
   static const int _shoppingTab = 3;
   static const int _calendarTab = 1;
+  static const int _tasksTab = 4;
   int _index = 0;
 
   /// „Alle Termine“ auf „Heute“: Kalender in der Agenda ab heute (#218).
@@ -100,7 +102,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final services = AppScope.of(context);
-    final titles = <String>[l.tabToday, l.tabCalendar, l.tabChat, l.tabShopping, l.tabFamily];
+    final titles = <String>[l.tabToday, l.tabCalendar, l.tabChat, l.tabShopping, l.tasksTitle];
     return FutureBuilder<void>(
       future: _opening,
       builder: (context, snap) {
@@ -131,7 +133,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
         return Scaffold(
           appBar: AppBar(
             title: Text(split ? l.tabCalendarAndChat : titles[_index]),
-            // Burger-Menü rechts oben: Einstellungen und Datenschutz.
+            // Burger-Menü rechts oben: Familie, Einstellungen und Datenschutz.
             actions: const <Widget>[_MenuButton()],
           ),
           endDrawer: const _MenuDrawer(),
@@ -150,12 +152,13 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
                     TodayScreen(
                       onOpenChat: () => setState(() => _index = _chatTab),
                       onOpenShopping: () => _go(_shoppingTab),
+                      onOpenTasks: () => _go(_tasksTab),
                       onOpenAgenda: _openAgenda,
                     ),
                     CalendarScreen(modeRequest: _calendarMode),
                     ChatScreen(active: chatVisible),
                     const ShoppingScreen(),
-                    const FamilyScreen(),
+                    const TasksTab(),
                   ],
                 ),
               ),
@@ -193,20 +196,20 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
         ),
         (icon: const Icon(Icons.shopping_cart_outlined), label: l.tabShopping),
         (
-          icon: ListenableBuilder(
-            listenable: services.gateway,
-            builder: (context, _) {
-              // Offene Beitrittsanfragen: nur Moderatoren können sie entscheiden.
-              final f = services.gateway.family;
-              final open = f != null && Permissions.isModerator(f) ? f.requests.length : 0;
-              return Badge(
-                isLabelVisible: open > 0,
-                label: Text('$open'),
-                child: Semantics(label: open > 0 ? l.tabFamilyRequests(open) : null, child: const Icon(Icons.groups_outlined)),
-              );
-            },
-          ),
-          label: l.tabFamily,
+          icon: services.tasks == null
+              ? const Icon(Icons.checklist_outlined)
+              : ListenableBuilder(
+                  listenable: services.tasks!,
+                  builder: (context, _) {
+                    final open = services.tasks!.myOpenCount;
+                    return Badge(
+                      isLabelVisible: open > 0,
+                      label: Text('$open'),
+                      child: Semantics(label: open > 0 ? l.tabTasksOpen(open) : null, child: const Icon(Icons.checklist_outlined)),
+                    );
+                  },
+                ),
+          label: l.tasksTitle,
         ),
       ];
 }
@@ -235,10 +238,20 @@ class _MenuDrawer extends StatelessWidget {
             child: Semantics(header: true, child: Text(l.menuTitle, style: Theme.of(context).textTheme.titleLarge)),
           ),
           if (!limited)
-            ListTile(
-              leading: const Icon(Icons.checklist_outlined),
-              title: Text(l.tasksTitle),
-              onTap: () => open(const TasksScreen()),
+            ListenableBuilder(
+              listenable: AppScope.of(context).gateway,
+              builder: (context, _) {
+                final requests = _openRequests(AppScope.of(context));
+                return ListTile(
+                  leading: Badge(
+                    isLabelVisible: requests > 0,
+                    label: Text('$requests'),
+                    child: Semantics(label: requests > 0 ? l.tabFamilyRequests(requests) : null, child: const Icon(Icons.groups_outlined)),
+                  ),
+                  title: Text(l.tabFamily),
+                  onTap: () => open(const _FamilyPage()),
+                );
+              },
             ),
           ListTile(
             leading: const Icon(Icons.settings_outlined),
@@ -263,6 +276,17 @@ class _MenuDrawer extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Familie als eigene Seite (mit Zurück-Pfeil), erreichbar über das Menü (E-105).
+class _FamilyPage extends StatelessWidget {
+  const _FamilyPage();
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: Text(AppLocalizations.of(context).tabFamily)),
+        body: const SafeArea(child: ContentWidth(child: FamilyScreen())),
+      );
 }
 
 /// Einstellungen als eigene Seite (mit Zurück-Pfeil).

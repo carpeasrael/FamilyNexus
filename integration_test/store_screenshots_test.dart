@@ -107,8 +107,14 @@ void main() {
     await shot('4-einzelchat');
     await tab(en ? 'Shopping' : 'Einkauf');
     await shot('5-einkauf');
-    await tab(en ? 'Family' : 'Familie');
+    // Familie liegt seit E-105 im Menü und öffnet eine eigene Seite mit Titelleiste (nicht mehr im Tab).
+    await tester.tap(find.byTooltip(en ? 'Open menu' : 'Menü öffnen').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, en ? 'Family' : 'Familie'));
+    await tester.pumpAndSettle();
     await shot('6-familie');
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
     // Datenschutz zuletzt, damit die Reihenfolge der übrigen Motive unberührt bleibt: Menü → Datenschutzerklärung.
     // Der Bildschirm besteht nur aus App-Text (auf Android mit der Android-Variante des Schlüsselspeicher-Textes).
     await tester.tap(find.byTooltip(en ? 'Open menu' : 'Menü öffnen').first);

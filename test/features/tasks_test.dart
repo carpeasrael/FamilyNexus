@@ -5,6 +5,7 @@ import 'package:family_nexus/domain/tasks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/shell_finders.dart';
 import '../support/test_app.dart';
 
 void _tall(WidgetTester tester) {
@@ -19,9 +20,7 @@ Future<void> _open(WidgetTester tester, TestApp app) async {
 }
 
 Future<void> _openTasks(WidgetTester tester) async {
-  await tester.tap(find.byTooltip('Menü öffnen'));
-  await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(ListTile, 'Aufgaben'));
+  await tester.tap(navTab('Aufgaben'));
   await tester.pumpAndSettle();
 }
 
@@ -244,9 +243,7 @@ void main() {
         title: 'Far list', assignee: app.gateway.userId!, interval: TaskInterval.daily, timeZone: 'Pacific/Kiritimati', items: ['Bins']);
     await app.services.tasks!.load();
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Open menu'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Tasks'));
+    await tester.tap(navTab('Tasks'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Far list'));
     await tester.pumpAndSettle();
@@ -296,9 +293,7 @@ void main() {
         title: 'Far list', assignee: app.gateway.userId!, interval: TaskInterval.daily, timeZone: 'Pacific/Kiritimati', items: ['Bins']);
     await app.services.tasks!.load();
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Open menu'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Tasks'));
+    await tester.tap(navTab('Tasks'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Far list'));
     await tester.pumpAndSettle();
@@ -385,9 +380,7 @@ void main() {
       rule: const TaskRule.weekdays(),
       items: <String>['Dishes'],
     );
-    await tester.tap(find.byTooltip('Open menu'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ListTile, 'Tasks'));
+    await tester.tap(navTab('Tasks'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Assigned to you'), findsOneWidget);
     expect(find.textContaining('Assigned to You'), findsNothing);

@@ -183,7 +183,7 @@ Spalten: **ID** · **Pl.** (Plattformen, `alle` = alle festgelegten) · **Schrit
 
 | ID | Pl. | Schritt | Erwartetes Ergebnis | Vertiefung | Screenshot | Beob. | Erg. |
 |---|---|---|---|---|---|---|---|
-| RT3-D-01 | alle (G2) | Tab „Familie“, an der eigenen Kachel „Avatar ändern“ | Auswahl mit zwölf Avataren und „Initialen (kein Avatar)“; Namen sichtbar, Touch-Ziele ≥ 48 dp | E-19b | `RT3-D-01_<Pl>.png` | | |
+| RT3-D-01 | alle (G2) | Menü → „Familie“, an der eigenen Kachel „Avatar ändern“ | Auswahl mit zwölf Avataren und „Initialen (kein Avatar)“; Namen sichtbar, Touch-Ziele ≥ 48 dp | E-19b | `RT3-D-01_<Pl>.png` | | |
 | RT3-D-02 | alle (G2) | „Segelboot“ wählen, „Speichern“; höchstens 20 s beobachten, Hinweis „Avatar gespeichert“ abwarten (#506) | Der Avatar-Bildschirm (kein Dialog) schließt von selbst, sobald die Wahl gemeldet ist, spätestens nach 15 s (zwischendurch „Wird übernommen …“); „Avatar gespeichert“ bleibt als Hinweis sichtbar; danach das Segelboot an der eigenen Kachel, ohne „Zurück“ zu tippen (#506, E-101-Nachtrag, PR #522). Bleibt der Bildschirm länger offen, als Fehler festhalten | E-101 | `RT3-D-02_<Pl>.png` | | |
 | RT3-D-03 | alle (G1) | Familie, Chat, Kalender, Heute ansehen | Bei I2 Segelboot: Mitgliederliste, links neben jeder Nachricht von I2 (nicht bei eigenen), Gesprächsliste (40 dp mit Online-Punkt **und** Text), Kalender (Ring in der Personenfarbe: Kachel, Terminkarte nur mit Thema, Zusagenliste, Personenfilter), „Heute“ (online) | E-19b | `RT3-D-03_<Pl>.png` | | |
 | RT3-D-04 | alle (G2→G1) | G2 wechselt zu „Initialen (kein Avatar)“ | G1 sieht den Anfangsbuchstaben in der Personenfarbe, Name unverändert | E-101 | `RT3-D-04_<Pl>.png` | | |
@@ -282,9 +282,9 @@ Seit E-102 (15.11., PR #479) öffnen Anmeldung und Anbieterseiten auf iOS, macOS
 | RT3-J-01 | iPad | Hoch- und Querformat, alle vier Ausrichtungen | Einspaltig bis 599 dp (Leiste unten), Rail ab 600 dp, Zweispalter Kalender und Chat ab 1000 dp; kein Neustart, keine neue Anmeldung | B-25 | `RT3-J-01_iPad_<Ausr>.png` | | |
 | RT3-J-02 | iPad | Split View, Slide Over, Stage Manager: Fenster stufenlos ziehen | Layout wechselt an 599/600/1000 dp ohne Zustandsverlust (Entwurf, Termin, Dialog) | B-25 | `RT3-J-02_iPad.png` | | |
 | RT3-J-03 | iPad, AndT | Bildschirmtastatur im Chat | Layout kippt nicht, Eingabefeld bleibt sichtbar | B-25 | `RT3-J-03_<Pl>.png` | | |
-| RT3-J-04 | alle | Schrift 200 % an Heute, Kalender, Chat, Einkauf, Einstellungen | Kein Überlauf nach rechts; Wörter brechen nicht mitten im Wort (Beobachtung Lauf 22, Folgeissue Entscheidung Nutzer) | #274 | `RT3-J-04_<Pl>.png` | | |
+| RT3-J-04 | alle | Schrift 200 % an Heute, Kalender, Chat, Einkauf, Aufgaben (mit Abzeichen), Einstellungen | Kein Überlauf nach rechts; Wörter brechen nicht mitten im Wort (Beobachtung Lauf 22, Folgeissue Entscheidung Nutzer) | #274 | `RT3-J-04_<Pl>.png` | | |
 | RT3-J-05 | AndT | Drehen mit und ohne Rotationssperre, Multi-Window | Wie J-01; Klasse darf beim Tippen nicht wechseln (`adjustResize`) | B-25 | `RT3-J-05_AndT.png` | | |
-| RT3-J-06 | iPad, AndT, Win, Mac | Ab 1000 dp: Heute, Einkauf, Familie | Einspaltig, **kein** senkrechter Strich (#309) | E-92 | `RT3-J-06_<Pl>.png` | | |
+| RT3-J-06 | iPad, AndT, Win, Mac | Ab 1000 dp: Heute, Einkauf, Aufgaben | Einspaltig, **kein** senkrechter Strich (#309) | E-92 | `RT3-J-06_<Pl>.png` | | |
 | RT3-J-07 | iPad, AndT, Win | Tab-Reihenfolge mit Hardware-Tastatur | Menü → Rail → Inhalt zusammenhängend (eigene Fokusgruppen) | E-92 | `RT3-J-07_<Pl>.png` | | |
 | RT3-J-08 | iPad | Anbieterseite (Captcha, Konto löschen) in der eingebetteten Ansicht, dann im Fehlerfall „Im Browser fortsetzen“ (System-Sitzung, Rückfallweg) | Eingebettete Ansicht: Schließen mit „Abbrechen“/„Fertig“; Hinweistext der System-Sitzung nennt „iPhone, iPad und Mac“ (#297) | #297 | `RT3-J-08_iPad.png` | | |
 
