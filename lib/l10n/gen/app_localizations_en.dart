@@ -383,6 +383,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatSending => 'Sending …';
 
   @override
+  String get chatStatusSent => 'Sent';
+
+  @override
+  String get chatStatusRead => 'Read';
+
+  @override
+  String chatStatusReadBy(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Read by $count',
+      one: 'Read by 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatReadByTitle => 'Read by';
+
+  @override
   String get chatEncryptedNote => 'End-to-end encrypted';
 
   @override
@@ -1282,7 +1302,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String privacy2Body(String keyStore, String cipher) {
-    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars) and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
+    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars), the members’ read state (up to which message someone has read) and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
   }
 
   @override
@@ -1290,7 +1310,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy3Body =>
-      'Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted) and room and profile names (for example the family name). With your own server you decide who sees this information.';
+      'Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, public read receipts (who has read up to which message, and when; only when “Send read receipts” is on, visible to the server and to the provider of your chat partners), the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted) and room and profile names (for example the family name). With your own server you decide who sees this information.';
 
   @override
   String get privacy4Title => 'Private events';
@@ -1445,6 +1465,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsShareOnlineStatus => 'Share online status';
+
+  @override
+  String get settingsShareReadReceipts => 'Send read receipts';
+
+  @override
+  String get settingsShareReadReceiptsHint =>
+      'Shows family members up to which of your messages you have read, and shows you who has read yours. The server and the provider of your chat partners see who read what and when. When off, you only send private read markers and you do not see who has read your messages either. Receipts already sent cannot be taken back; nothing is sent afterwards for messages you have already read.';
 
   @override
   String get settingsShareOnlineStatusHint =>
@@ -1657,11 +1684,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy10Title =>
-      'Online status, direct chats, shopping list, avatar';
+      'Online status, read receipts, direct chats, shopping list, avatar';
 
   @override
   String get privacy10Body =>
-      'The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. Your avatar is an exception: the choice of one of the twelve built-in avatars is kept as room state in the family room and is not end-to-end encrypted. The server and all family members see which symbol you chose; the choice stays in the room even if you are removed or your account is deleted. Otherwise the server only sees the metadata it always sees (see “What does the server see?”).';
+      'The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. The read receipt (“Read” under your messages) is a public read marker, visible to the server and to the provider of your chat partners (who has read up to which message, and when); it is on by default, and you can switch it off in the settings, then you only send private markers and do not see who has read either. Receipts already sent cannot be taken back. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. Your avatar is an exception: the choice of one of the twelve built-in avatars is kept as room state in the family room and is not end-to-end encrypted. The server and all family members see which symbol you chose; the choice stays in the room even if you are removed or your account is deleted. Otherwise the server only sees the metadata it always sees (see “What does the server see?”).';
 
   @override
   String onbFamilyFound(String name) {

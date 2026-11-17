@@ -156,6 +156,17 @@ class AppServices {
   ShoppingController? shopping;
   TasksController? tasks;
   PresenceSync? presence;
+
+  /// Letzter Stand von `shareReadReceipts`, damit nur dessen Änderung die Lesestände neu abbildet (#526, E-106).
+  bool? _shareReadReceiptsSeen;
+
+  void _onSettingsChangedForReceipts() {
+    final now = settings.settings.shareReadReceipts;
+    if (_shareReadReceiptsSeen == now) return;
+    _shareReadReceiptsSeen = now;
+    gateway.refreshReadStates();
+  }
+
   ReminderCoordinator? reminders;
   ActivityNotifier? activity;
   String? _calendarUser;
@@ -243,6 +254,8 @@ class AppServices {
       final p = PresenceSync(gateway: gateway, enabled: () => settings.settings.shareOnlineStatus);
       presence = p;
       settings.addListener(p.update);
+      _shareReadReceiptsSeen = settings.settings.shareReadReceipts;
+      settings.addListener(_onSettingsChangedForReceipts);
       p.start(foreground: WidgetsBinding.instance.lifecycleState != AppLifecycleState.paused);
       final s = scheduler;
       final appDb = database?.db;
@@ -388,6 +401,7 @@ class AppServices {
     activity = null;
     reminders?.dispose();
     reminders = null;
+    settings.removeListener(_onSettingsChangedForReceipts);
     final p = presence;
     if (p != null) {
       settings.removeListener(p.update);

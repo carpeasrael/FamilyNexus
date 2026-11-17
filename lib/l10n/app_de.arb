@@ -150,6 +150,11 @@
   "chatRetry": "Senden fehlgeschlagen – tippen zum Wiederholen",
   "chatNotSent": "Nicht gesendet. Bitte erneut schreiben.",
   "chatSending": "Wird gesendet …",
+  "chatStatusSent": "Gesendet",
+  "chatStatusRead": "Gelesen",
+  "chatStatusReadBy": "{count, plural, =1{Gelesen von 1} other{Gelesen von {count}}}",
+  "@chatStatusReadBy": {"placeholders": {"count": {"type": "int"}}},
+  "chatReadByTitle": "Gelesen von",
   "chatEncryptedNote": "Ende-zu-Ende-verschlüsselt",
   "chatAttachmentBlocked": "Anhang blockiert (Typ oder Größe nicht erlaubt)",
   "chatLoadAttachment": "Anhang laden",
@@ -600,7 +605,7 @@
   "privacy1Title": "Wer verarbeitet deine Daten?",
   "privacy1Body": "FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein. Die App zeigt diese Seite in einer eingebetteten Ansicht (iOS, macOS, Android) oder im Browser (Linux, Windows); die Seite läuft dann im Prozess der App.",
   "privacy2Title": "Welche Daten gibt es?",
-  "privacy2Body": "Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Geburts- und Gedenktage (Name und Datum, auch von Dritten und Verstorbenen), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.",
+  "privacy2Body": "Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Geburts- und Gedenktage (Name und Datum, auch von Dritten und Verstorbenen), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare), den Lesestand der Mitglieder (bis zu welcher Nachricht jemand gelesen hat) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.",
   "@privacy2Body": {
     "placeholders": {
       "keyStore": {
@@ -613,7 +618,7 @@
     }
   },
   "privacy3Title": "Was sieht der Server?",
-  "privacy3Body": "Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.",
+  "privacy3Body": "Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, öffentliche Lesebestätigungen (wer bis zu welcher Nachricht und wann gelesen hat; nur wenn „Lesebestätigung senden“ eingeschaltet ist, sie sind für den Server und den Anbieter deiner Gesprächspartner sichtbar), die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.",
   "privacy4Title": "Private Termine",
   "privacy4Body": "Private Termine werden nie an die Familie gesendet. Zwischen deinen eigenen Geräten werden sie über einen privaten, verschlüsselten Raum abgeglichen, dem nur dein Konto angehört.",
   "privacy5Title": "Erinnerungen und Benachrichtigungen",
@@ -694,6 +699,8 @@
   "attachmentSaveWarning": "Die Datei wird entschlüsselt und unverschlüsselt im gewählten Ordner gespeichert. Sie bleibt dort auch nach dem Abmelden oder Löschen der App-Daten erhalten. Fortfahren?",
   "tabShopping": "Einkauf",
   "settingsShareOnlineStatus": "Online-Status teilen",
+  "settingsShareReadReceipts": "Lesebestätigung senden",
+  "settingsShareReadReceiptsHint": "Zeigt Familienmitgliedern, bis zu welcher deiner Nachrichten du gelesen hast, und dir, wer deine Nachrichten gelesen hat. Der Server und der Anbieter der Gesprächspartner sehen, wer wann gelesen hat. Ausgeschaltet sendest du nur private Lesemarker und siehst auch nicht, wer gelesen hat. Bereits gesendete Bestätigungen lassen sich nicht zurücknehmen; für schon Gelesenes wird nichts nachgesendet.",
   "settingsShareOnlineStatusHint": "Zeigt der Familie, wann du die App nutzt. Die Meldung geht nur Ende-zu-Ende-verschlüsselt an Geräte von Familienmitgliedern. Ausgeschaltet giltst du für andere als offline.",
   "presenceOnline": "Online",
   "presenceOffline": "Offline",
@@ -897,8 +904,8 @@
       }
     }
   },
-  "privacy10Title": "Online-Status, Einzelchats, Einkaufszettel, Avatar",
-  "privacy10Body": "Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Dein Avatar ist eine Ausnahme: Die Wahl eines der zwölf eingebauten Avatare liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. Der Server und alle Familienmitglieder sehen, welches Symbol du gewählt hast; die Wahl bleibt im Raum stehen, auch wenn du entfernt wirst oder dein Konto gelöscht wird. Der Server sieht sonst nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).",
+  "privacy10Title": "Online-Status, Lesebestätigung, Einzelchats, Einkaufszettel, Avatar",
+  "privacy10Body": "Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Die Lesebestätigung („Gelesen“ unter deinen Nachrichten) ist als öffentlicher Lesemarker für den Server und den Anbieter deiner Gesprächspartner sichtbar (wer hat bis zu welcher Nachricht und wann gelesen); sie ist standardmäßig an, du kannst sie in den Einstellungen ausschalten, dann sendest du nur private Marker und siehst auch nicht, wer gelesen hat. Bereits gesendete Bestätigungen lassen sich nicht zurücknehmen. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Dein Avatar ist eine Ausnahme: Die Wahl eines der zwölf eingebauten Avatare liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. Der Server und alle Familienmitglieder sehen, welches Symbol du gewählt hast; die Wahl bleibt im Raum stehen, auch wenn du entfernt wirst oder dein Konto gelöscht wird. Der Server sieht sonst nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).",
   "onbFamilyFound": "Familie „{name}“ gefunden – du bist bereits Mitglied. Die Einrichtung wird abgeschlossen.",
   "@onbFamilyFound": {
     "placeholders": {

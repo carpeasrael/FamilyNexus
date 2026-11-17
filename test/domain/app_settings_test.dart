@@ -65,6 +65,18 @@ void main() {
     expect(AppSettings.fromMap(const <String, String>{}).shareOnlineStatus, isTrue);
   });
 
+  test('Lesebestätigung senden (#526): Standard an, Rundreise, Unsinn und leer fallen auf „an“ zurück', () {
+    expect(const AppSettings().shareReadReceipts, isTrue);
+    final off = const AppSettings().copyWith(shareReadReceipts: false);
+    expect(off.shareReadReceipts, isFalse);
+    expect(AppSettings.fromMap(off.toMap()).shareReadReceipts, isFalse);
+    expect(AppSettings.fromMap(const <String, String>{'shareReadReceipts': 'vielleicht'}).shareReadReceipts, isTrue);
+    expect(AppSettings.fromMap(const <String, String>{'shareReadReceipts': ''}).shareReadReceipts, isTrue);
+    expect(AppSettings.fromMap(const <String, String>{}).shareReadReceipts, isTrue);
+    expect(off == const AppSettings(), isFalse);
+    expect(off.copyWith(shareReadReceipts: true), const AppSettings());
+  });
+
   test('Akzentfarbe: Standard Türkis, Rundreise, Unsinn fällt zurück', () {
     expect(const AppSettings().accent, AccentChoice.teal);
     final lime = const AppSettings().copyWith(accent: AccentChoice.lime);

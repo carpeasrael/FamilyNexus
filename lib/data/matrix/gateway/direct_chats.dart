@@ -19,6 +19,7 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
   LocalSends get _localSends;
   GatewayException _map(Object e);
   bool get _participantsLoaded;
+  bool get _showReadBy;
   Room? _privateRoom();
   Future<void> _refresh();
   Future<bool> _repairEchoes(Client client, Timeline t);
@@ -105,7 +106,7 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
       for (final e in _dmTimelines.entries.toList()) {
         if (!await _repairEchoes(client, e.value)) return;
         if (!identical(_dmTimelines[e.key], e.value)) continue;
-        _dmMessages[e.key] = ChatMapper.messages(e.value, threadId: e.key, sends: _localSends);
+        _dmMessages[e.key] = ChatMapper.messages(e.value, threadId: e.key, sends: _localSends, showReadBy: _showReadBy);
       }
     }
     final dms = <ChatThread>[

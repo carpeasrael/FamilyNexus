@@ -2,7 +2,7 @@
 
 **This is a translation of the German original (`privacy-policy.de.md`). If the two versions differ, the German version prevails.**
 
-**Last updated: 15 November 2026**
+**Last updated: 17 November 2026**
 
 **Platform: native apps for iOS, macOS, Windows, Linux, Flatpak and Android as well as web app.**
 
@@ -51,6 +51,7 @@ share with you or that your provider supplies for synchronization.
 | Task lists, assignments, recurrence rules, completions, times and voluntary comments | Distribute tasks and display the completion history. The history is retained even after a periodic reset of the list. |
 | Family and room names, memberships, roles, invitations and join requests | Manage the family and control access to shared content. |
 | Online/offline status with time | Optionally show other family members your availability. |
+| Read state (public read marker: up to which message a member has read, with time) | Optionally show “Sent” and “Read” or “Read by n” under your own messages. The marker is not end-to-end encrypted and is visible to the provider and to the provider of your chat partners. On by default, can be switched off under “Send read receipts”; markers already sent cannot be taken back. |
 | Calendar themes (freely chosen name up to 30 characters, color) | Assign events to a theme and show them in color. Like events, themes are sent end-to-end encrypted to the family. |
 | Birthdays and memorial days (freely chosen name up to 60 characters, date of birth and date of death, each with or without a year; including third parties and deceased people) | Show the family's birthdays and memorial days in the calendar and on “Today”, with age in years. Like events, the entries are sent end-to-end encrypted to the family. The advance notice of the display is a local setting. |
 | Choice of one of the twelve built-in avatars (only the identifier, no image, no text) | Show the avatar to other family members, including in the chat. The choice is kept as room state in the family room and is not end-to-end encrypted. |
@@ -118,7 +119,7 @@ The connections to the provider are additionally protected with HTTPS/TLS.
 End-to-end encryption does **not hide all metadata**. The provider
 can process, among other things, account and device identifiers, profile details, room names,
 memberships and roles, times, IP addresses as well as sizes and assignments of
-encrypted events. In particular, room state and
+encrypted events. This includes public read receipts (who has read up to which message, and when) as long as “Send read receipts” is on. In particular, room state and
 account management are not end-to-end encrypted like message content. This includes
 the choice of your avatar (one of the twelve built-in avatars): it is kept as room state
 in the family room, is expressly not end-to-end encrypted and is visible to the provider
@@ -138,7 +139,7 @@ only in working memory and does not build a permanent history from it. For
 delivery, the server may temporarily hold encrypted device messages. You can switch off
 sharing under **Settings → Privacy →
 Share online status**. The provider can still
-see connection times.
+see connection times. The read receipt (“Read” under your own messages) is a public read marker and not end-to-end encrypted content. It is on by default and can be switched off under **Settings → Privacy → Send read receipts**; you then only send private read markers and do not see who has read your messages either. Public markers already sent cannot be taken back.
 
 Blocks are stored locally in the encrypted database. They
 hide content on your device; they do not automatically remove the person concerned

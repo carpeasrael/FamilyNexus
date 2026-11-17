@@ -71,6 +71,8 @@ const List<String> _expectedSettings = <String>[
   'tap',
   'L=Online-Status teilen | Zeigt der Familie, wann du die App nutzt. Die Meldung geht nur Ende-zu-Ende-verschlüsselt an Geräte von Familienmitgliedern. Ausgeschaltet giltst du für andere als offline. tap',
   'tap',
+  'L=Lesebestätigung senden | Zeigt Familienmitgliedern, bis zu welcher deiner Nachrichten du gelesen hast, und dir, wer deine Nachrichten gelesen hat. Der Server und der Anbieter der Gesprächspartner sehen, wer wann gelesen hat. Ausgeschaltet sendest du nur private Lesemarker und siehst auch nicht, wer gelesen hat. Bereits gesendete Bestätigungen lassen sich nicht zurücknehmen; für schon Gelesenes wird nichts nachgesendet. tap',
+  'tap',
   'L=Über die App | Speicherorte',
   'L=Datenschutzerklärung button tap',
   'L=Datenbank-Ordner V=/home/test/.local/share/de.inneso.familynexus/databases textfield',

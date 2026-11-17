@@ -47,13 +47,14 @@ tun muss, steht in Abschnitt 1. Rechtliche Angaben sind Hinweise, keine Rechtsbe
 
 ### Datensicherheit (Vorschlag – Verantwortung für die endgültigen Angaben liegt beim Herausgeber)
 
-Der Herausgeber betreibt keinen Server und erhält keine Daten. Die App sendet Daten ausschließlich an den **vom Nutzer gewählten Matrix-Server**; Inhalte sind Ende-zu-Ende-verschlüsselt, Metadaten (Konto-ID, Zeitpunkte, Raumgröße, Geräte, Raum- und Profilnamen, die Wahl eines der zwölf eingebauten Avatare als nicht verschlüsselter Raumzustand) sieht der Serverbetreiber. „Daten werden nicht erhoben“ bleibt zutreffend: der Herausgeber erhält nichts.
+Der Herausgeber betreibt keinen Server und erhält keine Daten. Die App sendet Daten ausschließlich an den **vom Nutzer gewählten Matrix-Server**; Inhalte sind Ende-zu-Ende-verschlüsselt, Metadaten (Konto-ID, Zeitpunkte, Raumgröße, Geräte, Raum- und Profilnamen, öffentliche Lesebestätigungen, die Wahl eines der zwölf eingebauten Avatare als nicht verschlüsselter Raumzustand) sieht der Serverbetreiber. „Daten werden nicht erhoben“ bleibt zutreffend: der Herausgeber erhält nichts.
 
 | Datentyp | Erfasst? | Geteilt? | Hinweis |
 |---|---|---|---|
 | Nachrichten, Dateien, Kalenderereignisse, Kalender-Themen (Name, Farbe), Geburts- und Gedenktage (Name, Datum, auch Dritter und Verstorbener; angelegte Einträge bleiben nach Kontolöschung für die Familie bestehen), Einkaufsliste, Aufgabenlisten | ja, auf Wunsch des Nutzers an den gewählten Matrix-Server | nein (an Familienmitglieder, vom Nutzer gesteuert) | Ende-zu-Ende-verschlüsselt, „Daten werden bei der Übertragung verschlüsselt“: ja |
 | Nutzer-ID (Matrix-ID), Anzeigename | ja (Anmeldung am gewählten Server) | nein | nötig für die App-Funktion, nicht optional |
 | Avatar-Wahl (eine Kennung aus zwölf, kein Bild) | ja, als Raumzustand im Familienraum beim gewählten Matrix-Server, nicht Ende-zu-Ende-verschlüsselt | nein (sichtbar für Familienmitglieder und den Serverbetreiber) | optional; bleibt nach Entfernen oder Kontolöschung im Raum stehen (E-101) |
+| Lesestatus (öffentlicher Lesemarker: bis zu welcher Nachricht jemand gelesen hat, mit Zeitpunkt) | ja, beim gewählten Matrix-Server, nicht Ende-zu-Ende-verschlüsselt | nein (sichtbar für den Serverbetreiber und den Anbieter der Gesprächspartner) | optional, Standard an, unter „Lesebestätigung senden“ abschaltbar; bereits gesendete Marker lassen sich nicht zurücknehmen (E-106) |
 | Standort, Kontakte, Fotos (automatisch), Gesundheit, Finanzen | nein | – | |
 | Kennungen für Werbung / Analyse / Absturzberichte | nein | – | keine Telemetrie, keine SDKs |
 | Löschung | Nutzer löscht lokale Daten in der App („Alle lokalen Daten löschen“) und das Konto beim Anbieter („Konto löschen“, E-73); übrige Serverdaten beim Betreiber des Matrix-Servers | | Konto-Löschung in der App angestoßen |

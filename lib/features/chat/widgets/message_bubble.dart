@@ -117,10 +117,13 @@ class _Bubble extends StatelessWidget {
                         style: monoStyle(context, size: 11, color: t.textSecondary),
                       ),
                     ),
-                    if (m.status == MessageStatus.sending) ...<Widget>[
-                      const SizedBox(width: 6),
-                      Icon(Icons.schedule, size: 12, semanticLabel: l.chatSending),
-                    ],
+                    if (mine)
+                      _DeliveryStatus(
+                        message: m,
+                        myUserId: myUserId,
+                        isFamily: threadId == ChatThread.familyId,
+                        services: services,
+                      ),
                   ]),
                   if (m.status == MessageStatus.failed && !m.retryable)
                     Padding(

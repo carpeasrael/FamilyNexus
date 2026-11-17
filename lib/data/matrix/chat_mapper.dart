@@ -8,6 +8,7 @@ import '../../domain/reaction_codec.dart';
 import '../../domain/text_sanitizer.dart';
 import 'event_trust.dart';
 import 'local_sends.dart';
+import 'read_markers.dart';
 
 /// Übersetzt SDK-Ereignisse in Domänenmodelle. Alle Eingaben stammen von
 /// anderen Teilnehmern und gelten als nicht vertrauenswürdig: Typen werden
@@ -41,8 +42,11 @@ class ChatMapper {
     required String threadId,
     required LocalSends sends,
     String? myUserId,
+    bool showReadBy = false,
   }) {
     final me = myUserId ?? timeline.room.client.userID;
+    // Gegenseitigkeit (E-106): Ist die eigene Lesebestätigung aus, zeigt die App auch bei anderen nichts.
+    final markers = showReadBy ? ReadMarkers.of(timeline, me) : ReadMarkers.none;
     final joinedAt = me == null ? null : _joinedAt(timeline, me);
     final pastNames = _pastNames(timeline);
     final encryptedReactions = _encryptedReactions(timeline, me);
@@ -51,7 +55,7 @@ class ChatMapper {
     DateTime? firstHidden;
     for (final e in timeline.events.reversed) {
       try {
-        final m = _map(timeline, e, pastNames, me, threadId, sends, encryptedReactions);
+        final m = _map(timeline, e, pastNames, me, threadId, sends, encryptedReactions, markers);
         if (m == null) continue;
         if (m.undecryptable && joinedAt != null && m.time.isBefore(joinedAt)) {
           hidden++;
@@ -240,6 +244,7 @@ class ChatMapper {
     String threadId,
     LocalSends sends,
     Map<String, Map<String, Set<String>>> encryptedReactions,
+    ReadMarkers markers,
   ) {
     final name = _senderName(e, pastNames);
     final status = _status(e, sends);
@@ -311,6 +316,7 @@ class ChatMapper {
       blockedAttachment: blocked,
       status: status,
       retryable: sends.canRetry(e.eventId, threadId, timeline.room.id),
+      readBy: e.senderId == me && status == MessageStatus.sent ? markers.readersOf(e) : const <String>{},
     );
   }
 }

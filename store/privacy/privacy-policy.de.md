@@ -1,6 +1,6 @@
 # Datenschutzerklärung für FamilyNexus
 
-**Stand: 15. November 2026**
+**Stand: 17. November 2026**
 
 **Plattform: native Apps für iOS, macOS, Windows, Linux, Flatpak und Android sowie Web-App.**
 
@@ -49,6 +49,7 @@ teilen oder die dein Anbieter zur Synchronisierung bereitstellt.
 | Aufgabenlisten, Zuordnungen, Wiederholungsregeln, Erledigungen, Zeitpunkte und freiwillige Kommentare | Aufgaben verteilen und den Erledigungsverlauf anzeigen. Der Verlauf bleibt auch nach einem periodischen Neustart der Liste erhalten. |
 | Familien- und Raumnamen, Mitgliedschaften, Rollen, Einladungen und Beitrittsanfragen | Familie verwalten und den Zugriff auf gemeinsame Inhalte steuern. |
 | Online-/Offline-Status mit Zeitpunkt | Optional anderen Familienmitgliedern die Erreichbarkeit anzeigen. |
+| Lesestatus (öffentlicher Lesemarker: bis zu welcher Nachricht ein Mitglied gelesen hat, mit Zeitpunkt) | Optional unter eigenen Nachrichten „Gesendet“ und „Gelesen“ bzw. „Gelesen von n“ anzeigen. Der Marker ist nicht Ende-zu-Ende-verschlüsselt und für den Anbieter sowie den Anbieter deiner Gesprächspartner sichtbar. Standardmäßig an, unter „Lesebestätigung senden“ abschaltbar; bereits gesendete Marker lassen sich nicht zurücknehmen. |
 | Kalender-Themen (frei gewählter Name bis 30 Zeichen, Farbe) | Termine einem Thema zuordnen und farbig anzeigen. Themen werden wie Termine Ende-zu-Ende-verschlüsselt an die Familie gesendet. |
 | Geburts- und Gedenktage (frei gewählter Name bis 60 Zeichen, Geburts- und Todesdatum, jeweils mit oder ohne Jahr; auch von Dritten und Verstorbenen) | Geburts- und Gedenktage der Familie im Kalender und auf „Heute“ anzeigen, mit Alter in Jahren. Die Einträge werden wie Termine Ende-zu-Ende-verschlüsselt an die Familie gesendet. Die Vorlaufzeit der Anzeige ist eine lokale Einstellung. |
 | Wahl eines der zwölf eingebauten Avatare (nur die Kennung, kein Bild, kein Text) | Den Avatar bei anderen Familienmitgliedern anzeigen, auch im Chat. Die Wahl liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. |
@@ -116,7 +117,7 @@ Die Verbindungen zum Anbieter sind zusätzlich mit HTTPS/TLS geschützt.
 Ende-zu-Ende-Verschlüsselung verbirgt **nicht sämtliche Metadaten**. Der Anbieter
 kann unter anderem Konto- und Gerätekennungen, Profilangaben, Raumnamen,
 Mitgliedschaften und Rollen, Zeitpunkte, IP-Adressen sowie Größen und Zuordnungen
-verschlüsselter Ereignisse verarbeiten. Insbesondere Raumzustand und
+verschlüsselter Ereignisse verarbeiten. Dazu gehören öffentliche Lesebestätigungen (wer bis zu welcher Nachricht und wann gelesen hat), solange „Lesebestätigung senden“ eingeschaltet ist. Insbesondere Raumzustand und
 Kontoverwaltung sind nicht wie Nachrichteninhalte Ende-zu-Ende-verschlüsselt. Dazu
 gehört die Wahl deines Avatars (eines der zwölf eingebauten Avatare): Sie liegt als
 Raumzustand im Familienraum, ist ausdrücklich nicht Ende-zu-Ende-verschlüsselt und
@@ -136,7 +137,7 @@ nur im Arbeitsspeicher und führt daraus keinen dauerhaften Verlauf. Für die
 Zustellung kann der Server verschlüsselte Gerätenachrichten vorübergehend
 vorhalten. Du kannst das Teilen unter **Einstellungen → Datenschutz →
 Online-Status teilen** ausschalten. Der Anbieter kann dennoch Verbindungszeitpunkte
-erkennen.
+erkennen. Die Lesebestätigung („Gelesen“ unter eigenen Nachrichten) ist ein öffentlicher Lesemarker und kein Ende-zu-Ende-verschlüsselter Inhalt. Sie ist standardmäßig an und lässt sich unter **Einstellungen → Datenschutz → Lesebestätigung senden** ausschalten; dann sendest du nur private Lesemarker und siehst auch nicht, wer deine Nachrichten gelesen hat. Bereits gesendete öffentliche Marker lassen sich nicht zurücknehmen.
 
 Blockierungen werden lokal in der verschlüsselten Datenbank gespeichert. Sie
 blenden Inhalte auf deinem Gerät aus; sie entfernen die betroffene Person nicht

@@ -105,7 +105,7 @@ void main() {
   });
 
   testWidgets('Version mit Build-Nummer im Menü, unter „Über die App“ und im Datenbericht (#14)', (tester) async {
-    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.physicalSize = const Size(900, 3300);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final (services, _) = await _services(lang: 'de');
@@ -127,7 +127,7 @@ void main() {
   });
 
   testWidgets('Datenschutzerklärung ist erreichbar (de)', (tester) async {
-    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.physicalSize = const Size(900, 3300);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final app = await buildTestApp(lang: 'de');
@@ -142,7 +142,7 @@ void main() {
   });
 
   testWidgets('Alle lokalen Daten löschen: nur nach Bestätigung', (tester) async {
-    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.physicalSize = const Size(900, 3300);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final app = await buildTestApp(lang: 'de');
@@ -166,7 +166,7 @@ void main() {
   });
 
   testWidgets('#272 Alle lokalen Daten löschen zeigt keine Anmeldung und prüft keinen Anbieter', (tester) async {
-    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.physicalSize = const Size(900, 3300);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final app = await buildTestApp(lang: 'de', matrixOrgDefault: true);
@@ -215,7 +215,7 @@ void main() {
   });
 
   testWidgets('Akzentfarbe wählbar: Standard Türkis, Wechsel färbt die Oberfläche und bleibt gespeichert', (tester) async {
-    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.physicalSize = const Size(900, 3300);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final (services, _) = await _services(lang: 'de');

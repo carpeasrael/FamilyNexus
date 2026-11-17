@@ -841,4 +841,143 @@ void main() {
       expect(m.single.senderName, '@neu:fake.test');
     });
   });
+
+  group('#526: Lesestand eigener Nachrichten (readBy)', () {
+    const me = '@ida:fake.test';
+    const ben = '@ben:fake.test';
+    const cleo = '@cleo:fake.test';
+
+    Event own(String id, int ts) => ev(id, text('Hallo $id'), sender: me, status: EventStatus.sent.intValue, ts: ts);
+
+    void membership(String user, String ms) => room.setState(Event.fromJson(<String, Object?>{
+          'type': 'm.room.member',
+          'event_id': '\$m$user$ms',
+          'sender': user,
+          'state_key': user,
+          'origin_server_ts': 1,
+          'content': <String, Object?>{'membership': ms},
+        }, room));
+
+    void marker(String user, String eventId, {int ts = 5000, bool main = false}) {
+      final t = main ? (room.receiptState.mainThread ??= LatestReceiptStateForTimeline.empty()) : room.receiptState.global;
+      t.otherUsers[user] = LatestReceiptStateData(eventId, ts);
+    }
+
+    List<ChatMessage> mapRead(List<Event> chronological, {bool show = true}) => ChatMapper.messages(
+          timeline(chronological.reversed.toList()),
+          threadId: 'family',
+          sends: sends,
+          myUserId: me,
+          showReadBy: show,
+        );
+
+    Map<String, Set<String>> readBy(List<ChatMessage> m) => <String, Set<String>>{for (final e in m) e.id: e.readBy};
+
+    test('Standard ohne Schalter: readBy leer, auch mit Marker', () {
+      membership(ben, 'join');
+      marker(ben, r'$b');
+      final m = ChatMapper.messages(
+        timeline(<Event>[own(r'$b', 20), own(r'$a', 10)]),
+        threadId: 'family',
+        sends: sends,
+        myUserId: me,
+      );
+      expect(m.every((e) => e.readBy.isEmpty), isTrue);
+    });
+
+    test('Marker auf der Nachricht: gelesen; Nachrichten davor ebenfalls, danach nicht', () {
+      membership(ben, 'join');
+      marker(ben, r'$b');
+      final m = mapRead(<Event>[own(r'$a', 10), own(r'$b', 20), own(r'$c', 30)]);
+      expect(readBy(m), <String, Set<String>>{
+        r'$a': <String>{ben},
+        r'$b': <String>{ben},
+        r'$c': <String>{},
+      });
+    });
+
+    test('Marker vor der Nachricht: nicht gelesen', () {
+      membership(ben, 'join');
+      marker(ben, r'$a');
+      expect(mapRead(<Event>[own(r'$a', 10), own(r'$b', 20)]).last.readBy, isEmpty);
+    });
+
+    test('mehrere Mitglieder; eigene ID und fremde Nachrichten tragen nie readBy', () {
+      membership(ben, 'join');
+      membership(cleo, 'join');
+      membership(me, 'join');
+      marker(ben, r'$b');
+      marker(cleo, r'$a');
+      marker(me, r'$b');
+      final m = mapRead(<Event>[own(r'$a', 10), own(r'$b', 20), ev(r'$x', text('von Ben'), ts: 30)]);
+      expect(readBy(m), <String, Set<String>>{
+        r'$a': <String>{ben, cleo},
+        r'$b': <String>{ben},
+        r'$x': <String>{},
+      });
+    });
+
+    test('Mitglied mit Zustand leave, invite oder ban zählt nicht', () {
+      membership(ben, 'leave');
+      membership(cleo, 'invite');
+      membership('@dora:fake.test', 'ban');
+      marker(ben, r'$a');
+      marker(cleo, r'$a');
+      marker('@dora:fake.test', r'$a');
+      expect(mapRead(<Event>[own(r'$a', 10)]).single.readBy, isEmpty);
+    });
+
+    test('fehlendes Member-Ereignis (Lazy Loading): zählt nicht, kein Netzwerkzugriff nötig', () {
+      marker(ben, r'$a');
+      expect(mapRead(<Event>[own(r'$a', 10)]).single.readBy, isEmpty);
+    });
+
+    test('Marker im mainThread (anderer Client) zählt', () {
+      membership(ben, 'join');
+      marker(ben, r'$a', main: true);
+      expect(mapRead(<Event>[own(r'$a', 10)]).single.readBy, <String>{ben});
+    });
+
+    test('Marker auf ein nicht angezeigtes Ereignis hinter der Nachricht (Reaktion) zählt als gelesen', () {
+      membership(ben, 'join');
+      marker(ben, r'$r');
+      final reaction = ev(r'$r', <String, Object?>{}, type: 'm.reaction', ts: 25);
+      final m = mapRead(<Event>[own(r'$a', 10), reaction]);
+      expect(m.single.readBy, <String>{ben});
+    });
+
+    test('Marker außerhalb des Fensters: Zeitstempel entscheidet', () {
+      membership(ben, 'join');
+      marker(ben, r'$unbekannt', ts: 15);
+      final m = mapRead(<Event>[own(r'$a', 10), own(r'$b', 20)]);
+      expect(readBy(m), <String, Set<String>>{
+        r'$a': <String>{ben},
+        r'$b': <String>{},
+      });
+    });
+
+    test('Schalter aus (Gegenseitigkeit): readBy leer', () {
+      membership(ben, 'join');
+      marker(ben, r'$a');
+      expect(mapRead(<Event>[own(r'$a', 10)], show: false).single.readBy, isEmpty);
+    });
+
+    test('Änderung des Receipt-Zustands liefert beim nächsten Abbilden anderes readBy', () {
+      membership(ben, 'join');
+      final events = <Event>[own(r'$a', 10), own(r'$b', 20)];
+      expect(mapRead(events).last.readBy, isEmpty);
+      marker(ben, r'$b');
+      expect(mapRead(events).last.readBy, <String>{ben});
+    });
+
+    test('laufende eigene Sendung trägt kein readBy', () {
+      membership(ben, 'join');
+      marker(ben, r'$a', ts: 99999);
+      final c = Completer<String?>();
+      unawaited(sends.run(txid: 't1', threadId: 'family', roomId: room.id, tail: 'x', send: () => c.future));
+      final e = ev('t1', text('x'), sender: me, status: EventStatus.sending.intValue, encrypted: false, unsigned: <String, Object?>{'transaction_id': 't1'});
+      expect(mapRead(<Event>[e]).single.readBy, isEmpty);
+      c.complete(r'$server');
+    });
+  });
 }

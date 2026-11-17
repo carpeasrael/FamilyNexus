@@ -87,7 +87,7 @@ part 'gateway/security_verification.dart';
 /// * SDK-Datenbank: SQLCipher, eigener Schlüssel im Keystore (Linux: Secret Service).
 /// * SDK-Logs werden auf AppLog umgeleitet (nur Typ des Fehlers) und nicht gesammelt.
 /// * Nachrichten werden ohne Markdown-Parsing und ohne Slash-Befehle gesendet.
-/// * Lesebestätigungen sind privat (`receiptsPublicByDefault: false`).
+/// * Lesebestätigungen sind standardmäßig öffentlich (`m.read`), wenn „Lesebestätigung senden“ an ist (E-106, #526); aus: nur privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
 class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _AvatarsModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
@@ -106,6 +106,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     this._accountStore,
     @visibleForTesting bool ensureAvatarPermission = true,
     @visibleForTesting DateTime Function()? now,
+    this._shareReadReceipts = _readReceiptsOn,
   })  : assert(_participantsRetryBase > Duration.zero),
         _ensureAvatarPermissionEnabled = ensureAvatarPermission,
         _now = now ?? DateTime.now,
@@ -113,6 +114,13 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
         _http = HttpsOnlyClient(httpClient);
 
   final Future<sql.Database> Function(String path, String key)? _databaseOpener;
+
+  static bool _readReceiptsOn() => true;
+
+  /// Eigene Lesebestätigung öffentlich senden und fremde anzeigen (Einstellung, #526, E-106); sonst nur private Marker.
+  final bool Function() _shareReadReceipts;
+  @override
+  bool get _showReadBy => _shareReadReceipts();
 
   // ------------------------------------------------------------ Avatare (#422, E-101)
 
@@ -523,11 +531,15 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     final last = _timelineFor(threadId)?.events.where((e) => e.status.isSent).firstOrNull;
     if (room == null || last == null || room.notificationCount == 0) return;
     try {
-      await room.setReadMarker(last.eventId, mRead: last.eventId);
+      await room.setReadMarker(last.eventId, mRead: last.eventId, public: _shareReadReceipts());
     } catch (e) {
       AppLog.e('gateway', 'Gelesen-Markierung fehlgeschlagen', e);
     }
   }
+
+  /// Bildet die Nachrichten neu ab, wenn sich die Einstellung „Lesebestätigung senden“ ändert (#526).
+  @override
+  void refreshReadStates() => _scheduleRefresh();
 
   // ---------------------------------------------------------------- Aufbau
 
@@ -1313,7 +1325,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     _family = _buildFamily(room, client.userID!);
     _updateAvatarSnapshot();
     _ensureAvatarPermission();
-    _messages = ChatMapper.messages(timeline, threadId: ChatThread.familyId, sends: _localSends);
+    _messages = ChatMapper.messages(timeline, threadId: ChatThread.familyId, sends: _localSends, showReadBy: _showReadBy);
     if (_presenceRoomId != room.id) {
       // Andere Familie: der Status der alten gilt nicht weiter.
       _presence.clear();

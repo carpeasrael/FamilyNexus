@@ -82,6 +82,12 @@ class _PrivacySection extends StatelessWidget {
         value: s.shareOnlineStatus,
         onChanged: (v) => controller.update((c) => c.copyWith(shareOnlineStatus: v)),
       ),
+      SwitchListTile(
+        title: Text(l.settingsShareReadReceipts),
+        subtitle: Text(l.settingsShareReadReceiptsHint),
+        value: s.shareReadReceipts,
+        onChanged: (v) => controller.update((c) => c.copyWith(shareReadReceipts: v)),
+      ),
       ListTile(
         leading: const Icon(Icons.block),
         title: Text(l.settingsBlockedUsers),
