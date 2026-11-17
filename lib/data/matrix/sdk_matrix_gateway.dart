@@ -17,6 +17,8 @@ import '../../core/app_log.dart';
 import '../../core/json_read.dart';
 import '../../core/platform_info.dart';
 import '../../domain/account_deletion.dart';
+import '../../domain/anniversaries.dart';
+import '../../domain/anniversary_codec.dart';
 import '../../domain/attachment_policy.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';

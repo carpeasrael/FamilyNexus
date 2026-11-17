@@ -6,10 +6,12 @@ import '../../domain/family.dart';
 import '../../domain/presence.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/widgets/clock_tick.dart';
+import '../calendar/anniversaries_screen.dart';
 import '../calendar/calendar_screen.dart' show SectionCard;
 import '../calendar/event_detail_screen.dart';
 import '../calendar/event_editor_screen.dart';
 import '../calendar/event_tile.dart';
+import '../calendar/widgets/anniversary_tile.dart';
 import '../family/member_avatar_view.dart';
 import '../presence/presence_view.dart';
 import '../reminders/permission_hint.dart';
@@ -43,7 +45,7 @@ class TodayScreen extends StatelessWidget {
         child: const Icon(Icons.add),
       ),
       body: ListenableBuilder(
-        listenable: Listenable.merge(<Listenable>[c, services.gateway, ?reminders, ?services.shopping, ?services.tasks]),
+        listenable: Listenable.merge(<Listenable>[c, services.gateway, services.settings, ?reminders, ?services.shopping, ?services.tasks]),
         builder: (context, _) {
           final upcoming = c.upcoming(limit: maxUpcoming);
           final unread = services.gateway.unreadCount;
@@ -72,6 +74,21 @@ class TodayScreen extends StatelessWidget {
                         ),
                     ]),
             ),
+            // Geburts- und Gedenktage innerhalb der Vorlaufzeit (E-104); ohne Treffer entfällt die Karte. Im
+            // ClockTick, damit der Tageswechsel ohne Datenänderung greift.
+            if (c.anniversaries != null)
+              ClockTick(builder: (context) {
+                final due = c.anniversariesDue(services.settings.settings.anniversaryLeadDays);
+                if (due.isEmpty) return const SizedBox.shrink();
+                return SectionCard(
+                  title: l.anniversariesTodayTitle,
+                  trailing: TextButton(
+                    onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => AnniversariesScreen(controller: c))),
+                    child: Text(l.anniversariesTitle),
+                  ),
+                  child: Column(children: <Widget>[for (final h in due) AnniversaryTile(hit: h, showWhen: true)]),
+                );
+              }),
             // Im Browser gibt es keine Erinnerungen (E-53, #145): keine Karte.
             if (reminders != null)
               SectionCard(

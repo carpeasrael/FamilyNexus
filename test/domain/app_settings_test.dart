@@ -84,4 +84,26 @@ void main() {
     expect(AppSettings.fromMap(const <String, String>{}).notifyChat, isTrue);
     expect(AppSettings.fromMap(const <String, String>{'notifyShopping': 'kaputt'}).notifyShopping, isTrue);
   });
+
+  group('anniversaryLeadDays (E-104)', () {
+    test('Standard 7, Roundtrip, Grenzwerte 0 und 60', () {
+      expect(const AppSettings().anniversaryLeadDays, 7);
+      for (final d in <int>[0, 1, 7, 60]) {
+        expect(AppSettings.fromMap(AppSettings(anniversaryLeadDays: d).toMap()).anniversaryLeadDays, d);
+      }
+    });
+
+    test('ungültig, negativ oder über 60 beim Lesen: 7', () {
+      for (final v in <String>['abc', '-1', '61', '', '7.5']) {
+        expect(AppSettings.fromMap(<String, String>{'anniversaryLeadDays': v}).anniversaryLeadDays, 7, reason: v);
+      }
+      expect(AppSettings.fromMap(const <String, String>{}).anniversaryLeadDays, 7);
+    });
+
+    test('copyWith klemmt auf 0 bis 60; Gleichheit berücksichtigt den Wert', () {
+      expect(const AppSettings().copyWith(anniversaryLeadDays: 99).anniversaryLeadDays, 60);
+      expect(const AppSettings().copyWith(anniversaryLeadDays: -2).anniversaryLeadDays, 0);
+      expect(const AppSettings(anniversaryLeadDays: 3) == const AppSettings(anniversaryLeadDays: 4), isFalse);
+    });
+  });
 }

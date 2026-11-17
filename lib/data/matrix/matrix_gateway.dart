@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../domain/account_deletion.dart';
+import '../../domain/anniversaries.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/chat.dart';
@@ -387,6 +388,11 @@ abstract class MatrixGateway implements Listenable {
 
   /// Sendet ein Kalender-Thema (ein Ereignis je Thema) verschlüsselt in den Familienraum (E-99).
   Future<void> publishEventTheme(EventTheme theme);
+
+  // ------------------------------------------------------------ Geburts- und Gedenktage
+
+  /// Sendet einen Geburts-/Gedenktag-Eintrag (ein Ereignis je Person) verschlüsselt in den Familienraum (E-104).
+  Future<void> publishAnniversary(AnniversaryPerson person);
 
   // ------------------------------------------------------------ Avatare
 

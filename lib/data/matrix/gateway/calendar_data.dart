@@ -115,6 +115,8 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
         _emit(TaskLogSignal(e.senderId, e.originServerTs, c));
       } else if (shared && e.type == EventThemeCodec.type) {
         _emit(EventThemeSignal(e.senderId, e.originServerTs, c));
+      } else if (shared && e.type == AnniversaryCodec.type) {
+        _emit(AnniversarySignal(e.senderId, e.originServerTs, c));
       } else if (!shared && e.type == EventCodec.privateType) {
         _emit(PrivateEventSignal(e.senderId, e.originServerTs, c));
       } else if (e.type == EventTypes.Encrypted) {
@@ -132,6 +134,7 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
     TaskCodec.listType,
     TaskCodec.logType,
     EventThemeCodec.type,
+    AnniversaryCodec.type,
     InviteTicket.type,
   };
 
@@ -345,6 +348,26 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
       rethrow;
     } catch (e) {
       AppLog.e('gateway', 'Kalender-Thema konnte nicht gesendet werden', e);
+      throw _map(e);
+    }
+  }
+
+  @override
+  Future<void> publishAnniversary(AnniversaryPerson person) async {
+    final room = _requireEncryptedRoom();
+    if (person.by != _client?.userID) throw const GatewayException(GatewayError.invalidInput);
+    final Map<String, Object?> content;
+    try {
+      content = AnniversaryCodec.encode(person);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    try {
+      await _sendCalendar(room, AnniversaryCodec.type, content);
+    } on GatewayException {
+      rethrow;
+    } catch (e) {
+      AppLog.e('gateway', 'Geburtstagseintrag konnte nicht gesendet werden', e);
       throw _map(e);
     }
   }

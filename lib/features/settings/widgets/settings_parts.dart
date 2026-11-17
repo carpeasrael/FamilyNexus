@@ -46,6 +46,13 @@ class _DisplaySection extends StatelessWidget {
         onChanged: (v) => controller.update((c) => c.copyWith(themeMode: v)),
       ),
       _AccentPicker(selected: s.accent, onChanged: (a) => controller.update((c) => c.copyWith(accent: a))),
+      _DropdownTile<int>(
+        label: l.settingsAnniversaryLead,
+        value: AppSettings.anniversaryLeadChoices.contains(s.anniversaryLeadDays) ? s.anniversaryLeadDays : AppSettings.defaultAnniversaryLeadDays,
+        items: <int, String>{for (final d in AppSettings.anniversaryLeadChoices) d: l.anniversaryLeadOption(d)},
+        onChanged: controller.setAnniversaryLeadDays,
+        stacked: true,
+      ),
       SwitchListTile(
         title: Text(l.settingsReduceEffects),
         subtitle: Text(l.settingsReduceEffectsHint),
@@ -172,8 +179,11 @@ class _DropdownTile<T> extends StatelessWidget {
     required this.value,
     required this.items,
     required this.onChanged,
+    this.stacked = false,
   });
 
+  /// Auswahl immer unter dem Titel (lange Beschriftungen, schmale Bildschirme).
+  final bool stacked;
   final String label;
   final T value;
   final Map<T, String> items;
@@ -182,7 +192,7 @@ class _DropdownTile<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Bei großer Schrift ist neben dem Titel kein Platz: Die Auswahl rutscht unter den Titel (#274).
-    final large = MediaQuery.textScalerOf(context).scale(1) > 1.3;
+    final large = stacked || MediaQuery.textScalerOf(context).scale(1) > 1.3;
     final dropdown = Semantics(
       label: label,
       container: true,

@@ -17,6 +17,10 @@ class SettingsController extends ChangeNotifier {
   static Future<SettingsController> load(KeyValueStore store) async =>
       SettingsController(store, AppSettings.fromMap(await store.readAll()));
 
+  /// Setzt die Vorlaufzeit der Geburts- und Gedenktage (E-104), geklemmt auf 0–60; bei Speicherfehler Rückfall
+  /// auf den Vorwert wie [update].
+  Future<bool> setAnniversaryLeadDays(int days) => update((c) => c.copyWith(anniversaryLeadDays: days));
+
   /// Wendet [change] an. Schlägt das Speichern fehl, wird der vorherige Zustand
   /// wiederhergestellt; Rückgabe `false`.
   Future<bool> update(AppSettings Function(AppSettings) change) async {

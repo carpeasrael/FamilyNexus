@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
+import '../../domain/anniversary_calc.dart';
 import '../../domain/calendar_view.dart';
 import '../../domain/occurrence.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -11,11 +12,14 @@ import '../../ui/theme/app_theme.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../family/member_avatar_view.dart';
+import 'anniversaries_screen.dart';
 import 'calendar_controller.dart';
 import 'event_detail_screen.dart';
 import 'event_editor_screen.dart';
 import 'event_tile.dart';
 import 'formatting.dart';
+import 'widgets/anniversary_day_marker.dart';
+import 'widgets/anniversary_tile.dart';
 import 'year_progress_card.dart';
 
 enum CalendarMode { day, week, month, agenda }
@@ -175,6 +179,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
             ),
             IconButton(tooltip: l.calendarNext, icon: const Icon(Icons.chevron_right), onPressed: () => _shift(1)),
+            if (AppScope.of(context).calendar?.anniversaries != null)
+              IconButton(
+                tooltip: l.anniversariesTitle,
+                icon: const Icon(Icons.cake_outlined),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => AnniversariesScreen(controller: AppScope.read(context).calendar!)),
+                ),
+              ),
             TextButton(onPressed: _today, child: Text(l.calendarToday)),
           ]),
         ]),
@@ -225,16 +237,28 @@ class _CalendarScreenState extends State<CalendarScreen> {
         final to = from.add(const Duration(days: 60));
         final occ = c.occurrences(from, to, persons: _activePersons);
         final groups = CalendarView.groupByDay(occ, c.zone, from, to);
-        if (groups.isEmpty) return Center(child: Text(l.calendarNoEvents));
+        final hits = _hitsByDay(c.anniversariesOn(_focus, DateTime.utc(_focus.year, _focus.month, _focus.day + 59)));
+        // Auch Tage ohne Termine, aber mit Geburts- oder Gedenktag; „keine Termine“ erst, wenn beides fehlt.
+        final days = <DateTime>{...groups.keys, ...hits.keys}.toList()..sort();
+        if (days.isEmpty) return Center(child: Text(l.calendarNoEvents));
         return ListView(padding: const EdgeInsets.fromLTRB(12, 12, 12, 96), children: <Widget>[
-          for (final e in groups.entries) ..._daySection(c, l, fmt, e.key, e.value, header: true),
+          for (final d in days) ..._daySection(c, l, fmt, d, groups[d] ?? const <Occurrence>[], hits[d] ?? const <AnniversaryHit>[], header: true),
         ]);
       case CalendarMode.month:
         return _month(c, l, fmt);
     }
   }
 
-  List<Widget> _daySection(CalendarController c, AppLocalizations l, Fmt fmt, DateTime day, List<Occurrence> list, {required bool header}) {
+  /// Treffer der Geburts- und Gedenktage nach Kalendertag (UTC-Datum) gruppiert.
+  Map<DateTime, List<AnniversaryHit>> _hitsByDay(List<AnniversaryHit> hits) {
+    final out = <DateTime, List<AnniversaryHit>>{};
+    for (final h in hits) {
+      out.putIfAbsent(h.occursOn, () => <AnniversaryHit>[]).add(h);
+    }
+    return out;
+  }
+
+  List<Widget> _daySection(CalendarController c, AppLocalizations l, Fmt fmt, DateTime day, List<Occurrence> list, List<AnniversaryHit> anniversaries, {required bool header}) {
     final t = AuroraTokens.of(context);
     final isToday = _isToday(day);
     return <Widget>[
@@ -253,6 +277,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ]),
           ),
         ),
+      for (final h in anniversaries) AnniversaryTile(hit: h),
       for (final o in list) EventTile(occurrence: o, controller: c, onTap: () => _open(o, c)),
     ];
   }
@@ -266,11 +291,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final from = CalendarView.startOfDay(c.zone, days.first).toUtc();
     final to = CalendarView.endOfDay(c.zone, days.last).toUtc();
     final occ = c.occurrences(from, to, persons: _activePersons);
+    final hits = _hitsByDay(c.anniversariesOn(days.first, days.last));
     final children = <Widget>[];
     for (final d in days) {
       final list = CalendarView.forDay(occ, c.zone, d);
-      if (showHeaders || list.isNotEmpty) children.addAll(_daySection(c, l, fmt, d, list, header: showHeaders));
-      if (showHeaders && list.isEmpty) {
+      final dayHits = hits[d] ?? const <AnniversaryHit>[];
+      if (showHeaders || list.isNotEmpty || dayHits.isNotEmpty) children.addAll(_daySection(c, l, fmt, d, list, dayHits, header: showHeaders));
+      if (showHeaders && list.isEmpty && dayHits.isEmpty) {
         children.add(Padding(
           padding: const EdgeInsets.only(left: 8, bottom: 4),
           child: Text(l.calendarNoEvents, style: Theme.of(context).textTheme.bodySmall),
@@ -288,6 +315,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final to = CalendarView.endOfDay(c.zone, grid.last).toUtc();
     final occ = c.occurrences(from, to, persons: _activePersons);
     final selected = CalendarView.forDay(occ, c.zone, _focus);
+    final hits = _hitsByDay(c.anniversariesOn(grid.first, grid.last));
+    final selectedHits = hits[_focus] ?? const <AnniversaryHit>[];
     final weekdays = CalendarView.weekDays(_focus);
     return ListView(padding: const EdgeInsets.fromLTRB(12, 12, 12, 96), children: <Widget>[
       Row(children: <Widget>[
@@ -303,7 +332,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         childAspectRatio: 0.95 / math.max(1.0, 1 + (MediaQuery.textScalerOf(context).scale(14) / 14 - 1) * 0.5),
         children: <Widget>[
           for (final d in grid)
-            _dayCell(c, l, fmt, t, d, CalendarView.forDay(occ, c.zone, d), inMonth: d.month == _focus.month, selected: d == _focus),
+            _dayCell(c, l, fmt, t, d, CalendarView.forDay(occ, c.zone, d), (hits[d] ?? const <AnniversaryHit>[]).length, inMonth: d.month == _focus.month, selected: d == _focus),
         ],
       ),
       const SizedBox(height: 12),
@@ -311,20 +340,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
         header: true,
         child: Text('${fmt.dateLong(_focus)} · ${l.calendarEventsOnDay(selected.length)}', style: Theme.of(context).textTheme.titleSmall),
       ),
+      for (final h in selectedHits) AnniversaryTile(hit: h),
       for (final o in selected) EventTile(occurrence: o, controller: c, onTap: () => _open(o, c)),
       YearProgressCard(today: c.today),
     ]);
   }
 
-  Widget _dayCell(CalendarController c, AppLocalizations l, Fmt fmt, AuroraTokens t, DateTime d, List<Occurrence> list, {required bool inMonth, required bool selected}) {
+  Widget _dayCell(CalendarController c, AppLocalizations l, Fmt fmt, AuroraTokens t, DateTime d, List<Occurrence> list, int anniversaryCount, {required bool inMonth, required bool selected}) {
     final today = _isToday(d);
+    final anniversarySuffix = anniversaryCount > 0 ? ', ${l.calendarAnniversariesOnDay(anniversaryCount)}' : '';
     final todaySuffix = today ? ', ${l.calendarToday}' : '';
     final colors = list.map((o) => AuroraTokens.personColors[c.displayColor(o.event) % AuroraTokens.personColors.length]).toSet().take(3).toList();
     return Semantics(
       button: true,
       selected: selected,
       // Volles Datum über fmt.dateLong nach App-Sprache, nicht d.day: Monat und Nachbarmonat bleiben hörbar (#463).
-      label: '${fmt.dateLong(d)}, ${l.calendarEventsOnDay(list.length)}$todaySuffix',
+      label: '${fmt.dateLong(d)}, ${l.calendarEventsOnDay(list.length)}$anniversarySuffix$todaySuffix',
       excludeSemantics: true,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -355,6 +386,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   for (final col in colors)
                     Container(margin: const EdgeInsets.symmetric(horizontal: 1.5), width: 6, height: 6, decoration: BoxDecoration(color: col, shape: BoxShape.circle)),
                   if (list.length > 3) Text('+', style: TextStyle(fontSize: 9, color: t.textSecondary)),
+                  if (anniversaryCount > 0) const AnniversaryDayMarker(),
                 ]),
               ),
             ]),

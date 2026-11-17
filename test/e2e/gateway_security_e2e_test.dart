@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:family_nexus/data/matrix/event_trust.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
+import 'package:family_nexus/domain/anniversary_codec.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/chat.dart';
@@ -567,7 +568,7 @@ void main() {
       final raw = t.peer.sdkClient!;
       final own = t.g.sdkClient!;
       const junk = <String, Object?>{'x': 'KLARTEXT'};
-      for (final type in <String>[EventCodec.sharedType, EventCodec.rsvpType, ShoppingCodec.type, TaskCodec.listType, TaskCodec.logType, EventThemeCodec.type]) {
+      for (final type in <String>[EventCodec.sharedType, EventCodec.rsvpType, ShoppingCodec.type, TaskCodec.listType, TaskCodec.logType, EventThemeCodec.type, AnniversaryCodec.type]) {
         await raw.sendMessage(t.roomId, type, raw.generateUniqueTransactionId(), junk);
       }
       await own.sendMessage(privateId, EventCodec.privateType, own.generateUniqueTransactionId(), junk);

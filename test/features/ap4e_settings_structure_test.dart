@@ -42,6 +42,8 @@ const List<String> _expectedSettings = <String>[
   'L=Orange button',
   'L=Rosé button',
   'L=Grün button',
+  'L=Geburtstage anzeigen',
+  'L=Geburtstage anzeigen | 7 Tage vorher button tap',
   'L=Effekte reduzieren | Weniger Unschärfe und Leuchten, deckendere Flächen. tap',
   'tap',
   'L=Konto',

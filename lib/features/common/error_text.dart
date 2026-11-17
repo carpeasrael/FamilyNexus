@@ -1,4 +1,6 @@
 import '../../data/matrix/matrix_gateway.dart';
+import '../../domain/anniversaries.dart';
+import '../../domain/anniversary_service.dart';
 import '../../domain/event_theme_service.dart';
 import '../../domain/event_themes.dart';
 import '../../domain/shopping.dart';
@@ -55,6 +57,13 @@ String errorText(AppLocalizations l, Object error) {
       EventThemeError.notFound => l.errNotFound,
       EventThemeError.limit => l.themeLimit(EventTheme.maxActive),
       EventThemeError.notAllowed => l.errNotAllowed,
+    };
+  }
+  if (error is AnniversaryException) {
+    return switch (error.error) {
+      AnniversaryError.invalid => l.anniversaryInvalid(AnniversaryPerson.maxName),
+      AnniversaryError.notFound => l.errNotFound,
+      AnniversaryError.limit => l.anniversaryLimit(AnniversaryPerson.maxActive),
     };
   }
   return l.errUnknown;

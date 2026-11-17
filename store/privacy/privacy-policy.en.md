@@ -52,6 +52,7 @@ share with you or that your provider supplies for synchronization.
 | Family and room names, memberships, roles, invitations and join requests | Manage the family and control access to shared content. |
 | Online/offline status with time | Optionally show other family members your availability. |
 | Calendar themes (freely chosen name up to 30 characters, color) | Assign events to a theme and show them in color. Like events, themes are sent end-to-end encrypted to the family. |
+| Birthdays and memorial days (freely chosen name up to 60 characters, date of birth and date of death, each with or without a year; including third parties and deceased people) | Show the family's birthdays and memorial days in the calendar and on “Today”, with age in years. Like events, the entries are sent end-to-end encrypted to the family. The advance notice of the display is a local setting. |
 | Choice of one of the twelve built-in avatars (only the identifier, no image, no text) | Show the avatar to other family members, including in the chat. The choice is kept as room state in the family room and is not end-to-end encrypted. |
 | Language, appearance, reminder, notification and security settings, locally blocked accounts and pending invitations | Configure the app and continue processes already begun. |
 | IP address, connection times, account, room and device identifiers as well as technical transmission data | Connection, delivery and operation at the server being contacted; its logging is governed by its privacy notices. |
@@ -97,13 +98,13 @@ promised.
 
 ## 4. Encryption, recipients and visible metadata
 
-Chat content, attachments, calendar, shopping and task data are protected before
+Chat content, attachments, calendar, shopping, task and birthday data are protected before
 transmission with the encryption methods of the Matrix protocol.
 Messages use Olm/Megolm; attachments are encrypted before upload.
 The connections to the provider are additionally protected with HTTPS/TLS.
 
-- **Family room:** Shared messages, events, shopping lists and tasks
-  including their history are readable by authorized family members on their
+- **Family room:** Shared messages, events, shopping lists, tasks
+  including their history, and birthdays and memorial days are readable by authorized family members on their
   approved devices.
 - **Direct chat:** Content is shared between the two accounts involved.
 - **Private events:** They are synchronized between your own devices via a separate
@@ -344,6 +345,8 @@ deleted or retained further depends on the provider and
 any statutory obligations. The choice of your avatar (one value out of twelve) stays
 in the family room as room state even after you are removed from the family or your
 account is deleted; the app hides it for people who are no longer members.
+Birthdays and memorial days you created remain for the family (shared family data,
+every member may change them).
 
 **Remaining copies:** Neither local deletion nor account deletion guarantees
 the removal of content already delivered on other people's devices, federated

@@ -50,6 +50,7 @@ teilen oder die dein Anbieter zur Synchronisierung bereitstellt.
 | Familien- und Raumnamen, Mitgliedschaften, Rollen, Einladungen und Beitrittsanfragen | Familie verwalten und den Zugriff auf gemeinsame Inhalte steuern. |
 | Online-/Offline-Status mit Zeitpunkt | Optional anderen Familienmitgliedern die Erreichbarkeit anzeigen. |
 | Kalender-Themen (frei gewählter Name bis 30 Zeichen, Farbe) | Termine einem Thema zuordnen und farbig anzeigen. Themen werden wie Termine Ende-zu-Ende-verschlüsselt an die Familie gesendet. |
+| Geburts- und Gedenktage (frei gewählter Name bis 60 Zeichen, Geburts- und Todesdatum, jeweils mit oder ohne Jahr; auch von Dritten und Verstorbenen) | Geburts- und Gedenktage der Familie im Kalender und auf „Heute“ anzeigen, mit Alter in Jahren. Die Einträge werden wie Termine Ende-zu-Ende-verschlüsselt an die Familie gesendet. Die Vorlaufzeit der Anzeige ist eine lokale Einstellung. |
 | Wahl eines der zwölf eingebauten Avatare (nur die Kennung, kein Bild, kein Text) | Den Avatar bei anderen Familienmitgliedern anzeigen, auch im Chat. Die Wahl liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. |
 | Sprache, Darstellung, Erinnerungs-, Meldungs- und Sicherheitseinstellungen, lokal blockierte Konten und vorgemerkte Einladungen | App konfigurieren und begonnene Abläufe fortsetzen. |
 | IP-Adresse, Verbindungszeitpunkte, Konto-, Raum- und Gerätekennungen sowie technische Übertragungsdaten | Verbindung, Zustellung und Betrieb beim jeweils angesprochenen Server; dessen Protokollierung richtet sich nach seinen Datenschutzhinweisen. |
@@ -95,13 +96,13 @@ nicht zugesagt.
 
 ## 4. Verschlüsselung, Empfänger und sichtbare Metadaten
 
-Chatinhalte, Anhänge, Kalender-, Einkaufs- und Aufgabendaten werden vor der
+Chatinhalte, Anhänge, Kalender-, Einkaufs-, Aufgaben- und Geburtstagsdaten werden vor der
 Übertragung mit den Verschlüsselungsverfahren des Matrix-Protokolls geschützt.
 Nachrichten verwenden Olm/Megolm; Anhänge werden vor dem Hochladen verschlüsselt.
 Die Verbindungen zum Anbieter sind zusätzlich mit HTTPS/TLS geschützt.
 
-- **Familienraum:** Gemeinsame Nachrichten, Termine, Einkaufszettel und Aufgaben
-  einschließlich ihres Verlaufs sind für berechtigte Familienmitglieder auf ihren
+- **Familienraum:** Gemeinsame Nachrichten, Termine, Einkaufszettel, Aufgaben
+  einschließlich ihres Verlaufs sowie Geburts- und Gedenktage sind für berechtigte Familienmitglieder auf ihren
   freigeschalteten Geräten lesbar.
 - **Einzelchat:** Inhalte werden zwischen den beiden beteiligten Konten geteilt.
 - **Private Termine:** Sie werden über einen gesonderten verschlüsselten Raum
@@ -344,7 +345,8 @@ gelöscht oder weiter aufbewahrt werden, richtet sich nach dem Anbieter und
 gegebenenfalls bestehenden gesetzlichen Pflichten. Die Wahl deines Avatars (ein Wert
 aus zwölf) bleibt auch nach dem Entfernen aus der Familie oder der Kontolöschung als
 Raumzustand im Familienraum stehen; die App blendet sie für Personen aus, die nicht
-mehr Mitglied sind.
+mehr Mitglied sind. Geburts- und Gedenktage, die du angelegt hast, bleiben für die
+Familie bestehen (gemeinsame Familiendaten, jedes Mitglied darf sie ändern).
 
 **Verbleibende Kopien:** Weder lokale Löschung noch Kontolöschung garantieren die
 Entfernung bereits zugestellter Inhalte auf Geräten anderer Personen, föderierten

@@ -22,6 +22,13 @@ String formatDateNumeric(DateTime d, String locale) {
   return DateFormat(pattern, locale).format(d);
 }
 
+/// Tag und Monat ohne Jahr in der Schreibweise der App-Sprache, zweistellig: `03.11.` (de) bzw. `11/03` (en);
+/// für Daten ohne Jahr (Geburts- und Gedenktage, E-104).
+String formatDayMonthNumeric(DateTime d, String locale) {
+  final pattern = Intl.shortLocale(locale) == 'de' ? 'dd.MM.' : 'MM/dd';
+  return DateFormat(pattern, locale).format(d);
+}
+
 /// Formatierung von Terminzeiten in der Zeitzone des Betrachters.
 class Fmt {
   Fmt(this.context, this.zone)

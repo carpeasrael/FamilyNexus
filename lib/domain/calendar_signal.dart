@@ -47,6 +47,12 @@ class TaskLogSignal extends CalendarSignal {
   final Map<String, Object?> content;
 }
 
+/// Geburts- oder Gedenktag einer Person (ein Datensatz je Person) aus dem Familienraum (E-104).
+class AnniversarySignal extends CalendarSignal {
+  const AnniversarySignal(super.sender, super.timestamp, this.content);
+  final Map<String, Object?> content;
+}
+
 /// Kalender-Thema (ein Datensatz je Thema) aus dem Familienraum (E-99).
 class EventThemeSignal extends CalendarSignal {
   const EventThemeSignal(super.sender, super.timestamp, this.content);

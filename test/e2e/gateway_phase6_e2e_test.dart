@@ -1,6 +1,7 @@
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/data/sync/activity_notifier.dart';
+import 'package:family_nexus/domain/anniversary_codec.dart';
 import 'package:family_nexus/domain/app_settings.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/chat.dart';
@@ -428,7 +429,7 @@ void main() {
       for (final secret in <String>['GEHEIME-LISTE', 'GEHEIMER-PUNKT', 'GEHEIMER-KOMMENTAR']) {
         expect(dump, isNot(contains(secret)));
       }
-      expect(raw.chunk.where((e) => e.type == TaskCodec.listType || e.type == TaskCodec.logType || e.type == EventThemeCodec.type), isEmpty);
+      expect(raw.chunk.where((e) => e.type == TaskCodec.listType || e.type == TaskCodec.logType || e.type == EventThemeCodec.type || e.type == AnniversaryCodec.type), isEmpty);
     });
   });
 }

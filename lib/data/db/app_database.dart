@@ -125,6 +125,18 @@ class AppDatabase {
           data TEXT NOT NULL
         )''');
     },
+    // v6: Geburts- und Gedenktage, ein Datensatz je Person (E-104)
+    (db) async {
+      await db.execute('''
+        CREATE TABLE anniversaries (
+          id TEXT PRIMARY KEY NOT NULL,
+          version INTEGER NOT NULL,
+          published INTEGER NOT NULL DEFAULT 0,
+          deleted INTEGER NOT NULL,
+          author TEXT NOT NULL,
+          data TEXT NOT NULL
+        )''');
+    },
   ];
 
   static int get schemaVersion => migrations.length;
