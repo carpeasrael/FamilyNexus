@@ -29,6 +29,8 @@ class AppSettings {
     this.blockedUsers = const <String>[],
     this.anniversaryLeadDays = defaultAnniversaryLeadDays,
     this.pendingInvite,
+    this.restoreLastChat = false,
+    this.lastChatThread,
   });
 
   /// Vorlaufzeit der Geburts- und Gedenktage auf „Heute“ in Tagen (E-104): Standard 7, 0 = nur am Tag selbst.
@@ -84,6 +86,16 @@ class AppSettings {
   /// beim Lesen erneut streng geprüft (`InviteLink.check`).
   final String? pendingInvite;
 
+  /// Schlüssel in der Ablage; die Kennung gehört zu den lokalen Familiendaten und wird mit ihnen gelöscht (E-107).
+  static const String lastChatThreadKey = 'lastChatThread';
+
+  /// Im Chat-Tab das zuletzt offene Gespräch statt der Liste öffnen (#516, E-107). Standard aus, rein lokal.
+  final bool restoreLastChat;
+
+  /// Zuletzt offenes Gespräch (`ChatThread.familyId` oder Raum-ID); wird nur gespeichert, solange [restoreLastChat]
+  /// an ist. `null` = Liste oder nichts gemerkt.
+  final String? lastChatThread;
+
   AppSettings copyWith({
     Object? languageCode = _unset,
     AppThemeMode? themeMode,
@@ -103,6 +115,8 @@ class AppSettings {
     List<String>? blockedUsers,
     int? anniversaryLeadDays,
     Object? pendingInvite = _unset,
+    bool? restoreLastChat,
+    Object? lastChatThread = _unset,
   }) =>
       AppSettings(
         languageCode:
@@ -124,6 +138,8 @@ class AppSettings {
         blockedUsers: blockedUsers ?? this.blockedUsers,
         anniversaryLeadDays: (anniversaryLeadDays ?? this.anniversaryLeadDays).clamp(0, maxAnniversaryLeadDays),
         pendingInvite: identical(pendingInvite, _unset) ? this.pendingInvite : _validInvite(pendingInvite as String?),
+        restoreLastChat: restoreLastChat ?? this.restoreLastChat,
+        lastChatThread: identical(lastChatThread, _unset) ? this.lastChatThread : _validThread(lastChatThread as String?),
       );
 
   static const Object _unset = Object();
@@ -147,6 +163,8 @@ class AppSettings {
         if (blockedUsers.isNotEmpty) blockedUsersKey: BlockedUsers.encode(blockedUsers),
         'anniversaryLeadDays': '$anniversaryLeadDays',
         'pendingInvite': ?pendingInvite,
+        'restoreLastChat': '$restoreLastChat',
+        lastChatThreadKey: ?lastChatThread,
       };
 
   /// Liest Einstellungen defensiv: unbekannte oder ungültige Werte fallen auf
@@ -185,12 +203,18 @@ class AppSettings {
       blockedUsers: BlockedUsers.parse(m[blockedUsersKey]),
       anniversaryLeadDays: (lead != null && lead >= 0 && lead <= maxAnniversaryLeadDays) ? lead : defaultAnniversaryLeadDays,
       pendingInvite: _validInvite(m['pendingInvite']),
+      restoreLastChat: m['restoreLastChat'] == 'true',
+      lastChatThread: _validThread(m[lastChatThreadKey]),
     );
   }
 
   /// Nur kurze Links im App-Schema; die eigentliche Prüfung macht `InviteLink.check`.
   static String? _validInvite(String? raw) =>
       (raw != null && raw.length <= 1024 && raw.startsWith('familynexus://join')) ? raw : null;
+
+  /// Gemerkte Gesprächs-Kennung: nicht leer, höchstens 255 Zeichen, keine Steuerzeichen (gilt als nicht vertrauenswürdig).
+  static String? _validThread(String? raw) =>
+      (raw != null && raw.isNotEmpty && raw.length <= 255 && !RegExp(r'[\x00-\x1f\x7f]').hasMatch(raw)) ? raw : null;
 
   /// Nur gültige https-Server werden übernommen (gespeicherte Werte gelten als
   /// nicht vertrauenswürdig).

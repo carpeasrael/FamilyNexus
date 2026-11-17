@@ -118,4 +118,40 @@ void main() {
       expect(const AppSettings(anniversaryLeadDays: 3) == const AppSettings(anniversaryLeadDays: 4), isFalse);
     });
   });
+
+  group('Letztes Gespräch wieder öffnen (#516)', () {
+    test('Standard aus, Kennung leer und nicht in toMap', () {
+      const s = AppSettings();
+      expect(s.restoreLastChat, isFalse);
+      expect(s.lastChatThread, isNull);
+      expect(s.toMap(), isNot(contains(AppSettings.lastChatThreadKey)));
+      expect(s.toMap()['restoreLastChat'], 'false');
+    });
+
+    test('Rundlauf und copyWith(lastChatThread: null) setzt zurück', () {
+      final s = const AppSettings().copyWith(restoreLastChat: true, lastChatThread: '!abc:example.org');
+      expect(s.toMap()[AppSettings.lastChatThreadKey], '!abc:example.org');
+      final back = AppSettings.fromMap(s.toMap());
+      expect(back.restoreLastChat, isTrue);
+      expect(back.lastChatThread, '!abc:example.org');
+      expect(back, s);
+      expect(s.copyWith(restoreLastChat: false).lastChatThread, '!abc:example.org', reason: 'ohne Angabe unverändert');
+      final reset = s.copyWith(lastChatThread: null);
+      expect(reset.lastChatThread, isNull);
+      expect(reset.toMap(), isNot(contains(AppSettings.lastChatThreadKey)));
+    });
+
+    test('Unsinn für den Schalter: aus; ungültige Kennung: null', () {
+      expect(AppSettings.fromMap(<String, String>{'restoreLastChat': 'ja'}).restoreLastChat, isFalse);
+      expect(AppSettings.fromMap(<String, String>{'restoreLastChat': ''}).restoreLastChat, isFalse);
+      String? id(String v) => AppSettings.fromMap(<String, String>{AppSettings.lastChatThreadKey: v}).lastChatThread;
+      expect(id(''), isNull);
+      expect(id('a' * 256), isNull);
+      expect(id('a' * 255), 'a' * 255);
+      expect(id('!a\nb'), isNull);
+      expect(id('!a\u0000b'), isNull);
+      expect(id('!a\u007fb'), isNull);
+      expect(const AppSettings().copyWith(lastChatThread: ''), isNot(predicate<AppSettings>((s) => s.lastChatThread == '')));
+    });
+  });
 }

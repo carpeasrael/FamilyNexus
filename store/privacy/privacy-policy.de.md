@@ -1,6 +1,6 @@
 # Datenschutzerklärung für FamilyNexus
 
-**Stand: 17. November 2026**
+**Stand: 18. November 2026**
 
 **Plattform: native Apps für iOS, macOS, Windows, Linux, Flatpak und Android sowie Web-App.**
 
@@ -53,7 +53,7 @@ teilen oder die dein Anbieter zur Synchronisierung bereitstellt.
 | Kalender-Themen (frei gewählter Name bis 30 Zeichen, Farbe) | Termine einem Thema zuordnen und farbig anzeigen. Themen werden wie Termine Ende-zu-Ende-verschlüsselt an die Familie gesendet. |
 | Geburts- und Gedenktage (frei gewählter Name bis 60 Zeichen, Geburts- und Todesdatum, jeweils mit oder ohne Jahr; auch von Dritten und Verstorbenen) | Geburts- und Gedenktage der Familie im Kalender und auf „Heute“ anzeigen, mit Alter in Jahren. Die Einträge werden wie Termine Ende-zu-Ende-verschlüsselt an die Familie gesendet. Die Vorlaufzeit der Anzeige ist eine lokale Einstellung. |
 | Wahl eines der zwölf eingebauten Avatare (nur die Kennung, kein Bild, kein Text) | Den Avatar bei anderen Familienmitgliedern anzeigen, auch im Chat. Die Wahl liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. |
-| Sprache, Darstellung, Erinnerungs-, Meldungs- und Sicherheitseinstellungen, lokal blockierte Konten und vorgemerkte Einladungen | App konfigurieren und begonnene Abläufe fortsetzen. |
+| Sprache, Darstellung, Erinnerungs-, Meldungs- und Sicherheitseinstellungen, lokal blockierte Konten, vorgemerkte Einladungen und, nur wenn „Letztes Gespräch wieder öffnen“ eingeschaltet ist, die Kennung des zuletzt geöffneten Gesprächs | App konfigurieren und begonnene Abläufe fortsetzen. |
 | IP-Adresse, Verbindungszeitpunkte, Konto-, Raum- und Gerätekennungen sowie technische Übertragungsdaten | Verbindung, Zustellung und Betrieb beim jeweils angesprochenen Server; dessen Protokollierung richtet sich nach seinen Datenschutzhinweisen. |
 
 Du entscheidest, welche Inhalte du eingibst und teilst. Freitexte und Dateien können
@@ -328,7 +328,7 @@ App die Termine (auch private), Einkaufszettel und Aufgaben dieses Kontos vom Ge
 und bricht geplante Erinnerungen ab, entfernt Meldungen und setzt die Zahl am App-Symbol
 zurück. Das gilt auch, wenn die Sitzung auf andere
 Weise endet, etwa weil das Gerät von einem anderen Gerät aus abgemeldet wurde.
-App-Einstellungen wie Sprache und Darstellung bleiben erhalten. Bereits gesendete
+Die gemerkte Kennung des zuletzt geöffneten Gesprächs wird gelöscht. App-Einstellungen wie Sprache und Darstellung bleiben erhalten. Bereits gesendete
 Inhalte werden nach der nächsten Anmeldung wieder synchronisiert; noch nicht
 gesendete Änderungen gehen verloren.
 

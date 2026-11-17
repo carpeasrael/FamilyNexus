@@ -95,3 +95,14 @@ ChatView resolveChatView({
     endWaiting: waitingFor == open,
   );
 }
+
+/// Wiederherstellung des letzten Gesprächs (#516, E-107): Zielkennung oder `null`. [restoreId] ist die gemerkte
+/// Kennung (`null` = nichts wiederherzustellen). Ein Ziel gibt es nur, wenn der erste Abgleich ([initialSyncDone])
+/// da ist, der Chat noch nie aktiv war ([everActive], danach reißt die Wiederherstellung niemanden mehr aus einer
+/// sichtbaren Ansicht) und das Gespräch vorhanden ist: der Familienchat nur bei mehr als einem Gespräch (bei einem
+/// einzigen gilt Rang 3 von [resolveChatView]), ein Einzelchat nur in den **sichtbaren** Gesprächen (ohne blockierte).
+String? restoreTarget(String? restoreId, List<ChatThread> visibleThreads, bool initialSyncDone, bool everActive) {
+  if (restoreId == null || !initialSyncDone || everActive) return null;
+  if (restoreId == ChatThread.familyId) return visibleThreads.length > 1 ? restoreId : null;
+  return visibleThreads.any((t) => t.id == restoreId) ? restoreId : null;
+}

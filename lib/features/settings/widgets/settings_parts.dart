@@ -59,6 +59,13 @@ class _DisplaySection extends StatelessWidget {
         value: s.reduceEffects,
         onChanged: (v) => controller.update((c) => c.copyWith(reduceEffects: v)),
       ),
+      SwitchListTile(
+        title: Text(l.settingsRestoreLastChat),
+        subtitle: Text(l.settingsRestoreLastChatHint),
+        value: s.restoreLastChat,
+        // Aus: gemerktes Gespräch im selben Schritt verwerfen (E-107).
+        onChanged: (v) => controller.update((c) => c.copyWith(restoreLastChat: v, lastChatThread: v ? c.lastChatThread : null)),
+      ),
     ]);
   }
 }

@@ -183,8 +183,8 @@ Future<AppServices> bootstrap({
     badge: PlatformInfo.isWeb ? null : PlatformAppBadge(),
     familyDataClaim: (owner) async {
       final wiped = await AppServices.claimFamilyData(database.db, owner, onWiped: scheduler?.cancelAll);
-      // Die Blockierliste ist mit den Familiendaten aus der Ablage entfernt (#450); gezielt auch im Speicher.
-      if (wiped) await settings.update((c) => c.copyWith(blockedUsers: const <String>[]));
+      // Blockierliste (#450) und gemerktes Gespräch (E-107) sind mit den Familiendaten aus der Ablage entfernt; gezielt auch im Speicher.
+      if (wiped) await settings.update((c) => c.copyWith(blockedUsers: const <String>[], lastChatThread: null));
     },
     calendarBuilder: (userId, familyRoom) async {
       final store = SqlEventStore(database.db);

@@ -2,7 +2,7 @@
 
 **This is a translation of the German original (`privacy-policy.de.md`). If the two versions differ, the German version prevails.**
 
-**Last updated: 17 November 2026**
+**Last updated: 18 November 2026**
 
 **Platform: native apps for iOS, macOS, Windows, Linux, Flatpak and Android as well as web app.**
 
@@ -55,7 +55,7 @@ share with you or that your provider supplies for synchronization.
 | Calendar themes (freely chosen name up to 30 characters, color) | Assign events to a theme and show them in color. Like events, themes are sent end-to-end encrypted to the family. |
 | Birthdays and memorial days (freely chosen name up to 60 characters, date of birth and date of death, each with or without a year; including third parties and deceased people) | Show the family's birthdays and memorial days in the calendar and on “Today”, with age in years. Like events, the entries are sent end-to-end encrypted to the family. The advance notice of the display is a local setting. |
 | Choice of one of the twelve built-in avatars (only the identifier, no image, no text) | Show the avatar to other family members, including in the chat. The choice is kept as room state in the family room and is not end-to-end encrypted. |
-| Language, appearance, reminder, notification and security settings, locally blocked accounts and pending invitations | Configure the app and continue processes already begun. |
+| Language, appearance, reminder, notification and security settings, locally blocked accounts, pending invitations and, only if “Reopen last conversation” is switched on, the ID of the conversation you last had open | Configure the app and continue processes already begun. |
 | IP address, connection times, account, room and device identifiers as well as technical transmission data | Connection, delivery and operation at the server being contacted; its logging is governed by its privacy notices. |
 
 You decide which content you enter and share. Free text and files can
@@ -328,7 +328,7 @@ app removes the events (including private ones), shopping lists and tasks of thi
 and cancels scheduled reminders, removes notifications and resets the number on the app icon.
 This also applies if the session ends in another
 way, for example because the device was signed out from another device.
-App settings such as language and appearance are retained. Content already sent
+The remembered ID of the conversation you last had open is deleted. App settings such as language and appearance are retained. Content already sent
 is synchronized again after the next sign-in; changes not yet
 sent are lost.
 
