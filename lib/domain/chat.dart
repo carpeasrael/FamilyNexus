@@ -25,6 +25,7 @@ class ChatMessage {
     this.blockedAttachment = false,
     this.undecryptable = false,
     this.beforeJoin = false,
+    this.readBy = const <String>{},
   });
 
   /// Höchstlänge eines Nachrichtentexts in UTF-16-Einheiten, wie `sendMessage` im Gateway prüft (#236).
@@ -60,10 +61,15 @@ class ChatMessage {
   /// Sammelhinweis statt einzelner, nicht lesbarer Ereignisse aus der Zeit vor dem eigenen Beitritt.
   final bool beforeJoin;
 
+  /// Matrix-IDs der anderen beigetretenen Mitglieder, deren öffentlicher Lesemarker auf oder hinter dieser eigenen
+  /// Nachricht liegt (#526, E-106). Leer, solange die Lesebestätigung aus ist oder niemand gelesen hat.
+  final Set<String> readBy;
+
   ChatMessage copyWith({
     Map<String, Set<String>>? reactions,
     MessageStatus? status,
     bool? retryable,
+    Set<String>? readBy,
   }) =>
       ChatMessage(
         id: id,
@@ -80,6 +86,7 @@ class ChatMessage {
         blockedAttachment: blockedAttachment,
         undecryptable: undecryptable,
         beforeJoin: beforeJoin,
+        readBy: readBy ?? this.readBy,
       );
 }
 

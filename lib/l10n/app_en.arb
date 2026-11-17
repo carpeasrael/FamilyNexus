@@ -150,6 +150,10 @@
   "chatRetry": "Sending failed – tap to retry",
   "chatNotSent": "Not sent. Please write it again.",
   "chatSending": "Sending …",
+  "chatStatusSent": "Sent",
+  "chatStatusRead": "Read",
+  "chatStatusReadBy": "{count, plural, =1{Read by 1} other{Read by {count}}}",
+  "chatReadByTitle": "Read by",
   "chatEncryptedNote": "End-to-end encrypted",
   "chatAttachmentBlocked": "Attachment blocked (type or size not allowed)",
   "chatLoadAttachment": "Load attachment",
@@ -600,7 +604,7 @@
   "privacy1Title": "Who processes your data?",
   "privacy1Body": "FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. The operator of the provider you chose (Matrix server) is responsible for processing on the server; you can see it during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that have their own sign-in page (e.g. matrix.org) you enter these details directly on their page. The app shows this page in an embedded view (iOS, macOS, Android) or in the browser (Linux, Windows); the page then runs in the app’s process.",
   "privacy2Title": "What data exists?",
-  "privacy2Body": "Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars) and your settings. Events and messages are stored encrypted ({cipher}) on your device. The key is held here: {keyStore} – not in the database file.",
+  "privacy2Body": "Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars), the members’ read state (up to which message someone has read) and your settings. Events and messages are stored encrypted ({cipher}) on your device. The key is held here: {keyStore} – not in the database file.",
   "@privacy2Body": {
     "placeholders": {
       "keyStore": {
@@ -613,7 +617,7 @@
     }
   },
   "privacy3Title": "What does the server see?",
-  "privacy3Body": "Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted) and room and profile names (for example the family name). With your own server you decide who sees this information.",
+  "privacy3Body": "Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, public read receipts (who has read up to which message, and when; only when “Send read receipts” is on, visible to the server and to the provider of your chat partners), the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted) and room and profile names (for example the family name). With your own server you decide who sees this information.",
   "privacy4Title": "Private events",
   "privacy4Body": "Private events are never sent to the family. Between your own devices they are synchronized through a private, encrypted room that only your account belongs to.",
   "privacy5Title": "Reminders and notifications",
@@ -694,6 +698,8 @@
   "attachmentSaveWarning": "The file is decrypted and saved unencrypted in the folder you choose. It stays there after signing out or deleting app data. Continue?",
   "tabShopping": "Shopping",
   "settingsShareOnlineStatus": "Share online status",
+  "settingsShareReadReceipts": "Send read receipts",
+  "settingsShareReadReceiptsHint": "Shows family members up to which of your messages you have read, and shows you who has read yours. The server and the provider of your chat partners see who read what and when. When off, you only send private read markers and you do not see who has read your messages either. Receipts already sent cannot be taken back; nothing is sent afterwards for messages you have already read.",
   "settingsShareOnlineStatusHint": "Shows your family when you are using the app. It is sent end-to-end encrypted to family members’ devices only. When off, you appear offline to others.",
   "presenceOnline": "Online",
   "presenceOffline": "Offline",
@@ -897,8 +903,8 @@
       }
     }
   },
-  "privacy10Title": "Online status, direct chats, shopping list, avatar",
-  "privacy10Body": "The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. Your avatar is an exception: the choice of one of the twelve built-in avatars is kept as room state in the family room and is not end-to-end encrypted. The server and all family members see which symbol you chose; the choice stays in the room even if you are removed or your account is deleted. Otherwise the server only sees the metadata it always sees (see “What does the server see?”).",
+  "privacy10Title": "Online status, read receipts, direct chats, shopping list, avatar",
+  "privacy10Body": "The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. The read receipt (“Read” under your messages) is a public read marker, visible to the server and to the provider of your chat partners (who has read up to which message, and when); it is on by default, and you can switch it off in the settings, then you only send private markers and do not see who has read either. Receipts already sent cannot be taken back. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. Your avatar is an exception: the choice of one of the twelve built-in avatars is kept as room state in the family room and is not end-to-end encrypted. The server and all family members see which symbol you chose; the choice stays in the room even if you are removed or your account is deleted. Otherwise the server only sees the metadata it always sees (see “What does the server see?”).",
   "onbFamilyFound": "Found family “{name}” – you are already a member. Finishing setup.",
   "@onbFamilyFound": {
     "placeholders": {

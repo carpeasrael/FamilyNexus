@@ -9,6 +9,7 @@ import '../../core/platform_info.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../data/platform/file_access.dart';
 import '../../domain/chat.dart';
+import '../../domain/chat_read.dart';
 import '../../domain/moderation.dart';
 import '../../domain/presence.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -30,6 +31,7 @@ import 'thread_preview.dart';
 
 part 'widgets/attachment_view.dart';
 part 'widgets/chat_parts.dart';
+part 'widgets/delivery_status.dart';
 part 'widgets/message_bubble.dart';
 part 'widgets/thread_and_lines.dart';
 part 'widgets/thread_list.dart';

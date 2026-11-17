@@ -482,6 +482,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
           .putIfAbsent(e.content['emoji']! as String, () => <String>{})
           .add(e.sender);
     }
+    final ids = <String>[for (final e in room.events.where((e) => e.type == 'm.room.message')) e.id];
+    final markers = readMarkers[threadId] ?? const <String, String>{};
     return <ChatMessage>[
       for (final e in room.events.where((e) => e.type == 'm.room.message'))
         ChatMessage(
@@ -501,8 +503,44 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
                   mimeType: e.content['mime']! as String,
                   size: e.content['size']! as int,
                 ),
-        ).copyWith(status: sendStates[e.id]?.status, retryable: sendStates[e.id]?.retryable),
+        ).copyWith(
+          status: sendStates[e.id]?.status,
+          retryable: sendStates[e.id]?.retryable,
+          readBy: _readBy(e.sender, e.id, ids, markers),
+        ),
     ];
+  }
+
+  /// Wer eine eigene Nachricht gelesen hat: Mitglieder, deren Lesemarker (Test) auf oder hinter ihr liegt. Leer bei
+  /// fremden Nachrichten, bei ausgeschalteter Lesebestätigung (Gegenseitigkeit, #526) und für die eigene ID.
+  Set<String> _readBy(String sender, String id, List<String> ids, Map<String, String> markers) {
+    if (!shareReadReceipts || sender != _userId) return const <String>{};
+    final at = ids.indexOf(id);
+    return <String>{
+      for (final m in markers.entries)
+        if (m.key != _userId && ids.indexOf(m.value) >= at) m.key,
+    };
+  }
+
+  /// Test (#526): Einstellung „Lesebestätigung senden“ dieses Nutzers; aus = `readBy` bleibt leer.
+  bool shareReadReceipts = true;
+
+  /// Test (#526): Lesemarker anderer je Gespräch: Nutzer-ID → Nachrichten-ID (`messagesIn` füllt `readBy` daraus).
+  final Map<String, Map<String, String>> readMarkers = <String, Map<String, String>>{};
+
+  /// Test (#526): setzt den Lesemarker von [userId] in [threadId] auf [eventId] und meldet die Änderung.
+  void setReadMarker(String userId, String eventId, {String threadId = ChatThread.familyId}) {
+    readMarkers.putIfAbsent(threadId, () => <String, String>{})[userId] = eventId;
+    notifyListeners();
+  }
+
+  /// Test (#526): Anzahl der Aufrufe von [refreshReadStates].
+  int readStateRefreshes = 0;
+
+  @override
+  void refreshReadStates() {
+    readStateRefreshes++;
+    notifyListeners();
   }
 
   void _require() {
@@ -556,6 +594,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<void> markChatRead({String threadId = ChatThread.familyId}) async {
     markedRead.add(threadId);
+    markedReadPublic.add(shareReadReceipts);
     _read[threadId] = messagesIn(threadId).length;
     notifyListeners();
   }
@@ -1015,6 +1054,9 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   /// Test (#423): Gespräche, für die gelesen markiert bzw. nachgeladen wurde, in der Reihenfolge der Aufrufe.
   final List<String> markedRead = <String>[];
+
+  /// Test (#526): je Aufruf von [markChatRead], ob die Lesebestätigung öffentlich gewesen wäre.
+  final List<bool> markedReadPublic = <bool>[];
   final List<String> loadedOlder = <String>[];
 
   @override

@@ -69,6 +69,8 @@ class E2e {
     Duration participantsRetryBase = SdkMatrixGateway.participantsRetryDelay,
     // #422: `false` startet das Gateway ohne die automatische Freischaltung des Avatar-Zustands für Mitglieder.
     bool ensureAvatarPermission = true,
+    // #526: Einstellung „Lesebestätigung senden“ dieses Geräts; ohne Angabe an (wie die App).
+    bool Function()? shareReadReceipts,
   }) async {
     final d = device ?? await newDevice();
     return SdkMatrixGateway(
@@ -80,6 +82,7 @@ class E2e {
       joinPollInterval: joinPollInterval,
       participantsRetryBase: participantsRetryBase,
       ensureAvatarPermission: ensureAvatarPermission,
+      shareReadReceipts: shareReadReceipts ?? () => true,
     );
   }
 
@@ -93,6 +96,7 @@ class E2e {
     Duration joinPollInterval = SdkMatrixGateway.rejectionPollInterval,
     Duration participantsRetryBase = SdkMatrixGateway.participantsRetryDelay,
     bool ensureAvatarPermission = true,
+    bool Function()? shareReadReceipts,
   }) async {
     await init();
     final acc = await registerUser(prefix);
@@ -101,6 +105,7 @@ class E2e {
       joinPollInterval: joinPollInterval,
       participantsRetryBase: participantsRetryBase,
       ensureAvatarPermission: ensureAvatarPermission,
+      shareReadReceipts: shareReadReceipts,
     );
     await g.restore();
     await g.login(server: server, username: acc.user, password: acc.password);

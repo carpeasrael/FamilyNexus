@@ -782,6 +782,30 @@ abstract class AppLocalizations {
   /// **'Wird gesendet …'**
   String get chatSending;
 
+  /// No description provided for @chatStatusSent.
+  ///
+  /// In de, this message translates to:
+  /// **'Gesendet'**
+  String get chatStatusSent;
+
+  /// No description provided for @chatStatusRead.
+  ///
+  /// In de, this message translates to:
+  /// **'Gelesen'**
+  String get chatStatusRead;
+
+  /// No description provided for @chatStatusReadBy.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{Gelesen von 1} other{Gelesen von {count}}}'**
+  String chatStatusReadBy(int count);
+
+  /// No description provided for @chatReadByTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Gelesen von'**
+  String get chatReadByTitle;
+
   /// No description provided for @chatEncryptedNote.
   ///
   /// In de, this message translates to:
@@ -2255,7 +2279,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy2Body.
   ///
   /// In de, this message translates to:
-  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Geburts- und Gedenktage (Name und Datum, auch von Dritten und Verstorbenen), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.'**
+  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Geburts- und Gedenktage (Name und Datum, auch von Dritten und Verstorbenen), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare), den Lesestand der Mitglieder (bis zu welcher Nachricht jemand gelesen hat) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.'**
   String privacy2Body(String keyStore, String cipher);
 
   /// No description provided for @privacy3Title.
@@ -2267,7 +2291,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy3Body.
   ///
   /// In de, this message translates to:
-  /// **'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.'**
+  /// **'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, öffentliche Lesebestätigungen (wer bis zu welcher Nachricht und wann gelesen hat; nur wenn „Lesebestätigung senden“ eingeschaltet ist, sie sind für den Server und den Anbieter deiner Gesprächspartner sichtbar), die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.'**
   String get privacy3Body;
 
   /// No description provided for @privacy4Title.
@@ -2521,6 +2545,18 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Online-Status teilen'**
   String get settingsShareOnlineStatus;
+
+  /// No description provided for @settingsShareReadReceipts.
+  ///
+  /// In de, this message translates to:
+  /// **'Lesebestätigung senden'**
+  String get settingsShareReadReceipts;
+
+  /// No description provided for @settingsShareReadReceiptsHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeigt Familienmitgliedern, bis zu welcher deiner Nachrichten du gelesen hast, und dir, wer deine Nachrichten gelesen hat. Der Server und der Anbieter der Gesprächspartner sehen, wer wann gelesen hat. Ausgeschaltet sendest du nur private Lesemarker und siehst auch nicht, wer gelesen hat. Bereits gesendete Bestätigungen lassen sich nicht zurücknehmen; für schon Gelesenes wird nichts nachgesendet.'**
+  String get settingsShareReadReceiptsHint;
 
   /// No description provided for @settingsShareOnlineStatusHint.
   ///
@@ -2825,13 +2861,13 @@ abstract class AppLocalizations {
   /// No description provided for @privacy10Title.
   ///
   /// In de, this message translates to:
-  /// **'Online-Status, Einzelchats, Einkaufszettel, Avatar'**
+  /// **'Online-Status, Lesebestätigung, Einzelchats, Einkaufszettel, Avatar'**
   String get privacy10Title;
 
   /// No description provided for @privacy10Body.
   ///
   /// In de, this message translates to:
-  /// **'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Dein Avatar ist eine Ausnahme: Die Wahl eines der zwölf eingebauten Avatare liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. Der Server und alle Familienmitglieder sehen, welches Symbol du gewählt hast; die Wahl bleibt im Raum stehen, auch wenn du entfernt wirst oder dein Konto gelöscht wird. Der Server sieht sonst nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).'**
+  /// **'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Die Lesebestätigung („Gelesen“ unter deinen Nachrichten) ist als öffentlicher Lesemarker für den Server und den Anbieter deiner Gesprächspartner sichtbar (wer hat bis zu welcher Nachricht und wann gelesen); sie ist standardmäßig an, du kannst sie in den Einstellungen ausschalten, dann sendest du nur private Marker und siehst auch nicht, wer gelesen hat. Bereits gesendete Bestätigungen lassen sich nicht zurücknehmen. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Dein Avatar ist eine Ausnahme: Die Wahl eines der zwölf eingebauten Avatare liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. Der Server und alle Familienmitglieder sehen, welches Symbol du gewählt hast; die Wahl bleibt im Raum stehen, auch wenn du entfernt wirst oder dein Konto gelöscht wird. Der Server sieht sonst nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).'**
   String get privacy10Body;
 
   /// No description provided for @onbFamilyFound.

@@ -21,6 +21,7 @@ class AppSettings {
     this.lockEnabled = false,
     this.lockTimeoutSeconds = 60,
     this.shareOnlineStatus = true,
+    this.shareReadReceipts = true,
     this.notifyChat = true,
     this.notifyShopping = true,
     this.accent = AccentChoice.teal,
@@ -55,6 +56,9 @@ class AppSettings {
 
   /// Online-Status an die Familie melden (E-38).
   final bool shareOnlineStatus;
+
+  /// Öffentliche Lesebestätigung senden und anzeigen, wer gelesen hat (#526, E-106). Aus: nur private Lesemarker.
+  final bool shareReadReceipts;
 
   /// Meldung „Neue Nachrichten“ ohne Inhalt, solange die App geöffnet ist; auf Mobilgeräten im Hintergrund nicht zugesagt (#254, E-88, #273).
   final bool notifyChat;
@@ -91,6 +95,7 @@ class AppSettings {
     bool? lockEnabled,
     int? lockTimeoutSeconds,
     bool? shareOnlineStatus,
+    bool? shareReadReceipts,
     bool? notifyChat,
     bool? notifyShopping,
     AccentChoice? accent,
@@ -111,6 +116,7 @@ class AppSettings {
         lockEnabled: lockEnabled ?? this.lockEnabled,
         lockTimeoutSeconds: (lockTimeoutSeconds ?? this.lockTimeoutSeconds).clamp(0, 3600),
         shareOnlineStatus: shareOnlineStatus ?? this.shareOnlineStatus,
+        shareReadReceipts: shareReadReceipts ?? this.shareReadReceipts,
         notifyChat: notifyChat ?? this.notifyChat,
         notifyShopping: notifyShopping ?? this.notifyShopping,
         accent: accent ?? this.accent,
@@ -133,6 +139,7 @@ class AppSettings {
         'lockEnabled': '$lockEnabled',
         'lockTimeout': '$lockTimeoutSeconds',
         'shareOnlineStatus': '$shareOnlineStatus',
+        'shareReadReceipts': '$shareReadReceipts',
         'notifyChat': '$notifyChat',
         'notifyShopping': '$notifyShopping',
         'accent': accent.name,
@@ -170,6 +177,7 @@ class AppSettings {
       lockEnabled: m['lockEnabled'] == 'true',
       lockTimeoutSeconds: (timeout != null && timeout >= 0 && timeout <= 3600) ? timeout : d.lockTimeoutSeconds,
       shareOnlineStatus: m['shareOnlineStatus'] != 'false',
+      shareReadReceipts: m['shareReadReceipts'] != 'false',
       notifyChat: m['notifyChat'] != 'false',
       notifyShopping: m['notifyShopping'] != 'false',
       accent: AccentChoice.values.firstWhere((e) => e.name == m['accent'], orElse: () => d.accent),

@@ -126,7 +126,12 @@ abstract class MatrixGateway implements Listenable {
   /// echten Sync der Sitzung und nach dem Abmelden; Ereignisse mit Zeitstempel ≤ diesem Wert werden nie gemeldet.
   DateTime? get liveSince;
 
-  /// Markiert ein Gespräch bis zur letzten Nachricht als gelesen (private Lesebestätigung).
+  /// Bildet die Nachrichten neu ab, damit Lesestände (`readBy`) der aktuellen Einstellung „Lesebestätigung senden“
+  /// folgen (#526, E-106). Der Abgleich ist entprellt; es gibt keinen Netzwerkzugriff.
+  void refreshReadStates();
+
+  /// Markiert ein Gespräch bis zur letzten Nachricht als gelesen. Öffentlich (`m.read`) nur bei eingeschalteter
+  /// Lesebestätigung, sonst privat (#526, E-106).
   Future<void> markChatRead({String threadId = ChatThread.familyId});
 
   /// Lädt ältere Nachrichten eines Gesprächs nach (Paginierung).
