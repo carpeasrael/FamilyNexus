@@ -1282,7 +1282,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String privacy2Body(String keyStore, String cipher) {
-    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars) and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
+    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars) and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
   }
 
   @override
@@ -1952,7 +1952,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy12Body =>
-      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. The server only sees the metadata it always sees (see “What does the server see?”), plus the choice of your avatar (room state, not end-to-end encrypted).';
+      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. Birthdays and memorial days (name of the person and date, including third parties and deceased people) are likewise sent end-to-end encrypted in the family room. The server only sees the metadata it always sees (see “What does the server see?”), plus the choice of your avatar (room state, not end-to-end encrypted).';
 
   @override
   String get webUnlockTitleCreate => 'Set up the browser vault';
@@ -3081,7 +3081,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String accountDeleteBody(String userId, String server) {
-    return 'Your account $userId will be permanently deleted at $server. The user ID cannot be used again. Messages you sent remain visible to the other family members, and so does the choice of your avatar (one value out of twelve), which stays in the family room. Afterwards all data on this device is deleted.';
+    return 'Your account $userId will be permanently deleted at $server. The user ID cannot be used again. Messages you sent remain visible to the other family members, and so does the choice of your avatar (one value out of twelve), which stays in the family room. Birthdays and memorial days you created remain for the family (shared family data, every member may change them). Afterwards all data on this device is deleted.';
   }
 
   @override
@@ -3341,4 +3341,196 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get embeddedLoading => 'Page is loading';
+
+  @override
+  String get anniversariesTitle => 'Birthdays';
+
+  @override
+  String get anniversariesTodayTitle => 'Birthdays and memorial days';
+
+  @override
+  String get anniversariesHint =>
+      'Birthdays and anniversaries of death of people, including relatives without an account and people who have passed away. All family members can see and change the entries.';
+
+  @override
+  String get anniversariesEmpty => 'No entries yet. Add the first one.';
+
+  @override
+  String get anniversaryAdd => 'Add person';
+
+  @override
+  String get anniversaryEdit => 'Edit entry';
+
+  @override
+  String get anniversaryDelete => 'Delete entry';
+
+  @override
+  String anniversaryDeleteBody(String name) {
+    return 'Delete “$name” for all family members?';
+  }
+
+  @override
+  String get anniversarySaved => 'Entry saved.';
+
+  @override
+  String get anniversaryDeleted => 'Entry deleted.';
+
+  @override
+  String get anniversaryName => 'Name of the person';
+
+  @override
+  String get anniversaryBirth => 'Date of birth';
+
+  @override
+  String get anniversaryDeath => 'Date of death';
+
+  @override
+  String get anniversaryDay => 'Day';
+
+  @override
+  String get anniversaryMonth => 'Month';
+
+  @override
+  String get anniversaryYear => 'Year (optional)';
+
+  @override
+  String get anniversaryDatesHint =>
+      'Both dates are optional, at least one is required. Without a year no age is shown.';
+
+  @override
+  String get anniversaryNameEmpty => 'Please enter a name.';
+
+  @override
+  String get anniversaryNeedDate => 'Please enter at least one date.';
+
+  @override
+  String get anniversaryDateInvalid =>
+      'Please enter a valid date (day, month, optional year).';
+
+  @override
+  String get anniversaryDateFuture => 'The date must not be in the future.';
+
+  @override
+  String get anniversaryDeathBeforeBirth =>
+      'The date of death must not be before the date of birth.';
+
+  @override
+  String anniversaryInvalid(int count) {
+    return 'Please enter a name (at most $count characters) and valid dates.';
+  }
+
+  @override
+  String anniversaryLimit(int count) {
+    return 'At most $count people are possible.';
+  }
+
+  @override
+  String anniversaryBirthdayOf(String name) {
+    return 'Birthday of $name';
+  }
+
+  @override
+  String anniversaryDeathdayOf(String name) {
+    return 'Anniversary of death of $name';
+  }
+
+  @override
+  String get anniversaryBirthdayLabel => 'Birthday';
+
+  @override
+  String get anniversaryDeathdayLabel => 'Anniversary of death';
+
+  @override
+  String anniversaryWillBe(int n) {
+    return 'turns $n';
+  }
+
+  @override
+  String anniversaryCurrentAge(int k) {
+    String _temp0 = intl.Intl.pluralLogic(
+      k,
+      locale: localeName,
+      other: 'currently $k years old',
+      one: 'currently 1 year old',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String anniversaryIsAge(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n years',
+      one: '1 year',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String anniversaryWouldBe(int n) {
+    return 'would be $n';
+  }
+
+  @override
+  String anniversaryNthDeathDay(int n) {
+    return 'Death anniversary no. $n';
+  }
+
+  @override
+  String anniversaryYearsAgo(int k) {
+    String _temp0 = intl.Intl.pluralLogic(
+      k,
+      locale: localeName,
+      other: '$k years ago',
+      one: '1 year ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get anniversaryToday => 'today';
+
+  @override
+  String get anniversaryTomorrow => 'tomorrow';
+
+  @override
+  String anniversaryInDays(int d) {
+    String _temp0 = intl.Intl.pluralLogic(
+      d,
+      locale: localeName,
+      other: 'in $d days',
+      one: 'in 1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String calendarAnniversariesOnDay(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count birthdays or memorial days',
+      one: '1 birthday or memorial day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsAnniversaryLead => 'Show birthdays';
+
+  @override
+  String anniversaryLeadOption(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days ahead',
+      one: '1 day ahead',
+      zero: 'Only on the day itself',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get eventTypeAnniversary => 'Birthdays and memorial days';
 }

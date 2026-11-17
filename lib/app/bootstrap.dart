@@ -7,6 +7,7 @@ import '../core/app_log.dart';
 import '../core/platform_info.dart';
 import '../data/db/app_database.dart';
 import '../data/db/key_value_store.dart';
+import '../data/db/sql_anniversary_store.dart';
 import '../data/db/sql_data_inventory.dart';
 import '../data/db/sql_event_store.dart';
 import '../data/db/sql_event_theme_store.dart';
@@ -190,6 +191,7 @@ Future<AppServices> bootstrap({
         userId: userId,
         zoneName: zone,
         themeStore: SqlEventThemeStore(database.db),
+        anniversaryStore: SqlAnniversaryStore(database.db),
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
       );
     },

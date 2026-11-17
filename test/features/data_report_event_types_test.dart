@@ -1,3 +1,4 @@
+import 'package:family_nexus/domain/anniversary_codec.dart';
 import 'package:family_nexus/domain/data_inventory.dart';
 import 'package:family_nexus/domain/event_theme_codec.dart';
 import 'package:family_nexus/domain/member_avatars.dart';
@@ -32,7 +33,7 @@ void main() {
               joinedMembers: 2,
               invitedMembers: 0,
               cachedEvents: 3,
-              eventTypes: <String, int>{ReactionCodec.type: 2, 'm.reaction': 1, EventThemeCodec.type: 3, AvatarPresets.type: 4},
+              eventTypes: <String, int>{ReactionCodec.type: 2, 'm.reaction': 1, EventThemeCodec.type: 3, AvatarPresets.type: 4, AnniversaryCodec.type: 5},
               attachments: 0,
             ),
           ],
@@ -48,6 +49,11 @@ void main() {
   test('E-99: der Ereignistyp der Kalender-Themen hat ein eigenes Label (de und en)', () {
     expect(report('de'), contains('Kalender-Themen (${EventThemeCodec.type}): 3'));
     expect(report('en'), contains('Calendar themes (${EventThemeCodec.type}): 3'));
+  });
+
+  test('E-104: der Ereignistyp der Geburts- und Gedenktage hat ein eigenes Label (de und en)', () {
+    expect(report('de'), contains('Geburts- und Gedenktage (${AnniversaryCodec.type}): 5'));
+    expect(report('en'), contains('Birthdays and memorial days (${AnniversaryCodec.type}): 5'));
   });
 
   test('E-101: der Zustandstyp der Avatar-Wahl hat ein eigenes Label (de und en)', () {

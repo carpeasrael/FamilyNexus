@@ -29,6 +29,7 @@ import 'fake_mail.dart';
 import 'fake_matrix.dart';
 import 'fake_scheduler.dart';
 import 'fake_store.dart';
+import 'memory_anniversary_store.dart';
 import 'memory_event_store.dart';
 import 'memory_event_theme_store.dart';
 import 'memory_shopping_store.dart';
@@ -46,6 +47,7 @@ class TestApp {
     required this.shoppingStore,
     required this.taskStore,
     required this.themeStore,
+    required this.anniversaryStore,
     required this.scheduler,
     required this.links,
     required this.auth,
@@ -72,6 +74,7 @@ class TestApp {
   final MemoryShoppingStore shoppingStore;
   final MemoryTaskStore taskStore;
   final MemoryEventThemeStore themeStore;
+  final MemoryAnniversaryStore anniversaryStore;
   final FakeReminderScheduler scheduler;
   final FakeLinkSource links;
   final FakeDeviceAuth auth;
@@ -120,6 +123,7 @@ Future<TestApp> buildTestApp({
   MemoryShoppingStore? shoppingItems,
   MemoryTaskStore? taskItems,
   MemoryEventThemeStore? themeItems,
+  MemoryAnniversaryStore? anniversaryItems,
   // Test: Meldungen zu Chat und Einkauf und Zahl am App-Symbol (#254). Ohne Angabe wie im Browser: keine.
   ActivityPlatform? activity,
   AppBadge? badge,
@@ -156,6 +160,7 @@ Future<TestApp> buildTestApp({
   final shoppingStore = shoppingItems ?? MemoryShoppingStore();
   final taskStore = taskItems ?? MemoryTaskStore();
   final themeStore = themeItems ?? MemoryEventThemeStore();
+  final anniversaryStore = anniversaryItems ?? MemoryAnniversaryStore();
   final scheduler = FakeReminderScheduler();
   final links = FakeLinkSource();
   final auth = FakeDeviceAuth();
@@ -234,6 +239,7 @@ Future<TestApp> buildTestApp({
         clock: clock,
         retryInterval: const Duration(hours: 1),
         themeStore: themeStore,
+        anniversaryStore: anniversaryStore,
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
       );
       builtCalendars.add(controller);
@@ -250,6 +256,7 @@ Future<TestApp> buildTestApp({
     shoppingStore: shoppingStore,
     taskStore: taskStore,
     themeStore: themeStore,
+    anniversaryStore: anniversaryStore,
     scheduler: scheduler,
     links: links,
     auth: auth,

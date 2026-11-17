@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../../domain/anniversary_codec.dart';
 import '../../domain/data_inventory.dart';
 import '../../domain/event_codec.dart';
 import '../../domain/event_theme_codec.dart';
@@ -61,6 +62,7 @@ class DataReport {
       TaskCodec.listType => l.eventTypeTaskList,
       TaskCodec.logType => l.eventTypeTaskDone,
       EventThemeCodec.type => l.eventTypeEventTheme,
+      AnniversaryCodec.type => l.eventTypeAnniversary,
       AvatarPresets.type => l.eventTypeAvatar,
       _ => null,
     };

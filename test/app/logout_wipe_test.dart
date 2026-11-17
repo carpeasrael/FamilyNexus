@@ -32,6 +32,7 @@ void main() {
     await db.insert('task_lists', <String, Object?>{'id': 't1', 'version': 1, 'deleted': 0, 'author': '@anna:example.org', 'data': '{}'});
     await db.insert('task_log', <String, Object?>{'id': 'l1', 'list_id': 't1', 'at_ms': 1, 'author': '@anna:example.org', 'data': '{}'});
     await db.insert('event_themes', <String, Object?>{'id': 'th1', 'version': 1, 'deleted': 0, 'author': '@anna:example.org', 'data': '{}'});
+    await db.insert('anniversaries', <String, Object?>{'id': 'an1', 'version': 1, 'deleted': 0, 'author': '@anna:example.org', 'data': '{}'});
   }
 
   Future<int> rows(String table) async => (await db.query(table)).length;
@@ -39,7 +40,7 @@ void main() {
   test('entfernt Termine, Einkaufszettel, Aufgaben und den Besitzer; Einstellungen bleiben', () async {
     await fill();
     await AppServices.wipeAccountDataIn(db);
-    for (final t in <String>['events', 'event_history', 'rsvps', 'event_reminders', 'person_colors', 'shopping_items', 'task_lists', 'task_log', 'event_themes']) {
+    for (final t in <String>['events', 'event_history', 'rsvps', 'event_reminders', 'person_colors', 'shopping_items', 'task_lists', 'task_log', 'event_themes', 'anniversaries']) {
       expect(await rows(t), 0, reason: t);
     }
     final settings = {for (final r in await db.query('settings')) r['key']: r['value']};

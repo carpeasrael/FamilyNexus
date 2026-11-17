@@ -1,4 +1,6 @@
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
+import 'package:family_nexus/domain/anniversaries.dart';
+import 'package:family_nexus/domain/anniversary_codec.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/event_codec.dart';
@@ -481,6 +483,22 @@ void main() {
     );
     anna.gateway.injectSignal(EventThemeSignal(anna.userId, DateTime.utc(2026), EventThemeCodec.encode(theme)));
     anna.gateway.injectSignal(EventThemeSignal(anna.userId, DateTime.utc(2026), const <String, Object?>{'müll': 1}));
+    await anna.sync.idle();
+    expect(anna.sync.rejected, before, reason: 'weder angenommen noch als ungültiger Termin gezählt');
+    expect(await anna.store.all(), isEmpty);
+  });
+
+  test('E-104: ein Geburtstags-Signal gehört AnniversarySync; die Kalender-Synchronisation ignoriert es ohne Fehler', () async {
+    final before = anna.sync.rejected;
+    final person = AnniversaryPerson(
+      id: '00000000-0000-4000-8000-0000000000b1',
+      name: 'Oma',
+      birth: const AnniversaryDate(month: 3, day: 15, year: 1940),
+      by: anna.userId,
+      updatedAt: DateTime.utc(2026, 10, 21),
+    );
+    anna.gateway.injectSignal(AnniversarySignal(anna.userId, DateTime.utc(2026), AnniversaryCodec.encode(person)));
+    anna.gateway.injectSignal(AnniversarySignal(anna.userId, DateTime.utc(2026), const <String, Object?>{'müll': 1}));
     await anna.sync.idle();
     expect(anna.sync.rejected, before, reason: 'weder angenommen noch als ungültiger Termin gezählt');
     expect(await anna.store.all(), isEmpty);

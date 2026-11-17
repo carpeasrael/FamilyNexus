@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
+import 'package:family_nexus/domain/anniversaries.dart';
+import 'package:family_nexus/domain/anniversary_codec.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_service.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
@@ -13,6 +15,7 @@ import 'package:family_nexus/domain/time_zones.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/memory_anniversary_store.dart';
 import '../support/memory_event_store.dart';
 import '../support/memory_event_theme_store.dart';
 import '../support/memory_shopping_store.dart';
@@ -74,6 +77,16 @@ class _HoldingThemes extends MemoryEventThemeStore {
   }
 }
 
+class _HoldingAnniversaries extends MemoryAnniversaryStore {
+  final _Hold hold = _Hold();
+
+  @override
+  Future<AnniversaryPerson?> get(String id) async {
+    await hold.pass();
+    return super.get(id);
+  }
+}
+
 /// #140: `AppServices` öffnet die Dienste für genau eine Familie, beansprucht die lokalen Daten vor dem Aufbau und lässt
 /// einen veralteten Öffnungslauf nichts mehr starten. Ein hängender Lauf hält keinen neuen auf (#153).
 void main() {
@@ -101,6 +114,7 @@ void main() {
     MemoryShoppingStore? shopping,
     MemoryTaskStore? tasks,
     MemoryEventThemeStore? themes,
+    MemoryAnniversaryStore? anniversaries,
   }) async {
     final app = await buildTestApp(
       beforeCalendarBuild: beforeCalendarBuild,
@@ -111,6 +125,7 @@ void main() {
       shoppingItems: shopping,
       taskItems: tasks,
       themeItems: themes,
+      anniversaryItems: anniversaries,
     );
     roomA = app.gateway.familyRoom!.id;
     roomB = app.server.addFamilyRoom('Familie B', _anna).id;
@@ -518,6 +533,45 @@ void main() {
       expect(app.calendarRooms, <String>[roomA, roomB]);
       expect(atClaim?.map((t) => t.id), [theme.id], reason: 'der Nachzügler ist vor dem Leeren fertig');
       expect(await store.all(), isEmpty, reason: 'nach dem Wechsel liegt kein Thema der alten Familie im Bestand');
+    });
+
+    test('Geburtstage (E-104): Anspruch und Aufbau laufen erst nach dem Durchlauf der Warteschlange; kein Eintrag der alten Familie bleibt', () async {
+      final store = _HoldingAnniversaries();
+      List<AnniversaryPerson>? atClaim;
+      final claims = <String>[];
+      final app = await make(
+        anniversaries: store,
+        claim: (o) async {
+          claims.add(o);
+          if (claims.length == 2) {
+            atClaim = await store.all();
+            await store.wipe();
+          }
+        },
+      );
+      final person = AnniversaryPerson(
+        id: '00000000-0000-4000-8000-0000000000e2',
+        name: 'Oma',
+        birth: const AnniversaryDate(month: 3, day: 15, year: 1940),
+        by: _anna,
+        updatedAt: at,
+      );
+      await app.services.openCalendar();
+      store.hold.gate = Completer<void>();
+      app.gateway.injectSignal(AnniversarySignal(_anna, at, AnniversaryCodec.encode(person)));
+      await store.hold.entered.future;
+      app.services.closeCalendar();
+      app.gateway.attachFamilyRoom(roomB);
+      final open = app.services.openCalendar();
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(app.calendarRooms, hasLength(1), reason: 'der Aufbau wartet auf die Warteschlange der alten Familie');
+      final gate = store.hold.gate!;
+      store.hold.gate = null;
+      gate.complete();
+      await open;
+      expect(app.calendarRooms, <String>[roomA, roomB]);
+      expect(atClaim?.map((t) => t.id), [person.id]);
+      expect(await store.all(), isEmpty, reason: 'nach dem Wechsel liegt kein Eintrag der alten Familie im Bestand');
     });
 
     test('Einkauf: Aufbau erst nach dem Durchlauf der alten Warteschlange', () async {

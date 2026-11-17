@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/domain/account_deletion.dart';
+import 'package:family_nexus/domain/anniversaries.dart';
+import 'package:family_nexus/domain/anniversary_codec.dart';
 import 'package:family_nexus/domain/attachment_policy.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
@@ -227,6 +229,7 @@ class FakeMatrixServer {
           TaskCodec.listType => TaskListSignal(e.sender, e.time, e.content),
           TaskCodec.logType => TaskLogSignal(e.sender, e.time, e.content),
           EventThemeCodec.type => EventThemeSignal(e.sender, e.time, e.content),
+          AnniversaryCodec.type => AnniversarySignal(e.sender, e.time, e.content),
           _ => null,
         };
       }
@@ -1571,6 +1574,26 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       throw const GatewayException(GatewayError.invalidInput);
     }
     fake.post(room, _userId!, EventThemeCodec.type, content);
+  }
+
+  // ------------------------------------------------- Geburts- und Gedenktage
+
+  @override
+  Future<void> publishAnniversary(AnniversaryPerson person) async {
+    _requireSession();
+    _require();
+    publishAttempts++;
+    if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
+    final room = familyRoom;
+    if (room == null) throw const GatewayException(GatewayError.notFound);
+    if (person.by != _userId) throw const GatewayException(GatewayError.invalidInput);
+    final Map<String, Object?> content;
+    try {
+      content = AnniversaryCodec.encode(person);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    fake.post(room, _userId!, AnniversaryCodec.type, content);
   }
 
   @override

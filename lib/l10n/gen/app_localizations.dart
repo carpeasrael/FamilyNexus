@@ -2255,7 +2255,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy2Body.
   ///
   /// In de, this message translates to:
-  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.'**
+  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Geburts- und Gedenktage (Name und Datum, auch von Dritten und Verstorbenen), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.'**
   String privacy2Body(String keyStore, String cipher);
 
   /// No description provided for @privacy3Title.
@@ -3317,7 +3317,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy12Body.
   ///
   /// In de, this message translates to:
-  /// **'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“), dazu die Wahl deines Avatars (Raumzustand, nicht Ende-zu-Ende-verschlüsselt).'**
+  /// **'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Ebenso werden Geburts- und Gedenktage (Name der Person und Datum, auch von Dritten und Verstorbenen) Ende-zu-Ende-verschlüsselt im Familienraum übertragen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“), dazu die Wahl deines Avatars (Raumzustand, nicht Ende-zu-Ende-verschlüsselt).'**
   String get privacy12Body;
 
   /// No description provided for @webUnlockTitleCreate.
@@ -5189,7 +5189,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleteBody.
   ///
   /// In de, this message translates to:
-  /// **'Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar, ebenso die Wahl deines Avatars (ein Wert aus zwölf), die im Familienraum stehen bleibt. Anschließend werden alle Daten auf diesem Gerät gelöscht.'**
+  /// **'Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar, ebenso die Wahl deines Avatars (ein Wert aus zwölf), die im Familienraum stehen bleibt. Geburts- und Gedenktage, die du angelegt hast, bleiben für die Familie bestehen (gemeinsame Familiendaten, jedes Mitglied darf sie ändern). Anschließend werden alle Daten auf diesem Gerät gelöscht.'**
   String accountDeleteBody(String userId, String server);
 
   /// No description provided for @accountDeleteSoleModerator.
@@ -5659,6 +5659,252 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Seite lädt'**
   String get embeddedLoading;
+
+  /// No description provided for @anniversariesTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Geburtstage'**
+  String get anniversariesTitle;
+
+  /// No description provided for @anniversariesTodayTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Geburtstage und Gedenktage'**
+  String get anniversariesTodayTitle;
+
+  /// No description provided for @anniversariesHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Geburts- und Todestage von Personen, auch von Verwandten ohne Konto und von Verstorbenen. Alle Familienmitglieder sehen und ändern die Einträge.'**
+  String get anniversariesHint;
+
+  /// No description provided for @anniversariesEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Einträge. Lege den ersten an.'**
+  String get anniversariesEmpty;
+
+  /// No description provided for @anniversaryAdd.
+  ///
+  /// In de, this message translates to:
+  /// **'Person anlegen'**
+  String get anniversaryAdd;
+
+  /// No description provided for @anniversaryEdit.
+  ///
+  /// In de, this message translates to:
+  /// **'Eintrag ändern'**
+  String get anniversaryEdit;
+
+  /// No description provided for @anniversaryDelete.
+  ///
+  /// In de, this message translates to:
+  /// **'Eintrag löschen'**
+  String get anniversaryDelete;
+
+  /// No description provided for @anniversaryDeleteBody.
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“ für alle Familienmitglieder löschen?'**
+  String anniversaryDeleteBody(String name);
+
+  /// No description provided for @anniversarySaved.
+  ///
+  /// In de, this message translates to:
+  /// **'Eintrag gespeichert.'**
+  String get anniversarySaved;
+
+  /// No description provided for @anniversaryDeleted.
+  ///
+  /// In de, this message translates to:
+  /// **'Eintrag gelöscht.'**
+  String get anniversaryDeleted;
+
+  /// No description provided for @anniversaryName.
+  ///
+  /// In de, this message translates to:
+  /// **'Name der Person'**
+  String get anniversaryName;
+
+  /// No description provided for @anniversaryBirth.
+  ///
+  /// In de, this message translates to:
+  /// **'Geburtsdatum'**
+  String get anniversaryBirth;
+
+  /// No description provided for @anniversaryDeath.
+  ///
+  /// In de, this message translates to:
+  /// **'Todesdatum'**
+  String get anniversaryDeath;
+
+  /// No description provided for @anniversaryDay.
+  ///
+  /// In de, this message translates to:
+  /// **'Tag'**
+  String get anniversaryDay;
+
+  /// No description provided for @anniversaryMonth.
+  ///
+  /// In de, this message translates to:
+  /// **'Monat'**
+  String get anniversaryMonth;
+
+  /// No description provided for @anniversaryYear.
+  ///
+  /// In de, this message translates to:
+  /// **'Jahr (optional)'**
+  String get anniversaryYear;
+
+  /// No description provided for @anniversaryDatesHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Beide Daten sind optional, mindestens eines ist nötig. Ohne Jahr wird kein Alter angezeigt.'**
+  String get anniversaryDatesHint;
+
+  /// No description provided for @anniversaryNameEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte einen Namen eingeben.'**
+  String get anniversaryNameEmpty;
+
+  /// No description provided for @anniversaryNeedDate.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte mindestens ein Datum angeben.'**
+  String get anniversaryNeedDate;
+
+  /// No description provided for @anniversaryDateInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte ein gültiges Datum angeben (Tag, Monat, optional Jahr).'**
+  String get anniversaryDateInvalid;
+
+  /// No description provided for @anniversaryDateFuture.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Datum darf nicht in der Zukunft liegen.'**
+  String get anniversaryDateFuture;
+
+  /// No description provided for @anniversaryDeathBeforeBirth.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Todesdatum darf nicht vor dem Geburtsdatum liegen.'**
+  String get anniversaryDeathBeforeBirth;
+
+  /// No description provided for @anniversaryInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte Name (höchstens {count} Zeichen) und gültige Daten angeben.'**
+  String anniversaryInvalid(int count);
+
+  /// No description provided for @anniversaryLimit.
+  ///
+  /// In de, this message translates to:
+  /// **'Es sind höchstens {count} Personen möglich.'**
+  String anniversaryLimit(int count);
+
+  /// No description provided for @anniversaryBirthdayOf.
+  ///
+  /// In de, this message translates to:
+  /// **'Geburtstag von {name}'**
+  String anniversaryBirthdayOf(String name);
+
+  /// No description provided for @anniversaryDeathdayOf.
+  ///
+  /// In de, this message translates to:
+  /// **'Todestag von {name}'**
+  String anniversaryDeathdayOf(String name);
+
+  /// No description provided for @anniversaryBirthdayLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Geburtstag'**
+  String get anniversaryBirthdayLabel;
+
+  /// No description provided for @anniversaryDeathdayLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Todestag'**
+  String get anniversaryDeathdayLabel;
+
+  /// No description provided for @anniversaryWillBe.
+  ///
+  /// In de, this message translates to:
+  /// **'wird {n}'**
+  String anniversaryWillBe(int n);
+
+  /// No description provided for @anniversaryCurrentAge.
+  ///
+  /// In de, this message translates to:
+  /// **'{k, plural, =1{aktuell 1 Jahr} other{aktuell {k} Jahre}}'**
+  String anniversaryCurrentAge(int k);
+
+  /// No description provided for @anniversaryIsAge.
+  ///
+  /// In de, this message translates to:
+  /// **'{n, plural, =1{1 Jahr} other{{n} Jahre}}'**
+  String anniversaryIsAge(int n);
+
+  /// No description provided for @anniversaryWouldBe.
+  ///
+  /// In de, this message translates to:
+  /// **'wäre {n}'**
+  String anniversaryWouldBe(int n);
+
+  /// No description provided for @anniversaryNthDeathDay.
+  ///
+  /// In de, this message translates to:
+  /// **'{n}. Todestag'**
+  String anniversaryNthDeathDay(int n);
+
+  /// No description provided for @anniversaryYearsAgo.
+  ///
+  /// In de, this message translates to:
+  /// **'{k, plural, =1{vor 1 Jahr} other{vor {k} Jahren}}'**
+  String anniversaryYearsAgo(int k);
+
+  /// No description provided for @anniversaryToday.
+  ///
+  /// In de, this message translates to:
+  /// **'heute'**
+  String get anniversaryToday;
+
+  /// No description provided for @anniversaryTomorrow.
+  ///
+  /// In de, this message translates to:
+  /// **'morgen'**
+  String get anniversaryTomorrow;
+
+  /// No description provided for @anniversaryInDays.
+  ///
+  /// In de, this message translates to:
+  /// **'{d, plural, =1{in 1 Tag} other{in {d} Tagen}}'**
+  String anniversaryInDays(int d);
+
+  /// No description provided for @calendarAnniversariesOnDay.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Geburts- oder Gedenktag} other{{count} Geburts- oder Gedenktage}}'**
+  String calendarAnniversariesOnDay(int count);
+
+  /// No description provided for @settingsAnniversaryLead.
+  ///
+  /// In de, this message translates to:
+  /// **'Geburtstage anzeigen'**
+  String get settingsAnniversaryLead;
+
+  /// No description provided for @anniversaryLeadOption.
+  ///
+  /// In de, this message translates to:
+  /// **'{days, plural, =0{Nur am Tag selbst} =1{1 Tag vorher} other{{days} Tage vorher}}'**
+  String anniversaryLeadOption(int days);
+
+  /// No description provided for @eventTypeAnniversary.
+  ///
+  /// In de, this message translates to:
+  /// **'Geburts- und Gedenktage'**
+  String get eventTypeAnniversary;
 }
 
 class _AppLocalizationsDelegate

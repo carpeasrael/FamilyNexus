@@ -26,8 +26,16 @@ class AppSettings {
     this.accent = AccentChoice.teal,
     this.defaultReminderMinutes = const <int>[10],
     this.blockedUsers = const <String>[],
+    this.anniversaryLeadDays = defaultAnniversaryLeadDays,
     this.pendingInvite,
   });
+
+  /// Vorlaufzeit der Geburts- und Gedenktage auf „Heute“ in Tagen (E-104): Standard 7, 0 = nur am Tag selbst.
+  static const int defaultAnniversaryLeadDays = 7;
+  static const int maxAnniversaryLeadDays = 60;
+
+  /// Auswahl in den Einstellungen.
+  static const List<int> anniversaryLeadChoices = <int>[0, 1, 3, 7, 14, 30, 60];
 
   /// Öffentlicher Standardserver (E-07).
   static const String defaultServerUrl = 'https://matrix.org';
@@ -64,6 +72,9 @@ class AppSettings {
   /// Lokal blockierte Matrix-IDs (E-48).
   final List<String> blockedUsers;
 
+  /// Wie viele Tage vorher Geburts- und Gedenktage auf „Heute“ erscheinen (0–60). Rein lokal, je Gerät (E-104).
+  final int anniversaryLeadDays;
+
   /// Einladungslink, der vor der Anmeldung geöffnet wurde (E-56). Bleibt erhalten, falls das System
   /// die App beendet, während die Person auf der Seite des Anbieters ihr Konto anlegt. Rohtext, wird
   /// beim Lesen erneut streng geprüft (`InviteLink.check`).
@@ -85,6 +96,7 @@ class AppSettings {
     AccentChoice? accent,
     List<int>? defaultReminderMinutes,
     List<String>? blockedUsers,
+    int? anniversaryLeadDays,
     Object? pendingInvite = _unset,
   }) =>
       AppSettings(
@@ -104,6 +116,7 @@ class AppSettings {
         accent: accent ?? this.accent,
         defaultReminderMinutes: defaultReminderMinutes ?? this.defaultReminderMinutes,
         blockedUsers: blockedUsers ?? this.blockedUsers,
+        anniversaryLeadDays: (anniversaryLeadDays ?? this.anniversaryLeadDays).clamp(0, maxAnniversaryLeadDays),
         pendingInvite: identical(pendingInvite, _unset) ? this.pendingInvite : _validInvite(pendingInvite as String?),
       );
 
@@ -125,6 +138,7 @@ class AppSettings {
         'accent': accent.name,
         'defaultReminders': defaultReminderMinutes.join(','),
         if (blockedUsers.isNotEmpty) blockedUsersKey: BlockedUsers.encode(blockedUsers),
+        'anniversaryLeadDays': '$anniversaryLeadDays',
         'pendingInvite': ?pendingInvite,
       };
 
@@ -134,6 +148,7 @@ class AppSettings {
     const d = AppSettings();
     final lang = m['language'];
     final timeout = int.tryParse(m['lockTimeout'] ?? '');
+    final lead = int.tryParse(m['anniversaryLeadDays'] ?? '');
     final reminders = (m['defaultReminders'] ?? '')
         .split(',')
         .map(int.tryParse)
@@ -160,6 +175,7 @@ class AppSettings {
       accent: AccentChoice.values.firstWhere((e) => e.name == m['accent'], orElse: () => d.accent),
       defaultReminderMinutes: m.containsKey('defaultReminders') ? reminders : d.defaultReminderMinutes,
       blockedUsers: BlockedUsers.parse(m[blockedUsersKey]),
+      anniversaryLeadDays: (lead != null && lead >= 0 && lead <= maxAnniversaryLeadDays) ? lead : defaultAnniversaryLeadDays,
       pendingInvite: _validInvite(m['pendingInvite']),
     );
   }

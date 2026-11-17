@@ -40,4 +40,28 @@ void main() {
     await c.update((s) => s);
     expect(notified, 0);
   });
+
+  group('setAnniversaryLeadDays (E-104)', () {
+    test('klemmt auf 0 bis 60, speichert und lädt wieder', () async {
+      final store = MemoryKeyValueStore();
+      final c = await SettingsController.load(store);
+      expect(c.settings.anniversaryLeadDays, 7);
+      expect(await c.setAnniversaryLeadDays(14), isTrue);
+      expect(c.settings.anniversaryLeadDays, 14);
+      expect((await SettingsController.load(store)).settings.anniversaryLeadDays, 14);
+      await c.setAnniversaryLeadDays(500);
+      expect(c.settings.anniversaryLeadDays, 60);
+      await c.setAnniversaryLeadDays(-3);
+      expect(c.settings.anniversaryLeadDays, 0);
+      expect(store.data['anniversaryLeadDays'], '0');
+    });
+
+    test('Speicherfehler stellt den Vorwert wieder her', () async {
+      final store = MemoryKeyValueStore();
+      final c = await SettingsController.load(store);
+      store.failWrites = true;
+      expect(await c.setAnniversaryLeadDays(30), isFalse);
+      expect(c.settings.anniversaryLeadDays, 7);
+    });
+  });
 }

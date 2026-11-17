@@ -1293,7 +1293,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String privacy2Body(String keyStore, String cipher) {
-    return 'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ($cipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: $keyStore – nicht in der Datenbankdatei.';
+    return 'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Geburts- und Gedenktage (Name und Datum, auch von Dritten und Verstorbenen), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ($cipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: $keyStore – nicht in der Datenbankdatei.';
   }
 
   @override
@@ -1967,7 +1967,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy12Body =>
-      'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“), dazu die Wahl deines Avatars (Raumzustand, nicht Ende-zu-Ende-verschlüsselt).';
+      'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Ebenso werden Geburts- und Gedenktage (Name der Person und Datum, auch von Dritten und Verstorbenen) Ende-zu-Ende-verschlüsselt im Familienraum übertragen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“), dazu die Wahl deines Avatars (Raumzustand, nicht Ende-zu-Ende-verschlüsselt).';
 
   @override
   String get webUnlockTitleCreate => 'Browser-Tresor einrichten';
@@ -3103,7 +3103,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String accountDeleteBody(String userId, String server) {
-    return 'Dein Konto $userId wird bei $server dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar, ebenso die Wahl deines Avatars (ein Wert aus zwölf), die im Familienraum stehen bleibt. Anschließend werden alle Daten auf diesem Gerät gelöscht.';
+    return 'Dein Konto $userId wird bei $server dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar, ebenso die Wahl deines Avatars (ein Wert aus zwölf), die im Familienraum stehen bleibt. Geburts- und Gedenktage, die du angelegt hast, bleiben für die Familie bestehen (gemeinsame Familiendaten, jedes Mitglied darf sie ändern). Anschließend werden alle Daten auf diesem Gerät gelöscht.';
   }
 
   @override
@@ -3363,4 +3363,197 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get embeddedLoading => 'Seite lädt';
+
+  @override
+  String get anniversariesTitle => 'Geburtstage';
+
+  @override
+  String get anniversariesTodayTitle => 'Geburtstage und Gedenktage';
+
+  @override
+  String get anniversariesHint =>
+      'Geburts- und Todestage von Personen, auch von Verwandten ohne Konto und von Verstorbenen. Alle Familienmitglieder sehen und ändern die Einträge.';
+
+  @override
+  String get anniversariesEmpty => 'Noch keine Einträge. Lege den ersten an.';
+
+  @override
+  String get anniversaryAdd => 'Person anlegen';
+
+  @override
+  String get anniversaryEdit => 'Eintrag ändern';
+
+  @override
+  String get anniversaryDelete => 'Eintrag löschen';
+
+  @override
+  String anniversaryDeleteBody(String name) {
+    return '„$name“ für alle Familienmitglieder löschen?';
+  }
+
+  @override
+  String get anniversarySaved => 'Eintrag gespeichert.';
+
+  @override
+  String get anniversaryDeleted => 'Eintrag gelöscht.';
+
+  @override
+  String get anniversaryName => 'Name der Person';
+
+  @override
+  String get anniversaryBirth => 'Geburtsdatum';
+
+  @override
+  String get anniversaryDeath => 'Todesdatum';
+
+  @override
+  String get anniversaryDay => 'Tag';
+
+  @override
+  String get anniversaryMonth => 'Monat';
+
+  @override
+  String get anniversaryYear => 'Jahr (optional)';
+
+  @override
+  String get anniversaryDatesHint =>
+      'Beide Daten sind optional, mindestens eines ist nötig. Ohne Jahr wird kein Alter angezeigt.';
+
+  @override
+  String get anniversaryNameEmpty => 'Bitte einen Namen eingeben.';
+
+  @override
+  String get anniversaryNeedDate => 'Bitte mindestens ein Datum angeben.';
+
+  @override
+  String get anniversaryDateInvalid =>
+      'Bitte ein gültiges Datum angeben (Tag, Monat, optional Jahr).';
+
+  @override
+  String get anniversaryDateFuture =>
+      'Das Datum darf nicht in der Zukunft liegen.';
+
+  @override
+  String get anniversaryDeathBeforeBirth =>
+      'Das Todesdatum darf nicht vor dem Geburtsdatum liegen.';
+
+  @override
+  String anniversaryInvalid(int count) {
+    return 'Bitte Name (höchstens $count Zeichen) und gültige Daten angeben.';
+  }
+
+  @override
+  String anniversaryLimit(int count) {
+    return 'Es sind höchstens $count Personen möglich.';
+  }
+
+  @override
+  String anniversaryBirthdayOf(String name) {
+    return 'Geburtstag von $name';
+  }
+
+  @override
+  String anniversaryDeathdayOf(String name) {
+    return 'Todestag von $name';
+  }
+
+  @override
+  String get anniversaryBirthdayLabel => 'Geburtstag';
+
+  @override
+  String get anniversaryDeathdayLabel => 'Todestag';
+
+  @override
+  String anniversaryWillBe(int n) {
+    return 'wird $n';
+  }
+
+  @override
+  String anniversaryCurrentAge(int k) {
+    String _temp0 = intl.Intl.pluralLogic(
+      k,
+      locale: localeName,
+      other: 'aktuell $k Jahre',
+      one: 'aktuell 1 Jahr',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String anniversaryIsAge(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n Jahre',
+      one: '1 Jahr',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String anniversaryWouldBe(int n) {
+    return 'wäre $n';
+  }
+
+  @override
+  String anniversaryNthDeathDay(int n) {
+    return '$n. Todestag';
+  }
+
+  @override
+  String anniversaryYearsAgo(int k) {
+    String _temp0 = intl.Intl.pluralLogic(
+      k,
+      locale: localeName,
+      other: 'vor $k Jahren',
+      one: 'vor 1 Jahr',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get anniversaryToday => 'heute';
+
+  @override
+  String get anniversaryTomorrow => 'morgen';
+
+  @override
+  String anniversaryInDays(int d) {
+    String _temp0 = intl.Intl.pluralLogic(
+      d,
+      locale: localeName,
+      other: 'in $d Tagen',
+      one: 'in 1 Tag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String calendarAnniversariesOnDay(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Geburts- oder Gedenktage',
+      one: '1 Geburts- oder Gedenktag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsAnniversaryLead => 'Geburtstage anzeigen';
+
+  @override
+  String anniversaryLeadOption(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days Tage vorher',
+      one: '1 Tag vorher',
+      zero: 'Nur am Tag selbst',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get eventTypeAnniversary => 'Geburts- und Gedenktage';
 }

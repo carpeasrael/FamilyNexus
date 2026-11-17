@@ -2,8 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../data/matrix/matrix_gateway.dart';
+import '../../data/sync/anniversary_sync.dart';
 import '../../data/sync/calendar_sync.dart';
 import '../../data/sync/event_theme_sync.dart';
+import '../../domain/anniversaries.dart';
+import '../../domain/anniversary_calc.dart';
+import '../../domain/anniversary_service.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_service.dart';
 import '../../domain/calendar_view.dart';
@@ -26,6 +30,8 @@ class CalendarController extends ChangeNotifier {
     DateTime Function()? clock,
     this.themes,
     this.themeSync,
+    this.anniversaries,
+    this.anniversarySync,
   })  : zone = TimeZones.tryGet(zoneName) ?? TimeZones.utc,
         zoneName = TimeZones.tryGet(zoneName) == null ? 'UTC' : zoneName,
         _clock = clock ?? DateTime.now;
@@ -39,6 +45,10 @@ class CalendarController extends ChangeNotifier {
   final EventThemeService? themes;
   final EventThemeSync? themeSync;
 
+  /// Geburts- und Gedenktage (E-104); `null`, wenn die Verdrahtung sie nicht vorsieht.
+  final AnniversaryService? anniversaries;
+  final AnniversarySync? anniversarySync;
+
   /// Zeitzone des Geräts (Betrachter).
   final tz.Location zone;
   final String zoneName;
@@ -49,6 +59,7 @@ class CalendarController extends ChangeNotifier {
   Map<String, int> _colors = const <String, int>{};
   Map<String, List<int>> _reminders = const <String, List<int>>{};
   List<EventTheme> _themes = const <EventTheme>[];
+  List<AnniversaryPerson> _people = const <AnniversaryPerson>[];
   bool _started = false;
 
   String get me => service.myUserId;
@@ -76,6 +87,11 @@ class CalendarController extends ChangeNotifier {
       ts.onChanged = () => load().ignore();
       ts.start(familyRoom: familyRoom);
     }
+    final an = anniversarySync;
+    if (an != null) {
+      an.onChanged = () => load().ignore();
+      an.start(familyRoom: familyRoom);
+    }
     load().ignore();
   }
 
@@ -89,12 +105,21 @@ class CalendarController extends ChangeNotifier {
       ts.onChanged = null;
       ts.dispose();
     }
+    final an = anniversarySync;
+    if (an != null) {
+      an.onChanged = null;
+      an.dispose();
+    }
     super.dispose();
   }
 
   /// Wartet, bis die bereits eingegangenen Signale von Kalender und Themen verarbeitet sind (Schließen der
   /// Familie, #140/#153).
-  Future<void> idle() => Future.wait<void>(<Future<void>>[sync.idle(), themeSync?.idle() ?? Future<void>.value()]);
+  Future<void> idle() => Future.wait<void>(<Future<void>>[
+        sync.idle(),
+        themeSync?.idle() ?? Future<void>.value(),
+        anniversarySync?.idle() ?? Future<void>.value(),
+      ]);
 
   Future<void>? _loading;
   bool _loadAgain = false;
@@ -134,6 +159,14 @@ class CalendarController extends ChangeNotifier {
     final themeStore = themes?.store;
     if (themeStore != null) {
       _themes = <EventTheme>[for (final t in await themeStore.all()) if (!t.deleted) t]
+        ..sort((a, b) {
+          final byName = a.name.toLowerCase().compareTo(b.name.toLowerCase());
+          return byName != 0 ? byName : a.id.compareTo(b.id);
+        });
+    }
+    final anniversaryStore = anniversaries?.store;
+    if (anniversaryStore != null) {
+      _people = <AnniversaryPerson>[for (final p in await anniversaryStore.all()) if (!p.deleted) p]
         ..sort((a, b) {
           final byName = a.name.toLowerCase().compareTo(b.name.toLowerCase());
           return byName != 0 ? byName : a.id.compareTo(b.id);
@@ -340,6 +373,43 @@ class CalendarController extends ChangeNotifier {
     // Die Karte verwiese sonst in der neuen Familie auf einen Termin der alten (#140).
     if (!sync.sameFamily) throw const GatewayException(GatewayError.serverUnreachable);
     await gateway.shareEventInChat(e);
+  }
+
+  // ------------------------------------------------- Geburts- und Gedenktage (E-104)
+
+  /// Aktive Personen der Geburts- und Gedenktage, nach Name sortiert.
+  List<AnniversaryPerson> get anniversaryPeople => _people;
+
+  /// Nächste Vorkommen aller Personen ab heute, nach Datum sortiert (Liste).
+  List<AnniversaryHit> get anniversaryUpcoming => AnniversaryCalc.upcoming(_people, today);
+
+  /// Treffer mit wirksamem Datum in [from, to] (Kalendertage, einschließlich), nach Datum sortiert.
+  List<AnniversaryHit> anniversariesOn(DateTime from, DateTime to) => AnniversaryCalc.between(_people, from, to, today);
+
+  /// Treffer innerhalb von [leadDays] Tagen ab heute (Karte auf „Heute“).
+  List<AnniversaryHit> anniversariesDue(int leadDays) => AnniversaryCalc.dueWithin(_people, today, leadDays);
+
+  /// Jedes beigetretene Mitglied (der Dienst kennt keine Rechte); ohne den Anteil wirft der Aufruf einen [StateError].
+  Future<AnniversaryPerson> createAnniversary({required String name, AnniversaryDate? birth, AnniversaryDate? death}) async {
+    final p = await anniversaries!.create(name: name, birth: birth, death: death);
+    await _anniversariesChanged();
+    return p;
+  }
+
+  Future<AnniversaryPerson> updateAnniversary(String id, {required String name, AnniversaryDate? birth, AnniversaryDate? death}) async {
+    final p = await anniversaries!.update(id, name: name, birth: birth, death: death);
+    await _anniversariesChanged();
+    return p;
+  }
+
+  Future<void> deleteAnniversary(String id) async {
+    await anniversaries!.delete(id);
+    await _anniversariesChanged();
+  }
+
+  Future<void> _anniversariesChanged() async {
+    await load();
+    anniversarySync?.kick();
   }
 
   // ------------------------------------------------------------ Themen (E-99)

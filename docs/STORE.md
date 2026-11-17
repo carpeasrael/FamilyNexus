@@ -51,7 +51,7 @@ Der Herausgeber betreibt keinen Server und erhält keine Daten. Die App sendet D
 
 | Datentyp | Erfasst? | Geteilt? | Hinweis |
 |---|---|---|---|
-| Nachrichten, Dateien, Kalenderereignisse, Kalender-Themen (Name, Farbe), Einkaufsliste, Aufgabenlisten | ja, auf Wunsch des Nutzers an den gewählten Matrix-Server | nein (an Familienmitglieder, vom Nutzer gesteuert) | Ende-zu-Ende-verschlüsselt, „Daten werden bei der Übertragung verschlüsselt“: ja |
+| Nachrichten, Dateien, Kalenderereignisse, Kalender-Themen (Name, Farbe), Geburts- und Gedenktage (Name, Datum, auch Dritter und Verstorbener; angelegte Einträge bleiben nach Kontolöschung für die Familie bestehen), Einkaufsliste, Aufgabenlisten | ja, auf Wunsch des Nutzers an den gewählten Matrix-Server | nein (an Familienmitglieder, vom Nutzer gesteuert) | Ende-zu-Ende-verschlüsselt, „Daten werden bei der Übertragung verschlüsselt“: ja |
 | Nutzer-ID (Matrix-ID), Anzeigename | ja (Anmeldung am gewählten Server) | nein | nötig für die App-Funktion, nicht optional |
 | Avatar-Wahl (eine Kennung aus zwölf, kein Bild) | ja, als Raumzustand im Familienraum beim gewählten Matrix-Server, nicht Ende-zu-Ende-verschlüsselt | nein (sichtbar für Familienmitglieder und den Serverbetreiber) | optional; bleibt nach Entfernen oder Kontolöschung im Raum stehen (E-101) |
 | Standort, Kontakte, Fotos (automatisch), Gesundheit, Finanzen | nein | – | |
