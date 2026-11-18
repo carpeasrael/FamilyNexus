@@ -23,6 +23,7 @@ class MemberAvatarView extends StatelessWidget {
     required this.colorIndex,
     this.online,
     this.ring = false,
+    this.fallbackName,
   }) : super(key: ValueKey<String>('avatar-$userId'));
 
   final String userId;
@@ -30,6 +31,10 @@ class MemberAvatarView extends StatelessWidget {
   final int colorIndex;
   final bool? online;
   final bool ring;
+
+  /// Name, den die Oberfläche neben dem Avatar zeigt, für Personen, die nicht mehr in der Familie stehen (Konto gelöscht,
+  /// entfernt; #551): Er liefert dann den Buchstaben. Ohne Namen bleibt „?“.
+  final String? fallbackName;
 
   /// Ab dieser Größe (einschließlich) zeichnet der Rückfall den Buchstaben; kleinere bleiben ein einfarbiger Kreis.
   static const double letterMinSize = 20;
@@ -41,7 +46,7 @@ class MemberAvatarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gateway = AppScope.maybeOf(context)?.gateway;
-    if (gateway == null) return AvatarFace(preset: null, letter: '?', size: size, colorIndex: colorIndex, online: online, ring: ring);
+    if (gateway == null) return AvatarFace(preset: null, letter: _letterOf(fallbackName), size: size, colorIndex: colorIndex, online: online, ring: ring);
     return ListenableBuilder(
       listenable: gateway.avatarRevision,
       builder: (context, _) {
@@ -51,12 +56,17 @@ class MemberAvatarView extends StatelessWidget {
         final joined = family == null || member?.status == MemberStatus.joined;
         final preset = joined ? gateway.avatarOf(userId) : null;
         final name = member?.displayName ?? '';
-        return AvatarFace(preset: preset, letter: name.isEmpty ? '?' : _initial(name), size: size, colorIndex: colorIndex, online: online, ring: ring);
+        return AvatarFace(preset: preset, letter: name.isEmpty ? _letterOf(fallbackName) : _initial(name), size: size, colorIndex: colorIndex, online: online, ring: ring);
       },
     );
   }
 
   static String _initial(String name) => name.characters.first.toUpperCase();
+
+  static String _letterOf(String? name) {
+    final n = name?.trim() ?? '';
+    return n.isEmpty ? '?' : _initial(n);
+  }
 }
 
 /// Personenfarbe (Palettenindex): lokal gespeicherte Farbe des Kalenders, sonst aus der Kennung abgeleitet.

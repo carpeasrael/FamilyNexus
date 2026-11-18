@@ -72,6 +72,22 @@ void main() {
     expect(find.text('B'), findsOneWidget, reason: 'Anzeigename bekannt, aber kein Avatar');
   });
 
+  testWidgets('Nicht-Mitglied: Buchstabe aus fallbackName, Mitgliedsname hat Vorrang, leer bleibt „?“ (#551)', (tester) async {
+    final app = await buildTestApp();
+    Widget view(String? f) => MemberAvatarView(userId: _ben, size: 28, colorIndex: 1, fallbackName: f);
+    await tester.pumpWidget(_host(view('  test Nutzer 2'), app: app));
+    expect(find.text('T'), findsOneWidget, reason: 'Ben ist nicht im Raum, der Nachrichtenname liefert den Buchstaben');
+    expect(find.text('?'), findsNothing);
+    for (final empty in <String?>[null, '', '   ']) {
+      await tester.pumpWidget(_host(view(empty), app: app));
+      expect(find.text('?'), findsOneWidget, reason: 'ohne Namen: "$empty"');
+    }
+    app.gateway.familyRoom!.membership[_ben] = MemberStatus.joined;
+    await tester.pumpWidget(_host(view('Zora'), app: app));
+    expect(find.text('B'), findsOneWidget, reason: 'Mitgliedsname vor fallbackName');
+    expect(find.text('Z'), findsNothing);
+  });
+
   testWidgets('ohne AppScope: Rückfall in der übergebenen Farbe mit ?, ohne assert; maybeOf liefert null', (tester) async {
     late BuildContext captured;
     await tester.pumpWidget(_host(Builder(builder: (c) {
@@ -80,6 +96,8 @@ void main() {
     })));
     expect(AppScope.maybeOf(captured), isNull);
     expect(find.text('?'), findsOneWidget);
+    await tester.pumpWidget(_host(MemberAvatarView(userId: _ben, size: 24, colorIndex: 3, fallbackName: 'Ben')));
+    expect(find.text('B'), findsOneWidget, reason: 'fallbackName auch ohne AppScope');
     expect(tester.takeException(), isNull);
   });
 
