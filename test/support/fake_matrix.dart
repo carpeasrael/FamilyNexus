@@ -307,6 +307,20 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   SessionState get session => _userId == null ? SessionState.loggedOut : SessionState.ready;
 
+  bool _sessionEndedByServer = false;
+
+  @override
+  bool get sessionEndedByServer => _sessionEndedByServer && _userId == null;
+
+  /// Simuliert, dass der Server die Sitzung beendet (Konto gelöscht, Token ungültig, #556).
+  void endSessionByServer() {
+    _userId = null;
+    _server = null;
+    _familyRoomId = null;
+    _sessionEndedByServer = true;
+    notifyListeners();
+  }
+
   @override
   String? get userId => _userId;
 
@@ -1390,6 +1404,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<void> logout() async {
     cancelRegistration();
+    _sessionEndedByServer = false;
     _oauthState = null;
     _viaOAuth = false;
     _userId = null;

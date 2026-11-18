@@ -148,6 +148,8 @@ class _LoginStepState extends State<LoginStep> {
           ];
         }
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+          // Der Server hat die Sitzung beendet (z. B. Konto gelöscht), die Person hat sich nicht abgemeldet (#556).
+          if (_s.gateway.sessionEndedByServer) OnboardingMessage(text: l.loginSessionEndedNotice, notice: true),
           ...main,
           if (_error != null) OnboardingMessage(text: _error!, notice: _errorNotice),
           if (!_waitingForBrowser) ...<Widget>[

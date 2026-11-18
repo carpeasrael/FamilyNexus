@@ -2429,6 +2429,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get loginSessionEndedNotice =>
+      'Deine Sitzung wurde beendet, zum Beispiel weil das Konto oder die Anmeldung beim Anbieter nicht mehr gültig ist. Melde dich neu an.';
+
+  @override
   String get loginNoAccount => 'Noch kein Konto? Jetzt erstellen';
 
   @override

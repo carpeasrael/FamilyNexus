@@ -1351,6 +1351,7 @@
       }
     }
   },
+  "loginSessionEndedNotice": "Deine Sitzung wurde beendet, zum Beispiel weil das Konto oder die Anmeldung beim Anbieter nicht mehr gültig ist. Melde dich neu an.",
   "loginNoAccount": "Noch kein Konto? Jetzt erstellen",
   "advTitle": "Erweitert",
   "advServerInfo": "Dein Konto liegt bei {host}.",
