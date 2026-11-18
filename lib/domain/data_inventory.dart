@@ -1,5 +1,6 @@
 import 'family.dart';
 import 'security.dart';
+import 'text_sanitizer.dart';
 
 /// Wo die Schlüssel der lokalen Datenbanken liegen (je Plattform).
 enum KeyStoreKind { androidKeystore, appleKeychain, linuxSecretService, linuxFlatpakPortal, windowsCredentialManager, browserVault }
@@ -66,6 +67,15 @@ abstract class LocalDataInventory {
 }
 
 enum InventoryRoomKind { family, private, direct, other }
+
+/// Name der Gegenseite eines Einzelchats für die Online-Datenübersicht (#555, E-109). [raw] ist der `displayname`
+/// aus dem lokal gespeicherten `m.room.member` der Gegenseite, `null` ohne diesen Eintrag. Bereinigt (höchstens 80
+/// Zeichen); leer, wenn nichts Brauchbares da ist, auch bei einem Wert, der wie eine Matrix-ID (`@…`) oder Raum-ID
+/// (`!…`) beginnt. Es gibt bewusst keinen Ersatz (kein Localpart, kein SDK-Fallback).
+String directPeerName(String? raw) {
+  final name = TextSanitizer.clean(raw ?? '', max: 80);
+  return name.startsWith('@') || name.startsWith('!') ? '' : name;
+}
 
 /// Ein Matrix-Raum des Kontos mit den auf diesem Gerät zwischengespeicherten Ereignissen.
 class InventoryRoom {

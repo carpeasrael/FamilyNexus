@@ -104,9 +104,12 @@ class DataReport {
   static void _rooms(StringBuffer b, AppLocalizations l, List<InventoryRoom> rooms, {required bool withMembers}) {
     if (rooms.isEmpty) b.writeln(l.reportNone);
     for (final r in rooms) {
+      // Raum-IDs stehen nicht in der Übersicht (#555, E-109): Die des Familienraums ist der Familien-Code (E-65). Nur
+      // unbekannte Räume tragen sie, sonst wären sie nicht zu unterscheiden. Namen der Gegenseite nur online (E-89).
+      final name = r.kind == InventoryRoomKind.direct && !withMembers ? '' : r.name;
       b
         ..writeln()
-        ..writeln('- ${_roomKind(l, r.kind)}${r.name.isEmpty ? '' : ' „${r.name}“'} (${r.id})');
+        ..writeln('- ${_roomKind(l, r.kind)}${name.isEmpty ? '' : ' „$name“'}${r.kind == InventoryRoomKind.other ? ' (${r.id})' : ''}');
       if (withMembers) {
         b
           ..writeln('  ${l.reportRoomEncrypted}: ${r.encrypted ? l.reportYes : l.reportNo}')
