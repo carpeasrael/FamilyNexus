@@ -455,8 +455,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     final entries = chatEntries(msgs, unreadFromId: _unreadFrom, allIds: <String>[for (final m in all) m.id]);
     _scrollToMarkerOnce(entries);
     // Querformat mit Tastatur (#548): Bei knapper Höhe entfallen Kopfzeile und Hinweis (sie kommen zurück, sobald die
-    // Tastatur weg ist), unter 150 dp auch die Antwortvorschau (die Antwort bleibt gesetzt); die Eingabeleiste bleibt immer sichtbar. Die Schlüssel
-    // halten das Eingabefeld beim Ein- und Ausblenden im Baum (Fokus bleibt).
+    // Tastatur weg ist), unter 150 dp auch die Antwortvorschau (die Antwort bleibt gesetzt); die Eingabeleiste bleibt immer sichtbar. Das Eingabefeld behält dabei
+    // den Fokus (Test).
     return LayoutBuilder(builder: (context, box) {
       final tight = box.maxHeight < 200;
       final veryTight = box.maxHeight < 150;
@@ -464,7 +464,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         if (view.showHeader && !tight) _ThreadHeader(thread: view.current, onBack: _backToList),
         if (!tight) _EncryptionNote(current: view.current),
         Expanded(
-          key: const ValueKey<String>('chat-list'),
           child: msgs.isEmpty
               ? Center(child: Text(l.emptyChat))
               : _MessageList(
@@ -480,7 +479,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                 ),
         ),
         if (_replyTo != null && !veryTight) _ReplyPreview(message: _replyTo!, onCancel: () => setState(() => _replyTo = null)),
-        _Composer(key: const ValueKey<String>('chat-composer'), controller: _ctrl, sending: _sending, onAttach: () => _attach(services), onSend: () => _send(g)),
+        _Composer(controller: _ctrl, sending: _sending, onAttach: () => _attach(services), onSend: () => _send(g)),
       ]);
     });
   }
