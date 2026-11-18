@@ -1,0 +1,132 @@
+import 'package:family_nexus/domain/data_inventory.dart';
+import 'package:family_nexus/features/settings/data_report.dart';
+import 'package:family_nexus/l10n/gen/app_localizations.dart';
+import 'package:flutter/widgets.dart' show Locale;
+import 'package:flutter_test/flutter_test.dart';
+
+/// #555, E-109: Die Datenübersicht nennt keine Raum-IDs (außer bei unbekannten Räumen) und zeigt bei Einzelchats
+/// online den Namen der Gegenseite.
+void main() {
+  InventoryRoom room(InventoryRoomKind kind, {String name = '', String id = '!abc123:fake.test'}) => InventoryRoom(
+        id: id,
+        kind: kind,
+        name: name,
+        encrypted: true,
+        membership: 'join',
+        joinedMembers: 2,
+        invitedMembers: 0,
+        cachedEvents: 0,
+        eventTypes: const <String, int>{},
+        attachments: 0,
+      );
+
+  OnlineInventory inventory(List<InventoryRoom> rooms) => OnlineInventory(
+        server: 'https://fake.test',
+        userId: '@ida:fake.test',
+        deviceId: 'GERAET',
+        displayName: null,
+        hasAvatar: false,
+        devices: const [],
+        crossSigning: false,
+        keyBackup: false,
+        accountDataTypes: const <String>[],
+        rooms: rooms,
+      );
+
+  String online(String locale, List<InventoryRoom> rooms) => DataReport.online(
+        l: lookupAppLocalizations(Locale(locale)),
+        now: DateTime(2026, 11, 18),
+        version: '1.2.3',
+        inventory: inventory(rooms),
+      );
+
+  String local(String locale, List<InventoryRoom> rooms) => DataReport.local(
+        l: lookupAppLocalizations(Locale(locale)),
+        inventory: const LocalInventory(
+          locations: StorageLocations(
+            databaseDirectory: '/tmp/db',
+            appDatabase: '/tmp/db/app.db',
+            matrixDatabase: '/tmp/db/matrix.db',
+            keyStore: KeyStoreKind.linuxSecretService,
+          ),
+          keys: <LocalKey>[],
+          tables: <LocalTable>[],
+        ),
+        matrix: inventory(rooms),
+        now: DateTime(2026, 11, 18),
+        version: '1.2.3',
+      );
+
+  group('Raumzeilen im Online-Bericht', () {
+    test('Einzelchat mit Namen: Name der Gegenseite, keine Raum-ID', () {
+      final r = online('de', [room(InventoryRoomKind.direct, name: 'Test Nutzer 2')]);
+      expect(r, contains('- Einzelchat „Test Nutzer 2“\n'));
+      expect(r, isNot(contains('!abc123')));
+      expect(online('en', [room(InventoryRoomKind.direct, name: 'Test Nutzer 2')]), contains('- Direct chat „Test Nutzer 2“\n'));
+    });
+
+    test('Einzelchat ohne Namen: nur die Art, ohne Klammerrest und doppeltes Leerzeichen', () {
+      final r = online('de', [room(InventoryRoomKind.direct)]);
+      expect(r, contains('- Einzelchat\n'));
+      expect(r, isNot(contains('!')));
+      expect(r, isNot(contains('Einzelchat  ')));
+      expect(r, isNot(contains('()')));
+    });
+
+    test('Familien- und privater Raum ohne Raum-ID (sie ist der Familien-Code, E-65)', () {
+      final r = online('de', [
+        room(InventoryRoomKind.family, name: 'Familie Muster', id: '!familie:fake.test'),
+        room(InventoryRoomKind.private, id: '!privat:fake.test'),
+      ]);
+      expect(r, contains('- Familie „Familie Muster“\n'));
+      expect(r, isNot(contains('!familie')));
+      expect(r, isNot(contains('!privat')));
+    });
+
+    test('unbekannter Raum behält die Raum-ID, sonst wären mehrere nicht zu unterscheiden', () {
+      final r = online('de', [
+        room(InventoryRoomKind.other, id: '!eins:fake.test'),
+        room(InventoryRoomKind.other, id: '!zwei:fake.test'),
+      ]);
+      expect(r, contains('- Sonstiger Raum (!eins:fake.test)\n'));
+      expect(r, contains('- Sonstiger Raum (!zwei:fake.test)\n'));
+    });
+  });
+
+  group('Raumzeilen im lokalen Bericht', () {
+    test('Einzelchat zeigt auch bei gefülltem Namen keinen Namen der Gegenseite (E-89), keine Raum-ID', () {
+      final r = local('de', [room(InventoryRoomKind.direct, name: 'Test Nutzer 2')]);
+      expect(r, contains('- Einzelchat\n'));
+      expect(r, isNot(contains('Test Nutzer 2')));
+      expect(r, isNot(contains('!abc123')));
+    });
+
+    test('Familie behält ihren Namen, ohne Raum-ID', () {
+      final r = local('de', [room(InventoryRoomKind.family, name: 'Familie Muster')]);
+      expect(r, contains('- Familie „Familie Muster“\n'));
+      expect(r, isNot(contains('!abc123')));
+    });
+  });
+
+  group('directPeerName', () {
+    test('liefert den bereinigten Namen', () {
+      expect(directPeerName('Test Nutzer 2'), 'Test Nutzer 2');
+      expect(directPeerName('  Anna\u0000 Müller  '), isNot(contains('\u0000')));
+    });
+
+    test('fehlender Eintrag oder leerer Name bleibt leer, ohne Ersatz', () {
+      expect(directPeerName(null), '');
+      expect(directPeerName(''), '');
+      expect(directPeerName('   '), '');
+    });
+
+    test('Matrix-ID oder Raum-ID als Name wird verworfen', () {
+      expect(directPeerName('@nutzer2:fake.test'), '');
+      expect(directPeerName('!abc123:fake.test'), '');
+    });
+
+    test('zu lange Namen werden auf 80 Zeichen gekürzt', () {
+      expect(directPeerName('a' * 200).length, lessThanOrEqualTo(80));
+    });
+  });
+}

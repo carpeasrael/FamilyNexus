@@ -39,6 +39,20 @@ mixin _DataInventoryModule on ChangeNotifier implements MatrixGateway {
     }
   }
 
+  /// Name der Gegenseite eines Einzelchats nur aus dem lokalen `m.room.member` (#555, E-109): keine Netzabfrage, keine
+  /// Zustandsänderung am Raum, kein `getLocalizedDisplayname()` (das fragt nach und liefert Ersatztexte). Nur für die
+  /// Online-Übersicht; die lokale zeigt keine Namen der übrigen Mitglieder (E-89).
+  String _peerName(Room r) {
+    final peer = r.directChatMatrixID;
+    if (peer == null) return '';
+    try {
+      return directPeerName(r.getState(EventTypes.RoomMember, peer)?.asUser(r).displayName);
+    } catch (e) {
+      AppLog.e('gateway', 'Name der Gegenseite für die Datenübersicht nicht lesbar', e);
+      return '';
+    }
+  }
+
   @override
   Future<OnlineInventory> dataInventory({bool refresh = true}) async {
     final c = _client;
@@ -84,7 +98,7 @@ mixin _DataInventoryModule on ChangeNotifier implements MatrixGateway {
                 : r.isDirectChat
                     ? InventoryRoomKind.direct
                     : InventoryRoomKind.other,
-        name: TextSanitizer.clean(r.name, max: 80),
+        name: r.isDirectChat && refresh ? _peerName(r) : TextSanitizer.clean(r.name, max: 80),
         encrypted: r.encrypted,
         membership: r.membership.name,
         joinedMembers: r.summary.mJoinedMemberCount ?? 0,
