@@ -5,10 +5,16 @@ class FakeDeviceAuth implements DeviceAuth {
   @override
   bool supported = true;
   bool succeed = true;
+
+  /// Die Geräteprüfung wirft (Plugin-Fehler): `isAvailable` ist `false`, `lockAbsent` aber nicht sicher.
+  bool checkFails = false;
   final List<String> reasons = <String>[];
 
   @override
   Future<bool> isAvailable() async => available;
+
+  @override
+  Future<bool> lockAbsent() async => !available && !checkFails;
 
   @override
   Future<bool> authenticate(String reason) async {

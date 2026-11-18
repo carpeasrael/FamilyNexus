@@ -12,6 +12,10 @@ abstract class DeviceAuth {
   /// `true`, wenn das Gerät eine gesicherte Sperre eingerichtet hat.
   Future<bool> isAvailable();
 
+  /// `true` nur, wenn die Plattform **sicher** meldet, dass keine gesicherte Gerätesperre eingerichtet ist (#549).
+  /// Eine Ausnahme der Prüfung zählt nicht als abwesend, damit ein Plugin-Fehler die App-Sperre nicht aufhebt.
+  Future<bool> lockAbsent();
+
   /// Fragt die Geräteanmeldedaten ab. Liefert `false` bei Abbruch/Fehler.
   Future<bool> authenticate(String reason);
 }
@@ -27,6 +31,16 @@ class LocalDeviceAuth implements DeviceAuth {
   Future<bool> isAvailable() async {
     try {
       return await _auth.isDeviceSupported();
+    } catch (e) {
+      AppLog.e('lock', 'Geräteprüfung fehlgeschlagen', e);
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> lockAbsent() async {
+    try {
+      return !await _auth.isDeviceSupported();
     } catch (e) {
       AppLog.e('lock', 'Geräteprüfung fehlgeschlagen', e);
       return false;
@@ -56,6 +70,9 @@ class UnavailableDeviceAuth implements DeviceAuth {
 
   @override
   Future<bool> isAvailable() async => false;
+
+  @override
+  Future<bool> lockAbsent() async => true;
 
   @override
   Future<bool> authenticate(String reason) async => false;

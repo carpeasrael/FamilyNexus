@@ -69,6 +69,12 @@ class AppLockController extends ChangeNotifier {
   /// Fragt die Geräteanmeldedaten ab; bei Erfolg wird entsperrt.
   Future<bool> unlock(String reason) async {
     if (!_locked || _authenticating) return !_locked;
+    // Ohne gesicherte Gerätesperre gibt es nichts abzufragen; sonst bliebe die App ausgesperrt (#549, E-17).
+    if (await auth.lockAbsent()) {
+      _locked = false;
+      notifyListeners();
+      return true;
+    }
     _authenticating = true;
     notifyListeners();
     try {
@@ -85,11 +91,15 @@ class AppLockController extends ChangeNotifier {
   /// deaktivieren verlangt ebenfalls die Geräteanmeldedaten.
   Future<bool> setEnabled(bool enable, String reason) async {
     if (enable && !await auth.isAvailable()) return false;
-    _authenticating = true;
-    try {
-      if (!await auth.authenticate(reason)) return false;
-    } finally {
-      _authenticating = false;
+    // Ausschalten ohne gesicherte Gerätesperre braucht keine Bestätigung (#549): Sie ließe sich nicht erbringen.
+    final absent = !enable && await auth.lockAbsent();
+    if (!absent) {
+      _authenticating = true;
+      try {
+        if (!await auth.authenticate(reason)) return false;
+      } finally {
+        _authenticating = false;
+      }
     }
     final ok = await settings.update((s) => s.copyWith(lockEnabled: enable));
     if (ok && !enable) {
