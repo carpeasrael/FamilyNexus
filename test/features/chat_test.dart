@@ -233,6 +233,18 @@ void main() {
     semantics.dispose();
   });
 
+  testWidgets('#551: Avatar eines entfernten Mitglieds zeigt den Buchstaben des Nachrichtennamens, nicht „?“', (tester) async {
+    final app = await buildTestApp();
+    final ben = await _joinBen(app);
+    await ben.sendMessage('Ich war da');
+    await app.gateway.removeMember(ben.userId!);
+    await _openChat(tester, app);
+    final avatar = find.byKey(ValueKey<String>('avatar-${ben.userId}'));
+    expect(avatar, findsOneWidget);
+    expect(find.descendant(of: avatar, matching: find.text('B')), findsOneWidget);
+    expect(find.descendant(of: avatar, matching: find.text('?')), findsNothing);
+  });
+
   testWidgets('Nachricht von Ben wird mit Absendernamen angezeigt', (tester) async {
     final app = await buildTestApp();
     final ben = await _joinBen(app);

@@ -61,7 +61,7 @@ class _Bubble extends StatelessWidget {
             child: Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(top: 2),
-                child: MemberAvatarView(userId: m.senderId, size: avatarSize, colorIndex: personColorOf(services, m.senderId)),
+                child: MemberAvatarView(userId: m.senderId, size: avatarSize, colorIndex: personColorOf(services, m.senderId), fallbackName: m.senderName),
               ),
               const SizedBox(width: avatarGap),
               Flexible(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: maxWidth - avatarSpace), child: card)),
