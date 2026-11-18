@@ -1,5 +1,7 @@
 # Testplan Apple-Rückmeldung Guideline 4 (Design): Anmeldung auf macOS
 
+> **Stand 18.11.2026 (#528):** Dieser Plan (v03) gehört zu E-91. Seit E-102 (#441) öffnet die Anmeldung auf macOS zuerst in einer eingebetteten Ansicht; die System-Sitzung (ASWebAuthenticationSession), die dieser Plan prüft, ist nur noch der Ausweg „Im Browser fortsetzen“. Die Schritte bleiben als Prüfung dieses Auswegs gültig; die Prüfung der eingebetteten Ansicht steht im Release-Test 1.2.3 (RT3-G-09 bis G-14).
+
 **Dokument-ID** `TP-FN-A4-MAC v03` · 14.11.2026 · Soll-Version **1.2.3 (29)**, Stand `main` @ `e4bc0b4` + #430
 
 Bezug: App-Review-Rückmeldung vom 12.11.2026 (Submission `2caec11f-cf19-4664-8200-97fcc20b86b2`, MacBook Pro, „1.2.1 (27)“): *Der Nutzer wird zum Standardbrowser geführt, um sich anzumelden oder ein Konto anzulegen.* Apple akzeptiert den Browser nur mit `ASWebAuthenticationSession`. Issue #268, `docs/ENTSCHEIDUNGEN.md` E-91, `macos/Runner/MainFlutterWindow.swift:93-150`, `lib/data/platform/browser_launcher.dart:78-100`.

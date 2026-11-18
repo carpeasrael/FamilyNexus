@@ -1,6 +1,6 @@
 # Release-Test FamilyNexus 1.2.3 (neue Funktionen, Änderungen, offene Nachtests)
 
-**Planversion: v06** (16.11.2026) · Dokument-ID `TP-FN-REL-123` · Stand: `main` @ `531981a` (enthält PR #482 und die Fixes #483 bis #487, PRs #489 bis #493) plus Build-Nummer 30 (PR #495, Branch `chore/build-30`, Commit `7bb3727`); Soll-Version der App **1.2.3 (30)** (`pubspec.yaml`: `1.2.3+30`). **Alle Schritte laufen auf einem Build, der aus dem aktuellen `main`-Stand gebaut wurde (Commit im Report, RT3-V-05), nicht auf dem TestFlight-/APK-Build 29 vom 13.11. (Build 30 ist freigegeben, aber nicht gebaut und nicht hochgeladen).**
+**Planversion: v07** (18.11.2026) · Dokument-ID `TP-FN-REL-123` · Stand: `main` @ `531981a` (enthält PR #482 und die Fixes #483 bis #487, PRs #489 bis #493) plus Build-Nummer 30 (PR #495, Branch `chore/build-30`, Commit `7bb3727`); Soll-Version der App **1.2.3 (30)** (`pubspec.yaml`: `1.2.3+30`). **Alle Schritte laufen auf einem Build, der aus dem aktuellen `main`-Stand gebaut wurde (Commit im Report, RT3-V-05), nicht auf dem TestFlight-/APK-Build 29 vom 13.11. (Build 30 ist freigegeben, aber nicht gebaut und nicht hochgeladen).**
 
 Bezug: Milestone „Release v1.2.3“ (39 offene Issues am 15.11. abends, siehe `Sprint/sprint_1.2.3.md`), Release Notes 1.2.3 (`store/metadata/*/release_notes.txt`), `docs/ENTSCHEIDUNGEN.md` (E-93 bis E-102), Release-Review `docs/release-reviews/1.2.3+29.md` (Läufe 1 bis 5) und `1.2.3+30.md` (Lauf 1, PR #496), Gesamtplan `Testplan_FamilyNexus.md` (TP-FN-001), Benachrichtigungsplan `Testplan_Benachrichtigungen_macOS-iOS.md` (TP-FN-NTF-381 v03), Geräte-Checkliste `Checkliste_Geraetenachtests.md`, Vorgänger `../Release-Test_1.2.2_v01.md` (TP-FN-REL-122).
 
@@ -411,7 +411,7 @@ Alle Bildschirme wurden ohne Verhaltensänderung zerlegt (Gateway in Module, Bil
    - **Abnahme iOS, macOS, Android (v03):** Ein Issue gilt für diese Plattformen als abgenommen, wenn alle ihm in Abschnitt 14 zugeordneten Schritte auf iOS-Simulator (iPhone, bei #274 auch iPad), Mac-App und Android-Emulator (bei #274 Tablet-AVD) ✅ sind. Die Spalte „Rest am Gerät“ benennt, was dann im Issue-Kommentar als nicht getestet stehen bleibt. Seit E-103 hängt das Schließen am Code-Test, die Spalte „Rest am Gerät“ benennt den Plattform-Pflichtschritt, der im Release-Beleg steht.
 4. **Nach dem Lauf:** Ergebnisse in den betroffenen Issues vermerken (Abschnitt 14). Ein Issue schließt nach E-103 mit positivem Code-Test (Code-Testplan `Codetestplan_Offene_Issues.md`), nicht erst nach diesen Schritten; die Schritte dieses Plans sind der Plattformbeleg je Build (`docs/release-e2e/<Version>.md`, `tool/check_release_e2e.sh`). Der Merge entscheidet der Nutzer; kein Release ohne Freigabe.
 
-## 14. Zuordnung Issues → Schritte (alle 39 offenen Issues, Stand 15.11. abends)
+## 14. Zuordnung Issues → Schritte (39 offene Issues am 15.11. abends, seither nur #508 und #528 ergänzt; die später umgesetzten #516, #524, #526 und #539 sind hier noch nicht nachgetragen)
 
 Spalte „Sim/Emu“: auf iOS-Simulator, Mac-App und Android-Emulator ausführbar (ja, teilweise, nein). Spalte „Rest am Gerät“: was nach Abschnitt 2a nur am echten Gerät oder in Store/Apple belegt wird. **Plattformen dieser Abnahme: iOS, macOS, Android.** Windows und Linux gehören nicht dazu; Schritte dort bleiben im Plan, die Issues #263, #325, #330 sind davon abhängig.
 
@@ -461,6 +461,7 @@ Spalte „Sim/Emu“: auf iOS-Simulator, Mac-App und Android-Emulator ausführba
 | #506 | RT3-D-02 | ja (zwei Instanzen) | Bildschirm schließt nach dem Speichern von selbst (Entscheidung des Herausgebers, PR #522) |
 | #507 | RT3-H-06 | ja | Ursache ohne Reproduktion nicht belegt |
 | #508 | RT3-P-14 | ja | – |
+| #528 | – (Linux und Windows bewusst Browser, Nachtrag zu E-102; macOS durch RT3-G-09 bis RT3-G-14) | ja (macOS, wie G-09 bis G-14) | Gerätenachtest der eingebetteten Anmeldung auf macOS (TP-OAUTH-11) |
 | #453 bis #456 | Sammel-Issues des Release-Reviews, keine Schritte; Schließen nach Entscheidung E9 | – | – |
 
 Bereits geschlossen, Gegenprobe im Plan: #442 (RT3-P-13, RT3-J-04), #444 und #459 (RT3-P-03), #460 (RT3-P-07), #461 (RT3-P-08), #462 (RT3-P-11), #464 (RT3-P-02), #483 (RT3-P-15), #484 (RT3-P-16), #485 (RT3-P-17), #487 (RT3-P-19). #431: nach v1.3 verschoben, kein Schritt.
@@ -479,3 +480,4 @@ Weitere Änderungen ohne eigenes offenes Issue (im Plan abgedeckt): #337 (E-07, 
 | v04 | 15.11.2026 | Soll-Version auf 1.2.3 (30) (Build-Nummer PR #495, kein Upload); Stand `main` @ `531981a`; neu P-15 bis P-19 für #483 bis #487 (Review-Lauf 4), Abschnitt 14 mit #486 (39 offene Issues); RT3-V-01, V-02, V-04, V-05 auf Build 30; Bezug auf Review-Berichte `+29` (Lauf 5) und `+30` |
 | v05 | 16.11.2026 | Folge-Issues #501 bis #508 des Release-Tests (Lauf 31): Zuordnung in Abschnitt 14; neu RT3-H-06 (#507, Abmelden und erneutes Anmelden), RT3-D-02 mit Beobachtung 20 s (#506), RT3-R-07 mit Statusleiste (#501); RT3-H-01, RT3-I-01, RT3-P-14 tragen #502, #503, #508 (Planerwartung korrigiert, App unverändert); Abnahme- und Schließregel auf E-103 umgestellt |
 | v06 | 16.11.2026 | RT3-D-02 (#506): Der Avatar-Bildschirm schließt nach dem Speichern von selbst (Entscheidung des Herausgebers, PR #522, E-101-Nachtrag); Erwartung und Abschnitt 14 angepasst |
+| v07 | 18.11.2026 | #528 (Anmeldung ohne Browser): Zuordnung in Abschnitt 14, keine neuen Schritte (Linux/Windows bewusst Browser, Nachtrag zu E-102). Rückstand, hier nicht nachgetragen: Schritte RT3-E-12 bis RT3-E-14 (#539, #526, #516) stehen ohne Versionszeile im Plan, #524 (E-105) hat keinen Schritt, #516, #526, #539 fehlen in Abschnitt 14 |
