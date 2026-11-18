@@ -1,4 +1,4 @@
-# Checkliste Gerätenachtests (Stand main d0bdfa6 + PR #319/#320, Lauf 22 und 23, 07.11.2026)
+# Checkliste Gerätenachtests (Stand main d0bdfa6 + PR #319/#320, Lauf 22 und 23, 07.11.2026; Zeilen zu #268/#297 am 18.11.2026 auf E-102 gebracht, #528)
 
 **Seit dem letzten Stand erledigt:** #150 geschlossen (Entscheidung des Nutzers, Messung H-20 entfällt, E-85); #296 geschlossen (PR #312, Store-Datenschutz nennt Meldungen und Zahl am Symbol). Zum Merge ausstehend: PR #313 (Testreport Lauf 22).
 
@@ -17,14 +17,14 @@ Quelle: letzte Kommentare der offenen Issues. Jeder Punkt schließt nur dann ein
 
 ## iPhone (echt)
 - [ ] **#144 (B-18):** Hinweis lautet „Verdeckt die App im App-Umschalter und bei Bildschirmaufnahmen. Einzelne Screenshots lassen sich unter iOS nicht verhindern.“. Screenshot gelingt, App-Umschalter verdeckt die App. *Lauf 22, Sim.: Hinweistext de und en richtig, Karte im App-Umschalter nur Markenfläche. Offen am echten iPhone: Bildschirmaufnahme (im Simulator nicht belegbar), App-Umschalter am Gerät.*
-- [ ] **#268 (TP-OAUTH-11):** Kontoanlage und Anmeldung in der System-Sitzung (ASWebAuthenticationSession), Captcha, Konto-löschen- und Passwort-Seite, Sichtschutz. Gegen matrix.org nur mit deiner Freigabe und eigenem Konto. *Lauf 22: nicht getestet (kein OAuth-Anbieter auf dem Testserver).*
-- [ ] **#297:** In der System-Sitzung (Captcha, Konto löschen) nennt der Hinweis zum Schließen „iPhone, iPad und Mac“ und „Abbrechen“. Braucht einen OAuth-Anbieter (Lauf 22: nicht getestet).
+- [ ] **#268 (TP-OAUTH-11):** Kontoanlage und Anmeldung in der eingebetteten Ansicht (E-102; die System-Sitzung ASWebAuthenticationSession ist nur noch der Ausweg „Im Browser fortsetzen“), Captcha, Konto-löschen- und Passwort-Seite, Sichtschutz. Gegen matrix.org nur mit deiner Freigabe und eigenem Konto. *Lauf 22: nicht getestet (kein OAuth-Anbieter auf dem Testserver).*
+- [ ] **#297:** In der eingebetteten Ansicht bzw. im Ausweg über die System-Sitzung (Captcha, Konto löschen) nennt der Hinweis zum Schließen „iPhone, iPad und Mac“ und „Abbrechen“. Braucht einen OAuth-Anbieter (Lauf 22: nicht getestet).
 - [ ] **#254 E-16b:** Meldung ohne Inhalt („Neue Nachricht“), Zahl am App-Symbol, Berechtigungsabfrage. *Lauf 22/23, Sim.: Berechtigung, Banner ohne Inhalt (de, en), allgemeine Meldungen für Chat und Einkauf, keine Meldung bei geöffnetem Chat, Abzeichen, Zurücksetzen beim Lesen und Abmelden bestanden. Offen am echten iPhone: Sperrbildschirm, iOS 15, nachträgliche Freigabe „Kennzeichen“; gleichzeitig angezeigte Chat- und Einkaufsmeldung nicht belegt.*
 
 ## Mac (macOS)
 **Voraussetzung:** der signierte TestFlight-Build 26. Der Debug-Build (ad hoc signiert) fragt beim Start das Login-Passwort für den Schlüsselbund ab und ist nicht bedienbar (Lauf 22). Die Test-Bundle-ID `.e2e` ist nur für Läufe ohne Nutzerdaten gedacht; den Rest `~/Library/Containers/de.inneso.familynexus.e2e` von Hand löschen.
 
-- [ ] **#268 (TP-OAUTH-11):** Anmeldung in der System-Sitzung, Start ohne `network.server`-Berechtigung, Mac mit Chrome als Standardbrowser. *Lauf 22: Teilbeleg, der Release-Build trägt `network.client` und kein `network.server`; Anmeldung nicht getestet.*
+- [ ] **#268 (TP-OAUTH-11):** Anmeldung in der eingebetteten Ansicht (E-102; Ausweg: System-Sitzung), Start ohne `network.server`-Berechtigung, Mac mit Chrome als Standardbrowser. *Lauf 22: Teilbeleg, der Release-Build trägt `network.client` und kein `network.server`; Anmeldung nicht getestet.*
 - [ ] **#254 E-16b:** Meldung, Zahl am Dock-Symbol, Berechtigungsabfrage. *Lauf 22: nicht getestet (App nicht bedienbar, siehe oben). Lauf 23: Debug-Build mit Bestätigung der Schlüsselbund-Abfrage bedienbar, Dock-Zahl und Berechtigung am signierten Build offen.*
 - [ ] **#274 (Desktop-Fenster):** wie bei Windows. *Lauf 22: nicht getestet.*
 - [ ] **#266 (Apple-Laufzeit):** App startet mit `sqlite3` 3.8.0, Tresor und Datenbank lesbar. *iOS-Simulator Lauf 22 bestanden; macOS offen.*

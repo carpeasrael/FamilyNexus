@@ -1,4 +1,4 @@
-# Sprint 1: manuelle Punkte (Stand 12.11.2026)
+# Sprint 1: manuelle Punkte (Stand 12.11.2026; Zeilen zu #268 am 18.11.2026 auf E-102 gebracht, #528)
 
 Zusammenstellung der Punkte aus dem Sprintplan `Sprint/Sprintplan_26-11.html`, die Agenten nicht ausführen können (Gerät, Konto, Play Console, Entscheidung). Die Einzelschritte stehen in `Checkliste_Geraetenachtests.md` und im Testplan; Ergebnisse gehören in das jeweilige Issue. Alle genannten Issues sind offen; ein Issue schließt sich erst, wenn sein Nachtest bestanden und der Fix auf `main` ist.
 
@@ -15,13 +15,13 @@ Zusammenstellung der Punkte aus dem Sprintplan `Sprint/Sprintplan_26-11.html`, d
 ## iPhone (echt)
 - [ ] **#144 (B-18):** Bildschirmaufnahme und App-Umschalter am Gerät.
 - [ ] **#254 (E-16b):** Sperrbildschirm, iOS 15, nachträgliche Freigabe „Kennzeichen“.
-- [ ] **#268, #297 (TP-OAUTH-11):** Anmeldung in der System-Sitzung (Captcha, Konto löschen, Hinweis zum Schließen); braucht einen OAuth-Anbieter. Gegen matrix.org nur mit Freigabe und eigenem Konto.
+- [ ] **#268, #297 (TP-OAUTH-11):** Anmeldung in der eingebetteten Ansicht, Ausweg System-Sitzung (E-102; Captcha, Konto löschen, Hinweis zum Schließen); braucht einen OAuth-Anbieter. Gegen matrix.org nur mit Freigabe und eigenem Konto.
 - [ ] **#317 (B-02):** Karte „Berechtigung fehlt“ bei blockierten Benachrichtigungen; hell, dunkel, große Schrift.
 - [ ] **#316, #345 (A-01):** Kaltstart hell und dunkel; notieren, ob der Wechsel beim Übergang zur App kommt (erwartet, E-94) und ob iOS im App-Umschalter das Vorschaubild des letzten Zustands zeigt.
 - [ ] **#273 (E-16b):** notieren, ob und nach wie vielen Sekunden im Hintergrund eine Meldung kommt. Ausbleiben ist kein Fehler (E-88, Entscheidung (a)).
 
 ## Mac (signierter TestFlight-Build 26)
-- [ ] **#268:** Anmeldung in der System-Sitzung, Chrome als Standardbrowser, Start ohne `network.server`.
+- [ ] **#268:** Anmeldung in der eingebetteten Ansicht (E-102; Ausweg: System-Sitzung), Chrome als Standardbrowser, Start ohne `network.server`.
 - [ ] **#254:** Meldung, Dock-Zahl, Berechtigungsabfrage.
 - [ ] **#274:** wie bei Windows.
 - [ ] **#266:** App startet mit `sqlite3` 3.8.0, Tresor und Datenbank lesbar.

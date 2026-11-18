@@ -1,6 +1,6 @@
-# Code-Testplan der offenen Issues (TP-FN-CODE-OFFEN v01)
+# Code-Testplan der offenen Issues (TP-FN-CODE-OFFEN v02)
 
-Stand: 2026-11-15, `main` + Branch `fix/497-einladung-server-mit-port`, 1.2.3+30. Regel: `CLAUDE.md`, Abschnitt „Abnahme und Schließen (Code-Test)“, Entscheidung E-103.
+Stand: 2026-11-18 (Eintrag #528), zuvor 2026-11-15, `main` + Branch `fix/497-einladung-server-mit-port`, 1.2.3+30. Regel: `CLAUDE.md`, Abschnitt „Abnahme und Schließen (Code-Test)“, Entscheidung E-103.
 
 **Grundsatz:** Ist der Code-Test eines Issues positiv, darf das Issue schließen (PR mit `Closes`, Merge durch den Nutzer). Was nur auf dem Gerät belegbar ist, steht in der Spalte „Plattform-Pflichtschritt“ und wird im Release-Test je Plattform mit Screenshots geführt (`docs/release-e2e/<Version>.md`, Gate in `release.yml`), nicht mehr am Issue.
 
@@ -98,6 +98,7 @@ Nach neuer Regel darf ein Issue dieser Gruppe schließen, wenn der Dart-Teil gr�
 | Issue | Grund |
 |---|---|
 | #15 Prüfkonto vorbereiten | rein manuell: Apple, echte Konten, Testperson |
+| #528 Anmeldung und Registrierung ohne Browser (macOS, Linux, Windows) | Wunschfunktion für Linux und Windows auf Entscheidung der Nutzerin (18.11.2026) nicht umgesetzt (kein gepflegtes, baubares Paket; Nachtrag zu E-102); macOS eingebettet durch #441, Gerätenachtest offen; reine Dokumentation, kein Code-Test; Issue bleibt offen (Refs) |
 | #268 Registrierung über matrix.org | echtes Konto bei matrix.org nötig (verboten ohne Freigabe); Teile in #441 und `invite_onboarding_test.dart` |
 | #273 Android-Hintergrundmeldungen (v1.3) | nur am Gerät belegbar, Milestone v1.3 |
 | #119, #120, #121, #311, #431, #434 (v1.3) | Entwürfe bzw. nicht umgesetzt; Plan erst mit der Umsetzung |
