@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/anniversaries.dart';
-import '../../domain/anniversary_calc.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/layout/adaptive.dart';
 import '../common/error_text.dart';
@@ -72,20 +71,13 @@ class AnniversariesScreen extends StatelessWidget {
             listenable: controller,
             builder: (context, _) {
               final hits = controller.anniversaryUpcoming;
-              // Je Person in der Reihenfolge ihres nächsten Vorkommens; Geburts- und Todestag zusammen.
-              final order = <String>[];
-              final byPerson = <String, List<AnniversaryHit>>{};
-              for (final h in hits) {
-                if (!byPerson.containsKey(h.person.id)) order.add(h.person.id);
-                byPerson.putIfAbsent(h.person.id, () => <AnniversaryHit>[]).add(h);
-              }
+              // Ein Eintrag je Treffer, streng nach nächstem Vorkommen (E-104, #550), wie Karte auf „Heute“ und Agenda.
               return ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, 88), children: <Widget>[
                 Text(l.anniversariesHint, style: Theme.of(context).textTheme.bodyMedium),
                 const SizedBox(height: 12),
-                if (order.isEmpty) Text(l.anniversariesEmpty),
-                for (final id in order)
-                  for (final h in byPerson[id]!)
-                    AnniversaryTile(hit: h, showWhen: true, showDate: true, onTap: () => _edit(context, existing: h.person)),
+                if (hits.isEmpty) Text(l.anniversariesEmpty),
+                for (final h in hits)
+                  AnniversaryTile(hit: h, showWhen: true, showDate: true, onTap: () => _edit(context, existing: h.person)),
               ]);
             },
           ),
