@@ -1,0 +1,3 @@
+#!/bin/sh
+# Quality-Gate: Run nach erfolgreichem Commit abschließen
+exec node "$(git rev-parse --show-toplevel)/.quality/bin/qg.mjs" hook git-post-commit

@@ -1,0 +1,1 @@
+**Systematisch (A):** Arbeite den Prüfkatalog Punkt für Punkt über **jeden** geänderten Hunk ab. Notiere für jeden Katalogpunkt intern „geprüft / nicht anwendbar“. Ziel: lückenlose Abdeckung der Regeln. Führe die im Katalog genannten Werkzeuge aus und werte deren Ausgabe aus.

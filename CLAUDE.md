@@ -66,3 +66,14 @@ Für **jeden** Build und jedes veröffentlichte Release gehört zu jeder gebaute
 ## Lokale Testumgebung
 
 `flutter` liegt unter `/home/carpeasrael/tools/flutter/bin/flutter`. E2E: `tool/e2e.sh` (Docker, Synapse). Der Host hat kein clang, Desktop-Integrationstests laufen daher nicht.
+
+## Quality-Gate (verbindlich)
+
+Gilt für Sitzungen mit `claude --agent qg-orchestrator`. Der Standardablauf für GitHub-Issues oben bleibt bis zu einer Entscheidung des Menschen unverändert.
+
+- Code-Änderungen (Feature, Fix, Refactoring) laufen ausschließlich über den Orchestrator: `claude --agent qg-orchestrator`.
+- Jeder Agent wird durch einen unabhängigen zweiten Agenten gegengeprüft. Implementierung erst nach dem Design-Gate (Freigabe zur Implementierung), Commit erst nach dem Code-Gate. Hooks und git-pre-commit erzwingen das.
+- Nach 5 Iterationen ohne einheitliches Ergebnis kann, nach 8 muss Modell + Aufwand eine Stufe hochgesetzt werden (`qg escalate`); nach 11 entscheidet der Mensch.
+- Regelkatalog: `.quality/standards/STANDARDS.md` (IDs STD-CODE, STD-SEC, STD-PERF, STD-TEST, STD-DOC, STD-DI).
+- `.quality/`, `.claude/`, `.githooks/`, `.idea/` sowie Lint-/Test-/Build-Konfiguration werden nicht von Agenten geändert.
+- Änderungen an Agenten/Modellen nur über `.quality/config.json` bzw. `.quality/templates/` und anschließend `QG_ADMIN=1 node .quality/bin/qg.mjs gen-agents` (Mensch, Vier-Augen-Review des Diffs).

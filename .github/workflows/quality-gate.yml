@@ -1,0 +1,37 @@
+# Quality-Gate: Nachweis je Commit prüfen (Kit v2, ci-examples/github-quality-gate.yml, angepasst für FamilyNexus).
+#
+# Abweichungen vom Kit:
+# - Nicht blockierend (continue-on-error), solange .quality/config.json gitHook.mode = "warn" ist.
+#   Reguläre Commits tragen dann keinen QG-Run-Trailer. Vor dem Wechsel auf "enforce" entfernen.
+# - Die deterministischen Checks (analyze, lib-size, test) laufen schon in dart.yml und werden hier
+#   nicht doppelt ausgeführt.
+name: quality-gate
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    container: node:22
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Quality-Gate-Nachweise je Commit prüfen
+        shell: bash
+        run: |
+          git config --global --add safe.directory "$PWD"
+          BASE="${{ github.event.pull_request.base.sha }}"
+          [ -z "$BASE" ] && BASE="${{ github.event.before }}"
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then BASE="$(git rev-list --max-parents=0 HEAD | tail -n1)"; fi
+          FAIL=0
+          for c in $(git rev-list --no-merges --reverse "$BASE"..HEAD); do
+            node .quality/bin/qg.mjs verify-commit "$c" || FAIL=1
+          done
+          exit $FAIL
