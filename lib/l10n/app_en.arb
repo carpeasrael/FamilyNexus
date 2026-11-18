@@ -1347,6 +1347,7 @@
       }
     }
   },
+  "loginSessionEndedNotice": "Your session was ended, for example because your account or sign-in at the provider is no longer valid. Sign in again.",
   "loginNoAccount": "No account yet? Create one",
   "advTitle": "Advanced",
   "advServerInfo": "Your account is hosted at {host}.",

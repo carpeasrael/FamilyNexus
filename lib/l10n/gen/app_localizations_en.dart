@@ -2410,6 +2410,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get loginSessionEndedNotice =>
+      'Your session was ended, for example because your account or sign-in at the provider is no longer valid. Sign in again.';
+
+  @override
   String get loginNoAccount => 'No account yet? Create one';
 
   @override

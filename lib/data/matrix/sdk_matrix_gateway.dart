@@ -81,6 +81,19 @@ part 'gateway/join_diagnostic.dart';
 part 'gateway/registration_session.dart';
 part 'gateway/security_verification.dart';
 
+/// Hat der Server die Sitzung beendet (und nicht die Person oder die App selbst)? `unknownToken`: Token ungültig, kein Weg
+/// zurück. `softLogoutRefreshFailed`: Der Server verweigerte das Erneuern (Anbieter mit Refresh-Token). Alle anderen
+/// Gründe gehen von der App aus. Vollständiger `switch`: Ein neuer SDK-Wert fällt beim Übersetzen auf (#556).
+@visibleForTesting
+bool sessionEndedByServerFor(SessionClearReason reason) => switch (reason) {
+      SessionClearReason.unknownToken || SessionClearReason.softLogoutRefreshFailed => true,
+      SessionClearReason.logout ||
+      SessionClearReason.exportDump ||
+      SessionClearReason.initFailed ||
+      SessionClearReason.unspecified =>
+        false,
+    };
+
 /// Produktive Implementierung auf Basis des Matrix-Dart-SDK (E-01).
 ///
 /// Sicherheitsrelevante Entscheidungen:
@@ -369,6 +382,12 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   SessionState get session =>
       (_client?.isLogged() ?? false) ? SessionState.ready : SessionState.loggedOut;
 
+  /// Gesetzt im `onSessionCleared`-Handler bei jedem Sitzungsende; angemeldet gilt es nie (siehe [sessionEndedByServer], #556).
+  bool _sessionEndedByServer = false;
+
+  @override
+  bool get sessionEndedByServer => _sessionEndedByServer && !(_client?.isLogged() ?? false);
+
   @override
   String? get userId => _client?.userID;
 
@@ -625,7 +644,12 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     _verificationSub = client.onKeyVerificationRequest.stream.listen(_onIncomingVerification);
     _toDeviceSub = client.onToDeviceEvent.stream.listen(_onToDevice);
     // Jedes Sitzungsende im SDK (ungültiges Token, gescheitertes `init`, Abmelden …) endet in `clear()` (#259).
-    _clearedSub = client.onSessionCleared.stream.listen((_) => _forgetProvider());
+    // Das SDK meldet den Grund vor `loggedOut`: Hat der Server die Sitzung beendet, sagt „Anmelden“ das (#556).
+    _clearedSub = client.onSessionCleared.stream.listen((reason) {
+      _sessionEndedByServer = sessionEndedByServerFor(reason);
+      notifyListeners();
+      _forgetProvider().ignore();
+    });
     return client;
   }
 

@@ -86,6 +86,10 @@ class GatewayException implements Exception {
 /// * Fehler enthalten keine Nachrichteninhalte.
 abstract class MatrixGateway implements Listenable {
   SessionState get session;
+
+  /// Der Server hat die Sitzung beendet (Token ungültig, z. B. weil das Konto gelöscht wurde), die Person hat sich nicht
+  /// selbst abgemeldet (#556). Nur im Arbeitsspeicher; gilt, solange niemand angemeldet ist, bis zur nächsten Anmeldung.
+  bool get sessionEndedByServer;
   String? get userId;
 
   /// Server, an dem die Sitzung läuft (nur wenn angemeldet).

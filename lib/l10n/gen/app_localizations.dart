@@ -4070,6 +4070,12 @@ abstract class AppLocalizations {
   /// **'Bei {host} anmelden'**
   String loginOAuth(String host);
 
+  /// No description provided for @loginSessionEndedNotice.
+  ///
+  /// In de, this message translates to:
+  /// **'Deine Sitzung wurde beendet, zum Beispiel weil das Konto oder die Anmeldung beim Anbieter nicht mehr gültig ist. Melde dich neu an.'**
+  String get loginSessionEndedNotice;
+
   /// No description provided for @loginNoAccount.
   ///
   /// In de, this message translates to:
