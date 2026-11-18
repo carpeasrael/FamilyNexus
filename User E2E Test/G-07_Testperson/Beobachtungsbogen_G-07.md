@@ -14,7 +14,7 @@ Pro Schritt: Ergebnis ✅ ohne Hilfe · ⚠️ mit Zögern/Fehlversuch/Rückfrag
 | 1 | Startseite ansehen (A-01) | versteht die drei Wege und die Hinweise | | | | G07-01 |
 | 2 | Sprache English → Deutsch (A-02) | Wechsel sofort | | | | G07-02 |
 | 3 | „Neue Familie gründen“ (A-03) | Konto-Erstellung, vorgeschlagener Anbieter matrix.org | | | | G07-03 |
-| 4 | Anbieter einstellen über „Erweitert“ (A-04/A-05) | findet „Anderen Anbieter verwenden“, Adresse, Bestätigung „Dein Konto liegt bei …“ | | | | G07-04 |
+| 4 | Anbieter einstellen im Schritt „Anbieter wählen“ (A-04/A-05) | findet „Anderer Anbieter oder eigener Server“, Adresse, Bestätigung „Dein Konto liegt bei …“, „Weiter“ | | | | G07-04 |
 | 5 | Name + Benutzername (A-06/A-08) | Benutzername frei, „Konto erstellen“ erst nach Passwort und Wiederholung aktiv | | | | G07-05 |
 | 6 | Passwort (A-08) | mindestens 8 Zeichen, Wiederholung gleich, Augen-Symbol | | | | G07-06 |
 | 7 | „Konto erstellen“ (A-09) | keine Wartezeit über 30 s (#27), kein Zusatzschritt | | | | G07-07 |

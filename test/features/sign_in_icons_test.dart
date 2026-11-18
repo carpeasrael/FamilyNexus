@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/nav.dart';
 import '../support/test_app.dart';
 
 /// Symbole der Schaltflächen, die eine Seite des Anbieters öffnen (#430, E-91; #441, E-102): In der App (eingebettet
@@ -79,6 +80,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text(entry));
       await tester.pumpAndSettle();
+      await continueFromServerStep(tester);
     }
 
     for (final platform in <TargetPlatform>[TargetPlatform.iOS, TargetPlatform.macOS, TargetPlatform.android]) {
@@ -113,6 +115,7 @@ void main() {
           await tester.pumpAndSettle();
           await tester.tap(find.text('Neue Familie gründen'));
           await tester.pumpAndSettle();
+          await continueFromServerStep(tester);
           expect(find.byIcon(icon), findsOneWidget, reason: '$platform');
           expect(find.byIcon(icon == Icons.language ? Icons.open_in_new : Icons.language), findsNothing, reason: '$platform');
           await tester.pumpWidget(const SizedBox());

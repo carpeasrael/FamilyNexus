@@ -85,6 +85,21 @@ class ProviderController extends ChangeNotifier {
     start();
   }
 
+  /// Zurück auf den Standard-Anbieter, ohne selbst zu prüfen oder zu benachrichtigen (E-108, #545): Wer eine Einladung
+  /// verworfen oder auf der Startseite neu gewählt hat, soll den Server des Einladenden oder einer früheren
+  /// Eingabe nicht behalten (ein Heimnetz-Server würde sonst ohne Zustimmung geprüft, Review R2). Ein folgendes
+  /// [start] prüft genau einmal.
+  void resetToStandard() {
+    _timer?.cancel();
+    _run++;
+    _custom = false;
+    _customText = '';
+    _info = null;
+    _options = null;
+    _error = null;
+    _status = ProviderStatus.checking;
+  }
+
   /// Verbindung nach Zustimmung herstellen (siehe [ProviderStatus.needsConsent]).
   void connect() => _check(immediate: true);
 

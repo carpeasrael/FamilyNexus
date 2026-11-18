@@ -17,7 +17,7 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
   have an account*. Accounts are created in the app (username suggested from your name, availability checked live; terms,
   email confirmation, invitation codes and captchas are guided) or, on providers with their own sign-in page such as
   matrix.org, on the provider's page (on iOS, macOS and Android inside the app) with an automatic return to the app. The provider is preselected and checked automatically;
-  changing it is under *Advanced*. An invitation link takes newcomers straight to *create account* at the inviter's
+  after choosing a path, a step *Choose a provider* lets you pick the recommended one, another provider or your own server (also under *Advanced* later). An invitation link takes newcomers straight to *create account* at the inviter's
   provider and then to a join card that names the inviting person and their provider (not the family, E-79). The mandatory key backup is the **emergency key** (copy with
   auto-clearing clipboard, or save as a printable file).
 - **Family chat and direct chats** (encrypted): messages, replies, reactions, attachments (validated, never opened

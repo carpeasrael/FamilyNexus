@@ -66,11 +66,11 @@ geteilt: Familienraum, privat: nur privater Raum des eigenen Kontos (Geräte-Syn
 
 ## Einrichtung und Kontoanlage (E-55–E-57)
 - `features/onboarding/onboarding_screen.dart` ist der Rahmen mit drei Wegen (`OnboardingPath`) und der Schrittanzeige je Weg;
-  die Schritte sind eigene Widgets: `WelcomeStep`, `InviteLinkStep`, `AccountCreateStep` (mit `RegistrationStageView` für
+  die Schritte sind eigene Widgets: `WelcomeStep`, `ServerStep` (Anbieter wählen, E-108), `InviteLinkStep`, `AccountCreateStep` (mit `RegistrationStageView` für
   Zusatzschritte), `LoginStep`, `SecurityPanel` (Notfall-Schlüssel, meldet `onReady`), `FamilyStep` (`FamilyStepMode`).
 - `ProviderController` (ChangeNotifier) hält den gewählten Anbieter und prüft ihn automatisch (sofort bzw. nach 800 ms
-  Pause bei eigener Eingabe): `MatrixGateway.probeServer` + `registrationOptions`. `ProviderSection` zeigt das Ergebnis und
-  „Erweitert“.
+  Pause bei eigener Eingabe): `MatrixGateway.probeServer` + `registrationOptions`; `resetToStandard()` setzt vor einer neuen Wegwahl auf den Standard zurück (E-108). `ProviderStatusLine` zeigt das Ergebnis, `ProviderSection`
+  zusätzlich „Erweitert“.
 - Domäne: `domain/registration.dart` (Modus, Zusatzschritte als `sealed`-Typen, Auswahl des Ablaufs, Bedingungen),
   `domain/username_suggestion.dart`.
 - Daten: `ServerProbe.registrationOptions`/`oauthIssuer`/`checkUsername`; `SdkMatrixGateway.register`/`continueRegistration`

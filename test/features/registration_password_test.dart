@@ -5,6 +5,7 @@ import 'package:family_nexus/domain/registration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/nav.dart';
 import '../support/registration_form.dart';
 import '../support/test_app.dart';
 
@@ -25,6 +26,7 @@ Future<TestApp> _open(WidgetTester tester, {void Function(TestApp app)? before})
   await tester.pumpAndSettle();
   await tester.tap(find.text('Neue Familie gründen'));
   await tester.pumpAndSettle();
+  await continueFromServerStep(tester);
   return app;
 }
 

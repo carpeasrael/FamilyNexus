@@ -146,7 +146,7 @@ Entscheidungen: E-55, E-56, E-57, SA-8. Testplan: `docs/TESTPLAN_ONBOARDING.md`.
 |---|---|
 | 8.1 | Domäne: Link v2 (`f`, `by`), Registrierungsmodell und Ablaufwahl, Benutzernamen-Vorschlag, neue Fehlerarten |
 | 8.2 | Daten: Serverprüfung (OAuth/UIA), UIA-Schleife, OAuth (MSC2964/2966), Rücksprung je Plattform, Gerätename, Anzeigename, Fake |
-| 8.3 | Oberfläche: drei Wege, Konto erstellen/Anmelden, „Erweitert“, Zusatzschritte, Notfall-Schlüssel, Beitrittskarte, „Jetzt einladen“, Einladungsdialog, Texte de/en |
+| 8.3 | Oberfläche (Stand Phase 8, seit E-108 zusätzlich der Schritt „Anbieter wählen“): drei Wege, Konto erstellen/Anmelden, „Erweitert“, Zusatzschritte, Notfall-Schlüssel, Beitrittskarte, „Jetzt einladen“, Einladungsdialog, Texte de/en |
 | 8.4 | Tests: Unit, Widget (Fake), E2E gegen Synapse, Bildschirmfotos, Testplan mit Ergebnissen |
 | 8.5 | Doku (README, ARCHITEKTUR, ENTSCHEIDUNGEN, OFFEN), Review durch separaten Agenten, Funde beheben |
 

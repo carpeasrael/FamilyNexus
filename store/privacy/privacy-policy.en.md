@@ -30,8 +30,8 @@ send him in order to handle your request.
 The operator of the **Matrix homeserver** you have chosen is responsible for account
 management, server operation and the processing carried out there. By default,
 `https://matrix.org` is preset; you can use another compatible provider
-or your own server. The provider is shown during setup under
-"Advanced". In addition, its privacy notices apply, in particular regarding
+or your own server. The provider is shown during setup in the
+"Choose a provider" step and under "Advanced". In addition, its privacy notices apply, in particular regarding
 operator details, logging, hosting, deletion periods and service providers. If
 the publisher also operates your server, his responsibility also covers this
 operation. A family moderator is not automatically the server operator.

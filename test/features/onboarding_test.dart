@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/shell_finders.dart';
 import '../support/fake_matrix.dart';
+import '../support/nav.dart';
 import '../support/registration_form.dart';
 import '../support/test_app.dart';
 
@@ -77,8 +78,9 @@ void main() {
     final app = await buildTestApp(loggedIn: false);
     await _pump(tester, app);
     await _tapText(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
 
-    expect(find.text('Schritt 1 von 3'), findsOneWidget);
+    expect(find.text('Schritt 2 von 4'), findsOneWidget);
     expect(find.text('Konto erstellen'), findsWidgets);
     expect(find.text('Dein Konto liegt bei fake.test.'), findsOneWidget, reason: 'Anbieter wird automatisch geprüft, kein „Server prüfen“');
     expect(find.text('Server prüfen'), findsNothing);
@@ -100,7 +102,7 @@ void main() {
     expect(app.server.passwordOf('@carla.gross:fake.test'), 'sicher-genug');
 
     // Notfall-Schlüssel (Pflicht).
-    expect(find.text('Schritt 2 von 3'), findsOneWidget);
+    expect(find.text('Schritt 3 von 4'), findsOneWidget);
     _expectNoJargon(tester, reason: 'Notfall-Schlüssel');
     await _tapText(tester, 'Notfall-Schlüssel erstellen');
     await tester.tap(find.byType(CheckboxListTile));
@@ -108,7 +110,7 @@ void main() {
     await _tapText(tester, 'Weiter');
 
     // Familie benennen.
-    expect(find.text('Schritt 3 von 3'), findsOneWidget);
+    expect(find.text('Schritt 4 von 4'), findsOneWidget);
     expect(find.byType(SegmentedButton<bool>), findsNothing, reason: 'Weg „Neue Familie“ fragt nicht nach Beitreten');
     await tester.enterText(find.widgetWithText(TextField, 'Name der Familie'), 'Familie Groß');
     await tester.pumpAndSettle();
@@ -130,6 +132,7 @@ void main() {
     final app = await buildTestApp(loggedIn: false);
     await _pump(tester, app);
     await _tapText(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
     await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), 'Anna');
     await _settleCheck(tester);
     expect(find.text('Schon vergeben – wie wäre es mit „anna2“?'), findsOneWidget);
@@ -146,6 +149,7 @@ void main() {
     final app = await buildTestApp(loggedIn: false);
     await _pump(tester, app);
     await _tapText(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
     await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), 'Dora');
     await _settleCheck(tester);
     await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'kurz');
@@ -159,6 +163,7 @@ void main() {
     final app = await buildTestApp(loggedIn: false);
     await _pump(tester, app);
     await _tapText(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
     TextField field() => tester.widget<TextField>(find.widgetWithText(TextField, 'Passwort'));
     expect(field().obscureText, isTrue);
     expect(field().enableSuggestions, isFalse);
@@ -172,6 +177,7 @@ void main() {
     final app = await buildTestApp(loggedIn: false);
     await _pump(tester, app);
     await _tapText(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
     expect(find.text('Anderen Anbieter verwenden'), findsNothing, reason: 'eingeklappt');
     await _tapText(tester, 'Erweitert');
     expect(find.text('fake.test (empfohlen)'), findsOneWidget);
@@ -193,6 +199,7 @@ void main() {
     final app = await buildTestApp(loggedIn: false);
     await _pump(tester, app);
     await _tapText(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
     await _tapText(tester, 'Erweitert');
     await _tapText(tester, 'Anderen Anbieter verwenden');
     await tester.enterText(find.widgetWithText(TextField, 'Adresse des Anbieters'), 'http://fake.test');
@@ -205,6 +212,7 @@ void main() {
     app.server.reachable = false;
     await _pump(tester, app);
     await _tapText(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
     expect(find.text('fake.test ist gerade nicht erreichbar. Prüfe deine Internetverbindung.'), findsOneWidget);
     app.server.reachable = true;
     await _tapText(tester, 'Erneut versuchen');
@@ -215,7 +223,8 @@ void main() {
     final app = await buildTestApp(loggedIn: false);
     await _pump(tester, app);
     await _tapText(tester, 'Ich habe schon ein Konto');
-    expect(find.text('Schritt 1 von 3'), findsOneWidget);
+    await continueFromServerStep(tester);
+    expect(find.text('Schritt 2 von 4'), findsOneWidget);
     await tester.enterText(find.widgetWithText(TextField, 'Benutzername'), 'anna');
     await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'falsch');
     await tester.pumpAndSettle();
@@ -225,7 +234,7 @@ void main() {
     await tester.pumpAndSettle();
     await _tapText(tester, 'Anmelden');
     expect(app.gateway.session, SessionState.ready);
-    expect(find.text('Schritt 2 von 3'), findsOneWidget);
+    expect(find.text('Schritt 3 von 4'), findsOneWidget);
     expect(find.text('Notfall-Schlüssel erstellen'), findsOneWidget);
   });
 
@@ -234,6 +243,7 @@ void main() {
     final app = await buildTestApp(loggedIn: false, defaultProvider: 'unbekannt.example');
     await _pump(tester, app);
     await _tapText(tester, 'Ich habe schon ein Konto');
+    await continueFromServerStep(tester);
     expect(find.textContaining('unbekannt.example ist gerade nicht erreichbar'), findsOneWidget);
     await tester.enterText(find.widgetWithText(TextField, 'Benutzername'), '@anna:fake.test');
     await tester.pump(const Duration(milliseconds: 700));
@@ -250,6 +260,7 @@ void main() {
     final app = await buildTestApp(loggedIn: false, server: other);
     await _pump(tester, app);
     await _tapText(tester, 'Ich habe schon ein Konto');
+    await continueFromServerStep(tester);
     // Standard ist andere.test (Voreinstellung im Test); die ID nennt fake.test.
     await tester.enterText(find.widgetWithText(TextField, 'Benutzername'), '@anna:fake.test');
     await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'geheim123');
@@ -266,12 +277,17 @@ void main() {
     final app = await buildTestApp(loggedIn: false);
     await _pump(tester, app);
     await _tapText(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
     await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), 'Ben');
     await _settleCheck(tester);
     await _tapText(tester, 'Ich habe schon ein Konto');
     expect(tester.widget<TextField>(find.widgetWithText(TextField, 'Benutzername')).controller!.text, 'ben');
     await _tapText(tester, 'Noch kein Konto? Jetzt erstellen');
     expect(find.widgetWithText(TextField, 'Wie heißt du?'), findsOneWidget);
+    // Seit E-108 liegt der Schritt „Anbieter wählen“ zwischen Startseite und Konto: ein „Zurück“ mehr.
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.text('Anbieter wählen'), findsWidgets, reason: 'zurück zum Anbieter');
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text('Neue Familie gründen'), findsOneWidget, reason: 'zurück zur Startseite');

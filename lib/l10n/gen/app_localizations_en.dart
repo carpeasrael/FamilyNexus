@@ -1302,7 +1302,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy1Body =>
-      'FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. The operator of the provider you chose (Matrix server) is responsible for processing on the server; you can see it during setup under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that have their own sign-in page (e.g. matrix.org) you enter these details directly on their page. The app shows this page in an embedded view (iOS, macOS, Android) or in the browser (Linux, Windows); the page then runs in the app’s process.';
+      'FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. The operator of the provider you chose (Matrix server) is responsible for processing on the server; you can see it during setup in the “Choose a provider” step and under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that have their own sign-in page (e.g. matrix.org) you enter these details directly on their page. The app shows this page in an embedded view (iOS, macOS, Android) or in the browser (Linux, Windows); the page then runs in the app’s process.';
 
   @override
   String get privacy2Title => 'What data exists?';
@@ -3578,4 +3578,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventTypeAnniversary => 'Birthdays and memorial days';
+
+  @override
+  String get serverStepTitle => 'Choose a provider';
+
+  @override
+  String get serverStepIntro =>
+      'Your account is kept by a provider. Choose the recommended one or enter the address of another, for example your own server.';
+
+  @override
+  String get serverStandardBody => 'Public service, set up in a few minutes.';
+
+  @override
+  String get serverOtherTitle => 'Another provider or your own server';
+
+  @override
+  String get serverOtherBody =>
+      'You have an account with another provider or run your own server.';
+
+  @override
+  String get errServerUnsupportedStep =>
+      'FamilyNexus does not support this provider. Please enter the address of another one.';
 }

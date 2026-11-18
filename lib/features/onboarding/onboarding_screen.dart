@@ -14,11 +14,12 @@ import 'family_step.dart';
 import 'invite_link_step.dart';
 import 'login_step.dart';
 import 'provider_controller.dart';
+import 'server_step.dart';
 import 'welcome_step.dart';
 
-enum _Step { welcome, inviteLink, account, login, security, family }
+enum _Step { welcome, server, inviteLink, account, login, security, family }
 
-/// Ersteinrichtung (E-55, E-56): drei Wege ohne Fachbegriffe.
+/// Ersteinrichtung (E-55, E-56, E-108): drei Wege ohne Fachbegriffe, danach (ohne Einladung) die Wahl des Anbieters.
 ///
 /// * Neue Familie gründen: Konto erstellen → Notfall-Schlüssel → Familie benennen.
 /// * Ich wurde eingeladen: (Link einfügen →) Konto erstellen beim Anbieter des Einladenden →
@@ -37,6 +38,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   /// Der Weg „eingeladen“ begann ohne Link (zusätzlicher Schritt „Link einfügen“).
   bool _withLinkStep = false;
+
+  /// Der Schritt „Anbieter wählen“ gehört zum Weg (E-108): nur Neu und Anmelden von der Startseite aus, ohne
+  /// Einladung. Neustart, Abmeldung, angemeldeter Start und Einladung zählen weiter ohne ihn.
+  bool _withServerStep = false;
   String? _loginUsername;
   bool _started = false;
 
@@ -99,11 +104,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (!mounted) return;
     final loggedIn = _s.gateway.session == SessionState.ready;
     // Angemeldet in einem Schritt vor der Absicherung (auch nach „Zurück“ während der Browser-Anmeldung).
-    if (loggedIn && (_step == _Step.welcome || _step == _Step.inviteLink || _step == _Step.account || _step == _Step.login)) {
+    if (loggedIn && (_step == _Step.welcome || _step == _Step.server || _step == _Step.inviteLink || _step == _Step.account || _step == _Step.login)) {
       setState(() => _step = _s.gateway.securityState == SecurityState.ready ? _Step.family : _Step.security);
     } else if (!loggedIn && (_step == _Step.security || _step == _Step.family)) {
       setState(() {
         _path = OnboardingPath.login;
+        _withServerStep = false;
         _step = _Step.login;
       });
       _provider.start();
@@ -114,14 +120,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _onInvite() {
     final invite = _s.pendingInvite.value;
     if (!mounted || invite == null) return;
-    if (_step == _Step.welcome || _step == _Step.inviteLink) {
+    if (_step == _Step.server && _path == OnboardingPath.login) {
+      // Wer sich anmelden will, meldet sich beim Server aus der Einladung an (wie im Schritt „Anmelden“).
+      setState(() {
+        _withServerStep = false;
+        _step = _Step.login;
+      });
+      _useInviteProvider(invite);
+    } else if (_step == _Step.welcome || _step == _Step.inviteLink || _step == _Step.server) {
       setState(() {
         _path = OnboardingPath.invited;
+        _withServerStep = false;
         _step = _Step.account;
       });
       _useInviteProvider(invite);
     } else if (_step == _Step.login) {
       // Wer sich schon anmeldet, meldet sich beim Server aus der Einladung an; die Familie folgt am Ende.
+      setState(() => _withServerStep = false);
       _useInviteProvider(invite);
     }
   }
@@ -137,10 +152,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _choose(OnboardingPath path) {
     if (path == OnboardingPath.create) _discardInvite();
     final invite = _s.pendingInvite.value;
+    // Mit dem Schritt „Anbieter wählen“ beginnen Neu und Anmelden, solange keine Einladung den Server vorgibt.
+    final withServer = invite == null && path != OnboardingPath.invited;
     setState(() {
       _path = path;
       _withLinkStep = path == OnboardingPath.invited && invite == null;
+      _withServerStep = withServer;
       _step = switch (path) {
+        _ when withServer => _Step.server,
         OnboardingPath.create => _Step.account,
         OnboardingPath.invited => invite == null ? _Step.inviteLink : _Step.account,
         OnboardingPath.login => _Step.login,
@@ -149,6 +168,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (path != OnboardingPath.create && invite != null) {
       _useInviteProvider(invite);
     } else {
+      // Kein Einladungs-Server: zurück auf den Standard, sonst bliebe der Server einer verworfenen Einladung oder
+      // früheren Eingabe gewählt (ein Heimnetz-Server würde ohne Zustimmung geprüft, R2); danach genau eine Prüfung.
+      _provider.resetToStandard();
       _provider.start();
     }
   }
@@ -159,9 +181,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _s.gateway.cancelRegistration();
     setState(() {
       switch (_step) {
+        case _Step.account || _Step.login when _withServerStep && _s.pendingInvite.value == null:
+          _step = _Step.server;
         case _Step.account when _path == OnboardingPath.invited && _withLinkStep:
           _step = _Step.inviteLink;
-        case _Step.inviteLink || _Step.account || _Step.login:
+        case _Step.server || _Step.inviteLink || _Step.account || _Step.login:
+          _withServerStep = false;
           _step = _Step.welcome;
           _discardInvite();
         default:
@@ -171,9 +196,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   List<_Step> get _plan => switch (_path) {
-        OnboardingPath.create => const <_Step>[_Step.account, _Step.security, _Step.family],
+        OnboardingPath.create => <_Step>[if (_withServerStep) _Step.server, _Step.account, _Step.security, _Step.family],
         OnboardingPath.invited => <_Step>[if (_withLinkStep) _Step.inviteLink, _Step.account, _Step.security, _Step.family],
-        OnboardingPath.login => const <_Step>[_Step.login, _Step.security, _Step.family],
+        OnboardingPath.login => <_Step>[if (_withServerStep) _Step.server, _Step.login, _Step.security, _Step.family],
       };
 
   /// Position im Weg; „Konto erstellen“ und „Anmelden“ teilen sich denselben Platz.
@@ -188,6 +213,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   String _title(AppLocalizations l) => switch (_step) {
         _Step.welcome => l.onbTitleLanguage,
+        _Step.server => l.serverStepTitle,
         _Step.inviteLink => l.inviteStepTitle,
         _Step.account => l.regTitle,
         _Step.login => l.onbTitleAccount,
@@ -206,7 +232,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final canGoBack = _step == _Step.inviteLink || _step == _Step.account || _step == _Step.login;
+    final canGoBack = _step == _Step.server || _step == _Step.inviteLink || _step == _Step.account || _step == _Step.login;
     return ListenableBuilder(
       listenable: _s.gateway,
       builder: (context, _) => Scaffold(
@@ -240,6 +266,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     switch (_step) {
       case _Step.welcome:
         return WelcomeStep(onChoose: _choose);
+      case _Step.server:
+        return ServerStep(
+          key: const ValueKey<String>('server'),
+          provider: _provider,
+          onContinue: () => setState(() => _step = _path == OnboardingPath.login ? _Step.login : _Step.account),
+        );
       case _Step.inviteLink:
         return const InviteLinkStep();
       case _Step.account:

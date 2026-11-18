@@ -261,6 +261,7 @@ Seit E-102 (15.11., PR #479) öffnen Anmeldung und Anbieterseiten auf iOS, macOS
 | RT3-H-04 | alle | Einrichtung mit gestörter Ablage am Ende (Speicher voll bzw. Datenbank gesperrt, Wegwerfgerät) | Fehler wird angezeigt, „Erneut versuchen“ möglich, Einrichtung bleibt nicht stehen; bei zweitem Fehlschlag „Später“ und „Jetzt einladen“ erreichbar | #411, E-45 | `RT3-H-04_<Pl>.png` | | |
 | RT3-H-05 | alle | Tour in Englisch und mit Schrift 200 % | Texte vollständig, kein Überlauf; Screenreader liest die Titel | – | `RT3-H-05_<Pl>.png` | | |
 | RT3-H-06 | alle | Konto A: Tour bis „Los geht’s“ beenden, abmelden, mit demselben Konto wieder anmelden (#507) | Die Tour erscheint **nicht** erneut (`tourSeen` bleibt, Abmelden setzt nur `blockedUsers` und den vorgemerkten Link zurück, #450). Erscheint sie doch: Beobachtung mit Angabe, ob die Tour zuvor mit „Los geht’s“ oder mit „Überspringen“ endete, und ob zwischendurch „Alle lokalen Daten löschen“ lief | E-95 | `RT3-H-06_<Pl>.png` | | |
+| RT3-H-07 | alle | **#545, E-108:** Einrichtung neu starten, „Neue Familie gründen“ bzw. „Ich habe schon ein Konto“ | Schritt „Anbieter wählen“ („Schritt 1 von 4“): „{Anbieter} (empfohlen)“ vorgewählt; „Anderer Anbieter oder eigener Server“ zeigt Adressfeld, Prüfung und Betreiber; „Weiter“ bei leerer Adresse nennt den Grund am Feld; Einladungslink überspringt den Schritt („Schritt 1 von 3“); „Zurück“ führt vom Konto zum Anbieter, dann zur Startseite; mit Schrift 200 %, VoiceOver/TalkBack (Radiogruppe, Feldfehler) | E-108 | `RT3-H-07_<Pl>.png` | | |
 
 ### I. Einstellungen: App teilen und bewerten, Screenshot-Schutz, Texte (#350, #351, #144, #326, E-95, E-98)
 
@@ -411,7 +412,7 @@ Alle Bildschirme wurden ohne Verhaltensänderung zerlegt (Gateway in Module, Bil
    - **Abnahme iOS, macOS, Android (v03):** Ein Issue gilt für diese Plattformen als abgenommen, wenn alle ihm in Abschnitt 14 zugeordneten Schritte auf iOS-Simulator (iPhone, bei #274 auch iPad), Mac-App und Android-Emulator (bei #274 Tablet-AVD) ✅ sind. Die Spalte „Rest am Gerät“ benennt, was dann im Issue-Kommentar als nicht getestet stehen bleibt. Seit E-103 hängt das Schließen am Code-Test, die Spalte „Rest am Gerät“ benennt den Plattform-Pflichtschritt, der im Release-Beleg steht.
 4. **Nach dem Lauf:** Ergebnisse in den betroffenen Issues vermerken (Abschnitt 14). Ein Issue schließt nach E-103 mit positivem Code-Test (Code-Testplan `Codetestplan_Offene_Issues.md`), nicht erst nach diesen Schritten; die Schritte dieses Plans sind der Plattformbeleg je Build (`docs/release-e2e/<Version>.md`, `tool/check_release_e2e.sh`). Der Merge entscheidet der Nutzer; kein Release ohne Freigabe.
 
-## 14. Zuordnung Issues → Schritte (39 offene Issues am 15.11. abends, seither nur #508 und #528 ergänzt; die später umgesetzten #516, #524, #526 und #539 sind hier noch nicht nachgetragen)
+## 14. Zuordnung Issues → Schritte (39 offene Issues am 15.11. abends, seither nur #508, #528 und #545 ergänzt; die später umgesetzten #516, #524, #526 und #539 sind hier noch nicht nachgetragen)
 
 Spalte „Sim/Emu“: auf iOS-Simulator, Mac-App und Android-Emulator ausführbar (ja, teilweise, nein). Spalte „Rest am Gerät“: was nach Abschnitt 2a nur am echten Gerät oder in Store/Apple belegt wird. **Plattformen dieser Abnahme: iOS, macOS, Android.** Windows und Linux gehören nicht dazu; Schritte dort bleiben im Plan, die Issues #263, #325, #330 sind davon abhängig.
 
@@ -461,6 +462,7 @@ Spalte „Sim/Emu“: auf iOS-Simulator, Mac-App und Android-Emulator ausführba
 | #506 | RT3-D-02 | ja (zwei Instanzen) | Bildschirm schließt nach dem Speichern von selbst (Entscheidung des Herausgebers, PR #522) |
 | #507 | RT3-H-06 | ja | Ursache ohne Reproduktion nicht belegt |
 | #508 | RT3-P-14 | ja | – |
+| #545 | RT3-H-07 | ja | VoiceOver/TalkBack, große Schrift am Gerät |
 | #528 | – (Linux und Windows bewusst Browser, Nachtrag zu E-102; macOS durch RT3-G-09 bis RT3-G-14) | ja (macOS, wie G-09 bis G-14) | Gerätenachtest der eingebetteten Anmeldung auf macOS (TP-OAUTH-11) |
 | #453 bis #456 | Sammel-Issues des Release-Reviews, keine Schritte; Schließen nach Entscheidung E9 | – | – |
 
@@ -480,4 +482,4 @@ Weitere Änderungen ohne eigenes offenes Issue (im Plan abgedeckt): #337 (E-07, 
 | v04 | 15.11.2026 | Soll-Version auf 1.2.3 (30) (Build-Nummer PR #495, kein Upload); Stand `main` @ `531981a`; neu P-15 bis P-19 für #483 bis #487 (Review-Lauf 4), Abschnitt 14 mit #486 (39 offene Issues); RT3-V-01, V-02, V-04, V-05 auf Build 30; Bezug auf Review-Berichte `+29` (Lauf 5) und `+30` |
 | v05 | 16.11.2026 | Folge-Issues #501 bis #508 des Release-Tests (Lauf 31): Zuordnung in Abschnitt 14; neu RT3-H-06 (#507, Abmelden und erneutes Anmelden), RT3-D-02 mit Beobachtung 20 s (#506), RT3-R-07 mit Statusleiste (#501); RT3-H-01, RT3-I-01, RT3-P-14 tragen #502, #503, #508 (Planerwartung korrigiert, App unverändert); Abnahme- und Schließregel auf E-103 umgestellt |
 | v06 | 16.11.2026 | RT3-D-02 (#506): Der Avatar-Bildschirm schließt nach dem Speichern von selbst (Entscheidung des Herausgebers, PR #522, E-101-Nachtrag); Erwartung und Abschnitt 14 angepasst |
-| v07 | 18.11.2026 | #528 (Anmeldung ohne Browser): Zuordnung in Abschnitt 14, keine neuen Schritte (Linux/Windows bewusst Browser, Nachtrag zu E-102). Rückstand, hier nicht nachgetragen: Schritte RT3-E-12 bis RT3-E-14 (#539, #526, #516) stehen ohne Versionszeile im Plan, #524 (E-105) hat keinen Schritt, #516, #526, #539 fehlen in Abschnitt 14 |
+| v07 | 18.11.2026 | #545 (Schritt „Anbieter wählen“, E-108): neu RT3-H-07, Zuordnung in Abschnitt 14; #528 (Anmeldung ohne Browser): Zuordnung in Abschnitt 14, keine neuen Schritte (Linux/Windows bewusst Browser, Nachtrag zu E-102). Rückstand, hier nicht nachgetragen: Schritte RT3-E-12 bis RT3-E-14 (#539, #526, #516) stehen ohne Versionszeile im Plan, #524 (E-105) hat keinen Schritt, #516, #526, #539 fehlen in Abschnitt 14 |

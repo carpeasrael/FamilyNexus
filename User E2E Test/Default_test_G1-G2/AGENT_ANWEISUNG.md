@@ -176,7 +176,7 @@ Notfall-Schlüssel: „Kopieren“ tippen; den Schlüssel aus `ui.py G<n> list` 
 2. DT-F-03 (Negativprobe) **vor** der Löschung: zurück in die App (`ui.py G<n> key BACK`, falls nötig), „Löschung prüfen“ → „Das Konto besteht noch …“. Danach „Seite erneut öffnen“.
 3. Auf der Kontoseite mit `fields`/`text` den Bereich zum Deaktivieren bzw. Löschen finden („Deactivate account“, „Delete account“ o. ä.), öffnen (`click "text:Delete account"`) und bestätigen. Stand 06.11.2026: Dialog „Delete this account?“ mit Passwortfeld „Enter your password to continue“ und roter Schaltfläche „Delete account“. Passwort per **Fingertipp** eingeben (Feld antippen, `ui.py G<n> typesecret N1_PASSWORD`; `fillsecret` allein reichte in Lauf 23 nicht), dann rote Schaltfläche per `ui.py G<n> tap` (bei zwei Treffern die im Dialog, ggf. `tap "Delete account" 2`). Folgezustand: „Account deleted“. Bestätigungsseite belegen (`cdp.py … shot` und `sandbox.sh shot`).
 4. Custom Tab schließen (`ui.py G<n> key BACK`), in der App „Löschung prüfen“ → Willkommensseite.
-5. Nachweis DT-N-01/02: „Ich habe schon ein Konto“ → „Bei matrix.org anmelden“ → auf der Seite Benutzername und **richtiges** Passwort (`fillsecret`) → Fehlermeldung wörtlich festhalten und belegen; Tab schließen, Meldung der App belegen.
+5. Nachweis DT-N-01/02: „Ich habe schon ein Konto“ → „Anbieter wählen“: „Weiter“ → „Bei matrix.org anmelden“ → auf der Seite Benutzername und **richtiges** Passwort (`fillsecret`) → Fehlermeldung wörtlich festhalten und belegen; Tab schließen, Meldung der App belegen.
 6. DT-N-03: `curl -s -w '\n%{http_code}' https://matrix-client.matrix.org/_matrix/client/v3/profile/<MXID>` für beide; Ausgabe wörtlich. DT-N-04 wie im Plan.
 7. In `secure/…`: `STATUS = Konten gelöscht <Datum Uhrzeit>`.
 

@@ -110,8 +110,8 @@ void main() {
   });
 
   test('#326 Gruppe 6 E17: Satzbau Verantwortlicher und Löschung', () {
-    expect(de.privacy1Body, contains('Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung unter „Erweitert“.'));
-    expect(enL.privacy1Body, contains('The operator of the provider you chose (Matrix server) is responsible for processing on the server; you can see it during setup under “Advanced”.'));
+    expect(de.privacy1Body, contains('Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung im Schritt „Anbieter wählen“ und unter „Erweitert“.'));
+    expect(enL.privacy1Body, contains('The operator of the provider you chose (Matrix server) is responsible for processing on the server; you can see it during setup in the “Choose a provider” step and under “Advanced”.'));
     expect(de.privacy9Body, contains('„Konto löschen“. Weitere Serverdaten verwaltet der Betreiber deines Servers.'));
     expect(enL.privacy9Body, contains('“Delete account”. Other server data is managed by your server’s operator.'));
   });

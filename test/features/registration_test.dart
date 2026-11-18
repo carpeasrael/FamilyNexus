@@ -9,6 +9,7 @@ import 'package:webview_flutter_platform_interface/webview_flutter_platform_inte
 
 import '../support/fake_browser.dart';
 import '../support/fake_webview_platform.dart';
+import '../support/nav.dart';
 import '../support/registration_form.dart';
 import '../support/test_app.dart';
 
@@ -33,6 +34,7 @@ Future<void> _tap(WidgetTester tester, String text) async {
 /// „Neue Familie gründen“ → Formular ausfüllen → „Konto erstellen“.
 Future<void> _fillAndSubmit(WidgetTester tester, {String name = 'Emil', String password = 'sicher-genug'}) async {
   await _tap(tester, 'Neue Familie gründen');
+  await continueFromServerStep(tester);
   await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), name);
   await tester.pump(const Duration(milliseconds: 700));
   await tester.pumpAndSettle();
@@ -266,6 +268,7 @@ void main() {
     app.server.registrationMode = RegistrationMode.disabled;
     await _pump(tester, app);
     await _tap(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
     expect(find.textContaining('kann die App kein Konto anlegen'), findsOneWidget);
     expect(find.widgetWithText(TextField, 'Wie heißt du?'), findsNothing);
     await _tap(tester, 'Webseite öffnen');
@@ -280,6 +283,7 @@ void main() {
     app.server.registrationMode = RegistrationMode.disabled;
     await _pump(tester, app);
     await _tap(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
     await _tap(tester, 'Element starten');
     expect(app.element.starts, 1);
     expect(find.textContaining('nicht installiert'), findsNothing);
@@ -298,6 +302,7 @@ void main() {
     ];
     await _pump(tester, app);
     await _tap(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
     expect(find.textContaining('kann die App kein Konto anlegen'), findsOneWidget);
   });
 
@@ -319,6 +324,7 @@ void main() {
     final app = await buildTestApp(loggedIn: false);
     await _pump(tester, app);
     await _tap(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
     await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), 'Fritz');
     await tester.pump(const Duration(milliseconds: 700));
     await tester.pumpAndSettle();

@@ -16,6 +16,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/shell_finders.dart';
 import '../support/fake_browser.dart';
 import '../support/fake_matrix.dart';
+import '../support/nav.dart';
 import '../support/registration_form.dart';
 import '../support/test_app.dart';
 
@@ -148,6 +149,7 @@ void main() {
       await s.guest.services.settings.update((c) => c.copyWith(pendingInvite: s.link));
       s.guest.services.pendingInvite.value = null;
       await _tap(tester, 'Neue Familie gründen');
+      await continueFromServerStep(tester);
       expect(s.guest.services.settings.settings.pendingInvite, isNull);
     });
 
@@ -230,6 +232,7 @@ void main() {
       final s = await _annaInvites(matrixOrgDefault: true);
       await _pump(tester, s.guest);
       await _tap(tester, 'Ich habe schon ein Konto');
+      await continueFromServerStep(tester);
       expect(find.widgetWithText(TextField, 'Adresse des Anbieters'), findsNothing, reason: 'vorher der Standardanbieter');
 
       s.guest.links.controller.add(s.link);
@@ -322,6 +325,7 @@ void main() {
       app.server.registrationMode = RegistrationMode.oauth;
       await _pump(tester, app);
       await _tap(tester, 'Neue Familie gründen');
+      await continueFromServerStep(tester);
       expect(find.widgetWithText(TextField, 'Passwort'), findsNothing, reason: 'Passwort nur beim Anbieter');
       await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), 'Greta');
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
@@ -343,6 +347,7 @@ void main() {
       app.server.registrationMode = RegistrationMode.oauth;
       await _pump(tester, app);
       await _tap(tester, 'Neue Familie gründen');
+      await continueFromServerStep(tester);
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
       app.oauth.deliver(app.gateway.oauthCallback('mallory', state: 'gefälscht'));
       await tester.pump();
@@ -359,13 +364,18 @@ void main() {
       app.server.registrationMode = RegistrationMode.oauth;
       await _pump(tester, app);
       await _tap(tester, 'Neue Familie gründen');
+      await continueFromServerStep(tester);
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
       expect(app.oauth.waiting, isTrue);
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
       expect(app.oauth.waiting, isFalse, reason: 'Versuch beendet');
+      expect(find.text('Anbieter wählen'), findsWidgets, reason: 'seit E-108 zuerst zurück zum Anbieter');
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
       expect(find.text('Neue Familie gründen'), findsOneWidget);
       await _tap(tester, 'Neue Familie gründen');
+      await continueFromServerStep(tester);
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
       app.oauth.deliver(app.gateway.oauthCallback('hanna'));
       await tester.pumpAndSettle();
@@ -378,6 +388,7 @@ void main() {
       app.server.registrationMode = RegistrationMode.oauth;
       await _pump(tester, app);
       await _tap(tester, 'Neue Familie gründen');
+      await continueFromServerStep(tester);
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
       await _tap(tester, 'Abbrechen');
       expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Du kannst es jederzeit noch einmal versuchen.'), findsOneWidget);
@@ -397,6 +408,7 @@ void main() {
       app.browser.available = false;
       await _pump(tester, app);
       await _tap(tester, 'Neue Familie gründen');
+      await continueFromServerStep(tester);
       await _tap(tester, 'Konto bei fake.test erstellen');
       expect(find.text('Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.'), findsOneWidget);
       _expectMessage(tester, 'Die Anmeldung beim Anbieter wurde nicht abgeschlossen. Bitte versuche es noch einmal.', notice: false);
@@ -407,6 +419,7 @@ void main() {
       app.server.registrationMode = RegistrationMode.oauth;
       await _pump(tester, app);
       await _tap(tester, 'Ich habe schon ein Konto');
+      await continueFromServerStep(tester);
       expect(find.widgetWithText(TextField, 'Passwort'), findsNothing);
       await _tap(tester, 'Bei fake.test anmelden', settle: false);
       expect(app.browser.opened.single.queryParameters.containsKey('prompt'), isFalse);
@@ -430,6 +443,7 @@ void main() {
     testWidgets('Seite öffnet in der Sitzung (nicht im Browser), der Rücksprung meldet an', (tester) async {
       final (app, session) = await sessionApp(tester);
       await _tap(tester, 'Neue Familie gründen');
+      await continueFromServerStep(tester);
       await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), 'Greta');
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
       expect(app.browser.opened, isEmpty, reason: 'kein externer Browser');
@@ -446,6 +460,7 @@ void main() {
     testWidgets('„Abbrechen“ in der Sitzung → Meldung, erneut möglich', (tester) async {
       final (app, session) = await sessionApp(tester);
       await _tap(tester, 'Ich habe schon ein Konto');
+      await continueFromServerStep(tester);
       await _tap(tester, 'Bei fake.test anmelden', settle: false);
       session.finish(null);
       await tester.pumpAndSettle();
@@ -462,6 +477,7 @@ void main() {
     testWidgets('Rücksprung mit fremdem state beendet den Versuch sofort mit Meldung (kein Warten)', (tester) async {
       final (app, session) = await sessionApp(tester);
       await _tap(tester, 'Ich habe schon ein Konto');
+      await continueFromServerStep(tester);
       await _tap(tester, 'Bei fake.test anmelden', settle: false);
       session.finish(app.gateway.oauthCallback('mallory', state: 'gefälscht'));
       await tester.pump();
@@ -496,6 +512,7 @@ void main() {
       addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(window, null));
       await _pump(tester, app);
       await _tap(tester, 'Ich habe schon ein Konto');
+      await continueFromServerStep(tester);
       await tester.enterText(find.widgetWithText(TextField, 'Benutzername'), 'anna');
       await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'geheim123');
       await tester.pumpAndSettle();
@@ -524,6 +541,7 @@ void main() {
       final app = await buildTestApp(loggedIn: false);
       await _pump(tester, app);
       await _tap(tester, 'Ich habe schon ein Konto');
+      await continueFromServerStep(tester);
       await tester.enterText(find.widgetWithText(TextField, 'Benutzername'), 'anna');
       await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'geheim123');
       await tester.pumpAndSettle();

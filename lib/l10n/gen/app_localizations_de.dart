@@ -1313,7 +1313,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy1Body =>
-      'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein. Die App zeigt diese Seite in einer eingebetteten Ansicht (iOS, macOS, Android) oder im Browser (Linux, Windows); die Seite läuft dann im Prozess der App.';
+      'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung im Schritt „Anbieter wählen“ und unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein. Die App zeigt diese Seite in einer eingebetteten Ansicht (iOS, macOS, Android) oder im Browser (Linux, Windows); die Seite läuft dann im Prozess der App.';
 
   @override
   String get privacy2Title => 'Welche Daten gibt es?';
@@ -3601,4 +3601,26 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get eventTypeAnniversary => 'Geburts- und Gedenktage';
+
+  @override
+  String get serverStepTitle => 'Anbieter wählen';
+
+  @override
+  String get serverStepIntro =>
+      'Dein Konto liegt bei einem Anbieter. Wähle den empfohlenen oder trage die Adresse eines anderen ein, zum Beispiel die eines eigenen Servers.';
+
+  @override
+  String get serverStandardBody =>
+      'Öffentlicher Dienst, in wenigen Minuten eingerichtet.';
+
+  @override
+  String get serverOtherTitle => 'Anderer Anbieter oder eigener Server';
+
+  @override
+  String get serverOtherBody =>
+      'Du hast ein Konto bei einem anderen Anbieter oder betreibst einen eigenen Server.';
+
+  @override
+  String get errServerUnsupportedStep =>
+      'Dieser Anbieter wird von FamilyNexus nicht unterstützt. Bitte gib die Adresse eines anderen ein.';
 }

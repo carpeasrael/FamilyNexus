@@ -4,6 +4,7 @@ Neu in 1.2.3:
 • Identitätsvermerke auch auf dem Gerät; Ladebild folgt der Darstellung.
 • Kalender: Jahresfortschritt, Abgleich alle 15 Min.
 • Einführung; App teilen und bewerten.
+• Einrichtung: Anbieter wählen als eigener Schritt.
 Neu in 1.2.2:
 • Jeden Beitritt bestätigt ein Moderator; Einladungslinks ohne lesbare Namen.
 • Einkauf: Einträge nach Gruppen ordnen.
