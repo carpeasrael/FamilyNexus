@@ -204,6 +204,19 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    ui('Reihenfolge: streng nach nächstem Vorkommen, nicht je Person gruppiert (#550)', (tester) async {
+      await open(tester, people: [
+        person('1', 'Opa', birth: date(9, 8, 1948), death: date(3, 22, 2020)), // Todestag in 2, Geburtstag in 172 Tagen
+        person('2', 'Oma', birth: date(3, 23, 1950)), // in 3 Tagen
+        person('3', 'Tante', birth: date(6, 30, 1970)), // in 102 Tagen
+      ]);
+      await openList(tester);
+      double y(String t) => tester.getTopLeft(find.text(t)).dy;
+      final order = <double>[y('Todestag von Opa'), y('Geburtstag von Oma'), y('Geburtstag von Tante'), y('Geburtstag von Opa')];
+      expect(order, orderedEquals(<double>[...order]..sort()), reason: 'Opa Todestag, Oma, Tante, Opa Geburtstag');
+      expect(order.toSet().length, 4);
+    });
+
     ui('Anlegen mit Geburts- und Todesdatum an einer Person', (tester) async {
       final app = await open(tester);
       await openList(tester);

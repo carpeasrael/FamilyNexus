@@ -91,6 +91,14 @@ void main() {
       expect(hits.map((h) => h.kind), <AnniversaryKind>[AnniversaryKind.death, AnniversaryKind.birth], reason: 'nach Datum sortiert');
       expect(AnniversaryCalc.dueWithin(both, today, 3).single.kind, AnniversaryKind.death);
     });
+    test('Gleicher Tag: erst Name (ohne Groß-/Kleinschreibung), dann Art (#550)', () {
+      final ps = <AnniversaryPerson>[
+        AnniversaryPerson(id: '00000000-0000-4000-8000-000000000002', name: 'berta', birth: date(3, 22, 1950), by: '@a:b.c', updatedAt: DateTime.utc(2026, 1, 1)),
+        AnniversaryPerson(id: '00000000-0000-4000-8000-000000000001', name: 'Anna', birth: date(3, 22, 1950), death: date(3, 22, 2010), by: '@a:b.c', updatedAt: DateTime.utc(2026, 1, 1)),
+      ];
+      final hits = AnniversaryCalc.upcoming(ps, today);
+      expect(hits.map((h) => '${h.person.name}/${h.kind.name}'), <String>['Anna/birth', 'Anna/death', 'berta/birth']);
+    });
     test('Löschmarken zählen nicht', () {
       final gone = AnniversaryPerson(id: '00000000-0000-4000-8000-000000000009', name: '', deleted: true, by: '@a:b.c', updatedAt: DateTime.utc(2026, 1, 1));
       expect(AnniversaryCalc.dueWithin(<AnniversaryPerson>[gone], today, 60), isEmpty);
