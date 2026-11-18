@@ -46,6 +46,8 @@ const List<String> _expectedSettings = <String>[
   'L=Geburtstage anzeigen | 7 Tage vorher button tap',
   'L=Effekte reduzieren | Weniger Unschärfe und Leuchten, deckendere Flächen. tap',
   'tap',
+  'L=Letztes Gespräch wieder öffnen | Öffnet im Chat-Tab das zuletzt offene Gespräch statt der Liste. Wird nur auf diesem Gerät gemerkt und beim Abmelden gelöscht. tap',
+  'tap',
   'L=Konto',
   'L=Server | fake.test',
   'L=Benutzername | @anna:fake.test',

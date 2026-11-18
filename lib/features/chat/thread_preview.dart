@@ -22,8 +22,9 @@ class ThreadRow {
   final ChatMessage? last;
 }
 
-/// Reihenfolge der Liste: Familienchat zuerst, danach nach dem größten Zeitstempel der Vorschau absteigend,
-/// Gespräche ohne Nachricht zuletzt nach Titel, dann Raum-ID (stabil).
+/// Reihenfolge der Liste (E-107): Familienchat zuerst, danach Gespräche mit Ungelesenem (`thread.unread > 0`) vor
+/// denen ohne; innerhalb jeder Gruppe nach dem größten Zeitstempel der Vorschau absteigend, Gespräche ohne
+/// Nachricht zuletzt nach Titel, dann Raum-ID (stabil).
 List<ThreadRow> orderedThreadRows(
   List<ChatThread> threads,
   List<ChatMessage> Function(String threadId) messagesOf,
@@ -40,6 +41,8 @@ List<ThreadRow> orderedThreadRows(
 
   rows.sort((a, b) {
     if (a.thread.isFamily != b.thread.isFamily) return a.thread.isFamily ? -1 : 1;
+    final aUnread = a.thread.unread > 0;
+    if (aUnread != (b.thread.unread > 0)) return aUnread ? -1 : 1;
     final at = a.last?.time;
     final bt = b.last?.time;
     if (at != null && bt != null) {

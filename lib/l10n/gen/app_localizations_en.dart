@@ -147,6 +147,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Less blur and glow, more opaque surfaces.';
 
   @override
+  String get settingsRestoreLastChat => 'Reopen last conversation';
+
+  @override
+  String get settingsRestoreLastChatHint =>
+      'Opens the conversation you last had open in the Chat tab instead of the list. Remembered only on this device and deleted when you sign out.';
+
+  @override
   String get settingsSecureScreen => 'Screen protection';
 
   @override
@@ -1302,7 +1309,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String privacy2Body(String keyStore, String cipher) {
-    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars), the members’ read state (up to which message someone has read) and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
+    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars), the members’ read state (up to which message someone has read), the conversation you last had open (only if switched on) and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
   }
 
   @override

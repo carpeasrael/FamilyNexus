@@ -302,10 +302,10 @@ class AppServices {
     } else if (db != null) {
       await wipeAccountDataIn(db);
     }
-    // Die Blockierliste gehört zu den lokalen Familiendaten (#450). Gezielt und ohne Neulesen: `AppRoot` ruft diese
+    // Blockierliste (#450) und gemerktes Gespräch (E-107) gehören zu den lokalen Familiendaten. Gezielt und ohne Neulesen: `AppRoot` ruft diese
     // Methode bei jedem Aufbau ohne Sitzung auf, auch in der Einrichtung; ein Neulesen überschriebe dort einen eben
     // gesetzten Einladungslink. Bei leerer Liste ändert sich nichts und niemand wird benachrichtigt.
-    await settings.update((c) => c.copyWith(blockedUsers: const <String>[]));
+    await settings.update((c) => c.copyWith(blockedUsers: const <String>[], lastChatThread: null));
   }
 
   /// Verwirft den vorgemerkten Einladungslink (Ablage und Speicher). Nur beim Ende einer Sitzung (#450): Der Link
@@ -351,7 +351,7 @@ class AppServices {
     await SqlEventThemeStore(db).wipe();
     await SqlAnniversaryStore(db).wipe();
     // Bestätigte Erinnerungen gehören zu den Familiendaten (E-87); der Besitzer fällt zuletzt bzw. zugleich.
-    await kv.apply(deletes: <String>[ReminderCoordinator.acknowledgedKey, AppSettings.blockedUsersKey, calendarOwnerKey]);
+    await kv.apply(deletes: <String>[ReminderCoordinator.acknowledgedKey, AppSettings.blockedUsersKey, AppSettings.lastChatThreadKey, calendarOwnerKey]);
   }
 
   /// Beansprucht die lokalen Familiendaten für [owner]: Gehörten sie jemand anderem (Nutzer oder Familie), werden sie
@@ -371,7 +371,7 @@ class AppServices {
       await SqlTaskStore(db).wipe();
       await SqlEventThemeStore(db).wipe();
       await SqlAnniversaryStore(db).wipe();
-      await kv.apply(deletes: <String>[ReminderCoordinator.acknowledgedKey, AppSettings.blockedUsersKey]);
+      await kv.apply(deletes: <String>[ReminderCoordinator.acknowledgedKey, AppSettings.blockedUsersKey, AppSettings.lastChatThreadKey]);
       await onWiped?.call();
       wiped = true;
     }

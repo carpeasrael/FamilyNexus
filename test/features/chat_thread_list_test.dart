@@ -131,6 +131,20 @@ void main() {
     ChatView view(List<ChatThread> t, {String? open, String? waiting, bool active = true, bool synced = true}) =>
         resolveChatView(threads: t, open: open, waitingFor: waiting, active: active, initialSyncDone: synced);
 
+    test('restoreTarget (#516): nur nach dem ersten Abgleich, nie nach der ersten Aktivierung, nur Vorhandenes', () {
+      final cara = _thread('cara', 'Cara');
+      final both = <ChatThread>[family, ben];
+      expect(restoreTarget(null, both, true, false), isNull);
+      expect(restoreTarget('ben', both, true, false), 'ben');
+      expect(restoreTarget('ben', both, false, false), isNull, reason: 'Abgleich fehlt');
+      expect(restoreTarget('ben', both, true, true), isNull, reason: 'Chat war schon aktiv');
+      expect(restoreTarget('cara', both, true, false), isNull, reason: 'nicht geladen oder blockiert');
+      expect(restoreTarget('cara', <ChatThread>[family, ben, cara], true, false), 'cara');
+      expect(restoreTarget(ChatThread.familyId, both, true, false), ChatThread.familyId);
+      expect(restoreTarget(ChatThread.familyId, <ChatThread>[family], true, false), isNull, reason: 'bei einem Gespräch gilt Rang 3');
+      expect(restoreTarget(ChatThread.familyId, const <ChatThread>[], true, false), isNull);
+    });
+
     test('Rang 1: angefordertes Gespräch fehlt noch, auch ohne weitere Gespräche; Pfeil nur bei mehreren', () {
       final single = view(<ChatThread>[family], open: 'neu', waiting: 'neu');
       expect((single.kind, single.shownId, single.showHeader), (ChatViewKind.opening, null, false));
@@ -229,6 +243,56 @@ void main() {
       expect(rows[1].last!.id, 'b1');
     });
 
+    group('Ungelesene zuerst (#516, E-107)', () {
+      ChatThread th(String id, String title, {int unread = 0, bool family = false}) => ChatThread(
+            id: id,
+            kind: family ? ThreadKind.family : ThreadKind.direct,
+            title: title,
+            peerId: family ? null : '@$id:fake.test',
+            unread: unread,
+          );
+      List<String> order(List<ChatThread> threads, Map<String, List<ChatMessage>> by) =>
+          orderedThreadRows(threads, (id) => by[id] ?? const <ChatMessage>[], const <String>{}, null).map((r) => r.thread.id).toList();
+      ChatMessage at(String id, int minutes) => _msg(id, t0.add(Duration(minutes: minutes)));
+
+      test('Familie bleibt oben, auch gelesen neben Ungelesenem; Ungelesenes älter vor Gelesenem neuer', () {
+        final by = <String, List<ChatMessage>>{
+          'ben': <ChatMessage>[at('b', 1)],
+          'cara': <ChatMessage>[at('c', 9)],
+          ChatThread.familyId: <ChatMessage>[at('f', 0)],
+        };
+        final threads = <ChatThread>[
+          th('cara', 'Cara'),
+          th('ben', 'Ben', unread: 2),
+          th(ChatThread.familyId, 'Familie', family: true),
+        ];
+        expect(order(threads, by), <String>[ChatThread.familyId, 'ben', 'cara']);
+      });
+
+      test('Familie mit Ungelesenem bleibt oben, Einzelchat ohne Ungelesenes danach', () {
+        final by = <String, List<ChatMessage>>{'ben': <ChatMessage>[at('b', 9)]};
+        final threads = <ChatThread>[th('ben', 'Ben'), th(ChatThread.familyId, 'Familie', unread: 3, family: true)];
+        expect(order(threads, by), <String>[ChatThread.familyId, 'ben']);
+      });
+
+      test('zwei mit Ungelesenem: jüngste zuerst; ohne Vorschau zuletzt in der Gruppe; gleiche Zeit: Titel, dann ID', () {
+        final by = <String, List<ChatMessage>>{
+          'a': <ChatMessage>[at('a1', 1)],
+          'b': <ChatMessage>[at('b1', 5)],
+          'c': <ChatMessage>[at('c1', 5)],
+          'x': <ChatMessage>[at('x1', 8)],
+        };
+        final threads = <ChatThread>[
+          th('x', 'Xaver'),
+          th('a', 'Anna', unread: 1),
+          th('d', 'Dora', unread: 1),
+          th('c', 'Bea', unread: 1),
+          th('b', 'Bea', unread: 1),
+        ];
+        expect(order(threads, by), <String>['b', 'c', 'a', 'd', 'x']);
+      });
+    });
+
     test('Vorschautext: Text, Du:, Anhang, Termin, nicht lesbar, blockiert, Zeilenumbrüche (de)', () {
       final l = AppLocalizationsDe();
       String p(ChatMessage m, {bool mine = false}) => threadPreviewText(l, m, mine: mine);
@@ -284,7 +348,7 @@ void main() {
       expect(find.byType(TextField), findsNothing);
       final rows = tester.widgetList<InkWell>(find.byWidgetPredicate((w) => w is InkWell && w.key is ValueKey<String>)).map((w) => (w.key! as ValueKey<String>).value);
       expect(rows.first, 'thread-family', reason: 'Familienchat zuerst');
-      expect(rows.toList(), <String>['thread-family', 'thread-$dmCara', 'thread-$dm'], reason: 'Cara schrieb zuletzt');
+      expect(rows.toList(), <String>['thread-family', 'thread-$dm', 'thread-$dmCara'], reason: 'Ben hat Ungelesenes (#516), Cara schrieb zuletzt');
       expect(find.descendant(of: _row(dm), matching: find.text('Hast du Zeit?')), findsOneWidget);
       expect(find.descendant(of: _row(dm), matching: find.text('2')), findsOneWidget, reason: 'Zähler');
       expect(find.descendant(of: _row(dmCara), matching: find.text('Du: Ja, gleich')), findsOneWidget);

@@ -57,6 +57,26 @@ void main() {
     expect(services.settings.settings.reduceEffects, isTrue);
   });
 
+  testWidgets('„Letztes Gespräch wieder öffnen“ (#516): Standard aus, einschalten, ausschalten verwirft die Kennung', (tester) async {
+    tester.view.physicalSize = const Size(900, 3400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final (services, _) = await _services(lang: 'de');
+    expect(services.settings.settings.restoreLastChat, isFalse);
+    await tester.pumpWidget(FamilyNexusApp(services: services));
+    await tester.pumpAndSettle();
+    await openSettings(tester);
+    await tester.tap(find.text('Letztes Gespräch wieder öffnen'));
+    await tester.pumpAndSettle();
+    expect(services.settings.settings.restoreLastChat, isTrue);
+    await services.settings.update((c) => c.copyWith(lastChatThread: '!dm:fake.test'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Letztes Gespräch wieder öffnen'));
+    await tester.pumpAndSettle();
+    expect(services.settings.settings.restoreLastChat, isFalse);
+    expect(services.settings.settings.lastChatThread, isNull);
+  });
+
   testWidgets('Bildschirmschutz ist standardmäßig aktiv und schaltbar', (tester) async {
     final (services, protection) = await _services(lang: 'de');
     await tester.pumpWidget(FamilyNexusApp(services: services));
@@ -105,7 +125,7 @@ void main() {
   });
 
   testWidgets('Version mit Build-Nummer im Menü, unter „Über die App“ und im Datenbericht (#14)', (tester) async {
-    tester.view.physicalSize = const Size(900, 3300);
+    tester.view.physicalSize = const Size(900, 3400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final (services, _) = await _services(lang: 'de');
@@ -127,7 +147,7 @@ void main() {
   });
 
   testWidgets('Datenschutzerklärung ist erreichbar (de)', (tester) async {
-    tester.view.physicalSize = const Size(900, 3300);
+    tester.view.physicalSize = const Size(900, 3400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final app = await buildTestApp(lang: 'de');
@@ -142,7 +162,7 @@ void main() {
   });
 
   testWidgets('Alle lokalen Daten löschen: nur nach Bestätigung', (tester) async {
-    tester.view.physicalSize = const Size(900, 3300);
+    tester.view.physicalSize = const Size(900, 3400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final app = await buildTestApp(lang: 'de');
@@ -166,7 +186,7 @@ void main() {
   });
 
   testWidgets('#272 Alle lokalen Daten löschen zeigt keine Anmeldung und prüft keinen Anbieter', (tester) async {
-    tester.view.physicalSize = const Size(900, 3300);
+    tester.view.physicalSize = const Size(900, 3400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final app = await buildTestApp(lang: 'de', matrixOrgDefault: true);
@@ -215,7 +235,7 @@ void main() {
   });
 
   testWidgets('Akzentfarbe wählbar: Standard Türkis, Wechsel färbt die Oberfläche und bleibt gespeichert', (tester) async {
-    tester.view.physicalSize = const Size(900, 3300);
+    tester.view.physicalSize = const Size(900, 3400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final (services, _) = await _services(lang: 'de');

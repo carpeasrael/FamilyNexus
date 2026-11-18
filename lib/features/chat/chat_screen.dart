@@ -62,6 +62,13 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   /// Nachladen, Lesen und Senden nutzen sie, nie [_open]; die Behandler lesen sie **vor jedem `await`**.
   String? _shown;
 
+  /// Gemerktes Gespräch, das beim ersten Aufbau des Tabs wiederhergestellt werden soll (#516, E-107); `null` =
+  /// nichts (mehr) zu tun. Gilt nur, bis der Chat-Tab zum ersten Mal aktiv wird oder der Nutzer handelt.
+  String? _restoreId;
+
+  /// Der Chat-Tab war schon einmal aktiv: danach wird nicht mehr wiederhergestellt.
+  bool _everActive = false;
+
   /// Eigener Controller der Liste; [_scroll] gehört nur dem Verlauf.
   final ScrollController _listScroll = ScrollController();
   late final AppServices _services;
@@ -107,6 +114,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     _foreground = _isForeground(WidgetsBinding.instance.lifecycleState);
     // Die Anforderung kann gestellt worden sein, bevor dieser Bildschirm entstand.
     final pending = _services.chatRequest.value;
+    final saved = _services.settings.settings;
+    if (pending == null && saved.restoreLastChat) _restoreId = saved.lastChatThread;
     if (pending != null) {
       _services.chatRequest.value = null;
       _select(pending);
@@ -124,6 +133,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   void _openRequested() {
     final id = _services.chatRequest.value;
     if (id == null) return;
+    _restoreId = null;
     _services.chatRequest.value = null;
     // Immer öffnen, auch bei schon gewähltem Gespräch oder offener Liste (#423).
     if (mounted) setState(() => _select(id));
@@ -150,7 +160,19 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     }
   }
 
+  /// Merkt [id] als zuletzt offenes Gespräch (`null` = Liste), nur bei eingeschaltetem Schalter. Nie synchron:
+  /// `SettingsController.update` benachrichtigt sofort, das darf nicht mitten im Aufbau geschehen (z. B. aus `initState`).
+  void _persistLast(String? id) {
+    if (!_services.settings.settings.restoreLastChat) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _services.settings.update((c) => c.restoreLastChat ? c.copyWith(lastChatThread: id) : c).ignore();
+    });
+  }
+
   void _select(String id) {
+    _restoreId = null;
+    _persistLast(id);
     _open = id;
     _replyTo = null;
     _resetMarker();
@@ -164,6 +186,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         _waitingFor = null;
         _open = ChatThread.familyId;
       });
+      _persistLast(ChatThread.familyId);
       _toast(AppLocalizations.of(context).chatOpenFailed);
     });
   }
@@ -194,7 +217,9 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       scaffold.closeEndDrawer();
       return;
     }
+    _persistLast(null);
     setState(() {
+      _restoreId = null;
       _open = null;
       _replyTo = null;
       _waitTimer?.cancel();
@@ -349,6 +374,20 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     });
   }
 
+  /// Stellt das gemerkte Gespräch her (#516, E-107): wie das Pinnen im Aufbau, ohne `setState`, ohne Speichern, ohne
+  /// Warten und Meldung. Spätestens mit dem ersten Aufbau des aktiven Tabs verfällt der Wunsch.
+  void _applyRestore(AppServices services, List<ChatThread> threads, bool initialSyncDone) {
+    if (_restoreId == null) return;
+    if (!services.settings.settings.restoreLastChat) {
+      _restoreId = null;
+      return;
+    }
+    final target = restoreTarget(_restoreId, threads, initialSyncDone, _everActive);
+    if (target != null) _open = target;
+    if (widget.active) _everActive = true;
+    if (target != null || _everActive) _restoreId = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final services = AppScope.of(context);
@@ -357,6 +396,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       listenable: Listenable.merge(<Listenable>[g, services.settings, services.lock]),
       builder: (context, _) {
         final threads = visibleThreads(g.threads, services.settings.settings.blockedUsers);
+        _applyRestore(services, threads, g.initialSyncDone);
         final view = resolveChatView(
           threads: threads,
           open: _open,

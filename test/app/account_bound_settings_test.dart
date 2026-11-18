@@ -32,6 +32,19 @@ void main() {
       expect(s.settings.settings.serverUrl, 'https://hs.example');
     });
 
+    test('wipeAccountData (#516): gemerktes Gespräch weg, Schalter bleibt', () async {
+      final app = await buildTestApp();
+      final s = app.services;
+      await s.settings.update((c) => c.copyWith(restoreLastChat: true, lastChatThread: '!dm:fake.test'));
+      expect(app.store.data, contains(AppSettings.lastChatThreadKey));
+      s.debugWipeAccountData = () async {};
+      await s.wipeAccountData();
+      expect(s.settings.settings.lastChatThread, isNull);
+      expect(app.store.data, isNot(contains(AppSettings.lastChatThreadKey)));
+      expect(s.settings.settings.restoreLastChat, isTrue);
+      expect(app.store.data['restoreLastChat'], 'true');
+    });
+
     test('wiederholter Aufruf ohne Blockierliste benachrichtigt niemanden (keine Schleife über AppRoot)', () async {
       final app = await buildTestApp();
       final s = app.services;
@@ -91,6 +104,18 @@ void main() {
       expect(s.settings.settings.pendingInvite, isNull);
       expect(s.pendingInvite.value, isNull);
       expect(s.settings.settings.blockedUsers, isEmpty);
+    });
+
+    testWidgets('Ende der Sitzung (#516): gemerktes Gespräch weg, Schalter bleibt', (tester) async {
+      final app = await buildTestApp();
+      final s = app.services;
+      await s.settings.update((c) => c.copyWith(restoreLastChat: true, lastChatThread: '!dm:fake.test'));
+      await pump(tester, app);
+      await app.gateway.logout();
+      await tester.pumpAndSettle();
+      expect(s.settings.settings.lastChatThread, isNull);
+      expect(app.store.data, isNot(contains(AppSettings.lastChatThreadKey)));
+      expect(s.settings.settings.restoreLastChat, isTrue);
     });
 
     testWidgets('Einrichtung vor der Anmeldung (E-56): der vorgemerkte Link bleibt trotz Aufbau ohne Sitzung', (tester) async {

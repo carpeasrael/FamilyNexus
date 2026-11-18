@@ -181,6 +181,19 @@ void main() {
       expect(await blocked(), isTrue);
     });
 
+    Future<void> lastChat() => db.insert('settings', <String, Object?>{'key': AppSettings.lastChatThreadKey, 'value': '!dm:example.org'}, conflictAlgorithm: ConflictAlgorithm.replace);
+
+    Future<bool> hasLastChat() async => (await db.query('settings', where: 'key = ?', whereArgs: <Object>[AppSettings.lastChatThreadKey])).isNotEmpty;
+
+    test('#516 anderer Besitzer: gemerktes Gespräch weg; gleicher Besitzer: bleibt', () async {
+      await own(annaA);
+      await lastChat();
+      expect(await AppServices.claimFamilyData(db, annaA), isFalse);
+      expect(await hasLastChat(), isTrue);
+      expect(await AppServices.claimFamilyData(db, annaB), isTrue);
+      expect(await hasLastChat(), isFalse);
+    });
+
     test('Wiederholung nach einem Fehler in onWiped löscht erneut, auch die Blockierliste', () async {
       await own(annaA);
       await block();

@@ -73,6 +73,16 @@ void main() {
     expect(settings['languageCode'], 'de');
   });
 
+  test('#516 entfernt das gemerkte Gespräch, der Schalter bleibt', () async {
+    await fill();
+    await db.insert('settings', <String, Object?>{'key': AppSettings.lastChatThreadKey, 'value': '!dm:example.org'});
+    await db.insert('settings', <String, Object?>{'key': 'restoreLastChat', 'value': 'true'});
+    await AppServices.wipeAccountDataIn(db);
+    final settings = {for (final r in await db.query('settings')) r['key']: r['value']};
+    expect(settings, isNot(contains(AppSettings.lastChatThreadKey)));
+    expect(settings['restoreLastChat'], 'true');
+  });
+
   test('#450 ohne Besitzer bleibt auch die Blockierliste unangetastet', () async {
     await fill();
     await db.delete('settings', where: 'key = ?', whereArgs: <Object>[AppServices.calendarOwnerKey]);
