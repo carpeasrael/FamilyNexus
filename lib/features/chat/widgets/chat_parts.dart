@@ -157,7 +157,7 @@ class _ReplyPreview extends StatelessWidget {
 
 /// Eingabeleiste: Anhängen, Textfeld, Senden.
 class _Composer extends StatelessWidget {
-  const _Composer({required this.controller, required this.sending, required this.onAttach, required this.onSend});
+  const _Composer({super.key, required this.controller, required this.sending, required this.onAttach, required this.onSend});
   final TextEditingController controller;
   final bool sending;
   final VoidCallback onAttach;

@@ -454,27 +454,35 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     _trackVisibility(services, g, threadId, g.unreadIn(threadId));
     final entries = chatEntries(msgs, unreadFromId: _unreadFrom, allIds: <String>[for (final m in all) m.id]);
     _scrollToMarkerOnce(entries);
-    return Column(children: <Widget>[
-      if (view.showHeader) _ThreadHeader(thread: view.current, onBack: _backToList),
-      _EncryptionNote(current: view.current),
-      Expanded(
-        child: msgs.isEmpty
-            ? Center(child: Text(l.emptyChat))
-            : _MessageList(
-                entries: entries,
-                byId: <String, ChatMessage>{for (final m in msgs) m.id: m},
-                scroll: _scroll,
-                markerKey: _markerKey,
-                collapseQuotes: _collapseQuotes,
-                gateway: g,
-                services: services,
-                threadId: threadId,
-                onLongPress: (m) => _actions(g, m),
-              ),
-      ),
-      if (_replyTo != null) _ReplyPreview(message: _replyTo!, onCancel: () => setState(() => _replyTo = null)),
-      _Composer(controller: _ctrl, sending: _sending, onAttach: () => _attach(services), onSend: () => _send(g)),
-    ]);
+    // Querformat mit Tastatur (#548): Bei knapper Höhe entfallen Kopfzeile und Hinweis (sie kommen zurück, sobald die
+    // Tastatur weg ist), unter 150 dp auch die Antwortvorschau (die Antwort bleibt gesetzt); die Eingabeleiste bleibt immer sichtbar. Die Schlüssel
+    // halten das Eingabefeld beim Ein- und Ausblenden im Baum (Fokus bleibt).
+    return LayoutBuilder(builder: (context, box) {
+      final tight = box.maxHeight < 200;
+      final veryTight = box.maxHeight < 150;
+      return Column(children: <Widget>[
+        if (view.showHeader && !tight) _ThreadHeader(thread: view.current, onBack: _backToList),
+        if (!tight) _EncryptionNote(current: view.current),
+        Expanded(
+          key: const ValueKey<String>('chat-list'),
+          child: msgs.isEmpty
+              ? Center(child: Text(l.emptyChat))
+              : _MessageList(
+                  entries: entries,
+                  byId: <String, ChatMessage>{for (final m in msgs) m.id: m},
+                  scroll: _scroll,
+                  markerKey: _markerKey,
+                  collapseQuotes: _collapseQuotes,
+                  gateway: g,
+                  services: services,
+                  threadId: threadId,
+                  onLongPress: (m) => _actions(g, m),
+                ),
+        ),
+        if (_replyTo != null && !veryTight) _ReplyPreview(message: _replyTo!, onCancel: () => setState(() => _replyTo = null)),
+        _Composer(key: const ValueKey<String>('chat-composer'), controller: _ctrl, sending: _sending, onAttach: () => _attach(services), onSend: () => _send(g)),
+      ]);
+    });
   }
 }
 
