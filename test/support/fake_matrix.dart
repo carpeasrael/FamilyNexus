@@ -1065,9 +1065,13 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Anzahl der Anbieterprüfungen (#272: nach „Alle lokalen Daten löschen“ keine).
   int probeCalls = 0;
 
+  /// Hosts der Anbieterprüfungen in der Reihenfolge (#545: nach einer verworfenen Einladung kein Abruf des alten Servers).
+  final List<String> probedHosts = <String>[];
+
   @override
   Future<ServerInfo> probeServer(ServerUrl url) async {
     probeCalls++;
+    probedHosts.add(url.host);
     _require();
     if (url.host != fake.host) throw const GatewayException(GatewayError.serverUnreachable);
     return ServerInfo(

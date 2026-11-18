@@ -1,14 +1,14 @@
 [English]
-FamilyNexus connects to a Matrix server (default: matrix.org, checked automatically; other servers under "Advanced"). Accounts can be created in the app. At matrix.org, sign-in and account creation take place on the provider's page (account.matrix.org) shown in an embedded view within the app; the app then continues automatically.
+FamilyNexus connects to a Matrix server (chosen in the step "Choose a provider", default matrix.org). Accounts can be created in the app. At matrix.org, sign-in and account creation take place on the provider's page (account.matrix.org) shown in an embedded view within the app; the app then continues automatically.
 
 Review account (username and password: see "Sign-in information"):
-1. Welcome screen → "I already have an account".
+1. Welcome screen → "I already have an account" → "Choose a provider" → "Next".
 2. "Sign in at matrix.org" → the provider's sign-in page opens in an embedded view within the app → enter username and password → "Continue". On a load error a notice offers the system sheet.
 3. Back in the app: "Unlock this device" → enter the emergency key below → "Unlock".
 4. Main view with the tabs Today, Calendar, Chat, Shopping, Family. The review account is moderator of a sample family with a second member and sample data.
 Emergency key of the review account: <EMERGENCY KEY OF THE REVIEW ACCOUNT>
 
-Account creation: Welcome screen → "Start a new family" → "What is your name?" → "Create account at matrix.org" → embedded view within the app → back in the app "Create emergency key" → "I have stored the emergency key safely." → "Next" → family name → "Create family".
+Account creation: Welcome screen → "Start a new family" → "Next" → "What is your name?" → "Create account at matrix.org" → embedded view within the app → back in the app "Create emergency key" → "I have stored the emergency key safely." → "Next" → family name → "Create family".
 Account deletion: menu (top right, "Open menu") → Settings → Account → "Delete account". At matrix.org the deletion is confirmed on the provider's page within the app; close it with "Done"; afterwards all data on the device is deleted.
 Notifications: if "Today" shows "Notifications are blocked", tap "Allow".
 
@@ -17,14 +17,14 @@ No advertising, no analytics, no tracking. Source code: AGPL-3.0.
 User-generated content: messages only go to invited family members. Report: long-press a message → "Report message" (choose a reason; the report goes to the operator of the Matrix server). Block: long-press a message → "Block <name>" or Family → member menu; undo under Settings → Blocked members. Moderators can remove members from the family.
 
 [Deutsch]
-FamilyNexus verbindet sich mit einem Matrix-Server (Standard: matrix.org, wird automatisch geprüft; andere unter „Erweitert“). Konten können in der App angelegt werden. Bei matrix.org laufen Anmeldung und Kontoanlage auf der Seite des Anbieters (account.matrix.org) in einer eingebetteten Ansicht in der App; danach geht es in der App automatisch weiter.
+FamilyNexus verbindet sich mit einem Matrix-Server (Wahl im Schritt „Anbieter wählen“, Standard matrix.org). Konten können in der App angelegt werden. Bei matrix.org laufen Anmeldung und Kontoanlage auf der Seite des Anbieters (account.matrix.org) in einer eingebetteten Ansicht in der App; danach geht es in der App automatisch weiter.
 
 Prüfkonto (Benutzername und Passwort: siehe „Anmeldeinformationen“):
-1. Willkommen → „Ich habe schon ein Konto“.
+1. Willkommen → „Ich habe schon ein Konto“ → „Anbieter wählen“ → „Weiter“.
 2. „Bei matrix.org anmelden“ → die Anmeldeseite des Anbieters öffnet sich eingebettet in der App → Benutzername und Passwort eingeben → „Weiter“. Bei Ladefehler bietet ein Hinweis das Systemfenster an.
 3. Zurück in der App: „Dieses Gerät freischalten“ → Notfall-Schlüssel (oben) eingeben → „Freischalten“.
 4. Hauptansicht mit Heute, Kalender, Chat, Einkauf, Familie. Das Prüfkonto ist Moderator einer Beispielfamilie mit zweitem Mitglied und Beispieldaten.
 
-Kontoanlage: Willkommen → „Neue Familie gründen“ → „Wie heißt du?“ → „Konto bei matrix.org erstellen“ → eingebettete Ansicht in der App → zurück in der App „Notfall-Schlüssel erstellen“ → „Ich habe den Notfall-Schlüssel sicher aufbewahrt.“ → „Weiter“ → Name der Familie → „Familie gründen“.
+Kontoanlage: Willkommen → „Neue Familie gründen“ → „Weiter“ → „Wie heißt du?“ → „Konto bei matrix.org erstellen“ → eingebettete Ansicht in der App → zurück in der App „Notfall-Schlüssel erstellen“ → „Ich habe den Notfall-Schlüssel sicher aufbewahrt.“ → „Weiter“ → Name der Familie → „Familie gründen“.
 Kontolöschung: Menü (oben rechts, „Menü öffnen“) → Einstellungen → Konto → „Konto löschen“. Bei matrix.org wird die Löschung auf der Seite des Anbieters in der App bestätigt; diese mit „Fertig“ schließen; danach werden alle Daten auf dem Gerät gelöscht.
 Benachrichtigungen: Zeigt „Heute“ „Benachrichtigungen sind blockiert“, „Erlauben“ tippen.

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/shell_finders.dart';
+import '../support/nav.dart';
 import '../support/test_app.dart';
 
 Future<void> _pump(WidgetTester tester, TestApp app) async {
@@ -23,6 +24,7 @@ void main() {
     await _pump(tester, app);
     await tester.tap(find.text('Neue Familie gründen'));
     await tester.pumpAndSettle();
+    await continueFromServerStep(tester);
     await tester.tap(find.widgetWithText(TextField, 'Wie heißt du?'));
     await tester.pump();
     expect(_keyboardOpen(tester), isTrue);

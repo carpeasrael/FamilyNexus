@@ -9,6 +9,7 @@ Neu in 1.2.3:
 • Zwölf eingebaute Avatare; in bestehenden Familien lassen sie sich wählen, sobald ein Moderator die App geöffnet hat.
 • Bitte alle Geräte der Familie aktualisieren: Wer einen Termin mit einer älteren App-Version bearbeitet, verliert dessen Thema.
 
+• Einrichtung: Anbieter wählen als eigener Schritt.
 Neu in 1.2.2:
 • Bitte alle Geräte der Familie aktualisieren. Ältere App-Versionen zeigen Gruppen, Einträge mit zusammengesetzten Emojis und neue Reaktionen nicht; ändert oder hakt jemand dort einen Eintrag ab, geht dessen Gruppe für alle verloren.
 • Einkauf: Einträge lassen sich einer Gruppe zuordnen, zum Beispiel einem Geschäft. Die Liste zeigt die offenen Einträge nach Gruppen, „Ohne Gruppe“ am Ende.

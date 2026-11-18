@@ -4,6 +4,7 @@ New in 1.2.3:
 • Identity records also kept on the device; loading screen follows the appearance.
 • Calendar: year progress, sync every 15 min.
 • Introduction; share and rate the app.
+• Setup: choosing a provider is its own step.
 New in 1.2.2:
 • A moderator confirms every join; invitation links no longer show names.
 • Shopping: group items, e.g. by shop.

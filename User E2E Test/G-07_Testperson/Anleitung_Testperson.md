@@ -22,7 +22,7 @@ Die App ist bereits installiert. Öffnen Sie sie.
 1. **Ansehen:** Lesen Sie die Startseite. Was kann man hier tun? (Sagen Sie es laut.)
 2. **Sprache:** Stellen Sie die Sprache auf **English** und dann wieder auf **Deutsch**.
 3. **Neue Familie gründen:** Wählen Sie „Neue Familie gründen“.
-4. **Anbieter einstellen:** Die App schlägt einen Anbieter vor. Verwenden Sie stattdessen **den Anbieter aus der Tabelle oben**. (Tipp: Es gibt einen Bereich „Erweitert“.) Weiter, wenn die App bestätigt, dass Ihr Konto dort liegt.
+4. **Anbieter einstellen:** Die App zeigt den Schritt „Anbieter wählen“ und schlägt einen Anbieter vor. Wählen Sie stattdessen „Anderer Anbieter oder eigener Server“ und tragen Sie **den Anbieter aus der Tabelle oben** ein. (Tipp: Später gibt es auch einen Bereich „Erweitert“.) Tippen Sie auf „Weiter“, wenn die App bestätigt, dass Ihr Konto dort liegt.
 5. **Name und Benutzername:** Tragen Sie `Testperson` als Namen ein und den Benutzernamen aus der Tabelle.
 6. **Passwort:** Wählen Sie ein Passwort, geben Sie es ein zweites Mal ein und notieren Sie es auf dem Zettel.
 7. **Konto erstellen.**

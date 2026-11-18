@@ -23,7 +23,7 @@ For a complete regression run, record results in a copy of the [full test plan](
 | Sign-in method | Short username and password inside FamilyNexus |
 | Expected registration | Account creation inside the app, without browser sign-in or extra verification steps |
 
-The app initially suggests **matrix.org**. For this test, open **Advanced → Use another provider** and enter the provider address above. Wait until the app displays **Your account is hosted at matrix-synapse-3ues.srv1348446.hstgr.cloud.** Do this whenever a fresh registration or sign-in screen defaults to matrix.org.
+The app initially suggests **matrix.org**. For this test, in the step **Choose a provider** (after the path) choose **Another provider or your own server** and enter the provider address above (later also under **Advanced → Use another provider**). Wait until the app displays **Your account is hosted at matrix-synapse-3ues.srv1348446.hstgr.cloud.** Do this whenever a fresh registration or sign-in screen defaults to matrix.org.
 
 **Use the short username when signing in**, for example `fnt-1030-n1`. The full test plan identifies `matrix.chaostribunal.de` as unreachable as a connection address, even though it appears in account IDs. Use a full Matrix ID only in a control that explicitly asks for a user ID, such as **Invite by user ID**.
 
@@ -46,7 +46,7 @@ Deleted usernames remain taken on this server. If a name is unavailable, use a n
 ## Create the first test user and family
 
 1. On G1, choose **Start a new family**.
-2. Open **Advanced → Use another provider** and set the test provider address. Wait for the provider confirmation.
+2. In the step **Choose a provider** pick **Another provider or your own server** and set the test provider address (or later under **Advanced → Use another provider**). Wait for the provider confirmation, then tap **Next**.
 3. Enter `Test N1` under **What is your name?** and your chosen `fnt-MMDD-n1` under **Your username**. Wait for **This username is available.**
 4. Enter your test password, enter it again under **Repeat password** and select **Create account**. The expected next screen is **Your emergency key**.
 5. Select **Create emergency key**. Save the key together with N1's username and provider in your password manager, or use **Save as file** and keep the file securely. A saved key file is unencrypted; copying a key makes the app try to clear the clipboard after one minute (if you leave the app, clear it yourself).

@@ -56,39 +56,8 @@ class _ProviderSectionState extends State<ProviderSection> {
     return ListenableBuilder(
       listenable: c,
       builder: (context, _) {
-        final host = c.server?.host ?? '';
-        final Widget status = switch (c.status) {
-          ProviderStatus.empty => Text(l.advEnterProvider),
-          ProviderStatus.needsConsent => Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-              Text(l.advLocalConsent(host), style: TextStyle(color: theme.colorScheme.error)),
-              const SizedBox(height: 8),
-              FilledButton.tonal(onPressed: c.connect, child: Text(l.advLocalConnect(host))),
-            ]),
-          ProviderStatus.checking => Row(children: <Widget>[
-              const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
-              const SizedBox(width: 8),
-              Expanded(child: Text(l.advChecking(host))),
-            ]),
-          ProviderStatus.ready => Row(children: <Widget>[
-              Icon(Icons.check_circle_outline, size: 18, color: theme.colorScheme.primary),
-              const SizedBox(width: 8),
-              Expanded(child: Text(l.advServerInfo(host))),
-            ]),
-          ProviderStatus.invalid => Text(l.serverUrlInvalid, style: TextStyle(color: theme.colorScheme.error)),
-          ProviderStatus.failed => Row(children: <Widget>[
-              Expanded(
-                child: Text(
-                  c.error == GatewayError.serverUnreachable
-                      ? l.advUnreachable(host)
-                      : errorText(l, GatewayException(c.error ?? GatewayError.unknown)),
-                  style: TextStyle(color: theme.colorScheme.error),
-                ),
-              ),
-              TextButton(onPressed: c.retry, child: Text(l.retry)),
-            ]),
-        };
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-          Semantics(liveRegion: true, child: status),
+          ProviderStatusLine(controller: c),
           ExpansionTile(
             controller: _tile,
             tilePadding: EdgeInsets.zero,
@@ -127,5 +96,55 @@ class _ProviderSectionState extends State<ProviderSection> {
         ]);
       },
     );
+  }
+}
+
+/// Statuszeile der Anbieter-Prüfung (E-55), in „Erweitert“ ([ProviderSection]) und im Schritt „Anbieter wählen“
+/// (E-108, [inStep]). Im Schritt verweist der Hinweis zu einem nicht unterstützten Anbieter nicht auf „Erweitert“.
+class ProviderStatusLine extends StatelessWidget {
+  const ProviderStatusLine({super.key, required this.controller, this.inStep = false});
+
+  final ProviderController controller;
+  final bool inStep;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final c = controller;
+    final theme = Theme.of(context);
+    final host = c.server?.host ?? '';
+    final Widget status = switch (c.status) {
+      ProviderStatus.empty => Text(l.advEnterProvider),
+      ProviderStatus.needsConsent => Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+          Text(l.advLocalConsent(host), style: TextStyle(color: theme.colorScheme.error)),
+          const SizedBox(height: 8),
+          FilledButton.tonal(onPressed: c.connect, child: Text(l.advLocalConnect(host))),
+        ]),
+      ProviderStatus.checking => Row(children: <Widget>[
+          const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+          const SizedBox(width: 8),
+          Expanded(child: Text(l.advChecking(host))),
+        ]),
+      ProviderStatus.ready => Row(children: <Widget>[
+          Icon(Icons.check_circle_outline, size: 18, color: theme.colorScheme.primary),
+          const SizedBox(width: 8),
+          Expanded(child: Text(l.advServerInfo(host))),
+        ]),
+      ProviderStatus.invalid => Text(l.serverUrlInvalid, style: TextStyle(color: theme.colorScheme.error)),
+      ProviderStatus.failed => Row(children: <Widget>[
+          Expanded(
+            child: Text(
+              c.error == GatewayError.serverUnreachable
+                  ? l.advUnreachable(host)
+                  : inStep && c.error == GatewayError.serverUnsupported
+                      ? l.errServerUnsupportedStep
+                      : errorText(l, GatewayException(c.error ?? GatewayError.unknown)),
+              style: TextStyle(color: theme.colorScheme.error),
+            ),
+          ),
+          TextButton(onPressed: c.retry, child: Text(l.retry)),
+        ]),
+    };
+    return Semantics(liveRegion: true, child: status);
   }
 }

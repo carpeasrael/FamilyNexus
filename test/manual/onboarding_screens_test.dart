@@ -105,6 +105,8 @@ void main() {
       await _start(tester, app);
       await _snap(tester, 'start');
       await _tap(tester, 'Neue Familie gründen');
+      await _snap(tester, 'anbieter-waehlen');
+      await _tap(tester, 'Weiter');
       await _snap(tester, 'konto-erstellen-leer');
       await _type(tester, 'Wie heißt du?', 'Anna');
       await _type(tester, 'Passwort', 'sicher-genug');
@@ -180,6 +182,7 @@ void main() {
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
       await _tap(tester, 'Ich habe schon ein Konto');
+      await _tap(tester, 'Weiter');
       await _snap(tester, 'anmelden');
       await _type(tester, 'Benutzername', 'anna');
       await _type(tester, 'Passwort', 'geheim123');
@@ -192,13 +195,16 @@ void main() {
       final app = await buildTestApp(loggedIn: false, server: server);
       await _start(tester, app);
       await _tap(tester, 'Neue Familie gründen');
+      await _tap(tester, 'Weiter');
       await _type(tester, 'Wie heißt du?', 'Greta');
       await _snap(tester, 'oauth-konto-erstellen');
       await _tap(tester, 'Konto bei fake.test erstellen', settle: false);
       await _snap(tester, 'oauth-wartet-auf-browser', settle: false);
       app.oauth.cancel();
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(BackButton));
+      await tester.tap(find.byType(BackButton)); // Konto → Anbieter (E-108)
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(BackButton)); // Anbieter → Startseite
       await tester.pumpAndSettle();
       await tester.tap(find.text('English'));
       await _snap(tester, 'start-englisch');

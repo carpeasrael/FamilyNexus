@@ -2279,7 +2279,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy1Body.
   ///
   /// In de, this message translates to:
-  /// **'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein. Die App zeigt diese Seite in einer eingebetteten Ansicht (iOS, macOS, Android) oder im Browser (Linux, Windows); die Seite läuft dann im Prozess der App.'**
+  /// **'FamilyNexus ist freie Software (AGPL-3.0). Die App sendet keine Daten an die Entwickler und enthält keine Telemetrie, Werbung oder Analyse. Für die Verarbeitung auf dem Server ist der Betreiber des von dir gewählten Anbieters (Matrix-Server) verantwortlich; du siehst ihn bei der Einrichtung im Schritt „Anbieter wählen“ und unter „Erweitert“. Legst du in der App ein Konto an, gehen Name, Benutzername, Passwort und – falls der Anbieter sie verlangt – deine E-Mail-Adresse nur an diesen Anbieter. Bei Anbietern mit eigener Anmeldeseite (z. B. matrix.org) gibst du diese Angaben direkt auf dessen Seite ein. Die App zeigt diese Seite in einer eingebetteten Ansicht (iOS, macOS, Android) oder im Browser (Linux, Windows); die Seite läuft dann im Prozess der App.'**
   String get privacy1Body;
 
   /// No description provided for @privacy2Title.
@@ -5959,6 +5959,42 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Geburts- und Gedenktage'**
   String get eventTypeAnniversary;
+
+  /// No description provided for @serverStepTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Anbieter wählen'**
+  String get serverStepTitle;
+
+  /// No description provided for @serverStepIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Konto liegt bei einem Anbieter. Wähle den empfohlenen oder trage die Adresse eines anderen ein, zum Beispiel die eines eigenen Servers.'**
+  String get serverStepIntro;
+
+  /// No description provided for @serverStandardBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Öffentlicher Dienst, in wenigen Minuten eingerichtet.'**
+  String get serverStandardBody;
+
+  /// No description provided for @serverOtherTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Anderer Anbieter oder eigener Server'**
+  String get serverOtherTitle;
+
+  /// No description provided for @serverOtherBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Du hast ein Konto bei einem anderen Anbieter oder betreibst einen eigenen Server.'**
+  String get serverOtherBody;
+
+  /// No description provided for @errServerUnsupportedStep.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Anbieter wird von FamilyNexus nicht unterstützt. Bitte gib die Adresse eines anderen ein.'**
+  String get errServerUnsupportedStep;
 }
 
 class _AppLocalizationsDelegate

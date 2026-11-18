@@ -37,11 +37,11 @@ Ergebnisse: ✅ bestanden · ⚠️ mit Befund · ❌ fehlgeschlagen · ⏳ nich
 |---|---|---|---|
 | A-01 | Versionen, Signatur, Entitlements der Prüfkopie, Standardbrowser, laufende Browser vor dem Test erfassen | 1.2.3 (29); Kanal `de.inneso.familynexus/webauth` im Binary; `network.client` ohne `network.server`; Liste der Browser-Prozesse notiert; Knopf „Bei matrix.org anmelden“ ohne „extern öffnen“-Symbol (Anmelde-Symbol) | `logs/A-01.txt` |
 | A-02 | Prüfkopie starten, Willkommensseite ansehen | Willkommensseite mit „Neue Familie gründen“ und „Ich habe schon ein Konto“; keine Schlüsselbund-Abfrage | `screenshots/A-02.png` |
-| A-03 | „Ich habe schon ein Konto“ öffnen | Standardanbieter matrix.org vorbelegt und geprüft, Knopf „Bei matrix.org anmelden“ | `screenshots/A-03.png` |
+| A-03 | „Ich habe schon ein Konto“ öffnen, im Schritt „Anbieter wählen“ „Weiter“ (E-108) | Standardanbieter matrix.org vorbelegt und geprüft, Knopf „Bei matrix.org anmelden“ | `screenshots/A-03.png` |
 | A-04 | „Bei matrix.org anmelden“ klicken, 6 s warten | Anmeldefenster der System-Sitzung vor der App (Adresse account.matrix.org); Fenster toolbarlos mit „Privates Surfen“ (Safari darf Vordergrund sein); kein Tab in einem anderen Browser | `screenshots/A-04.png`, `logs/A-04.txt` |
 | A-05 | Sitzung mit „Abbrechen“ schließen | Zurück in der App, **Hinweis** statt rotem Fehler, Knopf wieder bedienbar | `screenshots/A-05.png` |
 | A-06 | A-04 und A-05 wiederholen | gleiches Ergebnis (kein hängender Zustand nach Abbruch) | `screenshots/A-06.png` |
-| A-07 | Zurück, „Neue Familie gründen“, Name eingeben, „Konto bei matrix.org anlegen“ klicken | Kontoanlage öffnet ebenfalls in der System-Sitzung vor der App, nicht im Browser; **nichts ausfüllen** | `screenshots/A-07.png`, `logs/A-07.txt` |
+| A-07 | Zurück (zweimal, bis zur Startseite), „Neue Familie gründen“, „Weiter“ im Schritt „Anbieter wählen“, Name eingeben, „Konto bei matrix.org anlegen“ klicken | Kontoanlage öffnet ebenfalls in der System-Sitzung vor der App, nicht im Browser; **nichts ausfüllen** | `screenshots/A-07.png`, `logs/A-07.txt` |
 | A-08 | Sitzung abbrechen, App beenden, Prüfkopie samt Container aufräumen | Rückkehr mit Hinweis, ohne Fehler; Container `de.inneso.familynexus.apple4` entfernt, Nutzerdaten unberührt | `logs/A-08.txt` |
 | A-09 | Grenzfall Standardbrowser: Ergebnis aus A-04 mit dem in A-01 erfassten Standardbrowser bewerten | Sitzung ist unabhängig vom Standardbrowser; ⏳ falls kein zweiter Browser umgestellt werden darf (Systemeinstellung des Nutzers wird nicht verändert) | Bewertung im Bericht |
 
@@ -59,10 +59,10 @@ Ergebnisse: ✅ bestanden · ⚠️ mit Befund · ❌ fehlgeschlagen · ⏳ nich
 |---|---|---|---|
 | B-01 | Ausgangslage erfassen: Standardbrowser, laufende Browser, Prüfkopie mit frischer Bundle-ID | Standardbrowser dokumentiert; kein Konto angemeldet | `logs/B-01.txt` |
 | B-02 | Standardbrowser auf Firefox (zweiter Lauf optional Chrome) umstellen, Wirkung per `LaunchServices` prüfen | Firefox ist Standard; Safari ist es nicht | `logs/B-02.txt` |
-| B-03 | Prüfkopie starten, „Neue Familie gründen“, Name eingeben, „Konto bei matrix.org erstellen“ | Sitzung öffnet **vor der App** als Safari-gehostetes Fenster (nicht in Firefox); Firefox öffnet kein neues Fenster und keinen Tab | `screenshots/B-03.png` (zugeschnitten), `logs/B-03.txt` (Fensterlisten) |
+| B-03 | Prüfkopie starten, „Neue Familie gründen“, „Weiter“ im Schritt „Anbieter wählen“, Name eingeben, „Konto bei matrix.org erstellen“ | Sitzung öffnet **vor der App** als Safari-gehostetes Fenster (nicht in Firefox); Firefox öffnet kein neues Fenster und keinen Tab | `screenshots/B-03.png` (zugeschnitten), `logs/B-03.txt` (Fensterlisten) |
 | B-04 | **Nutzer** registriert im Sitzungsfenster mit der Wegwerf-Adresse (Passwort, CAPTCHA, Mailbestätigung) | Rücksprung in die App ohne Fehler; Anmeldung abgeschlossen | `screenshots/B-04.png` ohne Zugangsdaten |
 | B-05 | In der App weiter: Notfall-Schlüssel erstellen (**nicht** aufnehmen, nicht speichern), Familie gründen | Hauptansicht erreichbar | `screenshots/B-05.png` |
-| B-06 | Abmelden und über „Ich habe schon ein Konto“ erneut **in derselben Sitzung** anmelden (Nutzer tippt) | Anmeldung gelingt, wieder Sitzungsfenster, kein Standardbrowser | `screenshots/B-06.png`, `logs/B-06.txt` |
+| B-06 | Abmelden und über „Ich habe schon ein Konto“ (mit „Weiter“ im Schritt „Anbieter wählen“) erneut **in derselben Sitzung** anmelden (Nutzer tippt) | Anmeldung gelingt, wieder Sitzungsfenster, kein Standardbrowser | `screenshots/B-06.png`, `logs/B-06.txt` |
 | B-07 | „Einstellungen > Konto > Konto löschen“, „Löschseite öffnen“ | Löschseite von account.matrix.org in der Sitzung (nicht in Firefox) | `screenshots/B-07.png` |
 | B-08 | **Nutzer** bestätigt die Löschung auf der Anbieterseite, schließt mit „Abbrechen“, in der App „Löschung prüfen“ | App erkennt die Löschung, räumt lokal auf, zurück zur Willkommensseite | `screenshots/B-08.png` |
 | B-09 | Standardbrowser auf den Ausgangswert zurückstellen, Prüfkopie samt Daten löschen | Standardbrowser wie in B-01; kein Rest im Scratchpad | `logs/B-09.txt` |

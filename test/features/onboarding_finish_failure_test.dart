@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/shell_finders.dart';
+import '../support/nav.dart';
 import '../support/registration_form.dart';
 import '../support/test_app.dart';
 
@@ -32,6 +33,7 @@ void main() {
     await tester.pumpWidget(FamilyNexusApp(services: second.services));
     await tester.pumpAndSettle();
     await _tapText(tester, 'Ich habe schon ein Konto');
+    await continueFromServerStep(tester);
     await tester.enterText(find.widgetWithText(TextField, 'Benutzername'), 'anna');
     await tester.enterText(find.widgetWithText(TextField, 'Passwort'), 'geheim123');
     await tester.pumpAndSettle();
@@ -69,6 +71,7 @@ void main() {
     await tester.pumpWidget(FamilyNexusApp(services: app.services));
     await tester.pumpAndSettle();
     await _tapText(tester, 'Neue Familie gründen');
+    await continueFromServerStep(tester);
     await tester.enterText(find.widgetWithText(TextField, 'Wie heißt du?'), 'Carla Groß');
     await tester.pump(const Duration(milliseconds: 700));
     await tester.pumpAndSettle();

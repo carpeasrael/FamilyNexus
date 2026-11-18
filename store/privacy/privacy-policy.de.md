@@ -28,8 +28,8 @@ Wenn du ihn selbst kontaktierst, verarbeitet er deine Kontaktdaten und die von d
 Für Kontoführung, Serverbetrieb und die dortige Verarbeitung ist der Betreiber des
 von dir gewählten **Matrix-Homeservers** verantwortlich. Standardmäßig ist
 `https://matrix.org` voreingestellt; du kannst einen anderen kompatiblen Anbieter
-oder einen eigenen Server verwenden. Der Anbieter ist bei der Einrichtung unter
-„Erweitert“ sichtbar. Ergänzend gelten seine Datenschutzhinweise, insbesondere zu
+oder einen eigenen Server verwenden. Der Anbieter ist bei der Einrichtung im Schritt
+„Anbieter wählen“ und unter „Erweitert“ sichtbar. Ergänzend gelten seine Datenschutzhinweise, insbesondere zu
 Betreiberdaten, Protokollierung, Hosting, Löschfristen und Dienstleistern. Betreibt
 der Herausgeber zugleich deinen Server, umfasst seine Verantwortung auch diesen
 Betrieb. Ein Familienmoderator ist nicht automatisch der Serverbetreiber.

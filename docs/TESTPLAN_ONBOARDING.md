@@ -1,6 +1,6 @@
 # Testplan: Registrierung, Familie einrichten, Einladen und Beitreten
 
-Stand: 2026-10-24 · Phase 8 · Entscheidungen E-55, E-56, E-57, SA-8
+Stand: 2026-10-24, Anbieter-Schritt 2026-11-18 (E-108, #545) · Phase 8 · Entscheidungen E-55, E-56, E-57, E-108, SA-8
 
 ## 1. Ziel
 
@@ -36,15 +36,15 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 |---|---|---|---|---|---|
 | TP-START-01 | frische Installation | App öffnen | „Willkommen“, drei große Wege („Neue Familie gründen“, „Ich wurde eingeladen“, „Ich habe schon ein Konto“), keine Schrittanzeige, keine Fachbegriffe | F `onboarding_test.dart`, B 01, A | ✅ |
 | TP-START-02 | Startseite | „English“ tippen | Texte sofort auf Englisch, Einstellung gespeichert | F, B 24 | ✅ |
-| TP-START-03 | angemeldet, abgesichert, ohne Familie | App öffnen | direkt „Schritt 3 von 3“ (Gründen/Beitreten) | F | ✅ |
-| TP-START-03b | Einrichtung abgeschlossen, dann abgemeldet | App öffnen | direkt „Anmelden“, nicht die Startseite | F, `settings_screen_test.dart` | ✅ |
-| TP-START-04 | „Konto erstellen“ | „Ich habe schon ein Konto“, dann „Noch kein Konto? Jetzt erstellen“, dann „Zurück“ | Benutzername wird mitgenommen; „Zurück“ führt zur Startseite | F | ✅ |
+| TP-START-03 | angemeldet, abgesichert, ohne Familie | App öffnen | direkt „Schritt 3 von 3“ (Gründen/Beitreten; ohne Anbieter-Schritt, E-108) | F | ✅ |
+| TP-START-03b | Einrichtung abgeschlossen, dann abgemeldet | App öffnen | direkt „Anmelden“, nicht die Startseite; „Schritt 1 von 3“ (ohne Anbieter-Schritt, E-108) | F, `settings_screen_test.dart` | ✅ |
+| TP-START-04 | „Konto erstellen“ | „Ich habe schon ein Konto“, dann „Noch kein Konto? Jetzt erstellen“, dann „Zurück“ | Benutzername wird mitgenommen; „Zurück“ führt zuerst zum Schritt „Anbieter wählen“ (E-108), ein weiteres „Zurück“ zur Startseite | F | ✅ |
 
 ### 3.2 Konto erstellen (klassischer Anbieter)
 
 | ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
 |---|---|---|---|---|---|
-| TP-REG-01 | Anbieter mit offener Registrierung | Name, Passwort, Wiederholung, „Konto erstellen“ → Notfall-Schlüssel → Familienname → „Jetzt einladen“ | Konto angelegt, „Schritt 1/2/3 von 3“, Erfolgsansicht, Einladungsdialog, danach Hauptansicht als Moderator | F, B 02–13 | ✅ |
+| TP-REG-01 | Anbieter mit offener Registrierung | Name, Passwort, Wiederholung, „Konto erstellen“ → Notfall-Schlüssel → Familienname → „Jetzt einladen“ | Konto angelegt, nach „Anbieter wählen“ (E-108) „Schritt 2/3/4 von 4“, Erfolgsansicht, Einladungsdialog, danach Hauptansicht als Moderator | F, B 02–13 | ✅ |
 | TP-REG-02 | – | „Carla Groß“ eingeben | Benutzername `carla.gross` vorgeschlagen, „Der Benutzername ist frei.“ | F, U `username_suggestion_test.dart`, B 04 | ✅ |
 | TP-REG-03 | `anna` vergeben | Name „Anna“ | „Schon vergeben – wie wäre es mit „anna2“?“, Knopf übernimmt den Vorschlag, „Konto erstellen“ bis dahin gesperrt | F, U, B 03 | ✅ |
 | TP-REG-03b | Name wird zwischen Prüfung und Absenden vergeben | absenden | „Dieser Benutzername ist schon vergeben.“, nicht angemeldet | F `registration_test.dart`, S TP-E2E-01 | ✅ |
@@ -68,14 +68,18 @@ Ergebnis: ✅ bestanden · ❌ fehlgeschlagen · ⏳ offen (manuell, noch nicht 
 | TP-REG-17…17f | Formular unvollständig | Enter: Anbieter nicht bereit, Name leer, Benutzername ungültig/vergeben, Passwort zu kurz, Wiederholung abweichend oder leer | Grund in Live-Zeile und am Feld (Semantik-`hint`), Fokus aufs Feld (Anbieter: keiner); verschwindet bei Eingabe, über den Vorschlag bzw. wenn der Anbieter bereit wird | F | ✅ |
 | TP-REG-17g | Serverfehler steht | Eingabe und Enter | Eingabegrund steht davor, Serverfehler bleibt bis zum nächsten Absenden | F | ✅ |
 
-### 3.3 Anbieter (Homeserver) – „Erweitert“
+### 3.3 Anbieter (Homeserver) – Schritt „Anbieter wählen“ und „Erweitert“
 
 | ID | Vorbedingung | Schritte | Erwartet | Automatisiert in | Ergebnis |
 |---|---|---|---|---|---|
-| TP-SRV-01 | – | „Neue Familie gründen“ | Anbieter automatisch geprüft („Dein Konto liegt bei …“), kein „Server prüfen“ | F, B 04 | ✅ |
-| TP-SRV-02 | – | „Erweitert“ → anderer Anbieter, Adresse tippen | Prüfung nach kurzer Pause, Betreiber und Kontakt nur hier | F, B 05 | ✅ |
+| TP-SRV-01 | – | „Neue Familie gründen“ oder „Ich habe schon ein Konto“ | Schritt „Anbieter wählen“ („Schritt 1 von 4“), „{Anbieter} (empfohlen)“ vorgewählt; „Weiter“ → Konto erstellen bzw. Anmelden mit automatisch geprüftem Anbieter („Dein Konto liegt bei …“), kein „Server prüfen“ | F `onboarding_server_step_test.dart`, B | ✅ |
+| TP-SRV-02 | – | im Schritt „Anbieter wählen“ „Anderer Anbieter oder eigener Server“, Adresse tippen; oder später unter „Erweitert“ | Prüfung nach kurzer Pause, Betreiber und Kontakt im Schritt und unter „Erweitert“ | F, B 05 | ✅ |
 | TP-SRV-03 | – | `http://…` eingeben | „Bitte eine gültige https-Adresse eingeben.“ | F | ✅ |
-| TP-SRV-04 | Anbieter offline | Seite öffnen, dann „Erneut versuchen“ | „… ist gerade nicht erreichbar. Prüfe deine Internetverbindung.“ ohne Rohtext; danach erreichbar | F | ✅ |
+| TP-SRV-04 | Anbieter offline | Seite öffnen, dann „Erneut versuchen“ | „… ist gerade nicht erreichbar. Prüfe deine Internetverbindung.“ ohne Rohtext; danach erreichbar; „Weiter“ bleibt möglich (E-55-Abkürzung) | F | ✅ |
+| TP-SRV-05 | Schritt „Anbieter wählen“, „Anderer Anbieter …“ | „Weiter“ bei leerer oder ungültiger Adresse; Enter im Feld | Grund am Feld (wird mit dem Feld vorgelesen) und in der Statuszeile, Fokus im Feld, kein Schrittwechsel; verschwindet bei Eingabe | F | ✅ |
+| TP-SRV-06 | Einladung vorgemerkt oder Neustart/Abmeldung | Einrichtung öffnen | kein Schritt „Anbieter wählen“, „Schritt 1 von 3“; „Zurück“ führt nie in den Schritt, wenn eine Einladung vorgemerkt ist | F | ✅ |
+| TP-SRV-07 | Einladung verworfen („Zurück“), auch mit Server im Heimnetz | neue Wegwahl | Standard vorgewählt, Feld leer, genau eine Prüfung (nur des Standards, nie des alten oder des Heimnetz-Servers) | F | ✅ |
+| TP-SRV-08 | große Schrift, VoiceOver/TalkBack | Schritt „Anbieter wählen“ | Karten und „Weiter“ erreichbar, Radiogruppe mit Zustand, Fehler am Feld | F (große Schrift, Semantik); Gerät: Plattform-Pflichtschritt | ✅ F · ⏳ Gerät |
 
 ### 3.4 Anmeldung und Kontoanlage auf der Anbieterseite in der App (OAuth, z. B. matrix.org; E-91)
 
@@ -207,7 +211,7 @@ Durchlauf am 2026-10-24 auf Branch `feature/onboarding-simple` (Manjaro Linux, F
 | Android (A) | Debug-APK auf Pixel 8 API 36 | ✅ Startseite, Einladungs-Deep-Link (Kaltstart) → „Create account … at matrix.org“ mit echter OAuth-Erkennung, OAuth-Rücksprung erreicht die App |
 | Manuell (M) | – | ⏳ TP-OAUTH-M1, TP-JOIN-M1, TP-REG-M1 |
 
-Bildschirmfotos (B), Zuordnung: 01 Start · 02–04 Konto erstellen (leer, vergeben, ausgefüllt) · 05 Erweitert ·
+Bildschirmfotos (B), Zuordnung: 01 Start · 02–04 Konto erstellen (leer, vergeben, ausgefüllt) · 05 Erweitert (der Schritt „Anbieter wählen“ ist seit E-108 ein eigenes Bild, siehe `test/manual/onboarding_screens_test.dart`) ·
 06 Bedingungen · 07 „kein Roboter“ · 08–09 Notfall-Schlüssel · 10–11 Familie benennen/fertig · 12 Einladungsdialog ·
 13 Familienansicht · 14–17 Eingeladen (Konto, Beitrittskarte, Details, wartet) · 18 Moderatorin sieht die Anfrage ·
 19 Link einfügen · 20 Anmelden · 21 Gerät freischalten · 22–23 OAuth · 24 Start auf Englisch.

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/nav.dart';
 import '../support/test_app.dart';
 
 /// AP-4b: Die Zerlegung von `AccountCreateStep.build` ändert nicht, was ein Screenreader liest und bedienen kann.
@@ -19,6 +20,7 @@ Future<void> _open(WidgetTester tester, TestApp app) async {
   await tester.pumpAndSettle();
   await tester.tap(find.text('Neue Familie gründen'));
   await tester.pumpAndSettle();
+  await continueFromServerStep(tester);
 }
 
 List<String> _semantics(WidgetTester tester) {
