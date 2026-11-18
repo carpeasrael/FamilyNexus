@@ -1,0 +1,3 @@
+#!/bin/sh
+# Quality-Gate: Trailer QG-Run / QG-Hash / QG-Tier ergänzen
+exec node "$(git rev-parse --show-toplevel)/.quality/bin/qg.mjs" hook commit-msg "$1"

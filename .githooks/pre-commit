@@ -1,0 +1,3 @@
+#!/bin/sh
+# Quality-Gate: Commit nur für den freigegebenen, gestagten Stand
+exec node "$(git rev-parse --show-toplevel)/.quality/bin/qg.mjs" hook git-pre-commit

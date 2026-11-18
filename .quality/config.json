@@ -1,0 +1,256 @@
+{
+  "version": "2.0.0",
+  "orchestrator": {
+    "model": "claude-opus-5-5",
+    "effort": "high"
+  },
+  "tierCheck": {
+    "model": "claude-opus-5-5",
+    "effort": "high"
+  },
+  "complexityTiers": [
+    "low",
+    "medium",
+    "high"
+  ],
+  "levels": [
+    {
+      "id": "low",
+      "model": "claude-sonnet-5-5",
+      "effort": "medium",
+      "label": "Sonnet 5.5 · medium"
+    },
+    {
+      "id": "medium",
+      "model": "claude-sonnet-5-5",
+      "effort": "xhigh",
+      "label": "Sonnet 5.5 · extra high"
+    },
+    {
+      "id": "high",
+      "model": "claude-opus-5-5",
+      "effort": "high",
+      "label": "Opus 5.5 · high"
+    },
+    {
+      "id": "highx",
+      "model": "claude-opus-5-5",
+      "effort": "xhigh",
+      "label": "Opus 5.5 · extra high (Eskalation)"
+    },
+    {
+      "id": "highmax",
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "label": "Opus 5.5 · max (Eskalation)"
+    }
+  ],
+  "arbiterMinLevel": "high",
+  "iterationPolicy": {
+    "optionalEscalationAfter": 5,
+    "mandatoryEscalationAfter": 8,
+    "stopAfter": 11
+  },
+  "phases": {
+    "req": {
+      "domains": [
+        "req"
+      ],
+      "slots": [
+        "a"
+      ]
+    },
+    "design": {
+      "domains": [
+        "standards",
+        "security",
+        "performance",
+        "docs"
+      ],
+      "slots": [
+        "a",
+        "b"
+      ]
+    },
+    "code": {
+      "domains": [
+        "standards",
+        "security",
+        "performance",
+        "docs",
+        "acceptance"
+      ],
+      "slots": [
+        "a",
+        "b"
+      ]
+    }
+  },
+  "requireModelEvidence": true,
+  "requireEffortMatch": false,
+  "testGlobs": [
+    "test/**",
+    "integration_test/**",
+    "test_driver/**",
+    "**/*_test.dart"
+  ],
+  "governanceGlobs": [
+    "pubspec.yaml",
+    "pubspec.lock",
+    "analysis_options.yaml",
+    "l10n.yaml",
+    ".github/workflows/**",
+    "tool/lib_size_exceptions.txt",
+    "tool/check_*.sh",
+    ".gitleaks.toml",
+    ".gitleaksignore",
+    ".semgrep*",
+    ".semgrepignore",
+    ".editorconfig"
+  ],
+  "protectedGlobs": [
+    ".quality/**",
+    ".claude/**",
+    ".githooks/**",
+    ".git/**",
+    ".idea/**",
+    ".vscode/**",
+    ".env",
+    ".env.*",
+    "**/.env",
+    "**/.env.*",
+    "**/*.pem",
+    "**/*.key",
+    "**/*.p12",
+    ".secure/**",
+    "secure/**",
+    "Apple-Feedback/**",
+    "docs/release-e2e/**"
+  ],
+  "walkIgnore": [
+    "node_modules",
+    ".git",
+    "dist",
+    "build",
+    "coverage",
+    ".quality",
+    ".next",
+    ".turbo",
+    ".idea",
+    ".dart_tool",
+    "secure",
+    "Apple-Feedback",
+    "Test-Apple",
+    "Test-Apple-Report",
+    "User E2E Test",
+    "User E2E Test Report",
+    "release",
+    "debug-info",
+    "ios/Pods",
+    "android/.gradle",
+    "pen-Test",
+    "*.png",
+    "*.mov"
+  ],
+  "floor": {
+    "highPaths": [
+      "lib/data/matrix/**",
+      "lib/data/db/**",
+      "**/*crypto*",
+      "**/*password*",
+      "**/*session*",
+      "**/*account_deletion*",
+      "tool/synapse/**",
+      ".github/workflows/**",
+      "android/**/build.gradle*",
+      "ios/Runner/*.entitlements"
+    ],
+    "mediumPaths": [
+      "lib/domain/**",
+      "lib/data/sync/**",
+      "lib/data/platform/**",
+      "lib/app/**",
+      "pubspec.yaml"
+    ],
+    "highIfFilesOver": 15,
+    "highIfLinesOver": 600,
+    "mediumIfFilesOver": 4,
+    "mediumIfLinesOver": 150
+  },
+  "designChecks": [
+    {
+      "id": "secrets",
+      "cmd": "gitleaks protect --staged --redact --no-banner",
+      "required": true
+    },
+    {
+      "id": "tests-red",
+      "cmd": "flutter test",
+      "expect": "fail",
+      "required": true
+    },
+    {
+      "id": "traceability",
+      "builtin": "traceability",
+      "required": true
+    }
+  ],
+  "checks": [
+    {
+      "id": "analyze",
+      "cmd": "flutter analyze",
+      "required": true
+    },
+    {
+      "id": "test",
+      "cmd": "flutter test",
+      "required": true
+    },
+    {
+      "id": "lib-size",
+      "cmd": "dart tool/check_lib_size.dart",
+      "required": true
+    },
+    {
+      "id": "secrets",
+      "cmd": "gitleaks protect --staged --redact --no-banner",
+      "required": true
+    },
+    {
+      "id": "sast",
+      "cmd": "semgrep scan --config p/owasp-top-ten --config p/secrets --error --metrics=off --quiet",
+      "required": false
+    },
+    {
+      "id": "traceability",
+      "builtin": "traceability",
+      "required": true
+    }
+  ],
+  "checkTimeoutSec": 1800,
+  "gitHook": {
+    "mode": "warn"
+  },
+  "reviewerBashAllow": [
+    "^git (diff|log|show|status|blame|ls-files|rev-parse|grep)\\b",
+    "^npm (test|run (lint|typecheck|test|test:[a-z0-9:-]+|bench|build))\\b",
+    "^npm audit\\b",
+    "^npx (eslint|tsc --noEmit|vitest run|jest|playwright test|prettier --check|knip|depcruise|madge)\\b",
+    "^semgrep (scan|--config)\\b",
+    "^gitleaks (protect|detect|git|dir)\\b",
+    "^osv-scanner\\b",
+    "^node \\.quality/bin/qg\\.mjs (status|metrics)\\b",
+    "^(ls|wc|pwd)\\b",
+    "^flutter (analyze|test)\\b",
+    "^dart (analyze|tool/check_lib_size\\.dart)\\b"
+  ],
+  "pipeFilters": [
+    "head",
+    "tail",
+    "grep",
+    "wc",
+    "sort",
+    "uniq",
+    "cut"
+  ]
+}

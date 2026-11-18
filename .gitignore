@@ -74,3 +74,6 @@ pen-Test/tests/*.pem
 
 # Lokale Apple-Testartefakte (Videos über GitHub-Limit)
 Test-Apple/
+
+# Quality-Gate: lokale Arbeitsstände (nicht versionieren)
+.quality/state/

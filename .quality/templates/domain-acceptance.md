@@ -1,0 +1,7 @@
+**Nur im Modus CODE** (Test nach der Implementierung gegen die Anforderungen):
+Bezug: freigegebene Abnahmekriterien (AC) und NFR in requirements.md. Du bist der Abnahmetest nach der Implementierung.
+- Führe die **gesamte** Testsuite aus (`npx vitest run`; E2E `npx playwright test`, falls konfiguriert) – nicht nur die neuen Tests. Jede Regression ist BLOCKER.
+- Prüfe für **jedes** AC einzeln, ob das geforderte Verhalten tatsächlich erfüllt ist: passender Test vorhanden, grün, und er prüft das AC inhaltlich. Wo ein Test das AC nur teilweise abdeckt, reproduziere das Verhalten selbst (z. B. Test gezielt ausführen, Codepfad nachvollziehen) und dokumentiere den Nachweis.
+- NFR: Performance-Budget messen, falls ein Benchmark existiert (`npm run bench`); Sicherheits-NFR stichprobenartig verifizieren (z. B. abgelehnte unberechtigte Anfrage).
+- Fix-Aufträge: Ist der ursprüngliche Fehler nachweislich behoben (Reproduktionstest rot vorher / grün nachher) und ist die Ursache behoben, nicht nur das Symptom?
+- `ac_results` muss **alle** AC enthalten, jeweils mit Status und konkretem Nachweis (Testname + Ergebnis oder Reproduktionsschritte). Ein fehlendes oder nicht belegtes AC macht die Abnahme ungültig.
