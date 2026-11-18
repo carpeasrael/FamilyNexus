@@ -155,6 +155,47 @@ void main() {
     });
   });
 
+  group('Ohne Gerätesperre (#549)', () {
+    test('Ausschalten ohne Abfrage, wenn sicher keine Gerätesperre eingerichtet ist', () async {
+      final (c, auth, settings, _) = await _make();
+      await c.unlock('x');
+      auth.reasons.clear();
+      auth.available = false;
+      auth.succeed = false;
+      expect(await c.setEnabled(false, 'x'), isTrue);
+      expect(settings.settings.lockEnabled, isFalse);
+      expect(auth.reasons, isEmpty, reason: 'keine Abfrage');
+    });
+
+    test('Entsperren ohne Abfrage: kein Aussperren nach Neustart', () async {
+      final (c, auth, _, _) = await _make();
+      auth.available = false;
+      auth.succeed = false;
+      expect(c.locked, isTrue);
+      expect(await c.unlock('x'), isTrue);
+      expect(c.locked, isFalse);
+      expect(auth.reasons, isEmpty);
+    });
+
+    test('Fehler der Geräteprüfung hebt die Sperre nicht auf', () async {
+      final (c, auth, settings, _) = await _make();
+      auth.available = false;
+      auth.checkFails = true;
+      auth.succeed = false;
+      expect(await c.unlock('x'), isFalse);
+      expect(c.locked, isTrue);
+      expect(await c.setEnabled(false, 'x'), isFalse);
+      expect(settings.settings.lockEnabled, isTrue);
+    });
+
+    test('Einschalten bleibt ohne Gerätesperre verweigert', () async {
+      final (c, auth, settings, _) = await _make(enabled: false);
+      auth.available = false;
+      expect(await c.setEnabled(true, 'x'), isFalse);
+      expect(settings.settings.lockEnabled, isFalse);
+    });
+  });
+
   group('Sperrbildschirm', () {
     testWidgets('verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei', (tester) async {
       final app = await buildTestApp(lockEnabled: true);
