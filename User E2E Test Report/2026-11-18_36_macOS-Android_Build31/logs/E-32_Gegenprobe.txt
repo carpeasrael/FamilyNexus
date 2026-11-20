@@ -1,0 +1,1 @@
+{"errcode":"M_USER_IN_USE","error":"User ID already taken."}

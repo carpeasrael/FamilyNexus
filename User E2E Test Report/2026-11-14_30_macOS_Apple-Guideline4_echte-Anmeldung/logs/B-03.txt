@@ -1,0 +1,9 @@
+== B-03: nach Klick auf 'Konto bei matrix.org erstellen' ==
+2026-11-14T08:20:24
+Vordergrund: "Google Chrome" ASN:0x0-0x480e80a: (in front) 
+Safari 0 []
+Firefox 0 []
+Google Chrome 1 ["matrix-authentication-service sichtbar"]
+Vivaldi 0 []
+FamilyNexus 1 ["FamilyNexus sichtbar"]
+Standardbrowser https: /Applications/Google Chrome.app

@@ -1,0 +1,26 @@
+ID	Pl	Ergebnis	Beobachtung/Beleg	Screenshot
+RT3-V-01	Mac	✅	pubspec version: 1.2.3+29; HEAD 531981a (2026-11-15T19:25:27+01:00), detached origin/main, Arbeitsbaum sauber	-
+RT3-V-05	Mac	✅	git log a4594ea..HEAD: 14 Commits inkl. #482-Fix, #483-#487. T-08 Mac: flutter build macos --debug exit=0 (logs/mac_build.txt, logs/mac_build_e2e.txt; Bundle-ID temporär .e2e per xcconfig im Worktree, danach per git checkout zurückgesetzt)	-
+RT3-V-02	Mac	⏳	Info.plist des .app: Version 1.2.3, Build 29, adhoc-Signatur. Anzeige "Über die App" nicht prüfbar: App blockiert an Schlüsselbund-Passwortabfrage	screenshots/RT3-V-03_Mac_Schluesselbund-Abfrage.png
+RT3-V-03	Mac	⏳	Start blockiert durch Schlüsselbund-Abfrage (flutter_secure_storage_service, adhoc-Signatur, wie Lauf 27). Passwort nicht vorhanden, keines eingegeben. Willkommensseite nicht erreicht	screenshots/RT3-V-03_Mac_Schluesselbund-Abfrage.png
+RT3-A-03	Mac	⏳	Nur Ladebild "Lädt ..." (hell) hinter der Abfrage gesehen; Themenwechsel nicht prüfbar	screenshots/RT3-V-03_Mac_Schluesselbund-Abfrage.png
+RT3-A-06	Mac	⏳	Wie A-03; Zielzustand nicht erreicht	screenshots/RT3-V-03_Mac_Schluesselbund-Abfrage.png
+RT3-A-07	Mac	⏳	Nicht ausgeführt (App nicht benutzbar)	-
+RT3-B-01..B-05	Mac	⏳	App nicht benutzbar; Benachrichtigungs-Systemeinstellung darf nicht geändert werden	-
+RT3-F-01..F-04,F-06,F-11 und 46 Mac-Zeilen TP-FN-NTF-381	Mac	⏳	App nicht benutzbar (Schlüsselbund), kein Server erreichbar, Systemmitteilungen nicht änderbar	-
+RT3-G-01,G-02,G-08	Mac	⏳	App akzeptiert nur https mit gültigem Zertifikat (lib/domain/server.dart:38, kein badCertificateCallback in lib/, nur test/e2e/e2e_support.dart:32). Lokaler Synapse selbstsigniert (curl ohne -k scheitert). Zertifikat im Schlüsselbund vertrauen = dauerhafte Systemänderung, nicht getan	-
+RT3-G-04,G-05	Mac	⏳	Echter Anbieter/matrix.org nicht erlaubt	-
+RT3-G-06	Mac	⏳	Standardbrowser müsste dauerhaft geändert werden	-
+RT3-G-09..G-13	Mac	⏳	Eingebettete Ansicht nur über Anmeldung/Konto erreichbar; keine lokale Testseite ansteuerbar	-
+RT3-G-14	Mac	⏳	Restpunkt am Gerät, keine Freigabe	-
+RT3-I-01,I-04,I-08	Mac	⏳	Einstellungen nicht erreichbar	-
+RT3-J-04,J-06	Mac	⏳	App nicht benutzbar (Rail bei ca. 740 dp nur indirekt im Fake-Lauf gesehen)	-
+RT3-K-01	Mac	⏳	Semantikbaum nicht prüfbar; VoiceOver nicht erlaubt	-
+RT3-L-02	Mac	⏳	App startet, bricht vor Tresor/Datenbank an Schlüsselbund-Abfrage ab. log show --last 40m --predicate 'process == "FamilyNexus"' lieferte 0 Zeilen: kein Beleg für oder gegen "out of bounds"	-
+RT3-R-01..R-08	Mac	⏳	App nicht benutzbar	-
+RT3-Z-01	Mac	⏳	Kein Konto angelegt	-
+RT3-C-08	Mac	⚠️	Indirekter Beleg, kein Produktlauf: integration_test/manual/ui_tour_test.dart (Fake-Matrix) als echtes Mac-Fenster: Familie ohne Einzelchat zeigt direkt den Familienchat ohne Gesprächsliste, Rail, Neue-Nachrichten-Linie, geteilter Termin. Test bricht danach ab (ui_tour_test.dart:88: "Einstellungen" nicht im main-navigation; veralteter manueller Test)	screenshots/RT3-C-08_Mac_Uitour-Fake.jpg
+X-483..X-486	Mac	⏳	Alle vier brauchen Anmeldung bzw. eingebettete Ansicht; nicht erreichbar (siehe G-01)	-
+X-STORE-SHOTS	Mac	⚠️	integration_test/store_screenshots_test.dart -d macos: Build ok, 3 PNGs, Abbruch Zeile 100: Text "Ben" doppelt gefunden, tap mehrdeutig. Testskript, kein App-Fehler	logs/mac_integration_store_shots.txt
+X-ENV	Mac	⚠️	Datenträger fast voll (295-520 MiB frei): erste Läufe scheiterten mit "No space left on device"/"database or disk is full"; Wiederholung gelang	logs/mac_ui_tour.txt
+RT3-Z-04	Mac	⚠️	Inhalt von ~/Library/Containers/de.inneso.familynexus.e2e gelöscht (Data/ weg), Containerordner selbst nicht entfernbar (rm: Operation not permitted, Container-Schutz)	-

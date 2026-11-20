@@ -1,0 +1,7 @@
+OK      a: 502, 502, 200 -> Exit 0
+OK      a: Server sah mindestens 3 Anfragen
+OK      b: dauerhaft 502 -> Exit 1
+OK      b: Meldung "nicht erreichbar"
+OK      b: 5 Anfragen
+OK      c: geschlossener Port -> Exit 1
+Alle Fälle bestanden

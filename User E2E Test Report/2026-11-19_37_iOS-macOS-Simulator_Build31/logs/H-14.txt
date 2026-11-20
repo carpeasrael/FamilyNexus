@@ -1,0 +1,10 @@
+Link-Laenge 276 <=1024: True ; Parameter ausserhalb d: ['d', 'v']
+Schluessel in d: ['by', 'exp', 'inv', 'n', 'room', 'srv', 'via']
+room: Raum-ID, Laenge 29 endet auf :localhost
+via localhost
+srv localhost:18448
+inv: Matrix-ID der einladenden Person (Konto-ID, Namensraum fnt-1119-n1)
+exp: in 2.96 Tagen ab jetzt (Ablauf)
+by: Anzeigename Test N1
+n: Laenge 32 32 Hex: True
+verdaechtige Begriffe in d: []

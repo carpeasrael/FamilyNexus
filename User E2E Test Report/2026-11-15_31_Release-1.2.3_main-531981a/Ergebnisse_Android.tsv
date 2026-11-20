@@ -1,0 +1,123 @@
+ID	Pl	Ergebnis	Beobachtung/Beleg	Screenshot
+RT3-V-01	And	⚠️	HEAD 531981a (origin/main); pubspec 1.2.3+29. Plan v04 erwartet +30 (PR #495 nicht auf main); Auftrag nennt Soll 29.	-
+RT3-V-02	And	⚠️	Vorschau-APK auf Pixel8_API35 (API 35): Menue und Einstellungen unten 'Version 1.2.3 (29)' = pubspec. Plan-Soll (30) auf 531981a nicht erfuellbar.	screenshots/RT3-V-02_And.png
+RT3-V-03	And	⚠️	Frische Installation des regulaeren Debug-APK (kein Vorschau-Modus): uiautomator zeigt 'Willkommen bei FamilyNexus' mit 'Neue Familie gruenden', 'Ich wurde eingeladen', 'Ich habe schon ein Konto', Sprachwahl Deutsch/English. adb-Screenshot ist SCHWARZ (Standard Bildschirmschutz = an, FLAG_SECURE; lib/domain/app_settings.dart:17 secureScreen=true), daher kein Bildbeleg. 'Alle lokalen Daten loeschen' nicht ausgefuehrt.	screenshots/RT3-V-03_And_Willkommen.png (schwarz)
+RT3-V-05	And	⚠️	Build aus 531981a (enthaelt #482, #489-#493 laut Log); Build-30-PR #495 nicht enthalten, App zeigt (29). Debug-APK Vorschau-Einstieg gebaut (logs/android_build_apk_preview.txt).	-
+RT3-V-04	And	⏳	Update ueber Vorversion 1.2.2 (26) braucht Vorversions-APK und echte Familie/Server.	-
+RT3-A-03	And	⏳	Ladebild folgt dem System: im Vorschau-Modus nur Sekundenbruchteil, per adb nicht abgefangen; Systemthema nicht umgeschaltet.	-
+RT3-A-06	And	⚠️	Kaltstart (am start): Screenshot nach 1 s zeigte Systemdialog 'System-UI reagiert nicht' (Emulator -no-window, langsam); nach 'Warten' direkt 'Heute'. 'Laedt ...' nicht abgefangen, kein leerer Bildschirm gesehen; Hell/Dunkel nicht gewechselt.	screenshots/RT3-A-06_And.png
+RT3-A-07	And	⏳	Beschaedigte Datenbank: im Vorschau-Modus (Fake) nicht herstellbar.	-
+RT3-B-01	And	n/a	Plan: nur iOS/Mac. Auf Android Heute-Karten (Demodaten) betrachtet: Naechste Termine, Erinnerungen ('4 Erinnerungen geplant, 1 faellig'), Wer ist online, Einkaufszettel; jeweils einmal.	screenshots/RT3-B-01_And.png
+RT3-B-05	And	⏳	Termin mit Erinnerung anlegen und Uebersicht pruefen nicht ausgefuehrt (Fake-Gateway); nur Kartenanzeige gesehen.	-
+RT3-C-01	And	⚠️	Gespraechsliste: 'Gespraeche', Familienchat zuerst, dann Ben; Vorschau eine Zeile, Datum 21.10.2026, Zaehler 2/1, Tab-Zaehler 3, fette Titel, keine Chips (Screenshot). Teilabnahme, G2/zwei Konten nicht moeglich.	screenshots/RT3-C-01_And.png
+RT3-C-02	And	⚠️	Kopfzeile mit Pfeil 'Zurueck zu den Gespraechen', Titel, Online-Status als Punkt+Text; Entwurf 'Entwurf B' blieb erhalten, nachdem Tab 'Heute' und zurueck 'Chat' (gleiches Gespraech offen). Gespraechsuebergreifend Liste->anderes Gespraech nicht separat geprueft.	screenshots/RT3-C-02_And.png
+RT3-C-03	And	⏳	Braucht zweites Konto (G1 sendet).	-
+RT3-C-04	And	✅	Gespraech Ben offen, Tab Heute und zurueck Chat: Gespraech bleibt offen, Entwurf 'Entwurf B' erhalten (uiautomator).	screenshots/RT3-C-04_And.png
+RT3-C-05	And	⚠️	Zurueck im Gespraech -> Liste (App bleibt) und auf der Liste Zurueck verlaesst die App (Task wechselte zum Play Store, den ich zuvor per adb geoeffnet hatte). Faelle 'offenes Menue' und 'Tab Einkauf' nicht geprueft.	screenshots/RT3-C-05_And.png
+RT3-C-08	And	⏳	Familie ohne Einzelchat nicht in den Demodaten.	-
+RT3-C-09	And	⏳	Mitglied entfernen/blockieren nicht ausfuehrbar ohne Server.	-
+RT3-C-10	And	⏳	Zickzack-Zeitstempel nicht im Vorschau-Modus herstellbar.	-
+RT3-C-11	And	⏳	Senden/Anhang/Termin braucht echte Nachrichten.	-
+RT3-C-12	And	⏳	Senden bei langsamer Verbindung nicht herstellbar.	-
+RT3-C-13	And	✅	uiautomator-Semantik: 'Nachricht von dir\nIch uebernehme das, ... 14:00', fremde 'Nachricht von Ben/Clara'. Anzeige unveraendert (Vorschau). TalkBack nicht gestartet (Semantikbaum).	screenshots/RT3-C-02_And.png
+RT3-C-14	And	⏳	App-Sperre mit zweitem Sender nicht moeglich.	-
+RT3-D-01	And	✅	'Avatar aendern': Vorschau + zwoelf Avatare (Pfote, Hase, Vogel, Blume, Baum, Segelboot, Fahrrad, Pizza, Eis, Musik, Fussball, Rakete) + 'Initialen (kein Avatar)'; Namen sichtbar; Ziele ca. 242x234 px = ca. 92x89 dp (>=48 dp).	screenshots/RT3-D-01_And.png
+RT3-D-02	And	⚠️	Segelboot gewaehlt + Speichern: Hinweis 'Avatar gespeichert', Vorschau 'Segelboot'; im Kalender-Filter zeigt Anna danach das Segelboot. 'wird uebernommen bis Echo' im Fake nicht beobachtbar (Fake-Server).	screenshots/RT3-D-02_And.png
+RT3-D-03	And	⏳	Sicht von G1 braucht zweites Konto.	-
+RT3-D-04	And	⏳	Zweites Konto noetig.	-
+RT3-D-05	And	⚠️	Schrift 200 % Kalender-Filterchip mit Avatar sichtbar nicht abgeschnitten (Anna mit Segelboot), Familie nicht eigens geprueft; Hell nicht geprueft.	screenshots/RT3-J-04_Kalender_And.png
+RT3-D-06	And	⏳	Beitritt neues Mitglied nicht moeglich.	-
+RT3-D-07	And	⏳	Bestehende Familie vor 1.2.3 nicht im Vorschau-Modus.	-
+RT3-D-08	And	⏳	Moderator entfernt Mitglied: nicht moeglich ohne Server.	-
+RT3-E-01	And	✅	Familie -> 'Kalender-Themen' -> 'Thema anlegen': Farben Tuerkis, Rosa, Lila, Gelb, Gruen, Orange, Rot (sieben, kein Himmelblau); 'Schule' Lila angelegt, 'Thema gespeichert.', Liste 'Schule / Lila' mit 'Thema aendern/loeschen' (Moderator). Umbenennen nicht geprueft.	screenshots/RT3-E-01b_And.png
+RT3-E-02	And	⚠️	Termin-Editor: 'Privat' (Text 'Nur fuer dich ...') und 'Geteilt' vorhanden, aber unter 'Geteilt' erschien KEINE Themen-Chipzeile (obwohl Thema 'Schule' zuvor angelegt). Unklar ob Vorschau-Fake (Themenliste nicht an Editor gekoppelt) oder Fehler; Folgetest mit echtem Server noetig.	screenshots/RT3-E-02_Geteilt_And.png
+RT3-E-03	And	⏳	Abhaengig von E-02 (Thema im Editor).	-
+RT3-E-04	And	⏳	Zweites Konto noetig.	-
+RT3-E-05	And	⏳	Zwei Moderatoren noetig.	-
+RT3-E-06	And	⏳	Nicht ausgefuehrt (Zeitbox); Zaehler 'Noch 30 Zeichen' im Dialog sichtbar.	-
+RT3-E-07	And	✅	Monatsansicht Kalender: Karte '2026 / Tag 319 von 365 . noch 46 Tage . 87 % des Jahres verstrichen' + Balken (15.11.: 319/365=87,4 %); Semantik ein Satz 'Jahresfortschritt: 87 Prozent verstrichen'.	screenshots/RT3-E-07_Jahr_And.png
+RT3-E-08	And	⏳	Systemdatum nicht verstellt (Zeitbox).	-
+RT3-E-09	And	⏳	15-Minuten-Abgleich braucht zwei Konten/Server.	-
+RT3-E-10	And	⏳	Gestoerte Ablage nicht herstellbar.	-
+RT3-E-11	And	n/a	Plan: Win, Mac, iPad. Android-Zeitwaehler (Uhr und Texteingabe, Stunde 12, Minute 00) lief; nur Beobachtung.	screenshots/RT3-E-11_Zeitwaehler_And.png
+RT3-K-01	And	✅	uiautomator-Semantik (de): 'Nachricht von dir', 'Nachricht von Ben', 'Nachricht von Clara'. Englisch nicht geprueft; TalkBack-Sprache nicht.	screenshots/RT3-C-02_And.png
+RT3-K-02	And	✅	'Einzelchat mit Ben, Online, Kannst du auf dem Heimweg Milch mitbringen?, 1 ungelesen'; 'Familienchat Familie Berger, ..., 2 ungelesen'; Pfeil 'Zurueck zu den Gespraechen'.	screenshots/RT3-C-01_And.png
+RT3-K-03	And	⏳	Avatar-Nicht-Vorlesen: Semantikbaum Familie nicht vollstaendig ausgewertet.	-
+RT3-K-05	And	✅	Ein Satz: 'Jahresfortschritt: 87 Prozent verstrichen', Balken nicht einzeln.	screenshots/RT3-E-07_And.png
+RT3-I-01	And	⚠️	Einstellungen 'App teilen': kein System-Teilen-Menue; Android-Zwischenablage-Hinweis zeigt 'Ich nutze FamilyNexus, den Familienplaner mit Kalender, Ch...'; Snackbar 'Link zum Store-Eintrag kopiert' (Plan sagt 'Link kopiert'; Wortlaut weicht ab, l10n settingsShareAppCopied).	screenshots/RT3-I-01_And.png
+RT3-I-02	And	⏳	Einfuegen scheiterte per adb (Paste-Keyevent/Strg+V im Chatfeld ohne Wirkung); vollstaendiger Inhalt nicht belegt, nur Anfang im Systemhinweis.	screenshots/RT3-I-02_And.png
+RT3-I-03	And	⚠️	'App bewerten': Zeile vorhanden, Tap (Ripple sichtbar) startet KEINE Aktivitaet (logcat ohne START u0 von der App), weder Play Store noch Snackbar 'Store nicht geoeffnet'; Gegenprobe: adb VIEW-Intent auf denselben Play-Link oeffnet Play Store (UnauthenticatedMainActivity). Ursache offen (Emulator, Vorschau oder Fehler) - am Geraet/Emulator mit angemeldetem Play Store nachtesten.	screenshots/RT3-I-03_And.png
+RT3-I-08	And	✅	'Datenuebersicht: alle lokal/online gespeicherten Daten zeigen', 'Geraeteeinstellungen'-Abschnitt (Notfall-Schluessel und Geraete), Menue/Einstellungen unter Android; Englisch folgt separat. Hinweis: 'Speicherorte' zeigt in der Vorschau Linux-Pfade und 'Secret Service' (Fake-Platzhalter, kein Android-Befund).	screenshots/RT3-I-08_And.png
+RT3-I-09	And	⏳	Dativ-Zeilen (Einkauf zuletzt von dir, Aufgabe an dich) nicht gezielt geprueft.	-
+RT3-I-10	And	⏳	Datenschutzerklaerung nicht gelesen (Muttersprachler-Pruefung ohnehin Menschenaufgabe).	-
+RT3-J-04	And	⚠️	Schrift 200 % (font_scale 2.0): Heute 'Fussballtrainin	g' bricht mitten im Wort, Kalender 'Woch
+RT3-P-13	And	✅	Editor bei font_scale 2.0: 'Beginn'/'Ende' stehen ueber Datum und Uhrzeit, kein Wortbruch; Fehlertext umbricht sauber.	screenshots/RT3-P-13_And.png
+RT3-P-14	And	⚠️	Ende 12:00 vor Beginn 21:00, Speichern: Editor zeigt 'Das Ende muss nach dem Beginn liegen.' (Validierungstext), nicht 'konnte nicht gespeichert werden'. Den eventSaveError-Pfad (Gateway-Fehler) loest die Vorschau nicht aus.	screenshots/RT3-P-14_And.png
+RT3-I-08-EN	And	✅	Englisch: 'Data overview: show all locally stored data/online', 'Delete all local data', 'Share app', 'Rate app', 'Version 1.2.3 (29)'. (Zusatzzeile zu I-08)	screenshots/RT3-I-EN_And.png
+RT3-I-09-EN	And	⚠️	Englisch: Einkauf 'last changed by you' (kein 'by You'). Deutsch 'von dir' in Einkaufs-/Aufgabenzeilen nicht gezielt gesehen.	screenshots/RT3-R-03_And.png
+RT3-P-09	And	✅	Englisch, Kalender Monat (uiautomator-Semantik): 'Friday, October 30, 2026, No events', 'Sunday, November 1, 2026, No events', 'Tuesday, November 3, 2026, No events', 'Sunday, November 15, 2026, 1 event, Today', 'Tuesday, December 1, 2026'. Monat in jedem Label, kein deutscher Ordinalpunkt, Nachbarmonate unterscheidbar. TalkBack-Sprachausgabe nicht gestartet; Format 'Wochentag, Monat Tag, Jahr' statt Plan-Beispiel 'November 3, 2 events'.	screenshots/RT3-P-09_And.png
+RT3-H-01	And	⏳	Einrichtung bis zum Ende braucht echte Kontoanlage/Familiengruendung (Vorschau-Modus ohne Server). Tour stattdessen ueber Einstellungen gestartet (siehe H-03).	-
+RT3-H-02	And	⏳	'tourSeen' nach Neustart nicht geprueft.	-
+RT3-H-03	And	⚠️	Einstellungen -> 'Einfuehrung erneut ansehen' ('Watch the introduction again'): Tour startet, drei Schritte (Calendar, Chat, Shopping), 'Skip' in Schritt 1 und 2, 'Back'/'Next'; im letzten Schritt kein 'Skip' sondern 'Let's go' (Plan: Ueberspringen jederzeit). Tastatur (Tab/Enter/Esc) nicht geprueft (Emulator).	screenshots/RT3-H-03_And.png
+RT3-H-04	And	⏳	Gestoerte Ablage nicht herstellbar.	-
+RT3-H-05	And	✅	Tour Englisch und font_scale 2.0: alle drei Schritte vollstaendig lesbar, kein Ueberlauf; Semantik 'Step 1 of 3. Calendar. ...' Titel vorlesbar (TalkBack nicht gestartet).	screenshots/RT3-H-05_And.png
+RT3-R-07	And	⚠️	Theme umgeschaltet (Dunkel -> Hell): Farben/Kontrast der App ok; AUFFALLEND: Statusleisten-Symbole und Uhr bleiben weiss auf hellem Hintergrund und sind kaum lesbar (Systemleiste, Uhr 20:18). App-Sperre nicht geprueft (braucht Geraetesperre).	screenshots/RT3-B-03_hell_And.png
+RT3-R-03	And	⚠️	Einkauf (Fake): 'To buy (4)', 'Done (1)', 'Remove done items', Zeilen mit Semantik 'Mark Milch as done ...'. Anlegen/Gruppe/Erledigt nicht bedient.	screenshots/RT3-R-03_And.png
+RT3-R-04	And	⚠️	Aufgaben (Menue): Hinweistext + 'No task lists yet.' + 'New task list' sichtbar (leer in Demo); Anlegen/Zuweisen nicht bedient.	screenshots/RT3-R-04_And.png
+RT3-R-01	And	⏳	Konto anlegen/Notfall-Schluessel/Einladen braucht echten Server.	-
+RT3-R-02	And	⚠️	Termin-Editor und Zeitregel geprueft (P-14: 'Das Ende muss nach dem Beginn liegen.'); Speichern/Loeschen/Zusage nicht bis zum Ende.	screenshots/RT3-P-14_And.png
+RT3-R-05	And	⚠️	Chat nur lesend (Liste, Entwurf); Senden, Anhang, Reaktion usw. nicht ausgefuehrt.	-
+RT3-R-06	And	⚠️	Einstellungen: Erinnerungen, Geraete (DEV1 verifiziert), Speicherorte, Datenuebersicht sichtbar; Passwort aendern/Konto loeschen nicht ausgefuehrt (Server).	screenshots/RT3-I-scroll1_And.png
+RT3-R-08	And	⏳	Familienwechsel/Abmelden/erneut anmelden braucht Server.	-
+RT3-G-01	And	⏳	Vorschau-Modus ohne Server: keine echte Anmeldung.	-
+RT3-G-02	And	⏳	Frische Installation: 'Neue Familie gruenden' -> 'Konto erstellen, Schritt 1 von 3' mit Text 'Bei matrix.org legst du dein Konto auf der Seite des Anbieters an ...' und Schaltflaechen 'Konto bei matrix.org erstellen' / 'Ich habe schon ein Konto' (uiautomator). NICHT angetippt (keine Registrierung bei matrix.org). Symbol per Screenshot nicht pruefbar (schwarz wegen FLAG_SECURE).	screenshots/RT3-G-02_And.png (schwarz)
+RT3-G-03	And	⏳	Braucht Anbieterwahl (kein Vorschau-Zugang).	-
+RT3-G-04	And	⏳	Vorschau-Modus ohne Server.	-
+RT3-G-05	And	⏳	Vorschau-Modus ohne Server.	-
+RT3-G-07	And	⏳	Vorschau-Modus ohne Server; Anmeldung gegen selbstsigniertes Zertifikat im Android-Emulator nicht moeglich (erster Lauf).	-
+RT3-G-08	And	⏳	Vorschau-Modus ohne Server.	-
+RT3-G-09	And	⏳	Vorschau-Modus ohne Server; Logik nur durch Widget-Tests belegt (siehe X-/T-Zeilen).	-
+RT3-G-10	And	⏳	Navigationsregeln nur Widget-Test, nicht am Geraet (kein Server/keine lokale Testseite im Emulator aufgesetzt).	-
+RT3-G-11	And	⏳	Wie G-10.	-
+RT3-G-12	And	⏳	WebView-Daten loeschen nicht am Geraet pruefbar ohne Testseite.	-
+RT3-G-13	And	⏳	Wie G-10.	-
+RT3-G-14	And	⏳	Wie G-10.	-
+RT3-F-01	And	⏳	Abschnitt 'Meldungen' (Chat/Einkauf-Schalter) fehlt im Vorschau-Modus: settings_screen.dart:60 blendet ihn aus, wenn AppScope.activityPlatform == null (Vorschau-Services). Kein Android-Befund, nur nicht pruefbar. Einstellungen-Karte 'Reminders' (Standard-Erinnerung) vorhanden.	screenshots/RT3-F-01_And.png
+RT3-F-02	And	⏳	Braucht zweiten Sender.	-
+RT3-F-03	And	⏳	Braucht zweiten Sender.	-
+RT3-F-07	And	⏳	Braucht Server.	-
+RT3-F-10	And	⏳	Android-Meldung/Zahl am Symbol braucht echte Nachricht; kein Symbol-Zaehler auf Android (n/a laut Plan).	-
+RT3-F-11	And	⏳	Schalter nicht vorhanden im Vorschau-Modus (siehe F-01).	-
+RT3-I-05-And	And	✅	#144 Android: Einstellungen 'Bildschirmschutz' ('Blockiert Screenshots und verbirgt die App in der Uebersicht'). Aus: adb screencap 353 KB normal; An: 22 KB schwarz (FLAG_SECURE); wieder aus: 353 KB normal. Zusatz: Standard der App ist 'an' (Android-Screenshots/Aufnahmen schwarz), im Vorschau-Modus aus.	screenshots/RT3-I-06_an_And.png
+RT3-J-01	AndT	✅	fn_tablet 2560x1600@320dpi, Android 15: Quer (1280 dp): Rail links, Kalender+Chat zweispaltig (Titel 'Kalender und Chat'); Hoch (user_rotation 1, 800 dp): Rail, einspaltig 'Kalender'. Kein Neustart, keine neue Anmeldung. Nur 0 und 90 Grad geprueft, nicht alle vier.	screenshots/RT3-J-01_AndT_Kalender_quer.png
+RT3-J-02	AndT	⚠️	Fenstergrenzen per 'wm size' simuliert (320 dpi): 598 dp Leiste unten; 600 dp Rail; 998 dp einspaltig 'Kalender'; 1000 dp 'Kalender und Chat'. Echtes Multi-Window/Split-Screen NICHT getestet; Zustandserhalt (Entwurf, Dialog) beim Ziehen nicht geprueft.	screenshots/RT3-J-02_AndT_2000px.png
+RT3-J-03	AndT	✅	Hochformat, Chat 'Familie Berger', Bildschirmtastatur: Rail bleibt, Eingabefeld 'Tablet Test' und Senden sichtbar ueber der Tastatur.	screenshots/RT3-J-03_AndT.png
+RT3-J-04-AndT	AndT	⚠️	font_scale 2.0 Quer: Kalender + Gespraechsspalte ohne Ueberlauf, Rail-Beschriftungen lesbar. Nur Kalender ausgewertet; Heute/Einkauf/Einstellungen nur als Screenshot gespeichert.	screenshots/RT3-J-04_AndT.png
+RT3-J-05	AndT	⚠️	Drehen mit Rotationssperre (accelerometer_rotation 0, user_rotation 0/1) ok; Klasse wechselt beim Tippen mit Tastatur nicht (J-03). Auto-Rotate und Multi-Window nicht geprueft.	screenshots/RT3-J-05_AndT_hoch.png
+RT3-J-06	AndT	⚠️	Ab 1000 dp (Quer): 'Heute' einspaltig neben Rail (uiautomator, Screenshot gespeichert); Strichfrage nicht visuell ausgewertet; Einkauf/Familie nicht gesichtet.	screenshots/RT3-J-06_AndT_Heute.png
+RT3-C-07	AndT	✅	Kalender (Zweispalter), Gespraech 'Ben' in der Chatspalte geoeffnet, Android-Zurueck: Liste 'Gespraeche' in der Chatspalte, Kalender bleibt.	screenshots/RT3-C-07_AndT.png
+RT3-J-07	AndT	⏳	Hardware-Tastatur Tab-Reihenfolge nicht geprueft.	-
+RT3-J-08	And	n/a	Plan: nur iPad.	-
+RT3-K-04	And	⏳	Termin mit Thema (Label 'Thema <Name>') nicht pruefbar: Vorschau-Editor bot keine Themenwahl (siehe E-02). Terminkarten-Label ohne Thema: 'Elternabend Grundschule, 19:00 – 20:30, Geteilt'.	-
+RT3-K-06	And	⚠️	uiautomator: 'Datenuebersicht: ...', 'Erinnerungen', Geraete-Abschnitt lesbar (de/en); Aussprache nicht pruefbar (kein TalkBack).	-
+RT3-T-08	And	✅	`flutter build apk --debug` (regulaerer Einstieg, 18 s warm) und `-t tool/preview/preview_main.dart` (255 s kalt) gelingen auf 531981a: 'Built build/app/outputs/flutter-apk/app-debug.apk'; Platz 30-40 GB frei. iOS/macOS-Build nicht Teil dieses Laufs.	logs/android_build_apk_debug.txt; logs/android_build_apk_preview.txt
+RT3-T-IT-1	And	✅	integration_test/reminders_device_test.dart auf Pixel8_API35: 'Android-Adapter plant, ersetzt und entfernt lokale Erinnerungen' bestanden (+1); der -1 ist der bekannte Werkzeugfehler streamListen/VmServiceProxyGoldenFileComparator.	logs/android_it_reminders_device_test.txt
+RT3-T-IT-2	And	✅	integration_test/db_security_test.dart: 6 Tests bestanden (u.a. 'Datenbank liegt im app-internen Speicher, Schluessel nicht in Dateien', 'Vollstaendige Loeschung ...'); +6 -1, -1 = Werkzeugfehler.	logs/android_it_db_security_test.txt
+RT3-T-IT-3	And	✅	integration_test/event_store_test.dart: 10 Tests bestanden (Migrationen v1..v4, Einkauf, Termine verschluesselt); -1 = Werkzeugfehler.	logs/android_it_event_store_test.txt
+RT3-T-IT-4	And	⏳	matrix_sdk_smoke_test.dart und custom_tab_device_test.dart nicht ausgefuehrt: erster braucht Netz zum oeffentlichen Standardserver (matrix.org, nicht erlaubt), zweiter prueft den seit E-102 abgeloesten Custom Tab.	-
+RT3-T-W-1	And	✅	Widget-Tests (Logik, NICHT Geraet): embedded_browser_page_test, embedded_nav_test, password_change_embedded_test: 48 bestanden; test/data komplett 722 bestanden (inkl. oauth_redirect_test, embedded_redirect_test, website_data_test: 43 bestanden).	logs/android_widget_embedded_tests.txt; logs/android_test_data.txt
+X-483	And	⚠️	#483 Passwort aendern eingebettet: Logik durch password_change_embedded_test A-G gruen (u.a. 'Ausweg Im Browser fortsetzen (Android): Seite und Dialog weg, keine Route uebrig', Sperre, Seite nicht zu oeffnen). Am Geraet nicht pruefbar (Vorschau ohne OAuth-Konto).	logs/android_widget_embedded_tests.txt
+X-484	And	⚠️	#484 Ausweg+Fertig: Widget-/Redirect-Tests gruen; am Geraet nicht (keine Testseite mit HTTP 500).	logs/android_widget_embedded_tests.txt
+X-485	And	⚠️	#485 Fremder-Host-Hinweis: Logik nur Widget-Test (gruen); am Geraet nicht.	logs/android_widget_embedded_tests.txt
+X-486	And	n/a	#486: website_data.dart loescht nur auf iOS/macOS (_supported); Android unveraendert; website_data_test gruen.	logs/android_test_data.txt
+X-487	And	✅	#487 Doku-Kommentar _pump: kein Verhaltensunterschied, test/data gruen (722).	logs/android_test_data.txt
+RT3-P-01	And	⏳	Datenstrom-Stopp mit Proxy nicht aufgebaut; Chat-Anhang im Vorschau-Modus nicht ladbar.	-
+RT3-P-03	And	⏳	Netz trennen und Sendedurchlauf braucht zweites Konto/Server.	-
+RT3-P-04	And	⏳	Termin loeschen auf zwei Geraeten braucht Server.	-
+RT3-P-05	And	⏳	Kontowechsel braucht echte Konten.	-
+RT3-P-06	And	⏳	Zwei Konten/Server noetig. Der Text 'Ausgeschaltet giltst du fuer andere als offline.' steht in den Einstellungen (de, en 'When off, you appear offline to others').	-
+RT3-P-07	And	⚠️	Datum in der Gespraechsliste '21.10.2026' (Demodaten, fuehrende Null); Datum 03.11. nicht erzeugbar.	screenshots/RT3-C-01_And.png
+RT3-P-08	And	⏳	Familie gruenden mit Emoji-Namen: ohne Server nicht abschliessbar (Registrierung nicht erlaubt).	-
+RT3-P-15	And	⏳	Braucht OAuth-Konto; Widget-Test siehe X-483.	-
+RT3-P-16	And	⏳	Braucht Testseite; Widget-Test siehe X-484.	-
+RT3-P-17	And	⏳	Braucht Testseite; Widget-Test siehe X-485.	-

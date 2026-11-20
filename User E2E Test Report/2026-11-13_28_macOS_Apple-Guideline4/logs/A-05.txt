@@ -1,0 +1,4 @@
+-- A-05 23:48:57
+Vordergrund: "FamilyNexus" ASN:0x0-0x456d56
+Safari-Fenster: 0
+FamilyNexus läuft: 

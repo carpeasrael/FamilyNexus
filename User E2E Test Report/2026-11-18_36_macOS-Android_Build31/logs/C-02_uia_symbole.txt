@@ -1,0 +1,11 @@
+Verification | - | 540,810
+Compare these symbols with the ones on the other device. They must match in the same order | - | 540,966
+Dog | - | 224,1148
+Flower | - | 362,1148
+Tree | - | 500,1148
+Horse | - | 638,1148
+Panda | - | 776,1148
+Pencil | - | 431,1308
+Key | - | 569,1308
+They do not match | klickbar | 721,1501
+They match | klickbar | 741,1627

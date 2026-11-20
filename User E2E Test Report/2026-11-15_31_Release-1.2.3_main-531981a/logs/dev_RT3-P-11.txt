@@ -1,0 +1,10 @@
+52:| Kalender-Themen (frei gewählter Name bis 30 Zeichen, Farbe) | Termine einem Thema zuordnen und farbig anzeigen. Themen werden wie Termine Ende-zu-Ende-verschlüsselt an die Familie gesendet. |
+54:| Calendar themes (freely chosen name up to 30 characters, color) | Assign events to a theme and show them in color. Like events, themes are sent end-to-end encrypted to the family. |
+  auto-clearing clipboard, or save as a printable file).
+- **Family chat and direct chats** (encrypted): messages, replies, reactions, attachments (validated, never opened
+  automatically); unsent messages are retried while the app is running (after a restart they are shown as “not sent”
+  and have to be written again, E-33/#138). Direct chats can be started with family members via "Send message" in the
+  family view. As soon as there is more than one conversation, the chat tab shows a conversation list whenever no
+  conversation is open (family chat first, then direct chats with the latest message, unread count and online status),
+  and a back arrow returns from a conversation to the list (E-100); invitations from strangers are ignored.
+    db/                SQLCipher-Datenbank, Migrationen (v1 settings, v2 Kalender, v3 Einkaufszettel, v4 Aufgabenlisten, v5 Kalender-Themen), SqlEventStore, SqlShoppingStore, SqlTaskStore, SqlEventThemeStore, KeyValueStore

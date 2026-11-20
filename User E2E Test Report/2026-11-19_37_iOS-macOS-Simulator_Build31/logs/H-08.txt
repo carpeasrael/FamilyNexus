@@ -1,0 +1,4 @@
+H-08b Kopieren:
+   27227
+('Übersicht kopiert. Die App versucht, die Zwischenablage nach einer Minute zu leeren. Lösche sie im
+       0

@@ -1,0 +1,4 @@
+Original -> gespeicherte Datei auf G2 (SHA-256 gleich: ja)
+FN-ANHANG.txt -> FN-ANHANG.txt: 0e1498c60b2b0b13... gleich
+fn-bild.png -> fn-bild.png: 97dd3fc3abc096da... gleich
+a<b>c"d.txt -> a_b_c_d.txt: 953d05b7895d4c26... gleich

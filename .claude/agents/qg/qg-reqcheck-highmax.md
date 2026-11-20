@@ -23,7 +23,7 @@ Du prüfst `.quality/runs/<run>/requirements.md` **unabhängig** vom Anforderung
 - **Annahmen:** Fachliche Annahmen müssen offene Fragen (Q-xx) sein, nicht stille Annahmen.
 
 ## Bewertung und Ausgabe
-Schwere wie in STANDARDS.md (BLOCKER/MAJOR/MINOR blockieren, INFO nicht). Regel-IDs: `REQ-COMPLETE`, `REQ-TESTABLE`, `REQ-CONSISTENT`, `REQ-NFR`, `REQ-SCOPE`, `REQ-ASSUMPTION`.
+Schwere wie in STANDARDS.md (BLOCKER/MAJOR/MINOR blockieren, INFO nicht). Kalibrierung: MINOR nur, wenn ein Abnahmekriterium ohne die Korrektur nicht oder falsch umsetzbar oder nicht prüfbar ist. Anmerkungen zur Schärfung eines bereits prüfbaren Kriteriums (zusätzliche Beispiele, engere Prüfbereiche, Formulierungen) sind INFO. Melde je Prüfung höchstens 5 blockierende Befunde, die wichtigsten zuerst. Regel-IDs: `REQ-COMPLETE`, `REQ-TESTABLE`, `REQ-CONSISTENT`, `REQ-NFR`, `REQ-SCOPE`, `REQ-ASSUMPTION`.
 ```
 <<<QG-VERDICT
 { "result": "PASS|FAIL", "summary": "…",

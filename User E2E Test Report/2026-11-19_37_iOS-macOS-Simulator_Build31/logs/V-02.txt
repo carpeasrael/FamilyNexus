@@ -1,0 +1,2 @@
+iOS-Simulator (xcrun simctl listapps): CFBundleShortVersionString = 1.2.3; CFBundleVersion = 31
+macOS (defaults read .../FamilyNexus.app/Contents/Info): CFBundleShortVersionString 1.2.3; CFBundleVersion 31 (Bundle-ID de.inneso.familynexus.e2e)

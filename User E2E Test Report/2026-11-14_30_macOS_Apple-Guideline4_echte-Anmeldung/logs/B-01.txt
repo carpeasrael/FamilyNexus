@@ -1,0 +1,31 @@
+== Zeit ==
+2026-11-14T08:18:32
+== Standardbrowser (http/https) ==
+        LSHandlerRoleAll = "com.google.chrome";
+        LSHandlerURLScheme = https;
+        LSHandlerRoleAll = "com.google.chrome";
+        LSHandlerURLScheme = http;
+== Browser-Prozesse ==
+1180 /System/Library/PrivateFrameworks/SafariSafeBrowsing.framework/com.apple.Safari.SafeBrowsing.Service
+2869 Firefox.app/Contents/MacOS/firefox
+2875 Firefox.app/Contents/MacOS/crashhelper
+2876 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+2877 Firefox.app/Contents/MacOS/gpu-helper.app/Contents/MacOS/Firefox
+2878 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+2879 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+2885 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+4291 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper
+4907 Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+== Fenster je Browser (CoreGraphics) ==
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ModuleNotFoundError: No module named 'Quartz'
+== B-02: Standardbrowser nach Umstellung ==
+2026-11-14T08:18:56
+Umstellung durch den Nutzer in den Systemeinstellungen (LaunchServices-Datei geändert 08:17:59, vor B-01-Abfrage); Ausgangswert laut Lauf 29 A-01: Safari
+Safari 12 [" unsichtbar", " unsichtbar", "matrix-authentication-service unsichtbar", " unsichtbar", "matrix-authentication-service unsichtbar", "matrix-authentication-service unsichtbar", " unsichtbar", " unsichtbar", " unsichtbar", " unsichtbar", " unsichtbar", "matrix-authentication-service unsichtbar"]
+Firefox 6 [" unsichtbar", "IONOS - E-Mail-Details unsichtbar", " unsichtbar", " unsichtbar", " unsichtbar", " unsichtbar"]
+Google Chrome 4 [" unsichtbar", " unsichtbar", " unsichtbar", " unsichtbar"]
+Vivaldi 4 [" unsichtbar", " unsichtbar", " unsichtbar", " unsichtbar"]
+FamilyNexus 0 []
+Standardbrowser https: /Applications/Google Chrome.app

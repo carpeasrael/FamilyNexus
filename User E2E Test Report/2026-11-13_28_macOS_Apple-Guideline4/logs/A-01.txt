@@ -1,0 +1,42 @@
+== Datum
+Fri Nov 13 23:46:20 CET 2026
+== Version
+1.2.3
+29
+de.inneso.familynexus.apple4
+== macOS
+ProductName:		macOS
+ProductVersion:		27.3
+BuildVersion:		26C5035r
+== Signatur
+Identifier=de.inneso.familynexus.apple4
+Signature=adhoc
+TeamIdentifier=not set
+== Entitlements
+com.apple.security.app-sandbox
+com.apple.security.files.user-selected.read-write
+com.apple.security.network.client
+== Kanal im Binary
+de.inneso.familynexus/webauth
+== Standardbrowser
+== Browser-Prozesse
+/Applications/Bitwarden.app/Contents/PlugIns/safari.appex/Contents/MacOS/safari
+/Applications/Claude.app/Contents/Frameworks/Electron Framework.framework/Helpers/chrome_crashpad_handler
+/Applications/Firefox.app/Contents/MacOS/crashhelper
+/Applications/Firefox.app/Contents/MacOS/firefox
+/Applications/Firefox.app/Contents/MacOS/gpu-helper.app/Contents/MacOS/Firefox GPU Helper
+/Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container
+/System/Cryptexes/App/usr/libexec/SafariBookmarksSyncAgent
+/System/Cryptexes/App/usr/libexec/SafariLaunchAgent
+/System/Cryptexes/App/usr/libexec/SafariNotificationAgent
+/System/Cryptexes/App/usr/libexec/com.apple.Safari.History
+/System/Library/PrivateFrameworks/SafariFoundation.framework/Versions/A/XPCServices/CredentialProviderExtensionHelper.xpc/Contents/MacOS/CredentialProviderExtensionHelper
+/System/Library/PrivateFrameworks/SafariFoundation.framework/Versions/A/XPCServices/SafariConfigurationSubscriber.xpc/Contents/MacOS/SafariConfigurationSubscriber
+/System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper
+/System/Library/PrivateFrameworks/SafariSafeBrowsing.framework/com.apple.Safari.SafeBrowsing.Service
+/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app/Contents/MacOS/Safari
+/private/var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/AppTranslocation/8DF1590B-0A6A-4785-89C5-9AD8350C5FC3/d/Vivaldi.app/Contents/Frameworks/Vivaldi Framework.framework/Versions/8.2.4133.94/Helpers/Vivaldi Helper (Renderer).app/Contents/MacOS/Vivaldi Helper (Renderer)
+/private/var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/AppTranslocation/8DF1590B-0A6A-4785-89C5-9AD8350C5FC3/d/Vivaldi.app/Contents/Frameworks/Vivaldi Framework.framework/Versions/8.2.4133.94/Helpers/Vivaldi Helper.app/Contents/MacOS/Vivaldi Helper
+/private/var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/AppTranslocation/8DF1590B-0A6A-4785-89C5-9AD8350C5FC3/d/Vivaldi.app/Contents/MacOS/Vivaldi
+/var/folders/wy/jzzl55q16tg6t3rk_kwlhw2m0000gn/T/AppTranslocation/8DF1590B-0A6A-4785-89C5-9AD8350C5FC3/d/Vivaldi.app/Contents/Frameworks/Vivaldi Framework.framework/Versions/8.2.4133.94/Helpers/chrome_crashpad_handler
+/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app

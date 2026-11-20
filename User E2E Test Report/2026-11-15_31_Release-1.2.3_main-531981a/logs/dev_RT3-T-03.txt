@@ -1,0 +1,354 @@
+Synapse bereit: https://localhost:18448
+fn-synapse-pw-change-off bereit: http://127.0.0.1:18449
+fn-synapse-pw-login-off bereit: http://127.0.0.1:18450
+fn-synapse-pw-reauth bereit: http://127.0.0.1:18451
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.6 available)
+  archive 4.5.2 (4.7.1 available)
+  code_assets 1.2.1 (2.2.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  dev_build 1.1.15 (1.2.2 available)
+  file_picker 13.1.0 (13.3.3 available)
+  file_picker_darwin 2.3.2 (2.5.1 available)
+  file_picker_linux 2.0.2 (2.0.4 available)
+  file_picker_web 4.2.0 (4.2.1 available)
+  flutter_local_notifications 22.3.2 (23.0.2 available)
+  flutter_local_notifications_linux 8.0.2 (9.0.0 available)
+  flutter_local_notifications_platform_interface 12.2.0 (13.0.0 available)
+  flutter_local_notifications_web 1.0.0 (2.0.0 available)
+  flutter_local_notifications_windows 3.1.1 (4.0.1 available)
+  flutter_vodozemac 0.9.0 (0.9.1 available)
+  image 4.12.0 (4.13.1 available)
+  jni 1.1.0 (1.1.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  matrix 14.2.0 (16.0.4 available)
+  native_toolchain_c 0.19.2 (0.19.6 available)
+  objective_c 9.5.0 (9.6.4 available)
+  petitparser 7.0.2 (7.1.0 available)
+  posix 6.5.2 (6.5.4 available)
+  process_run 1.4.1 (1.4.4 available)
+  qr 4.0.0 (4.0.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common 2.5.14 (2.5.17 available)
+  sqflite_common_ffi 2.4.4 (2.4.7 available)
+  sqflite_common_ffi_web 1.2.0 (1.2.2 available)
+  sqlite3 3.8.0 (3.9.1 available)
+  synchronized 3.5.0 (3.6.1+1 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.4 available)
+  vodozemac 0.9.0 (0.9.1 available)
+  web 1.1.1 (1.1.2 available)
+  windows_file_picker 2.0.1 (2.0.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+38 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sdk_registration_test.dart
+00:00 +0: (setUpAll)
+00:00 +0: #129: der Client verkleinert Bilder im Hintergrund
+00:00 +1: #134: Wiederherstellen der Sitzung Matrix-Datenbank nicht zu öffnen: Die Sitzung gilt als unversehrt
+00:00 +2: #134: Wiederherstellen der Sitzung scheitert `client.init`, hat das SDK die Sitzung gelöscht
+[Matrix] [31m!!!CRITICAL!!! Client initialization failed - FormatException: Missing end `]` to match `[` in host (at character 8)
+http://[
+       ^
+
+#0      _Uri._fail (dart:core/uri.dart:2050:5)
+#1      _Uri._makeHost (dart:core/uri.dart:2415:9)
+#2      new _Uri.notSimple (dart:core/uri.dart:1906:14)
+#3      Uri.parse (dart:core/uri.dart:1176:17)
+#4      Client.init (package:matrix/src/client.dart:2086:26)
+<asynchronous suspension>
+#5      SdkMatrixGateway.restore (package:family_nexus/data/matrix/sdk_matrix_gateway.dart:670:11)
+<asynchronous suspension>
+#6      Throws._matchFuture (package:matcher/src/expect/throws_matcher.dart:103:19)
+<asynchronous suspension>
+#7      _expect.<anonymous closure> (package:matcher/src/expect/expect.dart:153:17)
+<asynchronous suspension>
+#8      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+#9      expectLater.<anonymous closure> (package:flutter_test/src/widget_tester.dart:508:19)
+<asynchronous suspension>
+#10     main.<anonymous closure>.<anonymous closure> (file:///Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sdk_registration_test.dart:245:7)
+<asynchronous suspension>
+#11     Declarer.test.<anonymous closure>.<anonymous closure> (package:test_api/src/backend/declarer.dart:253:15)
+<asynchronous suspension>
+#12     Declarer.test.<anonymous closure> (package:test_api/src/backend/declarer.dart:250:11)
+<asynchronous suspension>
+#13     Invoker._waitForOutstandingCallbacks.<anonymous closure> (package:test_api/src/backend/invoker.dart:318:9)
+<asynchronous suspension>
+[0m
+00:00 +3: #134: Wiederherstellen der Sitzung roher Fehler aus dem `clear` des SDK zählt ebenfalls als verloren
+[Matrix] [31m!!!CRITICAL!!! Client initialization failed - FormatException: Missing end `]` to match `[` in host (at character 8)
+http://[
+       ^
+
+#0      _Uri._fail (dart:core/uri.dart:2050:5)
+#1      _Uri._makeHost (dart:core/uri.dart:2415:9)
+#2      new _Uri.notSimple (dart:core/uri.dart:1906:14)
+#3      Uri.parse (dart:core/uri.dart:1176:17)
+#4      Client.init (package:matrix/src/client.dart:2086:26)
+<asynchronous suspension>
+#5      SdkMatrixGateway.restore (package:family_nexus/data/matrix/sdk_matrix_gateway.dart:670:11)
+<asynchronous suspension>
+#6      Throws._matchFuture (package:matcher/src/expect/throws_matcher.dart:103:19)
+<asynchronous suspension>
+#7      _expect.<anonymous closure> (package:matcher/src/expect/expect.dart:153:17)
+<asynchronous suspension>
+#8      StackZoneSpecification._registerCallback.<anonymous closure> (package:stack_trace/src/stack_zone_specification.dart:114:42)
+<asynchronous suspension>
+#9      expectLater.<anonymous closure> (package:flutter_test/src/widget_tester.dart:508:19)
+<asynchronous suspension>
+#10     main.<anonymous closure>.<anonymous closure> (file:///Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/data/sdk_registration_test.dart:253:7)
+<asynchronous suspension>
+#11     Declarer.test.<anonymous closure>.<anonymous closure> (package:test_api/src/backend/declarer.dart:253:15)
+<asynchronous suspension>
+#12     Declarer.test.<anonymous closure> (package:test_api/src/backend/declarer.dart:250:11)
+<asynchronous suspension>
+#13     Invoker._waitForOutstandingCallbacks.<anonymous closure> (package:test_api/src/backend/invoker.dart:318:9)
+<asynchronous suspension>
+[0m
+00:00 +4: #28: Anmeldung gelingt, ein Folgeschritt scheitert kein „Unbekannter Fehler.“: die Sitzung steht
+00:00 +5: #28: Anmeldung gelingt, ein Folgeschritt scheitert falsches Passwort bleibt ein Fehler
+00:00 +6: Passwort ändern (SdkMatrixGateway, #117) TP-PW-20 erster Aufruf ohne altes Passwort, Wiederholung mit Sitzung; logout_devices jedes Mal
+00:00 +7: Passwort ändern (SdkMatrixGateway, #117) TP-PW-20b `logout_devices: false` wird ausdrücklich gesendet
+00:00 +8: Passwort ändern (SdkMatrixGateway, #117) TP-PW-20c mehrere Flows: der reine Passwort-Flow reicht
+00:00 +9: Passwort ändern (SdkMatrixGateway, #117) TP-PW-21 Prüfungen vor jeder Anfrage
+00:00 +10: Passwort ändern (SdkMatrixGateway, #117) TP-PW-21b nicht angemeldet: keine Anfrage
+00:00 +11: Passwort ändern (SdkMatrixGateway, #117) TP-PW-22 klassische Anmeldung: Änderung in der App
+00:00 +12: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: flows: [] → passwordChangeUnavailable
+00:00 +13: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: nur SSO → passwordChangeUnavailable
+00:00 +14: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: Passwort + E-Mail → passwordChangeUnavailable
+00:00 +15: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: Passwort-Flow ohne Session → passwordChangeUnavailable
+00:00 +16: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: M_FORBIDDEN ohne Flows (abgeschaltet) → passwordChangeUnavailable
+00:00 +17: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: M_USER_LOCKED → notAllowed
+00:00 +18: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: M_USER_SUSPENDED → notAllowed
+00:00 +19: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: M_USER_DEACTIVATED → notAllowed
+00:00 +20: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: M_UNRECOGNIZED → passwordChangeUnavailable
+00:00 +21: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: M_LIMIT_EXCEEDED → rateLimited
+00:00 +22: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: M_WEAK_PASSWORD → weakPassword
+00:00 +23: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: M_PASSWORD_NO_DIGIT → weakPassword
+00:00 +24: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: Körper ohne errcode → unknown
+00:00 +25: Passwort ändern (SdkMatrixGateway, #117) TP-PW-23 erster Aufruf: kein JSON → unknown
+00:00 +26: Passwort ändern (SdkMatrixGateway, #117) TP-PW-24 Wiederholung: falsches Passwort (M_FORBIDDEN mit Flows) → invalidCredentials
+00:00 +27: Passwort ändern (SdkMatrixGateway, #117) TP-PW-24 Wiederholung: M_UNAUTHORIZED mit Flows → invalidCredentials
+00:00 +28: Passwort ändern (SdkMatrixGateway, #117) TP-PW-24 Wiederholung: Flows ohne errcode → unknown
+00:00 +29: Passwort ändern (SdkMatrixGateway, #117) TP-PW-24 Wiederholung: abgeschaltet nach richtigem Passwort → passwordChangeUnavailable
+00:00 +30: Passwort ändern (SdkMatrixGateway, #117) TP-PW-24 Wiederholung: M_LIMIT_EXCEEDED → rateLimited
+00:00 +31: Passwort ändern (SdkMatrixGateway, #117) TP-PW-25 Zuordnung: Nur das rohe errcode zählt, `M_PASSWORD*` nur als Zeichenkette
+00:00 +32: Passwort ändern (SdkMatrixGateway, #117) TP-PW-26 Kontoseite: ohne Löschaktion, nur https
+00:00 +33: UIA-Registrierung (SdkMatrixGateway) Bedingungen → Captcha: Sitzung und erledigte Schritte werden weitergegeben, Captcha-Seite des Servers
+00:00 +34: UIA-Registrierung (SdkMatrixGateway) falscher Zugangscode → „passt nicht“; Code wird im Feld token gesendet
+00:00 +35: UIA-Registrierung (SdkMatrixGateway) Platzhalterschritt (dummy) wird selbst erledigt; Endlosschleife des Servers wird abgebrochen
+00:00 +36: UIA-Registrierung (SdkMatrixGateway) nur nicht unterstützte Abläufe → registrationDisabled
+00:00 +37: UIA-Registrierung (SdkMatrixGateway) Fehlerzuordnung: vergeben, ungültig, schwaches Passwort, abgeschaltet
+00:00 +38: UIA-Registrierung (SdkMatrixGateway) Abbrechen verwirft die Registrierung samt Passwort; Anmelden ebenso (R4)
+00:00 +39: UIA-Registrierung (SdkMatrixGateway) #259 erfolgreiche Kontoanlage über .well-known: die App zeigt die eingegebene Adresse
+00:00 +40: UIA-Registrierung (SdkMatrixGateway) #259 Wettlauf: Der Kontoanlage-Schritt verwirft die Registrierung, bevor `register` zurückkehrt
+00:00 +41: UIA-Registrierung (SdkMatrixGateway) lokale Prüfungen vor jeder Anfrage
+00:00 +42: OAuth (SdkMatrixGateway) (setUpAll)
+00:00 +42: OAuth (SdkMatrixGateway) Start: dynamische Client-Anmeldung, PKCE S256, state, prompt=create
+00:00 +43: OAuth (SdkMatrixGateway) R12 unsicherer Token-Endpunkt: Abbruch, bevor sich die App beim Anbieter anmeldet
+00:00 +44: OAuth (SdkMatrixGateway) nur eigene Rücksprungadressen; fremder state wird verworfen, Anmeldung bleibt offen (R8)
+00:00 +45: OAuth (SdkMatrixGateway) anderer Fehler des Anbieters (error=server_error) bleibt ein Fehler, kein Hinweis (#430)
+00:00 +46: OAuth (SdkMatrixGateway) Ablehnung beim Anbieter (error=access_denied) beendet die Anmeldung
+00:00 +47: OAuth (SdkMatrixGateway) Desktop-Rücksprung über 127.0.0.1 wird angenommen, Fragment und Query werden gelesen
+00:00 +48: OAuth (SdkMatrixGateway) #259 erfolgreiche Browser-Anmeldung über .well-known: die App zeigt die eingegebene Adresse
+00:01 +49: OAuth (SdkMatrixGateway) #412: Token-Austausch gelingt, der Abgleich danach scheitert: die Sitzung steht, keine Fehlermeldung
+00:01 +50: OAuth (SdkMatrixGateway) #412: Token-Austausch scheitert (invalid_grant): weiter oauthCancelled, keine Sitzung
+00:01 +51: OAuth (SdkMatrixGateway) #259 Wettlauf: Kontoanlage über den Browser, der Schritt verwirft vor der Rückkehr von `oidcLogin`
+00:01 +52: OAuth (SdkMatrixGateway) #222: Metadaten einmal prüfen und festhalten R1 Start: genau ein Abruf, Registrierung beim geprüften Host, kein Kontakt ins Heimnetz
+00:01 +53: OAuth (SdkMatrixGateway) #222: Metadaten einmal prüfen und festhalten R2 Rücksprung: Token-POST an den geprüften Host
+00:01 +54: OAuth (SdkMatrixGateway) #222: Metadaten einmal prüfen und festhalten R2b fremder Rücksprung hebt die Festlegung nicht auf
+00:01 +55: OAuth (SdkMatrixGateway) #222: Metadaten einmal prüfen und festhalten R3 öffentlicher Server, Registrierungs-Endpunkt im Heimnetz: serverUnsupported, kein Kontakt
+00:01 +56: OAuth (SdkMatrixGateway) #222: Metadaten einmal prüfen und festhalten R4 lokaler Server mit lokalen Endpunkten wird nicht abgewiesen
+00:01 +57: OAuth (SdkMatrixGateway) #222: Metadaten einmal prüfen und festhalten R5 die Festlegung lebt so lange wie die Anmeldung
+00:01 +58: OAuth (SdkMatrixGateway) #222: Metadaten einmal prüfen und festhalten Start scheitert nach dem Festhalten (Client-Anmeldung abgelehnt): Festlegung aufgehoben
+00:01 +59: OAuth (SdkMatrixGateway) #222: Metadaten einmal prüfen und festhalten R6 gescheiterter zweiter Start (Endpunkte im Heimnetz) verwirft die erste Anmeldung
+00:01 +60: OAuth (SdkMatrixGateway) #222: Metadaten einmal prüfen und festhalten R6 gescheiterter zweiter Start (unsicherer Token-Endpunkt) verwirft die erste Anmeldung
+00:01 +61: OAuth (SdkMatrixGateway) #222: Metadaten einmal prüfen und festhalten R7 Passwort-Anmeldung hebt Anmeldung und Festlegung vor der Serverprüfung auf
+00:01 +62: OAuth (SdkMatrixGateway) #222: Metadaten einmal prüfen und festhalten ohne Festlegung kein Token-POST (doppelte Sicherung)
+00:01 +63: OAuth (SdkMatrixGateway) #222: Metadaten einmal prüfen und festhalten Metadaten nicht abrufbar: serverUnsupported ohne Client-Anmeldung (bewusste Änderung)
+00:01 +64: OAuth (SdkMatrixGateway) (tearDownAll)
+00:01 +64: (tearDownAll)
+00:01 +64: All tests passed!
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.6 available)
+  archive 4.5.2 (4.7.1 available)
+  code_assets 1.2.1 (2.2.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  dev_build 1.1.15 (1.2.2 available)
+  file_picker 13.1.0 (13.3.3 available)
+  file_picker_darwin 2.3.2 (2.5.1 available)
+  file_picker_linux 2.0.2 (2.0.4 available)
+  file_picker_web 4.2.0 (4.2.1 available)
+  flutter_local_notifications 22.3.2 (23.0.2 available)
+  flutter_local_notifications_linux 8.0.2 (9.0.0 available)
+  flutter_local_notifications_platform_interface 12.2.0 (13.0.0 available)
+  flutter_local_notifications_web 1.0.0 (2.0.0 available)
+  flutter_local_notifications_windows 3.1.1 (4.0.1 available)
+  flutter_vodozemac 0.9.0 (0.9.1 available)
+  image 4.12.0 (4.13.1 available)
+  jni 1.1.0 (1.1.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  matrix 14.2.0 (16.0.4 available)
+  native_toolchain_c 0.19.2 (0.19.6 available)
+  objective_c 9.5.0 (9.6.4 available)
+  petitparser 7.0.2 (7.1.0 available)
+  posix 6.5.2 (6.5.4 available)
+  process_run 1.4.1 (1.4.4 available)
+  qr 4.0.0 (4.0.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common 2.5.14 (2.5.17 available)
+  sqflite_common_ffi 2.4.4 (2.4.7 available)
+  sqflite_common_ffi_web 1.2.0 (1.2.2 available)
+  sqlite3 3.8.0 (3.9.1 available)
+  synchronized 3.5.0 (3.6.1+1 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.4 available)
+  vodozemac 0.9.0 (0.9.1 available)
+  web 1.1.1 (1.1.2 available)
+  windows_file_picker 2.0.1 (2.0.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+38 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart
+00:00 +0: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart: Gateway gegen echten Synapse Anmeldung, Familie anlegen, verschlüsselt chatten
+00:01 +1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart: Gateway gegen echten Synapse falsche Zugangsdaten werden als invalidCredentials gemeldet
+00:02 +2: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_basic_e2e_test.dart: Gateway gegen echten Synapse createFamily überschreibt keine bestehende Familie
+00:02 +3: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart
+00:03 +3: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Passwort ändern (#117) gegen echten Synapse richtiges Passwort: neues gilt, altes nicht mehr, aktuelle Sitzung bleibt
+00:04 +4: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Passwort ändern (#117) gegen echten Synapse falsches aktuelles Passwort: invalidCredentials, nichts geändert
+00:06 +5: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Passwort ändern (#117) gegen echten Synapse logoutOtherDevices: false lässt die zweite Sitzung bestehen, true beendet sie, die aktuelle bleibt
+00:07 +6: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Passwort ändern (#117) gegen echten Synapse Annahme: Ohne `logout_devices` meldet Synapse andere Geräte ab
+00:09 +7: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Passwort ändern (#117) gegen echten Synapse Annahme: Der erste Aufruf ohne `auth` fragt mit Passwort-Flow und Session nach
+00:09 +8: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Passwort ändern (#117) gegen echten Synapse Annahme: Falsches Passwort antwortet mit Flows, Session und `M_FORBIDDEN`
+00:10 +9: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Passwort ändern (#117) gegen echten Synapse Annahme: 512 Zeichen nimmt Synapse an (mit Anmeldung), 513 lehnt es ab
+00:12 +10: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Passwort ändern (#117): Annahmen zu abweichenden Synapse-Einstellungen Ohne Passwort-Anmeldung (`localdb_enabled: false`): leere Flows, ein POST, Passwort bleibt beim Gerät
+00:13 +11: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Passwort ändern (#117): Annahmen zu abweichenden Synapse-Einstellungen Ohne Passwort-Anmeldung (`enabled: false`): keine Passwort-Stufe in den Flows
+00:13 +12: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Passwort ändern (#117): Annahmen zu abweichenden Synapse-Einstellungen Annahme zu `only_for_reauth`: Passwort-Stufe vorhanden, richtiges Passwort ergibt 403 ohne Flows
+00:15 +13: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Passwort ändern (#117): Annahmen zu abweichenden Synapse-Einstellungen `only_for_reauth` mit echtem Gateway: falsches, richtiges Passwort und Richtlinie
+00:16 +14: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_account_e2e_test.dart: Kontolöschung (#12) gegen echten Synapse Passwort-Konto: falsches Passwort scheitert, danach gelöscht, Familie verlassen, Anmeldung unmöglich
+00:19 +15: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart
+00:19 +15: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Link eines Moderators: ein zweiter Moderator prüft und bestätigt die Anfrage
+00:24 +16: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse E-78: Anfrage mit gültigem Link wartet auf den Moderator, obwohl dessen App online ist
+00:35 +17: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse E-78: Vermerk einer alten App mit `auto` bestätigt nichts, die Anfrage bleibt manuell bestätigbar
+00:45 +18: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse E-78: Link läuft während des Wartens ab: nur noch ablehnbar, ein neuer Link führt zum Beitritt
+00:54 +19: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Pen-Test F-01: zwei Anfragen mit demselben Link, gleichzeitig bestätigt: genau eine Einladung
+01:07 +20: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Familien-Code ohne Link: Moderator sieht die Anfrage als „Code“, nichts geschieht von allein, Bestätigung führt zum Beitritt
+01:12 +21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Familien-Code ohne Link: Ablehnung erreicht den Anfragenden (#43)
+01:14 +22: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Konto-Server im Link: frei wählbar, Heimnetz-Fremdserver und Unsinn werden abgelehnt
+01:15 +23: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_invite_e2e_test.dart: Einladungen gegen echten Synapse Per Matrix-ID eingeladenes Konto findet die Einladung nach der Anmeldung
+01:16 +24: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart
+01:17 +24: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: (setUpAll)
+01:17 +24: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) echter Klartext eines Mitglieds: weder Nachricht noch Signal noch Vermerk; Verschlüsseltes kommt weiter an
+01:20 +25: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) gefälschte eigene Ereignisse mit bekannter Kennung und Status: kein Signal, kein Vermerk, keine Nachricht
+01:23 +26: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) nach einem Neustart: Verschlüsseltes bleibt aus der SDK-Datenbank lesbar, Klartext und Gefälschtes draußen
+01:27 +27: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) zweites eigenes Gerät: dessen Ereignisse kommen an, ältere über requestHistory, Klartext bleibt draußen
+01:36 +28: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) fehlgeschlagenes Senden: automatisch höchstens fünfmal, von Hand wiederholbar, kommt verschlüsselt an
+01:46 +29: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) fehlt die Verschlüsselung vorübergehend, bleiben die Versuche erhalten
+01:49 +30: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) Anhang und geteilter Termin: gescheitert, aus dem Original wiederholt
+01:52 +31: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) gefälschtes Fehler-Ereignis mit Einzelchat-Kennung in der Familien-Zeitleiste: kein Versuch dort
+01:58 +32: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) ausgetretenes Mitglied im richtigen Thread: Die Prüfung vor dem Versuch hält die Sendung auf
+02:02 +33: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) offene Familien-Sendung, Kontodaten wechseln im selben Sync: kein PUT, kein Inhalt im neuen Raum
+02:07 +34: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) offene Familien-Sendung, nach dem Zeitleisten-Wechsel: auch ein gefälschtes Fehler-Ereignis löst nichts aus
+02:11 +35: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) Sync-Echo vor der Sendeantwort: Nachricht, Termin und Wiederholen bleiben erhalten
+02:16 +36: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) Klartext aller Signal-Typen in Familie, privatem Raum und Einzelchat
+02:20 +37: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) Einzelchat: automatisch und von Hand wiederholt, nur in diesen Raum
+02:24 +38: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) Antwort da, Sync-Echo aus: Text, Antwort, Anhang und Karte bleiben sichtbar
+02:29 +39: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) echte Bearbeitung über Megolm gilt, Klartext-Bearbeitung danach nicht
+02:33 +40: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) offene Sendung aus A, Wechsel nach B und zurück: geht nur nach A
+02:37 +41: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) Sync-Echo vor der Sendeantwort im Einzelchat und im privaten Raum
+02:41 +42: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) eigener Klartext-Termin ohne bekannte Kennung, sent und synced: kein Signal
+02:44 +43: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) eigener Termin: Scan im Zustand gesendet, danach Echo: Signal kommt
+03:14 +43 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) eigener Termin: Scan im Zustand gesendet, danach Echo: Signal kommt [E]
+  TimeoutException after 0:00:30.000000: Test timed out after 30 seconds. See https://pub.dev/packages/test#timeouts
+  dart:isolate  _RawReceivePort._handleMessage
+  
+03:14 +43 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) Sync-Echo vor der Sendeantwort im privaten Raum, Antwort sofort nach dem Echo
+03:17 +44 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) gefälschtes Fehler-Ereignis mit derselben Kennung tauscht den Inhalt nicht
+03:21 +45 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) Antwortziel: Klartext wird abgewiesen, nichts geht hinaus; Verschlüsseltes bleibt beantwortbar
+03:24 +46 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) Antwortziel: Die eigene Nachricht zählt auch zwischen Sendeantwort und Sync-Echo
+03:26 +47 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) Fenster vor dem Abgleich: Zeitleiste schon zurück in A, `family` noch B: kein Versuch verbraucht
+03:31 +48 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) Abmelden während einer laufenden Sendung: kein Absturz, nichts bleibt offen
+03:33 +49 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Ersteinrichtung: Wiederherstellungsschlüssel, Cross-Signing, Gerät verifiziert
+03:33 +50 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse zweites Gerät: Emoji-Verifizierung mit dem ersten
+03:35 +51 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Abbruch: abweichende Emoji → keine Verifizierung
+03:36 +52 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Wiederherstellung mit Schlüssel: falscher Schlüssel scheitert, richtiger verifiziert und entschlüsselt alte Nachrichten
+03:44 +53 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse neuer Schlüssel (#11): alter scheitert, neuer verifiziert und entschlüsselt alte Nachrichten
+03:52 +54 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Schlüsselsicherung und Verifizierung gegen echten Synapse Unverifiziertes Gerät erhält keine Raumschlüssel; nach Verifizierung neue Nachrichten lesbar
+03:54 +55 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: (tearDownAll)
+03:54 +55 -1: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_avatar_e2e_test.dart
+03:54 +55 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_avatar_e2e_test.dart: Avatar als Raumzustand (#422, E-101) (a) neue Familie: Mitglied wählt, Ersteller sieht es; fremden Schlüssel setzen scheitert mit 403
+03:57 +56 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_avatar_e2e_test.dart: Avatar als Raumzustand (#422, E-101) (b) bestehende Familie ohne Freigabe: G2 needsModerator; ernannter Moderator G3 (50) schaltet frei, G2 wählt
+04:02 +57 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_avatar_e2e_test.dart: Avatar als Raumzustand (#422, E-101) (b2) Ersteller auf Stufe 50 schaltet frei
+04:06 +58 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_avatar_e2e_test.dart: Avatar als Raumzustand (#422, E-101) (b3) Ersteller bleibt auf Stufe 100 und schaltet frei
+04:10 +59 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_avatar_e2e_test.dart: Avatar als Raumzustand (#422, E-101) (c) später beigetretenes Mitglied sieht beide Avatare sofort; (d) Wechsel ersetzt die frühere Wahl
+04:15 +60 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_avatar_e2e_test.dart: Avatar als Raumzustand (#422, E-101) (e) Moderator entfernt eine Person: avatarOf liefert weiter, nicht mehr beigetreten, Ändern scheitert mit 403
+04:18 +61 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_avatar_e2e_test.dart: Avatar als Raumzustand (#422, E-101) (f) zwei ernannte Moderatoren auf Stufe 50 schalten gleichzeitig frei: Endzustand, beide bleiben auf 50
+04:23 +62 -1: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_moderation_e2e_test.dart
+04:23 +62 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_moderation_e2e_test.dart: Melden gegen echten Synapse fremde Nachricht wird gemeldet, eigene und unbekannte werden abgelehnt
+04:26 +63 -1: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_join_rejection_e2e_test.dart
+04:27 +63 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_join_rejection_e2e_test.dart: Ablehnung beim Anfragenden gegen echten Synapse langes Intervall: Die Ablehnung kommt über den Sync-Auslöser an
+04:28 +64 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_join_rejection_e2e_test.dart: Ablehnung beim Anfragenden gegen echten Synapse Ablehnung bei geschlossener App kommt beim nächsten Start an
+04:31 +65 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_join_rejection_e2e_test.dart: Ablehnung beim Anfragenden gegen echten Synapse offene Anfrage liefert knock
+04:34 +66 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_join_rejection_e2e_test.dart: Ablehnung beim Anfragenden gegen echten Synapse Anfrage, Ablehnung, Rückzug, neue Anfrage im selben Raum: kein Fehlalarm
+04:39 +67 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_join_rejection_e2e_test.dart: Ablehnung beim Anfragenden gegen echten Synapse Anfrage, Ablehnung, Rückzug, neue Anfrage in anderem Raum: kein Fehlalarm
+04:45 +68 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_join_rejection_e2e_test.dart: Ablehnung beim Anfragenden gegen echten Synapse Serverbeleg: Abrufform aus dem Nachtest liefert Absender und Vorzustand (Synapse 1.163.2)
+04:46 +69 -1: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart
+04:47 +69 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart: (setUpAll)
+04:47 +69 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart: Kalender über den echten Synapse geteilte und private Termine: verschlüsselt, getrennte Räume, Signale auch für späte Zuhörer
+04:48 +70 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_calendar_e2e_test.dart: (tearDownAll)
+04:48 +70 -1: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart
+04:49 +70 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse #139: Reaktionen bleiben verschlüsselt, im Familien- und im Einzelchat, ohne Doppelsendung
+04:56 +71 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse #254: Marke „Neue Nachrichten“ folgt Lesemarke und Zähler
+04:59 +72 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse #254 Teil B: Neustart – Rückstand bei geschlossener App meldet nichts, Neues schon
+05:06 +73 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Online-Status: verschlüsselt zugestellt, Anfrage wird beantwortet, Fremde und Klartext werden ignoriert
+05:17 +74 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einzelchat: verschlüsselt, automatische Annahme, getrennt vom Familienchat, nach Entfernen gesperrt
+05:22 +75 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einzelchat-Einladung von Fremden wird weder angenommen noch als Familieneinladung gezeigt
+05:28 +76 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einkaufszettel: Gruppe setzen, ändern und entfernen erreicht das zweite Mitglied (#211)
+05:32 +77 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Einkaufszettel: verschlüsselt im Familienraum, beide Mitglieder erhalten Einträge, Server sieht keinen Klartext
+05:35 +78 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Issue #1: Liste v2 (Erklärung, monatlich am letzten Freitag) wird verschlüsselt übertragen und gleich gelesen
+05:38 +79 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_phase6_e2e_test.dart: Online-Status, Einzelchats, Einkaufszettel gegen echten Synapse Aufgabenlisten: Liste und Protokolleintrag verschlüsselt im Familienraum, Server sieht keinen Klartext
+05:41 +80 -1: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart
+05:41 +80 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-01 Registrierungsweg wird erkannt; Name frei → Konto in der App angelegt → Name vergeben
+05:43 +81 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-02 lokale Prüfungen vor dem Senden: ungültiger Name, zu kurzes Passwort
+05:43 +82 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-03 Neuling: Konto anlegen → Link v4 mit Namen → Anfrage → Moderatorin sieht den Namen → bestätigt → Mitglied
+05:45 +83 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) Issue #6: Link einer Familie auf einem Heimnetz-Server (localhost) vor der Anmeldung lesen und beitreten
+05:47 +84 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-04 direkte Einladung zeigt den Namen der einladenden Person
+05:48 +85 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_registration_e2e_test.dart: Kontoanlage und Einladung gegen echten Synapse (E-55, E-56) TP-E2E-05 Abbruch: Registrierung lässt sich verwerfen, danach erneut starten
+05:49 +86 -1: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart
+05:49 +86 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familienwechsel im selben Prozess (#140) A → keine Familie → B: nichts aus A, kein Beitrittssignal; der private Termin kommt wieder
+05:57 +87 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familienwechsel im selben Prozess (#140) Issue-Szenario über Gateway, Sync und Ablage: eigene Daten aus A erreichen B nicht
+06:02 +88 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familienwechsel im selben Prozess (#140) direkter Wechsel: Einzelchats aus A sind sofort weg, auch vor der Mitgliederliste von B
+06:07 +89 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familienwechsel im selben Prozess (#140) direkter Wechsel: Die Mitgliederliste von A gilt nicht als geladen für B
+06:11 +90 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familienwechsel im selben Prozess (#140) direkter Wechsel über die Kontodaten: kein Signal aus A, Mitgliederliste von B geladen
+06:16 +91 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familienwechsel im selben Prozess (#140) Wiederbeitritt zu A: idempotent, jedes Ereignis höchstens einmal, kein Beitrittssignal
+06:20 +92 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familienwechsel im selben Prozess (#140) der Link-Vermerk eines anderen Moderators aus A macht eine Anfrage in B nicht gültig
+06:26 +93 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familienwechsel im selben Prozess (#140) verspätete Mitgliederliste aus A: keine Basis für B
+06:31 +94 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familienwechsel im selben Prozess (#140) #135: Fehler der Mitgliederliste aus A nach dem Wechsel startet keinen Neuversuch für B
+06:37 +95 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familienwechsel im selben Prozess (#140) vor dem ersten Abgleich nach dem Kontodaten-Wechsel geht nichts in den neuen Raum
+06:41 +96 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familienwechsel im selben Prozess (#140) Fenster vor dem Abgleich: Senden, Raumaktionen und Link-Vermerk gehen nicht in den neuen Raum
+06:46 +97 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse #129: Foto mit Vorschaubild kommt beim Mitglied an, die Datei bleibt unverändert
+06:49 +98 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Beitritt per Link: Anfrage → Bestätigung → Annahme; Chat wird entschlüsselt
+06:52 +99 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Einladungslink: gefälschte ID nicht bestätigbar, Link nur einmal verwendbar, Identität vermerkt
+06:56 +100 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Mitglied hat keine Verwaltungsrechte – im Gateway UND auf dem Server
+06:59 +101 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Ernennen, Umbenennen, Moderatoren sind gleichrangig
+07:02 +102 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Issue #7: Mitglied zum Moderator hochstufen – auch durch einen ernannten Moderator und mehrfach hintereinander
+07:07 +103 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Issue #7: zwei Ernennungen unmittelbar hintereinander (veralteter Zwischenspeicher)
+07:11 +104 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Issue #9: Ersteller ist im Raum Administrator (100), in der App Moderator; Moderator bleibt bei 50
+07:14 +105 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Ablehnen einer Anfrage und abgelaufene/ungültige Links
+07:16 +106 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Entfernen rotiert den Raumschlüssel; Entfernte lesen neue Nachrichten nicht
+07:20 +107 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Familie, Einladung, Rollen gegen echten Synapse Einladung per Matrix-ID und Ablehnen einer Einladung
+07:22 +108 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Mitgliederliste: Neuversuch nach Fehler (#135) ein gescheiterter Abruf wird nach der Wartezeit wiederholt
+07:25 +109 -1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_family_e2e_test.dart: Mitgliederliste: Neuversuch nach Fehler (#135) nach dispose wartet kein Neuversuch mehr
+07:32 +110 -1: Some tests failed.
+
+Failing tests:
+  /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/test/e2e/gateway_security_e2e_test.dart: Klartext in verschlüsselten Räumen (#138) eigener Termin: Scan im Zustand gesendet, danach Echo: Signal kommt
+Test-Homeserver entfernt
+exit=1

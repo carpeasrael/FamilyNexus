@@ -1,0 +1,6 @@
+## docs/e2e-plan-aktualisierung...origin/docs/e2e-plan-aktualisierung
+?? Screenshot_1794998234.png
+?? Screenshot_1794998242.png
+c6d2ef0 Testplan FamilyNexus 1.55: Geburtstage, Zustellstatus, Navigation (vor Lauf 36)
+b85ce9da6555d8d460987caee48cfdd564beb085
+version: 1.2.3+31

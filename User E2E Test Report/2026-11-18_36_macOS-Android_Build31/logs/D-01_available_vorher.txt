@@ -1,0 +1,5 @@
+fnt-1118-n1: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+fnt-1118-n12: {"available":true}
+fnt-1118-i2: {"available":true}
+fnt-1118-n9: {"available":true}
+fnt-1118-n12: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}

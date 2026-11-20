@@ -1,0 +1,48 @@
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /flutter_bootstrap.js HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /canvaskit/chromium/canvaskit.wasm HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /canvaskit/chromium/canvaskit.js HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /main.dart.js HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /favicon.png HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /icons/Icon-192.png HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /assets/FontManifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /assets/assets/fonts/SpaceGrotesk-Variable.ttf HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /assets/assets/fonts/IBMPlexSans-Variable.ttf HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /assets/assets/fonts/IBMPlexMono-Regular.ttf HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /assets/assets/fonts/IBMPlexMono-Medium.ttf HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:16] "GET /assets/fonts/fallback/Roboto-Regular.ttf HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:25] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:25] "GET /flutter_bootstrap.js HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:25] "GET /main.dart.js HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:25] "GET /assets/FontManifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:25] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:35] "GET /sqlite3mc.wasm HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:35] "GET /pkg/vodozemac_bindings_dart.js HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:35] "GET /pkg/vodozemac_bindings_dart_bg.wasm HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 20:05:42] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:42] "GET /flutter_bootstrap.js HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:42] "GET /main.dart.js HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:42] "GET /assets/FontManifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:42] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:51] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:51] "GET /flutter_bootstrap.js HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:51] "GET /main.dart.js HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:51] "GET /assets/FontManifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:05:51] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:06:01] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:06:01] "GET /flutter_bootstrap.js HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:06:01] "GET /main.dart.js HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:06:01] "GET /assets/FontManifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:06:01] "GET /assets/fonts/MaterialIcons-Regular.otf HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:06:19] "GET /sqlite3mc.wasm HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:06:19] "GET /pkg/vodozemac_bindings_dart.js HTTP/1.1" 304 -
+127.0.0.1 - - [15/Nov/2026 20:06:20] "GET /pkg/vodozemac_bindings_dart_bg.wasm HTTP/1.1" 304 -
+navigator.languages: de-DE,de
+ok   Tresor einrichten
+ok   Start nach dem Anlegen (Willkommen)
+ok   Entsperren nach Neuladen
+ok   Falsches Passwort abgelehnt
+ok   Richtiges Passwort entsperrt
+Rauchtest bestanden.

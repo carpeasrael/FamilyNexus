@@ -1,0 +1,8 @@
+-- A-06 Wiederholung 23:49:06
+Vordergrund: "Safari" ASN:0x0-0xfcafca: (in
+Safari-Fenster: matrix-authentication-service, 1, 124, 1025, 892
+nach Abbruch Vordergrund: "FamilyNexus" ASN:0x0-0x456d56
+Safari-Fenster: 1
+Hinweis: Screenshot der Sitzung in A-06 entfernt (Passwortvorschlag des Nutzers sichtbar); gleiches Fenster wie A-04.
+Safari-Fenster jetzt: 1
+Nach A-06: verbleibendes Safari-Fenster 'matrix-authentication-service' mit visible=false (unsichtbar, kein Tab lesbar)

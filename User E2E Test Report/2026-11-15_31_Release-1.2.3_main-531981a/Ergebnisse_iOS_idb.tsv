@@ -1,0 +1,147 @@
+ID	Pl	Ergebnis	Beobachtung/Beleg	Screenshot
+RT3-V-01	iOS	✅	pubspec.yaml version: 1.2.3+30; Commit e921f3f (origin/main, detached im Worktree), git status sauber	-
+RT3-V-01	iPad	✅	wie iOS (gleicher Build)	-
+RT3-V-02	iOS	✅	Einstellungen > Ueber die App (aufgeklappt) zeigt 'Version 1.2.3 (30)'; Menue zeigt ebenfalls 'Version 1.2.3 (30)'; Info.plist 1.2.3 / 30; Datenuebersicht 'App-Version 1.2.3 (30)'	screenshots/idb_V-02_iOS.png
+RT3-V-02	iPad	✅	Info.plist-Build identisch (CFBundleVersion 30), gleiche Binary wie iPhone; Anzeige am iPad nicht separat gescreenshottet (Menue 'Version 1.2.3 (30)' im Kalender-und-Chat-Layout nicht geprueft)	-
+RT3-V-03	iOS	⏳	Alle lokalen Daten loeschen bewusst nicht ausgefuehrt (zerstoert die Testkonten; Dialog 'Alle lokalen Daten loeschen?' wurde versehentlich geoeffnet und mit Abbrechen geschlossen, Daten blieben). Frische Installation (uninstall+install) zeigte 'Willkommen bei FamilyNexus' (idb_A-01)	screenshots/idb_A-01_iOS.png
+RT3-V-03	iPad	⏳	wie iOS; frische Installation zeigt Willkommensseite	screenshots/idb_A-01_iPad.png
+RT3-V-04	iOS	n/a	Plan: Vorversion 1.2.2 (26) nicht verfuegbar	-
+RT3-V-05	iOS	✅	Commit e921f3f (Merge PR #496), flutter build ios --simulator --debug erfolgreich (logs/ios_idb_build.txt); App zeigt 1.2.3 (30)	-
+RT3-V-05	iPad	✅	gleiche Binary	-
+RT3-A-01	iOS	⏳	Neuinstallation + simctl launch bei System hell: nach 25 s Willkommensseite. Erste Sekunden nicht aufgenommen (kein Videoaufnahme-Werkzeug im Lauf; nur Standbilder)	screenshots/idb_A-01_iOS.png
+RT3-A-01	iPad	⚠️	Start iPad Pro 13 (M5) mit Debug-Build: Willkommensseite nach <25 s (Vorlauf-Fehlschlag nicht reproduziert); erste Sekunden nicht aufgenommen; Debug-Banner unten rechts	screenshots/idb_A-01_iPad.png
+RT3-A-02	iOS	⏳	Dunkel-Start nicht erneut aufgenommen (Vorlauf: dunkles Startbild ohne Blitz in Stichprobe)	-
+RT3-A-02	iPad	⏳	nicht erneut ausgefuehrt	-
+RT3-A-03	iOS	⏳	Ladebild-Wechsel nur per Video belegbar; kein Videomitschnitt	-
+RT3-A-04	iOS	⏳	App-Umschalter-Vorschaubild nicht per idb/simctl abgreifbar (Umschalter-Geste ueber idb swipe nicht belastbar versucht)	-
+RT3-A-07	iOS	⏳	Beschaedigte Datenbank nicht herbeigefuehrt (Zerstoerung der Testdatenbank im Simulatorcontainer nicht erlaubt/gewollt)	-
+RT3-B-01	iOS	✅	Benachrichtigungen im Simulator nicht erteilt: Heute zeigt Karte 'Berechtigung fehlt' (Benachrichtigungen sind blockiert ...) genau einmal und Karte 'Erinnerungen' genau einmal; keine doppelte Ueberschrift (describe-all)	screenshots/idb_B-01_iOS.png
+RT3-B-02	iOS	⏳	Erinnerungen-Uebersicht (AppBar 'Erinnerungen') nicht geoeffnet	-
+RT3-B-03	iOS	⏳	Hell/dunkel/200 % fuer B-01/B-02 nicht gesondert geprueft	-
+RT3-B-05	iPad	⏳	Termin 'Privat Erinnerung' (21:00, Standard 10 Min vorher) angelegt; Uebersicht zeigt 'Keine Erinnerung geplant' weil 20:50 schon verstrichen war; Zeitwaehler-Texteingabe (Ziffernblock) reagierte nicht auf idb-Eingaben, daher kein zeitnaher Termin; Zeile 'Erinnerung: <Uhrzeit>' nicht belegt	-
+RT3-C-01	iOS	✅	Chat beginnt mit 'Gespraeche'; Zeile 1 'Familienchat Testfamilie', Zeile 2 Einzelchat; Label 'Einzelchat mit Bob, Online, Du: Hallo Bob'; keine Chip-Leiste	screenshots/idb_C-01_iOS.png
+RT3-C-01	iPad	✅	G2 (Bob): Liste in der Chatspalte: 'Familienchat Testfamilie ...', 'Einzelchat mit Anna, Online, Hallo Bob, 1 ungelesen'	screenshots/idb_C-01_iPad.png
+RT3-C-02	iPad	✅	Familienchat: Entwurf 'Entwurf Liste' getippt, Pfeil 'Zurueck zu den Gesprächen', Einzelchat (Kopfzeile Pfeil, Titel, Online-Punkt+Text), zurueck, Familienchat: Entwurf noch im Feld (TextField-Wert 'Entwurf Liste')	screenshots/idb_C-02_iPad.png
+RT3-C-03	iPad	✅	Auf Liste: G1 sendet 'Liste 1' (Familie), 'Liste 2' (Einzel): Zeilen 'Familienchat Testfamilie, Liste 1, 1 ungelesen' und 'Einzelchat mit Anna, Online, Liste 2, 1 ungelesen'; Chat-Tab-Zaehler 2; Zaehler bleiben bis zum Oeffnen. Fette Schrift nur aus Label/Screenshot nicht einzeln geprueft	screenshots/idb_C-03_iPad.png
+RT3-C-04	iOS	✅	Einzelchat offen, Tab Heute, zurueck zu Chat: Gespraech noch offen (Zurueck zu den Gespraechen, Bob), Entwurf erhalten (Scrollposition nicht geprueft)	screenshots/idb_C-04_iOS.png
+RT3-C-05	iOS	n/a	Plan: Android	-
+RT3-C-06	iOS	✅	Pfeil fuehrt zur Liste; Kantenwisch von links (idb swipe x=2) im Gespraech: kein Absturz, App laeuft weiter, Gespraech bleibt	-
+RT3-C-06	iPad	✅	Pfeil 'Zurueck zu den Gespraechen' fuehrt zur Liste (in Chatspalte)	-
+RT3-C-07	iPad	✅	iPad 13 hoch (1032 pt >= 1000): 'Kalender und Chat' zweispaltig; Liste in der Chatspalte; Zurueck wirkt auf sie; Kalender bleibt	screenshots/idb_C-07_iPad.png
+RT3-C-08	iPad	✅	Vor dem ersten Einzelchat: Chatspalte zeigt direkt den Familienchat ohne Liste und ohne Kopfzeile	screenshots/idb_C-08_iPad.png
+RT3-C-09	iOS	⏳	Entfernen/Blockieren waehrend offenem Gespraech: nicht ausgefuehrt (Zeit)	-
+RT3-C-10	iOS	⏳	Zickzack-Zeitstempel nicht erzeugbar ohne Hilfsclient	-
+RT3-C-11	iOS	⏳	Zeilenumbruch/Anhang/geteilter Termin: Anhang-Dateiauswahl im Simulator nicht per idb bedienbar; Zeilenumbruch nicht versucht	-
+RT3-C-12	iOS	⏳	Teil: nach Senden leert sich das Feld; Race bei langsamer Verbindung nicht erzeugt	-
+RT3-C-13	iOS	✅	Eigene Nachricht im Semantikbaum: 'Nachricht von dir' / 'Hallo Bob' / Zeit-Label (describe-all); Anzeige unveraendert; keine VoiceOver-Sprachausgabe geprueft	-
+RT3-C-14	iOS	⏳	App-Sperre nicht getestet (Geraetepasscode im Simulator)	-
+RT3-D-01	iPad	✅	Avatar aendern: Vorschau + 'Initialen (kein Avatar)' + 12 Symbole (Pfote, Hase, Vogel, Blume, Baum, Segelboot, Fahrrad, Pizza, Eis, Musik, Fussball, Rakete); Namen sichtbar; Kacheln 92x89 pt (>= 48)	screenshots/idb_D-01_iPad.png
+RT3-D-02	iPad	⚠️	Segelboot gewaehlt, Speichern: Auswahl bleibt als Ausgewaehlt, Speichern danach deaktiviert, Bildschirm bleibt stehen (kein automatisches Schliessen); Text 'wird uebernommen' nicht gesehen (Stichprobe 1 s spaeter); Segelboot an eigener Kachel/bei Anna sichtbar (D-03)	screenshots/idb_D-02_iPad.png
+RT3-D-03	iOS	✅	G1 sieht bei Bob das Segelboot in der Mitgliederliste (Screenshot); Chat/Kalender/Heute-Avatare nicht einzeln bewertet (Kalender-Chips 'A'/'B' mit Initialen sichtbar)	screenshots/idb_D-03_iOS.png
+RT3-D-04	iOS	✅	Bob wechselt zu 'Initialen (kein Avatar)': G1 sieht gruenes 'B', Name unveraendert	screenshots/idb_D-04_iOS.png
+RT3-D-05	iOS	⏳	Hell/200 % Avatar nicht geprueft	-
+RT3-D-06	iOS	⏳	drittes Mitglied nicht angelegt	-
+RT3-D-07	iOS	⏳	Bestehende Familie (vor 1.2.3) nicht vorhanden	-
+RT3-D-08	iOS	⏳	Entfernen von Bob nicht ausgefuehrt	-
+RT3-D-09	iOS	⚠️	Datenuebersicht (lokal) oeffnet, enthaelt tourSeen, identityPins, event_themes; Datenschutz-Text zur Avatar-Ausnahme nicht gelesen	-
+RT3-E-01	iOS	✅	Familie > Kalender-Themen > Thema anlegen: sieben Farben (Tuerkis, Rosa, Lila, Gelb, Gruen, Orange, Rot), kein Himmelblau; 'Schule' (Lila) und 'Sport' (Gruen) angelegt, Hinweis 'Thema gespeichert.'; Umbenennen nicht ausgefuehrt	screenshots/idb_E-01_iOS.png
+RT3-E-02	iOS	✅	Neuer Termin 'Test Thema': Privat zeigt 'Privat: immer blau' (iPad-Screenshot), Geteilt zeigt Chips 'Ohne Thema','Schule','Sport'; Termin: 'Test Thema, 21:00 - 22:00, Geteilt, Thema Schule', Lila Streifen, Themenname als Text (kein Android-B2-Befund auf iOS)	screenshots/idb_E-02_chips_iOS.png
+RT3-E-03	iOS	⏳	Auf Privat stellen nicht ausgefuehrt	-
+RT3-E-04	iPad	✅	I2 (Bob): in Familie kein Eintrag 'Kalender-Themen'; sieht 'Test Thema ... Thema Schule, Von Anna'; eigenen Termin mit Sport nicht angelegt (Zeitwaehler-Problem), G1 sieht Gruen daher nicht belegt	screenshots/idb_E-04_iPad.png
+RT3-E-05	iOS	⏳	zweiter Moderator nicht vorhanden	-
+RT3-E-06	iOS	⏳	30-Zeichen-/13-Themen-Grenze nicht ausgefuehrt	-
+RT3-E-07	iOS	✅	Jahresfortschritt: iPad 'Tag 319 von 365 - noch 46 Tage - 87 % des Jahres verstrichen' mit Balken; Semantik 'Jahresfortschritt: 87 Prozent verstrichen' (ein Satz); Rechnung (319-1)/365=87,1 stimmt	screenshots/idb_E-07_iOS.png
+RT3-E-08	iOS	⏳	Systemdatum nicht verstellt	-
+RT3-E-09	iOS	⏳	15-Minuten-Abgleich nicht abgewartet	-
+RT3-E-10	iOS	⏳	gestoerte Ablage nicht herbeigefuehrt	-
+RT3-E-11	iPad	⏳	Hardware-Tastatur im Simulator nicht ansteuerbar; Texteingabemodus des Zeitwaehlers oeffnet mit Ziffernblock, idb text und Tastendruecke aendern Stunde/Minute nicht	-
+RT3-F-01	iOS	✅	Heute: Karte 'Berechtigung fehlt' mit 'Erlauben' loest echten Systemdialog '„FamilyNexus“ moechte dir Mitteilungen senden' aus (iPhone: 'Nicht erlauben' gewaehlt, iPad: 'Erlauben'). Einstellungen > Benachrichtigungen: 'Meldungen ohne Inhalt, nur solange die App geoeffnet ist. Auf Mobilgeraeten koennen sie im Hintergrund und bei beendeter App ausbleiben (es gibt keinen Push-Dienst)' plus zwei Schalter (Neue Chat-Nachrichten, Neue Eintraege auf dem Einkaufszettel); Hinweis 'Die Zahl am App-Symbol erlaubst du in den Geraeteeinstellungen unter Mitteilungen > FamilyNexus > Kennzeichen'	screenshots/idb_F-01_Systemdialog_iOS.png
+RT3-F-02	iPad	✅	G1 sendet bei Heute-Ansicht (Chat nicht sichtbar): SpringBoard-Log 'Saving notification ... hasAlertContent: YES, shouldPresentAlert: YES' (logs/ios_idb_F02_notification_log.txt); Sperrbildschirm-Screenshot zeigt 'FamilyNexus - Neue Nachrichten' ohne Absender/Inhalt (Simulator ging in Bildschirmsperre). Banner im Vordergrund per simctl-Screenshot nicht sichtbar. Einkaufs-Meldung nicht getestet	screenshots/idb_F-02_Sperrbildschirm_iPad.png
+RT3-F-03	iPad	✅	Gespraech offen (Familienchat), G1 sendet 'Offen5': Nachricht kommt an, im SpringBoard-Log keine neue 'Saving notification' (nur Badge-Updates); auf der Gespraechsliste/Heute (kein Gespraech offen) kam die Meldung (Log 20:49:13, 20:54:35/36, 20:56:45)	screenshots/idb_F-03_iPad.png
+RT3-F-04	iOS	⏳	Zahl am Symbol: Log 'Setting badge count to N' (1,2,3) belegt API-Aufruf, Symbol auf Home-Screen nicht geprueft; Zuruecksetzen beim Lesen/Abmelden und Kennzeichen-Freigabe nur am echten iPhone abnehmbar	logs/ios_idb_F02_notification_log.txt
+RT3-F-05	iPad	⚠️	Simulator-Sperrbildschirm zeigt nur 'FamilyNexus / Neue Nachrichten'; echtes iPhone und Mitteilungszentrale nicht geprueft	screenshots/idb_F-02_Sperrbildschirm_iPad.png
+RT3-F-06	iOS	⏳	Erinnerung bei beendeter App: Zeitwaehler-Eingabe per idb nicht moeglich, kein Termin in 2 Minuten anlegbar	-
+RT3-F-07	iOS	⏳	Hintergrund/beendet 180 s nicht ausgefuehrt	-
+RT3-F-10	iOS	n/a	Plan: Lin, And	-
+RT3-F-11	iOS	⏳	Aus-Schalter nicht gepruft	-
+RT3-G-01	iOS	✅	Konto am lokalen Synapse ohne Browser angelegt (Wegwerfkonten, Server per Erweitert > Anderen Anbieter 'https://localhost:18448', Zertifikat vertraut); abmelden -> Anmelden: falsches Passwort zeigt 'Benutzername oder Passwort stimmen nicht.' direkt unter dem Formular, bleibt beim Aendern des Passworts stehen und ist beim naechsten Versuch weg; richtiges Passwort fuehrt zu 'Dieses Geraet freischalten' (Notfall-Schluessel noetig; Schluessel des ersten Kontos war nicht gesichert, daher dort Ende)	screenshots/idb_G-01_Fehleingabe_iOS.png
+RT3-G-01	iPad	✅	Konten Bob (abgemeldet) und Dora am lokalen Synapse angelegt; Einladung per Link in die Familie, Moderator bestaetigt (Beitrittsanfrage), Dora tritt bei	-
+RT3-G-02	iOS	✅	Anmeldeseite: Schaltflaeche 'Bei matrix.org anmelden' mit Login-Pfeilsymbol (Text maßgeblich); nach Anbieterwechsel 'localhost'; nicht angetippt (matrix.org gesperrt)	screenshots/idb_G-02_iOS.png
+RT3-G-02	iPad	⏳	iPad-Schaltflaeche nicht eigens gescreenshottet (gleiche Seite wie iPhone; nach Abmelden zeigte Anmelden-Seite matrix.org als Voreinstellung)	-
+RT3-G-04	iOS	⏳	Nicht freigegeben (OAuth/matrix.org)	-
+RT3-G-05	iOS	⏳	Nicht freigegeben (OAuth/matrix.org)	-
+RT3-G-06	iOS	n/a	Plan: Mac	-
+RT3-G-07	iOS	n/a	Plan: And	-
+RT3-G-08	iOS	⏳	Folgeschritt-Fehler (Netz trennen) nicht herbeifuehrbar ohne Eingriff am Synapse (nicht erlaubt)	-
+RT3-G-09	iOS	⏳	Eingebettete Ansicht nur aus OAuth-Anbieterfluss erreichbar (EmbeddedOpener nur in oauth_redirect/in_app_auth); der lokale Synapse hat keinen OAuth-Anbieter, keine Testseite einhaengbar ohne App-Code	-
+RT3-G-10	iOS	⏳	wie G-09	-
+RT3-G-11	iOS	⏳	wie G-09	-
+RT3-G-12	iOS	⏳	wie G-09; Container-Pruefung WebsiteData ohne Seitenbesuch sinnlos	-
+RT3-G-13	iOS	⏳	wie G-09	-
+RT3-G-14	iOS	⏳	Fremdanbieter nicht freigegeben	-
+RT3-G-09	iPad	⏳	wie iOS	-
+RT3-H-01	iOS	✅	Nach Familiengruendung Dialog 'Schritt 1 von 3 Kalender', 2 Chat, 3 Einkauf, 'Ueberspringen' in Schritt 1 und 2 sichtbar (im letzten Schritt 'Zurueck' und 'Los geht's' statt Ueberspringen, bekannte Abweichung B5)	screenshots/idb_H-01_iOS.png
+RT3-H-01	iPad	✅	Tour erscheint nach Beitritt als Dialog (Schritt 1 von 3, Ueberspringen/Weiter)	screenshots/idb_H-01_iPad.png
+RT3-H-02	iPad	✅	Tour uebersprungen, App neu gestartet (terminate/launch): Heute ohne Tour; Datenuebersicht enthaelt tourSeen. Hinweis: bei neuen Konten (Carl, Dora) erscheint die Tour auf demselben Geraet nicht erneut, weil tourSeen geraetebezogen ist	-
+RT3-H-02	iOS	✅	Tour mit 'Los geht's' beendet, Neustart: keine Tour	-
+RT3-H-03	iOS	⏳	Einfuehrung erneut ansehen vorhanden (Ueber die App), Tour nicht gestartet; Tastenbedienung nicht moeglich	-
+RT3-H-04	iOS	⏳	gestoerte Ablage nicht herbeigefuehrt	-
+RT3-H-05	iOS	⏳	Tour in Englisch/200 % nicht ausgefuehrt	-
+RT3-I-01	iOS	✅	App teilen: Zwischenablage = 'Ich nutze FamilyNexus, den Familienplaner mit Kalender, Chat und Einkaufsliste. Hier gibt es die App:' + https://play.google.com/store/apps/details?id=de.inneso.familynexus; Hinweis 'Link zum Store-Eintrag kopiert' (Plan: 'Link kopiert', B6); kein Teilen-Menue; keine Familiendaten	screenshots/idb_I-01_iOS.png
+RT3-I-04	iOS	✅	Einstellungen: kein Eintrag 'App bewerten' (nur 'App teilen')	-
+RT3-I-04	iPad	✅	Einstellungen iPad ohne 'App bewerten'	screenshots/idb_I-05_iPad.png
+RT3-I-05	iOS	✅	Text: 'Verdeckt die App im App-Umschalter und bei Bildschirmaufnahmen. Einzelne Screenshots lassen sich unter iOS nicht verhindern.' (Schalter 'Bildschirmschutz', standardmaessig an)	-
+RT3-I-05	iPad	✅	wie iOS	screenshots/idb_I-05_iPad.png
+RT3-I-06	iOS	n/a	Nur echtes Geraet	-
+RT3-I-08	iOS	✅	DE: 'Datenuebersicht: alle lokal gespeicherten Daten zeigen' / '... online ...', Seitentitel 'Lokal gespeicherte Daten'; EN: 'Data overview: show all locally stored data', 'Device settings' im Kennzeichen-Hinweis; Datenschutzerklaerung nicht verglichen	-
+RT3-I-09	iOS	⏳	Dativ 'von dir'/'Zugewiesen an dich': Einkaufs-/Aufgabeneintraege nicht angelegt	-
+RT3-I-10	iOS	⏳	Datenschutzerklaerung nicht gelesen	-
+RT3-J-01	iPad	⚠️	Nur Hochformat (Rotation per simctl/idb nicht moeglich): iPad 13 hoch = 1032 pt: Rail links + Zweispalter 'Kalender und Chat' (>= 1000) korrekt, iPhone (402 pt) Leiste unten; Rail 600-999 und Querformat nicht geprueft; kein Neustart/keine neue Anmeldung beim Wechsel zwischen Tabs	screenshots/idb_C-07_iPad.png
+RT3-J-02	iPad	⏳	Split View/Slide Over/Stage Manager nicht per idb/simctl bedienbar	-
+RT3-J-03	iPad	✅	Bildschirmtastatur im Chat: Eingabefeld bleibt sichtbar ueber der Tastatur, Layout kippt nicht	screenshots/idb_J-03_iPad.png
+RT3-J-04	iOS	⚠️	Schrift accessibility-large (ca. 200 %): kein Ueberlauf nach rechts, aber Segment-Beschriftungen brechen mitten im Wort ('Woch/e', 'Mona/t', 'Agen/da'); Einkauf-Platzhalter abgeschnitten ('Was wird g...', 'Meng...'); bei accessibility-extra-extra-extra-large auch 'Berechtigu/ng fehlt', 'Nove/mbe/r'. Bekannt (#274, B3)	screenshots/idb_J-04_iOS_200prozent.png
+RT3-J-04	iPad	⏳	nicht ausgefuehrt	-
+RT3-J-05	iPad	n/a	Plan: AndT	-
+RT3-J-06	iPad	✅	Ab 1000 dp: Heute (einspaltig, Rail links), Chat/Kalender zweispaltig; kein senkrechter Strich in Heute; Einkauf, Familie nicht eigens gescreenshottet	screenshots/idb_J-06_iPad_Heute.png
+RT3-J-07	iPad	⏳	Hardware-Tastatur nicht moeglich	-
+RT3-J-08	iPad	⏳	Eingebettete Ansicht nicht erreichbar (wie G-09)	-
+RT3-K-01	iOS	✅	Semantikbaum (idb): eigene Nachricht 'Nachricht von dir'; fremde 'Nachricht von Anna' (Label am iPad); englische App: Monats-/Jahreslabels englisch; Sprachausgabe nicht geprueft	-
+RT3-K-02	iOS	✅	Gesprächsliste: 'Einzelchat mit Bob, Online, Du: Hallo Bob'; 'Familienchat Testfamilie, Liste 1, 1 ungelesen'; Pfeil 'Zurueck zu den Gespraechen'	screenshots/idb_C-01_iOS.png
+RT3-K-03	iOS	✅	Mitgliederkachel: Label 'Bob / @bobgonea2:localhost / Online / Nachricht schreiben: Bob'; Avatar nicht als Label (kein Element 'Segelboot' im Baum der Familie)	screenshots/idb_D-03_iOS.png
+RT3-K-04	iOS	✅	Termin: 'Test Thema, 21:00 - 22:00, Geteilt, Thema Schule'; am iPad zusaetzlich ', Von Anna'	-
+RT3-K-05	iOS	✅	Jahresfortschritt: 'Jahresfortschritt: 87 Prozent verstrichen' (en: 'Year progress: 87 percent elapsed') als ein Satz	-
+RT3-K-06	iOS	⏳	Aussprache nur mit VoiceOver pruefbar; Schreibung Datenuebersicht/Geraeteeinstellungen/Erinnerungen ok im Baum	-
+RT3-P-09	iOS	✅	Englische App, Monatsansicht (Semantikbaum): 'Monday, October 26, 2026, No events', 'Sunday, November 15, 2026, No events, Today', 'Tuesday, December 1, 2026, No events': Monat steht im Label, englische Form, kein deutscher Ordinalpunkt; 'Year progress: 87 percent elapsed'	screenshots/idb_P-09_iOS_en.png
+RT3-P-13	iOS	✅	Termin-Editor mit accessibility-extra-extra-extra-large: 'Beginn'/'Ende' stehen ueber Datum und Uhrzeit, nicht mitten im Wort gebrochen. Auffaellig: Datumsschaltflaeche umbricht '15./Nov./2026' innerhalb der Pille, Titel 'Neuer...' abgeschnitten	screenshots/idb_P-13_iOS.png
+RT3-P-14	iOS	⚠️	Termin mit Ende vor Beginn: Editor zeigt inline 'Das Ende muss nach dem Beginn liegen.' unter dem Ende-Feld (Speichern wird abgewiesen), nicht den Text '... konnte nicht gespeichert werden'; Editor-eigene Meldung bleibt, kein 'geloescht'-Text; Plan-Wortlaut weicht ab	screenshots/idb_P-14_iOS.png
+RT3-P-04	iOS	⏳	Zwei Geraete desselben Kontos (Dora auf iPhone und iPad): privater Termin synchronisiert; iPad loescht, das iPhone mit offener Detailseite zeigt nach wenigen Sekunden von selbst 'Geloescht'. Der Fehlerzweig 'Der Termin konnte nicht geloescht werden.' war nicht erreichbar, weil der Sync schneller war als der Tipp auf Loeschen	screenshots/idb_P-04_iOS.png
+RT3-P-05	iOS	✅	Konto A (Carl) blockiert Dora (Zaehler 1 in Einstellungen), meldet sich ab; Konto B (Dora, Notfall-Schluessel) angemeldet: Einstellungen > Blockierte Mitglieder: 'Du hast niemanden blockiert.'; kein Rest von A (Familienwechsel nicht geprueft; vorgemerkter Einladungslink nicht anlegbar)	screenshots/idb_P-05_iOS.png
+RT3-P-06	iOS	✅	Dora schaltet 'Online-Status teilen' aus (iPad): Carl sieht Dora in Familie nicht mehr als 'Online'; Dora sieht Carl weiter 'Online' (Familie und 'Wer ist online'); Schaltertext 'Ausgeschaltet giltst du fuer andere als offline.' stimmt; vorher sahen beide sich als online	screenshots/idb_P-06_iOS.png
+RT3-P-07	iOS	⏳	Datum aelter als gestern in der Gespraechsliste nicht erzeugbar (Systemdatum nicht verstellt)	-
+RT3-P-08	iOS	⏳	Emoji-Eingabe per idb nicht moeglich (idb text sendet nur ASCII)	-
+RT3-P-15	iOS	⏳	Braucht OAuth-Konto (Testserver ohne OAuth-Anbieter); Passwort-aendern-Dialog gegen lokalen Synapse nicht als eingebettete Seite erreichbar	-
+RT3-P-16	iOS	⏳	wie G-09 (Fehlerseite ueber Testseite nicht erreichbar)	-
+RT3-P-17	iOS	⏳	wie G-09	-
+RT3-P-18	iOS	⏳	Kein Anbieterseitenbesuch moeglich; WebsiteData-Ordner nicht pruefbar (kein Besuch)	-
+RT3-R-01	iOS	✅	Konto anlegen, Notfall-Schluessel (Kopieren/Checkbox/Weiter), Familie gruenden, Einladen (Link kopieren, Beitrittsanfrage bestaetigen) wie bisher, keine neue Meldung	-
+RT3-R-02	iOS	⚠️	Termin anlegen, Detail, Loeschen (iPad), Ende-vor-Beginn-Regel ok; Bearbeiten und Zusage nicht geprueft	-
+RT3-R-03	iOS	⚠️	Einkauf: Eintrag 'Milch' hinzugefuegt (zuletzt von dir), Erledigt und zurueck; Gruppe nicht geprueft	-
+RT3-R-04	iOS	⏳	Aufgabenlisten: nur Moderatoren legen an; zum Zeitpunkt war iPhone-Konto Mitglied (Aufgaben: 'Noch keine Aufgabenlisten')	-
+RT3-R-05	iOS	⚠️	Chat: Senden, Einzelchat, Gesprächsliste, Blockieren ok; Anhang, Reaktion, Antwort, Zitat, Melden nicht geprueft	-
+RT3-R-06	iOS	⚠️	Einstellungen: Erinnerungen, Geraete (zwei Geraete angezeigt), Speicherorte, Datenuebersicht, Konto loeschen (Wegwerfkonto, Passwortbestaetigung, anschliessend Willkommensseite) ok; Passwort aendern nicht geprueft	-
+RT3-R-07	iOS	⚠️	Hell/Dunkel umschaltbar (Design-Dropdown: Wie Geraet/Dunkel/Hell); hell: Statusleiste (Uhr, WLAN, Akku) weiss auf hellem Grund kaum lesbar; App-Sperre nicht geprueft	screenshots/idb_R-07_hell_iOS.png
+RT3-R-08	iOS	✅	Abmelden und erneut Anmelden (Carl, Dora) mit Notfall-Schluessel; Familie und Daten wieder da; Tour erscheint nach erneuter Anmeldung von Carl erneut (nicht bei Dora auf dem iPad)	-
+RT3-Z-01	iOS	✅	Konto loeschen (Passwortbestaetigung): Dora und Carl geloescht, danach Willkommensseite; curl-Login von doragonea4 -> M_FORBIDDEN. Nicht loeschbar: annagonea1 (Notfall-Schluessel nicht gesichert) und bobgonea2 (Schluessel nicht gesichert): bleiben als Wegwerfkonten auf dem lokalen Synapse	screenshots/idb_Z-01_iOS.png
+RT3-Z-01	iPad	⚠️	iPad-Konto Dora wurde durch das Loeschen am iPhone serverseitig entfernt; iPad zeigte danach selbststaendig die Anmeldeseite	-
+INT-db_security	iOS	✅	integration_test/db_security_test.dart auf iPhone 17 Pro (iOS 26.5, Build e921f3f): 6 Tests, All tests passed (logs/ios_idb_integration_db_security.txt)	-
+INT-event_store	iOS	✅	integration_test/event_store_test.dart auf iPhone 17 Pro: 10 Tests, All tests passed (logs/ios_idb_integration_event_store.txt)	-
+INT-matrix_sdk_smoke	iOS	⏳	spricht den echten matrix.org-Server an, nicht freigegeben	-
+INT-custom_tab/reminders	iOS	n/a	Android-Tests	-
+TEIL-G/P-Widgettests	iOS	✅	flutter test fuer embedded_browser_page, password_change_embedded, account_deletion, sign_in_icons, in_app_auth, embedded_redirect, website_data, oauth_redirect, invite_onboarding: 151 bestanden, 0 Fehler (logs/ios_idb_flutter_test_embedded.txt). Teilbeleg fuer G-09..G-13, P-15..P-18 (nicht ersetzend, nicht am WKWebView)	-
+BEOB-1	iOS	⚠️	Einladungslink eines Servers mit Port (localhost:18448): Der Link traegt den Anbieter ohne Port; beim Beitritt zeigt die App 'localhost ist gerade nicht erreichbar' bis der Anbieter manuell auf 'localhost:18448' gesetzt wird (zweimal reproduziert, iPhone-Einladung, iPad-Beitritt). Nur Entwickler-/Heimnetzserver mit Port betroffen	-
+BEOB-2	iOS	⚠️	Hell-Design: Statusleisten-Symbole (Uhr, WLAN, Akku) weiss auf hellem Hintergrund (idb_R-07_hell_iOS.png); entspricht Android-Befund B4	screenshots/idb_R-07_hell_iOS.png
+BEOB-3	iOS	⚠️	Mitgliederkachel (Familie, iPhone 402 pt): '@annagonea1:localhost' bricht mitten im Wort ('localho/st')	screenshots/idb_D-04_iOS.png
+BEOB-4	iOS	⚠️	Heute-Karte Erinnerungen zeigt gleichzeitig 'Keine Erinnerung geplant' und '2 Erinnerungen faellig' (iPad, Termine 21:00 mit 10 Min vorher, Zeitpunkt 20:50 verstrichen); wirkt widerspruechlich	screenshots/idb_J-06_iPad_Heute.png
+BEOB-5	iOS	⚠️	Tour: nach erneuter Anmeldung desselben Kontos (Carl, nach Abmelden) erscheint die Einfuehrungstour wieder, bei neuen Konten auf demselben Geraet (Carl neu, Dora neu) nicht; tourSeen offenbar nach Abmelden wirkungsunterschiedlich	-
+BEOB-6	iOS	⚠️	Bildschirm-Auto-Sperre des Simulators sperrte das iPad waehrend des Laufs (kein App-Befund)	-
+BEOB-7	iOS	⚠️	Avatar-Auswahl: Nach 'Speichern' bleibt der Bildschirm offen, Speichern wird deaktiviert; kein sichtbarer 'wird uebernommen'-Text in der Stichprobe nach 1 s	screenshots/idb_D-02_iPad.png

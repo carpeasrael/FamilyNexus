@@ -1,0 +1,253 @@
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.6 available)
+  archive 4.5.2 (4.7.1 available)
+  code_assets 1.2.1 (2.2.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  dev_build 1.1.15 (1.2.2 available)
+  file_picker 13.1.0 (13.3.3 available)
+  file_picker_darwin 2.3.2 (2.5.1 available)
+  file_picker_linux 2.0.2 (2.0.4 available)
+  file_picker_web 4.2.0 (4.2.1 available)
+  flutter_local_notifications 22.3.2 (23.0.2 available)
+  flutter_local_notifications_linux 8.0.2 (9.0.0 available)
+  flutter_local_notifications_platform_interface 12.2.0 (13.0.0 available)
+  flutter_local_notifications_web 1.0.0 (2.0.0 available)
+  flutter_local_notifications_windows 3.1.1 (4.0.1 available)
+  flutter_vodozemac 0.9.0 (0.9.1 available)
+  image 4.12.0 (4.13.1 available)
+  jni 1.1.0 (1.1.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  matrix 14.2.0 (16.0.4 available)
+  native_toolchain_c 0.19.2 (0.19.6 available)
+  objective_c 9.5.0 (9.6.4 available)
+  petitparser 7.0.2 (7.1.0 available)
+  posix 6.5.2 (6.5.4 available)
+  process_run 1.4.1 (1.4.4 available)
+  qr 4.0.0 (4.0.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common 2.5.14 (2.5.17 available)
+  sqflite_common_ffi 2.4.4 (2.4.7 available)
+  sqflite_common_ffi_web 1.2.0 (1.2.2 available)
+  sqlite3 3.8.0 (3.9.1 available)
+  synchronized 3.5.0 (3.6.1+1 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.4 available)
+  vodozemac 0.9.0 (0.9.1 available)
+  web 1.1.1 (1.1.2 available)
+  windows_file_picker 2.0.1 (2.0.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+38 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Running Gradle task 'assembleDebug'...                          
+Resolving dependencies...
+Downloading packages...
++ adaptive_number 1.0.0
++ args 2.7.0
++ async 2.13.1
++ build_tool 1.0.0 from path /Users/carpeasrael/.pub-cache/hosted/pub.dev/flutter_vodozemac-0.9.0/cargokit/gradle/../build_tool
++ collection 1.19.1
++ convert 3.1.2
++ crypto 3.0.7 (3.0.8 available)
++ ed25519_edwards 0.3.1 (0.3.2 available)
++ fixnum 1.1.1
++ github 9.25.1 (9.26.0 available)
++ hex 0.2.0
++ http 1.6.0
++ http_parser 4.1.2
++ json_annotation 4.12.0
++ logging 1.3.0
++ meta 1.19.0
++ path 1.9.1
++ petitparser 7.1.0
++ source_span 1.10.2
++ string_scanner 1.4.1
++ term_glyph 1.2.2
++ toml 0.18.0
++ typed_data 1.4.0
++ version 3.0.2
++ web 1.1.2
++ yaml 3.1.3 (3.1.4 available)
+Changed 26 dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `dart pub outdated` for more information.
+Compiling bin/build_tool_runner.dart to kernel file bin/build_tool_runner.dill.
+INFO: Precompiled binaries are disabled
+INFO: Building vodozemac_bindings_dart for armv7-linux-androideabi
+SEVERE: ================================================================================
+SEVERE: Cargokit BuildTool failed with error:
+SEVERE: --------------------------------------------------------------------------------
+SEVERE: External Command: rustup "run" "stable-aarch64-apple-darwin" "cargo" "build" "--manifest-path" "/Users/carpeasrael/.pub-cache/hosted/pub.dev/flutter_vodozemac-0.9.0/rust/Cargo.toml" "-p" "vodozemac_bindings_dart" "--target" "armv7-linux-androideabi" "--target-dir" "/Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-ac4e968f7976c603a/build/flutter_vodozemac/build"
+SEVERE: Returned Exit Code: 101
+SEVERE: --------------------------------------------------------------------------------
+SEVERE: STDOUT:
+SEVERE: --------------------------------------------------------------------------------
+SEVERE: STDERR:
+SEVERE: Compiling proc-macro2 v1.0.94
+SEVERE:    Compiling unicode-ident v1.0.18
+SEVERE:    Compiling libc v0.2.171
+SEVERE:    Compiling typenum v1.18.0
+SEVERE:    Compiling version_check v0.9.5
+SEVERE:    Compiling cfg-if v1.0.0
+SEVERE:    Compiling serde v1.0.219
+SEVERE:    Compiling memchr v2.7.4
+SEVERE:    Compiling subtle v2.6.1
+SEVERE:    Compiling object v0.36.7
+SEVERE:    Compiling semver v1.0.26
+SEVERE:    Compiling autocfg v1.4.0
+SEVERE:    Compiling generic-array v0.14.7
+SEVERE:    Compiling adler2 v2.0.0
+SEVERE:    Compiling equivalent v1.0.2
+SEVERE:    Compiling hashbrown v0.15.2
+SEVERE:    Compiling gimli v0.31.1
+SEVERE:    Compiling zerocopy v0.8.24
+SEVERE:    Compiling miniz_oxide v0.8.8
+SEVERE:    Compiling slab v0.4.9
+SEVERE:    Compiling getrandom v0.2.15
+SEVERE:    Compiling aho-corasick v1.1.3
+SEVERE:    Compiling winnow v0.7.6
+SEVERE:    Compiling rand_core v0.6.4
+SEVERE:    Compiling quote v1.0.40
+SEVERE:    Compiling indexmap v2.9.0
+SEVERE:    Compiling pin-project-lite v0.2.16
+SEVERE:    Compiling syn v2.0.100
+SEVERE:    Compiling futures-core v0.3.31
+SEVERE:    Compiling shlex v1.3.0
+SEVERE:    Compiling rustc-demangle v0.1.24
+SEVERE:    Compiling futures-sink v0.3.31
+SEVERE:    Compiling regex-syntax v0.8.5
+SEVERE:    Compiling anyhow v1.0.97
+SEVERE:    Compiling crypto-common v0.1.6
+SEVERE:    Compiling block-buffer v0.10.4
+SEVERE:    Compiling digest v0.10.7
+SEVERE:    Compiling block-padding v0.3.3
+SEVERE:    Compiling inout v0.1.4
+SEVERE:    Compiling futures-channel v0.3.31
+SEVERE:    Compiling cc v1.2.18
+SEVERE:    Compiling proc-macro-error-attr2 v2.0.0
+SEVERE:    Compiling thiserror v1.0.69
+SEVERE:    Compiling pin-utils v0.1.0
+SEVERE:    Compiling futures-task v0.3.31
+SEVERE:    Compiling futures-io v0.3.31
+SEVERE:    Compiling either v1.15.0
+SEVERE:    Compiling itertools v0.14.0
+SEVERE:    Compiling regex-automata v0.4.9
+SEVERE:    Compiling addr2line v0.24.2
+SEVERE:    Compiling proc-macro-error2 v2.0.1
+SEVERE:    Compiling dart-sys v4.1.5
+SEVERE:    Compiling hmac v0.12.1
+SEVERE:    Compiling ppv-lite86 v0.2.21
+SEVERE:    Compiling universal-hash v0.5.1
+SEVERE:    Compiling syn v3.0.3
+SEVERE:    Compiling thiserror v2.0.19
+SEVERE:    Compiling signature v2.2.0
+SEVERE:    Compiling opaque-debug v0.3.1
+SEVERE:    Compiling build-target v0.4.0
+SEVERE:    Compiling serde_json v1.0.140
+SEVERE:    Compiling portable-atomic v1.15.0
+SEVERE:    Compiling log v0.4.27
+SEVERE:    Compiling flutter_rust_bridge v2.13.0
+SEVERE:    Compiling poly1305 v0.8.0
+SEVERE:    Compiling rand_chacha v0.3.1
+SEVERE:    Compiling md-5 v0.10.6
+SEVERE:    Compiling sha2 v0.10.9
+SEVERE:    Compiling aead v0.5.2
+SEVERE:    Compiling num_cpus v1.16.0
+SEVERE:    Compiling hex v0.4.3
+SEVERE:    Compiling atomic v0.5.3
+SEVERE:    Compiling itoa v1.0.15
+SEVERE:    Compiling android_log-sys v0.3.2
+SEVERE:    Compiling ryu v1.0.20
+SEVERE:    Compiling bytes v1.12.1
+SEVERE:    Compiling threadpool v1.8.1
+SEVERE:    Compiling rand v0.8.8
+SEVERE:    Compiling hkdf v0.12.4
+SEVERE:    Compiling tokio v1.44.2
+SEVERE:    Compiling base64ct v1.8.3
+SEVERE:    Compiling base64 v0.22.1
+SEVERE:    Compiling byteorder v1.5.0
+SEVERE:    Compiling backtrace v0.3.74
+SEVERE:    Compiling regex v1.11.1
+SEVERE:    Compiling lazy_static v1.5.0
+SEVERE:    Compiling pbkdf2 v0.12.2
+SEVERE:    Compiling env_filter v0.1.3
+SEVERE:    Compiling android_logger v0.15.1
+SEVERE:    Compiling thiserror-impl v2.0.19
+SEVERE:    Compiling allo-isolate v0.1.27
+SEVERE:    Compiling serde_derive v1.0.219
+SEVERE:    Compiling zeroize_derive v1.5.0
+SEVERE:    Compiling futures-macro v0.3.31
+SEVERE:    Compiling thiserror-impl v1.0.69
+SEVERE:    Compiling prost-derive v0.14.4
+SEVERE:    Compiling flutter_rust_bridge_macros v2.13.0
+SEVERE:    Compiling delegate-attr v0.3.0
+SEVERE:    Compiling zeroize v1.9.0
+SEVERE:    Compiling futures-util v0.3.31
+SEVERE:    Compiling cipher v0.4.4
+SEVERE:    Compiling chacha20 v0.9.1
+SEVERE:    Compiling aes v0.8.4
+SEVERE:    Compiling cbc v0.1.2
+SEVERE:    Compiling ctr v0.9.2
+SEVERE:    Compiling chacha20poly1305 v0.10.1
+SEVERE:    Compiling prost v0.14.4
+SEVERE:    Compiling futures-executor v0.3.31
+SEVERE:    Compiling futures v0.3.31
+SEVERE:    Compiling toml_datetime v0.6.8
+SEVERE:    Compiling serde_spanned v0.6.8
+SEVERE:    Compiling toml_edit v0.22.24
+SEVERE:    Compiling ed25519 v2.2.3
+SEVERE:    Compiling arrayvec v0.7.6
+SEVERE:    Compiling serde_bytes v0.11.17
+SEVERE:    Compiling rustc_version v0.4.1
+SEVERE:    Compiling curve25519-dalek v4.1.3
+SEVERE:    Compiling x25519-dalek v2.0.1
+SEVERE:    Compiling ed25519-dalek v2.1.1
+SEVERE:    Compiling proc-macro-crate v3.3.0
+SEVERE:    Compiling matrix-pickle-derive v0.2.1
+SEVERE:    Compiling matrix-pickle v0.2.1
+SEVERE:    Compiling vodozemac v0.10.0
+SEVERE:    Compiling vodozemac_bindings_dart v0.1.0 (/Users/carpeasrael/.pub-cache/hosted/pub.dev/flutter_vodozemac-0.9.0/rust)
+SEVERE: error: failed to build archive at `/Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-ac4e968f7976c603a/build/flutter_vodozemac/build/armv7-linux-androideabi/debug/deps/libvodozemac_bindings_dart.a`: No space left on device (os error 28)
+SEVERE: 
+SEVERE: error: could not compile `vodozemac_bindings_dart` (lib) due to 1 previous error
+SEVERE: --------------------------------------------------------------------------------
+SEVERE: #0      runCommand (package:build_tool/src/util.dart:121:5)
+SEVERE: #1      RustBuilder.build (package:build_tool/src/builder.dart:157:5)
+SEVERE: <asynchronous suspension>
+SEVERE: #2      ArtifactProvider.getArtifacts (package:build_tool/src/artifacts_provider.dart:71:25)
+SEVERE: <asynchronous suspension>
+SEVERE: #3      BuildGradle.build (package:build_tool/src/build_gradle.dart:41:23)
+SEVERE: <asynchronous suspension>
+SEVERE: #4      BuildGradleCommand.runBuildCommand (package:build_tool/src/build_tool.dart:65:5)
+SEVERE: <asynchronous suspension>
+SEVERE: #5      BuildCommand.run (package:build_tool/src/build_tool.dart:37:5)
+SEVERE: <asynchronous suspension>
+SEVERE: #6      CommandRunner.runCommand (package:args/command_runner.dart:212:13)
+SEVERE: <asynchronous suspension>
+SEVERE: #7      runMain (package:build_tool/src/build_tool.dart:256:5)
+SEVERE: <asynchronous suspension>
+SEVERE: --------------------------------------------------------------------------------
+SEVERE: BuildTool arguments: [build-gradle]
+SEVERE: ================================================================================
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Script '/Users/carpeasrael/.pub-cache/hosted/pub.dev/flutter_vodozemac-0.9.0/cargokit/gradle/plugin.gradle' line: 70
+
+* What went wrong:
+Execution failed for task ':flutter_vodozemac:cargokitCargoBuildFlutter_vodozemacDebug'.
+> Process 'command '/Users/carpeasrael/.pub-cache/hosted/pub.dev/flutter_vodozemac-0.9.0/cargokit/gradle/../run_build_tool.sh'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 3m 14s
+Running Gradle task 'assembleDebug'...                            194,8s
+Gradle task assembleDebug failed with exit code 1
+flutter build apk --debug  2.34s user 0.82s system 1% cpu 3:16.85 total

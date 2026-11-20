@@ -1,0 +1,61 @@
+== Mitglieder der Familie „Testfamilie 1119 neu“ ==
+- Test Nutzer 2 (@fnt-1119-i2:localhost) – Moderator – beigetreten
+- Test N1 (@fnt-1119-n1:localhost) – Moderator – beigetreten
+
+== Räume ==
+
+- Einzelchat „Test Nutzer 2“
+  Ende-zu-Ende-verschlüsselt: ja
+  Eigene Mitgliedschaft: beigetreten
+  Mitglieder: 2 beigetreten, 0 eingeladen
+  Ereignisse auf diesem Gerät: 22
+    Nachrichten (m.room.message): 4
+    m.room.member: 3
+    m.key.verification.done: 2
+    m.key.verification.mac: 2
+    m.key.verification.key: 2
+    m.key.verification.accept: 1
+    m.key.verification.start: 1
+    m.key.verification.ready: 1
+    m.room.encryption: 1
+    m.room.history_visibility: 1
+    m.room.guest_access: 1
+    m.room.join_rules: 1
+    m.room.power_levels: 1
+    m.room.create: 1
+
+- Familie „Testfamilie 1119 neu“
+  Ende-zu-Ende-verschlüsselt: ja
+  Eigene Mitgliedschaft: beigetreten
+  Mitglieder: 2 beigetreten, 0 eingeladen
+  Ereignisse auf diesem Gerät: 102
+    Einkaufszettel (de.inneso.familynexus.shopping): 21
+    Nachrichten (m.room.message): 18
+    Geburts- und Gedenktage (de.inneso.familynexus.anniversary): 9
+    Aufgabenlisten (de.inneso.familynexus.tasklist): 9
+    Termine (geteilt) (de.inneso.familynexus.event): 8
+    Kalender-Themen (de.inneso.familynexus.eventtheme): 8
+    m.room.member: 8
+    m.room.name: 5
+    Erledigte Aufgaben (de.inneso.familynexus.taskdone): 3
+    de.inneso.familynexus.invite: 3
+    m.room.power_levels: 2
+    Avatar-Wahl (de.inneso.familynexus.avatar): 1
+    Zu- und Absagen (de.inneso.familynexus.rsvp): 1
+    Reaktionen (de.inneso.familynexus.reaction): 1
+    m.room.join_rules: 1
+    m.room.history_visibility: 1
+    m.room.encryption: 1
+    m.room.guest_access: 1
+    m.room.create: 1
+  Anhänge: 2
+
+- Privater Raum (Abgleich privater Termine) „FamilyNexus“
+  Ende-zu-Ende-verschlüsselt: ja
+  Eigene Mitgliedschaft: beigetreten
+  Mitglieder: 1 beigetreten, 0 eingeladen
+  Ereignisse auf diesem Gerät: 16
+    Termine (privat) (de.inneso.familynexus.private_event): 8
+    m.room.name: 1
+    m.room.history_visibility: 1
+    m.room.encryption: 1

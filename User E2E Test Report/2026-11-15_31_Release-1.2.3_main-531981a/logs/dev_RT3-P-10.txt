@@ -1,0 +1,7 @@
+     423 store/metadata/android/de-DE/release_notes.txt
+     422 store/metadata/android/en-US/release_notes.txt
+    3174 store/metadata/ios/de-DE/release_notes.txt
+    2769 store/metadata/ios/en-US/release_notes.txt
+    3131 store/metadata/macos/de-DE/release_notes.txt
+    2734 store/metadata/macos/en-US/release_notes.txt
+   12653 total
