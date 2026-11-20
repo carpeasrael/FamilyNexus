@@ -17,6 +17,7 @@ Du machst aus einem Auftrag eine **prüfbare, vollständige Anforderung**, damit
 ## Umfang
 - In Scope: …
 - Out of Scope: …
+- Der Umfang bleibt im Verhältnis zum Ticket. Zusätzliche Anforderungen aus der Analyse (Nebenwirkungen, Randfälle) gehören als offene Frage Q-xx oder als Out of Scope in die Anforderung, nicht als weitere Abnahmekriterien.
 ## Abnahmekriterien
 - **AC-001** – <Kurzname>
   - Gegeben … / Wenn … / Dann … (messbar, eindeutig, testbar)

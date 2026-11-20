@@ -682,7 +682,7 @@ function writeGuard(file, role, admin) {
     block('Der Entwurfs-Agent schreibt nur design.md des Runs.');
   }
   if (admin) return;
-  if (['orchestrator', 'tiercheck', 'reqcheck', 'rev', 'arb'].includes(role.kind)) block(`Rolle ${role.name} ist schreibgeschützt.`);
+  if (['tiercheck', 'reqcheck', 'rev', 'arb'].includes(role.kind)) block(`Rolle ${role.name} ist schreibgeschützt.`);
   if (matchAny(r, CFG.protectedGlobs)) block(`Geschützter Pfad: ${r}`);
   if (role.kind === 'test') {
     if (!matchAny(r, CFG.testGlobs)) block(`Der Test-Agent schreibt nur Testdateien. Abgelehnt: ${r}`);
@@ -727,17 +727,9 @@ function bashGuard(cmd, role, admin) {
   }
   if (/\b(curl|wget|nc|ncat|ssh|scp|rsync|ftp)\b/.test(flat)) block('Netzwerkwerkzeuge sind gesperrt.');
   if (/--no-verify|\bnpm\s+(config|set)\b/.test(flat)) block('Umgehung von Hooks/Konfiguration ist verboten.');
-  if (role.kind === 'orchestrator') {
-    for (const seg of segments) {
-      const toks = splitShell(seg); const gi = toks.indexOf('git');
-      if (gi >= 0) {
-        const sub = toks.slice(gi + 1).find((t) => !t.startsWith('-'));
-        if (!['status', 'diff', 'log', 'show', 'commit', 'rev-parse', 'ls-files', 'blame', 'branch', 'switch'].includes(sub)) block(`git ${sub} ist für den Orchestrator nicht freigegeben (Staging nur über qg stage).`);
-        if (sub === 'branch' && toks.some((x) => /^-[dDmM]$/.test(x))) block('Branch löschen/umbenennen nicht freigegeben.');
-      } else if (!/^node\s+\.quality\/bin\/qg\.mjs\s/.test(seg) && !/^(ls|pwd|cat|head|tail|wc|grep)\b/.test(seg)) block('Der Orchestrator führt nur qg.mjs- und lesende Befehle aus.');
-    }
-    return;
-  }
+  // Option B (Beschluss 2026-11-19): Der Orchestrator darf beliebige Shell-, git- und gh-Befehle ausführen.
+  // Verblieben sind die Sperren oben: Gate-Infrastruktur, Netzwerkwerkzeuge, --no-verify, Hook-Konfiguration, Commit-Guard.
+  if (role.kind === 'orchestrator') return;
   if (CHECKER_KINDS.has(role.kind)) {
     if (/[<>`]|\$\(/.test(flat) || /&&|\|\||;/.test(flat)) block('Prüfer: keine Umleitungen, Verkettungen oder Subshells.');
     const [first, ...filters] = flat.split('|').map((s) => s.trim());
@@ -903,7 +895,7 @@ commands['gen-agents'] = () => {
   emit('qg-tiercheck', { description: 'Unabhängige Gegenprüfung der Komplexitätsbewertung. Nur vom qg-orchestrator.', model: CFG.tierCheck.model, effort: CFG.tierCheck.effort, tools: 'Read, Grep, Glob', disallowedTools: RO, color: 'purple', maxTurns: 30 }, fill(T('tiercheck.md'), {}));
   const levelTable = CFG.levels.map((l, i) => `| ${l.id} | ${l.model} | ${l.effort} | ${i < CFG.complexityTiers.length ? 'Komplexität ' + l.id : 'nur Eskalation'} |`).join('\n');
   fs.writeFileSync(path.join(ROOT, '.claude', 'agents', 'qg-orchestrator.md'),
-    fm({ name: 'qg-orchestrator', description: 'Orchestrator des Quality-Gates. Als Hauptagent starten mit: claude --agent qg-orchestrator', model: CFG.orchestrator.model, effort: CFG.orchestrator.effort, tools: `Agent(${names.join(', ')}), Read, Grep, Glob, Bash, TodoWrite, AskUserQuestion`, color: 'purple' })
+    fm({ name: 'qg-orchestrator', description: 'Orchestrator des Quality-Gates. Als Hauptagent starten mit: claude --agent qg-orchestrator', model: CFG.orchestrator.model, effort: CFG.orchestrator.effort, tools: `Agent(${names.join(', ')}), Read, Grep, Glob, Write, Edit, MultiEdit, Bash, TodoWrite, AskUserQuestion`, color: 'purple' })
     + '\n' + fill(T('orchestrator.md'), { LEVEL_TABLE: levelTable, OPT: String(POL.optionalEscalationAfter), MAND: String(POL.mandatoryEscalationAfter), STOP: String(POL.stopAfter),
       DESIGN_DOMAINS: CFG.phases.design.domains.join(', '), CODE_DOMAINS: CFG.phases.code.domains.join(', '), ARB_MIN: CFG.arbiterMinLevel }).trim() + '\n');
   writeJSON(path.join(QDIR, 'agents.manifest.json'), { generatedAt: now(), configHash: sha256(fs.readFileSync(path.join(QDIR, 'config.json'))), agents: ['qg-orchestrator', ...names] });

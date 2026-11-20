@@ -36,7 +36,12 @@
       "Bash(flutter analyze:*)",
       "Bash(flutter test:*)",
       "Bash(dart tool/check_lib_size.dart:*)",
-      "Bash(dart analyze:*)"
+      "Bash(dart analyze:*)",
+      "Bash(gh:*)",
+      "Bash(git add:*)",
+      "Bash(git switch:*)",
+      "Bash(git fetch:*)",
+      "Bash(git branch:*)"
     ],
     "ask": [
       "Bash(node .quality/bin/qg.mjs req:*)",
