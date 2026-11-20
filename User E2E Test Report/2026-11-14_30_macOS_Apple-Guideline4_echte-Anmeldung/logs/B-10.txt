@@ -1,0 +1,3 @@
+== B-10 / Abbruch ==
+2026-11-14T09:06:52
+Test auf Wunsch des Nutzers abgebrochen. B-10 nicht durchgeführt. Prüfkopie beendet und gelöscht; Container de.inneso.familynexus.apple4b soweit löschbar entfernt. Standardbrowser: Safari.

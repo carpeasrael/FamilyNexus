@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Testbericht Apple Guideline 4 macOS Lauf 30 (echte Anmeldung, Teilergebnis)</title>
+<style>
+@font-face{font-family:"Space Grotesk";src:url("fonts/SpaceGrotesk-Variable.ttf");font-weight:300 700}
+@font-face{font-family:"IBM Plex Sans";src:url("fonts/IBMPlexSans-Variable.ttf");font-weight:100 700}
+@font-face{font-family:"IBM Plex Mono";src:url("fonts/IBMPlexMono-Regular.ttf");font-weight:400}
+@font-face{font-family:"IBM Plex Mono";src:url("fonts/IBMPlexMono-Medium.ttf");font-weight:500}
+:root{
+ --primary:#0f766e;--primary-dark:#0b5f58;--primary-light:#14b8a6;
+ --success:#15803d;--warning:#b45309;--danger:#b91c1c;--info:#0284c7;--neutral:#475569;
+ --success-bg:rgba(21,128,61,.12);--warning-bg:rgba(180,83,9,.12);--danger-bg:rgba(185,28,28,.12);--info-bg:rgba(2,132,199,.12);--neutral-bg:rgba(71,85,105,.12);
+ --bg-body:#f6f7fb;--bg-primary:#ffffff;--bg-secondary:#eff3f8;--bg-tertiary:#e6edf6;
+ --text-primary:#0f172a;--text-secondary:#334155;--text-muted:#64748b;--text-inverse:#f8fafc;
+ --border-primary:#d7e0ea;--border-secondary:#c1cbd8;
+ --font-display:"Space Grotesk","IBM Plex Sans",system-ui,sans-serif;--font-sans:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;--font-mono:"IBM Plex Mono",Consolas,monospace;
+ --radius-sm:8px;--radius-md:12px;--radius-lg:18px;--radius-full:9999px;
+ --shadow-sm:0 1px 2px rgba(15,23,42,.08);--shadow-md:0 8px 16px rgba(15,23,42,.12);
+ --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;
+}
+@page{size:A4;margin:16mm 14mm}
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;background:var(--bg-body);color:var(--text-primary);font-family:var(--font-sans);font-size:10.5pt;line-height:1.55}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;letter-spacing:-.01em;line-height:1.2;margin:0}
+h2{break-after:avoid}h1{font-size:26pt}h2{font-size:16pt;margin:var(--space-6) 0 var(--space-3);color:var(--primary-dark)}h3{font-size:12pt;margin:var(--space-4) 0 var(--space-2);break-after:avoid}
+p{margin:0 0 var(--space-3)}
+code,.mono{font-family:var(--font-mono);font-size:9pt}
+.hero{background:var(--bg-primary);border:1px solid var(--border-primary);border-radius:var(--radius-lg);padding:var(--space-8);box-shadow:var(--shadow-md);border-top:6px solid var(--primary)}
+.eyebrow{font-family:var(--font-mono);font-size:8.5pt;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--space-2)}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);margin-top:var(--space-5)}
+.kv{background:var(--bg-secondary);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4)}
+.kv b{display:block;font-size:8pt;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em}
+.kv span{font-family:var(--font-mono);font-size:9pt}
+.card{background:var(--bg-primary);border:1px solid var(--border-primary);border-radius:var(--radius-md);padding:var(--space-5);margin:var(--space-4) 0;break-inside:avoid}
+.card.warn{border-left:5px solid var(--warning)}.card.ok{border-left:5px solid var(--success)}.card.info{border-left:5px solid var(--info)}
+.badge{display:inline-block;border-radius:var(--radius-full);padding:2px 10px;font-size:8.5pt;font-weight:600;white-space:nowrap}
+.b-ok{color:var(--success);background:var(--success-bg)}.b-warn{color:var(--warning);background:var(--warning-bg)}.b-fail{color:var(--danger);background:var(--danger-bg)}.b-skip{color:var(--neutral);background:var(--neutral-bg)}.b-info{color:var(--info);background:var(--info-bg)}
+table{width:100%;border-collapse:collapse;background:var(--bg-primary);border:1px solid var(--border-primary);border-radius:var(--radius-md);font-size:9.5pt}
+th{background:var(--bg-tertiary);text-align:left;font-weight:600;padding:8px 10px;border-bottom:1px solid var(--border-secondary)}
+td{padding:8px 10px;border-bottom:1px solid var(--border-primary);vertical-align:top}
+tr{break-inside:avoid}tr:nth-child(even) td{background:var(--bg-secondary)}
+td.id{font-family:var(--font-mono);white-space:nowrap}
+figure{margin:var(--space-3) 0;break-inside:avoid}
+figure img{width:100%;border:1px solid var(--border-secondary);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);display:block}
+figure.narrow img{width:72%}
+figcaption{font-size:8.5pt;color:var(--text-muted);margin-top:var(--space-2)}
+figcaption b{font-family:var(--font-mono);font-weight:500;color:var(--text-secondary)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+ul{margin:0 0 var(--space-3);padding-left:var(--space-5)}li{margin-bottom:var(--space-1)}
+.pb{break-before:page}
+.foot{margin-top:var(--space-8);padding-top:var(--space-3);border-top:1px solid var(--border-primary);font-size:8.5pt;color:var(--text-muted)}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);margin-top:var(--space-5)}
+.stat{border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);text-align:center}
+.stat strong{display:block;font-family:var(--font-display);font-size:22pt;line-height:1.1}
+.stat span{font-size:8.5pt;font-weight:600}
+
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+.cmp figure img{width:100%}
+.tag{font-family:var(--font-mono);font-size:8pt;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)}
+
+</style>
+</head>
+<body>
+<section class="hero">
+  <div class="eyebrow">Testbericht · TP-FN-A4-MAC v03, Block B · Lauf 30 · Teilergebnis</div>
+  <h1>Echte matrix.org-Anmeldung auf macOS, Standardbrowser Chrome und Safari</h1>
+  <p style="margin-top:12px;color:var(--text-secondary)">Block B des Plans v03: Konto bei matrix.org über die App anlegen, abmelden, erneut anmelden, Konto löschen. Der Lauf wurde nach B-06/B-09 auf Wunsch des Nutzers abgebrochen. Anmeldung und Rücksprung nach echter Registrierung sind belegt, die Löschung über die App und die Gegenprobe nicht.</p>
+  <div class="meta">
+    <div class="kv"><b>Datum</b><span>14.11.2026, 08:17–08:40</span></div>
+    <div class="kv"><b>Testobjekt</b><span>FamilyNexus 1.2.3 (29), Release, <code>main</code> @ bd6f25d (Neubau vom 14.11., 02:06)</span></div>
+    <div class="kv"><b>System</b><span>macOS 27.3, Mac des Entwicklers</span></div>
+    <div class="kv"><b>Signatur</b><span>ad hoc, Prüfkopie, Bundle-ID <code>…apple4b</code></span></div>
+    <div class="kv"><b>Standardbrowser</b><span>Chrome (B-02 bis B-08), danach Safari (B-09)</span></div>
+    <div class="kv"><b>Konto</b><span>Testkonto bei matrix.org, vom Nutzer angelegt</span></div>
+  </div>
+  <div class="summary">
+    <div class="stat b-ok"><strong>6</strong><span>✓ bestanden</span></div>
+    <div class="stat b-warn"><strong>1</strong><span>⚠ mit Befund</span></div>
+    <div class="stat b-fail"><strong>0</strong><span>✕ fehlgeschlagen</span></div>
+    <div class="stat b-skip"><strong>3</strong><span>○ nicht durchgeführt</span></div>
+  </div>
+</section>
+
+<h2>1. Ergebnis in Kürze</h2>
+<div class="card ok"><span class="badge b-ok">✓ belegt</span>
+<p style="margin-top:8px">Mit einem echten Konto bei matrix.org funktionieren Registrierung (B-03/B-04) und erneute Anmeldung (B-06): Die App öffnet die Anbieterseite, und nach der Eingabe durch den Nutzer kommt der Rücksprung in die App ohne Fehler. Danach ist in <code>logs/B-04.txt</code> und <code>logs/B-06.txt</code> kein Fenster eines Browsers mehr offen.</p></div>
+<div class="card warn"><span class="badge b-warn">⚠ Befund</span>
+<p style="margin-top:8px"><b>Mit Chrome als Standardbrowser erscheint die Anbieterseite in einem Chrome-Fenster mit Adressleiste</b> (Titel „matrix-authentication-service“, Chrome vorn, Chrome 0 → 1 Fenster, Safari 0). In Lauf 29 mit Safari als Standard war es ein Fenster ohne Adressleiste. Das Bild bei einem Prüfer hängt also vom Standardbrowser ab. Ob dies die Sitzung der App ist, die macOS im Standardbrowser hostet, oder ein Rückfall der App auf den externen Browser, ist <b>nicht belegt</b>: Es gibt keine Logzeile zum Codepfad.</p></div>
+<div class="card info"><span class="badge b-info">Offen</span>
+<p style="margin-top:8px">Die Löschung über die App (B-07, B-08) und die Gegenprobe mit dem gelöschten Konto (B-10) wurden nicht ausgeführt. Der Nutzer hat das Konto außerhalb der App auf <code>account.matrix.org</code> gelöscht; das ist nur seine Angabe, ich habe es nicht geprüft.</p></div>
+
+<h2>2. Ergebnisse je Schritt</h2>
+<table>
+<tr><th>Nr.</th><th>Schritt</th><th>Ergebnis</th><th>Beobachtung</th></tr>
+<tr><td class="id">B-01</td><td>Ausgangslage erfassen</td><td><span class="badge b-ok">✓ bestanden</span></td><td>Prüfkopie mit frischer Bundle-ID, kein Konto angemeldet, Browser-Fenster vor dem Test: keines sichtbar (<code>logs/B-01.txt</code>). Ausgangswert Standardbrowser laut Lauf 29: Safari.</td></tr>
+<tr><td class="id">B-02</td><td>Standardbrowser umstellen</td><td><span class="badge b-ok">✓ bestanden</span></td><td>Chrome ist Standard (LaunchServices-Datei 08:17:59 geändert, <code>NSWorkspace</code>: Chrome). Die Umstellung nahm der Nutzer in den Systemeinstellungen vor, geplant war Firefox.</td></tr>
+<tr><td class="id">B-03</td><td>„Neue Familie gründen“, Name, „Konto bei matrix.org erstellen“</td><td><span class="badge b-warn">⚠ mit Befund</span></td><td>Seite <code>account.matrix.org/register</code> erscheint vor der App in einem <b>Chrome-Fenster mit Adressleiste</b> (Abb. 3). Firefox, Vivaldi, Safari: kein Fenster. Kein Beleg für die Art der Sitzung (siehe Abschnitt 4).</td></tr>
+<tr><td class="id">B-04</td><td>Registrierung durch den Nutzer</td><td><span class="badge b-ok">✓ bestanden</span></td><td>Nutzer registrierte mit Wegwerf-Adresse. Rücksprung in die App ohne Fehler, App zeigt „Dein Notfall-Schlüssel“, Schritt 2 von 3 (Abb. 4). Kein Browser-Fenster offen.</td></tr>
+<tr><td class="id">B-05</td><td>Notfall-Schlüssel, Familie gründen, Hauptansicht</td><td><span class="badge b-ok">✓ bestanden</span></td><td>Schlüssel wurde nicht aufgenommen. Familienname „Pruefung“ und „Später“ bediente der Tester, die Hauptansicht „Heute“ ist erreicht (Abb. 5).</td></tr>
+<tr><td class="id">B-06</td><td>Abmelden und erneut anmelden (Nutzer tippt)</td><td><span class="badge b-ok">✓ bestanden</span></td><td>Abmelden führt zur Anmeldeseite (Abb. 6), „Bei matrix.org anmelden“ öffnet wieder ein Chrome-Fenster (Abb. 7). Nach der Anmeldung zurück in der App, ohne Browser-Fenster; die App verlangt „Dieses Gerät freischalten“ mit Notfall-Schlüssel (Abb. 8).</td></tr>
+<tr><td class="id">B-07</td><td>„Konto löschen“ in der App</td><td><span class="badge b-skip">○ nicht durchgeführt</span></td><td>Ohne Notfall-Schlüssel nicht erreichbar: Der Schlüssel war nicht gespeichert, die App steht nach der Anmeldung auf „Freischalten“. Planfehler (siehe Abschnitt 4).</td></tr>
+<tr><td class="id">B-08</td><td>Löschung bestätigen, „Löschung prüfen“</td><td><span class="badge b-skip">○ nicht durchgeführt</span></td><td>Folge von B-07. Das Konto löschte der Nutzer auf <code>account.matrix.org</code>; die App-Löschung bleibt ungetestet.</td></tr>
+<tr><td class="id">B-09</td><td>Standardbrowser zurückstellen</td><td><span class="badge b-ok">✓ bestanden</span></td><td>Safari ist wieder Standard (<code>logs/B-09.txt</code>, nach zwei Prüfungen; die Datei wurde zeitweise verzögert mit Firefox angezeigt).</td></tr>
+<tr><td class="id">B-10</td><td>Gegenprobe: Anmeldung mit gelöschtem Konto</td><td><span class="badge b-skip">○ nicht durchgeführt</span></td><td>Auf Wunsch des Nutzers abgebrochen (<code>logs/B-10.txt</code>). Prüfkopie beendet und gelöscht.</td></tr>
+</table>
+
+<h2 class="pb">3. Belege</h2>
+<p>Alle Aufnahmen stammen von der Prüfkopie. Passwort, Mailadresse, Benutzername und Notfall-Schlüssel sind auf keiner Aufnahme sichtbar. Aufnahmen, die sie zeigten, wurden verworfen.</p>
+<div class="cols">
+<figure><img src="screenshots/B-00_start.png"><figcaption><b>Abb. 1 · B-00</b> Willkommensseite der Prüfkopie.</figcaption></figure>
+<figure><img src="screenshots/B-00_neue.png"><figcaption><b>Abb. 2 · B-03</b> „Konto erstellen“ mit „Konto bei matrix.org erstellen“ (Symbol „Person mit Plus“).</figcaption></figure>
+</div>
+<figure><img src="screenshots/B-03_Kopf.png"><figcaption><b>Abb. 3 · B-03 (Hauptbeleg des Befunds)</b> Fensterkopf mit Chrome als Standardbrowser: Titel „matrix-authentication-service“, <b>Adressleiste sichtbar</b>. Zugeschnitten, es war noch nichts eingegeben. Vergleich: Lauf 29, Safari als Standard, ohne Adressleiste (unten).</figcaption></figure>
+<figure><div class="tag">Lauf 29 · A-04 · Safari als Standardbrowser</div><img src="screenshots/Lauf29_A-04.png"><figcaption>Fenster der Sitzung mit Safari: Titel „account.matrix.org — Privates Surfen“, keine Werkzeugleiste.</figcaption></figure>
+<div class="cols pb">
+<figure><img src="screenshots/B-04.png"><figcaption><b>Abb. 4 · B-04</b> Rückkehr nach der Registrierung: „Dein Notfall-Schlüssel“, Schritt 2 von 3.</figcaption></figure>
+<figure><img src="screenshots/B-05.png"><figcaption><b>Abb. 5 · B-05</b> Hauptansicht „Heute“ mit Einführung.</figcaption></figure>
+<figure><img src="screenshots/B-06a_Anmeldeseite.png"><figcaption><b>Abb. 6 · B-06</b> Nach „Abmelden“: „Bei matrix.org anmelden“ mit Anmelde-Symbol.</figcaption></figure>
+<figure><img src="screenshots/B-06_Kopf.png"><figcaption><b>Abb. 7 · B-06</b> Fensterkopf der erneuten Anmeldung: wieder ein Chrome-Fenster mit Adressleiste, Seite <code>account.matrix.org/login</code>. Zugeschnitten, noch nichts eingegeben.</figcaption></figure>
+<figure><img src="screenshots/B-06.png"><figcaption><b>Abb. 8 · B-06</b> Nach der erneuten Anmeldung: „Dieses Gerät freischalten“ (Notfall-Schlüssel nötig).</figcaption></figure>
+</div>
+
+<h2 class="pb">4. Bewertung</h2>
+<h3>Abnahmekriterien Block B</h3>
+<table>
+<tr><th>Kriterium</th><th>Ergebnis</th><th>Begründung</th></tr>
+<tr><td>Registrierung mit Rücksprung nach echter Eingabe (B-04)</td><td><span class="badge b-ok">✓ erfüllt</span></td><td>Rücksprung ohne Fehler, kein Fenster mehr offen.</td></tr>
+<tr><td>Erneute Anmeldung mit Rücksprung (B-06)</td><td><span class="badge b-ok">✓ erfüllt</span></td><td>Ebenso. Danach folgt die erwartete Freischaltung.</td></tr>
+<tr><td>Sitzung unabhängig vom Standardbrowser (B-03/B-06/B-07)</td><td><span class="badge b-warn">⚠ nicht erfüllt, so nicht belegt</span></td><td>Die Darstellung folgt dem Standardbrowser: Safari ohne Adressleiste (Lauf 29), Chrome mit Adressleiste (Lauf 30). Schritt B-07 wurde nicht ausgeführt.</td></tr>
+<tr><td>Löschung belegt (B-08, B-10)</td><td><span class="badge b-skip">○ offen</span></td><td>Nicht ausgeführt. Löschung nur durch Aussage des Nutzers.</td></tr>
+</table>
+<h3>Was nicht belegt ist</h3>
+<ul>
+<li><b>Codepfad:</b> Es gibt keine Logzeile, ob die App <code>ASWebAuthenticationSession</code> startete oder auf den externen Browser zurückfiel. Der Schluss beruht auf Titel und Fensterzahl.</li>
+<li><b>Löschung über die App</b> (B-07, B-08) und <b>Gegenprobe mit dem gelöschten Konto</b> (B-10).</li>
+<li><b>Konto gelöscht:</b> nur auf Angabe des Nutzers.</li>
+<li>Signierter App-Store-Build, Prüfer-Mac von Apple, iOS, andere Standardbrowser (Firefox, Vivaldi wurden nicht getestet).</li>
+</ul>
+<h3>Auffälligkeiten dieses Laufs</h3>
+<ul>
+<li><b>Planfehler:</b> Abmelden und erneutes Anmelden verlangt den Notfall-Schlüssel; mein Plan hatte das übersehen. Folge: B-07 bis B-10 nicht ausführbar, Löschung nur außerhalb der App.</li>
+<li><b>Notfall-Schlüssel auf einer Aufnahme:</b> Beim Nachsehen auf den Zustand der App war der Schlüssel auf einer Aufnahme des Testers sichtbar. Die Datei wurde sofort gelöscht, nichts davon steht in Bericht oder Logs. Das Konto war ein Wegwerf-Konto.</li>
+<li><b>Fehlerhafte Aufnahmen:</b> Zwei Aufnahmen zeigten Teile von Terminal und IDE; beide wurden verworfen.</li>
+<li><b>Aussagen des Nutzers und Zustand:</b> Zweimal stimmte die Meldung des Nutzers nicht mit dem Zustand der App überein (Hauptansicht bzw. Standardbrowser Safari). Gewertet wurde nach Systemabfrage.</li>
+<li><b>Prüfkopie:</b> Der Container <code>de.inneso.familynexus.apple4b</code> bleibt als leere Hülle zurück (macOS: geschützte Metadaten); der Datenordner ist entfernt.</li>
+</ul>
+
+<h2>5. Folgen für die Antwort an App Review</h2>
+<div class="card warn"><p>Die Antwort und die macOS-Review-Notiz sagen, das System zeige die Sitzung als <b>Safari</b>-gehostetes Fenster ohne Werkzeugleiste. Das gilt nach diesem Lauf nur, wenn Safari Standardbrowser ist. Mit Chrome zeigt macOS ein Fenster mit Adressleiste. Ob Apples Prüfer Safari als Standard haben, ist offen.</p>
+<p>Vorschlag: In Antwort und Notiz „Safari-gehostet“ durch „vom System im Fenster des Standardbrowsers dargestellt (mit Safari als Standard: privates Fenster ohne Werkzeugleiste)“ ersetzen, und im Anhang beide Fälle zeigen. Die Änderung ist noch nicht umgesetzt; <code>store/metadata/macos/review_notes.txt</code> trägt den Safari-Satz noch.</p></div>
+
+<h2>6. Verbesserungsvorschläge</h2>
+<table>
+<tr><th>Prio</th><th>Vorschlag</th><th>Warum</th><th>Aufwand</th></tr>
+<tr><td>1</td><td>Notiz und Antwort zum Standardbrowser anpassen (Abschnitt 5).</td><td>Sonst widerspricht die Notiz dem, was ein Prüfer mit anderem Standardbrowser sieht.</td><td>klein</td></tr>
+<tr><td>2</td><td>Codepfad der Sitzung sichtbar machen (Logzeile oder Test-Hook).</td><td>Nur so lässt sich „Sitzung der App“ von „Rückfall auf den Browser“ unterscheiden.</td><td>mittel</td></tr>
+<tr><td>3</td><td>Block B wiederholen mit gespeichertem Notfall-Schlüssel (ohne Abmelden) und App-Löschung zuerst; erst danach Gegenprobe.</td><td>Schließt B-07, B-08, B-10.</td><td>klein</td></tr>
+<tr><td>4</td><td>Plan v03 anpassen: Notfall-Schlüssel vor B-06 sichern oder B-06 vor B-07 streichen.</td><td>Verhindert denselben Planfehler.</td><td>klein</td></tr>
+</table>
+
+<div class="foot">Ablage: <code>User E2E Test Report/2026-11-14_30_macOS_Apple-Guideline4_echte-Anmeldung/</code> (Screenshots, Logs, diese Datei) · Testplan: <code>User E2E Test/Testplan_Apple_Guideline4_Anmeldung_macOS.md</code> (v03, Block B) · Bezug: Issue #268, #430, E-91. Durchführung und Auswertung durch denselben Agenten (Trennung nach CLAUDE.md Abschnitt 5 nicht eingehalten, weil Block B im Gespräch mit dem Nutzer lief). Das Testkonto wurde vom Nutzer angelegt und nach dessen Angabe gelöscht; Zugangsdaten stehen weder hier noch in den Logs.</div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+3f4e35b6673d81b025036191362985c4fecc05656d975eaa946190688f8bf41f .../File
+3f4e35b6673d81b025036191362985c4fecc05656d975eaa946190688f8bf41f .../File
+3f4e35b6673d81b025036191362985c4fecc05656d975eaa946190688f8bf41f .../a_b_c_d.txt
+-rw-r--r--@ 1 carpeasrael  staff  36 Nov 20 02:41 /Users/carpeasrael/Library/Containers/de.inneso.familynexus.e2e/Data/a_b_c_d.txt
+8afbbee8e996955a1cfebd8bbd98f20b28a2efb3a828f8ff2018b82c2b55fe54
+8afbbee8e996955a1cfebd8bbd98f20b28a2efb3a828f8ff2018b82c2b55fe54
+33

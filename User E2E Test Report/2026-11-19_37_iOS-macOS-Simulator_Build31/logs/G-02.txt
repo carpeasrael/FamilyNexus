@@ -1,0 +1,3 @@
+03:00 +2888 ~139: /private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/dba199fb-3c03-4513-940f-93420b03c245/scratchpad/wt-l37/test/data/join_rejection_test.dart: (tearDownAll)
+03:00 +2888 ~139: All tests passed!
+exit 0

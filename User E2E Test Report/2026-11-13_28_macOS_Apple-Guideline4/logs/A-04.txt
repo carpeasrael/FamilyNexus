@@ -1,0 +1,22 @@
+-- vorher 23:47:59
+Vordergrund: "FamilyNexus" ASN:0x0-0x456d569: (in fro
+Safari-Fenster: 0
+Safari-Tabs: 0
+Prozesse Auth: 1
+/System/Cryptexes/App/usr/libexec/AuthenticationServicesAgent
+-- nachher 23:48:06
+Vordergrund: "Safari" ASN:0x0-0xfcafca: (in front)   
+Safari-Fenster: 1
+Safari-Tabs: 1
+Prozesse Auth: 1
+/System/Cryptexes/App/usr/libexec/AuthenticationServicesAgent
+== Safari: Fenster (Name, Position, Größe), URL nur Host/Pfad
+matrix-authentication-service, 1, 124, 1025, 892
+https://account.matrix.org/login?<Parameter entfernt>
+== Fenster in System Events
+82:110: execution error: „System Events“ hat einen Fehler erhalten: „window 1 of window 1 of process "Safari"“ kann nicht gelesen werden. (-1728)
+missing value, missing value, missing value
+== Hostprozesse der Sitzung
+81609     1 /System/Cryptexes/App/usr/libexec/AuthenticationServicesAgent
+84337     1 /System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app/Contents/MacOS/Safari
+== FamilyNexus lebt: 26485

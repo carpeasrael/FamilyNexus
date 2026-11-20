@@ -1,0 +1,6 @@
+-- A-07 23:49:57
+Vordergrund: "Safari" ASN:0x0-0xfcafca: (in
+matrix-authentication-service, matrix-authentication-service, 1, 124, 1025, 892, 1, 124, 1025, 892, true, false
+https://account.matrix.org/register?<entfernt>
+nach Abbruch Vordergrund: "FamilyNexus" ASN:0x0-0x456d56
+Safari sichtbare Fenster: 0

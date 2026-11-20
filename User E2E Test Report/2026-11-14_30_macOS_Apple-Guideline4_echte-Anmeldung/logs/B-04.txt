@@ -1,0 +1,9 @@
+== B-04 ==
+2026-11-14T08:25:54
+Vordergrund: "FamilyNexus" ASN:0x0-0x481080c: (in front) 
+Safari 0 []
+Firefox 0 []
+Google Chrome 0 []
+Vivaldi 0 []
+FamilyNexus 1 ["FamilyNexus sichtbar"]
+Standardbrowser https: /Applications/Google Chrome.app

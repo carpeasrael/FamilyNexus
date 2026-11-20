@@ -1,0 +1,5 @@
+neues Passwort:
+200
+logout 200
+altes Passwort:
+403 M_FORBIDDEN

@@ -1,0 +1,47 @@
+ID	Pl	Ergebnis	Beobachtung/Beleg	Screenshot
+RT3-V-01	iOS	✅	pubspec.yaml version: 1.2.3+29; Commit 531981a (origin/main inkl. #483-#487, #489-#493); git status sauber	-
+RT3-V-02	iOS	⚠️	Info.plist der gebauten Runner.app: CFBundleShortVersionString 1.2.3, CFBundleVersion 29. Anzeige "Ueber die App" nicht geprueft (keine Tippsteuerung)	-
+RT3-V-03	iOS	⏳	Loeschen lokaler Daten braucht Antippen (kein idb). Erststart der frischen Installation zeigt Willkommensseite	screenshots/RT3-A-01_iOS.png
+RT3-V-04	iOS	⏳	Keine Vorversion 1.2.2 (26) verfuegbar, keine Tippsteuerung	-
+RT3-V-05	iOS	✅	Commit 531981a; Build aus Arbeitsbaum, logs/ios_build.txt	-
+RT3-A-01	iOS	⚠️	Debug-Build, System hell: erste Sekunde einfarbig hellgrau ohne Logo, nach 15 s Willkommensseite; kein weisser/schwarzer Blitz in 2 Stichproben, aber kein Zwischenbild "Laedt ..." erfasst und keine Bildschirmaufnahme (nur Standbilder). Willkommensseite erscheint auch bei System hell im dunklen Aurora-Stil (Voreinstellung Thema nicht geprueft)	screenshots/RT3-A-01_iOS_frueh.png, RT3-A-01_iOS.png
+RT3-A-02	iOS	⚠️	System dunkel: Startbild dunkel, kein heller Blitz in der Stichprobe nach 0,7 s, danach Willkommensseite; nur Standbilder, keine Aufnahme	screenshots/RT3-A-02_iOS_frueh.png, RT3-A-02_iOS.png
+RT3-A-03	iOS	⏳	App-Thema "Dunkel" setzen braucht Antippen	-
+RT3-A-04	iOS	⏳	App-Umschalter nicht per simctl bedienbar	-
+RT3-A-05	iOS	n/a	Nur echtes Geraet (--profile)	-
+RT3-A-06	iOS	n/a	Plan: Mac, And, Win, Lin	-
+RT3-A-07	iOS	⏳	Beschaedigte Datenbank im Simulator-Container nicht herbeigefuehrt; Teilbeleg flutter test gruen	-
+RT3-A-01	iPad	❌	iPad Pro 13" (M5) und iPad Pro 11" (M5), iOS 26.5, Debug-Build: App bleibt nach 15 s, 45 s und nach Simulator-Neustart auf dem einfarbigen Startbild mit kleinem grauen Bogen unten rechts; Willkommensseite erscheint nie (iPhone 17 Pro: nach 15 s da). Auf zwei Modellen reproduzierbar. Ursache ungeklaert (Debug-JIT im Simulator, iPad-spezifischer Start/Layout-Fehler oder Simulator-Artefakt); Log nur "Dart VM service is listening". Auf iPad (Release/echtes Geraet) gegenpruefen	screenshots/RT3-A-01_iPad_frueh.png, RT3-A-01_iPad.png, RT3-J-01_iPad_hoch.png, RT3-J-01_iPad_hoch_neustart.png, RT3-J-01_iPad_hoch_spaeter.png, RT3-J-01_iPad11.png
+RT3-A-02	iPad	❌	Wie A-01 iPad bei System dunkel: Startbild dunkel, Bogen unten rechts, App erscheint nicht	screenshots/RT3-A-02_iPad_frueh.png, RT3-A-02_iPad.png
+RT3-B-01..B-03,B-05	iOS	⏳	Systemeinstellungen/Antippen noetig. Teilbeleg: Widget-Test calendar_flow_test "Heute #317" gruen	-
+RT3-C-01..C-14	iOS	⏳	Chat: Antippen und zwei Konten noetig, keine Tippsteuerung (idb fehlt, nichts installiert). Server erreichbar (curl 200), Zertifikat im iPhone-Simulator vertraut, aber keine Bedienung moeglich. Teilbeleg Widget-Tests (direct_chat_test u.a.) gruen	-
+RT3-D-01..D-09	iOS	⏳	Avatare: Antippen/zwei Konten noetig. Teilbeleg Widget-Tests gruen	-
+RT3-E-01..E-11	iOS	⏳	Kalender: Antippen/zwei Konten noetig; E-11 nur Mac/iPad mit Hardware-Tastatur	-
+RT3-F-01..F-11	iOS	⏳	Meldungen: Berechtigungsdialog/Antippen noetig; F-04..F-07 echtes Geraet bzw. zweites Konto	-
+RT3-G-01	iOS	⏳	Kontoanlage/Anmeldung am Testserver: Antippen noetig	-
+RT3-G-02	iOS	⏳	Anbieterwahl: Antippen noetig	-
+RT3-G-04..G-08	iOS	⏳	Echter OAuth-Anbieter/matrix.org nicht freigegeben	-
+RT3-G-09..G-13	iOS	⏳	Eingebettete Ansicht gegen Testseite: keine Tippsteuerung. Teilbeleg embedded_browser_page_test, embedded_redirect_test, website_data_test gruen	-
+RT3-G-14	iOS	⏳	Fremdanbieter nicht freigegeben	-
+RT3-H-01..H-05	iOS	⏳	Einrichtung/Tour: Antippen noetig	-
+RT3-I-04,I-05,I-08..I-10	iOS	⏳	Einstellungen/Texte: Antippen noetig. Teilbeleg test/l10n/wording_test.dart gruen	-
+RT3-I-06	iOS	n/a	Nur echtes Geraet	-
+RT3-J-01..J-08	iPad	⏳	Wegen A-01 iPad (❌) nicht beurteilbar; Drehen, Split View, Hardware-Tastatur, Antippen per simctl nicht moeglich. 200%-Schrift (simctl content_size) gesetzt, Aufnahme zeigt nur Startbild. Teilbeleg Layout-Widget-Tests gruen	screenshots/RT3-J-04_iPad_200.png
+RT3-K-01..K-06	iOS	⏳	Semantikbaum nur ueber Widget-Tests, nicht einzeln zugeordnet; VoiceOver-Sprachausgabe nicht pruefbar (Rest am Geraet)	-
+RT3-P-01	iOS	⏳	Proxy nach Kopfzeilen nicht aufgebaut; Teilbeleg Unit-Tests gruen; E2E (T-03) nicht erlaubt	-
+RT3-P-04..P-09,P-13,P-14	iOS	⏳	Antippen/zwei Konten noetig; Teilbelege jeweils Unit-/Widget-Tests in flutter test gruen (nicht je Schritt zugeordnet)	-
+RT3-R-01..R-08	iOS	⏳	Regression Oberflaeche: Antippen noetig. Teilbeleg komplette Widget-Suite gruen	-
+RT3-Z-01	iOS	⏳	Kein Konto angelegt	-
+RT3-T-01	iOS	✅	flutter analyze: No issues found! (logs/ios_analyze.txt)	-
+RT3-T-02	iOS	✅	flutter test: All tests passed, +2591 ~115 uebersprungen, 0 Fehler (logs/ios_flutter_test.txt). Erster Lauf (logs/ios_flutter_test_lauf1_abgebrochen.txt) endete bei +904 ohne Ergebnis (Platte voll), Wiederholung vollstaendig gruen	-
+RT3-T-08	iOS	✅	flutter build ios --simulator --debug: Built build/ios/iphonesimulator/Runner.app (logs/ios_build.txt); Warnung: sqflite_sqlcipher ohne Swift Package Manager	-
+INT-db_security	iOS	✅	integration_test/db_security_test.dart auf iPhone 17 Pro: 6 Tests, All tests passed (logs/ios_integration_db_security.txt)	-
+INT-event_store	iOS	✅	integration_test/event_store_test.dart auf iPhone 17 Pro: 10 Tests, All tests passed (logs/ios_integration_event_store.txt); erster Versuch nur an "No space left on device" gescheitert	-
+INT-matrix_sdk_smoke	iOS	⏳	Spricht den echten matrix.org-Server an; nicht ausgefuehrt	-
+INT-custom_tab/reminders	iOS	n/a	Android-Tests	-
+INT-store_screenshots	iOS	n/a	Planvorgabe: nicht ausfuehren	-
+X-483	iOS	⏳	Passwort aendern eingebettet: Antippen noetig. Teilbeleg password_change_embedded_test gruen	-
+X-484	iOS	⏳	Ausweg und Fertig: Antippen noetig. Teilbeleg embedded_redirect_test, embedded_browser_page_test gruen	-
+X-485	iOS	⏳	Fremder-Host-Hinweis: Antippen noetig. Teilbeleg embedded_browser_page_test gruen	-
+X-486	iOS	⏳	WebView-Datenspeicher: iOS-Build mit AppDelegate-Kanal gelingt, iPhone-Start ohne Absturz; Loeschwirkung nur durch website_data_test (gruen), nicht am echten WKWebView	-
+RT3-A-01/02-NACHPRUEFUNG	iPad	⚠️	Ersttest ❌ (nur Startbild nach 45 s) nicht reproduzierbar: Neustart mit flutter run --debug auf iPad Pro 13 zeigt die Willkommensseite (dunkel) nach unter 45 s. Der graue Bogen unten rechts ist das Debug-Banner. Ursache des ersten Fehlschlags vermutlich langsamer Debug-JIT-Start bei voller Platte und paralleler Last; ein Release-/Profile-Build auf einem echten iPad bleibt nötig, um Startzeit zu belegen.	screenshots/X-IPAD-RERUN_40.png

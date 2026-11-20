@@ -1,0 +1,12 @@
+== B-09: Standardbrowser zurückgestellt ==
+2026-11-14T08:36:39
+Umstellung durch den Nutzer (Systemeinstellungen); Ausgangswert Safari (Lauf 29 A-01)
+Standardbrowser https: /Applications/Firefox.app
+[('https', 'org.mozilla.firefox'), ('http', 'org.mozilla.firefox')]
+== B-09 (zweite Prüfung): Standardbrowser ==
+2026-11-14T08:37:22
+Standardbrowser https: /System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app
+[('https', 'org.mozilla.firefox'), ('http', 'org.mozilla.firefox')]
+== B-09 (dritte Prüfung, nach Neustart der Prüfkopie) ==
+2026-11-14T08:38:23
+LaunchServices-Datei jetzt: http/https = com.apple.safari (zuvor zeitweise org.mozilla.firefox, die Datei wurde verzögert aktualisiert); NSWorkspace: Safari

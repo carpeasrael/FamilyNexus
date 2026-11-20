@@ -1,0 +1,13 @@
+      59
+       0
+zweiter Lauf: nach Kopieren:
+      59
+      59
+nach 66 s (abc):
+       0
+--- Wiederholung zweiter Lauf (simctl pbcopy allein wirkte nicht, daher host pbcopy + pbsync)
+      59
+nach Sync abc:
+       3
+nach 66 s:
+       3

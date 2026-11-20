@@ -1,0 +1,94 @@
+Resolving dependencies...
+Downloading packages...
+  android_file_picker 2.1.1 (2.1.6 available)
+  archive 4.5.2 (4.7.1 available)
+  code_assets 1.2.1 (2.2.0 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  crypto 3.0.7 (3.0.8 available)
+  dev_build 1.1.15 (1.2.2 available)
+  file_picker 13.1.0 (13.3.3 available)
+  file_picker_darwin 2.3.2 (2.5.1 available)
+  file_picker_linux 2.0.2 (2.0.4 available)
+  file_picker_web 4.2.0 (4.2.1 available)
+  flutter_local_notifications 22.3.2 (23.0.2 available)
+  flutter_local_notifications_linux 8.0.2 (9.0.0 available)
+  flutter_local_notifications_platform_interface 12.2.0 (13.0.0 available)
+  flutter_local_notifications_web 1.0.0 (2.0.0 available)
+  flutter_local_notifications_windows 3.1.1 (4.0.1 available)
+  flutter_vodozemac 0.9.0 (0.9.1 available)
+  image 4.12.0 (4.13.1 available)
+  jni 1.1.0 (1.1.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  matrix 14.2.0 (16.0.4 available)
+  native_toolchain_c 0.19.2 (0.19.6 available)
+  objective_c 9.5.0 (9.6.4 available)
+  petitparser 7.0.2 (7.1.0 available)
+  posix 6.5.2 (6.5.4 available)
+  process_run 1.4.1 (1.4.4 available)
+  qr 4.0.0 (4.0.1 available)
+  sdp_transform 0.3.2 (0.4.0 available)
+  sqflite_common 2.5.14 (2.5.17 available)
+  sqflite_common_ffi 2.4.4 (2.4.7 available)
+  sqflite_common_ffi_web 1.2.0 (1.2.2 available)
+  sqlite3 3.8.0 (3.9.1 available)
+  synchronized 3.5.0 (3.6.1+1 available)
+  test_api 0.7.12 (0.7.15 available)
+  vector_math 2.4.0 (2.4.4 available)
+  vodozemac 0.9.0 (0.9.1 available)
+  web 1.1.1 (1.1.2 available)
+  windows_file_picker 2.0.1 (2.0.2 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+38 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart
+00:00 +0: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Liste erreicht alle Mitglieder, nur als Ereignis im Familienraum
+00:00 +1: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskList.validate gültige Liste
+00:00 +2: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Abhaken mit Kommentar erscheint im Verlauf aller Geräte
+00:00 +3: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Abhaken mit Kommentar erscheint im Verlauf aller Geräte
+00:00 +4: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Abhaken mit Kommentar erscheint im Verlauf aller Geräte
+00:00 +5: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Abhaken mit Kommentar erscheint im Verlauf aller Geräte
+00:00 +6: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskCodec Roundtrip Protokoll inkl. Kommentar
+00:00 +7: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Issue #1: Liste mit Erklärung und neuer Regel (v2) erreicht alle; Abhaken nutzt den Schlüssel der Regel
+00:00 +8: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Issue #1: Liste mit Erklärung und neuer Regel (v2) erreicht alle; Abhaken nutzt den Schlüssel der Regel
+00:00 +9: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskCodec by muss dem Absender entsprechen
+00:00 +10: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Nicht-Moderator kann keine Liste einschleusen
+00:00 +11: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Nicht-Moderator kann keine Liste einschleusen
+00:00 +12: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Nicht-Moderator kann keine Liste einschleusen
+00:00 +13: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskMerge höhere Version gewinnt, dann Zeit, dann Absender
+00:00 +14: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Nicht Zugewiesene können nicht in fremdem Namen abhaken
+00:00 +15: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Nicht Zugewiesene können nicht in fremdem Namen abhaken
+00:00 +16: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskProgress (Reset als abgeleiteter Zustand) erledigter Punkt gilt in derselben Periode, nicht in der nächsten
+00:00 +17: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: #464: Abhak-Ereignis vor der Liste (Backfill-Reihenfolge) geht nicht verloren
+00:00 +18: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskProgress (Reset als abgeleiteter Zustand) wöchentlich: erledigt bis Sonntag, am Montag zurückgesetzt
+00:00 +19: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: #464: Einträge einer nicht zugewiesenen Person werden nicht gespeichert
+00:00 +20: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: #464: Einträge einer nicht zugewiesenen Person werden nicht gespeichert
+00:00 +21: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: #464: Einträge einer nicht zugewiesenen Person werden nicht gespeichert
+00:00 +22: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: #464: Einträge einer nicht zugewiesenen Person werden nicht gespeichert
+00:00 +23: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: #464: Einträge einer nicht zugewiesenen Person werden nicht gespeichert
+00:00 +24: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService nur Moderatoren legen an, ändern und löschen
+00:00 +25: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: gefälschtes by wird verworfen
+00:00 +26: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Müll blockiert nichts
+00:00 +27: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService Bearbeiten behält die IDs unveränderter Punkte und erhöht die Version
+00:00 +28: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Offline-Warteschlange: nichts geht verloren, später wird gesendet
+00:00 +29: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService nur die zugewiesene Person hakt ab; Datum, Periode und Kommentar werden protokolliert
+00:00 +30: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/data/task_sync_test.dart: Änderung durch die Moderatorin (Neuzuweisung) konvergiert
+00:00 +31: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService Mitternacht in der Listen-Zeitzone setzt zurück, der Verlauf bleibt
+00:00 +32: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService unbekannter Punkt, gelöschte Liste, Zurücknehmen
+00:00 +33: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService Grenzen: Anzahl Listen
+00:00 +34: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService Empfang: Liste eines Nicht-Moderators wird verworfen
+00:00 +35: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService Empfang: Protokoll-Duplikat, Zeitabweichung
+00:00 +36: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService #464: Einträge Nicht-Zugewiesener verdrängen keine Erledigung
+00:00 +37: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService #464: Einträge zu unbekannten Listen füllen die Gesamtgrenze nicht
+00:01 +38: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService #464: Eintrag vor seiner Liste wird nachgetragen
+00:01 +39: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService #464: Neuzuweisung (a) Eintrag wartet auf die passende Fassung
+00:01 +40: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService #464: Neuzuweisung (b) gespeicherte Einträge bleiben und zählen bei Rückzuweisung wieder
+00:01 +41: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService #464: Neuzuweisung (c) lokal durch die Moderatorin trägt gepufferte Einträge nach
+00:01 +42: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService #464: gelöschte Liste (Empfang): Verlauf bleibt, neue Einträge werden nicht gespeichert
+00:01 +43: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService #464: gelöschte Liste (lokal): Verlauf bleibt, neue Einträge werden nicht gespeichert
+00:01 +44: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService #464: Löschen und gleichzeitiges Ändern: beide Reihenfolgen kommen zum selben Ergebnis
+00:01 +45: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService #464: Puffer je Absender begrenzt: eine Flut verdrängt fremde Einträge nicht
+00:02 +46: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService #464: Überlauf je Absender verwirft den Eintrag mit dem ältesten Zeitpunkt
+00:02 +47: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: TaskService #464: volle Liste bei voller Gesamtgrenze nimmt den neuen Eintrag an
+00:02 +48: /Users/carpeasrael/NextCloud_int/mac_project_2/FamilyNexus/.claude/worktrees/agent-a6d6ea3ba195aea18/test/domain/tasks_test.dart: (tearDownAll)
+00:02 +48: All tests passed!

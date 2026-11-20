@@ -1,0 +1,16 @@
+H-04 Gegenprobe (lokales Protokoll 2026-11-20): Treffer je Begriff
+Testfamilie 1119: 1
+Test geteilt 2: 1
+Test N1: 1
+Termin I2: 2
+fnt-1119: 77
+H-09:
+PW_N1 Treffer: 0
+KN1 Treffer: 0
+KN1b Treffer: 0
+KN1c Treffer: 0
+syt_/access_token/Bearer: 0
+Hinweiszeilen:
+962:Außerdem gespeichert, aber aus Sicherheitsgründen nicht angezeigt: Zugangstoken der Sitzung, Geräteschlüssel und Schlüssel der verschlüsselten Gespräche.
+964:Nie gespeichert, nur im Arbeitsspeicher: Online-Status der Familienmitglieder.
+965:Geplante Erinnerungen liegen zusätzlich beim Betriebssystem.

@@ -1,0 +1,7 @@
+-- A-08 23:50:31
+Prozess FamilyNexus: 
+/Users/carpeasrael/Library/Containers/de.inneso.familynexus.apple4
+Container apple4 entfernt: /Users/carpeasrael/Library/Containers/de.inneso.familynexus.apple4
+Nutzer-Container unverändert vorhanden: /Users/carpeasrael/Library/Containers/de.inneso.familyNexus /Users/carpeasrael/Library/Containers/de.inneso.familynexus.e2e 
+Safari sichtbare Fenster: 0
+Container apple4: Entfernen von macOS verweigert (Operation not permitted); der Ordner enthaelt nur die geschuetzte Metadatendatei der Pruefkopie.

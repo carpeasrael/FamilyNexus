@@ -1,0 +1,35 @@
+== familynexus_app.db
+00000000: 2ba4 5c4d 859a ad50 9879 5d78 ffbc 01b4  +.\M...P.y]x....
+/private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/dba199fb-3c03-4513-940f-93420b03c245/scratchpad/hw/familynexus_app.db: data
+Error: in prepare, file is not a database (26)
+== familynexus_matrix.db
+00000000: 4ae1 2de0 7930 6278 a07a 3c76 d2a0 3906  J.-.y0bx.z<v..9.
+/private/tmp/claude-501/-Users-carpeasrael-NextCloud-int-mac-project-2-FamilyNexus/dba199fb-3c03-4513-940f-93420b03c245/scratchpad/hw/familynexus_matrix.db: data
+Error: in prepare, file is not a database (26)
+--- Suchbegriffe
+familynexus_app.db | Testfamilie 1119: 0
+familynexus_app.db | Test geteilt 2: 0
+familynexus_app.db | Hallo von Nutzer 1: 0
+familynexus_app.db | Nur für dich: 0
+familynexus_app.db | Test N1: 0
+familynexus_app.db | FN-ANHANG-: 0
+familynexus_app.db | Termin I2: 0
+familynexus_app.db | fnt-1119: 0
+familynexus_matrix.db | Testfamilie 1119: 0
+familynexus_matrix.db | Test geteilt 2: 0
+familynexus_matrix.db | Hallo von Nutzer 1: 0
+familynexus_matrix.db | Nur für dich: 0
+familynexus_matrix.db | Test N1: 0
+familynexus_matrix.db | FN-ANHANG-: 0
+familynexus_matrix.db | Termin I2: 0
+familynexus_matrix.db | fnt-1119: 0
+--- rekursiv Container
+Testfamilie 1119:        0
+Hallo von Nutzer 1:        0
+Test geteilt 2:        0
+Nur für dich:        0
+Test N1:        0
+fnt-1119:        0
+--- Gegenprobe: gefundene Dateien bei grep -a in Container ohne -I
+Testfamilie 1119:        0
+Hallo von Nutzer 1:        0

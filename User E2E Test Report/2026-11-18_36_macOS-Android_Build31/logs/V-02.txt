@@ -1,0 +1,8 @@
+1.2.3
+31
+de.inneso.familynexus.e2e
+Identifier=de.inneso.familynexus.e2e
+Signature=adhoc
+TeamIdentifier=not set
+    versionCode=31 minSdk=26 targetSdk=36
+    versionName=1.2.3

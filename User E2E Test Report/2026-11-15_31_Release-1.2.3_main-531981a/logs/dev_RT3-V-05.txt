@@ -1,0 +1,4 @@
+HEAD 531981ae5252609bcde90e348fc85e856e21fa5b (531981a), Commit-Datum 2026-11-15T19:25:27+01:00
+pubspec.yaml: version: 1.2.3+29
+git log --oneline | grep 482 -> cd5141b Merge pull request #482 (enthalten)
+git status --short (Worktree nach allen Laeufen, Mutation zurueckgesetzt): leer

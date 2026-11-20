@@ -1,0 +1,27 @@
+Calendar | - | 152,205
+Open menu | klickbar | 1017,206
+Day | klickbar | 249,353
+Week | klickbar | 443,353
+Month | klickbar | 637,353
+Agenda | klickbar | 831,353
+Previous | klickbar | 95,479
+Agenda | - | 394,478
+Next | klickbar | 694,479
+Birthdays | klickbar | 820,479
+Today | klickbar | 966,479
+Today / Wed, Nov 18, 2026 | - | 540,621
+Test Thema, 1:00 PM – 2:00 PM, Private | - | 540,770
+Thu, Nov 19, 2026 | - | 540,918
+Test geteilt 2, 10:30 AM – 11:30 AM, Shared | - | 540,1090
+Test privat, 9:00 PM – 10:00 PM, Private | - | 540,1313
+Fri, Nov 20, 2026 | - | 540,1461
+Anniversary of death of Opa Test, Death anniversary no. 6, 5 years ago | - | 540,1608
+Test Serie, All day, Private, Repeats | - | 540,1809
+Sat, Nov 21, 2026 | - | 540,1960
+Birthday of Oma Test, turns 76, currently 75 years old | - | 540,2068
+New event | klickbar | 964,2011
+Today / Tab 1 of 5 | klickbar | 108,2232
+Calendar / Tab 2 of 5 | klickbar | 324,2232
+Chat / Tab 3 of 5 | klickbar | 540,2232
+Shopping / Tab 4 of 5 | klickbar | 756,2232
+Tasks – 1 open / 1 / Tasks / Tab 5 of 5 | klickbar | 972,2232

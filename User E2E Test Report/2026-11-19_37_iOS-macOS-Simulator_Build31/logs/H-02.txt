@@ -1,0 +1,12 @@
+total 1512
+drwxr-xr-x@ 4 carpeasrael  staff     128 Nov 20 02:26 .
+drwxr-xr-x@ 7 carpeasrael  staff     224 Nov 19 23:06 ..
+-rw-r--r--  1 carpeasrael  staff  106496 Nov 20 02:23 familynexus_app.db
+-rw-r--r--  1 carpeasrael  staff  581632 Nov 20 02:26 familynexus_matrix.db
+total 1344
+-rw-r--r--@ 1 carpeasrael  wheel  106496 Nov 20 02:26 familynexus_app.db
+-rw-r--r--@ 1 carpeasrael  wheel  581632 Nov 20 02:26 familynexus_matrix.db
+--- Klartextartige Dateien im Container (json/txt/csv/png/jpg/sqlite/db)
+/Documents/familynexus_app.db
+/Documents/familynexus_matrix.db
+/Library/Caches/flutter_callback_cache.json

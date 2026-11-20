@@ -1,0 +1,12 @@
+2026-11-15 20:48:43.424 Df Runner[74630:f332f6] [com.apple.UserNotifications:Connections] [de.inneso.familynexus] Setting badge count to 0
+2026-11-15 20:48:43.425 Df SpringBoard[69850:f35742] [com.apple.UserNotifications:Connections] [de.inneso.familynexus] Setting badge count to 0
+2026-11-15 20:49:04.843 Df SpringBoard[69850:f358b0] [com.apple.UserNotifications:DataStore] [de.inneso.familynexus] Saving notification 356A-192B: YES [ hasAlertContent: YES, shouldPresentAlert: YES settingsShouldSave: YES pipelineState: pending]
+2026-11-15 20:49:05.324 Df Runner[74630:f332f6] [com.apple.UserNotifications:Connections] [de.inneso.familynexus] Setting badge count to 1
+2026-11-15 20:49:05.326 Df SpringBoard[69850:f35496] [com.apple.UserNotifications:Connections] [de.inneso.familynexus] Setting badge count to 1
+2026-11-15 20:49:13.763 Df SpringBoard[69850:f35496] [com.apple.UserNotifications:DataStore] [de.inneso.familynexus] Saving notification 356A-192B: YES [ hasAlertContent: YES, shouldPresentAlert: YES settingsShouldSave: YES pipelineState: pending]
+2026-11-15 20:49:14.219 Df Runner[74630:f332f6] [com.apple.UserNotifications:Connections] [de.inneso.familynexus] Setting badge count to 2
+2026-11-15 20:49:14.220 Df SpringBoard[69850:f35496] [com.apple.UserNotifications:Connections] [de.inneso.familynexus] Setting badge count to 2
+2026-11-15 20:54:35.830 Df SpringBoard[69850:f386cb] [com.apple.UserNotifications:DataStore] [de.inneso.familynexus] Saving notification 356A-192B: YES [ hasAlertContent: YES, shouldPresentAlert: YES settingsShouldSave: YES pipelineState: pending]
+2026-11-15 20:54:36.237 Df SpringBoard[69850:f388ee] [com.apple.UserNotifications:DataStore] [de.inneso.familynexus] Saving notification 356A-192B: YES [ hasAlertContent: YES, shouldPresentAlert: YES settingsShouldSave: YES pipelineState: completed]
+2026-11-15 20:54:36.276 Df Runner[74630:f332f6] [com.apple.UserNotifications:Connections] [de.inneso.familynexus] Setting badge count to 3
+2026-11-15 20:54:36.276 Df SpringBoard[69850:f38926] [com.apple.UserNotifications:Connections] [de.inneso.familynexus] Setting badge count to 3
