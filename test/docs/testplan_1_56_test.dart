@@ -31,7 +31,7 @@ void main() {
 
   test('2 A-12: dreistufige Einführungstour', () {
     final r = _row('A-12');
-    for (final s in ['Kalender', 'Chat', 'Einkauf', 'Überspringen', 'Los geht’s', 'Heute']) {
+    for (final s in ['Dreistufige Einführungstour', 'Kalender', 'Chat', 'Einkauf', 'Schritt 3 von 3', 'nur auf Stufe 1 und 2', 'Los geht’s', 'Heute']) {
       expect(r, contains(s));
     }
   });
@@ -50,6 +50,23 @@ void main() {
     expect(_row('H-09'), contains('KN1, KN1b, KN1c'));
     expect(_row('C-07'), contains('**KN1b**'));
     expect(_plan, contains('KN1c (N1, H-07)'));
+  });
+
+  test('4b H-19 läuft nach H-07 und schaltet mit KN1c frei', () {
+    final r = _row('H-19');
+    expect(r, contains('mit KN1c freischalten (KN1b, falls H-07 nicht gelaufen ist)'));
+    expect(r, isNot(contains('mit KN1b freischalten |')));
+  });
+
+  test('4c jede Zeile nach H-07, die KN1b nennt, kennzeichnet es als ungültig oder als Rückfall', () {
+    final h07 = _plan.indexOf('| H-07 |');
+    final after = _plan.substring(h07).split('\n').where((l) => l.startsWith('| ') && l.contains('KN1b'));
+    for (final l in after) {
+      final id = l.split('|')[1].trim();
+      if (id.startsWith('P-')) continue; // Änderungsverlauf
+      expect(l, anyOf(contains('KN1b wird ungültig'), contains('falls H-07 nicht gelaufen'), contains('KN1c bzw. KN1b'), contains('KN1, KN1b, KN1c')),
+          reason: 'Zeile $id nennt KN1b nach H-07 ohne Hinweis');
+    }
   });
 
   test('5 B-18 und Android-Gerät: Ausgangslage AN, dann AUS, danach wieder AN', () {
