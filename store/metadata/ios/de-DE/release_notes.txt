@@ -8,7 +8,9 @@ Neu in 1.2.3:
 • Chat: Eine Gesprächsliste zeigt Familienchat und Einzelchats, sobald es Einzelchats gibt.
 • Zwölf eingebaute Avatare; in bestehenden Familien lassen sie sich wählen, sobald ein Moderator die App geöffnet hat.
 • Bitte alle Geräte der Familie aktualisieren: Wer einen Termin mit einer älteren App-Version bearbeitet, verliert dessen Thema.
-
+• Kalender: Geburts- und Gedenktage der Familie, mit Vorlaufzeit; alle Mitglieder sehen und ändern sie.
+• Chat: Unter eigenen Nachrichten steht „Gesendet“ oder „Gelesen“ (im Familienchat „Gelesen von n“). Die Lesebestätigung ist standardmäßig an und lässt sich unter Einstellungen → Datenschutz ausschalten. Sie ist nicht Ende-zu-Ende-verschlüsselt: Dein Server und die Server der Gesprächspartner sehen, wer wann gelesen hat; gesendete Bestätigungen lassen sich nicht zurücknehmen.
+• Chat: Gespräche mit ungelesenen Nachrichten stehen oben; „Letztes Gespräch wieder öffnen“ (Einstellungen → Darstellung) ist optional.
 • Einrichtung: Anbieter wählen als eigener Schritt.
 Neu in 1.2.2:
 • Bitte alle Geräte der Familie aktualisieren. Ältere App-Versionen zeigen Gruppen, Einträge mit zusammengesetzten Emojis und neue Reaktionen nicht; ändert oder hakt jemand dort einen Eintrag ab, geht dessen Gruppe für alle verloren.

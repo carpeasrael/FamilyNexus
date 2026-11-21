@@ -1,10 +1,9 @@
 Neu in 1.2.3:
-• Kalender-Themen (Name, Farbe), Gesprächsliste, zwölf Avatare.
+• Geburts- und Gedenktage im Kalender.
+• „Gelesen“ unter Nachrichten: Standard an, abschaltbar unter Einstellungen → Datenschutz; Server sehen es.
+• Kalender-Themen, Gesprächsliste, zwölf Avatare.
 • Bitte alle Geräte der Familie aktualisieren.
 • Identitätsvermerke auch auf dem Gerät; Ladebild folgt der Darstellung.
-• Kalender: Jahresfortschritt, Abgleich alle 15 Min.
-• Einführung; App teilen und bewerten.
 • Einrichtung: Anbieter wählen als eigener Schritt.
 Neu in 1.2.2:
 • Jeden Beitritt bestätigt ein Moderator; Einladungslinks ohne lesbare Namen.
-• Einkauf: Einträge nach Gruppen ordnen.

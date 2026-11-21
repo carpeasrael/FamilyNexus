@@ -48,9 +48,33 @@ void main() {
       }
     });
 
+    test('#577 $f: nennt Geburts- und Gedenktage', () {
+      expect(text.toLowerCase(), contains(de ? 'geburts- und gedenktage' : 'birthdays and memorial days'));
+    });
+
+    test('#577 $f: nennt die standardmäßig öffentliche Lesebestätigung mit Ausweg (E-106)', () {
+      // Die Bestätigung ist für Bestandsnutzer nach dem Update ohne Zutun an und nicht rücknehmbar; der Store-Text ist
+      // der einzige Kanal zum Zeitpunkt des Updates (die App zeigt keinen Hinweis).
+      final line = text.split('\n').where((l) => l.contains(de ? 'Einstellungen → Datenschutz' : 'Settings → Privacy'));
+      expect(line, hasLength(1), reason: 'genau ein Punkt nennt den Schalter unter Datenschutz');
+      final l = line.single;
+      expect(l, contains(de ? 'Gelesen' : 'Read'));
+      expect(l, contains(f.contains('/android/') ? (de ? 'Standard an' : 'on by default') : (de ? 'standardmäßig an' : 'on by default')));
+      if (!f.contains('/android/')) {
+        expect(l, contains(de ? 'nicht Ende-zu-Ende-verschlüsselt' : 'not end-to-end encrypted'));
+        expect(l, contains(de ? 'nicht zurücknehmen' : 'cannot be taken back'));
+      } else {
+        expect(l, contains(de ? 'Server sehen es' : 'servers see it'));
+      }
+    });
+
     if (f.contains('/android/')) {
       test('$f: höchstens 500 Zeichen (Google Play)', () {
         expect(text.runes.length, lessThanOrEqualTo(500));
+      });
+    } else {
+      test('#577 $f: höchstens 4000 Zeichen (App Store, docs/STORE.md)', () {
+        expect(text.runes.length, lessThanOrEqualTo(4000));
       });
     }
   }
