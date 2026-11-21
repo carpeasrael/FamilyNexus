@@ -1516,6 +1516,9 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   bool delayNewDirectChats = false;
   final Set<String> hiddenThreads = <String>{};
 
+  /// Test (#574): Hält [startDirectChat] nach der Prüfung an, bis der Completer erfüllt ist (steuert das Warten).
+  Completer<void>? holdDirectChat;
+
   @override
   Future<String> startDirectChat(String userId) async {
     _requireSession();
@@ -1523,6 +1526,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final f = _fam();
     final m = _mem(f, userId);
     if (userId == _userId || m.status != MemberStatus.joined) throw const GatewayException(GatewayError.notAllowed);
+    final hold = holdDirectChat;
+    if (hold != null) await hold.future;
     for (final r in fake.dmRooms.values) {
       if (r.dmMembers.contains(_userId) && r.dmMembers.contains(userId)) return r.id;
     }
