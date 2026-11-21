@@ -56,7 +56,7 @@ jobs:
       BUILD: ${{ github.event.inputs.build || 'apk+aab' }}
 
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'apk') && github.event.inputs.ref || env.TAG }}
 
@@ -198,7 +198,7 @@ jobs:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'flatpak') && github.event.inputs.ref || env.TAG }}
 
@@ -245,7 +245,7 @@ jobs:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'appimage') && github.event.inputs.ref || env.TAG }}
 
@@ -308,7 +308,7 @@ jobs:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'windows') && github.event.inputs.ref || env.TAG }}
 
@@ -399,7 +399,7 @@ jobs:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'apple') && github.event.inputs.ref || env.TAG }}
 
@@ -551,7 +551,7 @@ jobs:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'web') && github.event.inputs.ref || env.TAG }}
 
