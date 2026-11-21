@@ -1,10 +1,9 @@
 New in 1.2.3:
-• Calendar themes (name, color), conversation list, twelve avatars.
+• Birthdays and memorial days in the calendar.
+• “Read” under messages: on by default, off under Settings → Privacy; servers see it.
+• Calendar themes, conversation list, twelve avatars.
 • Please update all devices of your family.
 • Identity records also kept on the device; loading screen follows the appearance.
-• Calendar: year progress, sync every 15 min.
-• Introduction; share and rate the app.
 • Setup: choosing a provider is its own step.
 New in 1.2.2:
 • A moderator confirms every join; invitation links no longer show names.
-• Shopping: group items, e.g. by shop.

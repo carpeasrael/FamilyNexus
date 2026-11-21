@@ -8,7 +8,9 @@ New in 1.2.3:
 • Chat: a conversation list shows the family chat and direct chats as soon as there are direct chats.
 • Twelve built-in avatars; in existing families they can be chosen once a moderator has opened the app.
 • Please update all devices of your family: whoever edits an event with an older app version loses its theme.
-
+• Calendar: birthdays and memorial days of the family, with lead time; all members see and edit them.
+• Chat: under your own messages “Sent” or “Read” appears (in the family chat “Read by n”). Read receipts are on by default and can be turned off under Settings → Privacy. They are not end-to-end encrypted: your server and the servers of the people you talk to see who read what and when; receipts already sent cannot be taken back.
+• Chat: conversations with unread messages come first; “Reopen last conversation” (Settings → Appearance) is optional.
 • Setup: choosing a provider is its own step.
 New in 1.2.2:
 • Please update all devices of your family. Older app versions do not show groups, items with combined emojis or new reactions; if someone edits or checks off an item there, its group is lost for everyone.
