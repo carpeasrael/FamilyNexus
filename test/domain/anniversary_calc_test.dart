@@ -116,5 +116,41 @@ void main() {
       expect(year.single.occursOn, d(2027, 1, 1));
       expect(year.single.ageAtNext, 37);
     });
+
+    group('keine Treffer vor dem Jahr des Datums (#575)', () {
+      final today = d(2026, 11, 21);
+      test('(a) Todestag 15.03.2024: 2023 leer, 2024 mit Alter 0, 2025 mit Alter 1', () {
+        final p = <AnniversaryPerson>[person(death: date(3, 15, 2024))];
+        expect(AnniversaryCalc.between(p, d(2023, 1, 1), d(2023, 12, 31), today), isEmpty);
+        final y24 = AnniversaryCalc.between(p, d(2024, 1, 1), d(2024, 12, 31), today);
+        expect((y24.single.occursOn, y24.single.ageAtNext), (d(2024, 3, 15), 0));
+        final y25 = AnniversaryCalc.between(p, d(2025, 1, 1), d(2025, 12, 31), today);
+        expect(y25.single.ageAtNext, 1);
+      });
+      test('(b) Geburtstag 10.05.2021, Bereich 2019 bis 2023: nur 2021 bis 2023', () {
+        final p = <AnniversaryPerson>[person(birth: date(5, 10, 2021))];
+        final hits = AnniversaryCalc.between(p, d(2019, 1, 1), d(2023, 12, 31), today);
+        expect(hits.map((h) => h.occursOn.year), <int>[2021, 2022, 2023]);
+        expect(hits.map((h) => h.ageAtNext), <int>[0, 1, 2]);
+      });
+      test('(c) Datum ohne Jahr: Treffer in jedem Jahr', () {
+        final p = <AnniversaryPerson>[person(birth: date(5, 10))];
+        final hits = AnniversaryCalc.between(p, d(2019, 1, 1), d(2023, 12, 31), today);
+        expect(hits.map((h) => h.occursOn.year), <int>[2019, 2020, 2021, 2022, 2023]);
+        expect(hits.every((h) => h.ageAtNext == null), isTrue);
+      });
+      test('(d) 29.02.2020: 2019 leer, 2021 liefert den 28.02.', () {
+        final p = <AnniversaryPerson>[person(birth: date(2, 29, 2020))];
+        expect(AnniversaryCalc.between(p, d(2019, 1, 1), d(2019, 12, 31), today), isEmpty);
+        final h = AnniversaryCalc.between(p, d(2021, 1, 1), d(2021, 12, 31), today);
+        expect(h.single.occursOn, d(2021, 2, 28));
+        expect(h.single.ageAtNext, 1);
+      });
+      test('(e) Bereich über den Jahreswechsel mit Datum 01.01.2024', () {
+        final p = <AnniversaryPerson>[person(birth: date(1, 1, 2024))];
+        final h = AnniversaryCalc.between(p, d(2023, 12, 28), d(2024, 1, 3), today);
+        expect((h.single.occursOn, h.single.ageAtNext), (d(2024, 1, 1), 0));
+      });
+    });
   });
 }

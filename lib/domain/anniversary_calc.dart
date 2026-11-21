@@ -28,7 +28,8 @@ class AnniversaryHit {
   /// Vollendete Jahre seit dem Datum (heute), nur mit Jahr.
   final int? yearsSince;
 
-  /// Jahre am Tag [occursOn] (`occursOn.year − Jahr`), nur mit Jahr.
+  /// Jahre am Tag [occursOn] (`occursOn.year − Jahr`), nur mit Jahr. Aus [AnniversaryCalc.between] stets `>= 0`
+  /// (Jahre vor dem Datum liefern keinen Treffer, #575).
   final int? ageAtNext;
 }
 
@@ -126,12 +127,15 @@ class AnniversaryCalc {
       <AnniversaryHit>[for (final h in upcoming(people, today)) if (h.daysUntil <= leadDays) h];
 
   /// Treffer mit wirksamem Datum im Bereich [from, to] (Kalendertage, einschließlich); auch vergangene Tage.
+  /// Jahre vor dem Jahr des Datums entfallen (kein Treffer vor Geburt oder Tod, #575); das Jahr des Datums selbst
+  /// zählt (`ageAtNext == 0`). Ohne Jahr gilt das Datum in jedem Jahr.
   static List<AnniversaryHit> between(Iterable<AnniversaryPerson> people, DateTime from, DateTime to, DateTime today) {
     final a = _day(from);
     final b = _day(to);
     final out = <AnniversaryHit>[];
     void add(AnniversaryPerson p, AnniversaryKind kind, AnniversaryDate date) {
       for (var y = a.year; y <= b.year; y++) {
+        if (date.year != null && y < date.year!) continue;
         final eff = effectiveDate(date, y);
         if (eff.isBefore(a) || eff.isAfter(b)) continue;
         out.add(AnniversaryHit(
