@@ -27,6 +27,8 @@ dependencies:
   path: 1.9.1
   http: 1.6.0
   uuid: 4.6.0
+  # Avatar-Fotos (#434, E-111): Dekodieren fremder JPEG im speichersicheren Dart und Zuschneiden; BSD/MIT, war schon transitiv.
+  image: 4.12.0
   file_picker: 13.1.0
   timezone: 0.11.2
   flutter_timezone: 5.1.1

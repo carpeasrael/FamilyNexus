@@ -137,6 +137,34 @@ class AppDatabase {
           data TEXT NOT NULL
         )''');
     },
+    // v7: Avatar-Fotos, je Familienraum und Eigentümer das neueste Ereignis, dazu die Menge der Zurücksetzungen
+    // (#434, E-111). `data` ist Base64 des geprüften JPEG, `redact_ids` eine JSON-Liste eigener Ereignis-IDs.
+    (db) async {
+      await db.execute('''
+        CREATE TABLE avatar_photos (
+          room_id TEXT NOT NULL,
+          owner TEXT NOT NULL,
+          photo_id TEXT NOT NULL,
+          created_at INTEGER NOT NULL,
+          cleared INTEGER NOT NULL,
+          w INTEGER NOT NULL DEFAULT 0,
+          h INTEGER NOT NULL DEFAULT 0,
+          data TEXT NOT NULL DEFAULT '',
+          event_id TEXT NOT NULL DEFAULT '',
+          published INTEGER NOT NULL DEFAULT 0,
+          redact_ids TEXT NOT NULL DEFAULT '[]',
+          PRIMARY KEY (room_id, owner)
+        )''');
+      await db.execute('''
+        CREATE TABLE avatar_resets (
+          room_id TEXT NOT NULL,
+          target TEXT NOT NULL,
+          photo_id TEXT NOT NULL,
+          photo_created_at INTEGER NOT NULL,
+          published INTEGER NOT NULL DEFAULT 1,
+          PRIMARY KEY (room_id, target, photo_id)
+        )''');
+    },
   ];
 
   static int get schemaVersion => migrations.length;

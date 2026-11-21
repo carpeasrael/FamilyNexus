@@ -44,6 +44,32 @@ void main() {
     expect(SqlDataInventory.tables.toSet(), <String>{for (final r in rows) r['name']! as String});
   });
 
+  test('Avatar-Fotos erscheinen im Protokoll als Größe, nicht als Base64 der Bilddaten', () async {
+    final data = 'A' * 400; // 400 Base64-Zeichen entsprechen 300 Byte
+    await db.insert('avatar_photos', <String, Object?>{
+      'room_id': '!r:t',
+      'owner': '@a:t',
+      'photo_id': '00000000-0000-4000-8000-000000000001',
+      'created_at': 1,
+      'cleared': 0,
+      'w': 64,
+      'h': 48,
+      'data': data,
+    });
+    await db.insert('avatar_photos', <String, Object?>{
+      'room_id': '!r:t',
+      'owner': '@b:t',
+      'photo_id': '00000000-0000-4000-8000-000000000002',
+      'created_at': 2,
+      'cleared': 1,
+    });
+    final inv = await inventory().read();
+    final rows = inv.tables.firstWhere((t) => t.name == 'avatar_photos').rows;
+    expect(rows.firstWhere((r) => r['owner'] == '@a:t')['data'], '[JPEG, 300 Byte]');
+    expect(rows.firstWhere((r) => r['owner'] == '@b:t')['data'], '', reason: 'Löschmarke ohne Bild');
+    expect(rows.toString(), isNot(contains(data)));
+  });
+
   test('liefert Pfade, Zeilen, Dateigrößen und nur das Vorhandensein der Schlüssel', () async {
     await db.insert('settings', <String, Object?>{'key': 'language', 'value': 'de'});
     final secret = await keys.getOrCreateKey('db.app');
