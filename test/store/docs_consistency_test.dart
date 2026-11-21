@@ -33,4 +33,23 @@ void main() {
     expect(e108, contains('resetToStandard'));
     expect(e108, contains('ändert E-55'));
   });
+
+  test('README nennt Geburts- und Gedenktage und die öffentliche Lesebestätigung (#578, E-104, E-106)', () {
+    // Whitespace normalisieren, Markdown-Sternchen entfernen, ohne Groß-/Kleinschreibung vergleichen.
+    final readme = File('README.md')
+        .readAsStringSync()
+        .replaceAll('*', '')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .toLowerCase();
+    for (final term in <String>[
+      'birthdays and memorial days',
+      'read receipts',
+      'on by default',
+      'Settings → Privacy → Send read receipts',
+      'not end-to-end encrypted',
+      'cannot be taken back',
+    ]) {
+      expect(readme, contains(term.toLowerCase()), reason: 'README.md nennt "$term" nicht');
+    }
+  });
 }

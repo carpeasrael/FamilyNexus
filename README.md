@@ -32,6 +32,11 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
 - **Online status:** Which family members are online is shown in the member list, in the chat and on "Today" (text and
   dot, "last online … ago"). The status is sent end-to-end encrypted to devices of family members only, is never stored
   and can be turned off under *Settings → Privacy → Share online status*.
+- **Read receipts:** Under your own messages the chat shows "Sending …", "Sent" and "Read" (in the family chat
+  "Read by n"). Sending read receipts is **on by default** and can be turned off under *Settings → Privacy → Send read
+  receipts*. The receipts are public Matrix read markers and **not end-to-end encrypted**: the homeserver and the
+  provider of your chat partners see who read up to which message and when. Receipts already sent cannot be taken
+  back. With the setting off you only send private markers and do not see who has read your messages either (E-106).
 - **Shopping list:** shared family list (item, quantity, check off, edit, delete, "Remove completed"), transmitted and
   stored encrypted, offline-capable, deterministic merge of concurrent changes.
 - **Task lists:** moderators create lists with items and assign them to a family member; they repeat on a schedule
@@ -42,6 +47,11 @@ Primary source of requirements: [`Concept.md`](Concept.md). Decisions and their 
 - **Calendar** with day/week/month/agenda views, person filter, recurrences (including exceptions, daylight saving
   time), time zones, **private** (only you, synced end-to-end encrypted between your own devices) and **shared** events (encrypted in the family room), accept/decline,
   share events as a card in the chat.
+- **Birthdays and memorial days:** for any person, also relatives without an account or people who have passed away,
+  with an optional date of birth and an optional date of death. They appear in the calendar and on "Today" with an
+  icon and text; the age is only shown if a year was entered. Stored and sent end-to-end encrypted in the family room;
+  every member may change them. How many days ahead they show on "Today" is a local setting under *Settings →
+  Appearance* (E-104).
 - **Local reminders** without the event name in the notification.
 - **Family and roles:** member/moderator; invite via link (share by email, QR code or copy; single-use, time-limited) or
   Matrix ID, confirm join requests (any moderator can check and confirm a link issued by another), promote, remove (key
