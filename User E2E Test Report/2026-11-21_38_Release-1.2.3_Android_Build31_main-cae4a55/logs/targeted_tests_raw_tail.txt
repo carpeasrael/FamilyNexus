@@ -1,0 +1,289 @@
+00:00 +0: loading /private/tmp/claude-501/e2e-wt/test/data/anniversary_sync_test.dart
+00:00 +0: /private/tmp/claude-501/e2e-wt/test/data/tab_lock_test.dart: #137: Fehlerbild ohne Guard: die zweite Anfrage im selben Tab scheitert
+00:00 +1: /private/tmp/claude-501/e2e-wt/test/data/tab_lock_test.dart: #137: nach erneuter Passwortabfrage (zweiter Aufruf) gilt die Sperre weiter als gehalten
+00:00 +2: /private/tmp/claude-501/e2e-wt/test/data/tab_lock_test.dart: anderer Tab hält die Sperre: false, „Erneut versuchen“ fragt nach dem Schließen wieder an
+00:00 +3: /private/tmp/claude-501/e2e-wt/test/data/tab_lock_test.dart: gleichzeitige Aufrufe teilen sich eine Anfrage
+00:00 +4: /private/tmp/claude-501/e2e-wt/test/data/tab_lock_test.dart: scheitert die Anfrage mit einem Fehler, fragt der nächste Aufruf neu an
+00:00 +5: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: Geburtstag 15.03.1990 heute 14.03.2026: 35 / 36 / 1 Tag
+00:00 +6: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: Geburtstag 15.03.1990 heute 15.03.2026: 36 / 36 / 0
+00:00 +7: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: Geburtstag 15.03.1990 heute 16.03.2026: 36 / 37 / 364, nächstes 15.03.2027
+00:00 +8: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: Geburtstag 15.03.1990 Jahreswechsel: heute 31.12.2026, Eintrag 01.01.1990 in 1 Tag, Alter bezieht 2027 ein
+00:00 +9: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: Geburtstag 15.03.1990 ohne Jahr: kein Alter
+00:00 +10: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: 29.2.-Regel (Eintrag 29.02.2000) wirksames Datum: 29.2. im Schaltjahr, 28.2. sonst
+00:00 +11: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: 29.2.-Regel (Eintrag 29.02.2000) heute 27.02.2025: nächstes 28.02.2025
+00:00 +12: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: 29.2.-Regel (Eintrag 29.02.2000) heute 28.02.2025: erreicht, 25 / 25 / 0
+00:00 +13: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: 29.2.-Regel (Eintrag 29.02.2000) heute 01.03.2025: yearsSince 25, nächstes 28.02.2026, ageAtNext 26, 364 Tage
+00:00 +14: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: 29.2.-Regel (Eintrag 29.02.2000) Schaltjahrfall: heute 01.03.2027 → nächstes 29.02.2028, Alter 28; heute 29.02.2028 → 28
+00:00 +15: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: dueWithin Tag 7 enthalten, Tag 8 nicht (Vorlauf 7)
+00:00 +16: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: dueWithin Vorlauf 0: nur der Tag selbst
+00:00 +17: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: dueWithin Vorlauf 60: Tag 60 enthalten, Tag 61 nicht
+00:00 +18: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_calc_test.dart: dueWithin Todestag zählt ebenso, Geburts- und Todestag einer Person ergeben zwei Treffer
+00:00 +19: /private/tmp/claude-501/e2e-wt/test/data/anniversary_sync_test.dart: Eintrag erreicht alle Mitglieder, nur als verschlüsseltes Ereignis im Familienraum
+00:00 +20: /private/tmp/claude-501/e2e-wt/test/data/anniversary_sync_test.dart: Eintrag erreicht alle Mitglieder, nur als verschlüsseltes Ereignis im Familienraum
+00:00 +21: /private/tmp/claude-501/e2e-wt/test/data/anniversary_sync_test.dart: Eintrag erreicht alle Mitglieder, nur als verschlüsseltes Ereignis im Familienraum
+00:00 +22: /private/tmp/claude-501/e2e-wt/test/data/anniversary_sync_test.dart: Eintrag erreicht alle Mitglieder, nur als verschlüsseltes Ereignis im Familienraum
+00:00 +23: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: Migration 6 legt die Tabelle anniversaries an, der Bestand bleibt unverändert
+00:00 +24: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: Migration 6 legt die Tabelle anniversaries an, der Bestand bleibt unverändert
+00:00 +25: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: Migration 6 legt die Tabelle anniversaries an, der Bestand bleibt unverändert
+00:00 +26: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: Migration 6 legt die Tabelle anniversaries an, der Bestand bleibt unverändert
+00:00 +27: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: Migration 6 legt die Tabelle anniversaries an, der Bestand bleibt unverändert
+00:00 +28: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: Migration 6 legt die Tabelle anniversaries an, der Bestand bleibt unverändert
+00:00 +29: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: Migration 6 legt die Tabelle anniversaries an, der Bestand bleibt unverändert
+00:00 +30: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: Migration 6 legt die Tabelle anniversaries an, der Bestand bleibt unverändert
+00:00 +31: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: Migration 6 legt die Tabelle anniversaries an, der Bestand bleibt unverändert
+00:00 +32: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: speichern, lesen, Version überschreibt, ausstehend und veröffentlicht
+00:00 +33: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: Empfangenes wird mit publishedVersion abgelegt und nicht erneut gesendet
+00:00 +34: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: Löschmarken: nur veröffentlichte werden gekürzt, Zählung aktiv/gesamt
+00:00 +35: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: requeueLastEditedBy markiert nur eigene, nicht gelöschte Einträge neu
+00:00 +36: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: unlesbare oder ungültige Zeilen werden übergangen, nicht geworfen
+00:00 +37: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: Datenübersicht, Abmelden/Konto löschen und Familienwechsel leeren anniversaries
+00:00 +38: /private/tmp/claude-501/e2e-wt/test/data/sql_anniversary_store_test.dart: (tearDownAll)
+00:00 +38: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_codec_test.dart: Roundtrip Geburt mit Jahr
+00:00 +39: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_codec_test.dart: Roundtrip Geburt ohne Jahr
+00:00 +40: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_codec_test.dart: Roundtrip nur Tod
+00:00 +41: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_codec_test.dart: Roundtrip beide
+00:00 +42: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_codec_test.dart: Roundtrip Löschmarke
+00:00 +43: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_codec_test.dart: Roundtrip Format: Schlüssel v, id, by, version, deleted, name, birth {m,d,y}, ts; kein Schlüssel für fehlendes Jahr
+00:00 +44: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_codec_test.dart: Ablehnung by ≠ Absender
+00:00 +45: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_codec_test.dart: Ablehnung falscher Typ
+00:00 +46: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_codec_test.dart: Ablehnung 31.02. und Monat 13
+00:00 +47: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_codec_test.dart: Ablehnung Name leer, zu lang, Steuerzeichen
+00:00 +48: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_codec_test.dart: Ablehnung Jahr 999 und 2101; 1000 und 2100 gültig
+00:00 +49: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Geburtstag, Person lebt d > 0: wird 36 und aktuell 35
+00:00 +50: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Geburtstag, Person lebt d > 0: wird 36 und aktuell 35
+00:00 +51: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Geburtstag, Person lebt d > 0: wird 36 und aktuell 35
+00:00 +52: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Geburtstag, Person lebt d > 0: wird 36 und aktuell 35
+00:00 +53: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Geburtstag, Person lebt d > 0: wird 36 und aktuell 35
+00:00 +54: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Geburtstag, Person lebt d = 0: nur 36 Jahre, keine wird-/aktuell-Zeile
+00:00 +55: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Geburtstag, Person lebt Säugling (Geburt im laufenden Jahr, d > 0): wird 1, aktuell 0
+00:00 +56: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Geburtstag, Person lebt Geburt heute im laufenden Jahr (n = 0): keine Zeile
+00:00 +57: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Geburtstag, Person lebt Jahr in der Zukunft: keine Zeile
+00:00 +58: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Geburtstag, Person lebt ohne Jahr: keine Zeile
+00:00 +59: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Geburtstag, Person mit Todesdatum: wäre n, nie aktuell d > 0 und d = 0
+00:00 +60: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Todestag d > 0: 5. Todestag und vor 4 Jahren
+00:00 +61: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Todestag d = 0: nur 5. Todestag
+00:00 +62: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Todestag im laufenden Jahr (k = 0, d > 0): 1. Todestag ohne „vor 0 Jahren“
+00:00 +63: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: Todestag Jahr in der Zukunft oder ohne Jahr: keine Zeile
+00:00 +64: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_display_test.dart: vergangener Kalendertag (daysUntil < 0) zeigt die Spalte „heute“
+00:00 +65: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: Standardwerte: Dunkel, Bildschirmschutz an, https-Standardserver
+00:00 +66: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: Roundtrip toMap/fromMap
+00:00 +67: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: ungültige Werte fallen auf Standard zurück
+00:00 +68: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: unsichere/ungültige Server-URL aus dem Speicher wird verworfen
+00:00 +69: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: copyWith validiert Server und klemmt Sperrzeit
+00:00 +70: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: copyWith kann Sprache auf Gerätesprache zurücksetzen
+00:00 +71: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: Online-Status teilen: Standard an, Rundreise, Unsinn fällt auf „an“ zurück
+00:00 +72: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: Lesebestätigung senden (#526): Standard an, Rundreise, Unsinn und leer fallen auf „an“ zurück
+00:00 +73: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: Akzentfarbe: Standard Türkis, Rundreise, Unsinn fällt zurück
+00:00 +74: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: #254: Meldungen zu Chat und Einkauf standardmäßig an, Abschalten bleibt erhalten
+00:00 +75: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: anniversaryLeadDays (E-104) Standard 7, Roundtrip, Grenzwerte 0 und 60
+00:00 +76: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: anniversaryLeadDays (E-104) ungültig, negativ oder über 60 beim Lesen: 7
+00:00 +77: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: anniversaryLeadDays (E-104) copyWith klemmt auf 0 bis 60; Gleichheit berücksichtigt den Wert
+00:00 +78: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: Letztes Gespräch wieder öffnen (#516) Standard aus, Kennung leer und nicht in toMap
+00:00 +79: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: Letztes Gespräch wieder öffnen (#516) Rundlauf und copyWith(lastChatThread: null) setzt zurück
+00:00 +80: /private/tmp/claude-501/e2e-wt/test/domain/app_settings_test.dart: Letztes Gespräch wieder öffnen (#516) Unsinn für den Schalter: aus; ungültige Kennung: null
+00:00 +81: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: (setUpAll)
+00:00 +81: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: anlegen, ändern, löschen; jedes Mitglied darf ändern und löschen (kein Besitzer)
+00:01 +82: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: ungültige Eingaben: leerer Name, kein Datum, 31.02., Todesdatum vor Geburtsdatum
+00:01 +83: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Zukunftsregel Anlegen mit Datum in der Zukunft wird abgelehnt (invalid); heute und gestern sind erlaubt
+00:01 +84: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Zukunftsregel empfangenes Jahr 2100 wird angenommen; Namensänderung bleibt möglich, Jahr auf Zukunft nicht
+00:01 +85: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Zukunftsregel Todesdatum: empfangenes Zukunftsjahr bleibt bei Namensänderung, Änderung auf die Zukunft wird abgelehnt
+00:01 +86: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Namen Tabulator und Zeilenumbruch werden zu einem Leerzeichen normalisiert
+00:01 +87: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Namen Steuer-, Bidi- und Zero-Width-Zeichen sowie nur Leerraum werden abgelehnt
+00:01 +88: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Namen genau 60 Zeichen sind erlaubt, 61 nicht; Emoji zählt als ein Codepunkt
+00:01 +89: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Zeitzone (today aus dem Controller-Weg) Auckland: heute 16.03.2026; Geburt 16.03. angenommen, 17.03. abgelehnt
+00:01 +90: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Zeitzone (today aus dem Controller-Weg) Los Angeles: heute 15.03.; umgekehrt: 16.03. abgelehnt, 15.03. angenommen
+00:01 +91: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Grenzen 200 aktive: der 201. wird abgelehnt (limit), empfangen verworfen
+00:01 +92: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Grenzen 300 gesamt: veröffentlichte Löschmarken werden bereinigt, bis auf 20
+00:01 +93: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Grenzen Versionssprung und erste Version
+00:01 +94: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Konfliktlösung höhere Version, dann Zeit, dann Absender-ID, dann Inhalt
+00:01 +95: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Konfliktlösung Empfang konvergiert unabhängig von der Reihenfolge
+00:01 +96: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: Löschmarken-Bereinigung entfernt nur veröffentlichte
+00:01 +97: /private/tmp/claude-501/e2e-wt/test/domain/anniversary_service_test.dart: (tearDownAll)
+00:01 +97: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: (setUpAll)
+00:01 +97: /private/tmp/claude-501/e2e-wt/test/features/anniversary_factory_test.dart: (setUpAll)
+00:01 +97: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:01 +98: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:01 +99: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:01 +100: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:01 +101: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +102: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +103: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +104: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +105: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +106: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +107: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +108: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +109: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +110: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +111: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +112: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +113: /private/tmp/claude-501/e2e-wt/test/features/anniversary_tile_test.dart: de: Geburtstag lebend: wird 36 · aktuell 35 Jahre · morgen, Symbol Kuchen, Semantics
+00:02 +114: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:02 +115: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:02 +116: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:02 +117: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:02 +118: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +119: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +120: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +121: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +122: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +123: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +124: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +125: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +126: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +127: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +128: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +129: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +130: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +131: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +132: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +133: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +134: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +135: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ zeigt Name, Alter und Tage bei Vorlauf 7 und entfällt bei Vorlauf 2; Einstellung baut die Karte neu
+00:03 +136: /private/tmp/claude-501/e2e-wt/test/features/app_lock_test.dart: Sperrbildschirm verdeckt die App, fragt sofort die Geräteanmeldung ab und gibt frei
+00:04 +137: /private/tmp/claude-501/e2e-wt/test/features/chat_delivery_status_test.dart: Familienchat: gesendet zeigt Haken mit Beschriftung, noch kein Text
+00:04 +138: /private/tmp/claude-501/e2e-wt/test/features/chat_delivery_status_test.dart: Familienchat: gesendet zeigt Haken mit Beschriftung, noch kein Text
+00:04 +139: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Schalter an, Einzelgespräch gemerkt und geladen: der Chat-Tab öffnet es, Start bleibt „Heute“
+00:04 +140: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Zeilen: Titel, Vorschau, Du:, Anhang, Termin, Zähler, fett bei Ungelesenem, Familienchat zuerst
+00:04 +141: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Zeilen: Titel, Vorschau, Du:, Anhang, Termin, Zähler, fett bei Ungelesenem, Familienchat zuerst
+00:05 +142: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Zeilen: Titel, Vorschau, Du:, Anhang, Termin, Zähler, fett bei Ungelesenem, Familienchat zuerst
+00:05 +143: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Zeilen: Titel, Vorschau, Du:, Anhang, Termin, Zähler, fett bei Ungelesenem, Familienchat zuerst
+00:05 +144: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Zeilen: Titel, Vorschau, Du:, Anhang, Termin, Zähler, fett bei Ungelesenem, Familienchat zuerst
+00:05 +145: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Zeilen: Titel, Vorschau, Du:, Anhang, Termin, Zähler, fett bei Ungelesenem, Familienchat zuerst
+00:05 +146: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Zeilen: Titel, Vorschau, Du:, Anhang, Termin, Zähler, fett bei Ungelesenem, Familienchat zuerst
+00:05 +147: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Zeilen: Titel, Vorschau, Du:, Anhang, Termin, Zähler, fett bei Ungelesenem, Familienchat zuerst
+00:05 +148: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Zeilen: Titel, Vorschau, Du:, Anhang, Termin, Zähler, fett bei Ungelesenem, Familienchat zuerst
+00:05 +149: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Karte auf „Heute“ en: Texte und Semantics
+00:06 +150: /private/tmp/claude-501/e2e-wt/test/features/chat_delivery_status_test.dart: Familienchat: Gelesen von 1 und 2, Tippen zeigt die Namen; fremde Nachricht ohne Status
+00:06 +151: /private/tmp/claude-501/e2e-wt/test/features/chat_delivery_status_test.dart: Familienchat: Gelesen von 1 und 2, Tippen zeigt die Namen; fremde Nachricht ohne Status
+00:06 +152: /private/tmp/claude-501/e2e-wt/test/features/chat_delivery_status_test.dart: Familienchat: Gelesen von 1 und 2, Tippen zeigt die Namen; fremde Nachricht ohne Status
+00:06 +153: /private/tmp/claude-501/e2e-wt/test/features/app_lock_test.dart: Einstellungen #67: Plattform ohne Geräteanmeldung (Linux) zeigt keinen Schalter „App-Sperre“
+00:06 +154: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Anhang und Termin ohne Text, nicht lesbar und blockierter Absender in der Vorschau
+00:07 +155: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Öffnen speichert die Kennung, Zurück zur Liste speichert null (auch in der Ablage)
+00:07 +156: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Öffnen speichert die Kennung, Zurück zur Liste speichert null (auch in der Ablage)
+00:07 +157: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Öffnen speichert die Kennung, Zurück zur Liste speichert null (auch in der Ablage)
+00:07 +158: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste ohne Nachricht: Online-Status (Einzelchat) bzw. „Noch keine Nachrichten“; Status live
+00:07 +159: /private/tmp/claude-501/e2e-wt/test/features/chat_delivery_status_test.dart: nur blockierte Leser: zurück auf Gesendet
+00:07 +160: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Kalender Agenda ohne Termine, aber mit Treffer: zeigt die Treffer statt „keine Termine“
+00:07 +161: /private/tmp/claude-501/e2e-wt/test/features/clock_format_test.dart: formatClock: englisch + 12-h-Gerät → AM/PM
+00:08 +162: /private/tmp/claude-501/e2e-wt/test/features/clock_format_test.dart: formatClock: englisch + 12-h-Gerät → AM/PM
+00:08 +163: /private/tmp/claude-501/e2e-wt/test/features/clock_format_test.dart: formatClock: englisch + 12-h-Gerät → AM/PM
+00:08 +164: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Timeout-Rückfall auf die Familie speichert die Familien-Kennung
+00:08 +165: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Timeout-Rückfall auf die Familie speichert die Familien-Kennung
+00:08 +166: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Timeout-Rückfall auf die Familie speichert die Familien-Kennung
+00:08 +167: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Timeout-Rückfall auf die Familie speichert die Familien-Kennung
+00:08 +168: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Timeout-Rückfall auf die Familie speichert die Familien-Kennung
+00:08 +169: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Timeout-Rückfall auf die Familie speichert die Familien-Kennung
+00:08 +170: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Timeout-Rückfall auf die Familie speichert die Familien-Kennung
+00:08 +171: /private/tmp/claude-501/e2e-wt/test/features/chat_delivery_status_test.dart: Großschrift 2.0 ohne Überlauf (Telefonbreite, Gelesen von 1)
+00:08 +172: /private/tmp/claude-501/e2e-wt/test/features/chat_delivery_status_test.dart: Großschrift 2.0 ohne Überlauf (Telefonbreite, Gelesen von 1)
+00:08 +173: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Tippen öffnet das Gespräch, Pfeil führt zurück, der Entwurf bleibt (#410)
+00:08 +174: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Tippen öffnet das Gespräch, Pfeil führt zurück, der Entwurf bleibt (#410)
+00:08 +175: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Tippen öffnet das Gespräch, Pfeil führt zurück, der Entwurf bleibt (#410)
+00:09 +176: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Ziel vor der ersten Aktivierung geladen: der Tab öffnet es direkt
+00:09 +177: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Ziel vor der ersten Aktivierung geladen: der Tab öffnet es direkt
+00:09 +178: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Ziel vor der ersten Aktivierung geladen: der Tab öffnet es direkt
+00:09 +179: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Ziel vor der ersten Aktivierung geladen: der Tab öffnet es direkt
+00:09 +180: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Ziel vor der ersten Aktivierung geladen: der Tab öffnet es direkt
+00:09 +181: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Ziel vor der ersten Aktivierung geladen: der Tab öffnet es direkt
+00:09 +182: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Ziel vor der ersten Aktivierung geladen: der Tab öffnet es direkt
+00:09 +183: /private/tmp/claude-501/e2e-wt/test/features/chat_restore_last_test.dart: Wiederherstellung Ziel vor der ersten Aktivierung geladen: der Tab öffnet es direkt
+00:09 +184: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Gesprächsliste Semantik der Zeile (Gespräch, Status, Vorschau, Zähler) und des Pfeils
+00:09 +185: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:09 +186: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:09 +187: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:09 +188: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:09 +189: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:09 +190: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:09 +191: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:09 +192: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:09 +193: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:09 +194: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:10 +195: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:10 +196: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:10 +197: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:10 +198: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:10 +199: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:10 +200: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:10 +201: /private/tmp/claude-501/e2e-wt/test/features/data_report_copy_test.dart: Datenübersicht wird als vertraulich kopiert (auch > 512 Zeichen) und nach einer Minute geleert
+00:10 +202: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Liste und Dialog Anlegen mit Geburts- und Todesdatum an einer Person
+00:10 +203: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Sichtbarkeit und Lesestatus Eintritt in die Liste gibt die Marke frei (Tab vor dem Sync aktiv, kein Pinnen)
+00:10 +204: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Sichtbarkeit und Lesestatus Eintritt in die Liste gibt die Marke frei (Tab vor dem Sync aktiv, kein Pinnen)
+00:10 +205: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Sichtbarkeit und Lesestatus Eintritt in die Liste gibt die Marke frei (Tab vor dem Sync aktiv, kein Pinnen)
+00:11 +206: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Sichtbarkeit und Lesestatus Eintritt in die Liste gibt die Marke frei (Tab vor dem Sync aktiv, kein Pinnen)
+00:11 +207: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Liste und Dialog Dialog zeigt Eingabefehler: leerer Name, kein Datum, 31.02., Zukunft, Todesdatum vor Geburtsdatum
+00:11 +208: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Liste und Dialog Dialog zeigt Eingabefehler: leerer Name, kein Datum, 31.02., Zukunft, Todesdatum vor Geburtsdatum
+00:11 +209: /private/tmp/claude-501/e2e-wt/test/features/anniversaries_ui_test.dart: Liste und Dialog Dialog zeigt Eingabefehler: leerer Name, kein Datum, 31.02., Zukunft, Todesdatum vor Geburtsdatum
+00:11 +210: /private/tmp/claude-501/e2e-wt/test/features/data_report_save_test.dart: #136: Abgebrochenes Speichern des Protokolls meldet keinen Erfolg
+00:11 +211: /private/tmp/claude-501/e2e-wt/test/features/data_report_save_test.dart: #136: Abgebrochenes Speichern des Protokolls meldet keinen Erfolg
+00:12 +212: /private/tmp/claude-501/e2e-wt/test/features/data_report_save_test.dart: #136: Abgebrochenes Speichern des Protokolls meldet keinen Erfolg
+00:12 +213: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:12 +214: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:12 +215: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:12 +216: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:12 +217: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:12 +218: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:12 +219: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:12 +220: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:12 +221: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +222: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +223: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +224: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +225: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +226: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +227: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +228: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +229: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +230: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +231: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +232: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +233: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +234: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +235: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +236: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +237: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:13 +238: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Sperren entzieht dem Chatfeld den Fokus; Tastatur erreicht den Inhalt nicht
+00:14 +239: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile genau fünf Ziele in der Reihenfolge, kein Ziel „Familie“ (400 dp)
+00:14 +240: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile genau fünf Ziele in der Reihenfolge, kein Ziel „Familie“ (400 dp)
+00:14 +241: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile genau fünf Ziele in der Reihenfolge, kein Ziel „Familie“ (400 dp)
+00:14 +242: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile genau fünf Ziele in der Reihenfolge, kein Ziel „Familie“ (400 dp)
+00:14 +243: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile genau fünf Ziele in der Reihenfolge, kein Ziel „Familie“ (400 dp)
+00:14 +244: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile genau fünf Ziele in der Reihenfolge, kein Ziel „Familie“ (400 dp)
+00:14 +245: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Tab bleibt auf dem Sperrbildschirm, Entsperren stellt den Inhalt wieder her
+00:14 +246: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Tab bleibt auf dem Sperrbildschirm, Entsperren stellt den Inhalt wieder her
+00:14 +247: /private/tmp/claude-501/e2e-wt/test/features/lock/lock_gate_focus_test.dart: Tab bleibt auf dem Sperrbildschirm, Entsperren stellt den Inhalt wieder her
+00:15 +248: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Übergänge Blockieren blendet das offene Gespräch aus: Familienchat statt Liste
+00:15 +249: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Übergänge Blockieren blendet das offene Gespräch aus: Familienchat statt Liste
+00:15 +250: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Übergänge Blockieren blendet das offene Gespräch aus: Familienchat statt Liste
+00:15 +251: /private/tmp/claude-501/e2e-wt/test/ui/page_transitions_test.dart: iOS: Rückwisch mitten in der Geste, die oberste Seite ist deckend (variant: TargetPlatform.iOS)
+00:15 +252: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile Aufgaben: Badge mit eigener Zahl offener Aufgaben und Semantik „Aufgaben – n offene“
+00:15 +253: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile Aufgaben: Badge mit eigener Zahl offener Aufgaben und Semantik „Aufgaben – n offene“
+00:15 +254: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile Aufgaben: Badge mit eigener Zahl offener Aufgaben und Semantik „Aufgaben – n offene“
+00:15 +255: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile Aufgaben: Badge mit eigener Zahl offener Aufgaben und Semantik „Aufgaben – n offene“
+00:15 +256: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile Aufgaben: Badge mit eigener Zahl offener Aufgaben und Semantik „Aufgaben – n offene“
+00:15 +257: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Übergänge chatRequest öffnet ein Gespräch aus der Liste und auch ein schon gewähltes nach Zurück
+00:15 +258: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile ohne Aufgabendienst: Tab bleibt sichtbar, Inhalt leer, kein Absturz
+00:15 +259: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile ohne Aufgabendienst: Tab bleibt sichtbar, Inhalt leer, kein Absturz
+00:16 +260: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile ohne Aufgabendienst: Tab bleibt sichtbar, Inhalt leer, kein Absturz
+00:16 +261: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Übergänge Pinnen: einem Nutzer im Familienchat kommt ein Einzelchat hinzu, er bleibt im Familienchat
+00:16 +262: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Übergänge Pinnen: einem Nutzer im Familienchat kommt ein Einzelchat hinzu, er bleibt im Familienchat
+00:16 +263: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile in keinem Tab eine zweite sichtbare AppBar; Aufgaben-FAB tippbar und nicht überdeckt (400 dp)
+00:16 +264: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile in keinem Tab eine zweite sichtbare AppBar; Aufgaben-FAB tippbar und nicht überdeckt (400 dp)
+00:16 +265: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Ziel-ID: Senden, Anhang, Reaktion, Melden, Nachladen Anhang: ein Gesprächswechsel während der Dateiauswahl ändert das Ziel nicht
+00:16 +266: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile in keinem Tab eine zweite sichtbare AppBar; Aufgaben-FAB tippbar und nicht überdeckt (1100 dp)
+00:17 +267: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Fußzeile in keinem Tab eine zweite sichtbare AppBar; Aufgaben-FAB tippbar und nicht überdeckt (1100 dp)
+00:17 +268: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Ziel-ID: Senden, Anhang, Reaktion, Melden, Nachladen Nachladen: nur für das gezeigte Gespräch, auf der Liste nie
+00:17 +269: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Ziel-ID: Senden, Anhang, Reaktion, Melden, Nachladen Nachladen: nur für das gezeigte Gespräch, auf der Liste nie
+00:17 +270: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Menü Reihenfolge Familie, Einstellungen, Datenschutz; kein Eintrag Aufgaben
+00:17 +271: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Lücken Teststärke #423 Eintritt in die Liste: Familienchat war sichtbar, danach kein Gespräch sichtbar, nichts gelesen markiert, Marke neu
+00:17 +272: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Menü Familie öffnet eine eigene Seite mit AppBar „Familie“ und FamilyScreen
+00:18 +273: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Lücken Teststärke #423 genau eine Überschrift je Ansicht: Liste „Gespräche“, Gespräch der Titel der Kopfzeile
+00:18 +274: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Beitrittsanfragen am Menü (Moderator) Badge „2“ am Menüknopf, Hinweis, Badge im Menüeintrag, der offene Drawer aktualisiert sich
+00:18 +275: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Lücken Teststärke #423 Timeout bei mehreren Gesprächen: Familienchat mit Kopfzeile und Pfeil plus Hinweis, nichts ging an ein anderes Gespräch
+00:18 +276: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Lücken Teststärke #423 Timeout bei mehreren Gesprächen: Familienchat mit Kopfzeile und Pfeil plus Hinweis, nichts ging an ein anderes Gespräch
+00:18 +277: /private/tmp/claude-501/e2e-wt/test/features/shell/shell_tasks_family_menu_test.dart: Beitrittsanfragen am Menü (Moderator) Nichtmoderator sieht kein Badge trotz offener Anfrage
+00:18 +278: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Lücken Teststärke #423 viele Gespräche: Reihenfolge, jede Zeile erreichbar und mindestens 56 dp hoch, jede öffnet das richtige Gespräch
+00:19 +279: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Englisch Liste, Vorschau „You:“, „Yesterday“, Pfeil und Kopfzeile
+00:19 +280: /private/tmp/claude-501/e2e-wt/test/features/chat_thread_list_test.dart: Englisch Datum älter als gestern mit führender Null (#460, E-20)
+00:19 +281: All tests passed!
+exit 0

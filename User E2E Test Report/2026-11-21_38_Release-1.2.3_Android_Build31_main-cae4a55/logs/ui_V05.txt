@@ -1,0 +1,14 @@
+Zurück | klickbar | 74,206
+Einstellungen | - | 357,205
+Über die App / Speicherorte | - | 540,1287
+Schlüsselbund des Systems (Secret Service) | - | 540,354
+https://fake.test | - | 540,513
+Datenübersicht: alle lokal gespeicherten Daten zeigen | klickbar | 540,681
+Datenübersicht: alle online gespeicherten Daten zeigen | klickbar | 540,849
+Alle lokalen Daten löschen / Meldet dich ab und löscht Datenbank, Schlüssel und Erinnerung | klickbar | 540,1068
+Einführung erneut ansehen | klickbar | 540,1276
+App teilen / Kopiert den Link zum Store-Eintrag, damit du ihn weitergeben kannst. Es werde | klickbar | 540,1485
+App bewerten / Öffnet den Eintrag im Play Store. | klickbar | 540,1714
+Version 1.2.3 (31) | - | 540,1882
+Keine Telemetrie, keine Werbung, keine Analyse. | - | 540,2040
+Lizenz: AGPL-3.0-or-later | - | 540,2197

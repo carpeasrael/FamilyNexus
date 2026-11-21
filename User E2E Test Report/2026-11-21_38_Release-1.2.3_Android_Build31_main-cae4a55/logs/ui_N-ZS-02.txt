@@ -1,0 +1,7 @@
+Zurück | klickbar | 74,206
+Einstellungen | - | 357,205
+Datenschutz / Blockierte Mitglieder / Nachrichten blockierter Mitglieder werden ausgeblend | klickbar | 540,1308
+App-Sperre / Sperrt die App nach Inaktivität. Die Bestätigung erfolgt mit der Sperre deine | klickbar | 540,581
+Online-Status teilen / Zeigt der Familie, wann du die App nutzt. Die Meldung geht nur Ende | klickbar | 540,1044
+Lesebestätigung senden / Zeigt Familienmitgliedern, bis zu welcher deiner Nachrichten du g | klickbar | 540,1590
+Bildschirmschutz / Blockiert Screenshots und verbirgt die App in der Übersicht. | klickbar | 540,2249

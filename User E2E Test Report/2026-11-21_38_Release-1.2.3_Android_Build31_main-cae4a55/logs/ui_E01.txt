@@ -1,0 +1,67 @@
+Kalender | - | 152,205
+Menü öffnen | klickbar | 1017,206
+Tag | klickbar | 249,353
+Woche | klickbar | 443,353
+Monat | klickbar | 637,353
+Agenda | klickbar | 831,353
+Zurück | klickbar | 95,479
+November 2026 | - | 394,478
+Weiter | klickbar | 693,479
+Geburtstage | klickbar | 819,479
+Heute | klickbar | 965,479
+Alle | klickbar | 137,605
+Anna ✓ | klickbar | 402,605
+Ben | klickbar | 668,605
+Clara | klickbar | 912,605
+Mo / Di / Mi / Do / Fr / Sa / So | - | 540,721
+Montag, 26. Oktober 2026, Keine Termine | - | 104,830
+Dienstag, 27. Oktober 2026, Keine Termine | - | 249,830
+Mittwoch, 28. Oktober 2026, Keine Termine | - | 394,830
+Donnerstag, 29. Oktober 2026, Keine Termine | - | 540,830
+Freitag, 30. Oktober 2026, Keine Termine | - | 685,830
+Samstag, 31. Oktober 2026, Keine Termine | - | 830,830
+Sonntag, 1. November 2026, Keine Termine | - | 976,830
+Montag, 2. November 2026, Keine Termine | - | 104,983
+Dienstag, 3. November 2026, Keine Termine | - | 249,983
+Mittwoch, 4. November 2026, Keine Termine | - | 394,983
+Donnerstag, 5. November 2026, Keine Termine | - | 540,983
+Freitag, 6. November 2026, Keine Termine | - | 685,983
+Samstag, 7. November 2026, Keine Termine | - | 830,983
+Sonntag, 8. November 2026, Keine Termine | - | 976,983
+Montag, 9. November 2026, Keine Termine | - | 104,1136
+Dienstag, 10. November 2026, Keine Termine | - | 249,1136
+Mittwoch, 11. November 2026, Keine Termine | - | 394,1136
+Donnerstag, 12. November 2026, Keine Termine | - | 540,1136
+Freitag, 13. November 2026, Keine Termine | - | 685,1136
+Samstag, 14. November 2026, Keine Termine | - | 830,1136
+Sonntag, 15. November 2026, Keine Termine | - | 976,1136
+Montag, 16. November 2026, Keine Termine | - | 104,1289
+Dienstag, 17. November 2026, Keine Termine | - | 249,1289
+Mittwoch, 18. November 2026, Keine Termine | - | 394,1289
+Donnerstag, 19. November 2026, Keine Termine | - | 540,1289
+Freitag, 20. November 2026, Keine Termine | - | 685,1289
+Samstag, 21. November 2026, 1 Termin, Heute | - | 830,1289
+Sonntag, 22. November 2026, 1 Termin | - | 976,1289
+Montag, 23. November 2026, 1 Termin | - | 104,1442
+Dienstag, 24. November 2026, Keine Termine | - | 249,1442
+Mittwoch, 25. November 2026, 1 Termin | - | 394,1442
+Donnerstag, 26. November 2026, Keine Termine | - | 540,1442
+Freitag, 27. November 2026, 1 Termin | - | 685,1442
+Samstag, 28. November 2026, Keine Termine | - | 830,1442
+Sonntag, 29. November 2026, Keine Termine | - | 976,1442
+Montag, 30. November 2026, Keine Termine | - | 104,1595
+Dienstag, 1. Dezember 2026, Keine Termine | - | 249,1595
+Mittwoch, 2. Dezember 2026, Keine Termine | - | 394,1595
+Donnerstag, 3. Dezember 2026, Keine Termine | - | 540,1595
+Freitag, 4. Dezember 2026, Keine Termine | - | 685,1595
+Samstag, 5. Dezember 2026, Keine Termine | - | 830,1595
+Sonntag, 6. Dezember 2026, Keine Termine | - | 976,1595
+Samstag, 21. November 2026 · 1 Termin | - | 540,1730
+Elternabend Grundschule, 19:00 – 20:30, Geteilt | - | 540,1881
+Jahresfortschritt: 89 Prozent verstrichen | - | 540,2104
+Neuer Termin | klickbar | 964,2011
+Heute / Tab 1 von 5 | klickbar | 108,2232
+Kalender / Tab 2 von 5 | klickbar | 324,2232
+3 / Chat / Tab 3 von 5 | klickbar | 540,2232
+Einkauf / Tab 4 von 5 | klickbar | 756,2232
+Aufgaben / Tab 5 von 5 | klickbar | 972,2232

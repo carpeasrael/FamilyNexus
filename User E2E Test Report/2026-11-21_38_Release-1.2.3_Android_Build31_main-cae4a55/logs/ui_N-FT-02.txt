@@ -1,0 +1,10 @@
+Aufgaben | - | 163,205
+Menü öffnen | klickbar | 1017,206
+Nur Moderatoren legen Listen an. Abhaken kann nur die zugewiesene Person. | - | 540,355
+Noch keine Aufgabenlisten. | - | 540,500
+Neue Aufgabenliste | klickbar | 964,2011
+Heute / Tab 1 von 5 | klickbar | 108,2232
+Kalender / Tab 2 von 5 | klickbar | 324,2232
+Chat / Tab 3 von 5 | klickbar | 540,2232
+Einkauf / Tab 4 von 5 | klickbar | 756,2232
+Aufgaben / Tab 5 von 5 | klickbar | 972,2232

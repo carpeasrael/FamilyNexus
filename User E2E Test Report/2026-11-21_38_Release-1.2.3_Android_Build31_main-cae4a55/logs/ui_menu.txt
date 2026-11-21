@@ -1,0 +1,5 @@
+Menü | - | 393,205
+Familie | klickbar | 681,331
+Einstellungen | klickbar | 681,478
+Datenschutzerklärung | klickbar | 681,625
+Version 1.2.3 (31) | - | 460,2271

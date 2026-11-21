@@ -1,0 +1,8 @@
+== 31.2.1999
+Bitte ein gültiges Datum angeben (Tag, Monat, optional Jahr). | - | 540,1597
+== 15.6.2999
+Bitte ein gültiges Datum angeben (Tag, Monat, optional Jahr). | - | 540,1597
+== Geb 15.6.1950 Tod 1.1.1940
+Das Todesdatum darf nicht vor dem Geburtsdatum liegen. | - | 540,1597
+== 15.6.2027 (Zukunft)
+Das Datum darf nicht in der Zukunft liegen. | - | 534,1596

@@ -1,0 +1,8 @@
+Nur am Tag selbst | klickbar | 540,1143
+1 Tag vorher | klickbar | 540,1269
+3 Tage vorher | klickbar | 540,1395
+7 Tage vorher | klickbar | 540,1521
+14 Tage vorher | klickbar | 540,1647
+30 Tage vorher | klickbar | 540,1773
+60 Tage vorher | klickbar | 540,1899
+Schließen | klickbar | 540,1200

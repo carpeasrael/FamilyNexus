@@ -1,0 +1,12 @@
+Geburtstag von Oma Erna K., 23.11.1950, wird 76, aktuell 75 Jahre, in 2 Tagen | - | 540,896
+Eintrag gespeichert. | - | 540,2064
+Eintrag löschen | - | 540,1063
+„Oma Erna K.“ für alle Familienmitglieder löschen? | - | 540,1192
+Abbrechen | klickbar | 489,1374
+Löschen | klickbar | 774,1374
+-- Abbrechen im Rückfragedialog
+Geburtstag von Oma Erna K., 23.11.1950, wird 76, aktuell 75 Jahre, in 2 Tagen | - | 540,896
+„Temp“ für alle Familienmitglieder löschen? | - | 540,1192
+Todestag von Onkel Karl, 22.11.2010, 16. Todestag, vor 15 Jahren, morgen | - | 540,644
+Geburtstag von Oma Erna K., 23.11.1950, wird 76, aktuell 75 Jahre, in 2 Tagen | - | 540,896
+Eintrag gelöscht. | - | 540,2064

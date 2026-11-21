@@ -1,0 +1,22 @@
+== Effekte reduzieren AUS
+Tab Heute / Tab 1 -> Heute 
+Tab Kalender / Tab 2 -> Kalender 
+Tab Chat / Tab 3 -> Chat 
+Tab Einkauf / Tab 4 -> Einkauf 
+Tab Aufgaben / Tab 5 -> Aufgaben 
+Familie: Familie 
+zurück: Aufgaben 
+Einstellungen: Einstellungen 
+zurück: Aufgaben 
+FATAL: 0
+== Effekte reduzieren AN
+Tab Heute / Tab 1 -> Heute 
+Tab Kalender / Tab 2 -> Kalender 
+Tab Chat / Tab 3 -> Chat 
+Tab Einkauf / Tab 4 -> Einkauf 
+Tab Aufgaben / Tab 5 -> Aufgaben 
+Familie: Familie 
+zurück: Aufgaben 
+Einstellungen: Einstellungen 
+zurück: Aufgaben 
+FATAL: 0
