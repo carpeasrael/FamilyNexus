@@ -41,6 +41,8 @@ class SqlDataInventory implements LocalDataInventory {
     'task_log',
     'event_themes',
     'anniversaries',
+    'avatar_photos',
+    'avatar_resets',
   ];
 
   static KeyStoreKind get _keyStoreKind {
@@ -84,7 +86,8 @@ class SqlDataInventory implements LocalDataInventory {
     final loc = await locations();
     final result = <LocalTable>[];
     for (final t in tables) {
-      result.add(LocalTable(t, await _db.query(t)));
+      final rows = await _db.query(t);
+      result.add(LocalTable(t, t == 'avatar_photos' ? <Map<String, Object?>>[for (final r in rows) _photoRow(r)] : rows));
     }
     return LocalInventory(
       locations: loc,
@@ -95,6 +98,13 @@ class SqlDataInventory implements LocalDataInventory {
       appDatabaseBytes: _size(loc.inBrowser ? null : loc.appDatabase),
       matrixDatabaseBytes: _size(loc.inBrowser ? null : loc.matrixDatabase),
     );
+  }
+
+  /// Foto-Zeilen (#434): statt der Base64-Bilddaten steht ihre Größe im Protokoll (lesbar, nicht Tausende Zeichen).
+  static Map<String, Object?> _photoRow(Map<String, Object?> row) {
+    final data = row['data'];
+    if (data is! String || data.isEmpty) return row;
+    return <String, Object?>{...row, 'data': '[JPEG, ${data.length * 3 ~/ 4} Byte]'};
   }
 
   static int? _size(String? path) {

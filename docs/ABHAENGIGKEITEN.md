@@ -14,6 +14,7 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `flutter_timezone` | direct main | 5.1.1 | 2026-10-03 | apache-2.0 | 160 | ok |
 | `flutter_vodozemac` | direct main | 0.9.0 | 2026-10-19 | agpl-3.0 | 140 | ok |
 | `http` | direct main | 1.6.0 | 2025-11-10 | bsd-3-clause | 160 | ok |
+| `image` | direct main | 4.12.0 | 2026-10-11 | mit | 160 | Avatar-Fotos (#434, E-111): fremde JPEG im speichersicheren Dart dekodieren, Zuschneiden, Kodieren; vorher nur transitiv |
 | `intl` | direct main | 0.20.3 | 2026-06-25 | bsd-3-clause | 160 | ok |
 | `local_auth` | direct main | 3.0.2 | 2026-07-09 | bsd-3-clause | 160 | ok |
 | `matrix` | direct main | 14.2.0 | 2026-10-20 | agpl-3.0 | 150 | ok |
@@ -81,7 +82,6 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `html` | transitive | 0.15.7 | 2026-08-28 | unknown | 150 | ok |
 | `html_unescape` | transitive | 2.0.0 | 2021-03-22 | bsd-3-clause | 160 | ok |
 | `http_parser` | transitive | 4.1.2 | 2025-01-02 | bsd-3-clause | 160 | ok |
-| `image` | transitive | 4.12.0 | 2026-10-11 | mit | 160 | ok |
 | `jni` | transitive | 1.1.0 | 2026-10-01 | bsd-3-clause | 160 | ok |
 | `jni_flutter` | transitive | 1.0.4+1 | 2026-10-06 | bsd-3-clause | 160 | ok |
 | `jni_util` | transitive | 1.0.0 | 2026-07-27 | bsd-3-clause | 150 | ok |

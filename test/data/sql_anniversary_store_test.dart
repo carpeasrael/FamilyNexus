@@ -37,7 +37,7 @@ void main() {
   tearDown(() => db.close());
 
   test('Migration 6 legt die Tabelle anniversaries an, der Bestand bleibt unverändert', () async {
-    expect(AppDatabase.schemaVersion, 6);
+    expect(AppDatabase.schemaVersion, 7);
     final cols = (await db.rawQuery('PRAGMA table_info(anniversaries)')).map((r) => r['name']).toSet();
     expect(cols, <String>{'id', 'version', 'published', 'deleted', 'author', 'data'});
     // Bestand eines Standes mit Version 5: Zeilen der Themen überstehen die Migration 6 unverändert.
