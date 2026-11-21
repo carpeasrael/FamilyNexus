@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/app/app_scope.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/data/platform/mail_launcher.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
+import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/features/family/family_screen.dart';
 import 'package:family_nexus/l10n/gen/app_localizations.dart';
 import 'package:family_nexus/ui/theme/app_theme.dart';
@@ -422,5 +425,122 @@ void main() {
     expect(find.text('Mitglied einladen'), findsOneWidget, reason: 'Kontrolle: Moderator, Verwaltung sichtbar');
     expect(find.text('Kalender-Themen'), findsNothing);
     expect(find.byIcon(Icons.palette_outlined), findsNothing);
+  });
+
+  group('#574: „Nachricht schreiben“ schließt nur die eigene Route', () {
+    Widget overBase(TestApp app) => AppScope(
+          services: app.services,
+          child: MaterialApp(
+            locale: const Locale('de'),
+            supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            theme: buildTheme(Brightness.light),
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: TextButton(
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const Scaffold(body: FamilyScreen()))),
+                  child: const Text('Basis-Öffnen'),
+                ),
+              ),
+            ),
+          ),
+        );
+
+    Future<void> join(TestApp app, String name) async {
+      app.server.addAccount(name, 'geheim456');
+      final dev = app.server.newDevice();
+      await dev.login(server: ServerUrl.tryParse(app.server.host)!, username: name, password: 'geheim456');
+      final room = app.gateway.familyRoom!;
+      room.membership['@$name:fake.test'] = MemberStatus.joined;
+      dev.attachFamilyRoom(room.id);
+    }
+
+    Future<TestApp> start(WidgetTester tester, List<String> names) async {
+      tester.view.physicalSize = const Size(900, 3000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final app = await buildTestApp();
+      for (final n in names) {
+        await join(app, n);
+      }
+      app.gateway.holdDirectChat = Completer<void>();
+      await tester.pumpWidget(overBase(app));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Basis-Öffnen'));
+      await tester.pumpAndSettle();
+      expect(find.byType(FamilyScreen), findsOneWidget);
+      return app;
+    }
+
+    Future<void> write(WidgetTester tester, String name) async {
+      await tester.tap(find.byTooltip('Nachricht schreiben: $name'));
+      await tester.pump();
+    }
+
+    Future<void> finish(WidgetTester tester, TestApp app) async {
+      app.gateway.holdDirectChat!.complete();
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('(a) Dialog darüber: Dialog bleibt, Familienseite schließt, Chat wird angefordert', (tester) async {
+      final app = await start(tester, <String>['ben']);
+      await write(tester, 'ben');
+      unawaited(showDialog<void>(
+        context: tester.element(find.byType(FamilyScreen)),
+        useRootNavigator: false,
+        barrierDismissible: false,
+        builder: (_) => const AlertDialog(title: Text('Verifizierung-Dialog')),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.text('Verifizierung-Dialog'), findsOneWidget);
+      await finish(tester, app);
+      expect(find.byType(FamilyScreen), findsNothing, reason: 'die eigene Seite ist zu');
+      expect(find.text('Verifizierung-Dialog'), findsOneWidget, reason: 'der fremde Dialog bleibt');
+      expect(app.services.chatRequest.value, isNotNull);
+    });
+
+    testWidgets('(b) Aktionsmenü eines zweiten Mitglieds offen: Menü bleibt, Seite schließt, Chat angefordert', (tester) async {
+      final app = await start(tester, <String>['ben', 'cara']);
+      await write(tester, 'ben');
+      await tester.tap(find.byTooltip('Aktionen für cara'));
+      await tester.pumpAndSettle();
+      expect(find.text('Verifizieren'), findsOneWidget);
+      await finish(tester, app);
+      expect(find.byType(FamilyScreen), findsNothing);
+      expect(find.text('Verifizieren'), findsOneWidget, reason: 'das fremde Menü bleibt');
+      expect(app.services.chatRequest.value, isNotNull);
+    });
+
+    testWidgets('(c) Standardfall: Seite schließt, Chat angefordert', (tester) async {
+      final app = await start(tester, <String>['ben']);
+      await write(tester, 'ben');
+      await finish(tester, app);
+      expect(find.byType(FamilyScreen), findsNothing);
+      expect(find.text('Basis-Öffnen'), findsOneWidget);
+      expect(app.services.chatRequest.value, isNotNull);
+    });
+
+    testWidgets('(d) Kachel ungemountet: eigene Seite schließt, Chat angefordert', (tester) async {
+      final app = await start(tester, <String>['ben', 'cara']);
+      await write(tester, 'cara');
+      app.gateway.familyRoom!.membership.remove('@ben:fake.test');
+      app.server.notifyAll();
+      await tester.pumpAndSettle();
+      await finish(tester, app);
+      expect(find.byType(FamilyScreen), findsNothing);
+      expect(find.text('Basis-Öffnen'), findsOneWidget);
+      expect(app.services.chatRequest.value, isNotNull);
+    });
+
+    testWidgets('(e) Seite schon geschlossen: kein zweites pop, Chat angefordert', (tester) async {
+      final app = await start(tester, <String>['ben']);
+      await write(tester, 'ben');
+      Navigator.of(tester.element(find.byType(FamilyScreen))).pop();
+      await tester.pumpAndSettle();
+      expect(find.text('Basis-Öffnen'), findsOneWidget);
+      await finish(tester, app);
+      expect(find.text('Basis-Öffnen'), findsOneWidget, reason: 'die Basisroute blieb offen');
+      expect(app.services.chatRequest.value, isNotNull);
+    });
   });
 }

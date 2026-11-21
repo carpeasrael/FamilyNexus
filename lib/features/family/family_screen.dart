@@ -265,14 +265,28 @@ extension on _MemberTile {
     final services = AppScope.read(context);
     final l = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
+    // #574: Navigator und eigene Route vor dem await erfassen; danach ist der Kontext vielleicht schon weg.
+    final nav = Navigator.of(context);
+    final route = ModalRoute.of(context);
     try {
       final id = await gateway.startDirectChat(member.userId);
       // Familie ist seit E-105 eine eigene Seite über der Shell: erst zurück, damit der Chat sichtbar wird.
-      if (context.mounted) await Navigator.of(context).maybePop();
+      _closeOwnRoute(nav, route);
       services.chatRequest.value = id;
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(errorText(l, e))));
     }
+  }
+}
+
+/// #574: Schließt nur die **eigene** Route der Familienseite (wie #531 im `AvatarScreen`). `maybePop` träfe die oberste
+/// Route, also auch ein Menü oder einen Dialog darüber, während die Seite offen bliebe. Ist die Route schon zu, passiert nichts.
+void _closeOwnRoute(NavigatorState nav, Route<dynamic>? route) {
+  if (route == null || !route.isActive || !nav.mounted) return;
+  if (route.isCurrent) {
+    nav.pop();
+  } else {
+    nav.removeRoute(route);
   }
 }
 
