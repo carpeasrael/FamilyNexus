@@ -14,14 +14,22 @@
 """
 import os, re, subprocess, sys, time
 
-ADB = os.path.join(os.environ.get('ANDROID_SDK_ROOT', os.path.expanduser('~/Android/Sdk')), 'platform-tools', 'adb')
 SERIAL = {'G1': 'emulator-5560', 'G2': 'emulator-5562'}
 UML = str.maketrans({'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'Ä': 'Ae', 'Ö': 'Oe', 'Ü': 'Ue', 'ß': 'ss', '„': '"', '“': '"', '–': '-'})
 KEYS = {'BACK': 4, 'ENTER': 66, 'TAB': 61, 'DEL': 67}
 
 
+def _adb_path():
+    """adb aus ANDROID_SDK_ROOT (Standard ~/Android/Sdk); wird je Aufruf aufgelöst und geprüft, nie beim Import."""
+    sdk = os.environ.get('ANDROID_SDK_ROOT', os.path.expanduser('~/Android/Sdk'))
+    path = os.path.realpath(os.path.join(sdk, 'platform-tools', 'adb'))
+    if os.path.basename(path) != 'adb' or not os.path.isfile(path) or not os.access(path, os.X_OK):
+        sys.exit(f'adb nicht gefunden oder nicht ausführbar: {path}')
+    return path
+
+
 def adb(dev, *a, capture=True):
-    return subprocess.run([ADB, '-s', SERIAL[dev], *a], capture_output=capture, text=True).stdout
+    return subprocess.run([_adb_path(), '-s', SERIAL[dev], *a], capture_output=capture, text=True).stdout
 
 
 def nodes(dev):

@@ -6,7 +6,7 @@ richtiges Passwort. Geprüft wird über den Semantikbaum von Flutter (Text im DO
 Tastatur per DevTools-Protokoll. Aufruf: tool/web_smoke.py [Pfad zu Chrome]
 """
 
-import base64, hashlib, json, os, socket, struct, subprocess, sys, tempfile, time, urllib.request
+import base64, hashlib, json, os, re, socket, struct, subprocess, sys, tempfile, time, urllib.request
 
 class WS:
     def __init__(self, url):
@@ -74,11 +74,18 @@ def _drain(ws, seconds):
                 pass
     ws.s.settimeout(60)
 
+def browser_lang():
+    """Browsersprache aus WEB_SMOKE_BROWSER_LANG (Standard de-DE); nur ein Sprachkennzeichen wie de, de-DE oder fil."""
+    value = os.environ.get('WEB_SMOKE_BROWSER_LANG', 'de-DE')
+    if not re.fullmatch(r'[a-z]{2,3}(-[A-Z]{2})?', value):
+        sys.exit(f'WEB_SMOKE_BROWSER_LANG ungültig (erwartet z. B. de-DE): {value!r}')
+    return value
+
 class Chrome:
     def __init__(self, chrome, width=1100, height=800, port=9333):
         self.dir = tempfile.mkdtemp()
         self.proc = subprocess.Popen([chrome, '--headless=new', '--disable-gpu', '--no-sandbox', f'--user-data-dir={self.dir}',
-            f'--remote-debugging-port={port}', f'--window-size={width},{height}', f'--lang={os.environ.get("WEB_SMOKE_BROWSER_LANG", "de-DE")}', 'about:blank'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            f'--remote-debugging-port={port}', f'--window-size={width},{height}', f'--lang={browser_lang()}', 'about:blank'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
         for _ in range(60):
             try:
                 tabs = json.load(urllib.request.urlopen(f'http://127.0.0.1:{port}/json'))
