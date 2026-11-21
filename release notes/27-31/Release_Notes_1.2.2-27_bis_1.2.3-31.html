@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FamilyNexus Release Notes 1.2.3 (31)</title>
+<style>
+:root { color-scheme: light dark; --bg: #f4f8fa; --fg: #0b1d26; --card: #ffffff; --accent: #0f766e; --on-accent: #ffffff; --muted: #4a5d68; --line: #d3e0e6; }
+@media (prefers-color-scheme: dark) { :root { --bg: #0b1d26; --fg: #e6f0f4; --card: #12303d; --accent: #2dd4bf; --on-accent: #0b1d26; --muted: #9db3bd; --line: #1f4352; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 44rem; margin: 0 auto; padding: 2rem 1rem 3rem; }
+header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+header img { width: 64px; height: 64px; border-radius: 16px; }
+.badge { display: inline-block; background: var(--accent); color: var(--on-accent); border-radius: 999px; padding: .15rem .75rem; font-weight: 600; font-size: .85rem; }
+h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
+h2 { font-size: 1.2rem; margin: 2rem 0 .5rem; padding-bottom: .25rem; border-bottom: 2px solid var(--accent); }
+h3 { font-size: 1.05rem; margin: 1.25rem 0 .25rem; color: var(--accent); }
+ul { margin: .25rem 0; padding-left: 1.25rem; }
+li { margin: .35rem 0; }
+.note { background: var(--card); border: 1px solid var(--line); border-left: 6px solid var(--accent); border-radius: 12px; padding: .75rem 1rem; }
+.small, footer { color: var(--muted); font-size: .85rem; margin-top: 2rem; }
+</style>
+</head>
+<body>
+<main>
+<header>
+<img src="../../web/icons/Icon-192.png" alt="">
+<div><h1>FamilyNexus: Release Notes</h1>
+<span class="badge">1.2.2 (27) → 1.2.3 (31)</span> <span class="small">Stand: 21. November 2026</span></div>
+</header>
+
+
+<p>Stand: 21. November 2026</p>
+<p class="note"><strong>Bitte alle Geräte der Familie aktualisieren.</strong> Wer einen Termin mit einer älteren App-Version bearbeitet, verliert dessen Kalender-Thema.</p>
+<h2>Neu</h2>
+<h3>Kalender</h3>
+<ul>
+<li><strong>Kalender-Themen:</strong> Moderatoren legen Themen mit Name und Farbe an. Jedes Mitglied wählt eines für den eigenen geteilten Termin.</li>
+<li><strong>Jahresfortschritt:</strong> Der Kalender zeigt, wie weit das Jahr ist (Tag, verbleibende Tage, Prozent und Balken).</li>
+<li><strong>Geburts- und Gedenktage:</strong> Personen mit Geburts- und Todesdatum, mit Vorlaufzeit, Symbol und Jahreszahl. Die Geburtstagsliste ordnet streng nach dem nächsten Vorkommen.</li>
+<li><strong>Abgleich alle 15 Minuten:</strong> Der Kalender gleicht zusätzlich regelmäßig mit dem Server ab.</li>
+</ul>
+<h3>Chat</h3>
+<ul>
+<li><strong>Gesprächsliste:</strong> Familienchat und Einzelchats stehen in einer Liste, sobald es Einzelchats gibt.</li>
+<li><strong>Ungelesene zuerst</strong> und die Einstellung „Letztes Gespräch wieder öffnen“.</li>
+<li><strong>Zustellstatus:</strong> „Sendet“, „Gesendet“ und „Gelesen“. Über einen Schalter lässt sich die Lesebestätigung ein- und ausschalten.</li>
+</ul>
+<h3>Familie und Profil</h3>
+<ul>
+<li><strong>Zwölf eingebaute Avatare:</strong> In bestehenden Familien lassen sie sich wählen, sobald ein Moderator die App geöffnet hat. Der Avatar erscheint in Familie, Chat, Gesprächsliste, Kalender und Heute.</li>
+<li><strong>Anordnung der Bereiche:</strong> Aufgaben sind ein eigener Tab, Familie liegt im Menü.</li>
+</ul>
+<h3>Einrichtung und Anmeldung</h3>
+<ul>
+<li><strong>Einführungstour</strong> in Kalender, Chat und Einkauf: einmalig, überspringbar, in den Einstellungen wiederholbar.</li>
+<li><strong>Anbieter wählen</strong> ist ein eigener Schritt vor „Konto erstellen“ und „Anmelden“.</li>
+<li><strong>Anmeldung und Anbieterseiten</strong> öffnen in einer eingebetteten Ansicht der App. Die Symbole passen zur Plattform, ein Abbruch beim Anbieter erscheint als Hinweis.</li>
+<li><strong>Hinweis bei beendeter Sitzung:</strong> Beendet der Server die Sitzung, sagt die App das jetzt.</li>
+</ul>
+<h3>Einstellungen</h3>
+<ul>
+<li><strong>App teilen</strong> kopiert den Link zum Store-Eintrag, <strong>App bewerten</strong> öffnet ihn (Android).</li>
+<li><strong>App-Sperre</strong> lässt sich auch ohne gesicherte Gerätesperre aus- und wieder entsperren.</li>
+<li><strong>Datenübersicht:</strong> keine Raum-IDs mehr; bei Einzelchats steht online der Name der Gegenseite.</li>
+</ul>
+<h3>Sicherheit</h3>
+<ul>
+<li>Die <strong>Identitätsvermerke</strong> der Familienmitglieder liegen zusätzlich verschlüsselt auf dem Gerät. Ändert der Server einen Schlüssel, fällt das auf. Ein Kontowechsel verwirft den Bestand des alten Kontos.</li>
+</ul>
+<h2>Verbessert</h2>
+<ul>
+<li>Das <strong>Ladebild beim Start</strong> folgt der Darstellung des Geräts. Auf macOS erscheint beim Kaltstart die Startfarbe statt eines schwarzen Rahmens.</li>
+<li><strong>Seitenübergänge</strong> haben einen deckenden Hintergrund, beim Wischen scheint nichts mehr durch.</li>
+<li>Die <strong>Statusleiste</strong> zeigt auf hellem Design dunkle Symbole.</li>
+<li>Im <strong>Querformat mit Tastatur</strong> läuft der Chat nicht mehr über; Kopfzeile und Hinweis weichen bei knapper Höhe.</li>
+<li>„Heute“: Die Karte „Keine Erinnerung geplant“ entfällt, solange Erinnerungen fällig sind.</li>
+<li>Das Terminformular zeigt bei großer Schrift die Beschriftung über Datum und Uhrzeit.</li>
+<li>Die Gesprächsliste zeigt das Datum mit führender Null; Monatszellen lesen Screenreadern das volle Datum in der App-Sprache vor.</li>
+<li>Einladungslinks: Ein eingetragener Servername ohne Port gilt wie ein leeres Feld. Ein Heimnetz-Server mit anderem Port gilt als eigener Konto-Server.</li>
+<li>Die Texte nennen Meldungen nur bei geöffneter App; auf Mobilgeräten sind sie im Hintergrund nicht zugesagt. „Link kopiert“ ersetzt den alten Hinweis beim Teilen.</li>
+</ul>
+<h2>Behoben</h2>
+<ul>
+<li>Der <strong>Avatar-Bildschirm</strong> schließt nach dem Speichern, nur seine eigene Route, nicht einen Dialog darüber.</li>
+<li><strong>Avatar entfernter Mitglieder:</strong> Buchstabe aus dem Nachrichtennamen statt Fragezeichen.</li>
+<li>„Passwort ändern“ schließt den Dialog nach der eingebetteten Kontoseite über die eigene Route.</li>
+<li>„Ausweg“ und „Fertig“ gleichzeitig lösen weder Fehler noch Fehlerbanner aus.</li>
+<li>Abmelden und Kontowechsel lassen Blockierliste und vorgemerkten Link nicht mehr stehen.</li>
+<li>Der Sync meldet das Konto nicht mehr als offline, wenn der Online-Status geteilt wird.</li>
+<li>„Termin löschen“ meldet Fehler als Löschfehler statt als Speicherfehler; Ablagefehler beim Speichern eines Termins erscheinen im Editor.</li>
+<li>Einrichtung: Speicherfehler am Ende werden angezeigt und erlauben einen neuen Versuch.</li>
+<li>Chat: Das Eingabefeld leert sich nach dem Senden nur, wenn Text und Antwort unverändert sind.</li>
+<li>Browser-Anmeldung: Die Sitzung gilt, wenn nur ein Folgeschritt scheitert.</li>
+<li>Anhang-Download mit Zeitschranke am Datenstrom; unerwartete Fehler beim Senden zählen als Fehlversuch und werden protokolliert.</li>
+<li>Aufgabenprotokoll: Die Rechte werden beim Empfang vor dem Speichern geprüft.</li>
+<li>Das Feld „Familienname“ zählt dieselben Zeichen wie die Prüfung.</li>
+<li>iOS und macOS: Der WebView-Datenspeicher wird vollständig gelöscht.</li>
+</ul>
+<h2>Datenschutz</h2>
+<p>Die Datenschutzerklärung nennt die sichtbare Avatar-Wahl und trägt das Änderungsdatum 15. November 2026.</p>
+<h2>Stand</h2>
+<p>Diese Notizen fassen die Änderungen im Quelltext von Build 27 (1.2.2) bis zum Build 31 (1.2.3) zusammen, einschließlich Korrekturen nach dem Versionsvermerk von Build 31 (bis #556).</p>
+</main>
+</body>
+</html>
