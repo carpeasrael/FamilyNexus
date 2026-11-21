@@ -9,9 +9,23 @@ class MainFlutterWindow: NSWindow {
   private var current: (id: Int, session: ASWebAuthenticationSession)?
   private var maxStartedId = 0
   private var preCancelled = Set<Int>()
+  private static let launchDark = 0x0B1120
+  private static let launchLight = 0xF6F7FB
+
+  private static func rgb(_ hex: Int) -> NSColor {
+    return NSColor(
+      srgbRed: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255,
+      blue: CGFloat(hex & 0xFF) / 255, alpha: 1)
+  }
 
   override func awakeFromNib() {
     let flutterViewController = FlutterViewController()
+    // Startfarbe (#554, E-94): Ohne Farbe ist der FlutterView bis zum ersten Frame schwarz. Sie folgt der
+    // Systemdarstellung (wie das Ladebild), nicht dem gespeicherten Thema (#345); Werte wie `AuroraTokens.bgBody`.
+    let dark = NSApplication.shared.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+    let launchColor = MainFlutterWindow.rgb(dark ? MainFlutterWindow.launchDark : MainFlutterWindow.launchLight)
+    flutterViewController.backgroundColor = launchColor
+    self.backgroundColor = launchColor
     let windowFrame = self.frame
     self.contentViewController = flutterViewController
     self.setFrame(windowFrame, display: true)

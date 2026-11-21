@@ -15,8 +15,8 @@ String _row(String id) {
 }
 
 void main() {
-  test('Planversion 1.56 mit Historie und P-104', () {
-    expect(_plan, contains('**Planversion: 1.56**'));
+  test('Planversion ab 1.56 mit Historie und P-104', () {
+    expect(_plan, matches(RegExp(r'\*\*Planversion: 1\.(5[6-9]|[6-9]\d)\*\*')), reason: 'Planversion mindestens 1.56');
     expect(_plan, contains('| 1.56 |'));
     expect(_plan, contains('| P-104 |'));
   });

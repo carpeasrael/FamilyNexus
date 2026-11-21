@@ -44,6 +44,7 @@ Ausgangslage heute: die unten genannten vorhandenen Testdateien und -ordner lauf
 | #350 „App bewerten“ / #351 „App teilen“ | `test/features/settings_recommend_test.dart` | Befund B1: Tap löst auf Android nichts aus; Test, der den Launcher-Aufruf mit der Store-URL belegt | I-03 Android (Play Store öffnet) |
 | #349 Play-Store-Screenshots | `test/store/play_screenshots_test.dart` | – | – |
 | #348 Play-Store-Beschreibung | `test/store/description_test.dart` | – | – |
+| #554 macOS Kaltstart ohne schwarzen Rahmen | `test/platform/macos_launch_background_test.dart` (Textprüfung, kein Verhaltensbeleg) | – | Release-E2E `macos`: A-01 Kaltstart hell und dunkel, Montage im 0,13-s-Raster (nicht hier ausführbar) |
 | #345 Startbild folgt App-Thema | `test/app/bootstrapper_test.dart` | – | A-01 Mac, iOS: kein heller Blitz im Dunkel-Thema |
 | #332 „Nachricht von dir“ | `test/features/chat_test.dart` | – | Screenreader Android |
 | #326 Text-Audit DE/EN | `test/l10n/wording_test.dart`, `plural_counts_test.dart`, `test/features/presence_label_test.dart`, `sender_name_test.dart` | – | – |
