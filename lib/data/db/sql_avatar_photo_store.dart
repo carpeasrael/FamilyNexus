@@ -125,10 +125,36 @@ class SqlAvatarPhotoStore implements AvatarPhotoStore {
   }
 
   @override
-  Future<void> markPublished(String roomId, String owner, String photoId, String eventId) => _db.rawUpdate(
-    'UPDATE avatar_photos SET published = 1, event_id = ? WHERE room_id = ? AND owner = ? AND photo_id = ?',
-    <Object?>[eventId, roomId, owner, photoId],
-  );
+  Future<void> markPublished(String roomId, String owner, String photoId, String eventId) =>
+      _db.transaction((txn) async {
+        final rows = await txn.query(
+          'avatar_photos',
+          where: 'room_id = ? AND owner = ? AND photo_id = ?',
+          whereArgs: <Object?>[roomId, owner, photoId],
+          limit: 1,
+        );
+        if (rows.isEmpty) return;
+        final cur = _decode(rows.first);
+        // Eine frühere Kopie desselben Fotos (Resync) wird aufgeräumt; das neue Ereignis bleibt der gültige Stand.
+        final redact = <String>{
+          ...?cur?.redactIds,
+          if (cur != null && cur.eventId.isNotEmpty && cur.eventId != eventId) cur.eventId,
+        }.toList();
+        await txn.update(
+          'avatar_photos',
+          <String, Object?>{'published': 1, 'event_id': eventId, 'redact_ids': json.encode(redact)},
+          where: 'room_id = ? AND owner = ? AND photo_id = ?',
+          whereArgs: <Object?>[roomId, owner, photoId],
+        );
+      });
+
+  @override
+  Future<void> requeueOwnPhoto(String roomId, String owner) =>
+      _db.rawUpdate('UPDATE avatar_photos SET published = 0 WHERE room_id = ? AND owner = ?', <Object?>[roomId, owner]);
+
+  @override
+  Future<void> requeueResets(String roomId) =>
+      _db.rawUpdate('UPDATE avatar_resets SET published = 0 WHERE room_id = ?', <Object?>[roomId]);
 
   @override
   Future<List<StoredAvatarPhoto>> redactQueue(String roomId) async {

@@ -3,11 +3,13 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../../data/matrix/matrix_gateway.dart';
 import '../../data/sync/anniversary_sync.dart';
+import '../../data/sync/avatar_photo_sync.dart';
 import '../../data/sync/calendar_sync.dart';
 import '../../data/sync/event_theme_sync.dart';
 import '../../domain/anniversaries.dart';
 import '../../domain/anniversary_calc.dart';
 import '../../domain/anniversary_service.dart';
+import '../../domain/avatar_photo_service.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_service.dart';
 import '../../domain/calendar_view.dart';
@@ -32,6 +34,8 @@ class CalendarController extends ChangeNotifier {
     this.themeSync,
     this.anniversaries,
     this.anniversarySync,
+    this.avatarPhotos,
+    this.avatarPhotoSync,
   })  : zone = TimeZones.tryGet(zoneName) ?? TimeZones.utc,
         zoneName = TimeZones.tryGet(zoneName) == null ? 'UTC' : zoneName,
         _clock = clock ?? DateTime.now;
@@ -48,6 +52,11 @@ class CalendarController extends ChangeNotifier {
   /// Geburts- und Gedenktage (E-104); `null`, wenn die Verdrahtung sie nicht vorsieht.
   final AnniversaryService? anniversaries;
   final AnniversarySync? anniversarySync;
+
+  /// Avatar-Fotos (#434, E-111); `null`, wenn die Verdrahtung sie nicht vorsieht. Die Sync-Klasse ist bis zur Freigabe
+  /// (`AvatarPhotoFlags.enabled`) inaktiv.
+  final AvatarPhotoService? avatarPhotos;
+  final AvatarPhotoSync? avatarPhotoSync;
 
   /// Zeitzone des Geräts (Betrachter).
   final tz.Location zone;
@@ -92,6 +101,7 @@ class CalendarController extends ChangeNotifier {
       an.onChanged = () => load().ignore();
       an.start(familyRoom: familyRoom);
     }
+    avatarPhotoSync?.start();
     load().ignore();
   }
 
@@ -110,6 +120,8 @@ class CalendarController extends ChangeNotifier {
       an.onChanged = null;
       an.dispose();
     }
+    avatarPhotoSync?.onChanged = null;
+    avatarPhotoSync?.dispose();
     super.dispose();
   }
 
@@ -119,6 +131,7 @@ class CalendarController extends ChangeNotifier {
         sync.idle(),
         themeSync?.idle() ?? Future<void>.value(),
         anniversarySync?.idle() ?? Future<void>.value(),
+        avatarPhotoSync?.idle() ?? Future<void>.value(),
       ]);
 
   Future<void>? _loading;

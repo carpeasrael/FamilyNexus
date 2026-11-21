@@ -1,13 +1,18 @@
 import '../data/matrix/matrix_gateway.dart';
 import '../data/sync/anniversary_sync.dart';
+import '../data/sync/avatar_photo_sync.dart';
 import '../data/sync/calendar_sync.dart';
 import '../data/sync/event_theme_sync.dart';
 import '../domain/anniversary_service.dart';
 import '../domain/anniversary_store.dart';
+import '../domain/avatar_photo.dart';
+import '../domain/avatar_photo_service.dart';
+import '../domain/avatar_photo_store.dart';
 import '../domain/calendar_service.dart';
 import '../domain/event_store.dart';
 import '../domain/event_theme_service.dart';
 import '../domain/event_theme_store.dart';
+import '../domain/family.dart';
 import '../features/calendar/calendar_controller.dart';
 
 /// Baut Dienst, Synchronisation und Controller für einen Nutzer zusammen.
@@ -24,7 +29,10 @@ CalendarController buildCalendarController({
   Duration retryInterval = const Duration(seconds: 60),
   EventThemeStore? themeStore,
   AnniversaryStore? anniversaryStore,
+  AvatarPhotoStore? avatarPhotoStore,
+  String? familyRoom,
   bool Function(String userId)? isModerator,
+  bool avatarPhotosEnabled = AvatarPhotoFlags.enabled,
 }) {
   final service = CalendarService(store: store, myUserId: userId, clock: clock);
   final sync = CalendarSync(
@@ -71,6 +79,27 @@ CalendarController buildCalendarController({
       retryInterval: retryInterval,
     );
   }
+  // Avatar-Fotos (#434, E-111): nur mit Ablage und bekannter Familie; die Sync-Klasse bleibt bis zur Freigabe inaktiv.
+  AvatarPhotoService? avatarPhotos;
+  AvatarPhotoSync? avatarPhotoSync;
+  if (avatarPhotoStore != null && familyRoom != null) {
+    avatarPhotos = AvatarPhotoService(
+      store: avatarPhotoStore,
+      roomId: familyRoom,
+      myUserId: userId,
+      isModerator: isModerator ?? (_) => false,
+      isMember: (id) => gateway.family?.member(id)?.status == MemberStatus.joined,
+      clock: clock,
+    );
+    avatarPhotoSync = AvatarPhotoSync(
+      gateway: gateway,
+      service: avatarPhotos,
+      store: avatarPhotoStore,
+      enabled: avatarPhotosEnabled,
+      clock: clock,
+      retryInterval: retryInterval,
+    );
+  }
   controller = CalendarController(
     service: service,
     store: store,
@@ -82,6 +111,8 @@ CalendarController buildCalendarController({
     themeSync: themeSync,
     anniversaries: anniversaries,
     anniversarySync: anniversarySync,
+    avatarPhotos: avatarPhotos,
+    avatarPhotoSync: avatarPhotoSync,
   );
   return controller;
 }

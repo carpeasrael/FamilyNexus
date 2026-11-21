@@ -11,7 +11,7 @@ void main() {
   late Database db;
   const annaA = '@anna:example.org|!a:example.org';
   const annaB = '@anna:example.org|!b:example.org';
-  const tables = <String>['events', 'event_history', 'rsvps', 'event_reminders', 'person_colors', 'shopping_items', 'task_lists', 'task_log', 'event_themes', 'anniversaries'];
+  const tables = <String>['events', 'event_history', 'rsvps', 'event_reminders', 'person_colors', 'shopping_items', 'task_lists', 'task_log', 'event_themes', 'anniversaries', 'avatar_photos', 'avatar_resets'];
 
   setUpAll(sqfliteFfiInit);
 
@@ -36,6 +36,8 @@ void main() {
     await db.insert('task_log', <String, Object?>{'id': 'l1', 'list_id': 't1', 'at_ms': 1, 'author': '@anna:example.org', 'data': '{}'});
     await db.insert('event_themes', <String, Object?>{'id': 'th1', 'version': 1, 'deleted': 0, 'author': '@anna:example.org', 'data': '{}'});
     await db.insert('anniversaries', <String, Object?>{'id': 'an1', 'version': 1, 'deleted': 0, 'author': '@anna:example.org', 'data': '{}'});
+    await db.insert('avatar_photos', <String, Object?>{'room_id': '!f:example.org', 'owner': '@anna:example.org', 'photo_id': '00000000-0000-4000-8000-000000000001', 'created_at': 1, 'cleared': 1});
+    await db.insert('avatar_resets', <String, Object?>{'room_id': '!f:example.org', 'target': '@anna:example.org', 'photo_id': '00000000-0000-4000-8000-000000000002', 'photo_created_at': 1});
   }
 
   Future<void> own(String owner) => db.insert('settings', <String, Object?>{'key': AppServices.calendarOwnerKey, 'value': owner}, conflictAlgorithm: ConflictAlgorithm.replace);

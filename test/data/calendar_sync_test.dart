@@ -503,6 +503,15 @@ void main() {
     expect(anna.sync.rejected, before, reason: 'weder angenommen noch als ungültiger Termin gezählt');
     expect(await anna.store.all(), isEmpty);
   });
+
+  test('E-111: Avatar-Foto-Signale gehören AvatarPhotoSync; die Kalender-Synchronisation ignoriert sie ohne Fehler', () async {
+    final before = anna.sync.rejected;
+    anna.gateway.injectSignal(AvatarPhotoSignal(anna.userId, DateTime.utc(2026), const <String, Object?>{'müll': 1}, eventId: r'$x'));
+    anna.gateway.injectSignal(AvatarResetSignal(anna.userId, DateTime.utc(2026), const <String, Object?>{'müll': 1}));
+    await anna.sync.idle();
+    expect(anna.sync.rejected, before, reason: 'weder angenommen noch als ungültiger Termin gezählt');
+    expect(await anna.store.all(), isEmpty);
+  });
 }
 
 /// Hilfstyp, um Reihenfolgen übersichtlich zu bauen.

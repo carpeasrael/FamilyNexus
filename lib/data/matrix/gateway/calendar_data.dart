@@ -117,6 +117,10 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
         _emit(EventThemeSignal(e.senderId, e.originServerTs, c));
       } else if (shared && e.type == AnniversaryCodec.type) {
         _emit(AnniversarySignal(e.senderId, e.originServerTs, c));
+      } else if (shared && e.type == AvatarPhotoCodec.type) {
+        _emit(AvatarPhotoSignal(e.senderId, e.originServerTs, c, eventId: e.eventId));
+      } else if (shared && e.type == AvatarResetCodec.type) {
+        _emit(AvatarResetSignal(e.senderId, e.originServerTs, c));
       } else if (!shared && e.type == EventCodec.privateType) {
         _emit(PrivateEventSignal(e.senderId, e.originServerTs, c));
       } else if (e.type == EventTypes.Encrypted) {
@@ -135,6 +139,8 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
     TaskCodec.logType,
     EventThemeCodec.type,
     AnniversaryCodec.type,
+    AvatarPhotoCodec.type,
+    AvatarResetCodec.type,
     InviteTicket.type,
   };
 
@@ -368,6 +374,59 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
       rethrow;
     } catch (e) {
       AppLog.e('gateway', 'Geburtstagseintrag konnte nicht gesendet werden', e);
+      throw _map(e);
+    }
+  }
+
+  @override
+  Future<String> publishAvatarPhoto(AvatarPhoto photo) async {
+    final room = _requireEncryptedRoom();
+    // Gesendet werden nur eigene Fotos; Empfänger verwerfen fremde `owner`-Angaben.
+    if (photo.owner != _client?.userID) throw const GatewayException(GatewayError.invalidInput);
+    final Map<String, Object?> content;
+    try {
+      content = AvatarPhotoCodec.encode(photo);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    try {
+      return (await _sendCalendar(room, AvatarPhotoCodec.type, content))!;
+    } on GatewayException {
+      rethrow;
+    } catch (e) {
+      AppLog.e('gateway', 'Avatar-Foto konnte nicht gesendet werden', e);
+      throw _map(e);
+    }
+  }
+
+  @override
+  Future<void> publishAvatarReset(AvatarReset reset) async {
+    final room = _requireEncryptedRoom();
+    final Map<String, Object?> content;
+    try {
+      content = AvatarResetCodec.encode(reset);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    try {
+      await _sendCalendar(room, AvatarResetCodec.type, content);
+    } on GatewayException {
+      rethrow;
+    } catch (e) {
+      AppLog.e('gateway', 'Zurücksetzen eines Avatar-Fotos konnte nicht gesendet werden', e);
+      throw _map(e);
+    }
+  }
+
+  @override
+  Future<void> redactOwnEvent(String eventId) async {
+    final room = _requireEncryptedRoom();
+    if (!eventId.startsWith(r'$') || eventId.length > 255) throw const GatewayException(GatewayError.invalidInput);
+    try {
+      await room.redactEvent(eventId);
+    } catch (e) {
+      // Aufräumen nach bestem Bemühen: kein Eintrag mit Inhalt im Protokoll.
+      AppLog.w('gateway', 'Schwärzen eines eigenen Ereignisses fehlgeschlagen: ${e.runtimeType}');
       throw _map(e);
     }
   }

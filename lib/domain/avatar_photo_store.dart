@@ -51,8 +51,15 @@ abstract class AvatarPhotoStore {
   /// Eigene Ereignisse, die noch nicht gesendet sind.
   Future<List<StoredAvatarPhoto>> pendingPhotos(String roomId);
 
-  /// Merkt das Senden: nur wenn die Zeile des Eigentümers noch dieses Foto ([photoId]) hält.
+  /// Merkt das Senden: nur wenn die Zeile des Eigentümers noch dieses Foto ([photoId]) hält. Eine bisherige, andere
+  /// `eventId` (frühere Kopie desselben Fotos nach einem Resync) wandert in `redactIds`.
   Future<void> markPublished(String roomId, String owner, String photoId, String eventId);
+
+  /// Merkt das aktuelle Ereignis des Eigentümers erneut zum Senden vor (Resync für neue Mitglieder, E-111).
+  Future<void> requeueOwnPhoto(String roomId, String owner);
+
+  /// Merkt alle bekannten Zurücksetzen erneut zum Senden vor (Resync durch Moderatoren, E-111).
+  Future<void> requeueResets(String roomId);
 
   /// Eigene Zeilen mit offenen Schwärz-Aufträgen.
   Future<List<StoredAvatarPhoto>> redactQueue(String roomId);

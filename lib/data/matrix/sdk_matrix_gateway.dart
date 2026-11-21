@@ -20,6 +20,7 @@ import '../../domain/account_deletion.dart';
 import '../../domain/anniversaries.dart';
 import '../../domain/anniversary_codec.dart';
 import '../../domain/attachment_policy.dart';
+import '../../domain/avatar_photo.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/chat.dart';
