@@ -1,0 +1,18 @@
+# Hält die festgenagelten GitHub-Actions (Commit-SHA mit Tag-Kommentar) aktuell (#568).
+# Dependabot ändert SHA und Kommentar. Updates von release.yml prüft der Nutzer, die CI muss grün sein.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    # Neue Releases erst nach einer Woche vorschlagen: Zeit, eine kompromittierte Version zu bemerken.
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: ci
+    groups:
+      github-actions-minor-patch:
+        update-types:
+          - minor
+          - patch
