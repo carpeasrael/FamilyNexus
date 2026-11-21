@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../domain/account_deletion.dart';
 import '../../domain/anniversaries.dart';
+import '../../domain/avatar_photo.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/chat.dart';
@@ -397,6 +398,19 @@ abstract class MatrixGateway implements Listenable {
 
   /// Sendet ein Kalender-Thema (ein Ereignis je Thema) verschlüsselt in den Familienraum (E-99).
   Future<void> publishEventTheme(EventTheme theme);
+
+  // ------------------------------------------------------------ Avatar-Fotos
+
+  /// Sendet ein Avatar-Foto (oder eine Löschmarke) des eigenen Kontos verschlüsselt in den Familienraum (#434,
+  /// E-111) und liefert die Matrix-ID des Ereignisses.
+  Future<String> publishAvatarPhoto(AvatarPhoto photo);
+
+  /// Sendet das Zurücksetzen eines Avatar-Fotos (nur Moderatoren sind für Empfänger gültig) in den Familienraum.
+  Future<void> publishAvatarReset(AvatarReset reset);
+
+  /// Schwärzt ein **eigenes** Ereignis des Familienraums (Aufräumen nach bestem Bemühen, E-111). Der Server lehnt
+  /// fremde Ereignisse ab, solange das Konto kein Moderator ist; die App ruft es nur mit eigenen Ereignis-IDs auf.
+  Future<void> redactOwnEvent(String eventId);
 
   // ------------------------------------------------------------ Geburts- und Gedenktage
 

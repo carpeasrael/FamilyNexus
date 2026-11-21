@@ -5,6 +5,7 @@ import 'package:family_nexus/domain/account_deletion.dart';
 import 'package:family_nexus/domain/anniversaries.dart';
 import 'package:family_nexus/domain/anniversary_codec.dart';
 import 'package:family_nexus/domain/attachment_policy.dart';
+import 'package:family_nexus/domain/avatar_photo.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/chat.dart';
@@ -230,6 +231,8 @@ class FakeMatrixServer {
           TaskCodec.logType => TaskLogSignal(e.sender, e.time, e.content),
           EventThemeCodec.type => EventThemeSignal(e.sender, e.time, e.content),
           AnniversaryCodec.type => AnniversarySignal(e.sender, e.time, e.content),
+          AvatarPhotoCodec.type => AvatarPhotoSignal(e.sender, e.time, e.content, eventId: e.id),
+          AvatarResetCodec.type => AvatarResetSignal(e.sender, e.time, e.content),
           _ => null,
         };
       }
@@ -1640,6 +1643,63 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       throw const GatewayException(GatewayError.invalidInput);
     }
     fake.post(room, _userId!, EventThemeCodec.type, content);
+  }
+
+  // ------------------------------------------------------------ Avatar-Fotos
+
+  /// Test: Ereignis-IDs, die `redactOwnEvent` geschwärzt hat.
+  final List<String> redactedEvents = <String>[];
+
+  /// Test: `redactOwnEvent` scheitert mit diesem Fehler.
+  GatewayError? redactError;
+
+  /// Test: `publishAvatarPhoto` scheitert mit diesem Fehler.
+  GatewayError? publishAvatarError;
+
+  @override
+  Future<String> publishAvatarPhoto(AvatarPhoto photo) async {
+    _requireSession();
+    _require();
+    publishAttempts++;
+    if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
+    final avatarError = publishAvatarError;
+    if (avatarError != null) throw GatewayException(avatarError);
+    final room = familyRoom;
+    if (room == null) throw const GatewayException(GatewayError.notFound);
+    if (photo.owner != _userId) throw const GatewayException(GatewayError.invalidInput);
+    final Map<String, Object?> content;
+    try {
+      content = AvatarPhotoCodec.encode(photo);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    return fake.post(room, _userId!, AvatarPhotoCodec.type, content).id;
+  }
+
+  @override
+  Future<void> publishAvatarReset(AvatarReset reset) async {
+    _requireSession();
+    _require();
+    publishAttempts++;
+    if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
+    final room = familyRoom;
+    if (room == null) throw const GatewayException(GatewayError.notFound);
+    final Map<String, Object?> content;
+    try {
+      content = AvatarResetCodec.encode(reset);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    fake.post(room, _userId!, AvatarResetCodec.type, content);
+  }
+
+  @override
+  Future<void> redactOwnEvent(String eventId) async {
+    _requireSession();
+    _require();
+    final err = redactError;
+    if (err != null) throw GatewayException(err);
+    redactedEvents.add(eventId);
   }
 
   // ------------------------------------------------- Geburts- und Gedenktage

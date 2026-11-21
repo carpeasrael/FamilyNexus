@@ -171,6 +171,64 @@ void main() {
     expect(s.eventId, isEmpty);
   });
 
+  group('Resync (Teil 2)', () {
+    test('requeueOwnPhoto setzt nur das Foto des Eigentümers wieder auf ungesendet', () async {
+      await store.putPhoto(_room, _stored(eventId: r'$a', published: true));
+      await store.putPhoto(_room, _stored(owner: _ben, createdAt: 2000, eventId: r'$b', published: true));
+      await store.requeueOwnPhoto(_room, _anna);
+      expect((await store.pendingPhotos(_room)).map((p) => p.photo.owner), <String>[_anna]);
+      expect((await store.photo(_room, _ben))!.published, isTrue);
+    });
+
+    test('requeueOwnPhoto wirkt nur in der eigenen Familie', () async {
+      await store.putPhoto(_room, _stored(eventId: r'$a', published: true));
+      await store.putPhoto(_other, _stored(eventId: r'$b', published: true));
+      await store.requeueOwnPhoto(_room, _anna);
+      expect(await store.pendingPhotos(_other), isEmpty);
+    });
+
+    test('markPublished nach einer Wiederholung: die frühere Kopie wandert in die Schwärz-Liste', () async {
+      await store.putPhoto(_room, _stored(eventId: r'$alt', published: true));
+      await store.requeueOwnPhoto(_room, _anna);
+      await store.markPublished(_room, _anna, _id1, r'$neu');
+      final s = (await store.photo(_room, _anna))!;
+      expect(s.eventId, r'$neu');
+      expect(s.published, isTrue);
+      expect(s.redactIds, <String>[r'$alt']);
+    });
+
+    test('markPublished mit derselben Ereignis-ID räumt nichts auf', () async {
+      await store.putPhoto(_room, _stored(eventId: r'$gleich', published: true));
+      await store.markPublished(_room, _anna, _id1, r'$gleich');
+      expect((await store.photo(_room, _anna))!.redactIds, isEmpty);
+    });
+
+    test('markPublished lässt offene Aufträge bestehen und fügt hinzu, ohne Doppelte', () async {
+      await store.putPhoto(_room, _stored(eventId: r'$e1', published: true));
+      await store.putPhoto(
+        _room,
+        _stored(id: _id2, createdAt: 2000, eventId: r'$e2', published: true),
+        queueRedactOfPrevious: true,
+      );
+      await store.requeueOwnPhoto(_room, _anna);
+      await store.markPublished(_room, _anna, _id2, r'$e3');
+      expect((await store.photo(_room, _anna))!.redactIds, <String>[r'$e1', r'$e2']);
+      await store.requeueOwnPhoto(_room, _anna);
+      await store.markPublished(_room, _anna, _id2, r'$e3');
+      expect((await store.photo(_room, _anna))!.redactIds, <String>[r'$e1', r'$e2'], reason: 'keine Doppelten');
+    });
+
+    test('requeueResets setzt alle Zurücksetzen der Familie wieder auf ungesendet', () async {
+      await store.addReset(_room, const AvatarReset(target: _anna, photoId: _id1, photoCreatedAt: 1000));
+      await store.addReset(_room, const AvatarReset(target: _ben, photoId: _id2, photoCreatedAt: 2000));
+      await store.addReset(_other, const AvatarReset(target: _anna, photoId: _id1, photoCreatedAt: 1000));
+      expect(await store.pendingResets(_room), isEmpty);
+      await store.requeueResets(_room);
+      expect(await store.pendingResets(_room), hasLength(2));
+      expect(await store.pendingResets(_other), isEmpty, reason: 'eine andere Familie bleibt unberührt');
+    });
+  });
+
   test('Aufräumen: die ID des bisherigen eigenen Ereignisses wandert in die Schwärz-Liste', () async {
     await store.putPhoto(_room, _stored(eventId: r'$e1', published: true));
     await store.putPhoto(_room, _stored(id: _id2, createdAt: 2000), queueRedactOfPrevious: true);

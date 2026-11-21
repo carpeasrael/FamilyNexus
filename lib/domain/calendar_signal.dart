@@ -58,3 +58,17 @@ class EventThemeSignal extends CalendarSignal {
   const EventThemeSignal(super.sender, super.timestamp, this.content);
   final Map<String, Object?> content;
 }
+
+/// Avatar-Foto (oder Löschmarke) eines Mitglieds aus dem Familienraum (#434, E-111). [eventId] ist die Matrix-ID des
+/// Ereignisses; sie gehört zu eigenen Ereignissen und dient dem Aufräumen.
+class AvatarPhotoSignal extends CalendarSignal {
+  const AvatarPhotoSignal(super.sender, super.timestamp, this.content, {this.eventId = ''});
+  final Map<String, Object?> content;
+  final String eventId;
+}
+
+/// Zurücksetzen eines Avatar-Fotos durch einen Moderator aus dem Familienraum (#434, E-111).
+class AvatarResetSignal extends CalendarSignal {
+  const AvatarResetSignal(super.sender, super.timestamp, this.content);
+  final Map<String, Object?> content;
+}

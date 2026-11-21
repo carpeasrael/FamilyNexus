@@ -5,6 +5,7 @@ import '../core/app_log.dart';
 import '../data/db/app_database.dart';
 import '../data/db/key_value_store.dart';
 import '../data/db/sql_anniversary_store.dart';
+import '../data/db/sql_avatar_photo_store.dart';
 import '../data/db/sql_event_store.dart';
 import '../data/db/sql_event_theme_store.dart';
 import '../data/db/sql_shopping_store.dart';
@@ -350,6 +351,7 @@ class AppServices {
     await SqlTaskStore(db).wipe();
     await SqlEventThemeStore(db).wipe();
     await SqlAnniversaryStore(db).wipe();
+    await SqlAvatarPhotoStore(db).wipe();
     // Bestätigte Erinnerungen gehören zu den Familiendaten (E-87); der Besitzer fällt zuletzt bzw. zugleich.
     await kv.apply(deletes: <String>[ReminderCoordinator.acknowledgedKey, AppSettings.blockedUsersKey, AppSettings.lastChatThreadKey, calendarOwnerKey]);
   }
@@ -371,6 +373,7 @@ class AppServices {
       await SqlTaskStore(db).wipe();
       await SqlEventThemeStore(db).wipe();
       await SqlAnniversaryStore(db).wipe();
+      await SqlAvatarPhotoStore(db).wipe();
       await kv.apply(deletes: <String>[ReminderCoordinator.acknowledgedKey, AppSettings.blockedUsersKey, AppSettings.lastChatThreadKey]);
       await onWiped?.call();
       wiped = true;
