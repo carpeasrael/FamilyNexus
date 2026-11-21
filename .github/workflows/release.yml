@@ -56,7 +56,7 @@ jobs:
       BUILD: ${{ github.event.inputs.build || 'apk+aab' }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'apk') && github.event.inputs.ref || env.TAG }}
 
@@ -84,12 +84,12 @@ jobs:
           name=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
           if [ "v$name" != "$TAG" ]; then echo "::error::Tag $TAG does not match pubspec version $name"; exit 1; fi
 
-      - uses: actions/setup-java@v6
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6
         with:
           distribution: temurin
           java-version: "17"
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           flutter-version: "3.47.7"
           channel: stable
@@ -166,7 +166,7 @@ jobs:
           done
 
       # Obfuscation symbols are needed to read stack traces; keep them private (not a release asset).
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: debug-info-${{ env.TAG }}-run${{ github.run_number }}
           path: debug-info/
@@ -198,7 +198,7 @@ jobs:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'flatpak') && github.event.inputs.ref || env.TAG }}
 
@@ -245,7 +245,7 @@ jobs:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'appimage') && github.event.inputs.ref || env.TAG }}
 
@@ -267,7 +267,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev libssl-dev
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           flutter-version: "3.47.7"
           channel: stable
@@ -276,7 +276,7 @@ jobs:
       - name: Build AppImage
         run: tool/build_appimage.sh
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: debug-info-appimage-${{ env.TAG }}-run${{ github.run_number }}
           path: debug-info/
@@ -308,7 +308,7 @@ jobs:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'windows') && github.event.inputs.ref || env.TAG }}
 
@@ -325,7 +325,7 @@ jobs:
           name=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
           if [ "v$name" != "$TAG" ]; then echo "::error::Tag $TAG does not match pubspec version $name"; exit 1; fi
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           flutter-version: "3.47.7"
           channel: stable
@@ -370,7 +370,7 @@ jobs:
           powershell -NoProfile -Command "Compress-Archive -Path '$out/*' -DestinationPath 'dist/$name' -Force"
           (cd dist && sha256sum "$name" > "$name.sha256")
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: debug-info-windows-${{ env.TAG }}-run${{ github.run_number }}
           path: debug-info/
@@ -399,7 +399,7 @@ jobs:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'apple') && github.event.inputs.ref || env.TAG }}
 
@@ -416,7 +416,7 @@ jobs:
           name=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
           if [ "v$name" != "$TAG" ]; then echo "::error::Tag $TAG does not match pubspec version $name"; exit 1; fi
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           flutter-version: "3.47.7"
           channel: stable
@@ -500,21 +500,21 @@ jobs:
           cp build/macos/export/FamilyNexus.pkg "appstore-out/FamilyNexus-${TAG}-macos-appstore.pkg"
           (cd appstore-out && for f in *; do shasum -a 256 "$f" > "$f.sha256"; done)
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: steps.key.outputs.signed == 'true'
         with:
           name: appstore-${{ env.TAG }}-run${{ github.run_number }}
           path: appstore-out/
           retention-days: 90
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: steps.key.outputs.signed != 'true'
         with:
           name: macos-unsigned-${{ env.TAG }}-run${{ github.run_number }}
           path: build/macos/dmg/
           retention-days: 14
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: debug-info-apple-${{ env.TAG }}-run${{ github.run_number }}
           path: symbols/
@@ -551,7 +551,7 @@ jobs:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: ${{ (github.event.inputs.ref != '' && github.event.inputs.build == 'web') && github.event.inputs.ref || env.TAG }}
 
@@ -568,7 +568,7 @@ jobs:
           name=$(sed -n 's/^version: \([0-9.]*\)+.*/\1/p' pubspec.yaml)
           if [ "v$name" != "$TAG" ]; then echo "::error::Tag $TAG does not match pubspec version $name"; exit 1; fi
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           flutter-version: "3.47.7"
           channel: stable
@@ -580,7 +580,7 @@ jobs:
 
       - name: Cache Rust tools
         id: tools
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.cargo/bin
           key: web-tools-frb2.13.0-wasm-bindgen0.2.100-wasm-pack0.15.0-${{ runner.os }}
@@ -631,7 +631,7 @@ jobs:
           fi
           gh release upload "$TAG" dist/* --clobber
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
           path: build/web_app
 
@@ -648,4 +648,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
