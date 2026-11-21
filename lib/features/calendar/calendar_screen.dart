@@ -332,7 +332,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         childAspectRatio: 0.95 / math.max(1.0, 1 + (MediaQuery.textScalerOf(context).scale(14) / 14 - 1) * 0.5),
         children: <Widget>[
           for (final d in grid)
-            _dayCell(c, l, fmt, t, d, CalendarView.forDay(occ, c.zone, d), (hits[d] ?? const <AnniversaryHit>[]).length, inMonth: d.month == _focus.month, selected: d == _focus),
+            _dayCell(c, l, fmt, t, d, CalendarView.forDay(occ, c.zone, d), hits[d] ?? const <AnniversaryHit>[], inMonth: d.month == _focus.month, selected: d == _focus),
         ],
       ),
       const SizedBox(height: 12),
@@ -346,8 +346,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
     ]);
   }
 
-  Widget _dayCell(CalendarController c, AppLocalizations l, Fmt fmt, AuroraTokens t, DateTime d, List<Occurrence> list, int anniversaryCount, {required bool inMonth, required bool selected}) {
+  Widget _dayCell(CalendarController c, AppLocalizations l, Fmt fmt, AuroraTokens t, DateTime d, List<Occurrence> list, List<AnniversaryHit> anniversaries, {required bool inMonth, required bool selected}) {
     final today = _isToday(d);
+    final anniversaryCount = anniversaries.length;
     final anniversarySuffix = anniversaryCount > 0 ? ', ${l.calendarAnniversariesOnDay(anniversaryCount)}' : '';
     final todaySuffix = today ? ', ${l.calendarToday}' : '';
     final colors = list.map((o) => AuroraTokens.personColors[c.displayColor(o.event) % AuroraTokens.personColors.length]).toSet().take(3).toList();
@@ -386,7 +387,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   for (final col in colors)
                     Container(margin: const EdgeInsets.symmetric(horizontal: 1.5), width: 6, height: 6, decoration: BoxDecoration(color: col, shape: BoxShape.circle)),
                   if (list.length > 3) Text('+', style: TextStyle(fontSize: 9, color: t.textSecondary)),
-                  if (anniversaryCount > 0) const AnniversaryDayMarker(),
+                  if (anniversaryCount > 0) AnniversaryDayMarker(kinds: <AnniversaryKind>{for (final h in anniversaries) h.kind}),
                 ]),
               ),
             ]),

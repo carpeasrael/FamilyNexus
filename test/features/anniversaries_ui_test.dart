@@ -137,6 +137,43 @@ void main() {
       handle.dispose();
     });
 
+    // #579 (E-104): Das Raster zeigt je Art das Symbol der Kachel: Torte für Geburt, Blume für Tod. Testtag 10.03. (nicht der 20.03.).
+    Finder inGrid(IconData icon) => find.descendant(of: find.byType(GridView), matching: find.byIcon(icon));
+
+    ui('Raster: nur Todesdatum zeigt die Blume und keine Torte', (tester) async {
+      await open(tester, people: [person('5', 'Uroma', death: date(3, 10, 2000))]);
+      await calendarTab(tester);
+      expect(inGrid(Icons.local_florist), findsOneWidget);
+      expect(inGrid(Icons.cake), findsNothing);
+    });
+
+    ui('Raster: nur Geburtsdatum zeigt die Torte und keine Blume', (tester) async {
+      await open(tester, people: [person('6', 'Onkel', birth: date(3, 10, 1970))]);
+      await calendarTab(tester);
+      expect(inGrid(Icons.cake), findsOneWidget);
+      expect(inGrid(Icons.local_florist), findsNothing);
+    });
+
+    ui('Raster: Geburt und Tod am selben Tag zeigen beide Symbole, Semantics zählt 2', (tester) async {
+      final handle = tester.ensureSemantics();
+      await open(tester, people: [person('7', 'Opa', birth: date(3, 10, 1970), death: date(3, 10, 2000))]);
+      await calendarTab(tester);
+      expect(inGrid(Icons.cake), findsOneWidget);
+      expect(inGrid(Icons.local_florist), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp('Dienstag, 10\\. März 2026, Keine Termine, 2 Geburts- oder Gedenktage')), findsOneWidget);
+      handle.dispose();
+    });
+
+    ui('Raster: zwei Geburtstage am selben Tag zeigen nur ein Symbol je Art', (tester) async {
+      await open(tester, people: [
+        person('8', 'Anna', birth: date(3, 10, 1970)),
+        person('9', 'Berta', birth: date(3, 10, 1980)),
+      ]);
+      await calendarTab(tester);
+      expect(inGrid(Icons.cake), findsOneWidget);
+      expect(inGrid(Icons.local_florist), findsNothing);
+    });
+
     ui('Tag und Woche: Treffer vor den Terminen, „keine Termine“ erst ohne Treffer', (tester) async {
       await open(tester, people: [hit]);
       await calendarTab(tester);
