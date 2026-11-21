@@ -1,0 +1,16 @@
+Chat | - | 100,205
+Menü öffnen | klickbar | 1017,206
+Zurück zu den Gesprächen | klickbar | 63,342
+Ben | - | 259,342
+Online | - | 399,342
+Nur zwischen dir und Ben, Ende-zu-Ende-verschlüsselt | - | 563,438
+Mittwoch, 21. Oktober 2026 | - | 540,1507
+Neue Nachrichten | - | 540,1591
+Nachricht von Ben / Ben / Kannst du auf dem Heimweg Milch mitbringen? / Mittwoch, 21. Okto | - | 521,1768
+Datei anhängen | klickbar | 84,2033
+Senden | klickbar | 996,2033
+Heute / Tab 1 von 5 | klickbar | 108,2232
+Kalender / Tab 2 von 5 | klickbar | 324,2232
+Chat / Tab 3 von 5 | klickbar | 540,2232
+Einkauf / Tab 4 von 5 | klickbar | 756,2232
+Aufgaben / Tab 5 von 5 | klickbar | 972,2232

@@ -1,0 +1,8 @@
+Person anlegen | - | 540,315
+Noch 60 Zeichen | - | 833,570
+Geburtsdatum | - | 293,652
+Todesdatum | - | 275,886
+Beide Daten sind optional, mindestens eines ist nötig. Ohne Jahr wird kein Alter angezeigt | - | 540,1129
+Abbrechen | klickbar | 453,1302
+Speichern | klickbar | 756,1302
+Schließen | klickbar | 540,1200

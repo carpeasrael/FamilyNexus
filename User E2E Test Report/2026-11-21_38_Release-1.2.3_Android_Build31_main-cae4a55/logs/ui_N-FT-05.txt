@@ -1,0 +1,11 @@
+Aufgaben | - | 163,205
+Menü öffnen | klickbar | 1017,206
+Nur Moderatoren legen Listen an. Abhaken kann nur die zugewiesene Person. | - | 540,355
+Mir zugewiesen | - | 540,462
+Test / Zugewiesen an dich / 0 von 1 erledigt / Täglich | klickbar | 540,641
+Neue Aufgabenliste | klickbar | 964,2011
+Heute / Tab 1 von 5 | klickbar | 108,2232
+Kalender / Tab 2 von 5 | klickbar | 324,2232
+Chat / Tab 3 von 5 | klickbar | 540,2232
+Einkauf / Tab 4 von 5 | klickbar | 756,2232
+Aufgaben – 1 offene / 1 / Aufgaben / Tab 5 von 5 | klickbar | 972,2232

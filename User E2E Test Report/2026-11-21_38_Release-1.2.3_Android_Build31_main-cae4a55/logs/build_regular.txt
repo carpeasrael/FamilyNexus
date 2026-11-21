@@ -1,0 +1,42 @@
+Running Gradle task 'assembleDebug'...                          
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+Resolving dependencies...
+The --precompile flag is no longer used and does nothing.
+Downloading packages...
++ adaptive_number 1.0.0
++ args 2.7.0
++ async 2.13.1
++ build_tool 1.0.0 from path /Users/carpeasrael/.pub-cache/hosted/pub.dev/flutter_vodozemac-0.9.0/cargokit/gradle/../build_tool
++ collection 1.19.1
++ convert 3.1.2
++ crypto 3.0.7 (3.0.8 available)
++ ed25519_edwards 0.3.1 (0.3.2 available)
++ fixnum 1.1.1
++ github 9.25.1 (9.26.0 available)
++ hex 0.2.0
++ http 1.6.0
++ http_parser 4.1.2
++ json_annotation 4.12.0
++ logging 1.3.0
++ meta 1.19.0
++ path 1.9.1
++ petitparser 7.1.0
++ source_span 1.10.2
++ string_scanner 1.4.1
++ term_glyph 1.2.2
++ toml 0.18.0
++ typed_data 1.4.0
++ version 3.0.2
++ web 1.1.2
++ yaml 3.1.3 (3.1.4 available)
+Changed 26 dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `dart pub outdated` for more information.
+Compiling bin/build_tool_runner.dart to kernel file bin/build_tool_runner.dill.
+INFO: Precompiled binaries are disabled
+INFO: Building vodozemac_bindings_dart for aarch64-linux-android
+INFO: Building vodozemac_bindings_dart for i686-linux-android
+INFO: Building vodozemac_bindings_dart for x86_64-linux-android
+Running Gradle task 'assembleDebug'...                            146,8s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+exit 0

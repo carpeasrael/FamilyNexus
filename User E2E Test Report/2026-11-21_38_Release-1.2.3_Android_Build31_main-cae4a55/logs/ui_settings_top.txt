@@ -1,0 +1,21 @@
+Zurück | klickbar | 74,206
+Einstellungen | - | 357,205
+Darstellung / Akzentfarbe / Neonfarbe für Schaltflächen, Auswahl und Hervorhebungen. Gilt  | - | 540,1245
+Sprache | - | 540,512
+Sprache / Deutsch | klickbar | 794,513
+Design | - | 540,659
+Design / Dunkel | klickbar | 842,660
+Türkis | - | 215,996
+Magenta | - | 511,996
+Violett | - | 808,996
+Himmelblau | - | 264,1143
+Limette | - | 601,1143
+Orange | - | 222,1290
+Rosé | - | 493,1290
+Grün | - | 745,1290
+Geburtstage anzeigen | - | 540,1489
+Geburtstage anzeigen / 7 Tage vorher | klickbar | 529,1521
+Effekte reduzieren / Weniger Unschärfe und Leuchten, deckendere Flächen. | klickbar | 540,1712
+Letztes Gespräch wieder öffnen / Öffnet im Chat-Tab das zuletzt offene Gespräch statt der  | klickbar | 540,1982
+Konto | - | 540,2274
+Server / fake.test | - | 540,2333

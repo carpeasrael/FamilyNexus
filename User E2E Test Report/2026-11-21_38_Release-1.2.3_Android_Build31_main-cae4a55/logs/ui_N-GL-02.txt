@@ -1,0 +1,1 @@
+Letztes Gespräch wieder öffnen / Öffnet im Chat-Tab das zuletzt offene Gespräch statt der Liste. Wird nur auf diesem Gerät gemerkt und beim Abmelden gelöscht.

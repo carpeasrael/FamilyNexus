@@ -1,0 +1,14 @@
+im Gespräch:
+Zurück zu den Gesprächen | klickbar | 63,342
+Ben | - | 259,342
+nach BACK im Gespräch:
+Gespräche | - | 540,331
+Familienchat Familie Berger, Danke! Ich bringe das
+de.inneso.familynexus/de.inneso.familynexus.MainActivity
+Menü offen:
+Menü | - | 393,205
+nach BACK bei Menü:
+Gespräche | - | 540,331
+de.inneso.familynexus/de.inneso.familynexus.MainActivity
+BACK auf Liste:
+com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity

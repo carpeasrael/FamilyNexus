@@ -1,0 +1,31 @@
+Kalender | - | 152,205
+Menü öffnen | klickbar | 1017,206
+Tag | klickbar | 249,353
+Woche | klickbar | 443,353
+Monat | klickbar | 637,353
+Agenda | klickbar | 831,353
+Zurück | klickbar | 95,479
+16. Nov. – 22. Nov. 2026 | - | 394,479
+Weiter | klickbar | 693,479
+Geburtstage | klickbar | 819,479
+Heute | klickbar | 965,479
+Alle | klickbar | 137,605
+Anna ✓ | klickbar | 402,605
+Ben | klickbar | 668,605
+Clara | klickbar | 912,605
+Keine Termine | - | 540,674
+Do, 19. Nov. 2026 | - | 540,729
+Keine Termine | - | 540,807
+Fr, 20. Nov. 2026 | - | 540,884
+Keine Termine | - | 540,961
+Heute / Sa, 21. Nov. 2026 | - | 540,1039
+Elternabend Grundschule, 19:00 – 20:30, Geteilt | - | 540,1211
+So, 22. Nov. 2026 | - | 540,1382
+Todestag von Onkel Karl, 16. Todestag, vor 15 Jahren | - | 540,1529
+Zahnarzt Lena, 09:00 – 09:45, Geteilt | - | 540,1751
+Neuer Termin | klickbar | 964,2011
+Heute / Tab 1 von 5 | klickbar | 108,2232
+Kalender / Tab 2 von 5 | klickbar | 324,2232
+Chat / Tab 3 von 5 | klickbar | 540,2232
+Einkauf / Tab 4 von 5 | klickbar | 756,2232
+Aufgaben – 1 offene / 1 / Aufgaben / Tab 5 von 5 | klickbar | 972,2232
