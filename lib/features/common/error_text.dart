@@ -1,6 +1,8 @@
 import '../../data/matrix/matrix_gateway.dart';
 import '../../domain/anniversaries.dart';
 import '../../domain/anniversary_service.dart';
+import '../../domain/avatar_photo_processing.dart';
+import '../../domain/avatar_photo_service.dart';
 import '../../domain/event_theme_service.dart';
 import '../../domain/event_themes.dart';
 import '../../domain/shopping.dart';
@@ -34,6 +36,22 @@ String errorText(AppLocalizations l, Object error) {
       GatewayError.oauthAborted => l.errOAuthAborted,
       GatewayError.passwordChangeUnavailable => l.passwordChangeUnavailable,
       GatewayError.unknown => l.errUnknown,
+    };
+  }
+  if (error is AvatarPhotoProcessingException) {
+    return switch (error.error) {
+      AvatarPhotoProcessingError.unsupportedFormat => l.avatarPhotoErrFormat,
+      AvatarPhotoProcessingError.tooLarge => l.avatarPhotoErrTooLarge,
+      AvatarPhotoProcessingError.tooManyPixels => l.avatarPhotoErrPixels,
+      AvatarPhotoProcessingError.notDecodable => l.avatarPhotoErrDecode,
+      AvatarPhotoProcessingError.cannotShrink => l.avatarPhotoErrShrink,
+    };
+  }
+  if (error is AvatarPhotoException) {
+    return switch (error.error) {
+      AvatarPhotoError.invalid => l.errInvalidInput,
+      AvatarPhotoError.notAllowed => l.errNotAllowed,
+      AvatarPhotoError.clock => l.avatarPhotoErrClock,
     };
   }
   if (error is ShoppingException) {

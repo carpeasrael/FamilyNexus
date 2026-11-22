@@ -7,6 +7,7 @@ import '../../domain/family.dart';
 import '../../domain/permissions.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../common/error_text.dart';
+import '../family/avatar_screen.dart';
 
 /// Kontolöschung aus der App heraus (#12, Apple 5.1.1(v)): klassisch mit Passwort in der App, bei
 /// Anmeldung beim Anbieter (OAuth) über dessen Löschseite, die in der App öffnet (E-91). Endet die Sitzung, löscht die App danach
@@ -112,6 +113,18 @@ class _AccountDeletionDialogState extends State<AccountDeletionDialog> {
       content: SingleChildScrollView(
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
           Text(l.accountDeleteBody(g.userId ?? '–', g.server?.host ?? '–')),
+          // Foto zuerst entfernen (#434, E-73): eigene Handlung, unabhängig vom Passwort; nur bei freigegebener Funktion.
+          if (AppScope.of(context).calendar?.avatarPhotoSync?.enabled ?? false)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                key: const ValueKey<String>('account-delete-remove-photo'),
+                onPressed: _busy
+                    ? null
+                    : () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => AvatarScreen(services: AppScope.of(context)))),
+                child: Text(l.accountDeleteRemovePhoto),
+              ),
+            ),
           if (soleModerator(g.family)) ...<Widget>[
             const SizedBox(height: 12),
             Text(l.accountDeleteSoleModerator, style: TextStyle(color: error)),

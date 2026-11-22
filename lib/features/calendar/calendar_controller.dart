@@ -20,6 +20,7 @@ import '../../domain/occurrence.dart';
 import '../../domain/recurrence.dart';
 import '../../domain/time_zones.dart';
 import '../../ui/theme/tokens.dart';
+import '../family/avatar_photo_images.dart';
 
 /// Zustand und Aktionen des Kalenders für die Oberfläche.
 class CalendarController extends ChangeNotifier {
@@ -36,6 +37,7 @@ class CalendarController extends ChangeNotifier {
     this.anniversarySync,
     this.avatarPhotos,
     this.avatarPhotoSync,
+    this.avatarPhotoImages,
   })  : zone = TimeZones.tryGet(zoneName) ?? TimeZones.utc,
         zoneName = TimeZones.tryGet(zoneName) == null ? 'UTC' : zoneName,
         _clock = clock ?? DateTime.now;
@@ -57,6 +59,9 @@ class CalendarController extends ChangeNotifier {
   /// (`AvatarPhotoFlags.enabled`) inaktiv.
   final AvatarPhotoService? avatarPhotos;
   final AvatarPhotoSync? avatarPhotoSync;
+
+  /// Zwischenspeicher der Avatar-Fotos als Bilder für die Anzeige (#434); gehört dem Controller und endet mit ihm.
+  final AvatarPhotoImages? avatarPhotoImages;
 
   /// Zeitzone des Geräts (Betrachter).
   final tz.Location zone;
@@ -101,7 +106,11 @@ class CalendarController extends ChangeNotifier {
       an.onChanged = () => load().ignore();
       an.start(familyRoom: familyRoom);
     }
-    avatarPhotoSync?.start();
+    final photoSync = avatarPhotoSync;
+    if (photoSync != null) {
+      photoSync.onChanged = () => avatarPhotoImages?.invalidate();
+      photoSync.start();
+    }
     load().ignore();
   }
 
@@ -122,6 +131,7 @@ class CalendarController extends ChangeNotifier {
     }
     avatarPhotoSync?.onChanged = null;
     avatarPhotoSync?.dispose();
+    avatarPhotoImages?.dispose();
     super.dispose();
   }
 

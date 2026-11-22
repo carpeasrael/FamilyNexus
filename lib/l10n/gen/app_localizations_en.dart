@@ -271,7 +271,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverMetadataNote =>
-      'The server cannot see content, but it does see metadata such as who writes to whom and when, the choice of your avatar (one of twelve symbols, room state, not end-to-end encrypted), as well as room and profile names (for example the family name). Your own server decides who sees them – it does not remove them.';
+      'The server cannot see content, but it does see metadata such as who writes to whom and when, the choice of your avatar (one of twelve symbols, room state, not end-to-end encrypted), size and time of an avatar photo (the photo itself is encrypted), as well as room and profile names (for example the family name). Your own server decides who sees them – it does not remove them.';
 
   @override
   String get onbTitleAccount => 'Sign in';
@@ -1309,7 +1309,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String privacy2Body(String keyStore, String cipher) {
-    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars), the members’ read state (up to which message someone has read), the conversation you last had open (only if switched on) and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
+    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars) and, if set, their avatar photo (cropped square and small, encrypted in the family room), the members’ read state (up to which message someone has read), the conversation you last had open (only if switched on) and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
   }
 
   @override
@@ -1317,7 +1317,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy3Body =>
-      'Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, public read receipts (who has read up to which message, and when; only when “Send read receipts” is on, visible to the server and to the provider of your chat partners), the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted) and room and profile names (for example the family name). With your own server you decide who sees this information.';
+      'Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, public read receipts (who has read up to which message, and when; only when “Send read receipts” is on, visible to the server and to the provider of your chat partners), the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted), size and time of an avatar photo (the photo itself is end-to-end encrypted) and room and profile names (for example the family name). With your own server you decide who sees this information.';
 
   @override
   String get privacy4Title => 'Private events';
@@ -1695,7 +1695,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy10Body =>
-      'The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. The read receipt (“Read” under your messages) is a public read marker, visible to the server and to the provider of your chat partners (who has read up to which message, and when); it is on by default, and you can switch it off in the settings, then you only send private markers and do not see who has read either. Receipts already sent cannot be taken back. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. Your avatar is an exception: the choice of one of the twelve built-in avatars is kept as room state in the family room and is not end-to-end encrypted. The server and all family members see which symbol you chose; the choice stays in the room even if you are removed or your account is deleted. Otherwise the server only sees the metadata it always sees (see “What does the server see?”).';
+      'The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. The read receipt (“Read” under your messages) is a public read marker, visible to the server and to the provider of your chat partners (who has read up to which message, and when); it is on by default, and you can switch it off in the settings, then you only send private markers and do not see who has read either. Receipts already sent cannot be taken back. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. Your avatar is an exception: the choice of one of the twelve built-in avatars is kept as room state in the family room and is not end-to-end encrypted. Your own photo as an avatar, however, is end-to-end encrypted: all family members see it, the server only sees size and time. Moderators can take it out of the display. When you change or remove it, earlier copies are only redacted at the server on a best-effort basis; anyone who already received the photo keeps it, including members who have left. For children, parents or guardians should consent. The server and all family members see which symbol you chose; the choice stays in the room even if you are removed or your account is deleted. Otherwise the server only sees the metadata it always sees (see “What does the server see?”).';
 
   @override
   String onbFamilyFound(String name) {
@@ -1986,7 +1986,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy12Body =>
-      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. Birthdays and memorial days (name of the person and date, including third parties and deceased people) are likewise sent end-to-end encrypted in the family room. The server only sees the metadata it always sees (see “What does the server see?”), plus the choice of your avatar (room state, not end-to-end encrypted).';
+      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. Birthdays and memorial days (name of the person and date, including third parties and deceased people) are likewise sent end-to-end encrypted in the family room. The server only sees the metadata it always sees (see “What does the server see?”), plus the choice of your avatar (room state, not end-to-end encrypted). It does not see an avatar photo, only the size and time of the encrypted events.';
 
   @override
   String get webUnlockTitleCreate => 'Set up the browser vault';
@@ -3069,7 +3069,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportOnlineNote =>
-      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), the choice of avatar (one value out of twelve, room state in plain text), time and size of events and the types of account data. Event counts are based on this device’s sync; the provider may hold older events as well.';
+      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), the choice of avatar (one value out of twelve, room state in plain text), time and size of an avatar photo (the photo itself is encrypted), time and size of events and the types of account data. Event counts are based on this device’s sync; the provider may hold older events as well.';
 
   @override
   String get eventTypeMessage => 'Messages';
@@ -3130,7 +3130,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String accountDeleteBody(String userId, String server) {
-    return 'Your account $userId will be permanently deleted at $server. The user ID cannot be used again. Messages you sent remain visible to the other family members, and so does the choice of your avatar (one value out of twelve), which stays in the family room. Birthdays and memorial days you created remain for the family (shared family data, every member may change them). Afterwards all data on this device is deleted.';
+    return 'Your account $userId will be permanently deleted at $server. The user ID cannot be used again. Messages you sent remain visible to the other family members, and so does the choice of your avatar (one value out of twelve), which stays in the family room. An avatar photo stays encrypted in the room history, with the members who already have it; remove it beforehand if you do not want that. Birthdays and memorial days you created remain for the family (shared family data, every member may change them). Afterwards all data on this device is deleted.';
   }
 
   @override
@@ -3603,4 +3603,99 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errServerUnsupportedStep =>
       'FamilyNexus does not support this provider. Please enter the address of another one.';
+
+  @override
+  String get avatarPhotoSection => 'Your photo';
+
+  @override
+  String get avatarPhotoChoose => 'Choose photo';
+
+  @override
+  String get avatarPhotoChange => 'Change photo';
+
+  @override
+  String get avatarPhotoRemove => 'Remove photo';
+
+  @override
+  String get avatarPhotoRemoveConfirm =>
+      'Your photo disappears for all family members. Your chosen avatar or your initial appears again.';
+
+  @override
+  String get avatarPhotoNoticeTitle => 'Photo as avatar';
+
+  @override
+  String get avatarPhotoNoticeBody =>
+      'All family members see this photo, also in the chat. It is end-to-end encrypted: the server only sees ciphertext plus size and time, not the picture. Moderators can take a photo out of the display. For children, parents or guardians should consent.';
+
+  @override
+  String get avatarPhotoNoticeConfirm => 'Understood, continue';
+
+  @override
+  String get avatarPhotoCropTitle => 'Choose the crop';
+
+  @override
+  String get avatarPhotoCropHint =>
+      'Move and zoom the picture until the crop fits. The photo is saved square and small; location data and camera data are not kept.';
+
+  @override
+  String get avatarPhotoPreparing => 'Preparing the picture …';
+
+  @override
+  String get avatarPhotoSaved => 'Photo saved';
+
+  @override
+  String get avatarPhotoRemoved => 'Photo removed';
+
+  @override
+  String get avatarPhotoPending =>
+      'The photo is sent to the family as soon as there is a connection.';
+
+  @override
+  String get avatarPhotoErrFormat =>
+      'This format is not supported. Please choose JPEG, PNG or WebP.';
+
+  @override
+  String get avatarPhotoErrTooLarge =>
+      'The file is too large (at most 15 MiB).';
+
+  @override
+  String get avatarPhotoErrPixels =>
+      'The picture has too many pixels. Please choose a smaller picture.';
+
+  @override
+  String get avatarPhotoErrDecode => 'The picture cannot be read.';
+
+  @override
+  String get avatarPhotoErrShrink =>
+      'The picture cannot be saved small enough. Please choose another one.';
+
+  @override
+  String get avatarPhotoErrClock =>
+      'This device’s clock is wrong. Please check date and time.';
+
+  @override
+  String get avatarPhotoWasReset =>
+      'A moderator reset your photo. You can choose a new photo.';
+
+  @override
+  String get familyResetPhoto => 'Reset photo';
+
+  @override
+  String familyResetPhotoTitle(String name) {
+    return 'Reset the photo of $name?';
+  }
+
+  @override
+  String familyResetPhotoBody(String name) {
+    return 'The photo is hidden for everyone. $name can then choose a new photo.';
+  }
+
+  @override
+  String get familyResetPhotoDone => 'Photo reset';
+
+  @override
+  String get accountDeleteRemovePhoto => 'Remove photo first';
+
+  @override
+  String get eventTypeAvatarPhoto => 'Avatar photos';
 }

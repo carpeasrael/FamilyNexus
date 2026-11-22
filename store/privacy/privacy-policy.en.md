@@ -55,6 +55,7 @@ share with you or that your provider supplies for synchronization.
 | Calendar themes (freely chosen name up to 30 characters, color) | Assign events to a theme and show them in color. Like events, themes are sent end-to-end encrypted to the family. |
 | Birthdays and memorial days (freely chosen name up to 60 characters, date of birth and date of death, each with or without a year; including third parties and deceased people) | Show the family's birthdays and memorial days in the calendar and on “Today”, with age in years. Like events, the entries are sent end-to-end encrypted to the family. The advance notice of the display is a local setting. |
 | Choice of one of the twelve built-in avatars (only the identifier, no image, no text) | Show the avatar to other family members, including in the chat. The choice is kept as room state in the family room and is not end-to-end encrypted. |
+| Avatar photo (optional; cropped square, small, without location data and camera data) | Show the photo to other family members, including in the chat. It is kept end-to-end encrypted as an event in the family room; the provider only sees size and time. Moderators can take it out of the display. For children, parents or guardians should consent. |
 | Language, appearance, reminder, notification and security settings, locally blocked accounts, pending invitations and, only if “Reopen last conversation” is switched on, the ID of the conversation you last had open | Configure the app and continue processes already begun. |
 | IP address, connection times, account, room and device identifiers as well as technical transmission data | Connection, delivery and operation at the server being contacted; its logging is governed by its privacy notices. |
 
@@ -123,7 +124,8 @@ encrypted events. This includes public read receipts (who has read up to which m
 account management are not end-to-end encrypted like message content. This includes
 the choice of your avatar (one of the twelve built-in avatars): it is kept as room state
 in the family room, is expressly not end-to-end encrypted and is visible to the provider
-and to all family members.
+and to all family members. Your own photo as an avatar, however, is end-to-end encrypted; the
+provider only sees the size and time of the events.
 
 With communication across servers, the homeservers of other accounts involved
 may also receive encrypted events and the metadata required for
@@ -346,8 +348,11 @@ deleted or retained further depends on the provider and
 any statutory obligations. The choice of your avatar (one value out of twelve) stays
 in the family room as room state even after you are removed from the family or your
 account is deleted; the app hides it for people who are no longer members.
-Birthdays and memorial days you created remain for the family (shared family data,
-every member may change them).
+An avatar photo stays encrypted in the room history, with the members who already have it; you can
+remove it beforehand in the app (“Remove photo first”). When you change or remove it, earlier
+copies are only redacted at the provider on a best-effort basis; anyone who already received the
+photo keeps it, including members who have left. Birthdays and memorial days you created remain
+for the family (shared family data, every member may change them).
 
 **Remaining copies:** Neither local deletion nor account deletion guarantees
 the removal of content already delivered on other people's devices, federated

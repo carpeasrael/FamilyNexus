@@ -30,6 +30,7 @@ import 'fake_matrix.dart';
 import 'fake_scheduler.dart';
 import 'fake_store.dart';
 import 'memory_anniversary_store.dart';
+import 'memory_avatar_photo_store.dart';
 import 'memory_event_store.dart';
 import 'memory_event_theme_store.dart';
 import 'memory_shopping_store.dart';
@@ -48,6 +49,7 @@ class TestApp {
     required this.taskStore,
     required this.themeStore,
     required this.anniversaryStore,
+    this.avatarPhotoStore,
     required this.scheduler,
     required this.links,
     required this.auth,
@@ -75,6 +77,7 @@ class TestApp {
   final MemoryTaskStore taskStore;
   final MemoryEventThemeStore themeStore;
   final MemoryAnniversaryStore anniversaryStore;
+  final MemoryAvatarPhotoStore? avatarPhotoStore;
   final FakeReminderScheduler scheduler;
   final FakeLinkSource links;
   final FakeDeviceAuth auth;
@@ -124,6 +127,9 @@ Future<TestApp> buildTestApp({
   MemoryTaskStore? taskItems,
   MemoryEventThemeStore? themeItems,
   MemoryAnniversaryStore? anniversaryItems,
+  // Test (#434): Ablage der Avatar-Fotos. Ohne Angabe gibt es keine Foto-Funktion im Kalender-Controller.
+  MemoryAvatarPhotoStore? avatarPhotoItems,
+  bool avatarPhotosEnabled = true,
   // Test: Meldungen zu Chat und Einkauf und Zahl am App-Symbol (#254). Ohne Angabe wie im Browser: keine.
   ActivityPlatform? activity,
   AppBadge? badge,
@@ -240,6 +246,9 @@ Future<TestApp> buildTestApp({
         retryInterval: const Duration(hours: 1),
         themeStore: themeStore,
         anniversaryStore: anniversaryStore,
+        avatarPhotoStore: avatarPhotoItems,
+        familyRoom: room,
+        avatarPhotosEnabled: avatarPhotosEnabled,
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
       );
       builtCalendars.add(controller);
@@ -257,6 +266,7 @@ Future<TestApp> buildTestApp({
     taskStore: taskStore,
     themeStore: themeStore,
     anniversaryStore: anniversaryStore,
+    avatarPhotoStore: avatarPhotoItems,
     scheduler: scheduler,
     links: links,
     auth: auth,
@@ -303,6 +313,23 @@ class FakeFileAccess implements FileAccess {
   Future<PickedFile?> pickFile() async {
     await pickGate?.future;
     return next;
+  }
+
+  /// Test (#434): Ergebnis von [pickImage]; `null` = abgebrochen.
+  PickedFile? nextImage;
+
+  /// Test (#434): [pickImage] meldet eine zu große Datei.
+  bool imageTooLarge = false;
+
+  /// Test (#434): Zahl der Aufrufe von [pickImage].
+  int imagePicks = 0;
+
+  @override
+  Future<PickedFile?> pickImage() async {
+    imagePicks++;
+    await pickGate?.future;
+    if (imageTooLarge) throw const FileTooLargeException();
+    return nextImage;
   }
 
   @override

@@ -14,6 +14,7 @@ import '../domain/event_theme_service.dart';
 import '../domain/event_theme_store.dart';
 import '../domain/family.dart';
 import '../features/calendar/calendar_controller.dart';
+import '../features/family/avatar_photo_images.dart';
 
 /// Baut Dienst, Synchronisation und Controller für einen Nutzer zusammen.
 ///
@@ -82,6 +83,7 @@ CalendarController buildCalendarController({
   // Avatar-Fotos (#434, E-111): nur mit Ablage und bekannter Familie; die Sync-Klasse bleibt bis zur Freigabe inaktiv.
   AvatarPhotoService? avatarPhotos;
   AvatarPhotoSync? avatarPhotoSync;
+  AvatarPhotoImages? avatarPhotoImages;
   if (avatarPhotoStore != null && familyRoom != null) {
     avatarPhotos = AvatarPhotoService(
       store: avatarPhotoStore,
@@ -91,6 +93,7 @@ CalendarController buildCalendarController({
       isMember: (id) => gateway.family?.member(id)?.status == MemberStatus.joined,
       clock: clock,
     );
+    avatarPhotoImages = AvatarPhotoImages(avatarPhotos);
     avatarPhotoSync = AvatarPhotoSync(
       gateway: gateway,
       service: avatarPhotos,
@@ -113,6 +116,7 @@ CalendarController buildCalendarController({
     anniversarySync: anniversarySync,
     avatarPhotos: avatarPhotos,
     avatarPhotoSync: avatarPhotoSync,
+    avatarPhotoImages: avatarPhotoImages,
   );
   return controller;
 }

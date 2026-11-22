@@ -8,14 +8,14 @@ Oct 20, 2026 · @CarpeAsrael
 
 ## Vision & Goals
 
-The app (working title "FamilyNexus") combines a family calendar, a messenger and a shared shopping list in one application whose data lives exclusively on the family's devices and travels only end-to-end encrypted via the Matrix protocol (one exception: the choice of one of twelve built-in avatars is an unencrypted room state, E-101).
+The app (working title "FamilyNexus") combines a family calendar, a messenger and a shared shopping list in one application whose data lives exclusively on the family's devices and travels only end-to-end encrypted via the Matrix protocol (one exception: the choice of one of twelve built-in avatars is an unencrypted room state, E-101; an avatar photo is an ordinary encrypted event, E-111).
 
 **Target audience:** Families and households who want to coordinate appointments without entrusting their data to a central provider.
 
 **Guiding principles**
 
 - **Local-first:** All data is stored encrypted on the device; the app also works offline.
-- **E2EE by default:** No plaintext leaves the device, neither chat nor appointments (the only exception is the avatar choice, one value out of twelve, E-101).
+- **E2EE by default:** No plaintext leaves the device, neither chat nor appointments (the only exception is the avatar choice, one value out of twelve, E-101; an avatar photo is encrypted like all content, E-111).
 - **Replaceable server:** A public Matrix server by default, optionally your own homeserver.
 - **Data minimization:** No telemetry, no advertising, no analytics SDKs.
 - **One codebase:** Android, Windows, Linux, macOS, iOS and iPadOS.
@@ -83,7 +83,7 @@ Each family is an encrypted Matrix room: the devices hold the data, the server o
 
 &#91;embedded content: Architecture · two devices and one homeserver\]
 
-Local database and Matrix layer live on each device; the homeserver forwards encrypted events and cannot read them (one exception: the choice of one of twelve built-in avatars is an unencrypted room state, E-101).
+Local database and Matrix layer live on each device; the homeserver forwards encrypted events and cannot read them (one exception: the choice of one of twelve built-in avatars is an unencrypted room state, E-101; an avatar photo is an ordinary encrypted event, E-111).
 
 ### Matrix Model
 
