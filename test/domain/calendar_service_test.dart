@@ -80,7 +80,7 @@ void main() {
       expect((await store.history(e.id)).single.title, 'Zahnarzt');
     });
 
-    test('fremde Termine sind nicht änderbar oder löschbar (auch nicht für Moderatoren)', () async {
+    test('fremde Termine sind nicht änderbar oder löschbar (ohne bekannte Moderatorrolle, Standard-roleOf)', () async {
       final foreign = ev(owner: kOther);
       await svc.applyIncoming(foreign);
       await expectLater(svc.update(foreign.copyWith(title: 'X')), throwsA(isA<CalendarException>()));

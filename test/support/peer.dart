@@ -26,6 +26,7 @@ class Peer {
     DateTime Function()? clock,
     String Function()? ids,
     Role? Function(String userId)? roleOf,
+    DateTime Function()? syncClock,
   }) async {
     final gw = server.newDevice();
     await gw.login(server: ServerUrl.tryParse(server.host)!, username: user, password: password);
@@ -42,6 +43,7 @@ class Peer {
       gateway: gw,
       service: svc,
       store: store,
+      clock: syncClock,
       retryInterval: const Duration(hours: 1),
     );
     sync.start();

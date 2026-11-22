@@ -105,15 +105,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final l = AppLocalizations.of(context);
     final nav = Navigator.of(context);
     final series = e.recurrence.isRecurring;
+    // Ein Moderator ändert nur: Er nimmt höchstens ein Vorkommen aus der Serie, löscht aber nie den Termin (E-112).
+    final owner = c.service.canDelete(e);
     final choice = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l.eventDelete),
-        content: Text(series ? l.eventDeleteSeriesConfirm : l.eventDeleteConfirm),
+        content: Text(!owner ? l.eventDeleteOccurrenceConfirm : (series ? l.eventDeleteSeriesConfirm : l.eventDeleteConfirm)),
         actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l.cancel)),
           if (series) TextButton(onPressed: () => Navigator.pop(ctx, 'one'), child: Text(l.eventDeleteThis)),
-          TextButton(onPressed: () => Navigator.pop(ctx, 'all'), child: Text(series ? l.eventDeleteAll : l.delete)),
+          if (owner) TextButton(onPressed: () => Navigator.pop(ctx, 'all'), child: Text(series ? l.eventDeleteAll : l.delete)),
         ],
       ),
     );
@@ -144,6 +146,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         final fmt = Fmt(context, c.zone);
         final occurrence = _occurrenceOf(e);
         final mine = c.service.canEdit(e);
+        // Löschen: der Besitzer; ein Moderator nur bei einer Serie, und dann nur ein Vorkommen (E-112).
+        final canRemove = c.service.canDelete(e) || (mine && e.recurrence.isRecurring);
         final family = services.gateway.family;
         String nameOf(String id) => memberLabel(l, family, id, me: c.me);
         final rsvps = c.rsvpsOf(e.id);
@@ -159,7 +163,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   icon: const Icon(Icons.edit_outlined),
                   onPressed: () => _edit(e),
                 ),
-              if (mine)
+              if (canRemove)
                 IconButton(tooltip: l.eventDelete, icon: const Icon(Icons.delete_outline), onPressed: () => _delete(e)),
             ],
           ),
@@ -175,11 +179,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 dateLong: fmt.dateLong(DateTime.parse(occurrence.dateKey)),
                 owner: e.ownerId == c.me ? l.eventOwnerYou : l.eventOwner(memberLabel(l, family, e.ownerId, me: c.me, inSentence: true)),
                 mine: mine,
+                lastEdited: e.editorId == null
+                    ? null
+                    : l.eventLastEditedBy(
+                        nameOf(e.editorId!),
+                        '${fmt.dateShort(fmt.local(e.updatedAt))} ${fmt.time(e.updatedAt)}',
+                      ),
               ),
               if (e.isShared) ...<Widget>[
                 const SizedBox(height: 12),
                 _RsvpCard(controller: c, event: e, rsvps: rsvps, nameOf: nameOf),
-                if (mine) _ShareInChatButton(controller: c, event: e),
+                if (e.ownerId == c.me) _ShareInChatButton(controller: c, event: e),
               ],
               // Im Browser gibt es keine Erinnerungen (E-53, #145): keine Karte; gespeicherte Werte bleiben unberührt.
               if (services.reminders != null) ...<Widget>[

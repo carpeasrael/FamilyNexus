@@ -1014,7 +1014,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get rsvpNone => 'Keine Antwort';
 
   @override
-  String get eventHistory => 'Verlauf';
+  String get eventHistory => 'Letzte Änderungen auf diesem Gerät';
 
   @override
   String eventVersion(int version) {
@@ -1028,7 +1028,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get eventCancelled => 'Gelöscht';
 
   @override
-  String get eventReadOnly => 'Nur der Ersteller kann diesen Termin ändern.';
+  String get eventReadOnly =>
+      'Nur der Ersteller und Moderatoren können diesen Termin ändern.';
+
+  @override
+  String get eventDeleteOccurrenceConfirm =>
+      'Dieses Vorkommen aus der Serie nehmen? Die Serie bleibt bestehen.';
+
+  @override
+  String eventEditedLine(String name, String date) {
+    return '$name · $date (laut Absender)';
+  }
+
+  @override
+  String eventLastEditedBy(String name, String date) {
+    return 'Zuletzt geändert von $name · $date (laut Absender)';
+  }
 
   @override
   String get eventYourReminders => 'Deine Erinnerungen';
@@ -1709,7 +1724,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy10Body =>
-      'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Die Lesebestätigung („Gelesen“ unter deinen Nachrichten) ist als öffentlicher Lesemarker für den Server und den Anbieter deiner Gesprächspartner sichtbar (wer hat bis zu welcher Nachricht und wann gelesen); sie ist standardmäßig an, du kannst sie in den Einstellungen ausschalten, dann sendest du nur private Marker und siehst auch nicht, wer gelesen hat. Bereits gesendete Bestätigungen lassen sich nicht zurücknehmen. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Dein Avatar ist eine Ausnahme: Die Wahl eines der zwölf eingebauten Avatare liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. Ein eigenes Foto als Avatar ist dagegen Ende-zu-Ende-verschlüsselt: Alle Familienmitglieder sehen es, der Server nur Größe und Zeitpunkt. Moderatoren können es aus der Anzeige nehmen. Beim Ändern oder Entfernen werden frühere Kopien nur nach bestem Bemühen beim Server geschwärzt; wer das Foto schon erhalten hat, behält es, auch ausgetretene Mitglieder. Bei Kindern sollten Sorgeberechtigte einwilligen. Der Server und alle Familienmitglieder sehen, welches Symbol du gewählt hast; die Wahl bleibt im Raum stehen, auch wenn du entfernt wirst oder dein Konto gelöscht wird. Der Server sieht sonst nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).';
+      'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Die Lesebestätigung („Gelesen“ unter deinen Nachrichten) ist als öffentlicher Lesemarker für den Server und den Anbieter deiner Gesprächspartner sichtbar (wer hat bis zu welcher Nachricht und wann gelesen); sie ist standardmäßig an, du kannst sie in den Einstellungen ausschalten, dann sendest du nur private Marker und siehst auch nicht, wer gelesen hat. Bereits gesendete Bestätigungen lassen sich nicht zurücknehmen. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Geteilte Termine können außer dir auch Moderatoren ändern (löschen nur du); die Familie sieht dann, wer zuletzt geändert hat, laut Absender. Dein Avatar ist eine Ausnahme: Die Wahl eines der zwölf eingebauten Avatare liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. Ein eigenes Foto als Avatar ist dagegen Ende-zu-Ende-verschlüsselt: Alle Familienmitglieder sehen es, der Server nur Größe und Zeitpunkt. Moderatoren können es aus der Anzeige nehmen. Beim Ändern oder Entfernen werden frühere Kopien nur nach bestem Bemühen beim Server geschwärzt; wer das Foto schon erhalten hat, behält es, auch ausgetretene Mitglieder. Bei Kindern sollten Sorgeberechtigte einwilligen. Der Server und alle Familienmitglieder sehen, welches Symbol du gewählt hast; die Wahl bleibt im Raum stehen, auch wenn du entfernt wirst oder dein Konto gelöscht wird. Der Server sieht sonst nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).';
 
   @override
   String onbFamilyFound(String name) {
