@@ -108,7 +108,7 @@
     }
   },
   "serverNoPassword": "This provider does not allow signing in with a password.",
-  "serverMetadataNote": "The server cannot see content, but it does see metadata such as who writes to whom and when, the choice of your avatar (one of twelve symbols, room state, not end-to-end encrypted), as well as room and profile names (for example the family name). Your own server decides who sees them – it does not remove them.",
+  "serverMetadataNote": "The server cannot see content, but it does see metadata such as who writes to whom and when, the choice of your avatar (one of twelve symbols, room state, not end-to-end encrypted), size and time of an avatar photo (the photo itself is encrypted), as well as room and profile names (for example the family name). Your own server decides who sees them – it does not remove them.",
   "onbTitleAccount": "Sign in",
   "accountUsername": "Username",
   "accountPassword": "Password",
@@ -606,7 +606,7 @@
   "privacy1Title": "Who processes your data?",
   "privacy1Body": "FamilyNexus is free software (AGPL-3.0). The app sends no data to the developers and contains no telemetry, ads or analytics. The operator of the provider you chose (Matrix server) is responsible for processing on the server; you can see it during setup in the “Choose a provider” step and under “Advanced”. If you create an account in the app, your name, username, password and – if the provider requires it – your email address go only to this provider. With providers that have their own sign-in page (e.g. matrix.org) you enter these details directly on their page. The app shows this page in an embedded view (iOS, macOS, Android) or in the browser (Linux, Windows); the page then runs in the app’s process.",
   "privacy2Title": "What data exists?",
-  "privacy2Body": "Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars), the members’ read state (up to which message someone has read), the conversation you last had open (only if switched on) and your settings. Events and messages are stored encrypted ({cipher}) on your device. The key is held here: {keyStore} – not in the database file.",
+  "privacy2Body": "Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars) and, if set, their avatar photo (cropped square and small, encrypted in the family room), the members’ read state (up to which message someone has read), the conversation you last had open (only if switched on) and your settings. Events and messages are stored encrypted ({cipher}) on your device. The key is held here: {keyStore} – not in the database file.",
   "@privacy2Body": {
     "placeholders": {
       "keyStore": {
@@ -619,7 +619,7 @@
     }
   },
   "privacy3Title": "What does the server see?",
-  "privacy3Body": "Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, public read receipts (who has read up to which message, and when; only when “Send read receipts” is on, visible to the server and to the provider of your chat partners), the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted) and room and profile names (for example the family name). With your own server you decide who sees this information.",
+  "privacy3Body": "Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, public read receipts (who has read up to which message, and when; only when “Send read receipts” is on, visible to the server and to the provider of your chat partners), the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted), size and time of an avatar photo (the photo itself is end-to-end encrypted) and room and profile names (for example the family name). With your own server you decide who sees this information.",
   "privacy4Title": "Private events",
   "privacy4Body": "Private events are never sent to the family. Between your own devices they are synchronized through a private, encrypted room that only your account belongs to.",
   "privacy5Title": "Reminders and notifications",
@@ -906,7 +906,7 @@
     }
   },
   "privacy10Title": "Online status, read receipts, direct chats, shopping list, avatar",
-  "privacy10Body": "The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. The read receipt (“Read” under your messages) is a public read marker, visible to the server and to the provider of your chat partners (who has read up to which message, and when); it is on by default, and you can switch it off in the settings, then you only send private markers and do not see who has read either. Receipts already sent cannot be taken back. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. Your avatar is an exception: the choice of one of the twelve built-in avatars is kept as room state in the family room and is not end-to-end encrypted. The server and all family members see which symbol you chose; the choice stays in the room even if you are removed or your account is deleted. Otherwise the server only sees the metadata it always sees (see “What does the server see?”).",
+  "privacy10Body": "The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. The read receipt (“Read” under your messages) is a public read marker, visible to the server and to the provider of your chat partners (who has read up to which message, and when); it is on by default, and you can switch it off in the settings, then you only send private markers and do not see who has read either. Receipts already sent cannot be taken back. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. Your avatar is an exception: the choice of one of the twelve built-in avatars is kept as room state in the family room and is not end-to-end encrypted. Your own photo as an avatar, however, is end-to-end encrypted: all family members see it, the server only sees size and time. Moderators can take it out of the display. When you change or remove it, earlier copies are only redacted at the server on a best-effort basis; anyone who already received the photo keeps it, including members who have left. For children, parents or guardians should consent. The server and all family members see which symbol you chose; the choice stays in the room even if you are removed or your account is deleted. Otherwise the server only sees the metadata it always sees (see “What does the server see?”).",
   "onbFamilyFound": "Found family “{name}” – you are already a member. Finishing setup.",
   "@onbFamilyFound": {
     "placeholders": {
@@ -1142,7 +1142,7 @@
     }
   },
   "privacy12Title": "Task lists",
-  "privacy12Body": "Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. Birthdays and memorial days (name of the person and date, including third parties and deceased people) are likewise sent end-to-end encrypted in the family room. The server only sees the metadata it always sees (see “What does the server see?”), plus the choice of your avatar (room state, not end-to-end encrypted).",
+  "privacy12Body": "Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. Birthdays and memorial days (name of the person and date, including third parties and deceased people) are likewise sent end-to-end encrypted in the family room. The server only sees the metadata it always sees (see “What does the server see?”), plus the choice of your avatar (room state, not end-to-end encrypted). It does not see an avatar photo, only the size and time of the encrypted events.",
   "webUnlockTitleCreate": "Set up the browser vault",
   "webUnlockBodyCreate": "This browser stores your data encrypted. Choose a password for it. It is not stored anywhere and cannot be recovered; if you forget it, the only way out is to delete all local data and sign in again.",
   "webUnlockTitle": "Unlock FamilyNexus",
@@ -1792,7 +1792,7 @@
     }
   },
   "reportFamilyMembers": "Family members",
-  "reportOnlineNote": "Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), the choice of avatar (one value out of twelve, room state in plain text), time and size of events and the types of account data. Event counts are based on this device’s sync; the provider may hold older events as well.",
+  "reportOnlineNote": "Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), the choice of avatar (one value out of twelve, room state in plain text), time and size of an avatar photo (the photo itself is encrypted), time and size of events and the types of account data. Event counts are based on this device’s sync; the provider may hold older events as well.",
   "eventTypeMessage": "Messages",
   "eventTypeReaction": "Reactions",
   "eventTypeSharedEvent": "Events (shared)",
@@ -1816,7 +1816,7 @@
   "accountDelete": "Delete account",
   "accountDeleteHint": "Permanently delete your Matrix account at the provider",
   "accountDeleteTitle": "Delete account?",
-  "accountDeleteBody": "Your account {userId} will be permanently deleted at {server}. The user ID cannot be used again. Messages you sent remain visible to the other family members, and so does the choice of your avatar (one value out of twelve), which stays in the family room. Birthdays and memorial days you created remain for the family (shared family data, every member may change them). Afterwards all data on this device is deleted.",
+  "accountDeleteBody": "Your account {userId} will be permanently deleted at {server}. The user ID cannot be used again. Messages you sent remain visible to the other family members, and so does the choice of your avatar (one value out of twelve), which stays in the family room. An avatar photo stays encrypted in the room history, with the members who already have it; remove it beforehand if you do not want that. Birthdays and memorial days you created remain for the family (shared family data, every member may change them). Afterwards all data on this device is deleted.",
   "@accountDeleteBody": {
     "placeholders": {
       "userId": {"type": "String"},
@@ -2012,5 +2012,34 @@
   "serverStandardBody": "Public service, set up in a few minutes.",
   "serverOtherTitle": "Another provider or your own server",
   "serverOtherBody": "You have an account with another provider or run your own server.",
-  "errServerUnsupportedStep": "FamilyNexus does not support this provider. Please enter the address of another one."
+  "errServerUnsupportedStep": "FamilyNexus does not support this provider. Please enter the address of another one.",
+  "avatarPhotoSection": "Your photo",
+  "avatarPhotoChoose": "Choose photo",
+  "avatarPhotoChange": "Change photo",
+  "avatarPhotoRemove": "Remove photo",
+  "avatarPhotoRemoveConfirm": "Your photo disappears for all family members. Your chosen avatar or your initial appears again.",
+  "avatarPhotoNoticeTitle": "Photo as avatar",
+  "avatarPhotoNoticeBody": "All family members see this photo, also in the chat. It is end-to-end encrypted: the server only sees ciphertext plus size and time, not the picture. Moderators can take a photo out of the display. For children, parents or guardians should consent.",
+  "avatarPhotoNoticeConfirm": "Understood, continue",
+  "avatarPhotoCropTitle": "Choose the crop",
+  "avatarPhotoCropHint": "Move and zoom the picture until the crop fits. The photo is saved square and small; location data and camera data are not kept.",
+  "avatarPhotoPreparing": "Preparing the picture …",
+  "avatarPhotoSaved": "Photo saved",
+  "avatarPhotoRemoved": "Photo removed",
+  "avatarPhotoPending": "The photo is sent to the family as soon as there is a connection.",
+  "avatarPhotoErrFormat": "This format is not supported. Please choose JPEG, PNG or WebP.",
+  "avatarPhotoErrTooLarge": "The file is too large (at most 15 MiB).",
+  "avatarPhotoErrPixels": "The picture has too many pixels. Please choose a smaller picture.",
+  "avatarPhotoErrDecode": "The picture cannot be read.",
+  "avatarPhotoErrShrink": "The picture cannot be saved small enough. Please choose another one.",
+  "avatarPhotoErrClock": "This device’s clock is wrong. Please check date and time.",
+  "avatarPhotoWasReset": "A moderator reset your photo. You can choose a new photo.",
+  "familyResetPhoto": "Reset photo",
+  "familyResetPhotoTitle": "Reset the photo of {name}?",
+  "@familyResetPhotoTitle": {"placeholders": {"name": {"type": "String"}}},
+  "familyResetPhotoBody": "The photo is hidden for everyone. {name} can then choose a new photo.",
+  "@familyResetPhotoBody": {"placeholders": {"name": {"type": "String"}}},
+  "familyResetPhotoDone": "Photo reset",
+  "accountDeleteRemovePhoto": "Remove photo first",
+  "eventTypeAvatarPhoto": "Avatar photos"
 }

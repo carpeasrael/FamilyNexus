@@ -38,8 +38,8 @@ AvatarPhoto? _decode(Map<String, Object?> c, {String sender = _anna}) =>
     AvatarPhotoCodec.decode(c, sender: sender, now: _now);
 
 void main() {
-  test('Die Sperre ist in diesem Teil-PR aus', () {
-    expect(AvatarPhotoFlags.enabled, isFalse);
+  test('Die Sperre ist mit Teil 3 aufgehoben (Format, Sync, Oberfläche, Moderation und Texte sind vollständig)', () {
+    expect(AvatarPhotoFlags.enabled, isTrue);
   });
 
   group('AvatarPhotoCodec', () {

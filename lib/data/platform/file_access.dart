@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../core/app_log.dart';
 import '../../domain/attachment_policy.dart';
+import '../../domain/avatar_photo_processing.dart';
 
 class PickedFile {
   const PickedFile({required this.name, required this.bytes});
@@ -16,6 +17,11 @@ abstract class FileAccess {
   /// `null` = abgebrochen. Wirft [FileTooLargeException] vor dem Einlesen, wenn
   /// die Datei das Limit überschreitet.
   Future<PickedFile?> pickFile();
+
+  /// Wählt ein Bild für das Avatar-Foto (#434): Fotobibliothek bzw. Bilddialog des Systems. `null` = abgebrochen. Wirft
+  /// [FileTooLargeException] vor dem Einlesen, wenn die Datei größer als [AvatarPhotoProcessing.maxInputBytes] ist. Das Format
+  /// prüft erst die Bildaufbereitung.
+  Future<PickedFile?> pickImage();
 
   /// `true` = gespeichert, `false` = im Dialog abgebrochen.
   Future<bool> saveFile({required String name, required Uint8List bytes, required String mimeType});
@@ -52,6 +58,15 @@ class SystemFileAccess implements FileAccess {
         // Browser: kein Dateipfad, `lengthSync` steht dort nicht zur Verfügung.
         final size = kIsWeb ? await file.length() : (file.lengthSync() ?? await file.length());
         if (size == null || size > AttachmentPolicy.maxBytes) throw const FileTooLargeException();
+        return PickedFile(name: file.name, bytes: await file.readAsBytes());
+      });
+
+  @override
+  Future<PickedFile?> pickImage() => _guarded(() async {
+        final file = await FilePicker.pickFile(type: FileType.image);
+        if (file == null) return null;
+        final size = kIsWeb ? await file.length() : (file.lengthSync() ?? await file.length());
+        if (size == null || size > AvatarPhotoProcessing.maxInputBytes) throw const FileTooLargeException();
         return PickedFile(name: file.name, bytes: await file.readAsBytes());
       });
 

@@ -53,6 +53,7 @@ teilen oder die dein Anbieter zur Synchronisierung bereitstellt.
 | Kalender-Themen (frei gewählter Name bis 30 Zeichen, Farbe) | Termine einem Thema zuordnen und farbig anzeigen. Themen werden wie Termine Ende-zu-Ende-verschlüsselt an die Familie gesendet. |
 | Geburts- und Gedenktage (frei gewählter Name bis 60 Zeichen, Geburts- und Todesdatum, jeweils mit oder ohne Jahr; auch von Dritten und Verstorbenen) | Geburts- und Gedenktage der Familie im Kalender und auf „Heute“ anzeigen, mit Alter in Jahren. Die Einträge werden wie Termine Ende-zu-Ende-verschlüsselt an die Familie gesendet. Die Vorlaufzeit der Anzeige ist eine lokale Einstellung. |
 | Wahl eines der zwölf eingebauten Avatare (nur die Kennung, kein Bild, kein Text) | Den Avatar bei anderen Familienmitgliedern anzeigen, auch im Chat. Die Wahl liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. |
+| Avatar-Foto (optional; quadratisch zugeschnitten, klein, ohne Ortsangaben und Kameradaten) | Das Foto bei anderen Familienmitgliedern anzeigen, auch im Chat. Es liegt Ende-zu-Ende-verschlüsselt als Ereignis im Familienraum; der Anbieter sieht nur Größe und Zeitpunkt. Moderatoren können es aus der Anzeige nehmen. Bei Kindern sollten Sorgeberechtigte einwilligen. |
 | Sprache, Darstellung, Erinnerungs-, Meldungs- und Sicherheitseinstellungen, lokal blockierte Konten, vorgemerkte Einladungen und, nur wenn „Letztes Gespräch wieder öffnen“ eingeschaltet ist, die Kennung des zuletzt geöffneten Gesprächs | App konfigurieren und begonnene Abläufe fortsetzen. |
 | IP-Adresse, Verbindungszeitpunkte, Konto-, Raum- und Gerätekennungen sowie technische Übertragungsdaten | Verbindung, Zustellung und Betrieb beim jeweils angesprochenen Server; dessen Protokollierung richtet sich nach seinen Datenschutzhinweisen. |
 
@@ -121,7 +122,9 @@ verschlüsselter Ereignisse verarbeiten. Dazu gehören öffentliche Lesebestäti
 Kontoverwaltung sind nicht wie Nachrichteninhalte Ende-zu-Ende-verschlüsselt. Dazu
 gehört die Wahl deines Avatars (eines der zwölf eingebauten Avatare): Sie liegt als
 Raumzustand im Familienraum, ist ausdrücklich nicht Ende-zu-Ende-verschlüsselt und
-für den Anbieter sowie alle Familienmitglieder sichtbar.
+für den Anbieter sowie alle Familienmitglieder sichtbar. Ein eigenes Foto als Avatar ist
+dagegen Ende-zu-Ende-verschlüsselt; der Anbieter sieht nur Größe und Zeitpunkt der
+Ereignisse.
 
 Bei serverübergreifender Kommunikation können über die Matrix-Föderation auch
 Homeserver anderer beteiligter Konten verschlüsselte Ereignisse und die für die
@@ -346,8 +349,12 @@ gelöscht oder weiter aufbewahrt werden, richtet sich nach dem Anbieter und
 gegebenenfalls bestehenden gesetzlichen Pflichten. Die Wahl deines Avatars (ein Wert
 aus zwölf) bleibt auch nach dem Entfernen aus der Familie oder der Kontolöschung als
 Raumzustand im Familienraum stehen; die App blendet sie für Personen aus, die nicht
-mehr Mitglied sind. Geburts- und Gedenktage, die du angelegt hast, bleiben für die
-Familie bestehen (gemeinsame Familiendaten, jedes Mitglied darf sie ändern).
+mehr Mitglied sind. Ein Avatar-Foto bleibt verschlüsselt im Raumverlauf, bei den Mitgliedern,
+die es schon haben; es lässt sich vorher in der App entfernen („Foto zuerst entfernen“). Beim
+Ändern oder Entfernen werden frühere Kopien beim Anbieter nur nach bestem Bemühen geschwärzt;
+wer das Foto schon erhalten hat, behält es, auch ausgetretene Mitglieder. Geburts- und
+Gedenktage, die du angelegt hast, bleiben für die Familie bestehen (gemeinsame Familiendaten,
+jedes Mitglied darf sie ändern).
 
 **Verbleibende Kopien:** Weder lokale Löschung noch Kontolöschung garantieren die
 Entfernung bereits zugestellter Inhalte auf Geräten anderer Personen, föderierten

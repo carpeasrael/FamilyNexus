@@ -229,6 +229,15 @@ class _MemberTile extends StatelessWidget {
                     if (await _confirm(context, l.familyMemberRemove, l.familyMemberRemoveConfirm(m.displayName), l.familyMemberRemove) && context.mounted) {
                       await _act(context, () => gateway.removeMember(m.userId), success: l.familyDone);
                     }
+                  case 'resetphoto':
+                    if (await _confirm(context, l.familyResetPhotoTitle(m.displayName), l.familyResetPhotoBody(m.displayName), l.familyResetPhoto) && context.mounted) {
+                      await _act(context, () async {
+                        final calendar = services.calendar;
+                        await calendar!.avatarPhotos!.reset(m.userId);
+                        calendar.avatarPhotoImages?.invalidate();
+                        calendar.avatarPhotoSync?.kick();
+                      }, success: l.familyResetPhotoDone);
+                    }
                   case 'block':
                     await ModerationActions.block(context, services, userId: m.userId, name: m.displayName);
                   case 'unblock':
@@ -246,6 +255,8 @@ class _MemberTile extends StatelessWidget {
                 if (canAccept) PopupMenuItem<String>(value: 'accept', child: Text(l.identityAccept)),
                 if (canPromote) PopupMenuItem<String>(value: 'promote', child: Text(l.familyMemberPromote)),
                 if (canRemove) PopupMenuItem<String>(value: 'remove', child: Text(l.familyMemberRemove)),
+                // Foto zurücksetzen (#434): nur Moderatoren, nur wenn das Foto des Mitglieds gerade sichtbar ist.
+                if (canVerify && _canResetPhoto(services)) PopupMenuItem<String>(value: 'resetphoto', child: Text(l.familyResetPhoto)),
                 if (canVerify)
                   PopupMenuItem<String>(
                     value: blocked ? 'unblock' : 'block',
@@ -260,6 +271,15 @@ class _MemberTile extends StatelessWidget {
 }
 
 extension on _MemberTile {
+  /// Ob der Eintrag „Foto zurücksetzen“ angeboten wird: ich bin Moderator, die Funktion ist freigegeben und das
+  /// Mitglied hat ein sichtbares Foto im Zwischenspeicher.
+  bool _canResetPhoto(AppServices services) {
+    final calendar = services.calendar;
+    final sync = calendar?.avatarPhotoSync;
+    if (sync == null || !sync.enabled || calendar?.avatarPhotos == null) return false;
+    return Permissions.isModerator(family) && calendar?.avatarPhotoImages?.imageOf(member.userId) != null;
+  }
+
   /// Eröffnet den Einzelchat und wechselt zum Chat.
   Future<void> _writeTo(BuildContext context) async {
     final services = AppScope.read(context);

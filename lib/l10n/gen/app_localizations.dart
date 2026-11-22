@@ -575,7 +575,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverMetadataNote.
   ///
   /// In de, this message translates to:
-  /// **'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt, die Wahl deines Avatars (eines von zwölf Symbolen, als Raumzustand nicht Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.'**
+  /// **'Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt, die Wahl deines Avatars (eines von zwölf Symbolen, als Raumzustand nicht Ende-zu-Ende-verschlüsselt), Größe und Zeitpunkt eines Avatar-Fotos (das Foto selbst ist verschlüsselt) sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.'**
   String get serverMetadataNote;
 
   /// No description provided for @onbTitleAccount.
@@ -2291,7 +2291,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy2Body.
   ///
   /// In de, this message translates to:
-  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Geburts- und Gedenktage (Name und Datum, auch von Dritten und Verstorbenen), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare), den Lesestand der Mitglieder (bis zu welcher Nachricht jemand gelesen hat), das zuletzt geöffnete Gespräch (nur wenn eingeschaltet) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.'**
+  /// **'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Geburts- und Gedenktage (Name und Datum, auch von Dritten und Verstorbenen), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und, wenn gesetzt, ihr Avatar-Foto (quadratisch zugeschnitten und klein, verschlüsselt im Familienraum), den Lesestand der Mitglieder (bis zu welcher Nachricht jemand gelesen hat), das zuletzt geöffnete Gespräch (nur wenn eingeschaltet) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ({cipher}) auf deinem Gerät. Der Schlüssel dafür liegt hier: {keyStore} – nicht in der Datenbankdatei.'**
   String privacy2Body(String keyStore, String cipher);
 
   /// No description provided for @privacy3Title.
@@ -2303,7 +2303,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy3Body.
   ///
   /// In de, this message translates to:
-  /// **'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, öffentliche Lesebestätigungen (wer bis zu welcher Nachricht und wann gelesen hat; nur wenn „Lesebestätigung senden“ eingeschaltet ist, sie sind für den Server und den Anbieter deiner Gesprächspartner sichtbar), die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.'**
+  /// **'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, öffentliche Lesebestätigungen (wer bis zu welcher Nachricht und wann gelesen hat; nur wenn „Lesebestätigung senden“ eingeschaltet ist, sie sind für den Server und den Anbieter deiner Gesprächspartner sichtbar), die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt), Größe und Zeitpunkt eines Avatar-Fotos (das Foto selbst ist Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.'**
   String get privacy3Body;
 
   /// No description provided for @privacy4Title.
@@ -2879,7 +2879,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy10Body.
   ///
   /// In de, this message translates to:
-  /// **'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Die Lesebestätigung („Gelesen“ unter deinen Nachrichten) ist als öffentlicher Lesemarker für den Server und den Anbieter deiner Gesprächspartner sichtbar (wer hat bis zu welcher Nachricht und wann gelesen); sie ist standardmäßig an, du kannst sie in den Einstellungen ausschalten, dann sendest du nur private Marker und siehst auch nicht, wer gelesen hat. Bereits gesendete Bestätigungen lassen sich nicht zurücknehmen. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Dein Avatar ist eine Ausnahme: Die Wahl eines der zwölf eingebauten Avatare liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. Der Server und alle Familienmitglieder sehen, welches Symbol du gewählt hast; die Wahl bleibt im Raum stehen, auch wenn du entfernt wirst oder dein Konto gelöscht wird. Der Server sieht sonst nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).'**
+  /// **'Der Online-Status („online“ oder „offline“ mit Zeitpunkt) wird nur als Ende-zu-Ende-verschlüsselte Gerätenachricht an Geräte beigetretener Familienmitglieder gesendet und nie gespeichert; du kannst ihn in den Einstellungen ausschalten. Die Lesebestätigung („Gelesen“ unter deinen Nachrichten) ist als öffentlicher Lesemarker für den Server und den Anbieter deiner Gesprächspartner sichtbar (wer hat bis zu welcher Nachricht und wann gelesen); sie ist standardmäßig an, du kannst sie in den Einstellungen ausschalten, dann sendest du nur private Marker und siehst auch nicht, wer gelesen hat. Bereits gesendete Bestätigungen lassen sich nicht zurücknehmen. Einzelchats sind verschlüsselte Räume zwischen zwei Familienmitgliedern. Der Einkaufszettel wird wie geteilte Termine verschlüsselt im Familienraum übertragen und liegt verschlüsselt auf deinem Gerät; alle Familienmitglieder können ihn ändern. Dein Avatar ist eine Ausnahme: Die Wahl eines der zwölf eingebauten Avatare liegt als Raumzustand im Familienraum und ist nicht Ende-zu-Ende-verschlüsselt. Ein eigenes Foto als Avatar ist dagegen Ende-zu-Ende-verschlüsselt: Alle Familienmitglieder sehen es, der Server nur Größe und Zeitpunkt. Moderatoren können es aus der Anzeige nehmen. Beim Ändern oder Entfernen werden frühere Kopien nur nach bestem Bemühen beim Server geschwärzt; wer das Foto schon erhalten hat, behält es, auch ausgetretene Mitglieder. Bei Kindern sollten Sorgeberechtigte einwilligen. Der Server und alle Familienmitglieder sehen, welches Symbol du gewählt hast; die Wahl bleibt im Raum stehen, auch wenn du entfernt wirst oder dein Konto gelöscht wird. Der Server sieht sonst nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“).'**
   String get privacy10Body;
 
   /// No description provided for @onbFamilyFound.
@@ -3365,7 +3365,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacy12Body.
   ///
   /// In de, this message translates to:
-  /// **'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Ebenso werden Geburts- und Gedenktage (Name der Person und Datum, auch von Dritten und Verstorbenen) Ende-zu-Ende-verschlüsselt im Familienraum übertragen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“), dazu die Wahl deines Avatars (Raumzustand, nicht Ende-zu-Ende-verschlüsselt).'**
+  /// **'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Ebenso werden Geburts- und Gedenktage (Name der Person und Datum, auch von Dritten und Verstorbenen) Ende-zu-Ende-verschlüsselt im Familienraum übertragen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“), dazu die Wahl deines Avatars (Raumzustand, nicht Ende-zu-Ende-verschlüsselt). Ein Avatar-Foto sieht er nicht, nur Größe und Zeitpunkt der verschlüsselten Ereignisse.'**
   String get privacy12Body;
 
   /// No description provided for @webUnlockTitleCreate.
@@ -5135,7 +5135,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportOnlineNote.
   ///
   /// In de, this message translates to:
-  /// **'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), die Wahl des Avatars (ein Wert aus zwölf, Raumzustand im Klartext), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.'**
+  /// **'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), die Wahl des Avatars (ein Wert aus zwölf, Raumzustand im Klartext), Zeitpunkt und Größe eines Avatar-Fotos (das Foto selbst ist verschlüsselt), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.'**
   String get reportOnlineNote;
 
   /// No description provided for @eventTypeMessage.
@@ -5249,7 +5249,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountDeleteBody.
   ///
   /// In de, this message translates to:
-  /// **'Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar, ebenso die Wahl deines Avatars (ein Wert aus zwölf), die im Familienraum stehen bleibt. Geburts- und Gedenktage, die du angelegt hast, bleiben für die Familie bestehen (gemeinsame Familiendaten, jedes Mitglied darf sie ändern). Anschließend werden alle Daten auf diesem Gerät gelöscht.'**
+  /// **'Dein Konto {userId} wird bei {server} dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar, ebenso die Wahl deines Avatars (ein Wert aus zwölf), die im Familienraum stehen bleibt. Ein Avatar-Foto bleibt verschlüsselt im Raumverlauf, bei den Mitgliedern, die es schon haben; entferne es vorher, wenn du das nicht möchtest. Geburts- und Gedenktage, die du angelegt hast, bleiben für die Familie bestehen (gemeinsame Familiendaten, jedes Mitglied darf sie ändern). Anschließend werden alle Daten auf diesem Gerät gelöscht.'**
   String accountDeleteBody(String userId, String server);
 
   /// No description provided for @accountDeleteSoleModerator.
@@ -6001,6 +6001,168 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Dieser Anbieter wird von FamilyNexus nicht unterstützt. Bitte gib die Adresse eines anderen ein.'**
   String get errServerUnsupportedStep;
+
+  /// No description provided for @avatarPhotoSection.
+  ///
+  /// In de, this message translates to:
+  /// **'Eigenes Foto'**
+  String get avatarPhotoSection;
+
+  /// No description provided for @avatarPhotoChoose.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto wählen'**
+  String get avatarPhotoChoose;
+
+  /// No description provided for @avatarPhotoChange.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto ändern'**
+  String get avatarPhotoChange;
+
+  /// No description provided for @avatarPhotoRemove.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto entfernen'**
+  String get avatarPhotoRemove;
+
+  /// No description provided for @avatarPhotoRemoveConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Foto verschwindet für alle Familienmitglieder. Danach erscheint wieder dein gewählter Avatar oder dein Anfangsbuchstabe.'**
+  String get avatarPhotoRemoveConfirm;
+
+  /// No description provided for @avatarPhotoNoticeTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto als Avatar'**
+  String get avatarPhotoNoticeTitle;
+
+  /// No description provided for @avatarPhotoNoticeBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Familienmitglieder sehen dieses Foto, auch im Chat. Es ist Ende-zu-Ende-verschlüsselt: Der Server sieht nur Chiffretext sowie Größe und Zeitpunkt, nicht das Bild. Moderatoren können ein Foto aus der Anzeige nehmen. Bei Kindern sollten Sorgeberechtigte einwilligen.'**
+  String get avatarPhotoNoticeBody;
+
+  /// No description provided for @avatarPhotoNoticeConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Verstanden, weiter'**
+  String get avatarPhotoNoticeConfirm;
+
+  /// No description provided for @avatarPhotoCropTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Ausschnitt wählen'**
+  String get avatarPhotoCropTitle;
+
+  /// No description provided for @avatarPhotoCropHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Verschiebe und zoome das Bild, bis der Ausschnitt passt. Das Foto wird quadratisch und klein gespeichert; Ortsangaben und Kameradaten werden nicht übernommen.'**
+  String get avatarPhotoCropHint;
+
+  /// No description provided for @avatarPhotoPreparing.
+  ///
+  /// In de, this message translates to:
+  /// **'Bild wird vorbereitet …'**
+  String get avatarPhotoPreparing;
+
+  /// No description provided for @avatarPhotoSaved.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto gespeichert'**
+  String get avatarPhotoSaved;
+
+  /// No description provided for @avatarPhotoRemoved.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto entfernt'**
+  String get avatarPhotoRemoved;
+
+  /// No description provided for @avatarPhotoPending.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Foto wird an die Familie gesendet, sobald eine Verbindung besteht.'**
+  String get avatarPhotoPending;
+
+  /// No description provided for @avatarPhotoErrFormat.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieses Format wird nicht unterstützt. Bitte JPEG, PNG oder WebP wählen.'**
+  String get avatarPhotoErrFormat;
+
+  /// No description provided for @avatarPhotoErrTooLarge.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Datei ist zu groß (höchstens 15 MiB).'**
+  String get avatarPhotoErrTooLarge;
+
+  /// No description provided for @avatarPhotoErrPixels.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Bild hat zu viele Pixel. Bitte ein kleineres Bild wählen.'**
+  String get avatarPhotoErrPixels;
+
+  /// No description provided for @avatarPhotoErrDecode.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Bild lässt sich nicht lesen.'**
+  String get avatarPhotoErrDecode;
+
+  /// No description provided for @avatarPhotoErrShrink.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Bild lässt sich nicht klein genug speichern. Bitte ein anderes wählen.'**
+  String get avatarPhotoErrShrink;
+
+  /// No description provided for @avatarPhotoErrClock.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Uhr dieses Geräts geht falsch. Bitte Datum und Uhrzeit prüfen.'**
+  String get avatarPhotoErrClock;
+
+  /// No description provided for @avatarPhotoWasReset.
+  ///
+  /// In de, this message translates to:
+  /// **'Dein Foto wurde von einem Moderator zurückgesetzt. Du kannst ein neues Foto wählen.'**
+  String get avatarPhotoWasReset;
+
+  /// No description provided for @familyResetPhoto.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto zurücksetzen'**
+  String get familyResetPhoto;
+
+  /// No description provided for @familyResetPhotoTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto von {name} zurücksetzen?'**
+  String familyResetPhotoTitle(String name);
+
+  /// No description provided for @familyResetPhotoBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Foto wird für alle ausgeblendet. {name} kann danach ein neues Foto wählen.'**
+  String familyResetPhotoBody(String name);
+
+  /// No description provided for @familyResetPhotoDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto zurückgesetzt'**
+  String get familyResetPhotoDone;
+
+  /// No description provided for @accountDeleteRemovePhoto.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto zuerst entfernen'**
+  String get accountDeleteRemovePhoto;
+
+  /// No description provided for @eventTypeAvatarPhoto.
+  ///
+  /// In de, this message translates to:
+  /// **'Avatar-Fotos'**
+  String get eventTypeAvatarPhoto;
 }
 
 class _AppLocalizationsDelegate

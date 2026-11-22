@@ -9,15 +9,27 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
+import 'avatar_photo_crop_screen.dart';
+import 'avatar_photo_section.dart';
 import 'avatar_presets_ui.dart';
 import 'member_avatar_view.dart';
 
 /// Eigenen Avatar wählen (#422, E-101): zwölf eingebaute Avatare oder die Initialen. Kein optimistischer Wert: nach
 /// dem Speichern gilt die Wahl als „wird übernommen“, bis `avatarOf(ich)` sie meldet, längstens [pendingLimit].
 class AvatarScreen extends StatefulWidget {
-  const AvatarScreen({super.key, required this.services, this.pendingLimit = const Duration(seconds: 15)});
+  const AvatarScreen({
+    super.key,
+    required this.services,
+    this.pendingLimit = const Duration(seconds: 15),
+    this.photoPreview = defaultAvatarPreview,
+    this.photoPrepare = defaultAvatarPrepare,
+  });
 
   final AppServices services;
+
+  /// Vorschau und Aufbereitung des Foto-Zuschnitts (#434); Tests setzen direkte Fassungen ohne Isolate.
+  final AvatarPreviewBuilder photoPreview;
+  final AvatarPhotoPreparer photoPrepare;
 
   /// Nur die Anzeigefrist von „wird übernommen“; danach zeigt der Bildschirm den tatsächlichen Stand.
   final Duration pendingLimit;
@@ -147,11 +159,18 @@ class _AvatarScreenState extends State<AvatarScreen> {
                 Expanded(child: Text(l.avatarNeedsModerator)),
               ]),
             ),
+            AvatarPhotoSection(services: widget.services, preview: widget.photoPreview, prepare: widget.photoPrepare),
           ]),
         AvatarAvailability.settable => ListView(padding: const EdgeInsets.all(16), children: <Widget>[
             GlassCard(
               child: Row(children: <Widget>[
-                AvatarFace(preset: selected, letter: letter, size: 64, colorIndex: colorIndex),
+                AvatarFace(
+                  preset: selected,
+                  photo: widget.services.calendar?.avatarPhotoImages?.imageOf(_me),
+                  letter: letter,
+                  size: 64,
+                  colorIndex: colorIndex,
+                ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
@@ -162,6 +181,7 @@ class _AvatarScreenState extends State<AvatarScreen> {
                 ),
               ]),
             ),
+            AvatarPhotoSection(services: widget.services, preview: widget.photoPreview, prepare: widget.photoPrepare),
             const SizedBox(height: 16),
             Wrap(spacing: 8, runSpacing: 8, children: <Widget>[
               _Choice(

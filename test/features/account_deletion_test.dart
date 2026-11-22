@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/fake_browser.dart';
 import '../support/fake_matrix.dart';
+import '../support/memory_avatar_photo_store.dart';
 import '../support/nav.dart';
 import '../support/test_app.dart';
 
@@ -40,6 +41,46 @@ Future<TestApp> _oauthApp() async {
 }
 
 void main() {
+  group('Avatar-Foto vor der Kontolöschung (#434, E-73, E-111)', () {
+    testWidgets('der Dialog nennt das Foto und bietet „Foto zuerst entfernen“; der Weg öffnet den Avatar-Bildschirm', (tester) async {
+      _tallView(tester);
+      final app = await buildTestApp(lang: 'de', avatarPhotoItems: MemoryAvatarPhotoStore());
+      await app.services.openCalendar();
+      addTearDown(app.services.closeCalendar);
+      await tester.pumpWidget(FamilyNexusApp(services: app.services));
+      await tester.pumpAndSettle();
+      await _openDeletion(tester);
+      expect(find.textContaining('Ein Avatar-Foto bleibt verschlüsselt im Raumverlauf'), findsOneWidget);
+      expect(find.textContaining('entferne es vorher'), findsOneWidget);
+      final remove = find.byKey(const ValueKey<String>('account-delete-remove-photo'));
+      expect(remove, findsOneWidget);
+      expect(find.text('Foto zuerst entfernen'), findsOneWidget);
+      await tester.tap(remove);
+      await tester.pumpAndSettle();
+      expect(find.text('Eigenes Foto'), findsOneWidget, reason: 'der Foto-Abschnitt im Avatar-Bildschirm');
+      expect(find.byKey(const ValueKey<String>('avatar-photo-choose')), findsOneWidget);
+    });
+
+    testWidgets('ohne Foto-Funktion (gesperrt oder ohne Ablage) gibt es den Weg nicht, der Text nennt das Foto trotzdem', (tester) async {
+      _tallView(tester);
+      for (final locked in <bool>[true, false]) {
+        final app = await buildTestApp(
+          lang: 'de',
+          avatarPhotoItems: locked ? MemoryAvatarPhotoStore() : null,
+          avatarPhotosEnabled: !locked,
+        );
+        await app.services.openCalendar();
+        addTearDown(app.services.closeCalendar);
+        await tester.pumpWidget(FamilyNexusApp(services: app.services));
+        await tester.pumpAndSettle();
+        await _openDeletion(tester);
+        expect(find.byKey(const ValueKey<String>('account-delete-remove-photo')), findsNothing, reason: 'gesperrt=$locked');
+        expect(find.textContaining('Ein Avatar-Foto bleibt verschlüsselt'), findsOneWidget);
+        await tester.pumpWidget(const SizedBox());
+      }
+    });
+  });
+
   testWidgets('Konto löschen mit Passwort: falsches Passwort scheitert, danach Konto gelöscht und lokale Daten entfernt', (tester) async {
     _tallView(tester);
     final app = await buildTestApp(lang: 'de');

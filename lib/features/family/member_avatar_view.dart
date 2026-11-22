@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 
 import '../../app/app_services.dart';
@@ -47,16 +49,27 @@ class MemberAvatarView extends StatelessWidget {
   Widget build(BuildContext context) {
     final gateway = AppScope.maybeOf(context)?.gateway;
     if (gateway == null) return AvatarFace(preset: null, letter: _letterOf(fallbackName), size: size, colorIndex: colorIndex, online: online, ring: ring);
+    // Fotos (#434, E-111): der Zwischenspeicher gehört zum Kalender-Controller; ohne ihn bleibt es bei Avatar und Buchstabe.
+    final images = AppScope.maybeOf(context)?.calendar?.avatarPhotoImages;
     return ListenableBuilder(
-      listenable: gateway.avatarRevision,
+      listenable: Listenable.merge(<Listenable?>[gateway.avatarRevision, images]),
       builder: (context, _) {
         final family = gateway.family;
         final member = family?.member(userId);
         // Ohne Familie (noch nicht aufgebaut) ist der Beitrittsstatus unbekannt und gilt als beigetreten.
         final joined = family == null || member?.status == MemberStatus.joined;
         final preset = joined ? gateway.avatarOf(userId) : null;
+        final photo = joined ? images?.imageOf(userId) : null;
         final name = member?.displayName ?? '';
-        return AvatarFace(preset: preset, letter: name.isEmpty ? _letterOf(fallbackName) : _initial(name), size: size, colorIndex: colorIndex, online: online, ring: ring);
+        return AvatarFace(
+          preset: preset,
+          photo: photo,
+          letter: name.isEmpty ? _letterOf(fallbackName) : _initial(name),
+          size: size,
+          colorIndex: colorIndex,
+          online: online,
+          ring: ring,
+        );
       },
     );
   }
@@ -82,10 +95,13 @@ class AvatarFace extends StatelessWidget {
     required this.letter,
     required this.size,
     required this.colorIndex,
+    this.photo,
     this.online,
     this.ring = false,
   });
 
+  /// Eigenes Foto (#434): hat Vorrang vor [preset]; ohne Foto gilt der Rückfall Avatar, dann Buchstabe.
+  final ui.Image? photo;
   final String? preset;
   final String letter;
   final double size;
@@ -107,7 +123,17 @@ class AvatarFace extends StatelessWidget {
         border: ring ? Border.all(color: person, width: borderWidth) : null,
       ),
       child: Center(
-        child: style != null
+        child: photo != null
+            ? ClipOval(
+                child: RawImage(
+                  image: photo,
+                  width: ring ? size - 2 * borderWidth : size,
+                  height: ring ? size - 2 * borderWidth : size,
+                  fit: BoxFit.cover,
+                  filterQuality: FilterQuality.medium,
+                ),
+              )
+            : style != null
             ? Icon(style.icon, size: size * 0.6, color: fg)
             : (size >= MemberAvatarView.letterMinSize
                 ? Text(letter, style: TextStyle(color: fg, fontSize: size * 0.5, fontWeight: FontWeight.w600, height: 1))

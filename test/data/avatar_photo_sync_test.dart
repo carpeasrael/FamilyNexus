@@ -258,10 +258,10 @@ void main() {
     await off.sync.idle();
     expect(await off.store.photo(off.roomId, _ben), isNull, reason: 'es wird nichts verarbeitet');
     expect((await anna.service.visible(_ben)), isNotNull);
-    expect(AvatarPhotoFlags.enabled, isFalse, reason: 'Standard bleibt gesperrt');
+    expect(AvatarPhotoFlags.enabled, isTrue, reason: 'der Standard ist freigegeben, gesperrt wird ausdrücklich');
   });
 
-  test('Standardzustand: ohne enabled-Argument bleibt die Klasse inaktiv (Sperre aus)', () async {
+  test('Standardzustand: ohne enabled-Argument folgt die Klasse der Freigabe (Teil 3: aktiv)', () async {
     final room = anna.gateway.familyRoom!;
     server.addAccount('gina', 'pw7', displayName: 'Gina');
     server.addMember(room, '@gina:fake.test');
@@ -286,7 +286,7 @@ void main() {
     // Absichtlich ohne `enabled`: es gilt die Voreinstellung der Sperre.
     final sync = AvatarPhotoSync(gateway: gw, service: service, store: store);
     expect(sync.enabled, AvatarPhotoFlags.enabled);
-    expect(sync.enabled, isFalse);
+    expect(sync.enabled, isTrue);
     sync.start();
     await service.setOwn(jpegBytes());
     final before = gw.publishAttempts;
@@ -295,8 +295,8 @@ void main() {
     await ben.service.setOwn(jpegBytes());
     await ben.flush(others(ben));
     await sync.idle();
-    expect(gw.publishAttempts, before, reason: 'es wird nichts gesendet');
-    expect(await store.photo(room.id, _ben), isNull, reason: 'es wird nichts verarbeitet');
+    expect(gw.publishAttempts, greaterThan(before), reason: 'es wird gesendet');
+    expect((await store.photo(room.id, _ben))?.photo.owner, _ben, reason: 'es wird verarbeitet');
     sync.dispose();
     await db.close();
   });

@@ -4,12 +4,13 @@ import 'dart:typed_data';
 import 'jpeg_header.dart';
 import 'server.dart';
 
-/// Technische Sperre für eigene Fotos als Avatar (#434, E-111). Solange der Wert `false` ist, senden und
-/// verarbeiten Sync und Gateway keine Foto-Ereignisse, und die Oberfläche fehlt. Erst der letzte Teil-PR setzt ihn
-/// auf `true`; Tests übergeben den Wert über den Konstruktor.
+/// Technische Sperre für eigene Fotos als Avatar (#434, E-111). Solange der Wert `false` ist, senden und verarbeiten Sync
+/// und Gateway keine Foto-Ereignisse, und die Oberfläche fehlt. Er stand in den Teilen 1 und 2 auf `false`, damit ein
+/// Release dazwischen keine Fotos enthält, und ist seit Teil 3 (Oberfläche, Moderation, Texte) `true`. Tests übergeben den
+/// Wert über den Konstruktor.
 class AvatarPhotoFlags {
   const AvatarPhotoFlags._();
-  static const bool enabled = false;
+  static const bool enabled = true;
 }
 
 /// Grenzen des Foto-Formats (E-111).
