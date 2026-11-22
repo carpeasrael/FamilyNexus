@@ -85,6 +85,25 @@ extension on TestApp {
 AvatarPhoto _photo(String owner, {String id = '00000000-0000-4000-8000-0000000000a1', int createdAt = 1000}) =>
     AvatarPhoto(owner: owner, id: id, createdAt: createdAt, cleared: false, width: 64, height: 48, bytes: jpegBytes());
 
+/// Geöffnete Test-Apps; ihre Kalender-Controller haben Zeitgeber, die vor dem Ende des Tests enden müssen. Flutter 3.47
+/// (CI) prüft offene Zeitgeber vor `addTearDown`, deshalb räumt der Test selbst auf: erst den Widget-Baum entfernen, dann
+/// den Kalender schließen.
+final List<TestApp> _opened = <TestApp>[];
+
+void uiTest(String description, Future<void> Function(WidgetTester tester) body) {
+  testWidgets(description, (tester) async {
+    try {
+      await body(tester);
+    } finally {
+      await tester.pumpWidget(const SizedBox());
+      for (final app in _opened) {
+        app.services.closeCalendar();
+      }
+      _opened.clear();
+    }
+  });
+}
+
 void main() {
   late MemoryAvatarPhotoStore store;
   late _Prepare prepare;
@@ -97,7 +116,7 @@ void main() {
   Future<TestApp> app0({bool enabled = true, bool withStore = true}) async {
     final app = await buildTestApp(avatarPhotoItems: withStore ? store : null, avatarPhotosEnabled: enabled);
     await app.services.openCalendar();
-    addTearDown(app.services.closeCalendar);
+    _opened.add(app);
     return app;
   }
 
@@ -110,7 +129,7 @@ void main() {
   String room(TestApp app) => app.gateway.familyRoom!.id;
 
   group('Foto-Abschnitt im Avatar-Bildschirm', () {
-    testWidgets('gesperrt oder ohne Ablage erscheint kein Foto-Abschnitt', (tester) async {
+    uiTest('gesperrt oder ohne Ablage erscheint kein Foto-Abschnitt', (tester) async {
       bigView(tester);
       for (final (enabled, withStore) in <(bool, bool)>[(false, true), (true, false)]) {
         final app = await app0(enabled: enabled, withStore: withStore);
@@ -126,7 +145,7 @@ void main() {
       }
     });
 
-    testWidgets('freigegeben: „Foto wählen“ zeigt zuerst den Pflicht-Hinweis; Abbrechen ruft die Auswahl nie auf', (
+    uiTest('freigegeben: „Foto wählen“ zeigt zuerst den Pflicht-Hinweis; Abbrechen ruft die Auswahl nie auf', (
       tester,
     ) async {
       bigView(tester);
@@ -164,9 +183,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('Foto wählen, zuschneiden, speichern: das Foto wird gespeichert und über den Sync gesendet', (
-      tester,
-    ) async {
+    uiTest('Foto wählen, zuschneiden, speichern: das Foto wird gespeichert und über den Sync gesendet', (tester) async {
       bigView(tester);
       final app = await app0();
       await chooseAndSave(tester, app);
@@ -187,7 +204,7 @@ void main() {
       );
     });
 
-    testWidgets('ohne Verbindung bleibt das Foto ungesendet, der Hinweis erscheint', (tester) async {
+    uiTest('ohne Verbindung bleibt das Foto ungesendet, der Hinweis erscheint', (tester) async {
       bigView(tester);
       final app = await app0();
       app.gateway.failPublishes = true;
@@ -200,7 +217,7 @@ void main() {
       expect(app.server.log.where((e) => e.type == AvatarPhotoCodec.type), isEmpty);
     });
 
-    testWidgets('zu große Datei und abgebrochene Auswahl', (tester) async {
+    uiTest('zu große Datei und abgebrochene Auswahl', (tester) async {
       bigView(tester);
       final app = await app0();
       await tester.pumpWidget(_screen(app, prepare));
@@ -221,7 +238,7 @@ void main() {
       expect(await store.photos(room(app)), isEmpty);
     });
 
-    testWidgets('nicht unterstütztes Format (HEIC): Hinweis, zurück im Avatar-Bildschirm, nichts gespeichert', (
+    uiTest('nicht unterstütztes Format (HEIC): Hinweis, zurück im Avatar-Bildschirm, nichts gespeichert', (
       tester,
     ) async {
       bigView(tester);
@@ -255,7 +272,7 @@ void main() {
       expect(await store.photos(room(app)), isEmpty);
     });
 
-    testWidgets('Entfernen: Rückfrage, dann Löschmarke; ohne Bestätigung bleibt das Foto', (tester) async {
+    uiTest('Entfernen: Rückfrage, dann Löschmarke; ohne Bestätigung bleibt das Foto', (tester) async {
       bigView(tester);
       final app = await app0();
       await store.putPhoto(room(app), StoredAvatarPhoto(photo: _photo(_anna), published: true, eventId: r'$e1'));
@@ -288,7 +305,7 @@ void main() {
       expect(find.text('Foto entfernt'), findsOneWidget);
     });
 
-    testWidgets('ist das eigene Foto zurückgesetzt, steht der Hinweis da; ein neues Foto ist weiter möglich', (
+    uiTest('ist das eigene Foto zurückgesetzt, steht der Hinweis da; ein neues Foto ist weiter möglich', (
       tester,
     ) async {
       bigView(tester);
@@ -322,7 +339,7 @@ void main() {
       await tester.pumpAndSettle(); // die Ausblendung des Hinweises ist beendet, nichts liegt mehr über der Fläche
     }
 
-    testWidgets('Standard: die Mitte des Bildes, Zoom 1', (tester) async {
+    uiTest('Standard: die Mitte des Bildes, Zoom 1', (tester) async {
       bigView(tester);
       final app = await app0();
       await openCrop(tester, app);
@@ -334,7 +351,7 @@ void main() {
       expect(prepare.last!.centerY, closeTo(0.5, 0.01));
     });
 
-    testWidgets('Verschieben ändert den Ausschnitt', (tester) async {
+    uiTest('Verschieben ändert den Ausschnitt', (tester) async {
       bigView(tester);
       final app = await app0();
       await openCrop(tester, app);
@@ -347,7 +364,7 @@ void main() {
       expect(prepare.last!.zoom, 1);
     });
 
-    testWidgets('der Zoom-Regler ersetzt die Geste (Tastatur, Screenreader)', (tester) async {
+    uiTest('der Zoom-Regler ersetzt die Geste (Tastatur, Screenreader)', (tester) async {
       bigView(tester);
       final app = await app0();
       await openCrop(tester, app);
@@ -364,7 +381,7 @@ void main() {
       expect(r.x, inInclusiveRange(0, 400 - r.side));
     });
 
-    testWidgets('Abbrechen im Zuschnitt speichert nichts', (tester) async {
+    uiTest('Abbrechen im Zuschnitt speichert nichts', (tester) async {
       bigView(tester);
       final app = await app0();
       await openCrop(tester, app);
@@ -400,7 +417,7 @@ void main() {
       home: Scaffold(body: Center(child: child)),
     );
 
-    testWidgets('das Foto füllt den Kreis; mit Ring ist es um die Randbreite kleiner, damit der Ring sichtbar bleibt', (
+    uiTest('das Foto füllt den Kreis; mit Ring ist es um die Randbreite kleiner, damit der Ring sichtbar bleibt', (
       tester,
     ) async {
       final image = await tinyImage(tester);
@@ -413,7 +430,7 @@ void main() {
       expect(find.text('A'), findsNothing, reason: 'das Foto verdrängt den Buchstaben');
     });
 
-    testWidgets('das Foto hat Vorrang vor dem Avatar; ohne Foto gilt der Avatar, dann der Buchstabe', (tester) async {
+    uiTest('das Foto hat Vorrang vor dem Avatar; ohne Foto gilt der Avatar, dann der Buchstabe', (tester) async {
       final image = await tinyImage(tester);
       await tester.pumpWidget(host(AvatarFace(preset: 'p01', photo: image, letter: 'A', size: 48, colorIndex: 0)));
       expect(find.byType(RawImage), findsOneWidget);
@@ -427,7 +444,7 @@ void main() {
   });
 
   group('Foto nur für beigetretene Mitglieder', () {
-    testWidgets('eine Person, die nicht in der Familie steht, zeigt kein Foto, auch wenn eines in der Ablage liegt', (
+    uiTest('eine Person, die nicht in der Familie steht, zeigt kein Foto, auch wenn eines in der Ablage liegt', (
       tester,
     ) async {
       final app = await app0();
@@ -473,7 +490,7 @@ void main() {
 
     Finder avatarOf(String userId) => find.byKey(ValueKey<String>('avatar-$userId'));
 
-    testWidgets('ein Foto ersetzt den Avatar in der Mitgliederliste; ohne Foto bleibt der Rückfall', (tester) async {
+    uiTest('ein Foto ersetzt den Avatar in der Mitgliederliste; ohne Foto bleibt der Rückfall', (tester) async {
       final app = await app0();
       await joinBen(app);
       await store.putPhoto(room(app), StoredAvatarPhoto(photo: _photo(_ben), published: true));
@@ -496,7 +513,7 @@ void main() {
       );
     });
 
-    testWidgets('ein zurückgesetztes oder entferntes Foto wird nicht angezeigt', (tester) async {
+    uiTest('ein zurückgesetztes oder entferntes Foto wird nicht angezeigt', (tester) async {
       final app = await app0();
       await joinBen(app);
       final p = _photo(_ben);
@@ -507,7 +524,7 @@ void main() {
       expect(find.descendant(of: avatarOf(_ben), matching: find.byType(RawImage)), findsNothing);
     });
 
-    testWidgets('Moderator: „Foto zurücksetzen“ mit Rückfrage legt ein ungesendetes Zurücksetzen an', (tester) async {
+    uiTest('Moderator: „Foto zurücksetzen“ mit Rückfrage legt ein ungesendetes Zurücksetzen an', (tester) async {
       final app = await app0();
       await joinBen(app);
       final p = _photo(_ben);
@@ -541,7 +558,7 @@ void main() {
       );
     });
 
-    testWidgets('ein Mitglied ohne Moderatorrolle sieht „Foto zurücksetzen“ nie, auch wenn das Foto sichtbar ist', (
+    uiTest('ein Mitglied ohne Moderatorrolle sieht „Foto zurücksetzen“ nie, auch wenn das Foto sichtbar ist', (
       tester,
     ) async {
       final app = await app0();
@@ -562,9 +579,7 @@ void main() {
       expect(find.text('Verifizieren'), findsWidgets, reason: 'das Menü selbst ist offen (anderer Eintrag vorhanden)');
     });
 
-    testWidgets('ein Foto, das über den Sync eintrifft, erscheint ohne Neuaufbau der Seite in der Anzeige', (
-      tester,
-    ) async {
+    uiTest('ein Foto, das über den Sync eintrifft, erscheint ohne Neuaufbau der Seite in der Anzeige', (tester) async {
       final app = await app0();
       await joinBen(app);
       await openFamilyPage(tester, app);
@@ -593,14 +608,14 @@ void main() {
       );
     });
 
-    testWidgets('beim Schließen des Kalenders wird der Bilder-Zwischenspeicher freigegeben', (tester) async {
+    uiTest('beim Schließen des Kalenders wird der Bilder-Zwischenspeicher freigegeben', (tester) async {
       final app = await app0();
       final images = app.services.calendar!.avatarPhotoImages!;
       app.services.closeCalendar();
       expect(() => images.addListener(() {}), throwsFlutterError, reason: 'nach dispose nicht mehr benutzbar');
     });
 
-    testWidgets('kein Eintrag „Foto zurücksetzen“ ohne Foto, bei gesperrter Funktion und ohne Moderatorrolle', (
+    uiTest('kein Eintrag „Foto zurücksetzen“ ohne Foto, bei gesperrter Funktion und ohne Moderatorrolle', (
       tester,
     ) async {
       // Ohne Foto
