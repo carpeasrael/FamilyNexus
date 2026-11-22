@@ -25,8 +25,11 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
     final me = client.userID!;
     return <PendingInvitation>[
       for (final r in client.rooms)
-        // Einladungen in Einzelchats (is_direct) sind keine Familieneinladungen (E-39).
-        if (r.membership == Membership.invite && r.getState(EventTypes.RoomMember, me)?.content['is_direct'] != true)
+        // Einladungen in Einzelchats (is_direct) sind keine Familieneinladungen (E-39); Einladungen in Buch-Räume
+        // (Kassenbuch, E-113) ebenso nicht: Sie erscheinen hier nie, damit Annehmen den Familienzeiger nicht überschreibt.
+        if (r.membership == Membership.invite &&
+            r.getState(EventTypes.RoomMember, me)?.content['is_direct'] != true &&
+            !BookRoomMarker.isBook(r.getState(EventTypes.RoomCreate)?.content))
           PendingInvitation(
             roomId: r.id,
             roomName: TextSanitizer.clean(r.getLocalizedDisplayname(), max: FamilyRoomSpec.nameMax),
@@ -590,6 +593,10 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
     if (!MatrixIds.isRoomId(roomId)) throw const GatewayException(GatewayError.invalidInput);
     final room = client.getRoomById(roomId);
     if (room == null || room.membership != Membership.invite) throw const GatewayException(GatewayError.notFound);
+    // Tiefenverteidigung (E-113): Ein Raum, der sich als Buch kennzeichnet, wird nie zur Familie.
+    if (BookRoomMarker.isBook(room.getState(EventTypes.RoomCreate)?.content)) {
+      throw const GatewayException(GatewayError.notAllowed);
+    }
     final existing = _familyRoomAnyState();
     if (existing != null && existing.membership != Membership.leave && existing.membership != Membership.ban) {
       throw const GatewayException(GatewayError.alreadyExists);
@@ -609,6 +616,12 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
       }
       // Ein fremder Raum ohne Ende-zu-Ende-Verschlüsselung wird nie zur Familie (S5).
       final joinedRoom = client.getRoomById(roomId);
+      // Fail-safe (E-113): Enthielt die Einladung keinen `m.room.create` (Server ohne `room_prejoin_state`), zeigt sich
+      // das Buch-Kennzeichen erst jetzt: Raum verlassen, der Familienvermerk wird unten zurückgesetzt.
+      if (BookRoomMarker.isBook(joinedRoom?.getState(EventTypes.RoomCreate)?.content)) {
+        await joinedRoom?.leave();
+        throw const GatewayException(GatewayError.notAllowed);
+      }
       if (joinedRoom == null || !joinedRoom.encrypted || joinedRoom.getState(EventTypes.Encryption)?.content['algorithm'] != 'm.megolm.v1.aes-sha2') {
         await joinedRoom?.leave();
         throw const GatewayException(GatewayError.encryptionUnavailable);
