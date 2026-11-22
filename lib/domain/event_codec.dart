@@ -4,11 +4,14 @@ import 'server.dart';
 
 /// Ergebnis des Dekodierens eines fremden (nicht vertrauenswürdigen) Ereignisses.
 class DecodeResult {
-  const DecodeResult.ok(CalendarEvent this.event) : error = null;
-  const DecodeResult.failure(String this.error) : event = null;
+  const DecodeResult.ok(CalendarEvent this.event, {this.sender}) : error = null;
+  const DecodeResult.failure(String this.error) : event = null, sender = null;
 
   final CalendarEvent? event;
   final String? error;
+
+  /// Authentischer Absender des Matrix-Ereignisses (bei [EventCodec.decodeStored]: der gespeicherte Besitzer).
+  final String? sender;
   bool get isOk => event != null;
 }
 
@@ -49,7 +52,7 @@ class EventCodec {
   static Map<String, Object?> encodeStored(CalendarEvent e) => _encode(e);
 
   static DecodeResult decodeStored(Map<String, Object?> c, {required String owner, required EventVisibility visibility}) =>
-      decode(c, sender: owner, visibility: visibility);
+      decode(c, sender: owner, visibility: visibility, stored: true);
 
   static Map<String, Object?> _encode(CalendarEvent e) {
     final problems = e.validate();
@@ -81,6 +84,8 @@ class EventCodec {
       'updated_at': e.updatedAt.toIso8601String(),
       // Optional (E-99): nur gesetzt kodiert; ältere App-Versionen ignorieren den Schlüssel.
       if (e.themeId != null) 'theme': e.themeId,
+      // Optional (#431, E-112): nur gesetzt kodiert; Besitzerfassungen bleiben byte-gleich.
+      if (e.editorId != null) 'editor': e.editorId,
     };
   }
 
@@ -95,12 +100,20 @@ class EventCodec {
     Map<String, Object?> c, {
     required String sender,
     required EventVisibility visibility,
+    bool stored = false,
   }) {
     try {
       if (!MatrixIds.isUserId(sender)) return const DecodeResult.failure('sender');
       if (c['v'] != schema) return const DecodeResult.failure('schema');
       final owner = _str(c, 'owner');
-      if (owner != sender) return const DecodeResult.failure('owner-mismatch');
+      final editor = _optUserId(c, 'editor');
+      // Fremde Absender (#431, E-112): nur eine geteilte, nicht gelöschte Fassung, die der Absender als eigene Änderung
+      // ausweist. Ob er Moderator ist, prüft der Dienst (Rolle, Basis, Zeit); beim Lesen aus der eigenen Ablage nie.
+      final foreign = owner != sender;
+      if (foreign &&
+          (stored || editor != sender || visibility != EventVisibility.shared || c['deleted'] != false)) {
+        return const DecodeResult.failure('owner-mismatch');
+      }
       final rec = c['rec'];
       if (rec is! Map<String, Object?>) return const DecodeResult.failure('rec');
 
@@ -137,10 +150,11 @@ class EventCodec {
         attendees: _strList(c, 'attendees'),
         updatedAt: _date(c['updated_at']),
         themeId: _optId(c, 'theme'),
+        editorId: editor,
       );
       final problems = event.validate();
       if (problems.isNotEmpty) return DecodeResult.failure(problems.first);
-      return DecodeResult.ok(event);
+      return DecodeResult.ok(event, sender: sender);
     } on FormatException catch (e) {
       return DecodeResult.failure(e.message);
     }
@@ -197,6 +211,14 @@ class EventCodec {
     if (!m.containsKey(k)) return null;
     final v = m[k];
     if (v is! String || !CalendarEvent.isValidId(v)) throw FormatException(k);
+    return v;
+  }
+
+  /// Optionales Feld: fehlt es, ist es `null`; vorhanden muss es eine Matrix-ID sein.
+  static String? _optUserId(Map<String, Object?> m, String k) {
+    if (!m.containsKey(k)) return null;
+    final v = m[k];
+    if (v is! String || !MatrixIds.isUserId(v)) throw FormatException(k);
     return v;
   }
 
