@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../domain/account_deletion.dart';
 import '../../domain/anniversaries.dart';
 import '../../domain/avatar_photo.dart';
+import '../../domain/book_policy.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/chat.dart';
@@ -344,6 +345,39 @@ abstract class MatrixGateway implements Listenable {
   Future<void> acceptInvitation(String roomId);
 
   Future<void> declineInvitation(String roomId);
+
+  // ------------------------------------------------------ Kassenbücher (#311)
+
+  /// Beigetretene Bücher der aktuellen Familie. Leer, solange das Kassenbuch gesperrt ist (`CashBookFlags`).
+  List<BookRoomInfo> get books;
+
+  /// Annehmbare Buch-Einladungen (Einladender == Ersteller, Moderator der eigenen Familie). Leer, solange gesperrt.
+  List<BookInvitationInfo> get bookInvitations;
+
+  /// Legt ein Buch an (eigener verschlüsselter Raum, nur ich als Mitglied) und liefert die Raum-ID. Nur Moderatoren,
+  /// höchstens zehn Bücher je Familie. Wirft `notAllowed`, solange das Kassenbuch gesperrt ist.
+  Future<String> createBook();
+
+  /// Lädt einen beigetretenen Moderator der Familie in mein Buch ein. Nur der Ersteller; das Gateway prüft die Regeln
+  /// selbst ([BookPolicy.canInvite]).
+  Future<void> inviteToBook(String roomId, String userId);
+
+  /// Entfernt ein Mitglied aus meinem Buch (nur der Ersteller).
+  Future<void> removeFromBook(String roomId, String userId);
+
+  /// Verlässt ein Buch.
+  Future<void> leaveBook(String roomId);
+
+  Future<void> acceptBookInvitation(String roomId);
+  Future<void> declineBookInvitation(String roomId);
+
+  /// Sendeschutz: Wirft `notAllowed`, wenn im Buch-Raum ein Mitglied ist, das kein beigetretener Moderator der Familie
+  /// ist (Mitglieder werden frisch gelesen, nie aus einem Zwischenspeicher).
+  Future<void> verifyBookRecipients(String roomId);
+
+  /// Abgleich (nur Ersteller): Entfernt Mitglieder, die zweimal hintereinander nicht mehr berechtigt waren. Läuft nur
+  /// bei belastbarem Stand (erster Sync, Familie und Mitgliederliste geladen). Liefert die Entfernten.
+  Future<List<String>> reconcileBook(String roomId);
 
   // ------------------------------------------------------------ Kalender
 

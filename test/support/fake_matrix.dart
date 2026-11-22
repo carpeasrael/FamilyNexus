@@ -6,6 +6,7 @@ import 'package:family_nexus/domain/anniversaries.dart';
 import 'package:family_nexus/domain/anniversary_codec.dart';
 import 'package:family_nexus/domain/attachment_policy.dart';
 import 'package:family_nexus/domain/avatar_photo.dart';
+import 'package:family_nexus/domain/book_policy.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/chat.dart';
@@ -298,6 +299,39 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   FakeMatrixGateway(this.fake) {
     fake._register(this);
   }
+
+  // ------------------------------------------------------ Kassenbücher (#311)
+  // Der Fake kennt vorerst keine Buch-Räume (Teil 2c baut sie für den Sync aus): Das Kassenbuch ist gesperrt.
+
+  @override
+  List<BookRoomInfo> get books => const <BookRoomInfo>[];
+
+  @override
+  List<BookInvitationInfo> get bookInvitations => const <BookInvitationInfo>[];
+
+  @override
+  Future<String> createBook() => throw const GatewayException(GatewayError.notAllowed);
+
+  @override
+  Future<void> inviteToBook(String roomId, String userId) => throw const GatewayException(GatewayError.notAllowed);
+
+  @override
+  Future<void> removeFromBook(String roomId, String userId) => throw const GatewayException(GatewayError.notAllowed);
+
+  @override
+  Future<void> leaveBook(String roomId) => throw const GatewayException(GatewayError.notAllowed);
+
+  @override
+  Future<void> acceptBookInvitation(String roomId) => throw const GatewayException(GatewayError.notAllowed);
+
+  @override
+  Future<void> declineBookInvitation(String roomId) => throw const GatewayException(GatewayError.notAllowed);
+
+  @override
+  Future<void> verifyBookRecipients(String roomId) => throw const GatewayException(GatewayError.notAllowed);
+
+  @override
+  Future<List<String>> reconcileBook(String roomId) => throw const GatewayException(GatewayError.notAllowed);
 
   final FakeMatrixServer fake;
   String? _userId;
