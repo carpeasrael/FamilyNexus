@@ -9,6 +9,7 @@ import '../../domain/calendar_signal.dart';
 import '../../domain/conflict.dart';
 import '../../domain/event_codec.dart';
 import '../../domain/event_store.dart';
+import '../../domain/family.dart';
 import '../matrix/matrix_gateway.dart';
 import 'send_backoff.dart';
 
@@ -261,10 +262,29 @@ class CalendarSync {
 
   /// `false`, wenn ein Sendefehler oder ein Abbruch ([_canPublish]) den Durchlauf beendet hat.
   Future<bool> _publishEvents() async {
-    final pending = (await store.pendingPublish()).where((e) => e.ownerId == _me).toList()
+    // Eigene Termine und eigene Moderatorfassungen fremder Termine (E-112).
+    final pending = (await store.pendingPublish()).where((e) => e.ownerId == _me || e.editorId == _me).toList()
       ..sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
-    for (final e in pending) {
+    for (var e in pending) {
       if (!_canPublish) return false;
+      if (e.ownerId != _me) {
+        // Moderatorfassung: Ist die Rolle sicher `member` (herabgestuft), wird sie nicht gesendet und gilt als
+        // erledigt; bei unbekannter Familie oder Rolle bleibt sie in der Warteschlange.
+        final role = service.roleOf(_me);
+        if (role == Role.member) {
+          AppLog.w('sync', 'Moderatorfassung nicht gesendet (nicht mehr Moderator)');
+          await store.markPublished(e.id, e.version);
+          continue;
+        }
+        if (role == null) continue;
+        // Der Empfänger prüft `updatedAt` gegen die Serverzeit (±2 Tage): Eine lange liegen gebliebene Fassung wird
+        // vor dem Senden neu gestempelt (gleiche Version; sie wurde nie gesendet).
+        final now = _clock().toUtc();
+        if (now.difference(e.updatedAt) > const Duration(days: 1)) {
+          e = e.copyWith(updatedAt: now);
+          await store.put(e);
+        }
+      }
       try {
         if (e.isShared) {
           if (gateway.family == null) continue;

@@ -46,8 +46,14 @@ class CalendarService {
 
   bool isMine(CalendarEvent e) => e.ownerId == myUserId;
 
-  /// Rechte: Termine ändern/löschen darf nur der Besitzer (E-10).
-  bool canEdit(CalendarEvent e) => isMine(e) && !e.deleted;
+  /// Rechte (E-10, E-112): Ändern darf der Besitzer und ein Moderator (nur geteilte Termine, nie gelöschte).
+  /// Löschen und Sichtbarkeit wechseln darf nur der Besitzer ([canDelete], [canChangeVisibility]).
+  bool canEdit(CalendarEvent e) =>
+      !e.deleted && (isMine(e) || (e.isShared && roleOf(myUserId) == Role.moderator));
+
+  bool canDelete(CalendarEvent e) => isMine(e) && !e.deleted;
+
+  bool canChangeVisibility(CalendarEvent e) => isMine(e) && !e.deleted;
 
   /// Legt einen neuen eigenen Termin an. Bei [visibility] = geteilt wird er
   /// später veröffentlicht, bei privat nur in den eigenen privaten Raum.
@@ -128,6 +134,7 @@ class CalendarService {
   Future<CalendarEvent> _update(CalendarEvent edited) async {
     final current = await store.get(edited.id);
     if (current == null || !canEdit(current)) throw const CalendarException(CalendarError.notAllowed);
+    if (!isMine(current)) return _updateAsModerator(edited, current);
     final next = edited.copyWith(
       version: current.version + 1,
       updatedAt: _now,
@@ -142,12 +149,27 @@ class CalendarService {
     return next;
   }
 
+  /// Änderung eines fremden geteilten Termins durch einen Moderator (E-112): Besitzer, Kennung und Sichtbarkeit bleiben
+  /// die der gespeicherten Fassung, die Fassung trägt den Moderator als `editor`.
+  Future<CalendarEvent> _updateAsModerator(CalendarEvent edited, CalendarEvent current) async {
+    if (edited.ownerId != current.ownerId) throw const CalendarException(CalendarError.invalid);
+    final next = edited.copyWith(
+      version: current.version + 1,
+      updatedAt: _now,
+      visibility: current.visibility,
+      editorId: myUserId,
+    );
+    _check(next);
+    await store.put(next, replaced: current);
+    return next;
+  }
+
   Future<void> delete(String id) => _serial(() => _delete(id));
 
   Future<void> _delete(String id) async {
     final current = await store.get(id);
     if (current == null) throw const CalendarException(CalendarError.notFound);
-    if (!canEdit(current)) throw const CalendarException(CalendarError.notAllowed);
+    if (!canDelete(current)) throw const CalendarException(CalendarError.notAllowed);
     await store.put(current.tombstone(_now), replaced: current);
     await store.setReminders(id, null);
   }
@@ -163,7 +185,7 @@ class CalendarService {
   Future<CalendarEvent> _changeVisibility(String id, EventVisibility to) async {
     final current = await store.get(id);
     if (current == null) throw const CalendarException(CalendarError.notFound);
-    if (!canEdit(current)) throw const CalendarException(CalendarError.notAllowed);
+    if (!canChangeVisibility(current)) throw const CalendarException(CalendarError.notAllowed);
     if (current.visibility == to) return current;
     final reminders = (await store.reminders())[id];
     if (to == EventVisibility.shared) {

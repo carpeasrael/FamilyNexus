@@ -48,7 +48,17 @@ class Permissions {
   static bool canCompleteTask({required String assignee, required String me, required bool deleted}) =>
       !deleted && assignee == me;
 
-  /// Geteilte Termine ändern/löschen darf nur der Besitzer, auch kein Moderator (E-10).
-  static bool canEditEvent({required String ownerId, required String me, required bool deleted}) =>
+  /// Geteilte Termine ändern: der Besitzer und Moderatoren (E-112, kehrt E-10 für Bearbeiten um). Löschen und
+  /// Sichtbarkeit wechseln bleiben beim Besitzer ([canDeleteEvent]).
+  static bool canEditEvent({
+    required String ownerId,
+    required String me,
+    required bool deleted,
+    bool moderator = false,
+    bool shared = false,
+  }) =>
+      !deleted && (ownerId == me || (moderator && shared));
+
+  static bool canDeleteEvent({required String ownerId, required String me, required bool deleted}) =>
       !deleted && ownerId == me;
 }

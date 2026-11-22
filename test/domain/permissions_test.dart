@@ -51,10 +51,19 @@ void main() {
     });
   });
 
-  test('geteilte Termine: nur der Besitzer, auch nicht der Moderator (E-10)', () {
+  test('geteilte Termine ändern: Besitzer und Moderator (E-112, kehrt E-10 für Bearbeiten um), Mitglied nicht', () {
     expect(Permissions.canEditEvent(ownerId: '@a:x.org', me: '@a:x.org', deleted: false), isTrue);
-    expect(Permissions.canEditEvent(ownerId: '@a:x.org', me: '@mod:x.org', deleted: false), isFalse);
+    expect(Permissions.canEditEvent(ownerId: '@a:x.org', me: '@mod:x.org', deleted: false), isFalse, reason: 'Mitglied');
+    expect(Permissions.canEditEvent(ownerId: '@a:x.org', me: '@mod:x.org', deleted: false, moderator: true, shared: true), isTrue);
+    expect(Permissions.canEditEvent(ownerId: '@a:x.org', me: '@mod:x.org', deleted: false, moderator: true), isFalse, reason: 'privat');
     expect(Permissions.canEditEvent(ownerId: '@a:x.org', me: '@a:x.org', deleted: true), isFalse);
+    expect(Permissions.canEditEvent(ownerId: '@a:x.org', me: '@mod:x.org', deleted: true, moderator: true, shared: true), isFalse);
+  });
+
+  test('Löschen: nur der Besitzer, auch nicht der Moderator (E-10 bleibt, E-112)', () {
+    expect(Permissions.canDeleteEvent(ownerId: '@a:x.org', me: '@a:x.org', deleted: false), isTrue);
+    expect(Permissions.canDeleteEvent(ownerId: '@a:x.org', me: '@mod:x.org', deleted: false), isFalse);
+    expect(Permissions.canDeleteEvent(ownerId: '@a:x.org', me: '@a:x.org', deleted: true), isFalse);
   });
 
   test('unbekannter Nutzer gilt als Mitglied (keine Rechte)', () {
