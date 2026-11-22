@@ -54,7 +54,7 @@ void main() {
   tearDown(() => db.close());
 
   test('Migration v7 legt beide Tabellen an', () async {
-    expect(AppDatabase.schemaVersion, 7);
+    expect(AppDatabase.schemaVersion, 8);
     final rows = await db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'table'");
     expect(<String>{
       for (final r in rows) r['name']! as String,

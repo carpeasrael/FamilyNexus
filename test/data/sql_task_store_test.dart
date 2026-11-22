@@ -54,9 +54,9 @@ void main() {
 
   tearDown(() => db.close());
 
-  test('Migrationen legen die Tabellen an; schemaVersion ist 7', () async {
+  test('Migrationen legen die Tabellen an; schemaVersion ist 8', () async {
     // v5 (E-99) ergänzt die Tabelle der Kalender-Themen, v6 (E-104) die der Geburts- und Gedenktage, v7 (#434, E-111) die der Avatar-Fotos; die Version bleibt gleich der Zahl der Migrationen.
-    expect(AppDatabase.schemaVersion, 7);
+    expect(AppDatabase.schemaVersion, 8);
     expect(AppDatabase.schemaVersion, AppDatabase.migrations.length);
     final names = (await db.rawQuery("SELECT name FROM sqlite_master WHERE type = 'table'")).map((r) => r['name']).toSet();
     expect(names, containsAll(<String>['task_lists', 'task_log', 'event_themes', 'anniversaries']));
