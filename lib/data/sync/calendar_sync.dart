@@ -166,6 +166,9 @@ class CalendarSync {
           break; // gehört EventThemeSync (E-99)
         case AnniversarySignal():
           break; // gehört AnniversarySync (E-104)
+        case AvatarPhotoSignal():
+        case AvatarResetSignal():
+          break; // gehört AvatarPhotoSync (#434, E-111)
         case MemberJoinedSignal():
           // Zuverlässig: erneut zum Senden vormerken; die Warteschlange (mit Wiederholung)
           // erledigt den Rest, auch nach Neustart.
