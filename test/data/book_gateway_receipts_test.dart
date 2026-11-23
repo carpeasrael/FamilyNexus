@@ -149,6 +149,8 @@ class _Hs {
   bool eventFetchFails = false;
   int? mediaStatus;
   Uint8List Function(Uint8List)? mediaTransform;
+  bool mediaThrows = false;
+  int mediaChunksSent = 0;
   String createdRoom = _book;
 
   /// Der Server antwortet auf die Mitgliederliste der Familie mit einem Fehler (Teilliste, `_participantsLoaded` bleibt aus).
@@ -238,8 +240,16 @@ class _Hs {
           downloads.add(name);
           final data = media[name];
           if (data == null || (mediaStatus ?? 200) != 200) return _json(<String, Object?>{'errcode': 'M_NOT_FOUND'}, mediaStatus ?? 404);
+          if (mediaThrows) throw const SocketException('Verbindung getrennt');
           final out = mediaTransform?.call(data) ?? data;
-          return http.StreamedResponse(Stream<List<int>>.value(out), 200, contentLength: out.length, headers: <String, String>{'content-type': 'image/jpeg'});
+          Stream<List<int>> chunks() async* {
+            for (var i = 0; i < out.length; i += 65536) {
+              mediaChunksSent++;
+              yield out.sublist(i, i + 65536 > out.length ? out.length : i + 65536);
+            }
+          }
+
+          return http.StreamedResponse(chunks(), 200, headers: <String, String>{'content-type': 'image/jpeg'});
         }
         final ev = RegExp(r'/rooms/([^/]+)/event/([^/]+)$').firstMatch(path);
         if (ev != null && req.method == 'GET') {
@@ -543,6 +553,20 @@ void main() {
       expect(b, isNotEmpty);
     });
 
+    test('der Download wird bei 1 MiB + 1 KiB abgebrochen, nicht ganz gelesen (3 MiB angeboten)', () async {
+      final (hs, g, _, r) = await withFile();
+      hs.mediaTransform = (_) => Uint8List(3 * 1024 * 1024);
+      expect((await g.loadBookReceipt(_book, r.eventId, receipt: r, author: _cara)).status, BookReceiptStatus.invalid);
+      expect(hs.mediaChunksSent * 65536, lessThan(CashBookLimits.maxReceiptBytes + 1024 + 3 * 65536), reason: 'nach der Kappung wird nicht weiter gezogen');
+      expect(hs.mediaChunksSent * 65536, lessThan(3 * 1024 * 1024));
+    });
+
+    test('Verbindungsfehler beim Download (keine GatewayException): unavailable, nicht invalid', () async {
+      final (hs, g, _, r) = await withFile();
+      hs.mediaThrows = true;
+      expect((await g.loadBookReceipt(_book, r.eventId, receipt: r, author: _cara)).status, BookReceiptStatus.unavailable);
+    });
+
     test('Ereignis fehlt (404) oder ist geschwärzt: missing; Netzfehler beim Ereignis oder Download: unavailable', () async {
       final (hs, g, b, r) = await withFile();
       hs.events[r.eventId] = null;
@@ -627,6 +651,18 @@ void main() {
       hs.events[r'$bon1'] = _fileEvent(r'$bon1', sender: _me, size: 10);
       await g.redactBookReceipt(_book, r'$bon1');
       expect(hs.where('PUT', '/redact/'), hasLength(1));
+    });
+
+    test('das Schwärzen sendet keinen Grund; ein Fehler beim Abruf des Ereignisses ist kein notFound', () async {
+      final (hs, g) = await ready();
+      hs.events[r'$bon1'] = _fileEvent(r'$bon1', sender: _me, size: 10);
+      await g.redactBookReceipt(_book, r'$bon1');
+      expect(hs.where('PUT', '/redact/').single.$3, isNot(contains('reason')));
+      hs.eventFetchFails = true;
+      await expectLater(
+        g.redactBookReceipt(_book, r'$bon1'),
+        throwsA(isA<GatewayException>().having((e) => e.error, 'error', isNot(GatewayError.notFound))),
+      );
     });
 
     test('fremde Datei: notAllowed, auch wenn ich der Ersteller des Buchs bin (kein Schwärzen)', () async {

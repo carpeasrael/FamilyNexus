@@ -73,6 +73,7 @@ void main() {
     final c = build(cash: store, room: roomId, enabled: true);
     expect(c.cashBookSync!.enabled, isTrue);
     expect(c.cashBookReceipts!.enabled, isTrue);
+    expect(identical(c.cashBookSync!.receipts, c.cashBookReceipts), isTrue, reason: 'der Sync räumt mit denselben Bon-Diensten auf');
     expect(c.cashBooks!.onReceiptReleased, isNotNull, reason: 'der Rückruf des Dienstes räumt Bon-Dateien auf');
     expect(c.cashBooks!.myUserId, gateway.userId);
     gateway.fakeBooks = <BookRoomInfo>[BookRoomInfo(roomId: kBookRoom, creatorId: gateway.userId!)];

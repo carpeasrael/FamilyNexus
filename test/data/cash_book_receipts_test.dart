@@ -116,6 +116,19 @@ void main() {
       expect(redacted(), unorderedEquals(<String>[r'$receipt1', r'$receipt2']));
     });
 
+    test('das Warten zählt nicht als Fehlversuch: ein vorläufiger Fehler danach lässt den Auftrag bestehen', () async {
+      final e = await receipts.createWithReceipt(kBookRoom, date: now, store: 'A', amountCents: 1, jpeg: jpeg);
+      await service.delete(kBookRoom, e.id);
+      for (var i = 0; i < CashBookReceipts.maxAttempts + 2; i++) {
+        now = now.add(const Duration(hours: 1));
+        await receipts.flushCleanup();
+      }
+      await publishAll();
+      gw.redactReceiptHandler = (_, _) => const GatewayException(GatewayError.serverUnreachable);
+      await receipts.flushCleanup();
+      expect(receipts.jobCount, 1, reason: 'erst ein Fehlversuch, nicht neun');
+    });
+
     test('Warten auf die Veröffentlichung zählt nicht als Fehlversuch und verwirft nie', () async {
       final e = await receipts.createWithReceipt(kBookRoom, date: now, store: 'A', amountCents: 1, jpeg: jpeg);
       await service.delete(kBookRoom, e.id);
@@ -138,6 +151,7 @@ void main() {
       await publishAll();
       await receipts.flushCleanup();
       expect(redacted(), <String>[r'$B'], reason: 'A wird wieder verwendet, nur B ist frei');
+      expect(receipts.jobCount, 0, reason: 'der Auftrag für A ist nach dem Gegenlesen erledigt, nicht hängen geblieben');
     });
 
     test('der Eintrag ist lokal weg (Buch entfernt): der Auftrag entfällt ohne Schwärzen', () async {
@@ -212,12 +226,73 @@ void main() {
       expect(redacted(), <String>[r'$receipt1']);
     });
 
+    test('Gegenlesen: ein anderer Eintrag desselben Raums mit dem Verweis hält die Datei', () async {
+      final a = await service.create(kBookRoom, date: now, store: 'A', amountCents: 1, receipt: rcpt(r'$X'));
+      await service.create(kBookRoom, date: now, store: 'B', amountCents: 1, receipt: rcpt(r'$X'));
+      await publishAll();
+      await service.update(kBookRoom, a.copyWith(clearReceipt: true));
+      await publishAll();
+      await receipts.flushCleanup();
+      expect(redacted(), isEmpty);
+      expect(receipts.jobCount, 0);
+    });
+
+    test('derselbe Verweis in zwei Büchern ist zwei Aufträge (Schlüssel Raum und Ereignis)', () async {
+      await store.putBook(bookMeta(room: '!zwei:fake.test'));
+      final a = await service.create(kBookRoom, date: now, store: 'A', amountCents: 1, receipt: rcpt(r'$X'));
+      final b = await service.create('!zwei:fake.test', date: now, store: 'B', amountCents: 1, receipt: rcpt(r'$X'));
+      await service.delete(kBookRoom, a.id);
+      await service.delete('!zwei:fake.test', b.id);
+      expect(receipts.jobCount, 2);
+    });
+
+    test('der Rückruf kommt erst nach dem Speichern der neuen Fassung', () async {
+      final e = await service.create(kBookRoom, date: now, store: 'A', amountCents: 1, receipt: rcpt(r'$X'));
+      int? versionSeen;
+      service.onReceiptReleased = (room, id, ev) async {
+        versionSeen = (await store.getEntry(room, kBookOwner, id))!.version;
+      };
+      await service.update(kBookRoom, e.copyWith(clearReceipt: true));
+      await pumpEventQueue();
+      expect(versionSeen, 2);
+    });
+
+    test('Backoff wächst: 30 s, dann 60 s, dann 120 s', () async {
+      await orphan();
+      var calls = 0;
+      gw.redactReceiptHandler = (_, _) {
+        calls++;
+        return const GatewayException(GatewayError.serverUnreachable);
+      };
+      await receipts.flushCleanup();
+      expect(calls, 1);
+      for (final (wait, expected) in <(int, int)>[(29, 1), (1, 2), (59, 2), (1, 3), (119, 3), (1, 4)]) {
+        now = now.add(Duration(seconds: wait));
+        await receipts.flushCleanup();
+        expect(calls, expected, reason: '+${wait}s');
+      }
+    });
+
+    test('zwei gleichzeitige Läufe schwärzen eine Datei nur einmal', () async {
+      await orphan();
+      await Future.wait<void>(<Future<void>>[receipts.flushCleanup(), receipts.flushCleanup()]);
+      expect(redacted(), <String>[r'$receipt1']);
+    });
+
     test('höchstens 100 Aufträge: der älteste fällt weg', () async {
       for (var i = 0; i < CashBookReceipts.maxJobs + 5; i++) {
         final e = await service.create(kBookRoom, date: now, store: 'A$i', amountCents: 1, receipt: rcpt('\$f$i'));
         await service.delete(kBookRoom, e.id);
       }
       expect(receipts.jobCount, CashBookReceipts.maxJobs);
+      expect(CashBookReceipts.maxJobs, 100);
+      expect(CashBookReceipts.maxAttempts, 8);
+      await publishAll();
+      await receipts.flushCleanup();
+      expect(redacted(), isNot(contains(r'$f0')), reason: 'der älteste wurde verdrängt (FIFO)');
+      expect(redacted(), isNot(contains(r'$f4')));
+      expect(redacted(), contains(r'$f5'));
+      expect(redacted(), contains('\$f${CashBookReceipts.maxJobs + 4}'));
     });
 
     test('ohne Sitzung, ersten Sync oder Familie wird nichts geschwärzt', () async {
@@ -284,6 +359,29 @@ void main() {
       expect(service.onReceiptReleased, isNotNull);
       receipts.dispose();
       expect(service.onReceiptReleased, isNull);
+    });
+
+    test('Aufräumen auch im Sendedurchlauf allein und im Zeitgeber auch bei fehlgeschlagenem Senden', () async {
+      gw.fakeBooks = <BookRoomInfo>[const BookRoomInfo(roomId: kBookRoom, creatorId: kBookOwner)];
+      final sync = CashBookSync(
+        gateway: gw,
+        service: service,
+        store: store,
+        familyRoom: gw.familyRoom!.id,
+        enabled: true,
+        receipts: receipts,
+        retryInterval: const Duration(hours: 1),
+        clock: () => now,
+      );
+      await expectLater(receipts.createWithReceipt(kBookRoom, date: now, store: 'x', amountCents: -1, jpeg: jpeg), throwsA(isA<CashBookException>()));
+      await sync.publishPending();
+      expect(redacted(), <String>[r'$receipt1'], reason: 'Sendedurchlauf allein räumt auf');
+      await expectLater(receipts.createWithReceipt(kBookRoom, date: now, store: 'x', amountCents: -1, jpeg: jpeg), throwsA(isA<CashBookException>()));
+      await store.putEntry(kBookRoom, cashEntry(), publishedVersion: 0);
+      gw.publishError = const GatewayException(GatewayError.serverUnreachable);
+      await sync.tick();
+      expect(redacted(), <String>[r'$receipt1', r'$receipt2'], reason: 'der Zeitgeber räumt auch auf, wenn das Senden scheitert');
+      sync.dispose();
     });
 
     test('der Zeitgeber des Syncs arbeitet fällige Aufräumaufträge ab', () async {

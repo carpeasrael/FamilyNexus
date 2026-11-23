@@ -67,6 +67,14 @@ void main() {
     expect(released, isEmpty);
   });
 
+  test('ein gelöschter eigener Eintrag kann nicht mehr geändert werden und meldet nichts', () async {
+    final e = await own(r: receipt(r'$alt'));
+    await svc.delete(kBookRoom, e.id);
+    released.clear();
+    await expectLater(svc.update(kBookRoom, e.copyWith(clearReceipt: true)), throwsA(isA<CashBookException>()));
+    expect(released, isEmpty);
+  });
+
   test('ein fremder Eintrag kann nicht über update() geändert werden und meldet nichts', () async {
     final foreign = cashEntry(author: kBookMember, receipt: receipt(r'$fremd'));
     await store.putEntry(kBookRoom, foreign, publishedVersion: 1);
