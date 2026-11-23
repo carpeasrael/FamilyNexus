@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
 import 'avatar_photo.dart';
+import 'image_decoding.dart';
 
 /// Gründe, warum ein gewähltes Bild nicht als Avatar-Foto taugt (#434, E-111).
 enum AvatarPhotoProcessingError {
@@ -114,33 +115,19 @@ class AvatarPhotoProcessing {
   static const int qualityStart = 85;
   static const int qualityMin = 45;
 
-  /// Dekodiert das erste Bild nach Prüfung von Format, Dateigröße und Maßen. Wirft [AvatarPhotoProcessingException].
+  /// Dekodiert das erste Bild nach Prüfung von Format, Dateigröße und Maßen (gemeinsam mit den Bon-Fotos: [ImageDecoding]).
+  /// Wirft [AvatarPhotoProcessingException].
   static img.Image _decode(Uint8List input, {required int pixelLimit}) {
-    if (input.length > maxInputBytes) throw const AvatarPhotoProcessingException(AvatarPhotoProcessingError.tooLarge);
-    final decoder = img.findDecoderForData(input);
-    if (decoder is! img.JpegDecoder && decoder is! img.PngDecoder && decoder is! img.WebPDecoder) {
-      throw const AvatarPhotoProcessingException(AvatarPhotoProcessingError.unsupportedFormat);
-    }
-    final img.Image? frame;
     try {
-      final info = decoder!.startDecode(input);
-      if (info == null) throw const AvatarPhotoProcessingException(AvatarPhotoProcessingError.notDecodable);
-      if (info.width < 1 || info.height < 1) {
-        throw const AvatarPhotoProcessingException(AvatarPhotoProcessingError.notDecodable);
-      }
-      if (info.width > maxSide || info.height > maxSide || info.width * info.height > pixelLimit) {
-        throw const AvatarPhotoProcessingException(AvatarPhotoProcessingError.tooManyPixels);
-      }
-      // Nur das erste Bild: `decodeImage` würde bei Animationen alle Einzelbilder in den Speicher holen.
-      frame = decoder.decodeFrame(0);
-    } on AvatarPhotoProcessingException {
-      rethrow;
-    } catch (_) {
-      // Jede Ausnahme des Decoders heißt: das Bild ist nicht lesbar (defekt, abgeschnitten).
-      throw const AvatarPhotoProcessingException(AvatarPhotoProcessingError.notDecodable);
+      return ImageDecoding.decode(input, maxInputBytes: maxInputBytes, maxSide: maxSide, pixelLimit: pixelLimit);
+    } on ImageDecodeException catch (e) {
+      throw AvatarPhotoProcessingException(switch (e.error) {
+        ImageDecodeError.unsupportedFormat => AvatarPhotoProcessingError.unsupportedFormat,
+        ImageDecodeError.tooLarge => AvatarPhotoProcessingError.tooLarge,
+        ImageDecodeError.tooManyPixels => AvatarPhotoProcessingError.tooManyPixels,
+        ImageDecodeError.notDecodable => AvatarPhotoProcessingError.notDecodable,
+      });
     }
-    if (frame == null) throw const AvatarPhotoProcessingException(AvatarPhotoProcessingError.notDecodable);
-    return img.bakeOrientation(frame);
   }
 
   /// Vorschau für die Zuschnitt-Oberfläche.
