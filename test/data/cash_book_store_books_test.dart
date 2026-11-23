@@ -40,6 +40,12 @@ void main() {
         expect(await store.pendingBooks(kBookOwner), hasLength(1));
       });
 
+      test('markBookPublished: gleiche Felder, andere Version bleibt in der Warteschlange', () async {
+        await store.putBook(bookMeta(version: 2), published: false);
+        await store.markBookPublished(bookMeta(version: 1));
+        expect(await store.pendingBooks(kBookOwner), hasLength(1));
+      });
+
       test('requeueBook: setzt ein gesendetes Buch zurück, nie das Platzhalter-Buch', () async {
         await store.putBook(bookMeta(room: '!a:fake.test'), published: true);
         await store.putBook(bookMeta(room: '!p:fake.test', version: 0), published: true);

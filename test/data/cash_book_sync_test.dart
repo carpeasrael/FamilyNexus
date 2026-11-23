@@ -13,6 +13,14 @@ import '../support/memory_cash_book_store.dart';
 
 const String _room2 = '!zwei:fake.test';
 
+/// Ablage, deren `pending()` eine zuvor gelesene (veraltete) Fassung liefert, obwohl die gespeicherte schon weiter ist.
+class _StaleStore extends MemoryCashBookStore {
+  List<({String roomId, CashEntry entry})> snapshot = const <({String roomId, CashEntry entry})>[];
+
+  @override
+  Future<List<({String roomId, CashEntry entry})>> pending(String author) async => snapshot;
+}
+
 /// #311, E-113 (Teil 2c): `CashBookSync` gegen den Gateway-Fake: Annahmeregel, Warten, Rückfall, Senden, Resync,
 /// Aufräumen, Abgleich, Sperre.
 void main() {
@@ -168,6 +176,31 @@ void main() {
       expect(await store.getEntry(kBookRoom, '@neu:fake.test', kEntryId2), isNotNull);
     });
 
+    test('Warteliste behält je Eintrag die höchste Version (eine ältere verdrängt nie eine neuere)', () async {
+      await store.putBook(bookMeta());
+      gw.knownMembersError = const GatewayException(GatewayError.serverUnreachable);
+      await feed(<BookSignal>[
+        entrySignal(fresh(author: kBookMember, version: 2, cents: 200)),
+        entrySignal(fresh(author: kBookMember, version: 1, cents: 100)),
+      ]);
+      expect(sync.heldCount, 1);
+      gw.knownMembersError = null;
+      now = now.add(const Duration(seconds: 31));
+      await sync.publishPending();
+      expect((await store.getEntry(kBookRoom, kBookMember, kEntryId1))!.version, 2);
+    });
+
+    test('genau nach 30 Sekunden ist ein neuer Abruf erlaubt (Grenze)', () async {
+      await store.putBook(bookMeta());
+      await feed(<BookSignal>[entrySignal(fresh(author: '@fremd:fake.test'))]);
+      expect(gw.knownMembersCalls, 1);
+      await feed(<BookSignal>[entrySignal(fresh(id: kEntryId2, author: '@fremd:fake.test'))]);
+      expect(gw.knownMembersCalls, 1, reason: 'innerhalb des Fensters');
+      now = now.add(const Duration(seconds: 30));
+      await sync.publishPending();
+      expect(gw.knownMembersCalls, 2);
+    });
+
     test('Doppelzustellung und Reihenfolge konvergieren (Summe gleich)', () async {
       await store.putBook(bookMeta());
       final v1 = fresh(cents: 100);
@@ -251,6 +284,25 @@ void main() {
       expect(gw.bookPublished.map((p) => p.roomId), <String>[kBookRoom]);
       expect(gw.bookPublished.single.events.single.type, CashBookCodec.metaType);
       expect(await store.pendingBooks(kBookOwner), isEmpty);
+    });
+
+    test('Metadaten gehen vor den Einträgen hinaus', () async {
+      await store.putBook(bookMeta(), published: false);
+      await store.putEntry(kBookRoom, fresh(), publishedVersion: 0);
+      await sync.tick();
+      expect(gw.bookPublished.map((p) => p.events.single.type), <String>[CashBookCodec.metaType, CashBookCodec.entryType]);
+    });
+
+    test('vor dem ersten Sync oder nach dem Abmelden wird nichts gesendet', () async {
+      await store.putBook(bookMeta(), published: false);
+      await store.putEntry(kBookRoom, fresh(), publishedVersion: 0);
+      gw.syncDone = false;
+      await sync.publishPending();
+      expect(gw.bookPublished, isEmpty);
+      gw.syncDone = true;
+      await gw.logout();
+      await sync.publishPending();
+      expect(gw.bookPublished, isEmpty);
     });
 
     test('Raum nicht in der Liste der Bücher: nichts gesendet, der Eintrag bleibt in der Warteschlange', () async {
@@ -346,6 +398,28 @@ void main() {
     });
   });
 
+  group('Rennen zwischen Lesen und Senden', () {
+    test('ändert sich ein Eintrag zwischen pending() und restamp(), wird die alte Fassung nicht gesendet', () async {
+      sync.dispose();
+      final stale = _StaleStore();
+      stale.snapshot = <({String roomId, CashEntry entry})>[(roomId: kBookRoom, entry: fresh(updatedAt: now.subtract(const Duration(days: 6))))];
+      await stale.putBook(bookMeta());
+      await stale.putEntry(kBookRoom, fresh(version: 2, cents: 5), publishedVersion: 0);
+      final s = CashBookSync(
+        gateway: gw,
+        service: CashBookService(store: stale, myUserId: kBookOwner, clock: () => now),
+        store: stale,
+        familyRoom: gw.familyRoom!.id,
+        enabled: true,
+        retryInterval: const Duration(hours: 1),
+        clock: () => now,
+      );
+      await s.publishPending();
+      expect(gw.bookPublished, isEmpty, reason: 'die Kopie aus der Warteschlange ist veraltet');
+      s.dispose();
+    });
+  });
+
   group('Resync', () {
     test('Beitritt eines Mitglieds: eigene Einträge und (als Ersteller) die Metadaten werden erneut vorgemerkt', () async {
       await store.putBook(bookMeta());
@@ -356,6 +430,14 @@ void main() {
       expect((await store.pending(kBookOwner)).single.entry.id, kEntryId1);
       expect((await store.pending(kBookMember)), isEmpty, reason: 'fremde Einträge sendet nur ihr Autor');
       expect((await store.pendingBooks(kBookOwner)).single.roomId, kBookRoom);
+    });
+
+    test('nur der eigene Beitritt: nichts wird vorgemerkt', () async {
+      await store.putBook(bookMeta());
+      await store.putEntry(kBookRoom, fresh(), publishedVersion: 1);
+      await feed(<BookSignal>[BookSignal(roomId: kBookRoom, creatorId: kBookOwner, kind: BookSignalKind.memberJoined, sender: kBookOwner, timestamp: now)]);
+      expect(await store.pending(kBookOwner), isEmpty);
+      expect(await store.pendingBooks(kBookOwner), isEmpty);
     });
 
     test('Nicht-Ersteller sendet keine Metadaten erneut; eigener Beitritt löst nichts aus', () async {

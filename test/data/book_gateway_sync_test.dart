@@ -93,11 +93,12 @@ Map<String, Object?> _bookPl(String creator, {int invite = 100}) => <String, Obj
     };
 
 /// Beigetretenes Buch mit Zustand wie `BookRoomSpec` ihn erzeugt (anpassbar für Abweichungen).
-Map<String, Object?> _bookJoin(String room, {String creator = _me, Map<String, Object?>? pl, List<String> members = const <String>[], String family = _familyRoom, bool marker = true}) =>
+Map<String, Object?> _bookJoin(String room, {String creator = _me, Map<String, Object?>? pl, List<String> members = const <String>[], String family = _familyRoom, bool marker = true, bool summary = false}) =>
     <String, Object?>{
       'rooms': <String, Object?>{
         'join': <String, Object?>{
           room: <String, Object?>{
+            if (summary) 'summary': <String, Object?>{'m.joined_member_count': 1 + members.length, 'm.invited_member_count': 0},
             'state': <String, Object?>{
               'events': <Object?>[
                 _state('m.room.create', creator, <String, Object?>{
@@ -378,7 +379,9 @@ void main() {
       expect(g.bookRoomGone(_book), isFalse);
       expect(g.bookHistoryComplete(_book), isFalse);
       expect(g.bookUndecryptableCount(_book), 0);
-      g.debugIngestBookEvents(_book, _me, <Event>[]);
+      g.debugIngestBookEvents(_book, _me, <Event>[_arrived(g, _book, CashBookCodec.metaType, _me, _metaContent())]);
+      expect(g.debugBookHistory(_book), isEmpty, reason: 'gesperrt: nichts wird eingelesen');
+      expect(g.bookRoomGone('!nie:hs.example'), isFalse);
       expect(hs.calls.length, before);
       expect(g.debugBookTimelineIds, isEmpty);
     });
@@ -479,6 +482,24 @@ void main() {
       expect(hs.where('POST', '/invite'), isEmpty);
     });
 
+    test('eigenes Konto nur eingeladen statt beigetreten: Antwort unbrauchbar (fail-closed)', () async {
+      final (hs, g) = await _signedIn();
+      await _sync(g, _bookJoin(_book, members: <String>[_cara]));
+      hs.members = <String>[_cara];
+      hs.extra[_me] = 'invite';
+      await expectLater(g.verifyBookRecipients(_book), _error(GatewayError.serverUnreachable));
+    });
+
+    test('auch bei vollständiger lokaler Mitgliederliste fragt jeder Aufruf den Server (enforceFetchFromServer)', () async {
+      final (hs, g) = await _signedIn();
+      await _sync(g, _bookJoin(_book, members: <String>[_cara], summary: true));
+      hs.members = <String>[_me, _cara];
+      await g.verifyBookRecipients(_book);
+      hs.members = <String>[_me, _cara, _fremd];
+      await expectLater(g.verifyBookRecipients(_book), _notAllowed());
+      expect(hs.where('GET', '/members').where((c) => c.$2.contains(_book)), isNotEmpty);
+    });
+
     test('Mitgliedergrenze zählt die Mitglieder vom Server', () async {
       final (hs, g) = await _signedIn();
       await _sync(g, _bookJoin(_book));
@@ -550,6 +571,17 @@ void main() {
       expect(hs.sends.length, 2, reason: 'nach dem ersten Fehler wird nichts mehr versucht');
     });
 
+    test('genau 50 Ereignisse sind erlaubt; nicht kodierbarer Inhalt ist invalid', () async {
+      final (hs, g) = await ready();
+      final r = await g.publishBookEvents(_book, <BookOutgoing>[for (var i = 0; i < 50; i++) entry()]);
+      expect(r, everyElement(BookSendResult.sent));
+      expect(hs.sends, hasLength(50));
+      final bad = await g.publishBookEvents(_book, <BookOutgoing>[
+        BookOutgoing(CashBookCodec.entryType, <String, Object?>{'author': _me, 'x': DateTime.now()}),
+      ]);
+      expect(bad, <BookSendResult>[BookSendResult.invalid]);
+    });
+
     test('höchstens 50 Ereignisse; leere Liste; Buch einer anderen Familie', () async {
       final (hs, g) = await ready();
       await expectLater(
@@ -611,6 +643,52 @@ void main() {
       final h = g.debugBookHistory(_book);
       expect(h, hasLength(6001), reason: 'mehr als 5000 Signale gehen nicht verloren');
       expect(h.firstWhere((s) => s.content['id'] == '11111111-1111-4111-8111-111111111111').content['version'], 3);
+    });
+
+    test('zwei Absender mit gleicher id bleiben getrennt (Schlüssel Absender + id, nie Raum + id)', () async {
+      final (_, g) = await ready();
+      g.debugIngestBookEvents(_book, _me, <Event>[
+        _arrived(g, _book, CashBookCodec.entryType, _cara, _entryContent(author: _cara)),
+        _arrived(g, _book, CashBookCodec.entryType, _me, _entryContent(author: _me)),
+      ]);
+      expect(g.debugBookHistory(_book), hasLength(2));
+    });
+
+    test('über 30000 Einträge: der älteste fällt weg und der Verlauf gilt nie als vollständig', () async {
+      final (_, g) = await ready();
+      g.debugMarkBookComplete(_book);
+      expect(g.bookHistoryComplete(_book), isTrue);
+      g.debugIngestBookEvents(_book, _me, <Event>[
+        for (var i = 0; i <= 30000; i++)
+          _arrived(g, _book, CashBookCodec.entryType, _cara, _entryContent(author: _cara, id: '10000000-0000-4000-8000-${i.toString().padLeft(12, '0')}')),
+      ]);
+      expect(g.debugBookHistory(_book), hasLength(30000));
+      expect(g.bookHistoryComplete(_book), isFalse);
+    }, timeout: const Timeout(Duration(minutes: 3)));
+
+    test('Beitritt eines anderen Mitglieds: Livesignal memberJoined (nie in der Historie)', () async {
+      final (hs, g) = await _signedIn();
+      hs.members = <String>[_me, _cara];
+      await _syncJoined(g, _bookJoin(_book, members: <String>[_cara]));
+      await Future<void>.delayed(_settle);
+      await Future<void>.delayed(_settle);
+      final live = <BookSignal>[];
+      g.bookSignals.listen(live.add);
+      await Future<void>.delayed(Duration.zero);
+      await _syncJoined(g, <String, Object?>{
+        'rooms': <String, Object?>{
+          'join': <String, Object?>{
+            _book: <String, Object?>{
+              'timeline': <String, Object?>{
+                'events': <Object?>[_memberEvent(_ben, 'join')],
+              },
+            },
+          },
+        },
+      });
+      await Future<void>.delayed(_settle);
+      expect(live.map((s) => (s.kind, s.sender)), <Object>[(BookSignalKind.memberJoined, _ben)]);
+      expect(g.debugBookHistory(_book), isEmpty);
     });
 
     test('ein neuer Zuhörer erhält zuerst das Meta, dann die Einträge; Beitritte werden nie wiedereingespielt', () async {
@@ -702,7 +780,11 @@ void main() {
       final (_, g) = await _signedIn();
       await _syncJoined(g, _bookJoin(_book, members: <String>[_cara]));
       await Future<void>.delayed(_settle);
-      g.debugIngestBookEvents(_book, _me, <Event>[_arrived(g, _book, CashBookCodec.metaType, _me, _metaContent())]);
+      g.debugIngestBookEvents(_book, _me, <Event>[
+        _arrived(g, _book, CashBookCodec.metaType, _me, _metaContent()),
+        _arrived(g, _book, CashBookCodec.entryType, _cara, _entryContent(author: _cara)),
+      ]);
+      expect(g.debugBookHistory(_book), hasLength(2));
       expect(g.bookRoomGone(_book), isFalse);
       await _syncJoined(g, <String, Object?>{
         'rooms': <String, Object?>{

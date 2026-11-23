@@ -32,7 +32,7 @@ void main() {
         'event_id': id,
         'sender': sender,
         'origin_server_ts': 1000,
-        'content': content ?? <String, Object?>{'version': 1, 'room_id': '!anderer:fake.test'},
+        'content': content ?? <String, Object?>{'version': 1, 'room': '!anderer:fake.test', 'room_id': '!anderer:fake.test'},
         ...?extra,
       };
 

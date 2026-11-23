@@ -36,6 +36,23 @@ void main() {
       expect((await svc.restamp(kBookRoom, e.id, expectedVersion: 1, expectedDeleted: false))!.updatedAt, now);
     });
 
+    test('genau ein Tag Abweichung: unverändert (Grenze)', () async {
+      final e = cashEntry(updatedAt: now.subtract(const Duration(days: 1)));
+      await store.putEntry(kBookRoom, e, publishedVersion: 0);
+      expect(await svc.restamp(kBookRoom, e.id, expectedVersion: 1, expectedDeleted: false), e);
+    });
+
+    test('gleichzeitiges update() und restamp(): die Änderung geht nie verloren (Serialisierung)', () async {
+      final e = cashEntry(updatedAt: now.subtract(const Duration(days: 5)));
+      await store.putEntry(kBookRoom, e, publishedVersion: 0);
+      final r = svc.restamp(kBookRoom, e.id, expectedVersion: 1, expectedDeleted: false);
+      final u = svc.update(kBookRoom, e.copyWith(amountCents: 77));
+      await Future.wait<Object?>(<Future<Object?>>[r, u]);
+      final stored = (await store.getEntry(kBookRoom, kBookOwner, e.id))!;
+      expect(stored.version, 2);
+      expect(stored.amountCents, 77);
+    });
+
     test('höchstens ein Tag Abweichung: unverändert', () async {
       final e = cashEntry(updatedAt: now.subtract(const Duration(hours: 23)));
       await store.putEntry(kBookRoom, e, publishedVersion: 0);

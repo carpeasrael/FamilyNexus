@@ -1,5 +1,6 @@
 import 'package:family_nexus/app/calendar_factory.dart';
 import 'package:family_nexus/domain/book_policy.dart';
+import 'package:family_nexus/domain/book_signal.dart';
 import 'package:family_nexus/domain/cash_book.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/features/calendar/calendar_controller.dart';
@@ -75,5 +76,17 @@ void main() {
     await c.cashBookSync!.publishPending();
     expect(gateway.bookPublished.single.events.single.type, CashBookCodec.metaType);
     c.dispose();
+    // nach dem Schließen hört der Sync nicht mehr zu
+    gateway.injectBookSignal(BookSignal(
+      roomId: kBookRoom,
+      creatorId: gateway.userId!,
+      kind: BookSignalKind.meta,
+      sender: gateway.userId!,
+      timestamp: DateTime.now(),
+      content: CashBookCodec.encodeMeta(bookMeta(owner: gateway.userId!, title: 'Nach dem Schließen')),
+    ));
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    await c.cashBookSync!.idle();
+    expect((await store.getBook(kBookRoom))!.title, isNot('Nach dem Schließen'));
   });
 }
