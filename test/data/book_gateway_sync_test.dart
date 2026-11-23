@@ -8,6 +8,7 @@ import 'package:family_nexus/core/app_log.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart' show GatewayError, GatewayException;
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/server_probe.dart';
+import 'package:family_nexus/domain/book_policy.dart';
 import 'package:family_nexus/domain/book_room.dart';
 import 'package:family_nexus/domain/book_signal.dart';
 import 'package:family_nexus/domain/cash_book.dart';
@@ -448,6 +449,82 @@ void main() {
       await expectLater(g.bookKnownMembers('!anderes:hs.example'), _notAllowed());
       await expectLater(g.bookKnownMembers('!gibtsnicht:hs.example'), _error(GatewayError.notFound));
       await expectLater(g.bookKnownMembers('kein-raum'), _error(GatewayError.invalidInput));
+    });
+  });
+
+  group('bookMembers und staleBooks (Teil 4)', () {
+    test('bookMembers: beigetretene und eingeladene, frisch vom Server; leave und ban nicht', () async {
+      final (hs, g) = await _signedIn();
+      await _sync(g, _bookJoin(_book, members: <String>[_cara]));
+      hs.members = <String>[_me, _cara];
+      hs.left = <String>{_ben};
+      hs.extra[_dora] = 'invite';
+      hs.extra[_fremd] = 'ban';
+      final m = await g.bookMembers(_book);
+      expect(<String, BookMembership>{for (final x in m) x.userId: x.membership}, <String, BookMembership>{
+        _me: BookMembership.joined,
+        _cara: BookMembership.joined,
+        _dora: BookMembership.invited,
+      });
+    });
+
+    test('bookMembers: leere Antwort fail-closed; Buch einer anderen Familie notAllowed; gesperrt notAllowed ohne Anfrage', () async {
+      final (hs, g) = await _signedIn();
+      await _sync(g, _bookJoin(_book, members: <String>[_cara]));
+      hs.emptyMembers = true;
+      await expectLater(g.bookMembers(_book), _error(GatewayError.serverUnreachable));
+      await _sync(g, _bookJoin('!anderes:hs.example', family: '!andere:hs.example'));
+      hs.emptyMembers = false;
+      hs.members = <String>[_me];
+      await expectLater(g.bookMembers('!anderes:hs.example'), _notAllowed());
+      final (hs2, g2) = await _signedIn(enabled: false);
+      final before = hs2.calls.length;
+      await expectLater(g2.bookMembers(_book), _notAllowed());
+      expect(hs2.calls.length, before);
+    });
+
+    test('staleBooks: beigetretenes Buch einer anderen Familie ja; das der aktuellen und ein Raum ohne Buch-Kennzeichen nie', () async {
+      final (hs, g) = await _signedIn();
+      hs.members = <String>[_me];
+      await _syncJoined(g, _bookJoin(_book, members: <String>[_cara]));
+      await _sync(g, _bookJoin('!alt:hs.example', family: '!andere:hs.example'));
+      await _sync(g, _bookJoin('!ohne:hs.example', marker: false));
+      await Future<void>.delayed(_settle);
+      expect(g.staleBooks, <String>['!alt:hs.example']);
+    });
+
+    test('staleBooks: eingeladen (nicht beigetreten) und verlassen zählen nicht', () async {
+      final (hs, g) = await _signedIn();
+      hs.members = <String>[_me];
+      await _syncJoined(g, <String, Object?>{'rooms': <String, Object?>{'join': <String, Object?>{}}});
+      await _sync(g, <String, Object?>{
+        'rooms': <String, Object?>{
+          'invite': <String, Object?>{
+            '!eingeladen:hs.example': <String, Object?>{
+              'invite_state': <String, Object?>{
+                'events': <Object?>[
+                  <String, Object?>{
+                    'type': 'm.room.create',
+                    'state_key': '',
+                    'sender': _cara,
+                    'content': <String, Object?>{'room_version': '10', ...BookRoomMarker.cashCreationContent('!andere:hs.example')},
+                  },
+                ],
+              },
+            },
+          },
+        },
+      });
+      expect(g.staleBooks, isEmpty);
+    });
+
+    test('staleBooks ist leer: gesperrt, ohne bekannte Familie, ohne ersten Sync', () async {
+      final (_, locked) = await _signedIn(enabled: false);
+      await _sync(locked, _bookJoin('!alt:hs.example', family: '!andere:hs.example'));
+      expect(locked.staleBooks, isEmpty);
+      final (_, noFamily) = await _signedIn(familySynced: false);
+      await _sync(noFamily, _bookJoin('!alt:hs.example', family: '!andere:hs.example'));
+      expect(noFamily.staleBooks, isEmpty);
     });
   });
 

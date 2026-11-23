@@ -515,6 +515,111 @@ void main() {
     });
   });
 
+  group('Familienwechsel: alte Bücher verlassen (Teil 4)', () {
+    setUp(() => gw.nextBookRoom = '!x:fake.test');
+
+    test('erst nach zwei aufeinanderfolgenden Läufen, nicht beim ersten', () async {
+      gw.fakeStaleBooks = <String>['!alt:fake.test'];
+      await sync.tick();
+      expect(gw.leftBooks, isEmpty);
+      await sync.tick();
+      expect(gw.leftBooks, <String>['!alt:fake.test']);
+    });
+
+    test('verschwindet der Raum dazwischen aus der Liste, beginnt das Zählen von vorn', () async {
+      gw.fakeStaleBooks = <String>['!alt:fake.test'];
+      await sync.tick();
+      gw.fakeStaleBooks = const <String>[];
+      await sync.tick();
+      gw.fakeStaleBooks = <String>['!alt:fake.test'];
+      await sync.tick();
+      expect(gw.leftBooks, isEmpty);
+      await sync.tick();
+      expect(gw.leftBooks, hasLength(1));
+    });
+
+    test('ohne Voraussetzungen (erster Sync fehlt) wird gezählt nichts, und der Zähler wird geleert', () async {
+      gw.fakeStaleBooks = <String>['!alt:fake.test'];
+      await sync.tick();
+      gw.syncDone = false;
+      await sync.tick();
+      gw.syncDone = true;
+      await sync.tick();
+      expect(gw.leftBooks, isEmpty, reason: 'der Lauf ohne Voraussetzungen hat den Zähler gelöscht');
+      await sync.tick();
+      expect(gw.leftBooks, hasLength(1));
+    });
+
+    test('Verlassen scheitert: kein Absturz, nächster Lauf versucht es erneut; danach nur einmal', () async {
+      gw.fakeStaleBooks = <String>['!alt:fake.test'];
+      gw.bookActionError = const GatewayException(GatewayError.serverUnreachable);
+      await sync.tick();
+      await sync.tick();
+      expect(gw.leftBooks, isEmpty);
+      gw.bookActionError = null;
+      await sync.tick();
+      expect(gw.leftBooks, <String>['!alt:fake.test']);
+      gw.fakeStaleBooks = const <String>[];
+      await sync.tick();
+      expect(gw.leftBooks, hasLength(1));
+    });
+
+    test('der lokale Speicher bleibt vom Verlassen unberührt (das Leeren gehört claimFamilyData)', () async {
+      await store.putBook(bookMeta(room: '!alt:fake.test'));
+      await store.putEntry('!alt:fake.test', fresh(), publishedVersion: 1);
+      gw.fakeStaleBooks = <String>['!alt:fake.test'];
+      await sync.tick();
+      await sync.tick();
+      expect(gw.leftBooks, hasLength(1));
+      expect(await store.getBook('!alt:fake.test'), isNotNull);
+      expect(await store.entries('!alt:fake.test'), hasLength(1));
+    });
+
+    test('gesperrt oder andere Familie: nichts; dispose leert den Zähler', () async {
+      gw.fakeStaleBooks = <String>['!alt:fake.test'];
+      await sync.tick();
+      sync.dispose();
+      await sync.tick();
+      expect(gw.leftBooks, isEmpty, reason: 'dispose hat den Zähler geleert');
+      sync.dispose();
+      await build(enabled: false);
+      gw.nextBookRoom = '!x:fake.test';
+      gw.fakeStaleBooks = <String>['!alt:fake.test'];
+      await sync.tick();
+      await sync.tick();
+      expect(gw.leftBooks, isEmpty);
+    });
+  });
+
+  group('Sendeschutz meldet der Oberfläche (Teil 4)', () {
+    test('blockedRooms-Änderung löst onChanged aus, nur bei tatsächlicher Änderung', () async {
+      await store.putBook(bookMeta());
+      await store.putEntry(kBookRoom, fresh(), publishedVersion: 0);
+      var changed = 0;
+      sync.onChanged = () => changed++;
+      gw.publishHandler = (room, ev) => List<BookSendResult>.filled(ev.length, BookSendResult.blocked);
+      await sync.publishPending();
+      expect(sync.blockedRooms, <String>{kBookRoom});
+      expect(changed, 1);
+      await sync.publishPending();
+      expect(changed, 1, reason: 'unverändert blockiert: keine neue Meldung');
+      gw.publishHandler = null;
+      await sync.publishPending();
+      expect(sync.blockedRooms, isEmpty);
+      expect(changed, 2, reason: 'Aufhebung wird gemeldet');
+    });
+
+    test('blockierte Buch-Metadaten melden ebenfalls', () async {
+      await store.putBook(bookMeta(), published: false);
+      var changed = 0;
+      sync.onChanged = () => changed++;
+      gw.publishHandler = (room, ev) => List<BookSendResult>.filled(ev.length, BookSendResult.blocked);
+      await sync.publishPending();
+      expect(sync.blockedRooms, isNotEmpty);
+      expect(changed, 1);
+    });
+  });
+
   group('Sperre und Familie', () {
     test('gesperrt (enabled = false): kein Zuhören, kein Senden, kein Zeitgeber, kein Zugriff auf Gateway und Ablage', () async {
       sync.dispose();

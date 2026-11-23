@@ -401,6 +401,15 @@ abstract class MatrixGateway implements Listenable {
   /// unbrauchbarer Antwort (fail-closed).
   Future<Set<String>> bookKnownMembers(String roomId);
 
+  /// Aktuelle Mitglieder des Buchs (beigetreten oder eingeladen), frisch vom Server. Wirft bei unbrauchbarer Antwort
+  /// (fail-closed) und für ein Buch einer anderen Familie `notAllowed`.
+  Future<List<BookMember>> bookMembers(String roomId);
+
+  /// Raum-IDs beigetretener Buch-Räume, die zu einer **anderen** Familie gehören als der aktuellen (Familienwechsel). Leer
+  /// bei gesperrtem Kassenbuch, unbekannter Familie, vor dem ersten Sync und ohne geladene Mitgliederliste: Ohne
+  /// belastbare Familie ist keine Aussage möglich.
+  List<String> get staleBooks;
+
   /// Sendet Buch-Ereignisse (höchstens 50) in den Buch-Raum. Das Gateway prüft selbst: Familie, Verschlüsselung,
   /// Sendeschutz, Typ, Autor, Größe. Ergebnis je Ereignis ([BookSendResult]).
   Future<List<BookSendResult>> publishBookEvents(String roomId, List<BookOutgoing> events);

@@ -1,4 +1,5 @@
 import '../data/matrix/matrix_gateway.dart';
+import '../data/platform/file_access.dart';
 import '../data/sync/anniversary_sync.dart';
 import '../data/sync/avatar_photo_sync.dart';
 import '../data/sync/calendar_sync.dart';
@@ -19,6 +20,7 @@ import '../domain/event_theme_service.dart';
 import '../domain/event_theme_store.dart';
 import '../domain/family.dart';
 import '../features/calendar/calendar_controller.dart';
+import '../features/cashbook/cash_book_controller.dart';
 import '../features/family/avatar_photo_images.dart';
 
 /// Baut Dienst, Synchronisation und Controller für einen Nutzer zusammen.
@@ -41,6 +43,8 @@ CalendarController buildCalendarController({
   bool avatarPhotosEnabled = AvatarPhotoFlags.enabled,
   CashBookStore? cashBookStore,
   bool cashBooksEnabled = CashBookFlags.enabled,
+  FileAccess? files,
+  String cashBookCurrency = 'EUR',
 }) {
   final service = CalendarService(store: store, myUserId: userId, clock: clock);
   final sync = CalendarSync(
@@ -114,6 +118,7 @@ CalendarController buildCalendarController({
   CashBookService? cashBooks;
   CashBookSync? cashBookSync;
   CashBookReceipts? cashBookReceipts;
+  CashBookController? cashBookController;
   if (cashBookStore != null && familyRoom != null) {
     cashBooks = CashBookService(store: cashBookStore, myUserId: userId, clock: clock);
     cashBookReceipts = CashBookReceipts(
@@ -133,6 +138,18 @@ CalendarController buildCalendarController({
       clock: clock,
       retryInterval: retryInterval,
     );
+    cashBookController = CashBookController(
+      gateway: gateway,
+      service: cashBooks,
+      store: cashBookStore,
+      sync: cashBookSync,
+      receipts: cashBookReceipts,
+      enabled: cashBooksEnabled,
+      // Der Monat „laufend“ zählt nach dem lokalen Datum des Geräts, wie der Rest des Kalenders.
+      today: () => controller.today,
+      files: files,
+      currencyFallback: cashBookCurrency,
+    );
   }
   controller = CalendarController(
     service: service,
@@ -151,6 +168,7 @@ CalendarController buildCalendarController({
     cashBooks: cashBooks,
     cashBookSync: cashBookSync,
     cashBookReceipts: cashBookReceipts,
+    cashBookController: cashBookController,
   );
   return controller;
 }

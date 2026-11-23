@@ -200,6 +200,7 @@ Future<AppServices> bootstrap({
         anniversaryStore: SqlAnniversaryStore(database.db),
         avatarPhotoStore: SqlAvatarPhotoStore(database.db),
         cashBookStore: SqlCashBookStore(database.db),
+        files: fileAccess,
         familyRoom: familyRoom,
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
       );

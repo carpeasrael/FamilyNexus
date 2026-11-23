@@ -23,6 +23,7 @@ import '../../domain/occurrence.dart';
 import '../../domain/recurrence.dart';
 import '../../domain/time_zones.dart';
 import '../../ui/theme/tokens.dart';
+import '../cashbook/cash_book_controller.dart';
 import '../family/avatar_photo_images.dart';
 
 /// Zustand und Aktionen des Kalenders für die Oberfläche.
@@ -44,6 +45,7 @@ class CalendarController extends ChangeNotifier {
     this.cashBooks,
     this.cashBookSync,
     this.cashBookReceipts,
+    this.cashBookController,
   })  : zone = TimeZones.tryGet(zoneName) ?? TimeZones.utc,
         zoneName = TimeZones.tryGet(zoneName) == null ? 'UTC' : zoneName,
         _clock = clock ?? DateTime.now;
@@ -76,6 +78,9 @@ class CalendarController extends ChangeNotifier {
 
   /// Bon-Fotos (Teil 3b); `null`, wenn die Verdrahtung kein Kassenbuch vorsieht.
   final CashBookReceipts? cashBookReceipts;
+
+  /// Steuerung des Kassenbuchs für die Oberfläche (Teil 4); `null`, wenn die Verdrahtung kein Kassenbuch vorsieht.
+  final CashBookController? cashBookController;
 
   /// Zeitzone des Geräts (Betrachter).
   final tz.Location zone;
@@ -126,6 +131,7 @@ class CalendarController extends ChangeNotifier {
       photoSync.start();
     }
     cashBookSync?.start();
+    cashBookController?.start();
     load().ignore();
   }
 
@@ -146,6 +152,7 @@ class CalendarController extends ChangeNotifier {
     }
     avatarPhotoSync?.onChanged = null;
     avatarPhotoSync?.dispose();
+    cashBookController?.dispose();
     cashBookSync?.dispose();
     cashBookReceipts?.dispose();
     avatarPhotoImages?.dispose();

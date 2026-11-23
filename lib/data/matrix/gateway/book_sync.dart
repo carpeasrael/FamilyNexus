@@ -9,6 +9,7 @@ mixin _BookSyncModule on ChangeNotifier implements MatrixGateway {
   bool get _cashBooksEnabled;
   bool get _requireEncryptionForBooks;
   bool get _syncedOnce;
+  bool get _participantsLoaded;
   bool get _disposed;
   FamilyScope get _scope;
   GatewayException _map(Object e);
@@ -88,6 +89,41 @@ mixin _BookSyncModule on ChangeNotifier implements MatrixGateway {
       if (e is GatewayException) rethrow;
       throw _map(e);
     }
+  }
+
+  @override
+  Future<List<BookMember>> bookMembers(String roomId) async {
+    final room = _bookRoom(roomId, membership: Membership.join);
+    if (!_isBookOfCurrentFamily(room)) throw const GatewayException(GatewayError.notAllowed);
+    try {
+      final users = await _freshParticipants(room, const <Membership>[Membership.join, Membership.invite]);
+      return <BookMember>[
+        for (final u in users)
+          if (u.membership == Membership.join)
+            BookMember(u.id, BookMembership.joined)
+          else if (u.membership == Membership.invite)
+            BookMember(u.id, BookMembership.invited),
+      ];
+    } catch (e) {
+      if (e is GatewayException) rethrow;
+      throw _map(e);
+    }
+  }
+
+  @override
+  List<String> get staleBooks {
+    final client = _client;
+    final family = _family;
+    if (!_cashBooksEnabled || client == null || !client.isLogged() || family == null || !_syncedOnce || !_participantsLoaded) {
+      return const <String>[];
+    }
+    return <String>[
+      for (final r in client.rooms)
+        if (r.membership == Membership.join &&
+            BookRoomMarker.isBook(r.getState(EventTypes.RoomCreate)?.content) &&
+            r.getState(EventTypes.RoomCreate)?.content[BookRoomMarker.familyKey] != family.roomId)
+          r.id,
+    ];
   }
 
   @override

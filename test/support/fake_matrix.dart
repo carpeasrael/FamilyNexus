@@ -367,6 +367,26 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     redactedReceipts.add((roomId: roomId, eventId: eventId));
   }
 
+  /// Mitglieder je Buch und „andere Familie“ (Test).
+  final Map<String, List<BookMember>> bookMemberList = <String, List<BookMember>>{};
+  GatewayException? bookMembersError;
+  List<String> fakeStaleBooks = const <String>[];
+  final List<String> leftBooks = <String>[];
+
+  @override
+  Future<List<BookMember>> bookMembers(String roomId) async {
+    bookCalls++;
+    final e = bookMembersError;
+    if (e != null) throw e;
+    return bookMemberList[roomId] ?? const <BookMember>[];
+  }
+
+  @override
+  List<String> get staleBooks {
+    bookCalls++;
+    return fakeStaleBooks;
+  }
+
   void injectBookSignal(BookSignal s) => _bookSignals.add(s);
 
   @override
@@ -375,26 +395,65 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return fakeBooks;
   }
 
-  @override
-  List<BookInvitationInfo> get bookInvitations => const <BookInvitationInfo>[];
+  /// Einladungen und Buchaktionen (Test): Standard wie gesperrt (`notAllowed`); mit [nextBookRoom] gelingt das Anlegen.
+  List<BookInvitationInfo> fakeInvitations = const <BookInvitationInfo>[];
+  String? nextBookRoom;
+  GatewayException? bookActionError;
+  final List<(String, String)> invitedToBook = <(String, String)>[];
+  final List<(String, String)> removedFromBook = <(String, String)>[];
+  final List<String> acceptedBooks = <String>[];
+  final List<String> declinedBooks = <String>[];
 
   @override
-  Future<String> createBook() => throw const GatewayException(GatewayError.notAllowed);
+  List<BookInvitationInfo> get bookInvitations {
+    bookCalls++;
+    return fakeInvitations;
+  }
+
+  GatewayException _actionError() => bookActionError ?? const GatewayException(GatewayError.notAllowed);
 
   @override
-  Future<void> inviteToBook(String roomId, String userId) => throw const GatewayException(GatewayError.notAllowed);
+  Future<String> createBook() async {
+    bookCalls++;
+    final r = nextBookRoom;
+    if (r == null || bookActionError != null) throw _actionError();
+    return r;
+  }
 
   @override
-  Future<void> removeFromBook(String roomId, String userId) => throw const GatewayException(GatewayError.notAllowed);
+  Future<void> inviteToBook(String roomId, String userId) async {
+    bookCalls++;
+    if (nextBookRoom == null || bookActionError != null) throw _actionError();
+    invitedToBook.add((roomId, userId));
+  }
 
   @override
-  Future<void> leaveBook(String roomId) => throw const GatewayException(GatewayError.notAllowed);
+  Future<void> removeFromBook(String roomId, String userId) async {
+    bookCalls++;
+    if (nextBookRoom == null || bookActionError != null) throw _actionError();
+    removedFromBook.add((roomId, userId));
+  }
 
   @override
-  Future<void> acceptBookInvitation(String roomId) => throw const GatewayException(GatewayError.notAllowed);
+  Future<void> leaveBook(String roomId) async {
+    bookCalls++;
+    if (nextBookRoom == null || bookActionError != null) throw _actionError();
+    leftBooks.add(roomId);
+  }
 
   @override
-  Future<void> declineBookInvitation(String roomId) => throw const GatewayException(GatewayError.notAllowed);
+  Future<void> acceptBookInvitation(String roomId) async {
+    bookCalls++;
+    if (nextBookRoom == null || bookActionError != null) throw _actionError();
+    acceptedBooks.add(roomId);
+  }
+
+  @override
+  Future<void> declineBookInvitation(String roomId) async {
+    bookCalls++;
+    if (nextBookRoom == null || bookActionError != null) throw _actionError();
+    declinedBooks.add(roomId);
+  }
 
   @override
   Future<void> verifyBookRecipients(String roomId) => throw const GatewayException(GatewayError.notAllowed);

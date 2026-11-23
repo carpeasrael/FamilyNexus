@@ -81,8 +81,15 @@ class CashBookSync {
   final Map<String, int> _undecryptableSeen = <String, int>{};
   final Set<String> _seenInBooks = <String>{};
   final Map<String, ({DateTime first, int ticks})> _gone = <String, ({DateTime first, int ticks})>{};
+  final Map<String, int> _stale = <String, int>{};
 
   String get _me => service.myUserId;
+
+  /// Merkt oder löscht den Sendeschutz eines Raums und meldet **nur eine tatsächliche Änderung** (für die Oberfläche).
+  void _setBlocked(String room, bool blocked) {
+    final changed = blocked ? blockedRooms.add(room) : blockedRooms.remove(room);
+    if (changed) onChanged?.call();
+  }
 
   @visibleForTesting
   SendBackoff get backoff => _backoff;
@@ -127,6 +134,7 @@ class CashBookSync {
   }
 
   void dispose() {
+    _stale.clear();
     _sub?.cancel().ignore();
     _sub = null;
     _timer?.cancel();
@@ -288,7 +296,7 @@ class CashBookSync {
         case BookSendResult.sent || BookSendResult.invalid:
           await store.markBookPublished(meta);
         case BookSendResult.blocked:
-          blockedRooms.add(meta.roomId);
+          _setBlocked(meta.roomId, true);
         case BookSendResult.failed:
           _backoff.failure();
           return false;
@@ -328,14 +336,14 @@ class CashBookSync {
         final e = batch[i];
         switch (results[i]) {
           case BookSendResult.sent:
-            blockedRooms.remove(room);
+            _setBlocked(room, false);
             await store.markPublished(room, _me, e.id, e.version);
           case BookSendResult.invalid:
             AppLog.w('cashbook', 'Eintrag nicht sendbar, Warteschlange bereinigt');
             await store.markPublished(room, _me, e.id, e.version);
           case BookSendResult.blocked:
             allSent = false;
-            blockedRooms.add(room);
+            _setBlocked(room, true);
           case BookSendResult.failed:
             allSent = false;
             failed = true;
@@ -372,6 +380,7 @@ class CashBookSync {
       try {
         await _completeness();
         await _cleanup();
+        await _leaveStale();
         await _reconcile();
       } finally {
         done.complete();
@@ -436,6 +445,31 @@ class CashBookSync {
         onChanged?.call();
       } else {
         _gone[room] = (first: g.first, ticks: ticks);
+      }
+    }
+  }
+
+  /// Familienwechsel: Ein beigetretener Buch-Raum einer **anderen** Familie wird nach zwei aufeinanderfolgenden Läufen
+  /// verlassen (auch als Ersteller; der lokale Speicher ist beim Wechsel schon geleert, `claimFamilyData`). Ohne
+  /// belastbare Familie (kein Sync, `staleBooks` leer) geschieht nichts: Austritt ohne Nachfolgefamilie ist eine
+  /// dokumentierte Grenze (E-113). Die Zähler werden bei jedem Lauf ohne Treffer, ohne Voraussetzungen und in [dispose] gelöscht.
+  Future<void> _leaveStale() async {
+    if (!_canPublish) {
+      _stale.clear();
+      return;
+    }
+    final stale = gateway.staleBooks.toSet();
+    _stale.removeWhere((room, _) => !stale.contains(room));
+    for (final room in stale) {
+      final n = (_stale[room] ?? 0) + 1;
+      _stale[room] = n;
+      if (n < 2) continue;
+      try {
+        await gateway.leaveBook(room);
+        _stale.remove(room);
+        AppLog.w('cashbook', 'Buch einer früheren Familie verlassen');
+      } on GatewayException catch (e) {
+        AppLog.w('cashbook', 'Verlassen eines früheren Buchs verschoben (${e.error.name})');
       }
     }
   }

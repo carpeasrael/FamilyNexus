@@ -48,6 +48,7 @@ void main() {
       expect(c.cashBooks, isNull);
       expect(c.cashBookSync, isNull);
       expect(c.cashBookReceipts, isNull);
+      expect(c.cashBookController, isNull);
     }
   });
 
@@ -57,6 +58,8 @@ void main() {
     expect(c.cashBookSync!.enabled, isFalse);
     expect(c.cashBookReceipts!.enabled, isFalse);
     expect(c.cashBooks!.onReceiptReleased, isNull, reason: 'gesperrt: kein Rückruf verdrahtet');
+    expect(c.cashBookController!.enabled, isFalse);
+    expect(c.cashBookController!.available, isFalse);
     gateway.fakeBooks = <BookRoomInfo>[const BookRoomInfo(roomId: kBookRoom, creatorId: kBookOwner)];
     await store.putBook(bookMeta(owner: gateway.userId!), published: false);
     gateway.bookCalls = 0;
@@ -73,16 +76,20 @@ void main() {
     final c = build(cash: store, room: roomId, enabled: true);
     expect(c.cashBookSync!.enabled, isTrue);
     expect(c.cashBookReceipts!.enabled, isTrue);
+    expect(c.cashBookController!.enabled, isTrue);
+    expect(c.cashBookSync!.onChanged, isNull, reason: 'vor dem Start ist der Slot frei');
     expect(identical(c.cashBookSync!.receipts, c.cashBookReceipts), isTrue, reason: 'der Sync räumt mit denselben Bon-Diensten auf');
     expect(c.cashBooks!.onReceiptReleased, isNotNull, reason: 'der Rückruf des Dienstes räumt Bon-Dateien auf');
     expect(c.cashBooks!.myUserId, gateway.userId);
     gateway.fakeBooks = <BookRoomInfo>[BookRoomInfo(roomId: kBookRoom, creatorId: gateway.userId!)];
     await store.putBook(bookMeta(owner: gateway.userId!), published: false);
     c.start(familyRoom: roomId);
+    expect(c.cashBookSync!.onChanged, isNotNull, reason: 'der Controller des Kassenbuchs besitzt den Slot');
     await c.cashBookSync!.publishPending();
     expect(gateway.bookPublished.single.events.single.type, CashBookCodec.metaType);
     c.dispose();
     expect(c.cashBooks!.onReceiptReleased, isNull, reason: 'beim Schließen gelöst');
+    expect(c.cashBookSync!.onChanged, isNull, reason: 'beim Schließen gibt der Controller den Slot frei');
     // nach dem Schließen hört der Sync nicht mehr zu
     gateway.injectBookSignal(BookSignal(
       roomId: kBookRoom,
