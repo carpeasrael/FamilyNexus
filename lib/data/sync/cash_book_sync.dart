@@ -9,6 +9,7 @@ import '../../domain/cash_book.dart';
 import '../../domain/cash_book_service.dart';
 import '../../domain/cash_book_store.dart';
 import '../matrix/matrix_gateway.dart';
+import 'cash_book_receipts.dart';
 import 'send_backoff.dart';
 
 /// Verbindet die Kassenbücher mit Matrix (#311, E-113), nach dem Muster der übrigen Sync-Klassen:
@@ -30,6 +31,7 @@ class CashBookSync {
     required this.familyRoom,
     this.enabled = CashBookFlags.enabled,
     this.retryInterval = const Duration(seconds: 60),
+    this.receipts,
     this.fallbackCurrency = 'EUR',
     this.memberFetchInterval = const Duration(seconds: 30),
     DateTime Function()? clock,
@@ -47,6 +49,9 @@ class CashBookSync {
   final bool enabled;
   final Duration retryInterval;
   final String fallbackCurrency;
+
+  /// Bon-Dateien (3b): Aufräumen im Zeitgeber und nach erfolgreichem Senden.
+  final CashBookReceipts? receipts;
   final Duration memberFetchInterval;
   final DateTime Function() _clock;
   final SendBackoff _backoff;
@@ -254,6 +259,7 @@ class CashBookSync {
         if (!await _publishMetas(books)) return;
         if (!await _publishEntries(books)) return;
         _backoff.success();
+        await receipts?.flushCleanup();
       } while (_again);
     } catch (e) {
       AppLog.e('cashbook', 'Sendedurchlauf gescheitert', e);
@@ -373,6 +379,7 @@ class CashBookSync {
     });
     await done.future;
     await publishPending();
+    await receipts?.flushCleanup();
   }
 
   Future<void> _completeness() async {

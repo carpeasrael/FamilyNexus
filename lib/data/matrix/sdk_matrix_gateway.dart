@@ -27,6 +27,7 @@ import '../../domain/book_signal.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/cash_book.dart';
+import '../../domain/cash_receipt_check.dart';
 import '../../domain/chat.dart';
 import '../../domain/data_inventory.dart';
 import '../../domain/event_codec.dart';
@@ -71,6 +72,7 @@ import 'sync_relevance.dart';
 part 'gateway/account_deletion.dart';
 part 'gateway/app_client.dart';
 part 'gateway/avatars.dart';
+part 'gateway/book_receipts.dart';
 part 'gateway/book_sync.dart';
 part 'gateway/books.dart';
 part 'gateway/calendar_data.dart';
@@ -112,7 +114,7 @@ bool sessionEndedByServerFor(SessionClearReason reason) => switch (reason) {
 /// * Lesebestätigungen sind standardmäßig öffentlich (`m.read`), wenn „Lesebestätigung senden“ an ist (E-106, #526); aus: nur privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _BookSyncModule, _AccountDeletionModule, _BooksModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _AvatarsModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyncModule, _AccountDeletionModule, _BooksModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _AvatarsModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -1092,7 +1094,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookSyncModule, _AccountDele
   /// behauptete Wert ist nicht vertrauenswürdig) oder [timeout] lang nichts kommt (#458).
   @visibleForTesting
   static Future<Uint8List> boundedDownload(http.Client client, Uri uri,
-      {required String? accessToken, Duration timeout = attachmentTimeout}) async {
+      {required String? accessToken, Duration timeout = attachmentTimeout, int maxBytes = AttachmentPolicy.maxBytes}) async {
     final req = http.Request('GET', uri)..headers['authorization'] = 'Bearer $accessToken';
     final res = await client.send(req).timeout(timeout);
     if (res.statusCode != 200) {
@@ -1101,7 +1103,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookSyncModule, _AccountDele
       throw const GatewayException(GatewayError.notFound);
     }
     final declared = res.contentLength;
-    if (declared != null && declared > AttachmentPolicy.maxBytes + 1024) {
+    if (declared != null && declared > maxBytes + 1024) {
       unawaited(res.stream.listen(null).cancel());
       throw const GatewayException(GatewayError.attachmentRejected);
     }
@@ -1109,7 +1111,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookSyncModule, _AccountDele
     // `timeout` am Strom ist eine Leerlauf-Schranke und beendet beim Auslösen das Abo (wie invitations.dart, E-81).
     await for (final chunk in res.stream.timeout(timeout)) {
       buf.add(chunk);
-      if (buf.length > AttachmentPolicy.maxBytes + 1024) {
+      if (buf.length > maxBytes + 1024) {
         throw const GatewayException(GatewayError.attachmentRejected);
       }
     }

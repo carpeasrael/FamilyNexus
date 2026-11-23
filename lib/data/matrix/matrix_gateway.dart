@@ -7,6 +7,8 @@ import '../../domain/book_policy.dart';
 import '../../domain/book_signal.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
+import '../../domain/cash_book.dart';
+import '../../domain/cash_receipt_check.dart';
 import '../../domain/chat.dart';
 import '../../domain/data_inventory.dart';
 import '../../domain/event_themes.dart';
@@ -402,6 +404,17 @@ abstract class MatrixGateway implements Listenable {
   /// Sendet Buch-Ereignisse (höchstens 50) in den Buch-Raum. Das Gateway prüft selbst: Familie, Verschlüsselung,
   /// Sendeschutz, Typ, Autor, Größe. Ergebnis je Ereignis ([BookSendResult]).
   Future<List<BookSendResult>> publishBookEvents(String roomId, List<BookOutgoing> events);
+
+  /// Sendet ein Bon-Foto (JPEG, höchstens 1 MiB) als **Datei** in den Buch-Raum und liefert die Ereignis-ID. Ohne
+  /// Vorschau und ohne Umkodierung des SDK. Prüft Familie, Verschlüsselung, Sendeschutz, Größe und JPEG-Kennung.
+  Future<String> sendBookReceipt(String roomId, Uint8List bytes);
+
+  /// Lädt und **prüft** die Bon-Datei eines Eintrags ([author] ist der Autor des Eintrags): Absender, Größe vor dem Laden,
+  /// Hash, Größe und Kennung der Bytes. Dekodiert nie ein Bild.
+  Future<BookReceiptLoad> loadBookReceipt(String roomId, String eventId, {required CashReceipt receipt, required String author});
+
+  /// Schwärzt eine **eigene** Bon-Datei (Aufräumen nach bestem Bemühen). Nie fremde Dateien, auch nicht als Ersteller.
+  Future<void> redactBookReceipt(String roomId, String eventId);
 
   // ------------------------------------------------------------ Kalender
 

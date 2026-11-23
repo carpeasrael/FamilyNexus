@@ -10,6 +10,8 @@ import 'package:family_nexus/domain/book_policy.dart';
 import 'package:family_nexus/domain/book_signal.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
+import 'package:family_nexus/domain/cash_book.dart';
+import 'package:family_nexus/domain/cash_receipt_check.dart';
 import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/data_inventory.dart';
 import 'package:family_nexus/domain/event_codec.dart';
@@ -333,6 +335,37 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Ergebnis von [reconcileBook] (Test); zählt Aufrufe.
   List<String> Function(String roomId)? reconcileHandler;
   int reconcileCalls = 0;
+
+  /// Bon-Dateien (Test): Ergebnis von [loadBookReceipt], Fehler und Protokoll der Aufrufe.
+  BookReceiptLoad Function(String roomId, String eventId, CashReceipt receipt, String author)? loadReceiptHandler;
+  GatewayException? sendReceiptError;
+  GatewayException? Function(String roomId, String eventId)? redactReceiptHandler;
+  final List<({String roomId, Uint8List bytes})> sentReceipts = <({String roomId, Uint8List bytes})>[];
+  final List<({String roomId, String eventId})> redactedReceipts = <({String roomId, String eventId})>[];
+  int receiptCounter = 0;
+
+  @override
+  Future<String> sendBookReceipt(String roomId, Uint8List bytes) async {
+    bookCalls++;
+    final e = sendReceiptError;
+    if (e != null) throw e;
+    sentReceipts.add((roomId: roomId, bytes: bytes));
+    return '\$receipt${++receiptCounter}';
+  }
+
+  @override
+  Future<BookReceiptLoad> loadBookReceipt(String roomId, String eventId, {required CashReceipt receipt, required String author}) async {
+    bookCalls++;
+    return loadReceiptHandler?.call(roomId, eventId, receipt, author) ?? const BookReceiptLoad(BookReceiptStatus.missing);
+  }
+
+  @override
+  Future<void> redactBookReceipt(String roomId, String eventId) async {
+    bookCalls++;
+    final e = redactReceiptHandler?.call(roomId, eventId);
+    if (e != null) throw e;
+    redactedReceipts.add((roomId: roomId, eventId: eventId));
+  }
 
   void injectBookSignal(BookSignal s) => _bookSignals.add(s);
 

@@ -47,6 +47,7 @@ void main() {
     for (final c in <CalendarController>[noStore, noRoom]) {
       expect(c.cashBooks, isNull);
       expect(c.cashBookSync, isNull);
+      expect(c.cashBookReceipts, isNull);
     }
   });
 
@@ -54,6 +55,8 @@ void main() {
     final c = build(cash: store, room: roomId);
     expect(c.cashBookSync, isNotNull);
     expect(c.cashBookSync!.enabled, isFalse);
+    expect(c.cashBookReceipts!.enabled, isFalse);
+    expect(c.cashBooks!.onReceiptReleased, isNull, reason: 'gesperrt: kein Rückruf verdrahtet');
     gateway.fakeBooks = <BookRoomInfo>[const BookRoomInfo(roomId: kBookRoom, creatorId: kBookOwner)];
     await store.putBook(bookMeta(owner: gateway.userId!), published: false);
     gateway.bookCalls = 0;
@@ -69,6 +72,8 @@ void main() {
   test('freigeschaltet: der Sync läuft, sendet die Metadaten und endet mit dem Controller', () async {
     final c = build(cash: store, room: roomId, enabled: true);
     expect(c.cashBookSync!.enabled, isTrue);
+    expect(c.cashBookReceipts!.enabled, isTrue);
+    expect(c.cashBooks!.onReceiptReleased, isNotNull, reason: 'der Rückruf des Dienstes räumt Bon-Dateien auf');
     expect(c.cashBooks!.myUserId, gateway.userId);
     gateway.fakeBooks = <BookRoomInfo>[BookRoomInfo(roomId: kBookRoom, creatorId: gateway.userId!)];
     await store.putBook(bookMeta(owner: gateway.userId!), published: false);
@@ -76,6 +81,7 @@ void main() {
     await c.cashBookSync!.publishPending();
     expect(gateway.bookPublished.single.events.single.type, CashBookCodec.metaType);
     c.dispose();
+    expect(c.cashBooks!.onReceiptReleased, isNull, reason: 'beim Schließen gelöst');
     // nach dem Schließen hört der Sync nicht mehr zu
     gateway.injectBookSignal(BookSignal(
       roomId: kBookRoom,

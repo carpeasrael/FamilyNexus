@@ -5,6 +5,7 @@ import '../../data/matrix/matrix_gateway.dart';
 import '../../data/sync/anniversary_sync.dart';
 import '../../data/sync/avatar_photo_sync.dart';
 import '../../data/sync/calendar_sync.dart';
+import '../../data/sync/cash_book_receipts.dart';
 import '../../data/sync/cash_book_sync.dart';
 import '../../data/sync/event_theme_sync.dart';
 import '../../domain/anniversaries.dart';
@@ -42,6 +43,7 @@ class CalendarController extends ChangeNotifier {
     this.avatarPhotoImages,
     this.cashBooks,
     this.cashBookSync,
+    this.cashBookReceipts,
   })  : zone = TimeZones.tryGet(zoneName) ?? TimeZones.utc,
         zoneName = TimeZones.tryGet(zoneName) == null ? 'UTC' : zoneName,
         _clock = clock ?? DateTime.now;
@@ -71,6 +73,9 @@ class CalendarController extends ChangeNotifier {
   /// (`CashBookFlags.enabled`) inaktiv.
   final CashBookService? cashBooks;
   final CashBookSync? cashBookSync;
+
+  /// Bon-Fotos (Teil 3b); `null`, wenn die Verdrahtung kein Kassenbuch vorsieht.
+  final CashBookReceipts? cashBookReceipts;
 
   /// Zeitzone des Geräts (Betrachter).
   final tz.Location zone;
@@ -142,6 +147,7 @@ class CalendarController extends ChangeNotifier {
     avatarPhotoSync?.onChanged = null;
     avatarPhotoSync?.dispose();
     cashBookSync?.dispose();
+    cashBookReceipts?.dispose();
     avatarPhotoImages?.dispose();
     super.dispose();
   }

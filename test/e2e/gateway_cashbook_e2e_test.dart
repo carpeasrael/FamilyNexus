@@ -1,12 +1,18 @@
+import 'dart:typed_data';
+
 import 'package:family_nexus/data/matrix/matrix_gateway.dart' show GatewayError, GatewayException;
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
+import 'package:family_nexus/data/sync/cash_book_receipts.dart';
 import 'package:family_nexus/data/sync/cash_book_sync.dart';
 import 'package:family_nexus/domain/cash_book.dart';
 import 'package:family_nexus/domain/cash_book_service.dart';
+import 'package:family_nexus/domain/cash_receipt_check.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/invite_link.dart';
+import 'package:family_nexus/domain/receipt_photo_processing.dart';
 import 'package:family_nexus/domain/security.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
 
 import '../support/memory_cash_book_store.dart';
 import 'e2e_support.dart';
@@ -121,6 +127,54 @@ void main() {
       // Entfernen: G2 verliert den Zugriff.
       await t.g1.removeFromBook(room, t.g2.userId!);
       await E2e.until(() => t.g2.bookRoomGone(room), what: 'G2 ist nicht mehr im Buch');
+    }, timeout: const Timeout(Duration(minutes: 3)));
+
+    test('Bon-Foto: senden, empfangen, Hash geprüft; Fälschung durch ein anderes Mitglied; Schwärzen nur eigener Dateien', () async {
+      final t = await twoModerators('cb-d');
+      final room = await t.g1.createBook();
+      await E2e.until(() => t.g1.books.any((b) => b.roomId == room), what: 'Buch da');
+      await t.g1.inviteToBook(room, t.g2.userId!);
+      await E2e.until(() => t.g2.bookInvitations.any((i) => i.roomId == room), what: 'Einladung');
+      await t.g2.acceptBookInvitation(room);
+      await E2e.until(() => t.g2.books.any((b) => b.roomId == room), what: 'G2 im Buch');
+      await t.p1.service.applyBook(CashBookMeta(roomId: room, title: 'Bons', currency: 'EUR', owner: t.g1.userId!), published: false);
+
+      final jpeg = ReceiptPhotoProcessing.prepare(Uint8List.fromList(img.encodeJpg(img.Image(width: 300, height: 400)))).bytes;
+      final r1 = CashBookReceipts(gateway: t.g1, service: t.p1.service, store: t.p1.store, enabled: true);
+      final r2 = CashBookReceipts(gateway: t.g2, service: t.p2.service, store: t.p2.store, enabled: true);
+      addTearDown(() {
+        r1.dispose();
+        r2.dispose();
+      });
+      final entry = await r1.createWithReceipt(room, date: DateTime.now(), store: 'Edeka', amountCents: 990, jpeg: jpeg);
+      await t.p1.sync.publishPending();
+      await E2e.untilAsync(() async => await t.p2.store.getEntry(room, t.g1.userId!, entry.id) != null, what: 'G2 sieht den Eintrag');
+      final got = await r2.load(room, (await t.p2.store.getEntry(room, t.g1.userId!, entry.id))!);
+      expect(got.status, BookReceiptStatus.ok);
+      expect(got.bytes, jpeg);
+
+      // Fälschung: Ein Eintrag von G2, der die Datei von G1 als seinen Bon ausgibt, ist ungültig (Absender != Autor).
+      final forged = CashEntry(
+        id: '33333333-3333-4333-8333-333333333333',
+        author: t.g2.userId!,
+        date: DateTime.now(),
+        store: 'Fälschung',
+        amountCents: 1,
+        receipt: entry.receipt,
+        updatedAt: DateTime.now(),
+      );
+      expect((await r1.load(room, forged)).status, BookReceiptStatus.invalid);
+
+      // Schwärzen: nur eigene Dateien.
+      await expectLater(
+        t.g2.redactBookReceipt(room, entry.receipt!.eventId),
+        throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.notAllowed)),
+      );
+      await t.g1.redactBookReceipt(room, entry.receipt!.eventId);
+      await E2e.untilAsync(
+        () async => (await r2.load(room, (await t.p2.store.getEntry(room, t.g1.userId!, entry.id))!)).status == BookReceiptStatus.missing,
+        what: 'geschwärzte Datei gilt als fehlend',
+      );
     }, timeout: const Timeout(Duration(minutes: 3)));
 
     test('Familienmitglied ohne Moderatorrolle wird nicht eingeladen', () async {

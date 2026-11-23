@@ -31,6 +31,11 @@ class CashBookService {
 
   DateTime get _now => _clock().toUtc();
 
+  /// Wird nach dem Speichern gerufen, wenn ein **eigener** Eintrag seinen Bon-Verweis verliert oder ändert (Ersetzen,
+  /// Entfernen, Löschen): Die frühere Datei darf aufgeräumt werden (nach bestem Bemühen, E-111). Nie bei Fremdeinträgen,
+  /// beim Empfang oder bei [restamp].
+  void Function(String roomId, String entryId, String eventId)? onReceiptReleased;
+
   // Alle schreibenden Abläufe laufen nacheinander (Eingänge, lokale Änderungen).
   Future<void> _tail = Future<void>.value();
 
@@ -122,6 +127,8 @@ class CashBookService {
         );
         _check(next);
         await store.putEntry(roomId, next);
+        final old = current.receipt;
+        if (old != null && old.eventId != next.receipt?.eventId) onReceiptReleased?.call(roomId, next.id, old.eventId);
         return next;
       });
 
@@ -131,6 +138,8 @@ class CashBookService {
         if (current == null) throw const CashBookException(CashBookError.notFound);
         if (current.deleted) return;
         await store.putEntry(roomId, current.tombstone(_now));
+        final old = current.receipt;
+        if (old != null) onReceiptReleased?.call(roomId, current.id, old.eventId);
       });
 
   /// Stempelt einen **eigenen** Eintrag (Version unverändert) neu, wenn sein `updated_at` mehr als einen Tag von jetzt

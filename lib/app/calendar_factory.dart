@@ -2,6 +2,7 @@ import '../data/matrix/matrix_gateway.dart';
 import '../data/sync/anniversary_sync.dart';
 import '../data/sync/avatar_photo_sync.dart';
 import '../data/sync/calendar_sync.dart';
+import '../data/sync/cash_book_receipts.dart';
 import '../data/sync/cash_book_sync.dart';
 import '../data/sync/event_theme_sync.dart';
 import '../domain/anniversary_service.dart';
@@ -112,10 +113,19 @@ CalendarController buildCalendarController({
   // Kassenbuch (#311, E-113): nur mit Ablage und bekannter Familie; die Sync-Klasse bleibt bis zur Freigabe inaktiv.
   CashBookService? cashBooks;
   CashBookSync? cashBookSync;
+  CashBookReceipts? cashBookReceipts;
   if (cashBookStore != null && familyRoom != null) {
     cashBooks = CashBookService(store: cashBookStore, myUserId: userId, clock: clock);
+    cashBookReceipts = CashBookReceipts(
+      gateway: gateway,
+      service: cashBooks,
+      store: cashBookStore,
+      enabled: cashBooksEnabled,
+      clock: clock,
+    );
     cashBookSync = CashBookSync(
       gateway: gateway,
+      receipts: cashBookReceipts,
       service: cashBooks,
       store: cashBookStore,
       familyRoom: familyRoom,
@@ -140,6 +150,7 @@ CalendarController buildCalendarController({
     avatarPhotoImages: avatarPhotoImages,
     cashBooks: cashBooks,
     cashBookSync: cashBookSync,
+    cashBookReceipts: cashBookReceipts,
   );
   return controller;
 }
