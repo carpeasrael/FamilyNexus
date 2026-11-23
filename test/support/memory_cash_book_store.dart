@@ -5,6 +5,7 @@ import 'package:family_nexus/domain/cash_book_store.dart';
 class MemoryCashBookStore implements CashBookStore {
   final Map<String, CashBookMeta> _books = <String, CashBookMeta>{};
   final Set<String> _complete = <String>{};
+  final Set<String> _unpublishedBooks = <String>{};
   final Map<(String, String, String), CashEntry> _entries = <(String, String, String), CashEntry>{};
   final Map<(String, String, String), int> _published = <(String, String, String), int>{};
 
@@ -15,11 +16,32 @@ class MemoryCashBookStore implements CashBookStore {
   Future<List<CashBookMeta>> books() async => _books.values.toList();
 
   @override
-  Future<void> putBook(CashBookMeta meta, {bool published = true}) async => _books[meta.roomId] = meta;
+  Future<void> putBook(CashBookMeta meta, {bool published = true}) async {
+    _books[meta.roomId] = meta;
+    published ? _unpublishedBooks.remove(meta.roomId) : _unpublishedBooks.add(meta.roomId);
+  }
+
+  @override
+  Future<List<CashBookMeta>> pendingBooks(String owner) async => <CashBookMeta>[
+        for (final b in _books.values)
+          if (b.owner == owner && b.version >= 1 && _unpublishedBooks.contains(b.roomId)) b,
+      ];
+
+  @override
+  Future<void> markBookPublished(CashBookMeta sent) async {
+    if (_books[sent.roomId] == sent) _unpublishedBooks.remove(sent.roomId);
+  }
+
+  @override
+  Future<void> requeueBook(String roomId) async {
+    final b = _books[roomId];
+    if (b != null && b.version >= 1) _unpublishedBooks.add(roomId);
+  }
 
   @override
   Future<void> deleteBook(String roomId) async {
     _books.remove(roomId);
+    _unpublishedBooks.remove(roomId);
     _complete.remove(roomId);
     _entries.removeWhere((k, _) => k.$1 == roomId);
     _published.removeWhere((k, _) => k.$1 == roomId);
@@ -73,6 +95,7 @@ class MemoryCashBookStore implements CashBookStore {
   @override
   Future<void> wipe() async {
     _books.clear();
+    _unpublishedBooks.clear();
     _complete.clear();
     _entries.clear();
     _published.clear();

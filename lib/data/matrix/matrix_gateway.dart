@@ -4,6 +4,7 @@ import '../../domain/account_deletion.dart';
 import '../../domain/anniversaries.dart';
 import '../../domain/avatar_photo.dart';
 import '../../domain/book_policy.dart';
+import '../../domain/book_signal.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
 import '../../domain/chat.dart';
@@ -378,6 +379,29 @@ abstract class MatrixGateway implements Listenable {
   /// Abgleich (nur Ersteller): Entfernt Mitglieder, die zweimal hintereinander nicht mehr berechtigt waren. Läuft nur
   /// bei belastbarem Stand (erster Sync, Familie und Mitgliederliste geladen). Liefert die Entfernten.
   Future<List<String>> reconcileBook(String roomId);
+
+  /// Empfangene Ereignisse der Buch-Räume (#311, E-113): `bookmeta` (höchste Version je Raum, zuerst), Einträge (je
+  /// Absender und `id` die höchste Version) und Beitritte neuer Mitglieder. Eigener Strom, nie Teil von
+  /// [calendarSignals]; neue Zuhörer erhalten zuerst den bisherigen Stand. Leer, solange gesperrt.
+  Stream<BookSignal> get bookSignals;
+
+  /// Ist der Verlauf des Buchs vollständig geladen (Backfill zu Ende, nicht gekürzt)? Sonst stehen Summen unter Vorbehalt.
+  bool bookHistoryComplete(String roomId);
+
+  /// Anzahl der (noch) nicht entschlüsselbaren Ereignisse in der Zeitleiste des Buchs.
+  int bookUndecryptableCount(String roomId);
+
+  /// Ist das Buch lokal nachweislich nicht mehr beigetreten (verlassen, entfernt, gebannt oder nach dem Initial-Sync
+  /// unbekannt)? Nur dann darf der lokale Bestand verworfen werden; ein Buch, das nur kurz aus [books] fehlt, zählt nicht.
+  bool bookRoomGone(String roomId);
+
+  /// Nutzer, die im Buch-Raum je `join`, `leave`, `invite` oder `ban` waren (frisch vom Server). Wirft bei
+  /// unbrauchbarer Antwort (fail-closed).
+  Future<Set<String>> bookKnownMembers(String roomId);
+
+  /// Sendet Buch-Ereignisse (höchstens 50) in den Buch-Raum. Das Gateway prüft selbst: Familie, Verschlüsselung,
+  /// Sendeschutz, Typ, Autor, Größe. Ergebnis je Ereignis ([BookSendResult]).
+  Future<List<BookSendResult>> publishBookEvents(String roomId, List<BookOutgoing> events);
 
   // ------------------------------------------------------------ Kalender
 

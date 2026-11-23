@@ -20,6 +20,19 @@ mixin _BooksModule on ChangeNotifier implements MatrixGateway {
       BookRoomMarker.isBook(room.getState(EventTypes.RoomCreate)?.content) &&
       room.getState(EventTypes.RoomCreate)?.content[BookRoomMarker.familyKey] == _family?.roomId;
 
+  /// Mitglieder **frisch vom Server** (`enforceFetchFromServer`, ohne Zwischenspeicher): maßgeblich ist die
+  /// **Rückgabe**, nie `room.getParticipants()` (bei `cache: false` schreibt das SDK nichts in den Raumzustand). Fehlt
+  /// das eigene Konto als beigetretenes Mitglied (leere oder unbrauchbare Antwort), gilt der Abruf als gescheitert
+  /// (fail-closed: nie „keine Fremden“ aus einer leeren Antwort schließen).
+  Future<List<User>> _freshParticipants(Room room, List<Membership> filter) async {
+    final users = await room.requestParticipants(filter, true, false, true);
+    final me = _client?.userID;
+    if (me == null || !users.any((u) => u.id == me && u.membership == Membership.join)) {
+      throw const GatewayException(GatewayError.serverUnreachable);
+    }
+    return users;
+  }
+
   Room _bookRoom(String roomId, {required Membership membership}) {
     final client = _client;
     if (!_cashBooksEnabled || client == null || !client.isLogged()) throw const GatewayException(GatewayError.notAllowed);
@@ -117,9 +130,8 @@ mixin _BooksModule on ChangeNotifier implements MatrixGateway {
       throw const GatewayException(GatewayError.notAllowed);
     }
     try {
-      await room.requestParticipants();
-      final members = room.getParticipants().where((u) => u.membership == Membership.join || u.membership == Membership.invite);
-      if (members.length >= CashBookLimits.maxMembersPerBook) throw const GatewayException(GatewayError.invalidInput);
+      final users = await _freshParticipants(room, const <Membership>[Membership.join, Membership.invite]);
+      if (users.length >= CashBookLimits.maxMembersPerBook) throw const GatewayException(GatewayError.invalidInput);
       await room.invite(userId).timeout(SdkMatrixGateway.roomOpTimeout);
     } catch (e) {
       if (e is GatewayException) rethrow;
@@ -240,16 +252,18 @@ mixin _BooksModule on ChangeNotifier implements MatrixGateway {
     final family = _family;
     final me = _client!.userID!;
     if (family == null) throw const GatewayException(GatewayError.notAllowed);
+    final List<User> users;
     try {
-      // Immer frisch lesen: kein Zwischenspeicher wie beim privaten Raum (`_privateVerified`).
-      await room.requestParticipants();
+      // Immer frisch vom Server lesen und die Rückgabe auswerten (nie der lokale Teilstand, kein Zwischenspeicher).
+      users = await _freshParticipants(room, const <Membership>[Membership.join, Membership.invite]);
     } catch (e) {
+      if (e is GatewayException) rethrow;
       throw _map(e);
     }
     final members = <BookMember>[
-      for (final u in room.getParticipants())
+      for (final u in users)
         if (u.membership == Membership.join) BookMember(u.id, BookMembership.joined),
-      for (final u in room.getParticipants())
+      for (final u in users)
         if (u.membership == Membership.invite) BookMember(u.id, BookMembership.invited),
     ];
     final bad = BookPolicy.unauthorized(members, family, me: me);
@@ -270,14 +284,16 @@ mixin _BooksModule on ChangeNotifier implements MatrixGateway {
       _bookReconciler.reset(roomId);
       return const <String>[];
     }
+    final List<User> users;
     try {
-      await room.requestParticipants();
+      users = await _freshParticipants(room, const <Membership>[Membership.join, Membership.invite]);
     } catch (e) {
       _bookReconciler.reset(roomId);
+      if (e is GatewayException) rethrow;
       throw _map(e);
     }
     final members = <BookMember>[
-      for (final u in room.getParticipants())
+      for (final u in users)
         if (u.membership == Membership.join || u.membership == Membership.invite)
           BookMember(u.id, u.membership == Membership.join ? BookMembership.joined : BookMembership.invited),
     ];

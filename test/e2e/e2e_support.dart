@@ -71,6 +71,8 @@ class E2e {
     bool ensureAvatarPermission = true,
     // #526: Einstellung „Lesebestätigung senden“ dieses Geräts; ohne Angabe an (wie die App).
     bool Function()? shareReadReceipts,
+    // #311: Kassenbuch freischalten (Standard: gesperrt wie in der App).
+    bool cashBooksEnabled = false,
   }) async {
     final d = device ?? await newDevice();
     return SdkMatrixGateway(
@@ -83,6 +85,7 @@ class E2e {
       participantsRetryBase: participantsRetryBase,
       ensureAvatarPermission: ensureAvatarPermission,
       shareReadReceipts: shareReadReceipts ?? () => true,
+      cashBooksEnabled: cashBooksEnabled,
     );
   }
 
@@ -97,6 +100,7 @@ class E2e {
     Duration participantsRetryBase = SdkMatrixGateway.participantsRetryDelay,
     bool ensureAvatarPermission = true,
     bool Function()? shareReadReceipts,
+    bool cashBooksEnabled = false,
   }) async {
     await init();
     final acc = await registerUser(prefix);
@@ -106,6 +110,7 @@ class E2e {
       participantsRetryBase: participantsRetryBase,
       ensureAvatarPermission: ensureAvatarPermission,
       shareReadReceipts: shareReadReceipts,
+      cashBooksEnabled: cashBooksEnabled,
     );
     await g.restore();
     await g.login(server: server, username: acc.user, password: acc.password);

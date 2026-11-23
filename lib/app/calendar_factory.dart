@@ -2,6 +2,7 @@ import '../data/matrix/matrix_gateway.dart';
 import '../data/sync/anniversary_sync.dart';
 import '../data/sync/avatar_photo_sync.dart';
 import '../data/sync/calendar_sync.dart';
+import '../data/sync/cash_book_sync.dart';
 import '../data/sync/event_theme_sync.dart';
 import '../domain/anniversary_service.dart';
 import '../domain/anniversary_store.dart';
@@ -9,6 +10,9 @@ import '../domain/avatar_photo.dart';
 import '../domain/avatar_photo_service.dart';
 import '../domain/avatar_photo_store.dart';
 import '../domain/calendar_service.dart';
+import '../domain/cash_book.dart';
+import '../domain/cash_book_service.dart';
+import '../domain/cash_book_store.dart';
 import '../domain/event_store.dart';
 import '../domain/event_theme_service.dart';
 import '../domain/event_theme_store.dart';
@@ -34,6 +38,8 @@ CalendarController buildCalendarController({
   String? familyRoom,
   bool Function(String userId)? isModerator,
   bool avatarPhotosEnabled = AvatarPhotoFlags.enabled,
+  CashBookStore? cashBookStore,
+  bool cashBooksEnabled = CashBookFlags.enabled,
 }) {
   final service = CalendarService(store: store, myUserId: userId, clock: clock);
   final sync = CalendarSync(
@@ -103,6 +109,21 @@ CalendarController buildCalendarController({
       retryInterval: retryInterval,
     );
   }
+  // Kassenbuch (#311, E-113): nur mit Ablage und bekannter Familie; die Sync-Klasse bleibt bis zur Freigabe inaktiv.
+  CashBookService? cashBooks;
+  CashBookSync? cashBookSync;
+  if (cashBookStore != null && familyRoom != null) {
+    cashBooks = CashBookService(store: cashBookStore, myUserId: userId, clock: clock);
+    cashBookSync = CashBookSync(
+      gateway: gateway,
+      service: cashBooks,
+      store: cashBookStore,
+      familyRoom: familyRoom,
+      enabled: cashBooksEnabled,
+      clock: clock,
+      retryInterval: retryInterval,
+    );
+  }
   controller = CalendarController(
     service: service,
     store: store,
@@ -117,6 +138,8 @@ CalendarController buildCalendarController({
     avatarPhotos: avatarPhotos,
     avatarPhotoSync: avatarPhotoSync,
     avatarPhotoImages: avatarPhotoImages,
+    cashBooks: cashBooks,
+    cashBookSync: cashBookSync,
   );
   return controller;
 }
