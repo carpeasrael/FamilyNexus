@@ -69,6 +69,9 @@ class ReceiptPhotoProcessing {
   static const int qualityStart = 85;
   static const int qualityMin = 60;
   static const int targetBytes = 600 * 1024;
+
+  /// Hartes Limit der Datei (1 MiB, `CashBookLimits.maxReceiptBytes`).
+  static const int hardLimitBytes = CashBookLimits.maxReceiptBytes;
   static const List<double> scaleSteps = <double>[1.0, 0.85, 0.7, 0.55, 0.4];
 
   /// Basisgröße (Breite, Höhe) zu einer ausgerichteten Quelle: harte Grenzen, nie vergrößert, `floor`, Kanten ≥ 1.
@@ -82,7 +85,7 @@ class ReceiptPhotoProcessing {
     Uint8List input, {
     int pixelLimit = maxPixels,
     int targetBytes = ReceiptPhotoProcessing.targetBytes,
-    int hardLimitBytes = CashBookLimits.maxReceiptBytes,
+    int hardLimitBytes = ReceiptPhotoProcessing.hardLimitBytes,
   }) {
     final img.Image oriented;
     try {

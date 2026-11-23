@@ -76,6 +76,7 @@ void main() {
       expect(ReceiptPhotoProcessing.minShortSide, 1000);
       expect(ReceiptPhotoProcessing.targetBytes, 600 * 1024);
       expect(CashBookLimits.maxReceiptBytes, 1024 * 1024);
+      expect(ReceiptPhotoProcessing.hardLimitBytes, 1024 * 1024);
       expect(ReceiptPhotoProcessing.qualityStart, 85);
       expect(ReceiptPhotoProcessing.qualityMin, 60);
       expect(ReceiptPhotoProcessing.scaleSteps, <double>[1.0, 0.85, 0.7, 0.55, 0.4]);
@@ -116,6 +117,41 @@ void main() {
       expect(ReceiptPhotoProcessing.maxPixelsWeb, 4000000);
       expect(ReceiptPhotoProcessing.maxPixels, 12000000);
       expect(ReceiptPhotoProcessing.maxSide, 4096);
+    });
+
+    test('Kopf mit zu großen Maßen und unbrauchbaren Bilddaten: tooManyPixels (Maße werden vor dem Dekodieren geprüft)', () {
+      final webp = Uint8List.fromList(base64Decode('UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA=='));
+      final at = <int>[for (var i = 0; i + 4 < webp.length; i++) if (webp[i] == 0x56 && webp[i + 1] == 0x50 && webp[i + 2] == 0x38 && webp[i + 3] == 0x4C) i].single;
+      // VP8L: Signatur 0x2F, dann 14 Bit Breite-1, 14 Bit Höhe-1 (little endian): 5000 × 5000.
+      final bits = 4999 | (4999 << 14);
+      webp.setRange(at + 9, at + 13, <int>[bits & 255, (bits >> 8) & 255, (bits >> 16) & 255, (bits >> 24) & 255]);
+      // Die Bilddaten sind abgeschnitten: Würde vor der Maßprüfung dekodiert, käme `notDecodable`.
+      final cut = Uint8List.fromList(webp.sublist(0, 30));
+      expect(_error(() => ReceiptPhotoProcessing.prepare(cut)), ReceiptPhotoProcessingError.tooManyPixels);
+      try {
+        AvatarPhotoProcessing.prepare(cut);
+        fail('erwartet');
+      } on AvatarPhotoProcessingException catch (e) {
+        expect(e.error, AvatarPhotoProcessingError.tooManyPixels);
+      }
+    });
+
+    test('gültiger Kopf, aber keine Bilddaten: notDecodable (nicht lesbar, kein Absturz)', () {
+      final webp = base64Decode('UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==');
+      expect(_error(() => ReceiptPhotoProcessing.prepare(Uint8List.fromList(webp.sublist(0, 30)))), ReceiptPhotoProcessingError.notDecodable);
+    });
+
+    test('Avatar und Bon teilen die Seitengrenze 4096 (4097 × 10 und 10 × 4097 werden abgelehnt)', () {
+      for (final (w, h) in <(int, int)>[(4097, 10), (10, 4097)]) {
+        final png = Uint8List.fromList(img.encodePng(img.Image(width: w, height: h)));
+        expect(_error(() => ReceiptPhotoProcessing.prepare(png)), ReceiptPhotoProcessingError.tooManyPixels, reason: '$w x $h');
+        try {
+          AvatarPhotoProcessing.prepare(png);
+          fail('erwartet');
+        } on AvatarPhotoProcessingException catch (e) {
+          expect(e.error, AvatarPhotoProcessingError.tooManyPixels, reason: '$w x $h');
+        }
+      }
     });
 
     test('abgeschnittene oder defekte Daten: nicht lesbar, kein Absturz', () {
@@ -254,6 +290,15 @@ void main() {
       }
       final expected = <int>[for (final f in ReceiptPhotoProcessing.scaleSteps) (400 * f).floor()];
       expect(widths.toSet(), containsAll(expected.take(4)), reason: 'die ersten vier Stufen kommen vor');
+    });
+
+    test('das Ziel gilt einschließlich: ein Ergebnis genau in Zielgröße wird genommen, ein Byte weniger verlangt ein kleineres', () {
+      final top = ReceiptPhotoProcessing.prepare(noisy, targetBytes: 1 << 30);
+      final exact = ReceiptPhotoProcessing.prepare(noisy, targetBytes: top.bytes.length);
+      expect(exact.bytes.length, top.bytes.length);
+      expect(width(exact.bytes), 400);
+      final below = ReceiptPhotoProcessing.prepare(noisy, targetBytes: top.bytes.length - 1);
+      expect(below.bytes.length, lessThan(top.bytes.length));
     });
 
     test('Ziel nie erreicht: das kleinste Ergebnis (kleinste Stufe, Qualität 60) gilt, wenn es unter dem harten Limit liegt', () {
