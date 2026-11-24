@@ -33,8 +33,20 @@ class _CashBookMembersScreenState extends State<CashBookMembersScreen> {
   @override
   void initState() {
     super.initState();
+    _c.addListener(_onController);
     final v = _view;
     _members = v == null ? Future<List<CashBookMemberView>>.value(const <CashBookMemberView>[]) : _c.members(v);
+  }
+
+  /// Änderungen des Controllers (Sperre, Rollenverlust, Familienwechsel): neu zeichnen, damit nichts Veraltetes bedienbar bleibt.
+  void _onController() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _c.removeListener(_onController);
+    super.dispose();
   }
 
   void _reload() {

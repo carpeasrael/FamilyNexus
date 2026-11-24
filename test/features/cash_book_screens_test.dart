@@ -11,6 +11,7 @@ import 'package:family_nexus/domain/cash_book.dart';
 import 'package:family_nexus/domain/cash_book_service.dart';
 import 'package:family_nexus/domain/cash_month.dart';
 import 'package:family_nexus/domain/cash_receipt_check.dart';
+import 'package:family_nexus/domain/receipt_photo_processing.dart';
 import 'package:family_nexus/domain/receipt_preview.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/features/cashbook/cash_book_controller.dart';
@@ -20,6 +21,8 @@ import 'package:family_nexus/features/cashbook/cash_book_screen.dart';
 import 'package:family_nexus/features/cashbook/cash_books_screen.dart';
 import 'package:family_nexus/features/cashbook/cash_entry_detail_screen.dart';
 import 'package:family_nexus/features/cashbook/cash_entry_editor_screen.dart';
+import 'package:family_nexus/features/cashbook/cash_receipt_picture.dart';
+import 'package:family_nexus/features/common/error_text.dart';
 import 'package:family_nexus/features/settings/settings_screen.dart';
 import 'package:family_nexus/features/today/today_screen.dart';
 import 'package:family_nexus/l10n/gen/app_localizations.dart';
@@ -58,11 +61,13 @@ void main() {
     server.addAccount('anna', 'pw1', displayName: 'Anna');
     server.addAccount('cara', 'pw2', displayName: 'Cara');
     server.addAccount('ben', 'pw3', displayName: 'Ben');
+    server.addAccount('dora', 'pw4', displayName: 'Dora');
     gw = server.newDevice();
     await gw.login(server: ServerUrl.tryParse(server.host)!, username: 'anna', password: 'pw1');
     await gw.createFamily('Familie');
     final fr = gw.familyRoom!;
     server.addMember(fr, _cara, power: 50);
+    server.addMember(fr, '@dora:fake.test', power: 50);
     server.addMember(fr, _ben);
     if (!moderator) {
       gw = server.newDevice();
@@ -645,8 +650,400 @@ void main() {
     });
   });
 
+
+  /// Tippt neben den Dialog (Wegtippen): Ergebnis `null`, keine Antwort.
+  Future<void> dismissDialog(WidgetTester tester) async {
+    await tester.tapAt(const Offset(2, 2));
+    await tester.pumpAndSettle();
+  }
+
+  group('Härtung (Mutationsprobe Teil 4a-2)', () {
+    ui('Wegtippen eines Dialogs ist keine Zustimmung: Einladung wird nicht angenommen', (tester) async {
+      gw.fakeInvitations = <BookInvitationInfo>[const BookInvitationInfo(roomId: '!einl:fake.test', inviterId: _cara, inviterName: 'Cara')];
+      await show(tester, CashBooksScreen(controller: c));
+      await tester.tap(find.text('Annehmen'));
+      await tester.pumpAndSettle();
+      await dismissDialog(tester);
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(gw.acceptedBooks, isEmpty);
+    });
+
+    ui('Wegtippen des Foto-Hinweises wählt kein Foto', (tester) async {
+      files.nextImage = PickedFile(name: 'bon.jpg', bytes: jpeg);
+      await showPushed(tester, () => CashEntryEditorScreen(controller: c, roomId: room));
+      await tester.tap(find.text('Foto hinzufügen'));
+      await tester.pumpAndSettle();
+      await dismissDialog(tester);
+      expect(files.imagePicks, 0);
+      expect(find.text('Bon angehängt'), findsNothing);
+    });
+
+    ui('Wegtippen der Bestätigung beim Verlassen verlässt nichts; scheitert das Verlassen, bleibt die Seite offen', (tester) async {
+      await store.putBook(bookMeta(room: '!zwei:fake.test', owner: _cara, title: 'Urlaub'));
+      gw.fakeBooks = <BookRoomInfo>[BookRoomInfo(roomId: room, creatorId: me), const BookRoomInfo(roomId: '!zwei:fake.test', creatorId: _cara)];
+      await showPushed(tester, () => CashBookScreen(controller: c, roomId: '!zwei:fake.test'));
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Buch verlassen'));
+      await tester.pumpAndSettle();
+      await dismissDialog(tester);
+      expect(gw.leftBooks, isEmpty);
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Buch verlassen'));
+      await tester.pumpAndSettle();
+      gw.bookActionError = const GatewayException(GatewayError.serverUnreachable);
+      await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Buch verlassen')).last);
+      await tester.pumpAndSettle();
+      expect(find.byType(CashBookScreen), findsOneWidget, reason: 'bei einem Fehler wird die Seite nicht geschlossen');
+      expect(find.textContaining('Server'), findsWidgets);
+    });
+
+    ui('Einladen wählt den gewählten Kandidaten (nicht den ersten)', (tester) async {
+      gw.bookMemberList[room] = <BookMember>[BookMember(me, BookMembership.joined)];
+      await show(tester, CashBookMembersScreen(controller: c, roomId: room));
+      await tester.tap(find.text('Mitglied einladen'));
+      await tester.pumpAndSettle();
+      expect(find.text('Cara'), findsOneWidget);
+      expect(find.text('Dora'), findsOneWidget);
+      await tester.tap(find.text('Dora'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Einladen'));
+      await tester.pumpAndSettle();
+      expect(gw.invitedToBook, <(String, String)>[(room, '@dora:fake.test')]);
+    });
+
+    ui('Neues Buch: die gewählte Währung wird angelegt', (tester) async {
+      await store.deleteBook(room);
+      gw.nextBookRoom = '!neu:fake.test';
+      gw.fakeBooks = <BookRoomInfo>[BookRoomInfo(roomId: '!neu:fake.test', creatorId: me)];
+      await show(tester, CashBooksScreen(controller: c));
+      await tester.tap(find.byTooltip('Neues Kassenbuch'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).first, 'Reise');
+      await tester.tap(find.byType(DropdownButtonFormField<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('CHF').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Anlegen'));
+      await tester.pumpAndSettle();
+      expect((await store.getBook('!neu:fake.test'))!.currency, 'CHF');
+    });
+
+    ui('Währung je Buch: Liste, Buch und Detail zeigen die Währung des Buchs (nicht fest Euro)', (tester) async {
+      await store.putBook(bookMeta(room: '!usd:fake.test', owner: _cara, title: 'Reise', currency: 'USD'));
+      final e = cashEntry(id: kEntryId2, author: _cara, store: 'Shop', cents: 500, date: DateTime.utc(2026, 11, 2));
+      await store.putEntry('!usd:fake.test', e, publishedVersion: 1);
+      gw.fakeBooks = <BookRoomInfo>[BookRoomInfo(roomId: room, creatorId: me), const BookRoomInfo(roomId: '!usd:fake.test', creatorId: _cara)];
+      await show(tester, CashBooksScreen(controller: c));
+      expect(find.text('5,00 \$'), findsOneWidget);
+      await tester.tap(find.text('Reise'));
+      await tester.pumpAndSettle();
+      expect(find.text('Summe: 5,00 \$'), findsOneWidget);
+      expect(find.text('5,00 \$'), findsOneWidget, reason: 'Betrag des Eintrags');
+      await tester.tap(find.text('Shop'));
+      await tester.pumpAndSettle();
+      expect(find.text('5,00 \$'), findsOneWidget, reason: 'Detail');
+    });
+
+    ui('Heute: höchstens drei Bücher; ohne Kassenbuch-Controller keine Karte und kein Absturz', (tester) async {
+      for (var i = 0; i < 4; i++) {
+        await store.putBook(bookMeta(room: '!b$i:fake.test', owner: me, title: 'Buch $i'));
+      }
+      gw.fakeBooks = <BookRoomInfo>[
+        BookRoomInfo(roomId: room, creatorId: me),
+        for (var i = 0; i < 4; i++) BookRoomInfo(roomId: '!b$i:fake.test', creatorId: me),
+      ];
+      c.start();
+      await tester.pumpWidget(host(Scaffold(body: SingleChildScrollView(child: CashBookTodayCard(controller: c)))));
+      await tester.pumpAndSettle();
+      expect(find.textContaining(' in diesem Monat'), findsNWidgets(CashBookTodayCard.maxBooks));
+    });
+
+    ui('Buch: Hinweise nur bei Bedarf (vollständiger Verlauf und nichts Ungesendetes: keine Hinweise)', (tester) async {
+      await store.setComplete(room, true);
+      await store.putEntry(room, own(), publishedVersion: 1);
+      await show(tester, CashBookScreen(controller: c, roomId: room));
+      expect(find.text('Verlauf unvollständig – Summen unter Vorbehalt'), findsNothing);
+      expect(find.textContaining('noch nicht gesendet'), findsNothing);
+      expect(find.textContaining('Im Buch ist jemand'), findsNothing);
+      await store.setComplete(room, false);
+      await c.load();
+      await tester.pumpAndSettle();
+      expect(find.text('Verlauf unvollständig – Summen unter Vorbehalt'), findsOneWidget);
+    });
+
+    ui('Buch: die Karte des Buchs in der Liste trägt eine Bezeichnung für die Sprachausgabe', (tester) async {
+      final handle = tester.ensureSemantics();
+      await show(tester, CashBooksScreen(controller: c));
+      expect(find.bySemanticsLabel(RegExp('Haushalt, 0,00.*€')), findsOneWidget);
+      handle.dispose();
+    });
+
+    ui('Sperre nach dem Öffnen: verliert die Person die Moderatorrolle, melden Buch, Mitglieder und Editor, dass es nicht verfügbar ist', (tester) async {
+      await showPushed(tester, () => CashBookScreen(controller: c, roomId: room));
+      gw.familyRoom!.power[me] = 0;
+      server.notifyAll();
+      await c.load();
+      await tester.pumpAndSettle();
+      expect(find.text('Das Kassenbuch ist nicht mehr verfügbar.'), findsOneWidget);
+    });
+
+    ui('Sperre nach dem Öffnen: Mitglieder und Editor', (tester) async {
+      await showPushed(tester, () => CashBookMembersScreen(controller: c, roomId: room));
+      gw.familyRoom!.power[me] = 0;
+      server.notifyAll();
+      await c.load();
+      await tester.pumpAndSettle();
+      expect(find.text('Mitglied einladen'), findsNothing);
+      expect(find.text('Das Kassenbuch ist nicht mehr verfügbar.'), findsOneWidget);
+    });
+
+    ui('Editor: ohne Moderatorrolle ist Speichern gesperrt, der Entwurf bleibt', (tester) async {
+      await showPushed(tester, () => CashEntryEditorScreen(controller: c, roomId: room));
+      await tester.enterText(find.widgetWithText(TextField, 'Geschäft'), 'Edeka');
+      gw.familyRoom!.power[me] = 0;
+      server.notifyAll();
+      await c.load();
+      await tester.pumpAndSettle();
+      expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Speichern')).onPressed, isNull);
+      expect(find.text('Das Kassenbuch ist nicht mehr verfügbar.'), findsOneWidget);
+    });
+
+    group('Editor: Eingaben und Fehler', () {
+      ui('ein Geschäft nur aus Leerzeichen gilt als leer; Texte sind auf 60 und 200 Zeichen begrenzt; Felder sind beim Speichern gesperrt', (tester) async {
+        await show(tester, CashEntryEditorScreen(controller: c, roomId: room));
+        await tester.enterText(find.widgetWithText(TextField, 'Geschäft'), '    ');
+        await tester.enterText(find.widgetWithText(TextField, 'Betrag'), '5');
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        expect(find.text('Bitte ein Geschäft eingeben.'), findsOneWidget);
+        expect(await store.entries(room), isEmpty);
+        await tester.enterText(find.widgetWithText(TextField, 'Geschäft'), 'x' * 80);
+        expect(tester.widget<TextField>(find.widgetWithText(TextField, 'Geschäft')).controller!.text.length, 60);
+        await tester.enterText(find.widgetWithText(TextField, 'Notiz (optional)'), 'n' * 250);
+        expect(tester.widget<TextField>(find.widgetWithText(TextField, 'Notiz (optional)')).controller!.text.length, 200);
+      });
+
+      ui('Datum wählen: der gewählte Tag wird gespeichert (als UTC-Kalendertag)', (tester) async {
+        await showPushed(tester, () => CashEntryEditorScreen(controller: c, roomId: room));
+        await tester.tap(find.text('Datum'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('15').last);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.widgetWithText(TextField, 'Geschäft'), 'Edeka');
+        await tester.enterText(find.widgetWithText(TextField, 'Betrag'), '5');
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        final e = (await store.entries(room)).single;
+        expect(e.date.day, 15);
+        expect(e.date.isUtc, isTrue);
+        expect((e.date.hour, e.date.minute), (0, 0));
+      });
+
+      for (final source in <String>['Betrag', 'Notiz', 'Datum', 'Foto wählen', 'Foto entfernen']) {
+        ui('„$source“ verändert den Entwurf: Zurück fragt nach', (tester) async {
+          files.nextImage = PickedFile(name: 'bon.jpg', bytes: jpeg);
+          final withPhoto = source == 'Foto entfernen';
+          if (withPhoto) {
+            final e = own().copyWith(receipt: const CashReceipt(eventId: r'$bon', sha256: kHash, size: 10));
+            await store.putEntry(room, e, publishedVersion: 1);
+            gw.loadReceiptHandler = (r, ev, rc, a) => const BookReceiptLoad(BookReceiptStatus.missing);
+            await showPushed(tester, () => CashEntryEditorScreen(controller: c, roomId: room, entry: e));
+          } else {
+            await showPushed(tester, () => CashEntryEditorScreen(controller: c, roomId: room));
+          }
+          switch (source) {
+            case 'Betrag':
+              await tester.enterText(find.widgetWithText(TextField, 'Betrag'), '7');
+            case 'Notiz':
+              await tester.enterText(find.widgetWithText(TextField, 'Notiz (optional)'), 'Hinweis');
+            case 'Datum':
+              await tester.tap(find.text('Datum'));
+              await tester.pumpAndSettle();
+              await tester.tap(find.text('15').last);
+              await tester.tap(find.text('OK'));
+            case 'Foto wählen':
+              await tester.tap(find.text('Foto hinzufügen'));
+              await tester.pumpAndSettle();
+              await tester.tap(find.text('Foto wählen'));
+            case 'Foto entfernen':
+              await tester.tap(find.text('Foto entfernen'));
+          }
+          await tester.pumpAndSettle();
+          await tester.tap(find.byType(BackButton));
+          await tester.pumpAndSettle();
+          expect(find.text('Änderungen verwerfen?'), findsOneWidget, reason: source);
+        });
+      }
+
+      ui('Fehler beim Speichern: Fehlertext, Speichern wieder möglich, der Entwurf bleibt (Zurück fragt nach)', (tester) async {
+        files.nextImage = PickedFile(name: 'bon.jpg', bytes: jpeg);
+        gw.sendReceiptError = const GatewayException(GatewayError.serverUnreachable);
+        await showPushed(tester, () => CashEntryEditorScreen(controller: c, roomId: room));
+        await tester.tap(find.text('Foto hinzufügen'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Foto wählen'));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.widgetWithText(TextField, 'Geschäft'), 'Edeka');
+        await tester.enterText(find.widgetWithText(TextField, 'Betrag'), '5');
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        expect(find.textContaining('Server'), findsWidgets, reason: 'Fehlertext');
+        expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Speichern')).onPressed, isNotNull);
+        expect(await store.entries(room), isEmpty);
+        await tester.tap(find.byType(BackButton));
+        await tester.pumpAndSettle();
+        expect(find.text('Änderungen verwerfen?'), findsOneWidget);
+      });
+
+      ui('Eintrag bearbeiten mit neuem Foto: das neue Foto wird gesendet', (tester) async {
+        c.start();
+        final e = await c.addEntry(room, date: today, store: 'Edeka', amountCents: 100);
+        files.nextImage = PickedFile(name: 'bon.jpg', bytes: jpeg);
+        await showPushed(tester, () => CashEntryEditorScreen(controller: c, roomId: room, entry: e));
+        await tester.tap(find.text('Foto hinzufügen'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Foto wählen'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        expect(gw.sentReceipts, hasLength(1));
+        expect((await store.getEntry(room, me, e.id))!.receipt, isNotNull);
+      });
+
+      ui('nach „Foto entfernen“ zeigt der Editor den Bon nicht mehr', (tester) async {
+        final e = own().copyWith(receipt: const CashReceipt(eventId: r'$bon', sha256: kHash, size: 10));
+        await store.putEntry(room, e, publishedVersion: 1);
+        gw.loadReceiptHandler = (r, ev, rc, a) => const BookReceiptLoad(BookReceiptStatus.missing);
+        await showPushed(tester, () => CashEntryEditorScreen(controller: c, roomId: room, entry: e));
+        expect(find.text('Bon nicht verfügbar'), findsOneWidget);
+        await tester.tap(find.text('Foto entfernen'));
+        await tester.pumpAndSettle();
+        expect(find.text('Bon nicht verfügbar'), findsNothing);
+      });
+    });
+
+    group('Bon-Anzeige', () {
+      ui('Detail ohne Bon: keine Bon-Überschrift, kein Platzhalter', (tester) async {
+        final e = cashEntry(id: kEntryId2, author: _cara, store: 'Aldi');
+        await show(tester, CashEntryDetailScreen(controller: c, roomId: room, entry: e));
+        expect(find.text('Bon'), findsNothing);
+        expect(find.text('Bon nicht verfügbar'), findsNothing);
+      });
+
+      ui('ein Fehler beim Laden ergibt „momentan nicht abrufbar“ mit „Erneut versuchen“ (nicht „nicht verfügbar“)', (tester) async {
+        final e = cashEntry(id: kEntryId2, author: _cara, store: 'Aldi').copyWith(receipt: const CashReceipt(eventId: r'$bon', sha256: kHash, size: 10));
+        await store.putEntry(room, e, publishedVersion: 1);
+        gw.loadReceiptHandler = (r, ev, rc, a) => BookReceiptLoad(BookReceiptStatus.ok, jpeg);
+        c.dispose();
+        c = CashBookController(
+          gateway: gw,
+          service: service,
+          store: store,
+          sync: sync,
+          receipts: receipts,
+          enabled: true,
+          today: () => today,
+          decodePreview: (b) async => throw StateError('kaputt'),
+        );
+        await show(tester, CashEntryDetailScreen(controller: c, roomId: room, entry: e));
+        expect(find.text('Bon momentan nicht abrufbar'), findsOneWidget);
+        expect(find.text('Erneut versuchen'), findsOneWidget);
+      });
+
+      ui('das Bild erscheint nur bei „ok“, auch wenn ein Controller (fälschlich) zu einem anderen Zustand eine Vorschau liefert', (tester) async {
+        final e = cashEntry(id: kEntryId2, author: _cara, store: 'Aldi').copyWith(receipt: const CashReceipt(eventId: r'$bon', sha256: kHash, size: 10));
+        c.dispose();
+        final lying = _LyingController(
+          gateway: gw,
+          service: service,
+          store: store,
+          sync: sync,
+          receipts: receipts,
+          today: () => today,
+        );
+        c = lying;
+        for (final s in <BookReceiptStatus>[BookReceiptStatus.missing, BookReceiptStatus.invalid, BookReceiptStatus.unavailable]) {
+          lying.status = s;
+          await tester.pumpWidget(const SizedBox());
+          await showReal(tester, CashEntryDetailScreen(controller: c, roomId: room, entry: e));
+          expect(find.byType(RawImage), findsNothing, reason: s.name);
+        }
+      });
+
+      ui('der Verweis des Eintrags ändert sich: der Bon wird neu geladen', (tester) async {
+        var loads = 0;
+        gw.loadReceiptHandler = (r, ev, rc, a) {
+          loads++;
+          return const BookReceiptLoad(BookReceiptStatus.missing);
+        };
+        final e1 = cashEntry(id: kEntryId2, author: _cara).copyWith(receipt: const CashReceipt(eventId: r'$a', sha256: kHash, size: 10));
+        final e2 = cashEntry(id: kEntryId2, author: _cara).copyWith(receipt: const CashReceipt(eventId: r'$b', sha256: kHash, size: 10));
+        c.start();
+        Widget screen(CashEntry e) => host(Scaffold(body: CashReceiptPicture(controller: c, roomId: room, entry: e)));
+        await tester.pumpWidget(screen(e1));
+        await tester.pumpAndSettle();
+        expect(loads, 1);
+        await tester.pumpWidget(screen(e2));
+        await tester.pumpAndSettle();
+        expect(loads, 2);
+        await tester.pumpWidget(screen(e2));
+        await tester.pumpAndSettle();
+        expect(loads, 2, reason: 'gleicher Verweis: kein erneutes Laden');
+      });
+    });
+
+    ui('Fehlertexte: jede Zuordnung von CashBookError, Bildaufbereitung und zu großer Datei ist eigenständig', (tester) async {
+      await tester.pumpWidget(host(const SizedBox()));
+      final l = AppLocalizations.of(tester.element(find.byType(SizedBox)));
+      expect(errorText(l, const CashBookException(CashBookError.invalid)), l.cashErrInvalid);
+      expect(errorText(l, const CashBookException(CashBookError.notAllowed)), l.errNotAllowed);
+      expect(errorText(l, const CashBookException(CashBookError.notFound)), l.errNotFound);
+      expect(errorText(l, const CashBookException(CashBookError.limit)), l.cashErrLimit);
+      expect(errorText(l, const ReceiptPhotoProcessingException(ReceiptPhotoProcessingError.unsupportedFormat)), l.cashPhotoErrFormat);
+      expect(errorText(l, const ReceiptPhotoProcessingException(ReceiptPhotoProcessingError.tooLarge)), l.cashPhotoErrTooLarge);
+      expect(errorText(l, const ReceiptPhotoProcessingException(ReceiptPhotoProcessingError.tooManyPixels)), l.cashPhotoErrPixels);
+      expect(errorText(l, const ReceiptPhotoProcessingException(ReceiptPhotoProcessingError.notDecodable)), l.cashPhotoErrDecode);
+      expect(errorText(l, const ReceiptPhotoProcessingException(ReceiptPhotoProcessingError.cannotShrink)), l.cashPhotoErrShrink);
+      expect(errorText(l, const FileTooLargeException()), l.cashPhotoErrTooLarge);
+      final texts = <String>{
+        l.cashErrInvalid,
+        l.errNotAllowed,
+        l.errNotFound,
+        l.cashErrLimit,
+        l.cashPhotoErrFormat,
+        l.cashPhotoErrTooLarge,
+        l.cashPhotoErrPixels,
+        l.cashPhotoErrDecode,
+        l.cashPhotoErrShrink,
+      };
+      expect(texts, hasLength(9), reason: 'alle Texte sind verschieden');
+    });
+  });
+
   test('der gesperrte Standard bleibt', () {
     expect(CashBookFlags.enabled, isFalse);
     expect(CashMonth.of(today), const CashMonth(2026, 11));
   });
+}
+
+/// Controller, der zu jedem Zustand eine Vorschau liefert (Test: die Anzeige darf das Bild nur bei „ok“ zeigen).
+class _LyingController extends CashBookController {
+  _LyingController({
+    required super.gateway,
+    required super.service,
+    required super.store,
+    required super.sync,
+    required super.receipts,
+    required super.today,
+  }) : super(enabled: true);
+
+  BookReceiptStatus status = BookReceiptStatus.invalid;
+
+  @override
+  Future<CashReceiptView> loadReceipt(String roomId, CashEntry entry) async =>
+      CashReceiptView(status, ReceiptPreview(width: 2, height: 2, rgba: Uint8List.fromList(List<int>.filled(16, 200))));
 }
