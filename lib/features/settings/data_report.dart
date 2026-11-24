@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../../domain/anniversary_codec.dart';
 import '../../domain/avatar_photo.dart';
+import '../../domain/cash_book.dart';
 import '../../domain/data_inventory.dart';
 import '../../domain/event_codec.dart';
 import '../../domain/event_theme_codec.dart';
@@ -31,6 +32,7 @@ class DataReport {
         InventoryRoomKind.family => l.roomKindFamily,
         InventoryRoomKind.private => l.roomKindPrivate,
         InventoryRoomKind.direct => l.roomKindDirect,
+        InventoryRoomKind.book => l.roomKindBook,
         InventoryRoomKind.other => l.roomKindOther,
       };
 
@@ -67,6 +69,8 @@ class DataReport {
       AvatarPresets.type => l.eventTypeAvatar,
       AvatarPhotoCodec.type => l.eventTypeAvatarPhoto,
       AvatarResetCodec.type => l.eventTypeAvatarPhoto,
+      CashBookCodec.metaType => l.eventTypeBookMeta,
+      CashBookCodec.entryType => l.eventTypeCashEntry,
       _ => null,
     };
     return label == null ? type : '$label ($type)';
@@ -109,7 +113,8 @@ class DataReport {
     for (final r in rooms) {
       // Raum-IDs stehen nicht in der Übersicht (#555, E-109): Die des Familienraums ist der Familien-Code (E-65). Nur
       // unbekannte Räume tragen sie, sonst wären sie nicht zu unterscheiden. Namen der Gegenseite nur online (E-89).
-      final name = r.kind == InventoryRoomKind.direct && !withMembers ? '' : r.name;
+      // Ein Kassenbuch trägt nur den festen Raumnamen der App, er sagt nichts (#311, E-113).
+      final name = (r.kind == InventoryRoomKind.direct && !withMembers) || r.kind == InventoryRoomKind.book ? '' : r.name;
       b
         ..writeln()
         ..writeln('- ${_roomKind(l, r.kind)}${name.isEmpty ? '' : ' „$name“'}${r.kind == InventoryRoomKind.other ? ' (${r.id})' : ''}');

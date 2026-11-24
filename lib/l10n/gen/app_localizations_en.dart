@@ -3041,6 +3041,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roomKindDirect => 'Direct chat';
 
   @override
+  String get roomKindBook => 'Cash book';
+
+  @override
   String get roomKindOther => 'Other room';
 
   @override
@@ -3579,6 +3582,12 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get eventTypeBookMeta => 'Cash book: master data';
+
+  @override
+  String get eventTypeCashEntry => 'Cash book: entries';
 
   @override
   String get eventTypeAnniversary => 'Birthdays and memorial days';

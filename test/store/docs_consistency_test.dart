@@ -52,4 +52,25 @@ void main() {
       expect(readme, contains(term.toLowerCase()), reason: 'README.md nennt "$term" nicht');
     }
   });
+
+  test('ABHAENGIGKEITEN.md führt jede direkte Abhängigkeit der pubspec.yaml mit der richtigen Art (#311: crypto)', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+    final doc = File('docs/ABHAENGIGKEITEN.md').readAsStringSync();
+    Set<String> names(String section) {
+      final m = RegExp('^$section:\\n((?:[ \\t].*\\n|\\n)*)', multiLine: true).firstMatch(pubspec)!.group(1)!;
+      return RegExp(r'^  ([a-z_0-9]+):', multiLine: true).allMatches(m).map((x) => x.group(1)!).toSet();
+    }
+
+    bool listed(String name, String kind) => RegExp('^\\| `$name` \\| $kind \\|', multiLine: true).hasMatch(doc);
+    final main = names('dependencies');
+    final dev = names('dev_dependencies');
+    expect(main, contains('crypto'));
+    expect(dev, isNotEmpty);
+    for (final n in main) {
+      expect(listed(n, 'direct main'), isTrue, reason: '`$n` (dependencies) fehlt als „direct main“ in docs/ABHAENGIGKEITEN.md');
+    }
+    for (final n in dev) {
+      expect(listed(n, 'direct dev'), isTrue, reason: '`$n` (dev_dependencies) fehlt als „direct dev“ in docs/ABHAENGIGKEITEN.md');
+    }
+  });
 }

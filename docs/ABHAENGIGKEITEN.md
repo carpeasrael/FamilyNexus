@@ -1,11 +1,12 @@
 # Abhängigkeiten (SBOM)
 
-Stand: 2026-10-22 · erzeugt mit `tool/sbom.py` aus `pubspec.lock` und pub.dev.
+Stand: 2026-11-24 · erzeugt mit `tool/sbom.py` aus `pubspec.lock` und pub.dev.
 
 Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive Versionen fixiert `pubspec.lock`. Spalte „Pub-Punkte“ = pub.dev-Bewertung (max. 160).
 
 | Paket | Art | Version | Veröffentlicht | Lizenz | Pub-Punkte | Hinweis |
 |---|---|---|---|---|---|---|
+| `crypto` | direct main | 3.0.7 | 2025-11-04 | bsd-3-clause | 160 | SHA-256 der Bon-Datei (#311, E-113, Teil 3b); vorher nur transitiv |
 | `file_picker` | direct main | 13.1.0 | 2026-09-15 | mit | 160 | ok |
 | `flutter` | direct main | 0.0.0 | — | — | — | SDK/lokal |
 | `flutter_local_notifications` | direct main | 22.3.2 | 2026-10-12 | bsd-3-clause | 150 | ok |
@@ -50,7 +51,6 @@ Alle direkten Abhängigkeiten sind in `pubspec.yaml` exakt gepinnt; transitive V
 | `code_assets` | transitive | 1.2.1 | 2026-06-01 | bsd-3-clause | 160 | neuer: 2.1.0 |
 | `collection` | transitive | 1.19.1 | 2024-10-21 | bsd-3-clause | 140 | ok |
 | `cross_file` | transitive | 0.3.5+5 | 2026-08-25 | bsd-3-clause | 160 | neuer: 0.4.0 |
-| `crypto` | transitive | 3.0.7 | 2025-11-04 | bsd-3-clause | 160 | ok |
 | `csslib` | transitive | 1.0.2 | 2024-10-29 | bsd-3-clause | 160 | ok |
 | `dbus` | direct main | 0.8.0 | 2026-09-16 | mpl-2.0 | 160 | ok (Zahl am Starter-Symbol unter Linux, #254) |
 | `equatable` | transitive | 3.0.0 | 2026-09-15 | mit | 160 | ok |

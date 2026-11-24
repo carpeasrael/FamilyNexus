@@ -1,3 +1,4 @@
+import 'package:family_nexus/domain/cash_book.dart';
 import 'package:family_nexus/domain/data_inventory.dart';
 import 'package:family_nexus/features/settings/data_report.dart';
 import 'package:family_nexus/l10n/gen/app_localizations.dart';
@@ -90,6 +91,39 @@ void main() {
       ]);
       expect(r, contains('- Sonstiger Raum (!eins:fake.test)\n'));
       expect(r, contains('- Sonstiger Raum (!zwei:fake.test)\n'));
+    });
+  });
+
+  group('Kassenbuch in der Datenübersicht (#311, E-113)', () {
+    test('Kassenbuch: Art ohne Namen (er ist der feste Raumname der App) und ohne Raum-ID, in beiden Sprachen und beiden Berichten', () {
+      final rooms = [room(InventoryRoomKind.book, name: 'FamilyNexus', id: '!buch:fake.test')];
+      for (final r in [online('de', rooms), local('de', rooms)]) {
+        expect(r, contains('- Kassenbuch\n'));
+        expect(r, isNot(contains('„FamilyNexus“')));
+        expect(r, isNot(contains('!buch')));
+        expect(r, isNot(contains('Sonstiger Raum')));
+      }
+      expect(online('en', rooms), contains('- Cash book\n'));
+      expect(online('en', rooms), isNot(contains('Other room')));
+    });
+
+    test('die Ereignisarten des Buchs haben Namen (de und en), der Roh-Typ steht in Klammern', () {
+      const r = InventoryRoom(
+        id: '!buch:fake.test',
+        kind: InventoryRoomKind.book,
+        name: '',
+        encrypted: true,
+        membership: 'join',
+        joinedMembers: 2,
+        invitedMembers: 0,
+        cachedEvents: 3,
+        eventTypes: <String, int>{CashBookCodec.metaType: 1, CashBookCodec.entryType: 2},
+        attachments: 1,
+      );
+      expect(online('de', [r]), contains('Kassenbuch: Stammdaten (${CashBookCodec.metaType}): 1'));
+      expect(online('de', [r]), contains('Kassenbuch: Einträge (${CashBookCodec.entryType}): 2'));
+      expect(online('en', [r]), contains('Cash book: master data (${CashBookCodec.metaType}): 1'));
+      expect(online('en', [r]), contains('Cash book: entries (${CashBookCodec.entryType}): 2'));
     });
   });
 

@@ -3063,6 +3063,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get roomKindDirect => 'Einzelchat';
 
   @override
+  String get roomKindBook => 'Kassenbuch';
+
+  @override
   String get roomKindOther => 'Sonstiger Raum';
 
   @override
@@ -3602,6 +3605,12 @@ class AppLocalizationsDe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get eventTypeBookMeta => 'Kassenbuch: Stammdaten';
+
+  @override
+  String get eventTypeCashEntry => 'Kassenbuch: Einträge';
 
   @override
   String get eventTypeAnniversary => 'Geburts- und Gedenktage';

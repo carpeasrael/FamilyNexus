@@ -97,7 +97,9 @@ mixin _DataInventoryModule on ChangeNotifier implements MatrixGateway {
                 ? InventoryRoomKind.private
                 : r.isDirectChat
                     ? InventoryRoomKind.direct
-                    : InventoryRoomKind.other,
+                    : BookRoomMarker.isBook(r.getState(EventTypes.RoomCreate)?.content)
+                        ? InventoryRoomKind.book
+                        : InventoryRoomKind.other,
         name: r.isDirectChat && refresh ? _peerName(r) : TextSanitizer.clean(r.name, max: 80),
         encrypted: r.encrypted,
         membership: r.membership.name,

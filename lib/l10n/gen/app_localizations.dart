@@ -5090,6 +5090,12 @@ abstract class AppLocalizations {
   /// **'Einzelchat'**
   String get roomKindDirect;
 
+  /// No description provided for @roomKindBook.
+  ///
+  /// In de, this message translates to:
+  /// **'Kassenbuch'**
+  String get roomKindBook;
+
   /// No description provided for @roomKindOther.
   ///
   /// In de, this message translates to:
@@ -5959,6 +5965,18 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'{days, plural, =0{Nur am Tag selbst} =1{1 Tag vorher} other{{days} Tage vorher}}'**
   String anniversaryLeadOption(int days);
+
+  /// No description provided for @eventTypeBookMeta.
+  ///
+  /// In de, this message translates to:
+  /// **'Kassenbuch: Stammdaten'**
+  String get eventTypeBookMeta;
+
+  /// No description provided for @eventTypeCashEntry.
+  ///
+  /// In de, this message translates to:
+  /// **'Kassenbuch: Einträge'**
+  String get eventTypeCashEntry;
 
   /// No description provided for @eventTypeAnniversary.
   ///
