@@ -43,6 +43,7 @@ class ChatMapper {
     required LocalSends sends,
     String? myUserId,
     bool showReadBy = false,
+    bool allowEventRefs = false,
   }) {
     final me = myUserId ?? timeline.room.client.userID;
     // Gegenseitigkeit (E-106): Ist die eigene Lesebestätigung aus, zeigt die App auch bei anderen nichts.
@@ -55,7 +56,7 @@ class ChatMapper {
     DateTime? firstHidden;
     for (final e in timeline.events.reversed) {
       try {
-        final m = _map(timeline, e, pastNames, me, threadId, sends, encryptedReactions, markers);
+        final m = _map(timeline, e, pastNames, me, threadId, sends, encryptedReactions, markers, allowEventRefs);
         if (m == null) continue;
         if (m.undecryptable && joinedAt != null && m.time.isBefore(joinedAt)) {
           hidden++;
@@ -245,6 +246,7 @@ class ChatMapper {
     LocalSends sends,
     Map<String, Map<String, Set<String>>> encryptedReactions,
     ReadMarkers markers,
+    bool allowEventRefs,
   ) {
     final name = _senderName(e, pastNames);
     final status = _status(e, sends);
@@ -302,7 +304,9 @@ class ChatMapper {
     }
     encryptedReactions[e.eventId]?.forEach(addReaction);
 
-    final ref = d.content.tryGet<String>('de.inneso.familynexus.event_ref');
+    // Terminverweise gelten nur im Familienraum (#119, B1/B3): Dort liegen die Familientermine, und Zusagen gehen in
+    // diesen Raum. In jedem anderen Raum (Einzelchat, später Kontakte und Gruppen) bleibt es ein gewöhnlicher Text.
+    final ref = allowEventRefs ? d.content.tryGet<String>('de.inneso.familynexus.event_ref') : null;
     return ChatMessage(
       id: e.eventId,
       senderId: e.senderId,

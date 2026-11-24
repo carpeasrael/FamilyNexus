@@ -1,6 +1,6 @@
 # Kontakte und Gruppen außerhalb der Familie (Release V1.4)
 
-Stand: 2026-10-31 · Status: **Entwurf zur Abstimmung, nicht umgesetzt** · Basis: Version 1.2.1 (22) · Entscheidung: E-75
+Stand: 2026-10-31 · **Hinweis 2026-11-25:** E-75 und SA-11 sind inzwischen anderweitig vergeben; die Entscheidung zu diesem Konzept ist **E-114** (Phase K1 umgesetzt, Rest offen) · Status: **Entwurf zur Abstimmung, nicht umgesetzt** · Basis: Version 1.2.1 (22) · Entscheidung: E-75
 (vorgeschlagen) · Sicherheitsabweichung: SA-11 (vorgeschlagen) · ändert E-39, ergänzt E-11, E-41, E-47, E-48
 
 ## 1. Ziel und Abgrenzung

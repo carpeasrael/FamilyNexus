@@ -73,6 +73,10 @@ matrix.example.org {
 
 Ein Kassenbuch ist ein eigener verschlüsselter Raum, den die App an `m.room.create` mit dem Schlüssel `de.inneso.familynexus.book` erkennt. Damit die Einladung dem Eingeladenen als Buch-Einladung erscheint, muss der Server den Raumzustand `m.room.create` in die Einladung aufnehmen. Laut Synapse-Dokumentation gehört `m.room.create` zum Standard von `room_prejoin_state` (hier nicht gegen einen echten Server geprüft: E2E steht aus); wer `room_prejoin_state` einschränkt, sollte `m.room.create` nicht entfernen. Fehlt der Typ, erscheint die Einladung als Familieneinladung „FamilyNexus“; die App erkennt das Buch nach dem Beitritt, verlässt den Raum und setzt den Familienvermerk zurück, das Buch ist dann aber nicht erreichbar. Der Raum setzt `history_visibility: shared`: Wer später eingeladen wird, kann den bisherigen Verlauf (auch frühere Fassungen von Einträgen und Bons) entschlüsseln; ein Server, der die Sichtbarkeit des Verlaufs erzwingt oder ändert, ändert damit, was neue Mitglieder sehen.
 
+## Familieneinladungen: `join_rules` im Einladungszustand (#119, E-114)
+
+Die App erkennt eine Familieneinladung am `join_rule: knock` des Raums und lässt nur diese als Familie zu. Der Server sollte `m.room.join_rules` wie `m.room.create` in die Einladung aufnehmen (Standard von `room_prejoin_state` in Synapse); fehlt es, gilt die Einladung zur Anzeige weiter als Familieneinladung, **nach dem Beitritt** prüft die App den Zustand beim Server und verlässt den Raum, wenn er nicht `knock` ist oder nicht abrufbar. Wer als Moderator die Beitrittsregel des Familienraums mit einem fremden Client ändert, verhindert damit neue Einladungen. Nicht gegen einen echten Server geprüft (K0).
+
 ## Prüfliste
 - [ ] `https://matrix.example.org/_matrix/client/versions` liefert `v1.1` oder höher.
 - [ ] `https://matrix.example.org/_matrix/client/v3/login` nennt `m.login.password`.

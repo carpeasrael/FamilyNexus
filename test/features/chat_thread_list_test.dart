@@ -390,10 +390,15 @@ void main() {
       await app.services.settings.update((s) => s.copyWith(blockedUsers: const <String>[]));
       await tester.pumpAndSettle();
       expect(find.descendant(of: _row(dm), matching: find.text('Anhang')), findsOneWidget);
-      app.server.post(app.server.dmRooms[dm]!, ben.userId!, 'm.room.message', <String, Object?>{'body': '', 'event_ref': 'ev1'});
+      // Terminverweis im Familienraum: Vorschau „Termin“. Im Einzelchat gibt es keine Terminkarte (#119, B3): dort bleibt
+      // es ein gewöhnlicher Text.
+      app.server.post(app.server.dmRooms[dm]!, ben.userId!, 'm.room.message', <String, Object?>{'body': 'Nur Text', 'event_ref': 'ev1'});
+      app.server.post(app.gateway.familyRoom!, ben.userId!, 'm.room.message', <String, Object?>{'body': '', 'event_ref': 'ev1'});
       app.server.notifyAll();
       await tester.pumpAndSettle();
-      expect(find.descendant(of: _row(dm), matching: find.text('Termin')), findsOneWidget);
+      expect(find.descendant(of: _row(ChatThread.familyId), matching: find.text('Termin')), findsOneWidget);
+      expect(find.descendant(of: _row(dm), matching: find.text('Nur Text')), findsOneWidget);
+      expect(find.descendant(of: _row(dm), matching: find.text('Termin')), findsNothing);
     });
 
     testWidgets('ohne Nachricht: Online-Status (Einzelchat) bzw. „Noch keine Nachrichten“; Status live', (tester) async {
@@ -440,7 +445,7 @@ void main() {
       }
     });
 
-    testWidgets('Tippen öffnet das Gespräch, Pfeil führt zurück, der Entwurf bleibt (#410)', (tester) async {
+    testWidgets('Tippen öffnet das Gespräch, Pfeil führt zurück, der Entwurf bleibt je Gespräch (#410, #119 B4: nie im anderen Gespräch)', (tester) async {
       _wide(tester);
       final app = await buildTestApp();
       final ben = await _member(app, 'ben', 'Ben');
@@ -454,7 +459,15 @@ void main() {
       expect(find.byType(TextField), findsNothing);
       await _open(tester, dm);
       expect(find.text('Nur zwischen dir und Ben, Ende-zu-Ende-verschlüsselt'), findsOneWidget);
-      expect(tester.widget<TextField>(find.byType(TextField)).controller!.text, 'Entwurf');
+      String field() => tester.widget<TextField>(find.byType(TextField)).controller!.text;
+      expect(field(), isEmpty, reason: 'der Familienentwurf gelangt nie in den Einzelchat (#119, B4)');
+      await tester.enterText(find.byType(TextField), 'Nur Ben');
+      await _toList(tester);
+      await _open(tester, ChatThread.familyId);
+      expect(field(), 'Entwurf', reason: 'der Entwurf des Familienchats ist wieder da');
+      await _toList(tester);
+      await _open(tester, dm);
+      expect(field(), 'Nur Ben', reason: 'und der des Einzelchats auch');
     });
 
     testWidgets('Semantik der Zeile (Gespräch, Status, Vorschau, Zähler) und des Pfeils', (tester) async {

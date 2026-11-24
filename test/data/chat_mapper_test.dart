@@ -107,6 +107,36 @@ void main() {
     expect(m.first.senderId, '@ben:fake.test');
   });
 
+  group('Terminverweis (event_ref, #119 B3)', () {
+    List<ChatMessage> mapRef(List<Event> chronological, {required bool allow}) => ChatMapper.messages(
+          timeline(chronological.reversed.toList()),
+          threadId: allow ? 'family' : '!dm:fake.test',
+          sends: sends,
+          allowEventRefs: allow,
+        );
+
+    final withRef = <String, Object?>{'msgtype': 'm.text', 'body': 'Zum Termin', 'de.inneso.familynexus.event_ref': '0b1f6c2e-3a4d-4e5f-8a9b-0c1d2e3f4a5b'};
+
+    test('im Familienraum wird der Verweis übernommen', () {
+      final m = mapRef(<Event>[ev(r'$a', withRef)], allow: true).single;
+      expect(m.sharedEventId, '0b1f6c2e-3a4d-4e5f-8a9b-0c1d2e3f4a5b');
+      expect(m.body, 'Zum Termin');
+    });
+
+    test('in jedem anderen Raum wird er verworfen, der Text bleibt sichtbar', () {
+      final m = mapRef(<Event>[ev(r'$a', withRef)], allow: false).single;
+      expect(m.sharedEventId, isNull);
+      expect(m.body, 'Zum Termin');
+    });
+
+    test('ohne Angabe gilt der sichere Standard (verwerfen); eine ungültige ID bleibt auch im Familienraum null', () {
+      final m = ChatMapper.messages(timeline(<Event>[ev(r'$a', withRef)]), threadId: 'family', sends: sends).single;
+      expect(m.sharedEventId, isNull, reason: 'Standard ist false');
+      final bad = mapRef(<Event>[ev(r'$b', <String, Object?>{...withRef, 'de.inneso.familynexus.event_ref': '../ungültig'})], allow: true).single;
+      expect(bad.sharedEventId, isNull);
+    });
+  });
+
   test('Antwort: Zitat-Fallback wird aus dem Text entfernt, Bezug bleibt', () {
     final m = map(<Event>[
       ev(r'$a', text('Wer holt ab?')),
