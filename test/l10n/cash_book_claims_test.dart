@@ -33,14 +33,14 @@ void main() {
         'Frühere Fassungen bleiben verschlüsselt im Verlauf',
         'nach bestem Bemühen geschwärzt',
         'behält, was er schon erhalten hat',
+        'wer sie schon erhalten hat, behält sie',
         'kann ein Buch nicht von Hand verlassen',
         'verlässt sein Gerät das Buch automatisch',
         'bis der Abgleich auf dem Gerät des Erstellers',
         'nicht mehr Moderator',
       ],
-      'serverMetadataNote': <String>['Mitglieder, Zeitpunkte und Größen der Ereignisse eines Kassenbuchs'],
       'reportOnlineNote': <String>['auch in Kassenbüchern'],
-      'accountDeleteBody': <String>['Kassenbüchern angelegt hast, bleiben verschlüsselt im Buch bei den Mitgliedern', 'frühere Fassungen'],
+      'accountDeleteBody': <String>['Kassenbüchern angelegt hast, bleiben verschlüsselt im Buch bei den Mitgliedern, auch frühere Fassungen', '(frühere Fassungen bleiben dennoch im Verlauf)'],
       'cashInviteConfirmBody': <String>['bisherigen Verlauf'],
       'logoutBody': <String>['Kassenbücher', 'Geburts- und Gedenktage', 'Avatar-Fotos', 'beim Beenden der Sitzung'],
     },
@@ -56,14 +56,14 @@ void main() {
         'earlier versions remain encrypted in the history',
         'best-effort basis',
         'keeps what they have already received',
+        'whoever already received it keeps it',
         'cannot leave a book by hand',
         'their device leaves the book automatically',
         'until the reconciliation on the creator’s device',
         'no longer a moderator',
       ],
-      'serverMetadataNote': <String>['members, times and sizes of the events of a cash book'],
       'reportOnlineNote': <String>['also in cash books'],
-      'accountDeleteBody': <String>['cash books remain encrypted in the book with the members', 'earlier versions'],
+      'accountDeleteBody': <String>['cash books remain encrypted in the book with the members, including earlier versions', '(earlier versions still remain in the history)'],
       'cashInviteConfirmBody': <String>['earlier history'],
       'logoutBody': <String>['cash books', 'birthdays and memorial days', 'avatar photos', 'when the session ends'],
     },
@@ -137,18 +137,14 @@ void main() {
   test('docs/STORE.md: Kassenbuch-Zeile, Finanzen als Zahlungs- und Kontodaten, Metadaten, Sperrhinweis', () {
     final t = File('docs/STORE.md').readAsStringSync();
     expect(t, contains('| Kassenbuch (Datum, Geschäft, Betrag, Währung, Notiz;'));
-    expect(t, contains('Zahlungs- und Kontodaten'));
+    expect(t, contains('| Standort, Kontakte, Fotos (automatisch), Gesundheit, Zahlungs- und Kontodaten | nein |'));
     expect(t, contains('bei Kassenbüchern Mitglieder, Zeitpunkte und Größen der Ereignisse'));
     expect(t, contains('Funktion gesperrt'));
   });
 
   test('solange das Kassenbuch gesperrt ist, nennen weder Beschreibung noch Release-Notes noch Store-Metadaten die Funktion', () {
     if (CashBookFlags.enabled) return; // der Freigabe-PR ändert diese Texte bewusst
-    final files = Directory('store/metadata')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((f) => f.path.endsWith('.txt'))
-        .toList();
+    final files = Directory('store/metadata').listSync(recursive: true).whereType<File>().toList(); // jede Dateiart, nicht nur .txt
     expect(files, isNotEmpty);
     for (final f in files) {
       final t = f.readAsStringSync();

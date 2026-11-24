@@ -95,6 +95,19 @@ void main() {
   });
 
   group('Kassenbuch in der Datenübersicht (#311, E-113)', () {
+    test('Raumart: Familie, privat und Einzelchat gehen vor dem Buch-Kennzeichen; ohne Kennzeichen gibt es kein Buch', () {
+      InventoryRoomKind k({bool f = false, bool p = false, bool d = false, bool b = false}) =>
+          inventoryRoomKind(isFamily: f, isPrivate: p, isDirect: d, isBook: b);
+      expect(k(f: true, b: true), InventoryRoomKind.family);
+      expect(k(p: true, b: true), InventoryRoomKind.private);
+      expect(k(d: true, b: true), InventoryRoomKind.direct);
+      expect(k(f: true, p: true, d: true, b: true), InventoryRoomKind.family);
+      expect(k(p: true, d: true, b: true), InventoryRoomKind.private);
+      expect(k(b: true), InventoryRoomKind.book);
+      expect(k(), InventoryRoomKind.other);
+      expect(k(d: true), InventoryRoomKind.direct);
+    });
+
     test('Kassenbuch: Art ohne Namen (er ist der feste Raumname der App) und ohne Raum-ID, in beiden Sprachen und beiden Berichten', () {
       final rooms = [room(InventoryRoomKind.book, name: 'FamilyNexus', id: '!buch:fake.test')];
       for (final r in [online('de', rooms), local('de', rooms)]) {

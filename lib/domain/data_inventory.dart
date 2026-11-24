@@ -69,6 +69,17 @@ abstract class LocalDataInventory {
 /// Art eines Raums in der Datenübersicht. [book] ist ein Kassenbuch (#311, E-113).
 enum InventoryRoomKind { family, private, direct, book, other }
 
+/// Art eines Raums in der Datenübersicht. Die Reihenfolge ist Absicht: Familie und privater Raum gehen vor, dann der
+/// Einzelchat, erst dann das Kassenbuch; ein Raum, der sich als Buch kennzeichnet, aber die Familie, der private Raum
+/// oder ein Einzelchat ist, bleibt, was er ist (#311, E-113).
+InventoryRoomKind inventoryRoomKind({required bool isFamily, required bool isPrivate, required bool isDirect, required bool isBook}) {
+  if (isFamily) return InventoryRoomKind.family;
+  if (isPrivate) return InventoryRoomKind.private;
+  if (isDirect) return InventoryRoomKind.direct;
+  if (isBook) return InventoryRoomKind.book;
+  return InventoryRoomKind.other;
+}
+
 /// Name der Gegenseite eines Einzelchats für die Online-Datenübersicht (#555, E-109). [raw] ist der `displayname`
 /// aus dem lokal gespeicherten `m.room.member` der Gegenseite, `null` ohne diesen Eintrag. Bereinigt (höchstens 80
 /// Zeichen); leer, wenn nichts Brauchbares da ist, auch bei einem Wert, der wie eine Matrix-ID (`@…`) oder Raum-ID

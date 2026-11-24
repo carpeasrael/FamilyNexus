@@ -108,7 +108,7 @@
     }
   },
   "serverNoPassword": "This provider does not allow signing in with a password.",
-  "serverMetadataNote": "The server cannot see content, but it does see metadata such as who writes to whom and when, the choice of your avatar (one of twelve symbols, room state, not end-to-end encrypted), size and time of an avatar photo (the photo itself is encrypted), members, times and sizes of the events of a cash book (not its content) as well as room and profile names (for example the family name). Your own server decides who sees them – it does not remove them.",
+  "serverMetadataNote": "The server cannot see content, but it does see metadata such as who writes to whom and when, the choice of your avatar (one of twelve symbols, room state, not end-to-end encrypted), size and time of an avatar photo (the photo itself is encrypted), as well as room and profile names (for example the family name). Your own server decides who sees them – it does not remove them.",
   "onbTitleAccount": "Sign in",
   "accountUsername": "Username",
   "accountPassword": "Password",
@@ -619,7 +619,7 @@
     }
   },
   "privacy3Title": "What does the server see?",
-  "privacy3Body": "Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, public read receipts (who has read up to which message, and when; only when “Send read receipts” is on, visible to the server and to the provider of your chat partners), the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted), size and time of an avatar photo (the photo itself is end-to-end encrypted) members, times and sizes of the events of a cash book (not its content; that a room is a cash book of the family is visible in plain text in the room) and room and profile names (for example the family name). With your own server you decide who sees this information.",
+  "privacy3Body": "Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, public read receipts (who has read up to which message, and when; only when “Send read receipts” is on, visible to the server and to the provider of your chat partners), the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted), size and time of an avatar photo (the photo itself is end-to-end encrypted), members, times and sizes of the events of a cash book (not its content; that a room is a cash book of the family is visible in plain text in the room) and room and profile names (for example the family name). With your own server you decide who sees this information.",
   "privacy4Title": "Private events",
   "privacy4Body": "Private events are never sent to the family. Between your own devices they are synchronized through a private, encrypted room that only your account belongs to.",
   "privacy5Title": "Reminders and notifications",

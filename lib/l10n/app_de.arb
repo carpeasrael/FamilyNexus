@@ -108,7 +108,7 @@
     }
   },
   "serverNoPassword": "Bei diesem Anbieter ist keine Anmeldung mit Passwort möglich.",
-  "serverMetadataNote": "Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt, die Wahl deines Avatars (eines von zwölf Symbolen, als Raumzustand nicht Ende-zu-Ende-verschlüsselt), Größe und Zeitpunkt eines Avatar-Fotos (das Foto selbst ist verschlüsselt) Mitglieder, Zeitpunkte und Größen der Ereignisse eines Kassenbuchs (nicht dessen Inhalt) sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.",
+  "serverMetadataNote": "Der Server sieht keine Inhalte, aber Metadaten wie wer wann mit wem schreibt, die Wahl deines Avatars (eines von zwölf Symbolen, als Raumzustand nicht Ende-zu-Ende-verschlüsselt), Größe und Zeitpunkt eines Avatar-Fotos (das Foto selbst ist verschlüsselt) sowie Raum- und Profilnamen (etwa den Familiennamen). Ein eigener Server bestimmt, wer sie sieht – er beseitigt sie nicht.",
   "onbTitleAccount": "Anmelden",
   "accountUsername": "Benutzername",
   "accountPassword": "Passwort",
@@ -620,7 +620,7 @@
     }
   },
   "privacy3Title": "Was sieht der Server?",
-  "privacy3Body": "Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, öffentliche Lesebestätigungen (wer bis zu welcher Nachricht und wann gelesen hat; nur wenn „Lesebestätigung senden“ eingeschaltet ist, sie sind für den Server und den Anbieter deiner Gesprächspartner sichtbar), die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt), Größe und Zeitpunkt eines Avatar-Fotos (das Foto selbst ist Ende-zu-Ende-verschlüsselt) Mitglieder, Zeitpunkte und Größen der Ereignisse eines Kassenbuchs (nicht dessen Inhalt; dass ein Raum ein Kassenbuch der Familie ist, steht im Klartext im Raum) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.",
+  "privacy3Body": "Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, öffentliche Lesebestätigungen (wer bis zu welcher Nachricht und wann gelesen hat; nur wenn „Lesebestätigung senden“ eingeschaltet ist, sie sind für den Server und den Anbieter deiner Gesprächspartner sichtbar), die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt), Größe und Zeitpunkt eines Avatar-Fotos (das Foto selbst ist Ende-zu-Ende-verschlüsselt), Mitglieder, Zeitpunkte und Größen der Ereignisse eines Kassenbuchs (nicht dessen Inhalt; dass ein Raum ein Kassenbuch der Familie ist, steht im Klartext im Raum) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.",
   "privacy4Title": "Private Termine",
   "privacy4Body": "Private Termine werden nie an die Familie gesendet. Zwischen deinen eigenen Geräten werden sie über einen privaten, verschlüsselten Raum abgeglichen, dem nur dein Konto angehört.",
   "privacy5Title": "Erinnerungen und Benachrichtigungen",
