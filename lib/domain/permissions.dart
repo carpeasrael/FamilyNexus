@@ -34,6 +34,13 @@ class Permissions {
     return m != null && m.status == MemberStatus.joined && m.role == Role.moderator;
   }
 
+  /// Rolle eines beigetretenen Mitglieds; `null`, wenn die Familie oder das Mitglied (noch) unbekannt oder nicht
+  /// beigetreten ist (#431, E-112).
+  static Role? roleOf(Family? f, String userId) {
+    final m = f?.member(userId);
+    return m != null && m.status == MemberStatus.joined ? m.role : null;
+  }
+
   /// Aufgabenlisten anlegen, ändern, zuweisen und löschen: nur Moderatoren (E-51).
   static bool canManageTasks(Family f) => isModerator(f);
 
