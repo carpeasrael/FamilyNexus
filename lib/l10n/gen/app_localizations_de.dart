@@ -3722,4 +3722,287 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get eventTypeAvatarPhoto => 'Avatar-Fotos';
+
+  @override
+  String get cashTitle => 'Kassenbuch';
+
+  @override
+  String get cashTodayTitle => 'Kassenbuch';
+
+  @override
+  String get cashOpen => 'Öffnen';
+
+  @override
+  String cashTodayBook(String title, String amount) {
+    return '$title: $amount in diesem Monat';
+  }
+
+  @override
+  String get cashTodayNone => 'Noch kein Kassenbuch.';
+
+  @override
+  String get cashSettingsSubtitle =>
+      'Gemeinsame Ausgaben mit anderen Moderatoren, Ende-zu-Ende-verschlüsselt';
+
+  @override
+  String get cashBooksEmpty =>
+      'Noch kein Kassenbuch. Lege eines an oder warte auf eine Einladung.';
+
+  @override
+  String get cashNewBook => 'Neues Kassenbuch';
+
+  @override
+  String get cashNewBookTitleHint => 'Name des Buchs';
+
+  @override
+  String get cashNewBookCurrency => 'Währung';
+
+  @override
+  String get cashCreate => 'Anlegen';
+
+  @override
+  String get cashBookMine => 'Von dir';
+
+  @override
+  String cashBookBy(String name) {
+    return 'Von $name';
+  }
+
+  @override
+  String get cashBookPlaceholder =>
+      'Der Name dieses Buchs ist noch nicht bekannt.';
+
+  @override
+  String get cashIncomplete => 'Verlauf unvollständig – Summen unter Vorbehalt';
+
+  @override
+  String get cashBlocked =>
+      'Im Buch ist jemand, der nicht berechtigt ist. Gesendet wird erst, wenn der Ersteller das bereinigt hat. Deine Einträge bleiben gespeichert.';
+
+  @override
+  String cashPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Einträge noch nicht gesendet',
+      one: '1 Eintrag noch nicht gesendet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cashInvitationsTitle => 'Einladungen';
+
+  @override
+  String cashInvitationText(String name) {
+    return 'Einladung zum Kassenbuch von $name';
+  }
+
+  @override
+  String get cashAccept => 'Annehmen';
+
+  @override
+  String get cashDecline => 'Ablehnen';
+
+  @override
+  String get cashAcceptConfirmTitle => 'Einladung annehmen?';
+
+  @override
+  String get cashAcceptConfirmBody =>
+      'Alle Mitglieder des Buchs sehen alle Einträge und Bons. Möchtest du beitreten?';
+
+  @override
+  String cashMonthTotal(String amount) {
+    return 'Summe: $amount';
+  }
+
+  @override
+  String get cashMonthPrev => 'Vorheriger Monat';
+
+  @override
+  String get cashMonthNext => 'Nächster Monat';
+
+  @override
+  String get cashNoEntries => 'Keine Einträge in diesem Monat.';
+
+  @override
+  String get cashAddEntry => 'Eintrag hinzufügen';
+
+  @override
+  String get cashEditEntry => 'Eintrag bearbeiten';
+
+  @override
+  String get cashEntryDate => 'Datum';
+
+  @override
+  String get cashEntryStore => 'Geschäft';
+
+  @override
+  String get cashEntryAmount => 'Betrag';
+
+  @override
+  String get cashEntryNote => 'Notiz (optional)';
+
+  @override
+  String get cashEntryAmountInvalid =>
+      'Bitte einen Betrag größer als 0 und höchstens 999.999,99 eingeben.';
+
+  @override
+  String get cashEntryStoreRequired => 'Bitte ein Geschäft eingeben.';
+
+  @override
+  String get cashEntrySave => 'Speichern';
+
+  @override
+  String get cashEntryDelete => 'Löschen';
+
+  @override
+  String get cashEntryDeleteConfirm =>
+      'Der Eintrag wird bei den Mitgliedern entfernt, sobald ihr Gerät ihn empfängt. Die Bon-Datei wird nach Möglichkeit gelöscht.';
+
+  @override
+  String get cashDiscardTitle => 'Änderungen verwerfen?';
+
+  @override
+  String get cashDiscard => 'Verwerfen';
+
+  @override
+  String get cashKeepEditing => 'Weiter bearbeiten';
+
+  @override
+  String cashEntryBy(String name) {
+    return 'von $name';
+  }
+
+  @override
+  String get cashEntryByMe => 'von dir';
+
+  @override
+  String cashEntrySemantics(String store, String amount, String date) {
+    return '$store, $amount, $date';
+  }
+
+  @override
+  String get cashReceipt => 'Bon';
+
+  @override
+  String get cashReceiptAdd => 'Foto hinzufügen';
+
+  @override
+  String get cashReceiptReplace => 'Foto ersetzen';
+
+  @override
+  String get cashReceiptRemove => 'Foto entfernen';
+
+  @override
+  String get cashReceiptPrivacyTitle => 'Foto des Bons';
+
+  @override
+  String get cashReceiptPrivacyBody =>
+      'Bons können Karten- oder Personendaten zeigen. Das Foto wird verkleinert, ohne Ortsangaben gespeichert und ist für alle Mitglieder des Buchs sichtbar.';
+
+  @override
+  String get cashReceiptContinue => 'Foto wählen';
+
+  @override
+  String get cashReceiptMissing => 'Bon nicht verfügbar';
+
+  @override
+  String get cashReceiptInvalid => 'Bon konnte nicht geprüft werden';
+
+  @override
+  String get cashReceiptUnavailable => 'Bon momentan nicht abrufbar';
+
+  @override
+  String get cashRetry => 'Erneut versuchen';
+
+  @override
+  String get cashReceiptPreparing => 'Foto wird vorbereitet …';
+
+  @override
+  String get cashReceiptSemantics => 'Foto des Bons';
+
+  @override
+  String get cashReceiptAttached => 'Bon angehängt';
+
+  @override
+  String get cashPhotoErrFormat =>
+      'Dieses Format wird nicht unterstützt. Bitte JPEG, PNG oder WebP wählen.';
+
+  @override
+  String get cashPhotoErrTooLarge =>
+      'Die Datei ist zu groß (höchstens 15 MiB).';
+
+  @override
+  String get cashPhotoErrPixels =>
+      'Das Bild hat zu viele Pixel. Bitte ein kleineres Bild wählen.';
+
+  @override
+  String get cashPhotoErrDecode => 'Das Bild lässt sich nicht lesen.';
+
+  @override
+  String get cashPhotoErrShrink =>
+      'Das Foto lässt sich nicht klein genug speichern (höchstens 1 MiB). Bitte ein anderes wählen.';
+
+  @override
+  String get cashErrInvalid => 'Bitte die Eingaben prüfen.';
+
+  @override
+  String get cashErrLimit =>
+      'Das Limit für Einträge in diesem Buch ist erreicht.';
+
+  @override
+  String get cashMembersTitle => 'Mitglieder';
+
+  @override
+  String get cashMemberJoined => 'Beigetreten';
+
+  @override
+  String get cashMemberInvited => 'Eingeladen';
+
+  @override
+  String get cashMemberCreator => 'Ersteller';
+
+  @override
+  String get cashInvite => 'Mitglied einladen';
+
+  @override
+  String get cashInviteNone => 'Keine weiteren Moderatoren zum Einladen.';
+
+  @override
+  String cashInviteConfirmTitle(String name) {
+    return '$name einladen?';
+  }
+
+  @override
+  String get cashInviteConfirmBody =>
+      'Alle Mitglieder des Buchs sehen alle Einträge und Bons. Wer entfernt wird, behält den bisherigen Stand.';
+
+  @override
+  String get cashInviteAction => 'Einladen';
+
+  @override
+  String get cashRemove => 'Entfernen';
+
+  @override
+  String cashRemoveConfirm(String name) {
+    return '$name aus dem Buch entfernen?';
+  }
+
+  @override
+  String get cashLeave => 'Buch verlassen';
+
+  @override
+  String get cashLeaveConfirm =>
+      'Möchtest du dieses Buch verlassen? Ungesendete Einträge gehen verloren. Du kannst nur mit einer neuen Einladung wieder beitreten.';
+
+  @override
+  String get cashCreatorCannotLeave =>
+      'Als Ersteller kannst du das Buch nicht verlassen. Du kannst aber Mitglieder entfernen.';
+
+  @override
+  String get cashBookGone => 'Das Kassenbuch ist nicht mehr verfügbar.';
+
+  @override
+  String get cashLoading => 'Wird geladen …';
 }

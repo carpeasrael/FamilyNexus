@@ -31,6 +31,7 @@ import 'fake_scheduler.dart';
 import 'fake_store.dart';
 import 'memory_anniversary_store.dart';
 import 'memory_avatar_photo_store.dart';
+import 'memory_cash_book_store.dart';
 import 'memory_event_store.dart';
 import 'memory_event_theme_store.dart';
 import 'memory_shopping_store.dart';
@@ -130,6 +131,9 @@ Future<TestApp> buildTestApp({
   // Test (#434): Ablage der Avatar-Fotos. Ohne Angabe gibt es keine Foto-Funktion im Kalender-Controller.
   MemoryAvatarPhotoStore? avatarPhotoItems,
   bool avatarPhotosEnabled = true,
+  // Test (#311): Ablage des Kassenbuchs und Freischaltung. Ohne Angabe gibt es keinen Kassenbuch-Controller.
+  MemoryCashBookStore? cashBookItems,
+  bool cashBooksEnabled = false,
   // Test: Meldungen zu Chat und Einkauf und Zahl am App-Symbol (#254). Ohne Angabe wie im Browser: keine.
   ActivityPlatform? activity,
   AppBadge? badge,
@@ -249,6 +253,8 @@ Future<TestApp> buildTestApp({
         avatarPhotoStore: avatarPhotoItems,
         familyRoom: room,
         avatarPhotosEnabled: avatarPhotosEnabled,
+        cashBookStore: cashBookItems,
+        cashBooksEnabled: cashBooksEnabled,
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
       );
       builtCalendars.add(controller);

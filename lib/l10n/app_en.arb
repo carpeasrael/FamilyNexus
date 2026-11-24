@@ -2041,5 +2041,158 @@
   "@familyResetPhotoBody": {"placeholders": {"name": {"type": "String"}}},
   "familyResetPhotoDone": "Photo reset",
   "accountDeleteRemovePhoto": "Remove photo first",
-  "eventTypeAvatarPhoto": "Avatar photos"
+  "eventTypeAvatarPhoto": "Avatar photos",
+  "cashTitle": "Cash book",
+  "cashTodayTitle": "Cash book",
+  "cashOpen": "Open",
+  "cashTodayBook": "{title}: {amount} this month",
+  "@cashTodayBook": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "cashTodayNone": "No cash book yet.",
+  "cashSettingsSubtitle": "Shared expenses with other moderators, end-to-end encrypted",
+  "cashBooksEmpty": "No cash book yet. Create one or wait for an invitation.",
+  "cashNewBook": "New cash book",
+  "cashNewBookTitleHint": "Name of the book",
+  "cashNewBookCurrency": "Currency",
+  "cashCreate": "Create",
+  "cashBookMine": "By you",
+  "cashBookBy": "By {name}",
+  "@cashBookBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cashBookPlaceholder": "The name of this book is not known yet.",
+  "cashIncomplete": "History incomplete – totals are provisional",
+  "cashBlocked": "Someone in this book is not authorized. Nothing is sent until the creator has cleaned this up. Your entries stay saved.",
+  "cashPending": "{count, plural, =1{1 entry not sent yet} other{{count} entries not sent yet}}",
+  "@cashPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cashInvitationsTitle": "Invitations",
+  "cashInvitationText": "Invitation to a cash book from {name}",
+  "@cashInvitationText": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cashAccept": "Accept",
+  "cashDecline": "Decline",
+  "cashAcceptConfirmTitle": "Accept the invitation?",
+  "cashAcceptConfirmBody": "All members of the book see all entries and receipts. Do you want to join?",
+  "cashMonthTotal": "Total: {amount}",
+  "@cashMonthTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "cashMonthPrev": "Previous month",
+  "cashMonthNext": "Next month",
+  "cashNoEntries": "No entries this month.",
+  "cashAddEntry": "Add entry",
+  "cashEditEntry": "Edit entry",
+  "cashEntryDate": "Date",
+  "cashEntryStore": "Store",
+  "cashEntryAmount": "Amount",
+  "cashEntryNote": "Note (optional)",
+  "cashEntryAmountInvalid": "Please enter an amount greater than 0 and at most 999,999.99.",
+  "cashEntryStoreRequired": "Please enter a store.",
+  "cashEntrySave": "Save",
+  "cashEntryDelete": "Delete",
+  "cashEntryDeleteConfirm": "The entry is removed for the members as soon as their device receives it. The receipt file is deleted where possible.",
+  "cashDiscardTitle": "Discard changes?",
+  "cashDiscard": "Discard",
+  "cashKeepEditing": "Keep editing",
+  "cashEntryBy": "by {name}",
+  "@cashEntryBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cashEntryByMe": "by you",
+  "cashEntrySemantics": "{store}, {amount}, {date}",
+  "@cashEntrySemantics": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cashReceipt": "Receipt",
+  "cashReceiptAdd": "Add photo",
+  "cashReceiptReplace": "Replace photo",
+  "cashReceiptRemove": "Remove photo",
+  "cashReceiptPrivacyTitle": "Photo of the receipt",
+  "cashReceiptPrivacyBody": "Receipts can show card or personal data. The photo is reduced in size, saved without location data, and visible to all members of the book.",
+  "cashReceiptContinue": "Choose photo",
+  "cashReceiptMissing": "Receipt not available",
+  "cashReceiptInvalid": "Receipt could not be verified",
+  "cashReceiptUnavailable": "Receipt cannot be retrieved right now",
+  "cashRetry": "Try again",
+  "cashReceiptPreparing": "Preparing photo …",
+  "cashReceiptSemantics": "Photo of the receipt",
+  "cashReceiptAttached": "Receipt attached",
+  "cashPhotoErrFormat": "This format is not supported. Please choose JPEG, PNG or WebP.",
+  "cashPhotoErrTooLarge": "The file is too large (15 MiB at most).",
+  "cashPhotoErrPixels": "The image has too many pixels. Please choose a smaller image.",
+  "cashPhotoErrDecode": "The image cannot be read.",
+  "cashPhotoErrShrink": "The photo cannot be saved small enough (1 MiB at most). Please choose another one.",
+  "cashErrInvalid": "Please check your input.",
+  "cashErrLimit": "The limit for entries in this book has been reached.",
+  "cashMembersTitle": "Members",
+  "cashMemberJoined": "Joined",
+  "cashMemberInvited": "Invited",
+  "cashMemberCreator": "Creator",
+  "cashInvite": "Invite member",
+  "cashInviteNone": "No other moderators to invite.",
+  "cashInviteConfirmTitle": "Invite {name}?",
+  "@cashInviteConfirmTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cashInviteConfirmBody": "All members of the book see all entries and receipts. Anyone who is removed keeps what they have already received.",
+  "cashInviteAction": "Invite",
+  "cashRemove": "Remove",
+  "cashRemoveConfirm": "Remove {name} from the book?",
+  "@cashRemoveConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cashLeave": "Leave book",
+  "cashLeaveConfirm": "Do you want to leave this book? Entries that were not sent are lost. You can only rejoin with a new invitation.",
+  "cashCreatorCannotLeave": "As the creator you cannot leave the book. You can remove members, though.",
+  "cashBookGone": "The cash book is no longer available.",
+  "cashLoading": "Loading …"
 }

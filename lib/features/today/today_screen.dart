@@ -12,6 +12,7 @@ import '../calendar/event_detail_screen.dart';
 import '../calendar/event_editor_screen.dart';
 import '../calendar/event_tile.dart';
 import '../calendar/widgets/anniversary_tile.dart';
+import '../cashbook/cash_book_entry_points.dart';
 import '../family/member_avatar_view.dart';
 import '../presence/presence_view.dart';
 import '../reminders/permission_hint.dart';
@@ -126,6 +127,7 @@ class TodayScreen extends StatelessWidget {
                 trailing: TextButton(onPressed: onOpenTasks, child: Text(l.tasksTitle)),
                 child: Text(l.todayTasksOpen(services.tasks!.myOpenCount)),
               ),
+            if (c.cashBookController != null) CashBookTodayCard(controller: c.cashBookController!),
             SectionCard(
               title: l.todayUnread,
               trailing: TextButton(onPressed: onOpenChat, child: Text(l.todayOpenChat)),

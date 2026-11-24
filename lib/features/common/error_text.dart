@@ -1,10 +1,13 @@
 import '../../data/matrix/matrix_gateway.dart';
+import '../../data/platform/file_access.dart';
 import '../../domain/anniversaries.dart';
 import '../../domain/anniversary_service.dart';
 import '../../domain/avatar_photo_processing.dart';
 import '../../domain/avatar_photo_service.dart';
+import '../../domain/cash_book_service.dart';
 import '../../domain/event_theme_service.dart';
 import '../../domain/event_themes.dart';
+import '../../domain/receipt_photo_processing.dart';
 import '../../domain/shopping.dart';
 import '../../domain/tasks.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -84,5 +87,23 @@ String errorText(AppLocalizations l, Object error) {
       AnniversaryError.limit => l.anniversaryLimit(AnniversaryPerson.maxActive),
     };
   }
+  if (error is CashBookException) {
+    return switch (error.error) {
+      CashBookError.invalid => l.cashErrInvalid,
+      CashBookError.notAllowed => l.errNotAllowed,
+      CashBookError.notFound => l.errNotFound,
+      CashBookError.limit => l.cashErrLimit,
+    };
+  }
+  if (error is ReceiptPhotoProcessingException) {
+    return switch (error.error) {
+      ReceiptPhotoProcessingError.unsupportedFormat => l.cashPhotoErrFormat,
+      ReceiptPhotoProcessingError.tooLarge => l.cashPhotoErrTooLarge,
+      ReceiptPhotoProcessingError.tooManyPixels => l.cashPhotoErrPixels,
+      ReceiptPhotoProcessingError.notDecodable => l.cashPhotoErrDecode,
+      ReceiptPhotoProcessingError.cannotShrink => l.cashPhotoErrShrink,
+    };
+  }
+  if (error is FileTooLargeException) return l.cashPhotoErrTooLarge;
   return l.errUnknown;
 }

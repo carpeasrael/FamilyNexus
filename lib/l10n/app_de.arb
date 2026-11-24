@@ -2051,5 +2051,158 @@
   "@familyResetPhotoBody": {"placeholders": {"name": {"type": "String"}}},
   "familyResetPhotoDone": "Foto zurückgesetzt",
   "accountDeleteRemovePhoto": "Foto zuerst entfernen",
-  "eventTypeAvatarPhoto": "Avatar-Fotos"
+  "eventTypeAvatarPhoto": "Avatar-Fotos",
+  "cashTitle": "Kassenbuch",
+  "cashTodayTitle": "Kassenbuch",
+  "cashOpen": "Öffnen",
+  "cashTodayBook": "{title}: {amount} in diesem Monat",
+  "@cashTodayBook": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "cashTodayNone": "Noch kein Kassenbuch.",
+  "cashSettingsSubtitle": "Gemeinsame Ausgaben mit anderen Moderatoren, Ende-zu-Ende-verschlüsselt",
+  "cashBooksEmpty": "Noch kein Kassenbuch. Lege eines an oder warte auf eine Einladung.",
+  "cashNewBook": "Neues Kassenbuch",
+  "cashNewBookTitleHint": "Name des Buchs",
+  "cashNewBookCurrency": "Währung",
+  "cashCreate": "Anlegen",
+  "cashBookMine": "Von dir",
+  "cashBookBy": "Von {name}",
+  "@cashBookBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cashBookPlaceholder": "Der Name dieses Buchs ist noch nicht bekannt.",
+  "cashIncomplete": "Verlauf unvollständig – Summen unter Vorbehalt",
+  "cashBlocked": "Im Buch ist jemand, der nicht berechtigt ist. Gesendet wird erst, wenn der Ersteller das bereinigt hat. Deine Einträge bleiben gespeichert.",
+  "cashPending": "{count, plural, =1{1 Eintrag noch nicht gesendet} other{{count} Einträge noch nicht gesendet}}",
+  "@cashPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cashInvitationsTitle": "Einladungen",
+  "cashInvitationText": "Einladung zum Kassenbuch von {name}",
+  "@cashInvitationText": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cashAccept": "Annehmen",
+  "cashDecline": "Ablehnen",
+  "cashAcceptConfirmTitle": "Einladung annehmen?",
+  "cashAcceptConfirmBody": "Alle Mitglieder des Buchs sehen alle Einträge und Bons. Möchtest du beitreten?",
+  "cashMonthTotal": "Summe: {amount}",
+  "@cashMonthTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "cashMonthPrev": "Vorheriger Monat",
+  "cashMonthNext": "Nächster Monat",
+  "cashNoEntries": "Keine Einträge in diesem Monat.",
+  "cashAddEntry": "Eintrag hinzufügen",
+  "cashEditEntry": "Eintrag bearbeiten",
+  "cashEntryDate": "Datum",
+  "cashEntryStore": "Geschäft",
+  "cashEntryAmount": "Betrag",
+  "cashEntryNote": "Notiz (optional)",
+  "cashEntryAmountInvalid": "Bitte einen Betrag größer als 0 und höchstens 999.999,99 eingeben.",
+  "cashEntryStoreRequired": "Bitte ein Geschäft eingeben.",
+  "cashEntrySave": "Speichern",
+  "cashEntryDelete": "Löschen",
+  "cashEntryDeleteConfirm": "Der Eintrag wird bei den Mitgliedern entfernt, sobald ihr Gerät ihn empfängt. Die Bon-Datei wird nach Möglichkeit gelöscht.",
+  "cashDiscardTitle": "Änderungen verwerfen?",
+  "cashDiscard": "Verwerfen",
+  "cashKeepEditing": "Weiter bearbeiten",
+  "cashEntryBy": "von {name}",
+  "@cashEntryBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cashEntryByMe": "von dir",
+  "cashEntrySemantics": "{store}, {amount}, {date}",
+  "@cashEntrySemantics": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "cashReceipt": "Bon",
+  "cashReceiptAdd": "Foto hinzufügen",
+  "cashReceiptReplace": "Foto ersetzen",
+  "cashReceiptRemove": "Foto entfernen",
+  "cashReceiptPrivacyTitle": "Foto des Bons",
+  "cashReceiptPrivacyBody": "Bons können Karten- oder Personendaten zeigen. Das Foto wird verkleinert, ohne Ortsangaben gespeichert und ist für alle Mitglieder des Buchs sichtbar.",
+  "cashReceiptContinue": "Foto wählen",
+  "cashReceiptMissing": "Bon nicht verfügbar",
+  "cashReceiptInvalid": "Bon konnte nicht geprüft werden",
+  "cashReceiptUnavailable": "Bon momentan nicht abrufbar",
+  "cashRetry": "Erneut versuchen",
+  "cashReceiptPreparing": "Foto wird vorbereitet …",
+  "cashReceiptSemantics": "Foto des Bons",
+  "cashReceiptAttached": "Bon angehängt",
+  "cashPhotoErrFormat": "Dieses Format wird nicht unterstützt. Bitte JPEG, PNG oder WebP wählen.",
+  "cashPhotoErrTooLarge": "Die Datei ist zu groß (höchstens 15 MiB).",
+  "cashPhotoErrPixels": "Das Bild hat zu viele Pixel. Bitte ein kleineres Bild wählen.",
+  "cashPhotoErrDecode": "Das Bild lässt sich nicht lesen.",
+  "cashPhotoErrShrink": "Das Foto lässt sich nicht klein genug speichern (höchstens 1 MiB). Bitte ein anderes wählen.",
+  "cashErrInvalid": "Bitte die Eingaben prüfen.",
+  "cashErrLimit": "Das Limit für Einträge in diesem Buch ist erreicht.",
+  "cashMembersTitle": "Mitglieder",
+  "cashMemberJoined": "Beigetreten",
+  "cashMemberInvited": "Eingeladen",
+  "cashMemberCreator": "Ersteller",
+  "cashInvite": "Mitglied einladen",
+  "cashInviteNone": "Keine weiteren Moderatoren zum Einladen.",
+  "cashInviteConfirmTitle": "{name} einladen?",
+  "@cashInviteConfirmTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cashInviteConfirmBody": "Alle Mitglieder des Buchs sehen alle Einträge und Bons. Wer entfernt wird, behält den bisherigen Stand.",
+  "cashInviteAction": "Einladen",
+  "cashRemove": "Entfernen",
+  "cashRemoveConfirm": "{name} aus dem Buch entfernen?",
+  "@cashRemoveConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cashLeave": "Buch verlassen",
+  "cashLeaveConfirm": "Möchtest du dieses Buch verlassen? Ungesendete Einträge gehen verloren. Du kannst nur mit einer neuen Einladung wieder beitreten.",
+  "cashCreatorCannotLeave": "Als Ersteller kannst du das Buch nicht verlassen. Du kannst aber Mitglieder entfernen.",
+  "cashBookGone": "Das Kassenbuch ist nicht mehr verfügbar.",
+  "cashLoading": "Wird geladen …"
 }

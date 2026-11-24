@@ -138,6 +138,9 @@ class CashBookController extends ChangeNotifier {
     return f != null && Permissions.isModerator(f);
   }
 
+  /// Anzeigename eines Familienmitglieds (leer, wenn unbekannt).
+  String nameOf(String userId) => gateway.family?.member(userId)?.displayName ?? '';
+
   /// Die Funktion ist freigeschaltet **und** ich bin Moderator: nur dann zeigt die Oberfläche Einstiege.
   bool get available => enabled && isModerator;
 

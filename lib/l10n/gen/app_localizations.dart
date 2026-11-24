@@ -6163,6 +6163,492 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Avatar-Fotos'**
   String get eventTypeAvatarPhoto;
+
+  /// No description provided for @cashTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kassenbuch'**
+  String get cashTitle;
+
+  /// No description provided for @cashTodayTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kassenbuch'**
+  String get cashTodayTitle;
+
+  /// No description provided for @cashOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'Öffnen'**
+  String get cashOpen;
+
+  /// No description provided for @cashTodayBook.
+  ///
+  /// In de, this message translates to:
+  /// **'{title}: {amount} in diesem Monat'**
+  String cashTodayBook(String title, String amount);
+
+  /// No description provided for @cashTodayNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch kein Kassenbuch.'**
+  String get cashTodayNone;
+
+  /// No description provided for @cashSettingsSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Gemeinsame Ausgaben mit anderen Moderatoren, Ende-zu-Ende-verschlüsselt'**
+  String get cashSettingsSubtitle;
+
+  /// No description provided for @cashBooksEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch kein Kassenbuch. Lege eines an oder warte auf eine Einladung.'**
+  String get cashBooksEmpty;
+
+  /// No description provided for @cashNewBook.
+  ///
+  /// In de, this message translates to:
+  /// **'Neues Kassenbuch'**
+  String get cashNewBook;
+
+  /// No description provided for @cashNewBookTitleHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Name des Buchs'**
+  String get cashNewBookTitleHint;
+
+  /// No description provided for @cashNewBookCurrency.
+  ///
+  /// In de, this message translates to:
+  /// **'Währung'**
+  String get cashNewBookCurrency;
+
+  /// No description provided for @cashCreate.
+  ///
+  /// In de, this message translates to:
+  /// **'Anlegen'**
+  String get cashCreate;
+
+  /// No description provided for @cashBookMine.
+  ///
+  /// In de, this message translates to:
+  /// **'Von dir'**
+  String get cashBookMine;
+
+  /// No description provided for @cashBookBy.
+  ///
+  /// In de, this message translates to:
+  /// **'Von {name}'**
+  String cashBookBy(String name);
+
+  /// No description provided for @cashBookPlaceholder.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Name dieses Buchs ist noch nicht bekannt.'**
+  String get cashBookPlaceholder;
+
+  /// No description provided for @cashIncomplete.
+  ///
+  /// In de, this message translates to:
+  /// **'Verlauf unvollständig – Summen unter Vorbehalt'**
+  String get cashIncomplete;
+
+  /// No description provided for @cashBlocked.
+  ///
+  /// In de, this message translates to:
+  /// **'Im Buch ist jemand, der nicht berechtigt ist. Gesendet wird erst, wenn der Ersteller das bereinigt hat. Deine Einträge bleiben gespeichert.'**
+  String get cashBlocked;
+
+  /// No description provided for @cashPending.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Eintrag noch nicht gesendet} other{{count} Einträge noch nicht gesendet}}'**
+  String cashPending(int count);
+
+  /// No description provided for @cashInvitationsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladungen'**
+  String get cashInvitationsTitle;
+
+  /// No description provided for @cashInvitationText.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladung zum Kassenbuch von {name}'**
+  String cashInvitationText(String name);
+
+  /// No description provided for @cashAccept.
+  ///
+  /// In de, this message translates to:
+  /// **'Annehmen'**
+  String get cashAccept;
+
+  /// No description provided for @cashDecline.
+  ///
+  /// In de, this message translates to:
+  /// **'Ablehnen'**
+  String get cashDecline;
+
+  /// No description provided for @cashAcceptConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladung annehmen?'**
+  String get cashAcceptConfirmTitle;
+
+  /// No description provided for @cashAcceptConfirmBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Mitglieder des Buchs sehen alle Einträge und Bons. Möchtest du beitreten?'**
+  String get cashAcceptConfirmBody;
+
+  /// No description provided for @cashMonthTotal.
+  ///
+  /// In de, this message translates to:
+  /// **'Summe: {amount}'**
+  String cashMonthTotal(String amount);
+
+  /// No description provided for @cashMonthPrev.
+  ///
+  /// In de, this message translates to:
+  /// **'Vorheriger Monat'**
+  String get cashMonthPrev;
+
+  /// No description provided for @cashMonthNext.
+  ///
+  /// In de, this message translates to:
+  /// **'Nächster Monat'**
+  String get cashMonthNext;
+
+  /// No description provided for @cashNoEntries.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Einträge in diesem Monat.'**
+  String get cashNoEntries;
+
+  /// No description provided for @cashAddEntry.
+  ///
+  /// In de, this message translates to:
+  /// **'Eintrag hinzufügen'**
+  String get cashAddEntry;
+
+  /// No description provided for @cashEditEntry.
+  ///
+  /// In de, this message translates to:
+  /// **'Eintrag bearbeiten'**
+  String get cashEditEntry;
+
+  /// No description provided for @cashEntryDate.
+  ///
+  /// In de, this message translates to:
+  /// **'Datum'**
+  String get cashEntryDate;
+
+  /// No description provided for @cashEntryStore.
+  ///
+  /// In de, this message translates to:
+  /// **'Geschäft'**
+  String get cashEntryStore;
+
+  /// No description provided for @cashEntryAmount.
+  ///
+  /// In de, this message translates to:
+  /// **'Betrag'**
+  String get cashEntryAmount;
+
+  /// No description provided for @cashEntryNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Notiz (optional)'**
+  String get cashEntryNote;
+
+  /// No description provided for @cashEntryAmountInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte einen Betrag größer als 0 und höchstens 999.999,99 eingeben.'**
+  String get cashEntryAmountInvalid;
+
+  /// No description provided for @cashEntryStoreRequired.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte ein Geschäft eingeben.'**
+  String get cashEntryStoreRequired;
+
+  /// No description provided for @cashEntrySave.
+  ///
+  /// In de, this message translates to:
+  /// **'Speichern'**
+  String get cashEntrySave;
+
+  /// No description provided for @cashEntryDelete.
+  ///
+  /// In de, this message translates to:
+  /// **'Löschen'**
+  String get cashEntryDelete;
+
+  /// No description provided for @cashEntryDeleteConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Eintrag wird bei den Mitgliedern entfernt, sobald ihr Gerät ihn empfängt. Die Bon-Datei wird nach Möglichkeit gelöscht.'**
+  String get cashEntryDeleteConfirm;
+
+  /// No description provided for @cashDiscardTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Änderungen verwerfen?'**
+  String get cashDiscardTitle;
+
+  /// No description provided for @cashDiscard.
+  ///
+  /// In de, this message translates to:
+  /// **'Verwerfen'**
+  String get cashDiscard;
+
+  /// No description provided for @cashKeepEditing.
+  ///
+  /// In de, this message translates to:
+  /// **'Weiter bearbeiten'**
+  String get cashKeepEditing;
+
+  /// No description provided for @cashEntryBy.
+  ///
+  /// In de, this message translates to:
+  /// **'von {name}'**
+  String cashEntryBy(String name);
+
+  /// No description provided for @cashEntryByMe.
+  ///
+  /// In de, this message translates to:
+  /// **'von dir'**
+  String get cashEntryByMe;
+
+  /// No description provided for @cashEntrySemantics.
+  ///
+  /// In de, this message translates to:
+  /// **'{store}, {amount}, {date}'**
+  String cashEntrySemantics(String store, String amount, String date);
+
+  /// No description provided for @cashReceipt.
+  ///
+  /// In de, this message translates to:
+  /// **'Bon'**
+  String get cashReceipt;
+
+  /// No description provided for @cashReceiptAdd.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto hinzufügen'**
+  String get cashReceiptAdd;
+
+  /// No description provided for @cashReceiptReplace.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto ersetzen'**
+  String get cashReceiptReplace;
+
+  /// No description provided for @cashReceiptRemove.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto entfernen'**
+  String get cashReceiptRemove;
+
+  /// No description provided for @cashReceiptPrivacyTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto des Bons'**
+  String get cashReceiptPrivacyTitle;
+
+  /// No description provided for @cashReceiptPrivacyBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Bons können Karten- oder Personendaten zeigen. Das Foto wird verkleinert, ohne Ortsangaben gespeichert und ist für alle Mitglieder des Buchs sichtbar.'**
+  String get cashReceiptPrivacyBody;
+
+  /// No description provided for @cashReceiptContinue.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto wählen'**
+  String get cashReceiptContinue;
+
+  /// No description provided for @cashReceiptMissing.
+  ///
+  /// In de, this message translates to:
+  /// **'Bon nicht verfügbar'**
+  String get cashReceiptMissing;
+
+  /// No description provided for @cashReceiptInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Bon konnte nicht geprüft werden'**
+  String get cashReceiptInvalid;
+
+  /// No description provided for @cashReceiptUnavailable.
+  ///
+  /// In de, this message translates to:
+  /// **'Bon momentan nicht abrufbar'**
+  String get cashReceiptUnavailable;
+
+  /// No description provided for @cashRetry.
+  ///
+  /// In de, this message translates to:
+  /// **'Erneut versuchen'**
+  String get cashRetry;
+
+  /// No description provided for @cashReceiptPreparing.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto wird vorbereitet …'**
+  String get cashReceiptPreparing;
+
+  /// No description provided for @cashReceiptSemantics.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto des Bons'**
+  String get cashReceiptSemantics;
+
+  /// No description provided for @cashReceiptAttached.
+  ///
+  /// In de, this message translates to:
+  /// **'Bon angehängt'**
+  String get cashReceiptAttached;
+
+  /// No description provided for @cashPhotoErrFormat.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieses Format wird nicht unterstützt. Bitte JPEG, PNG oder WebP wählen.'**
+  String get cashPhotoErrFormat;
+
+  /// No description provided for @cashPhotoErrTooLarge.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Datei ist zu groß (höchstens 15 MiB).'**
+  String get cashPhotoErrTooLarge;
+
+  /// No description provided for @cashPhotoErrPixels.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Bild hat zu viele Pixel. Bitte ein kleineres Bild wählen.'**
+  String get cashPhotoErrPixels;
+
+  /// No description provided for @cashPhotoErrDecode.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Bild lässt sich nicht lesen.'**
+  String get cashPhotoErrDecode;
+
+  /// No description provided for @cashPhotoErrShrink.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Foto lässt sich nicht klein genug speichern (höchstens 1 MiB). Bitte ein anderes wählen.'**
+  String get cashPhotoErrShrink;
+
+  /// No description provided for @cashErrInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte die Eingaben prüfen.'**
+  String get cashErrInvalid;
+
+  /// No description provided for @cashErrLimit.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Limit für Einträge in diesem Buch ist erreicht.'**
+  String get cashErrLimit;
+
+  /// No description provided for @cashMembersTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Mitglieder'**
+  String get cashMembersTitle;
+
+  /// No description provided for @cashMemberJoined.
+  ///
+  /// In de, this message translates to:
+  /// **'Beigetreten'**
+  String get cashMemberJoined;
+
+  /// No description provided for @cashMemberInvited.
+  ///
+  /// In de, this message translates to:
+  /// **'Eingeladen'**
+  String get cashMemberInvited;
+
+  /// No description provided for @cashMemberCreator.
+  ///
+  /// In de, this message translates to:
+  /// **'Ersteller'**
+  String get cashMemberCreator;
+
+  /// No description provided for @cashInvite.
+  ///
+  /// In de, this message translates to:
+  /// **'Mitglied einladen'**
+  String get cashInvite;
+
+  /// No description provided for @cashInviteNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine weiteren Moderatoren zum Einladen.'**
+  String get cashInviteNone;
+
+  /// No description provided for @cashInviteConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} einladen?'**
+  String cashInviteConfirmTitle(String name);
+
+  /// No description provided for @cashInviteConfirmBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Mitglieder des Buchs sehen alle Einträge und Bons. Wer entfernt wird, behält den bisherigen Stand.'**
+  String get cashInviteConfirmBody;
+
+  /// No description provided for @cashInviteAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladen'**
+  String get cashInviteAction;
+
+  /// No description provided for @cashRemove.
+  ///
+  /// In de, this message translates to:
+  /// **'Entfernen'**
+  String get cashRemove;
+
+  /// No description provided for @cashRemoveConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} aus dem Buch entfernen?'**
+  String cashRemoveConfirm(String name);
+
+  /// No description provided for @cashLeave.
+  ///
+  /// In de, this message translates to:
+  /// **'Buch verlassen'**
+  String get cashLeave;
+
+  /// No description provided for @cashLeaveConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Möchtest du dieses Buch verlassen? Ungesendete Einträge gehen verloren. Du kannst nur mit einer neuen Einladung wieder beitreten.'**
+  String get cashLeaveConfirm;
+
+  /// No description provided for @cashCreatorCannotLeave.
+  ///
+  /// In de, this message translates to:
+  /// **'Als Ersteller kannst du das Buch nicht verlassen. Du kannst aber Mitglieder entfernen.'**
+  String get cashCreatorCannotLeave;
+
+  /// No description provided for @cashBookGone.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Kassenbuch ist nicht mehr verfügbar.'**
+  String get cashBookGone;
+
+  /// No description provided for @cashLoading.
+  ///
+  /// In de, this message translates to:
+  /// **'Wird geladen …'**
+  String get cashLoading;
 }
 
 class _AppLocalizationsDelegate

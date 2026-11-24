@@ -3698,4 +3698,285 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventTypeAvatarPhoto => 'Avatar photos';
+
+  @override
+  String get cashTitle => 'Cash book';
+
+  @override
+  String get cashTodayTitle => 'Cash book';
+
+  @override
+  String get cashOpen => 'Open';
+
+  @override
+  String cashTodayBook(String title, String amount) {
+    return '$title: $amount this month';
+  }
+
+  @override
+  String get cashTodayNone => 'No cash book yet.';
+
+  @override
+  String get cashSettingsSubtitle =>
+      'Shared expenses with other moderators, end-to-end encrypted';
+
+  @override
+  String get cashBooksEmpty =>
+      'No cash book yet. Create one or wait for an invitation.';
+
+  @override
+  String get cashNewBook => 'New cash book';
+
+  @override
+  String get cashNewBookTitleHint => 'Name of the book';
+
+  @override
+  String get cashNewBookCurrency => 'Currency';
+
+  @override
+  String get cashCreate => 'Create';
+
+  @override
+  String get cashBookMine => 'By you';
+
+  @override
+  String cashBookBy(String name) {
+    return 'By $name';
+  }
+
+  @override
+  String get cashBookPlaceholder => 'The name of this book is not known yet.';
+
+  @override
+  String get cashIncomplete => 'History incomplete – totals are provisional';
+
+  @override
+  String get cashBlocked =>
+      'Someone in this book is not authorized. Nothing is sent until the creator has cleaned this up. Your entries stay saved.';
+
+  @override
+  String cashPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries not sent yet',
+      one: '1 entry not sent yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cashInvitationsTitle => 'Invitations';
+
+  @override
+  String cashInvitationText(String name) {
+    return 'Invitation to a cash book from $name';
+  }
+
+  @override
+  String get cashAccept => 'Accept';
+
+  @override
+  String get cashDecline => 'Decline';
+
+  @override
+  String get cashAcceptConfirmTitle => 'Accept the invitation?';
+
+  @override
+  String get cashAcceptConfirmBody =>
+      'All members of the book see all entries and receipts. Do you want to join?';
+
+  @override
+  String cashMonthTotal(String amount) {
+    return 'Total: $amount';
+  }
+
+  @override
+  String get cashMonthPrev => 'Previous month';
+
+  @override
+  String get cashMonthNext => 'Next month';
+
+  @override
+  String get cashNoEntries => 'No entries this month.';
+
+  @override
+  String get cashAddEntry => 'Add entry';
+
+  @override
+  String get cashEditEntry => 'Edit entry';
+
+  @override
+  String get cashEntryDate => 'Date';
+
+  @override
+  String get cashEntryStore => 'Store';
+
+  @override
+  String get cashEntryAmount => 'Amount';
+
+  @override
+  String get cashEntryNote => 'Note (optional)';
+
+  @override
+  String get cashEntryAmountInvalid =>
+      'Please enter an amount greater than 0 and at most 999,999.99.';
+
+  @override
+  String get cashEntryStoreRequired => 'Please enter a store.';
+
+  @override
+  String get cashEntrySave => 'Save';
+
+  @override
+  String get cashEntryDelete => 'Delete';
+
+  @override
+  String get cashEntryDeleteConfirm =>
+      'The entry is removed for the members as soon as their device receives it. The receipt file is deleted where possible.';
+
+  @override
+  String get cashDiscardTitle => 'Discard changes?';
+
+  @override
+  String get cashDiscard => 'Discard';
+
+  @override
+  String get cashKeepEditing => 'Keep editing';
+
+  @override
+  String cashEntryBy(String name) {
+    return 'by $name';
+  }
+
+  @override
+  String get cashEntryByMe => 'by you';
+
+  @override
+  String cashEntrySemantics(String store, String amount, String date) {
+    return '$store, $amount, $date';
+  }
+
+  @override
+  String get cashReceipt => 'Receipt';
+
+  @override
+  String get cashReceiptAdd => 'Add photo';
+
+  @override
+  String get cashReceiptReplace => 'Replace photo';
+
+  @override
+  String get cashReceiptRemove => 'Remove photo';
+
+  @override
+  String get cashReceiptPrivacyTitle => 'Photo of the receipt';
+
+  @override
+  String get cashReceiptPrivacyBody =>
+      'Receipts can show card or personal data. The photo is reduced in size, saved without location data, and visible to all members of the book.';
+
+  @override
+  String get cashReceiptContinue => 'Choose photo';
+
+  @override
+  String get cashReceiptMissing => 'Receipt not available';
+
+  @override
+  String get cashReceiptInvalid => 'Receipt could not be verified';
+
+  @override
+  String get cashReceiptUnavailable => 'Receipt cannot be retrieved right now';
+
+  @override
+  String get cashRetry => 'Try again';
+
+  @override
+  String get cashReceiptPreparing => 'Preparing photo …';
+
+  @override
+  String get cashReceiptSemantics => 'Photo of the receipt';
+
+  @override
+  String get cashReceiptAttached => 'Receipt attached';
+
+  @override
+  String get cashPhotoErrFormat =>
+      'This format is not supported. Please choose JPEG, PNG or WebP.';
+
+  @override
+  String get cashPhotoErrTooLarge => 'The file is too large (15 MiB at most).';
+
+  @override
+  String get cashPhotoErrPixels =>
+      'The image has too many pixels. Please choose a smaller image.';
+
+  @override
+  String get cashPhotoErrDecode => 'The image cannot be read.';
+
+  @override
+  String get cashPhotoErrShrink =>
+      'The photo cannot be saved small enough (1 MiB at most). Please choose another one.';
+
+  @override
+  String get cashErrInvalid => 'Please check your input.';
+
+  @override
+  String get cashErrLimit =>
+      'The limit for entries in this book has been reached.';
+
+  @override
+  String get cashMembersTitle => 'Members';
+
+  @override
+  String get cashMemberJoined => 'Joined';
+
+  @override
+  String get cashMemberInvited => 'Invited';
+
+  @override
+  String get cashMemberCreator => 'Creator';
+
+  @override
+  String get cashInvite => 'Invite member';
+
+  @override
+  String get cashInviteNone => 'No other moderators to invite.';
+
+  @override
+  String cashInviteConfirmTitle(String name) {
+    return 'Invite $name?';
+  }
+
+  @override
+  String get cashInviteConfirmBody =>
+      'All members of the book see all entries and receipts. Anyone who is removed keeps what they have already received.';
+
+  @override
+  String get cashInviteAction => 'Invite';
+
+  @override
+  String get cashRemove => 'Remove';
+
+  @override
+  String cashRemoveConfirm(String name) {
+    return 'Remove $name from the book?';
+  }
+
+  @override
+  String get cashLeave => 'Leave book';
+
+  @override
+  String get cashLeaveConfirm =>
+      'Do you want to leave this book? Entries that were not sent are lost. You can only rejoin with a new invitation.';
+
+  @override
+  String get cashCreatorCannotLeave =>
+      'As the creator you cannot leave the book. You can remove members, though.';
+
+  @override
+  String get cashBookGone => 'The cash book is no longer available.';
+
+  @override
+  String get cashLoading => 'Loading …';
 }
