@@ -664,10 +664,10 @@ void main() {
       expect((await store.pending(kBookOwner)), hasLength(1));
     });
 
-    test('der eingebaute Standard ist gesperrt (CashBookFlags.enabled = false)', () async {
+    test('der eingebaute Standard ist freigeschaltet (CashBookFlags.enabled = true)', () async {
       final s = CashBookSync(gateway: gw, service: service, store: store, familyRoom: gw.familyRoom!.id);
-      expect(s.enabled, isFalse);
-      expect(CashBookFlags.enabled, isFalse);
+      expect(s.enabled, isTrue);
+      expect(CashBookFlags.enabled, isTrue);
     });
 
     test('andere Familie als die des Bestands: Signale werden ignoriert, nichts gesendet', () async {

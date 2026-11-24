@@ -8,6 +8,7 @@ import 'package:family_nexus/data/matrix/matrix_gateway.dart' show GatewayError,
 import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart';
 import 'package:family_nexus/data/matrix/server_probe.dart';
 import 'package:family_nexus/domain/book_room.dart';
+import 'package:family_nexus/domain/cash_book.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -328,7 +329,8 @@ void main() {
       expect(hs.calls.length, before);
     });
 
-    test('der eingebaute Standard ist gesperrt (CashBookFlags.enabled = false)', () async {
+    test('der eingebaute Standard ist freigeschaltet; ohne Sitzung bleibt jede Buchaktion notAllowed', () async {
+      expect(CashBookFlags.enabled, isTrue);
       final hs = _Hs();
       final dir = await Directory.systemTemp.createTemp('fn_bookgw0');
       addTearDown(() => dir.delete(recursive: true));
@@ -564,8 +566,17 @@ void main() {
   });
 
   group('Lücken der Mutationsprobe (Teil 2b)', () {
-    test('eingebauter Standard ist gesperrt: angemeldet, Familie bekannt, Buch und Einladung da, trotzdem nichts', () async {
-      final (hs, g) = await _signedIn(enabled: null);
+    test('eingebauter Standard ist freigeschaltet: angemeldet, Familie bekannt, Buch und Einladung sind sichtbar', () async {
+      final (_, g) = await _signedIn(enabled: null);
+      expect(g.family, isNotNull);
+      await _sync(g, _bookJoin(_book));
+      await _sync(g, _bookInvite('!einl:hs.example'));
+      expect(g.books.map((b) => b.roomId), <String>[_book]);
+      expect(g.bookInvitations.map((b) => b.roomId), <String>['!einl:hs.example']);
+    });
+
+    test('ausdrücklich gesperrt (enabled: false): angemeldet, Familie bekannt, Buch und Einladung da, trotzdem nichts', () async {
+      final (hs, g) = await _signedIn(enabled: false);
       expect(g.family, isNotNull);
       await _sync(g, _bookJoin(_book));
       await _sync(g, _bookInvite('!einl:hs.example'));

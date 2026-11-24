@@ -1024,8 +1024,8 @@ void main() {
     });
   });
 
-  test('der gesperrte Standard bleibt', () {
-    expect(CashBookFlags.enabled, isFalse);
+  test('der Standard ist freigeschaltet', () {
+    expect(CashBookFlags.enabled, isTrue);
     expect(CashMonth.of(today), const CashMonth(2026, 11));
   });
 }
