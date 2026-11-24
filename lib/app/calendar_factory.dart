@@ -40,13 +40,14 @@ CalendarController buildCalendarController({
   AvatarPhotoStore? avatarPhotoStore,
   String? familyRoom,
   bool Function(String userId)? isModerator,
+  Role? Function(String userId)? roleOf,
   bool avatarPhotosEnabled = AvatarPhotoFlags.enabled,
   CashBookStore? cashBookStore,
   bool cashBooksEnabled = CashBookFlags.enabled,
   FileAccess? files,
   String cashBookCurrency = 'EUR',
 }) {
-  final service = CalendarService(store: store, myUserId: userId, clock: clock);
+  final service = CalendarService(store: store, myUserId: userId, clock: clock, roleOf: roleOf ?? ((_) => null));
   final sync = CalendarSync(
     gateway: gateway,
     service: service,

@@ -203,6 +203,7 @@ Future<AppServices> bootstrap({
         files: fileAccess,
         familyRoom: familyRoom,
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
+        roleOf: (id) => Permissions.roleOf(gateway.family, id),
       );
     },
     shoppingBuilder: (userId, familyRoom) async {
