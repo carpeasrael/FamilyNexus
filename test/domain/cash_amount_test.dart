@@ -48,6 +48,13 @@ void main() {
     expect(de('1' * 30), isNull);
   });
 
+  test('11 bis 20 Ziffern ergeben null, nie eine Ausnahme (int.parse läuft nie über)', () {
+    for (final s in <String>['12345678901', '99999999999999999999', '1' * 11, '9' * 20, '12345678901,50']) {
+      expect(() => de(s), returnsNormally, reason: s);
+      expect(de(s), isNull, reason: s);
+    }
+  });
+
   test('gleiche Trenner für Dezimal und Gruppe: keine Gruppierung', () {
     expect(CashAmount.parse('1.250', decimalSeparator: '.', groupSeparator: '.'), isNull);
     expect(CashAmount.parse('12.5', decimalSeparator: '.', groupSeparator: '.'), 1250);

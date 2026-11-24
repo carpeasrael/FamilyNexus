@@ -38,6 +38,35 @@ void main() {
     expect(ReceiptPreview.decode(Uint8List.fromList(img.encodePng(img.Image(width: 3000, height: 8)))), isNotNull, reason: 'genau 3000 geht');
   });
 
+  test('Farbreihenfolge RGBA und volle Deckkraft (ein rotes Bild bleibt rot und sichtbar)', () {
+    final red = img.Image(width: 8, height: 4);
+    img.fill(red, color: img.ColorRgb8(255, 0, 0));
+    final p = ReceiptPreview.decode(Uint8List.fromList(img.encodeJpg(red, quality: 95)))!;
+    expect(p.rgba[0], greaterThan(200), reason: 'Rot');
+    expect(p.rgba[1], lessThan(60));
+    expect(p.rgba[2], lessThan(60), reason: 'Blau, nicht Rot (keine BGRA-Reihenfolge)');
+    expect(p.rgba[3], 255, reason: 'volle Deckkraft');
+  });
+
+  test('ein gültiges Bild zwischen 1 und 2 MiB: null (Grenze der Eingabe, nicht erst ein anderes Limit)', () {
+    Uint8List? big;
+    for (var side = 700; side <= 1400 && big == null; side += 50) {
+      final image = img.Image(width: side, height: side);
+      var seed = 3;
+      for (final px in image) {
+        seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+        px
+          ..r = seed & 255
+          ..g = (seed >> 8) & 255
+          ..b = (seed >> 16) & 255;
+      }
+      final bytes = Uint8List.fromList(img.encodeJpg(image, quality: 90));
+      if (bytes.length > 1024 * 1024 && bytes.length < 2 * 1024 * 1024) big = bytes;
+    }
+    expect(big, isNotNull, reason: 'Voraussetzung: ein Testbild zwischen 1 und 2 MiB');
+    expect(ReceiptPreview.decode(big!), isNull);
+  });
+
   test('über 1 MiB: null', () {
     final big = Uint8List(1024 * 1024 + 1)..setRange(0, 3, <int>[0xFF, 0xD8, 0xFF]);
     expect(ReceiptPreview.decode(big), isNull);

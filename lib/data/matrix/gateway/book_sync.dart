@@ -117,12 +117,18 @@ mixin _BookSyncModule on ChangeNotifier implements MatrixGateway {
     if (!_cashBooksEnabled || client == null || !client.isLogged() || family == null || !_syncedOnce || !_participantsLoaded) {
       return const <String>[];
     }
+    // Nur ein **vorhandener** Familienvermerk, der von der aktuellen Familie abweicht, macht ein Buch zum alten: Ein
+    // Buch-Raum ohne Vermerk wird nie verlassen (die Aktion ist nicht umkehrbar).
+    bool other(Room r) {
+      final content = r.getState(EventTypes.RoomCreate)?.content;
+      if (!BookRoomMarker.isBook(content)) return false;
+      final f = content?[BookRoomMarker.familyKey];
+      return f is String && f != family.roomId;
+    }
+
     return <String>[
       for (final r in client.rooms)
-        if (r.membership == Membership.join &&
-            BookRoomMarker.isBook(r.getState(EventTypes.RoomCreate)?.content) &&
-            r.getState(EventTypes.RoomCreate)?.content[BookRoomMarker.familyKey] != family.roomId)
-          r.id,
+        if (r.membership == Membership.join && other(r)) r.id,
     ];
   }
 

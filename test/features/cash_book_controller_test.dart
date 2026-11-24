@@ -534,4 +534,193 @@ void main() {
       expect(previews, 0);
     });
   });
+
+  CashBookView viewFor(String roomId, {required String owner, bool mine = true}) => CashBookView(
+        meta: bookMeta(room: roomId, owner: owner),
+        mine: mine,
+        isPlaceholder: false,
+        complete: true,
+        blocked: false,
+        pendingOwn: 0,
+        monthTotalCents: 0,
+        month: CashMonth.of(today),
+      );
+
+  group('Härtung (Mutationsprobe Teil 4a-1)', () {
+    test('Ersteller zählt nach dem Raum (Gateway), nicht nach den Metadaten: mine und canLeave stimmen überein', () async {
+      await store.putBook(bookMeta(room: '!a:fake.test', owner: me));
+      await store.putBook(bookMeta(room: '!b:fake.test', owner: _cara));
+      gw.fakeBooks = <BookRoomInfo>[const BookRoomInfo(roomId: '!a:fake.test', creatorId: _cara), BookRoomInfo(roomId: '!b:fake.test', creatorId: me)];
+      c.start();
+      await settle();
+      final a = viewOf('!a:fake.test')!;
+      final b = viewOf('!b:fake.test')!;
+      expect((a.mine, c.canLeave(a)), (false, true), reason: 'Meta sagt „ich“, der Raum sagt Cara');
+      expect((b.mine, c.canLeave(b)), (true, false), reason: 'Meta sagt Cara, der Raum sagt „ich“');
+      gw.bookCalls = 0;
+      await expectLater(c.leaveBook(b), throwsA(isA<CashBookException>()));
+      expect(gw.bookCalls, 0);
+    });
+
+    Future<void> allActionsRejected(String why) async {
+      await store.putEntry(room, own(cents: 777), publishedVersion: 1);
+      gw.bookCalls = 0;
+      var loads = 0;
+      gw.loadReceiptHandler = (r, e, rc, a) {
+        loads++;
+        return BookReceiptLoad(BookReceiptStatus.ok, jpeg);
+      };
+      final v = viewFor(room, owner: me);
+      final actions = <String, Future<Object?> Function()>{
+        'leaveBook': () => c.leaveBook(viewFor(room, owner: _cara, mine: false)),
+        'inviteMember': () => c.inviteMember(v, _cara),
+        'removeMember': () => c.removeMember(v, _cara),
+        'editEntry': () => c.editEntry(room, own()),
+        'deleteEntry': () => c.deleteEntry(room, kEntryId1),
+        'members': () => c.members(v),
+        'inviteCandidates': () => c.inviteCandidates(v),
+        'acceptInvitation': () => c.acceptInvitation('!x'),
+        'createBook': () => c.createBook(title: 'Haushalt', currency: 'EUR'),
+        'addEntry': () => c.addEntry(room, date: today, store: 'x', amountCents: 5),
+        'pickPhoto': () => c.pickPhoto(),
+      };
+      for (final e in actions.entries) {
+        await expectLater(e.value(), throwsA(isA<CashBookException>().having((x) => x.error, 'error', CashBookError.notAllowed)), reason: '$why: ${e.key}');
+      }
+      expect(await c.entriesOf(room, CashMonth.of(today)), isEmpty, reason: why);
+      expect(await c.monthTotal(room, CashMonth.of(today)), 0, reason: why);
+      expect((await c.loadReceipt(room, own().copyWith(receipt: const CashReceipt(eventId: r'$b', sha256: kHash, size: 10)))).status, BookReceiptStatus.missing, reason: why);
+      expect(loads, 0, reason: '$why: der Bon wird nicht einmal geladen');
+      expect(gw.bookCalls, 0, reason: '$why: keine Zugriffe auf das Gateway');
+      expect(gw.invitedToBook, isEmpty);
+      expect(gw.leftBooks, isEmpty);
+    }
+
+    test('gesperrt: jede Aktion und jede Abfrage wird abgelehnt, bevor etwas das Gateway erreicht', () async {
+      c.dispose();
+      await build(enabled: false);
+      await allActionsRejected('gesperrt');
+    });
+
+    test('Nicht-Moderator: jede Aktion und jede Abfrage wird abgelehnt, bevor etwas das Gateway erreicht', () async {
+      c.dispose();
+      await build(moderator: false);
+      await allActionsRejected('Nicht-Moderator');
+    });
+
+    test('ohne bekannte Familie: nicht verfügbar, kein Absturz, nichts sichtbar', () async {
+      c.start();
+      await settle();
+      expect(c.books, isNotEmpty);
+      await gw.logout();
+      expect(gw.family, isNull);
+      expect(c.isModerator, isFalse);
+      expect(c.available, isFalse);
+      await c.load();
+      expect(c.books, isEmpty);
+      await expectLater(c.leaveBook(viewFor(room, owner: _cara, mine: false)), throwsA(isA<CashBookException>()));
+    });
+
+    test('Eintrag ändern mit neuem Foto: das Foto wird zuerst aufbereitet (nie die rohen Bytes gesendet)', () async {
+      prepare = (b) => jpeg;
+      c.start();
+      final e = await c.addEntry(room, date: today, store: 'A', amountCents: 5);
+      final raw = Uint8List.fromList(<int>[7, 7, 7, 7]);
+      await c.editEntry(room, e, newPhoto: raw);
+      expect(gw.sentReceipts.single.bytes, jpeg);
+      expect(gw.sentReceipts.single.bytes, isNot(raw));
+    });
+
+    test('Bon „ok“ ohne Bytes gibt es nicht: invalid, kein Bild, keine Dekodierung', () async {
+      gw.loadReceiptHandler = (r, e, rc, a) => const BookReceiptLoad(BookReceiptStatus.ok);
+      final e = own().copyWith(receipt: const CashReceipt(eventId: r'$b', sha256: kHash, size: 10));
+      c.start();
+      final v = await c.loadReceipt(room, e);
+      expect(v.status, BookReceiptStatus.invalid);
+      expect(v.preview, isNull);
+      expect(previews, 0);
+    });
+
+    test('Einladungskandidaten: für Nicht-Ersteller leer und ohne Abfrage der Mitglieder', () async {
+      c.start();
+      await settle();
+      gw.bookCalls = 0;
+      expect(await c.inviteCandidates(viewFor(room, owner: _cara, mine: false)), isEmpty);
+      expect(gw.bookCalls, 0, reason: 'keine Mitgliederabfrage');
+    });
+
+    test('pendingOwn zählt je Buch (zwei Bücher mit offenen Einträgen)', () async {
+      await store.putBook(bookMeta(room: '!zwei:fake.test', owner: me));
+      gw.fakeBooks = <BookRoomInfo>[BookRoomInfo(roomId: room, creatorId: me), BookRoomInfo(roomId: '!zwei:fake.test', creatorId: me)];
+      await store.putEntry(room, own(), publishedVersion: 0);
+      await store.putEntry(room, own(id: kEntryId2), publishedVersion: 0);
+      await store.putEntry('!zwei:fake.test', own(id: '66666666-6666-4666-8666-666666666666'), publishedVersion: 0);
+      c.start();
+      await settle();
+      expect(viewOf(room)!.pendingOwn, 2);
+      expect(viewOf('!zwei:fake.test')!.pendingOwn, 1);
+    });
+
+    test('Buch nach erneutem Beitritt: erscheint wieder (das Merken „verlassen“ ist nur vorübergehend)', () async {
+      await store.putBook(bookMeta(room: '!zwei:fake.test', owner: _cara));
+      gw.fakeBooks = <BookRoomInfo>[BookRoomInfo(roomId: room, creatorId: me), const BookRoomInfo(roomId: '!zwei:fake.test', creatorId: _cara)];
+      c.start();
+      await settle();
+      await c.leaveBook(viewOf('!zwei:fake.test')!);
+      await pumpEventQueue();
+      expect(viewOf('!zwei:fake.test'), isNull);
+      gw.fakeBooks = <BookRoomInfo>[BookRoomInfo(roomId: room, creatorId: me)];
+      await settle();
+      gw.fakeBooks = <BookRoomInfo>[BookRoomInfo(roomId: room, creatorId: me), const BookRoomInfo(roomId: '!zwei:fake.test', creatorId: _cara)];
+      await settle();
+      expect(viewOf('!zwei:fake.test'), isNotNull, reason: 'nach dem Verschwinden aus dem Gateway ist das Merken gelöscht');
+    });
+
+    test('eine Änderung während eines laufenden Aufbaus löst genau einen weiteren Aufbau aus (nichts geht verloren)', () async {
+      final gated = _GatedStore();
+      await gated.putBook(bookMeta(room: room, owner: me));
+      final c2 = CashBookController(gateway: gw, service: CashBookService(store: gated, myUserId: me), store: gated, sync: sync, receipts: receipts, enabled: true, today: () => today);
+      gated.gate = Completer<void>();
+      final first = c2.load();
+      await pumpEventQueue();
+      expect(gated.booksCalls, 1, reason: 'der erste Lauf steht am Tor');
+      await gated.putEntry(room, own(cents: 4200), publishedVersion: 1);
+      final second = c2.load();
+      gated.gate!.complete();
+      await Future.wait<void>(<Future<void>>[first, second]);
+      expect(gated.booksCalls, 2, reason: 'genau ein Folgelauf');
+      expect(c2.books.single.monthTotalCents, 4200, reason: 'der Stand nach der Änderung ist sichtbar');
+      c2.dispose();
+    });
+
+    test('dispose: ein fremder Besitzer des Slots bleibt; der Gateway-Hörer ist weg; start nach dispose tut nichts', () async {
+      c.start();
+      await pumpEventQueue();
+      void other() {}
+      sync.onChanged = other;
+      c.dispose();
+      expect(sync.onChanged, other, reason: 'nur der eigene Eintrag wird gelöst');
+      gw.bookCalls = 0;
+      server.notifyAll();
+      await pumpEventQueue();
+      expect(gw.bookCalls, 0, reason: 'der Hörer am Gateway wurde entfernt');
+      sync.onChanged = null;
+      c.start();
+      expect(sync.onChanged, isNull, reason: 'nach dispose startet nichts mehr');
+    });
+  });
+}
+
+/// Ablage, deren `books()` an einem Tor wartet (Test: Änderung während eines laufenden Aufbaus).
+class _GatedStore extends MemoryCashBookStore {
+  Completer<void>? gate;
+  int booksCalls = 0;
+
+  @override
+  Future<List<CashBookMeta>> books() async {
+    booksCalls++;
+    final g = gate;
+    if (g != null && booksCalls == 1) await g.future;
+    return super.books();
+  }
 }

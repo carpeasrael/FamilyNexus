@@ -12,6 +12,20 @@ void main() {
     expect(const CashMonth(2026, 5).next, const CashMonth(2026, 6));
   });
 
+  test('Monate sind nur bei gleichem Jahr und Monat gleich', () {
+    expect(const CashMonth(2026, 1) == const CashMonth(2026, 2), isFalse);
+    expect(const CashMonth(2026, 1) == const CashMonth(2027, 1), isFalse);
+    expect(const CashMonth(2026, 1) == const CashMonth(2026, 1), isTrue);
+  });
+
+  test('gleiches Datum und gleicher Zeitstempel: die Reihenfolge entscheidet die id, unabhängig von der Eingabe', () {
+    final a = cashEntry(id: '00000000-0000-4000-8000-00000000000a', date: DateTime.utc(2026, 11, 5), updatedAt: DateTime.utc(2026, 11, 5, 8));
+    final b = cashEntry(id: '00000000-0000-4000-8000-00000000000b', date: DateTime.utc(2026, 11, 5), updatedAt: DateTime.utc(2026, 11, 5, 8));
+    const m = CashMonth(2026, 11);
+    expect(m.entriesOf(<dynamic>[a, b].cast()).map((e) => e.id), m.entriesOf(<dynamic>[b, a].cast()).map((e) => e.id));
+    expect(m.entriesOf(<dynamic>[b, a].cast()).first.id, a.id);
+  });
+
   test('of() und contains() zählen nur Jahr und Monat; Gleichheit', () {
     final m = CashMonth.of(DateTime.utc(2026, 11, 30, 23, 59));
     expect(m, const CashMonth(2026, 11));

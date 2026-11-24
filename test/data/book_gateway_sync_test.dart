@@ -518,6 +518,36 @@ void main() {
       expect(g.staleBooks, isEmpty);
     });
 
+    test('staleBooks: ein Buch-Raum ohne Familienvermerk gilt nie als alt (nie verlassen)', () async {
+      final (hs, g) = await _signedIn();
+      hs.members = <String>[_me];
+      await _sync(g, <String, Object?>{
+        'rooms': <String, Object?>{
+          'join': <String, Object?>{
+            '!ohnefamilie:hs.example': <String, Object?>{
+              'state': <String, Object?>{
+                'events': <Object?>[
+                  _state('m.room.create', _cara, <String, Object?>{'room_version': '10', BookRoomMarker.bookKey: BookRoomMarker.cashKind}),
+                  _memberEvent(_me, 'join'),
+                ],
+              },
+            },
+          },
+        },
+      });
+      await _syncJoined(g, <String, Object?>{'rooms': <String, Object?>{}});
+      await Future<void>.delayed(_settle);
+      expect(g.staleBooks, isEmpty);
+    });
+
+    test('staleBooks ist leer, solange die Mitgliederliste der Familie nicht geladen ist', () async {
+      final (_, g) = await _signedIn(familyMembersFail: true);
+      await _sync(g, _bookJoin('!alt:hs.example', family: '!andere:hs.example'));
+      await Future<void>.delayed(_settle);
+      expect(g.debugParticipantsLoaded, isFalse, reason: 'Voraussetzung des Tests');
+      expect(g.staleBooks, isEmpty);
+    });
+
     test('staleBooks ist leer: gesperrt, ohne bekannte Familie, ohne ersten Sync', () async {
       final (_, locked) = await _signedIn(enabled: false);
       await _sync(locked, _bookJoin('!alt:hs.example', family: '!andere:hs.example'));

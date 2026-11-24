@@ -141,8 +141,9 @@ class CashBookController extends ChangeNotifier {
   /// Die Funktion ist freigeschaltet **und** ich bin Moderator: nur dann zeigt die Oberfläche Einstiege.
   bool get available => enabled && isModerator;
 
-  /// Darf ich dieses Buch verlassen? Der Ersteller nicht.
-  bool canLeave(CashBookView b) => b.meta.owner != me;
+  /// Darf ich dieses Buch verlassen? Der Ersteller nicht. Maßgeblich ist der Ersteller laut Raum ([CashBookView.mine],
+  /// `m.room.create`), nicht die Angabe in den Metadaten.
+  bool canLeave(CashBookView b) => !b.mine;
 
   void start() {
     if (!enabled || _started || _disposed) return;
@@ -400,7 +401,9 @@ class CashBookController extends ChangeNotifier {
   Future<CashReceiptView> loadReceipt(String roomId, CashEntry entry) async {
     if (!available) return const CashReceiptView(BookReceiptStatus.missing);
     final l = await receipts.load(roomId, entry);
-    if (l.status != BookReceiptStatus.ok || l.bytes == null) return CashReceiptView(l.status);
+    if (l.status != BookReceiptStatus.ok) return CashReceiptView(l.status);
+    // „ok“ ohne Bytes darf es nicht geben; ein Bild gibt es nur mit geprüften Bytes.
+    if (l.bytes == null) return const CashReceiptView(BookReceiptStatus.invalid);
     final preview = await _decodePreview(l.bytes!);
     // Bytes, die geprüft sind, sich aber nicht anzeigen lassen, gelten als ungültig (nie ein Absturz).
     return preview == null ? const CashReceiptView(BookReceiptStatus.invalid) : CashReceiptView(BookReceiptStatus.ok, preview);
