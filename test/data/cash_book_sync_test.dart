@@ -564,6 +564,15 @@ void main() {
       expect(gw.leftBooks, hasLength(1));
     });
 
+    test('auch als Ersteller: das eigene Buch einer anderen Familie wird verlassen (danach kann niemand mehr einladen oder entfernen)', () async {
+      await store.putBook(bookMeta(room: '!alt:fake.test', owner: kBookOwner));
+      gw.fakeBooks = <BookRoomInfo>[book(), book('!alt:fake.test', kBookOwner)];
+      gw.fakeStaleBooks = <String>['!alt:fake.test'];
+      await sync.tick();
+      await sync.tick();
+      expect(gw.leftBooks, <String>['!alt:fake.test']);
+    });
+
     test('der lokale Speicher bleibt vom Verlassen unberührt (das Leeren gehört claimFamilyData)', () async {
       await store.putBook(bookMeta(room: '!alt:fake.test'));
       await store.putEntry('!alt:fake.test', fresh(), publishedVersion: 1);

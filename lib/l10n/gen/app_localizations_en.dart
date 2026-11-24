@@ -462,7 +462,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logoutBody =>
-      'Events, the shopping list and tasks are removed from this device. Everything already sent stays encrypted in your family and comes back after you sign in again; changes not yet sent are lost.';
+      'Events, the shopping list, tasks, birthdays and memorial days, avatar photos and cash books are removed from this device when the session ends. Everything already sent stays encrypted in your family and comes back after you sign in again; changes not yet sent are lost.';
 
   @override
   String get settingsAccount => 'Account';
@@ -1309,7 +1309,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String privacy2Body(String keyStore, String cipher) {
-    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars) and, if set, their avatar photo (cropped square and small, encrypted in the family room), the members’ read state (up to which message someone has read), the conversation you last had open (only if switched on) and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
+    return 'Chat messages, files, shared and private events, responses, the shopping list, task lists with their history, calendar themes (name and color), birthdays and memorial days (name and date, including third parties and deceased people), cash books (date, store, amount, currency, note and optionally a photo of the receipt, encrypted in a separate room per book), family members including the choice of their avatar (only the ID of one of the twelve built-in avatars) and, if set, their avatar photo (cropped square and small, encrypted in the family room), the members’ read state (up to which message someone has read), the conversation you last had open (only if switched on) and your settings. Events and messages are stored encrypted ($cipher) on your device. The key is held here: $keyStore – not in the database file.';
   }
 
   @override
@@ -1317,7 +1317,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy3Body =>
-      'Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, public read receipts (who has read up to which message, and when; only when “Send read receipts” is on, visible to the server and to the provider of your chat partners), the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted), size and time of an avatar photo (the photo itself is end-to-end encrypted) and room and profile names (for example the family name). With your own server you decide who sees this information.';
+      'Messages, files and shared events are end-to-end encrypted (Matrix, Olm/Megolm); the server cannot read their content. Metadata remains visible to the operator: account ID, devices, timestamps, room size, memberships, public read receipts (who has read up to which message, and when; only when “Send read receipts” is on, visible to the server and to the provider of your chat partners), the choice of your avatar (one of twelve symbols; room state, not end-to-end encrypted), size and time of an avatar photo (the photo itself is end-to-end encrypted), members, times and sizes of the events of a cash book (not its content; that a room is a cash book of the family is visible in plain text in the room) and room and profile names (for example the family name). With your own server you decide who sees this information.';
 
   @override
   String get privacy4Title => 'Private events';
@@ -1986,7 +1986,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy12Body =>
-      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. Birthdays and memorial days (name of the person and date, including third parties and deceased people) are likewise sent end-to-end encrypted in the family room. The server only sees the metadata it always sees (see “What does the server see?”), plus the choice of your avatar (room state, not end-to-end encrypted). It does not see an avatar photo, only the size and time of the encrypted events.';
+      'Task lists and their history (who completed which item and when, including an optional comment) are sent end-to-end encrypted in the family room like shared events and are stored encrypted on your device. All family members can read them. Birthdays and memorial days (name of the person and date, including third parties and deceased people) are likewise sent end-to-end encrypted in the family room. The server only sees the metadata it always sees (see “What does the server see?”), plus the choice of your avatar (room state, not end-to-end encrypted). It does not see an avatar photo, only the size and time of the encrypted events. Cash books: entries (date, store, amount, currency, note) and photos of receipts are end-to-end encrypted in a separate room per book and stored encrypted on your device. Only moderators of the family use them; all members of a book see all entries and receipts. Anyone invited later also sees the earlier history, including earlier versions of entries. Receipts are reduced in size before sending, camera data and location data (EXIF) are removed; they can still show card or personal data. Deleting or changing an entry creates a new event: earlier versions remain encrypted in the history, with the members and on the server; only your own receipt file is redacted on a best-effort basis, and whoever already received it keeps it. Anyone who is removed or leaves a book keeps what they have already received. The creator cannot leave a book by hand; if they switch families, their device leaves the book automatically, after which nobody can invite or remove anyone. If someone leaves the family, they can stay in the book and see new entries until the reconciliation on the creator’s device (online, itself in the family) removes them; this also applies if they are no longer a moderator.';
 
   @override
   String get webUnlockTitleCreate => 'Set up the browser vault';
@@ -3041,6 +3041,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roomKindDirect => 'Direct chat';
 
   @override
+  String get roomKindBook => 'Cash book';
+
+  @override
   String get roomKindOther => 'Other room';
 
   @override
@@ -3069,7 +3072,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportOnlineNote =>
-      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members, room and profile names (plain text), the choice of avatar (one value out of twelve, room state in plain text), time and size of an avatar photo (the photo itself is encrypted), time and size of events and the types of account data. Event counts are based on this device’s sync; the provider may hold older events as well.';
+      'Contents of messages, events, lists and attachments are stored at the provider only end-to-end encrypted. The provider can read metadata: account, devices, room members (also in cash books; their entries and receipts are encrypted), room and profile names (plain text), the choice of avatar (one value out of twelve, room state in plain text), time and size of an avatar photo (the photo itself is encrypted), time and size of events and the types of account data. Event counts are based on this device’s sync; the provider may hold older events as well.';
 
   @override
   String get eventTypeMessage => 'Messages';
@@ -3130,7 +3133,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String accountDeleteBody(String userId, String server) {
-    return 'Your account $userId will be permanently deleted at $server. The user ID cannot be used again. Messages you sent remain visible to the other family members, and so does the choice of your avatar (one value out of twelve), which stays in the family room. An avatar photo stays encrypted in the room history, with the members who already have it; remove it beforehand if you do not want that. Birthdays and memorial days you created remain for the family (shared family data, every member may change them). Afterwards all data on this device is deleted.';
+    return 'Your account $userId will be permanently deleted at $server. The user ID cannot be used again. Messages you sent remain visible to the other family members, and so does the choice of your avatar (one value out of twelve), which stays in the family room. An avatar photo stays encrypted in the room history, with the members who already have it; remove it beforehand if you do not want that. Birthdays and memorial days you created remain for the family (shared family data, every member may change them). Entries and receipts you created in cash books remain encrypted in the book with the members, including earlier versions; delete them beforehand if you do not want that (earlier versions still remain in the history). Afterwards all data on this device is deleted.';
   }
 
   @override
@@ -3581,6 +3584,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get eventTypeBookMeta => 'Cash book: master data';
+
+  @override
+  String get eventTypeCashEntry => 'Cash book: entries';
+
+  @override
   String get eventTypeAnniversary => 'Birthdays and memorial days';
 
   @override
@@ -3950,7 +3959,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cashInviteConfirmBody =>
-      'All members of the book see all entries and receipts. Anyone who is removed keeps what they have already received.';
+      'All members of the book see all entries and receipts. Newly invited members also see the earlier history. Anyone who is removed keeps what they have already received.';
 
   @override
   String get cashInviteAction => 'Invite';

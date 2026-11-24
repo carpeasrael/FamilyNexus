@@ -38,14 +38,14 @@ void main() {
 
   test('Datenschutzerklärung de: Tabelle, Abmelden, Stand', () {
     final t = _flat(File('store/privacy/privacy-policy.de.md').readAsStringSync());
-    expect(t, contains('**Stand: 18. November 2026**'));
+    expect(t, contains('**Stand: 24. November 2026**'));
     expect(t, contains('nur wenn „Letztes Gespräch wieder öffnen“ eingeschaltet ist, die Kennung des zuletzt geöffneten Gesprächs'));
     expect(t, contains('Die gemerkte Kennung des zuletzt geöffneten Gesprächs wird gelöscht.'));
   });
 
   test('Datenschutzerklärung en: Tabelle, Abmelden, Stand', () {
     final t = _flat(File('store/privacy/privacy-policy.en.md').readAsStringSync());
-    expect(t, contains('**Last updated: 18 November 2026**'));
+    expect(t, contains('**Last updated: 24 November 2026**'));
     expect(t, contains('only if “Reopen last conversation” is switched on, the ID of the conversation you last had open'));
     expect(t, contains('The remembered ID of the conversation you last had open is deleted.'));
   });

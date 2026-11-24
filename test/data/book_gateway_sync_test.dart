@@ -12,6 +12,7 @@ import 'package:family_nexus/domain/book_policy.dart';
 import 'package:family_nexus/domain/book_room.dart';
 import 'package:family_nexus/domain/book_signal.dart';
 import 'package:family_nexus/domain/cash_book.dart';
+import 'package:family_nexus/domain/data_inventory.dart' show InventoryRoomKind;
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -449,6 +450,22 @@ void main() {
       await expectLater(g.bookKnownMembers('!anderes:hs.example'), _notAllowed());
       await expectLater(g.bookKnownMembers('!gibtsnicht:hs.example'), _error(GatewayError.notFound));
       await expectLater(g.bookKnownMembers('kein-raum'), _error(GatewayError.invalidInput));
+    });
+  });
+
+  group('Datenübersicht: Raumart (Teil 4b)', () {
+    test('ein Buch-Raum ist ein Kassenbuch, ein Raum ohne Kennzeichen „sonstiger Raum“, der Familienraum bleibt Familie; unabhängig vom Schalter', () async {
+      for (final enabled in <bool>[true, false]) {
+        final (_, g) = await _signedIn(enabled: enabled);
+        await _sync(g, _bookJoin(_book, members: <String>[_cara]));
+        await _sync(g, _bookJoin('!ohne:hs.example', marker: false));
+        await Future<void>.delayed(_settle);
+        final inv = await g.dataInventory(refresh: false);
+        final kinds = <String, InventoryRoomKind>{for (final r in inv.rooms) r.id: r.kind};
+        expect(kinds[_book], InventoryRoomKind.book, reason: 'enabled=$enabled');
+        expect(kinds['!ohne:hs.example'], InventoryRoomKind.other, reason: 'enabled=$enabled');
+        expect(kinds[_familyRoom], InventoryRoomKind.family, reason: 'enabled=$enabled');
+      }
     });
   });
 

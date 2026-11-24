@@ -91,13 +91,12 @@ mixin _DataInventoryModule on ChangeNotifier implements MatrixGateway {
       }
       rooms.add(InventoryRoom(
         id: r.id,
-        kind: r.id == familyId
-            ? InventoryRoomKind.family
-            : r.id == privateId
-                ? InventoryRoomKind.private
-                : r.isDirectChat
-                    ? InventoryRoomKind.direct
-                    : InventoryRoomKind.other,
+        kind: inventoryRoomKind(
+          isFamily: r.id == familyId,
+          isPrivate: r.id == privateId,
+          isDirect: r.isDirectChat,
+          isBook: BookRoomMarker.isBook(r.getState(EventTypes.RoomCreate)?.content),
+        ),
         name: r.isDirectChat && refresh ? _peerName(r) : TextSanitizer.clean(r.name, max: 80),
         encrypted: r.encrypted,
         membership: r.membership.name,
