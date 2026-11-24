@@ -434,9 +434,13 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     removedFromBook.add((roomId, userId));
   }
 
+  /// Test: wird vor jeder Buchaktion (`leave`) gerufen und darf werfen.
+  void Function(String op, String roomId)? bookActionHook;
+
   @override
   Future<void> leaveBook(String roomId) async {
     bookCalls++;
+    bookActionHook?.call('leave', roomId);
     if (nextBookRoom == null || bookActionError != null) throw _actionError();
     leftBooks.add(roomId);
   }

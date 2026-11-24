@@ -16,7 +16,7 @@ void main() {
     expect(de('1.250,50'), 125050);
     expect(de('1.250'), 125000, reason: 'Punkt ist hier der Tausendertrenner');
     expect(de(' 7,00 '), 700);
-    expect(de('1 250,50'), 125050, reason: 'geschütztes Leerzeichen als Gruppe');
+    expect(de('1\u00A0250,50'), isNull, reason: 'Im deutschen Format ist der Punkt die Gruppe; ein Leerzeichen im Inneren gilt nicht');
   });
 
   test('englische Eingaben', () {
@@ -51,6 +51,16 @@ void main() {
   test('gleiche Trenner für Dezimal und Gruppe: keine Gruppierung', () {
     expect(CashAmount.parse('1.250', decimalSeparator: '.', groupSeparator: '.'), isNull);
     expect(CashAmount.parse('12.5', decimalSeparator: '.', groupSeparator: '.'), 1250);
+  });
+
+  test('Leerzeichen: am Rand egal, im Inneren nur als Gruppentrenner (sonst wäre „12 50“ ein Betrag von 1250)', () {
+    expect(de('12 50'), isNull);
+    expect(de('1 250,50'), isNull, reason: 'Punkt ist hier der Gruppentrenner, Leerzeichen nicht');
+    expect(de('\t7,00\n'), 700);
+    int? fr(String s) => CashAmount.parse(s, decimalSeparator: ',', groupSeparator: '\u202F');
+    expect(fr('1 250,50'), 125050, reason: 'gewöhnliches Leerzeichen als Gruppe im Format mit Leerzeichen-Trenner');
+    expect(fr('1\u202F250,50'), 125050);
+    expect(fr('12 5 0'), isNull);
   });
 
   test('Schweizer Format: Apostroph als Gruppentrenner', () {

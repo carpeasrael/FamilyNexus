@@ -575,6 +575,23 @@ void main() {
       expect(await store.entries('!alt:fake.test'), hasLength(1));
     });
 
+    test('ein unerwarteter Fehler beim Verlassen hält weder die anderen Räume noch den Abgleich an', () async {
+      gw.fakeStaleBooks = <String>['!a:fake.test', '!b:fake.test'];
+      gw.fakeBooks = <BookRoomInfo>[book(), book('!c:fake.test', kBookOwner)];
+      var calls = 0;
+      gw.bookActionHook = (op, room) {
+        if (op == 'leave') {
+          calls++;
+          if (room == '!a:fake.test') throw StateError('unerwartet');
+        }
+      };
+      await sync.tick();
+      await sync.tick();
+      expect(calls, 2, reason: 'beide Räume wurden versucht');
+      expect(gw.leftBooks, <String>['!b:fake.test']);
+      expect(gw.reconcileCalls, 4, reason: 'der Abgleich lief in beiden Läufen weiter (zwei eigene Bücher je Lauf)');
+    });
+
     test('gesperrt oder andere Familie: nichts; dispose leert den Zähler', () async {
       gw.fakeStaleBooks = <String>['!alt:fake.test'];
       await sync.tick();

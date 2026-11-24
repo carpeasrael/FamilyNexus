@@ -12,7 +12,12 @@ class CashAmount {
   /// Ziffern, erste Gruppe 1 bis 3). Leerzeichen jeder Art werden entfernt. Kein Vorzeichen, kein Exponent, nicht null,
   /// höchstens [CashBookLimits.maxAmountCents] (Pfand und Erstattungen sind ausgeschlossen).
   static int? parse(String input, {required String decimalSeparator, required String groupSeparator}) {
-    final text = input.replaceAll(_ws, '');
+    // Leerzeichen am Rand sind egal. Im Inneren sind sie nur dann erlaubt, wenn der Gruppentrenner selbst ein
+    // Leerzeichen ist (z. B. geschütztes Leerzeichen im Französischen); sonst wäre „12 50“ ein Betrag von 1250.
+    final trimmed = input.trim();
+    final spaceGroups = groupSeparator.isNotEmpty && _ws.hasMatch(groupSeparator);
+    if (!spaceGroups && _ws.hasMatch(trimmed)) return null;
+    final text = spaceGroups ? trimmed.replaceAll(_ws, groupSeparator) : trimmed;
     if (text.isEmpty || text.length > 20) return null;
     final groups = groupSeparator.isNotEmpty && groupSeparator != decimalSeparator;
     final parts = text.split(decimalSeparator);

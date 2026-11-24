@@ -470,6 +470,9 @@ class CashBookSync {
         AppLog.w('cashbook', 'Buch einer früheren Familie verlassen');
       } on GatewayException catch (e) {
         AppLog.w('cashbook', 'Verlassen eines früheren Buchs verschoben (${e.error.name})');
+      } catch (e) {
+        // Ein unerwarteter Fehler eines Raums darf die übrigen Räume und den Abgleich nicht anhalten.
+        AppLog.e('cashbook', 'Verlassen eines früheren Buchs gescheitert', e);
       }
     }
   }
