@@ -1,11 +1,11 @@
 import 'server.dart';
 import 'text_sanitizer.dart';
 
-/// Technische Sperre des Kassenbuchs (#311, E-113). Bis zum letzten Teil-PR `false`: Gateway, Sync und Oberfläche
-/// verhalten sich dann wie vor dem Kassenbuch (nur die ungesperrten Sicherheitspfade der Einladungstrennung greifen).
+/// Schalter des Kassenbuchs (#311, E-113). Mit `false` verhalten sich Gateway, Sync und Oberfläche wie vor dem Kassenbuch
+/// (nur die ungesperrten Sicherheitspfade der Einladungstrennung greifen). Freigegeben mit dem Freigabe-PR (`true`).
 class CashBookFlags {
   const CashBookFlags._();
-  static const bool enabled = false;
+  static const bool enabled = true;
 }
 
 /// Grenzen des Kassenbuchs (E-113).

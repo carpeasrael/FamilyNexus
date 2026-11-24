@@ -52,8 +52,8 @@ void main() {
     }
   });
 
-  test('Standard: gesperrt; Start, Senden und Schließen greifen nie auf Gateway oder Ablage zu', () async {
-    final c = build(cash: store, room: roomId);
+  test('gesperrt (enabled: false): Start, Senden und Schließen greifen nie auf Gateway oder Ablage zu', () async {
+    final c = build(cash: store, room: roomId, enabled: false);
     expect(c.cashBookSync, isNotNull);
     expect(c.cashBookSync!.enabled, isFalse);
     expect(c.cashBookReceipts!.enabled, isFalse);
@@ -70,6 +70,14 @@ void main() {
     expect(gateway.bookCalls, 0);
     expect(gateway.bookPublished, isEmpty);
     expect((await store.pendingBooks(gateway.userId!)), hasLength(1));
+  });
+
+  test('der Standard ist freigeschaltet (CashBookFlags.enabled)', () {
+    final c = build(cash: store, room: roomId);
+    expect(c.cashBookSync!.enabled, isTrue);
+    expect(c.cashBookReceipts!.enabled, isTrue);
+    expect(c.cashBookController!.enabled, isTrue);
+    c.dispose();
   });
 
   test('freigeschaltet: der Sync läuft, sendet die Metadaten und endet mit dem Controller', () async {

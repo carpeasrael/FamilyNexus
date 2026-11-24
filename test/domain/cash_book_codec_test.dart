@@ -18,8 +18,8 @@ void main() {
     expect(CashBookLimits.maxNote, 200);
   });
 
-  test('Sperre: das Kassenbuch ist bis zum letzten Teil-PR ausgeschaltet (E-113)', () {
-    expect(CashBookFlags.enabled, isFalse);
+  test('Freigabe: das Kassenbuch ist eingeschaltet (E-113, Freigabe-PR); ausschalten nur bewusst mit Anpassung der Store-Texte', () {
+    expect(CashBookFlags.enabled, isTrue);
   });
 
   Map<String, Object?> wire(CashEntry e) => CashBookCodec.encodeEntry(e);

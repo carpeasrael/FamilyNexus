@@ -139,7 +139,7 @@ void main() {
     expect(t, contains('| Kassenbuch (Datum, Geschäft, Betrag, Währung, Notiz;'));
     expect(t, contains('| Standort, Kontakte, Fotos (automatisch), Gesundheit, Zahlungs- und Kontodaten | nein |'));
     expect(t, contains('bei Kassenbüchern Mitglieder, Zeitpunkte und Größen der Ereignisse'));
-    expect(t, contains('Funktion gesperrt'));
+    expect(t, contains('Funktion freigeschaltet'));
   });
 
   test('solange das Kassenbuch gesperrt ist, nennen weder Beschreibung noch Release-Notes noch Store-Metadaten die Funktion', () {

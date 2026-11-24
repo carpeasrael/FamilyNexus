@@ -140,7 +140,6 @@ void main() {
       expect(await c.entriesOf(room, CashMonth.of(today)), isEmpty);
       expect(gw.bookCalls, 0);
       expect(sync.onChanged, isNull, reason: 'gesperrt: der Slot bleibt frei');
-      expect(CashBookFlags.enabled, isFalse);
     });
 
     test('Nicht-Moderator: nichts verfügbar, Aktionen notAllowed ohne Gateway-Aufruf', () async {

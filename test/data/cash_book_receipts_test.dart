@@ -351,8 +351,8 @@ void main() {
       await receipts.flushCleanup();
       expect(gw.bookCalls, 0);
       expect(gw.sentReceipts, isEmpty);
-      expect(CashBookFlags.enabled, isFalse);
-      expect(CashBookReceipts(gateway: gw, service: service, store: store).enabled, isFalse);
+      expect(CashBookFlags.enabled, isTrue);
+      expect(CashBookReceipts(gateway: gw, service: service, store: store).enabled, isTrue);
     });
 
     test('dispose löst den Rückruf', () {
