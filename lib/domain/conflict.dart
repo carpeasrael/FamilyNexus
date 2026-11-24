@@ -16,24 +16,37 @@ enum Resolution {
 
   /// Anderer Absender als der Besitzer: wird verworfen.
   rejectOwner,
+
+  /// Fremdfassung (Moderator, #431), die noch nicht beurteilt werden kann (Rolle, Basis oder Versionsfenster):
+  /// wird kurz im Speicher gehalten und später erneut geprüft.
+  deferred,
 }
 
-/// Konfliktauflösung (E-13): höhere Version gewinnt; bei gleicher Version der
-/// spätere `updatedAt`; bei völligem Gleichstand entscheidet die kanonische
-/// Darstellung – so konvergieren alle Geräte unabhängig von der Reihenfolge.
+/// Konfliktauflösung (E-13, E-112): lexikografische Totalordnung `(deleted, version, ohne editor, updatedAt,
+/// kanonische Darstellung)`, größer gewinnt – so konvergieren alle Geräte unabhängig von der Reihenfolge.
+///
+/// * Eine Löschmarke schlägt jede nicht gelöschte Fassung, auch mit höherer Version (Löschen ist endgültig). Das gilt
+///   nur bei gleicher Sichtbarkeit; beim erlaubten Übergang privat → geteilt zweier Geräte des Besitzers entscheidet
+///   weiter die Version.
+/// * Bei gleicher Version schlägt eine Fassung ohne `editorId` (Besitzer) eine Moderatorfassung, unabhängig von der
+///   frei wählbaren `updatedAt`.
 class ConflictResolver {
   const ConflictResolver._();
 
   static Resolution resolve(CalendarEvent? current, CalendarEvent incoming) {
     if (current == null) return Resolution.insert;
     if (incoming.ownerId != current.ownerId) return Resolution.rejectOwner;
-    if (incoming.version != current.version) {
-      return incoming.version > current.version ? Resolution.replace : Resolution.ignoreStale;
-    }
     if (incoming == current) return Resolution.ignoreDuplicate;
-    final byTime = incoming.updatedAt.compareTo(current.updatedAt);
-    if (byTime != 0) return byTime > 0 ? Resolution.replace : Resolution.ignoreStale;
-    final byContent = EventCodec.canonical(incoming).compareTo(EventCodec.canonical(current));
-    return byContent > 0 ? Resolution.replace : Resolution.ignoreStale;
+    return _compare(incoming, current) > 0 ? Resolution.replace : Resolution.ignoreStale;
+  }
+
+  static int _compare(CalendarEvent a, CalendarEvent b) {
+    if (a.visibility == b.visibility && a.deleted != b.deleted) return a.deleted ? 1 : -1;
+    if (a.version != b.version) return a.version.compareTo(b.version);
+    final aOwner = a.editorId == null;
+    if (aOwner != (b.editorId == null)) return aOwner ? 1 : -1;
+    final byTime = a.updatedAt.compareTo(b.updatedAt);
+    if (byTime != 0) return byTime;
+    return EventCodec.canonical(a).compareTo(EventCodec.canonical(b));
   }
 }
