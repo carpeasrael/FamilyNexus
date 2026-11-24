@@ -100,9 +100,34 @@ class CalendarSync {
   /// Fehler löst das keinen neuen Versuch aus (#132). Anmeldung, Wiederverbindung und Konto-/Familienwechsel
   /// heben das Fenster auf.
   void _onGatewayChanged() {
+    _maybeRetryDeferred();
     final changed = _backoff.changed(_gatewayState());
     if (!changed && _backoff.blocked) return;
     kick();
+  }
+
+  /// Rollenabbild der gepufferten Fremdfassungen beim letzten Wiederholungslauf; nur eine Änderung löst einen neuen aus.
+  String? _deferredState;
+
+  /// Gateway-Änderungen sind häufig: Ein Wiederholungslauf entsteht nur, wenn gepuffert ist und sich das Rollenabbild
+  /// der gepufferten Absender geändert hat (kein Lesen des Bestands sonst, E-112).
+  void _maybeRetryDeferred() {
+    if (!service.hasDeferred) {
+      _deferredState = null;
+      return;
+    }
+    final state = service.deferredRoleState;
+    if (state == _deferredState) return;
+    _deferredState = state;
+    _queue = _queue.then((_) => _retryDeferred()).catchError((Object e) {
+      AppLog.e('sync', 'Gepufferte Fassungen konnten nicht geprüft werden', e);
+    });
+  }
+
+  Future<void> _retryDeferred() async {
+    if (!sameFamily) return;
+    if (await service.retryDeferred()) onChanged?.call();
+    _deferredState = service.hasDeferred ? service.deferredRoleState : null;
   }
 
   void dispose() {
@@ -135,7 +160,7 @@ class CalendarSync {
     try {
       switch (s) {
         case SharedEventSignal():
-          await _apply(EventCodec.decode(s.content, sender: s.sender, visibility: EventVisibility.shared));
+          await _apply(EventCodec.decode(s.content, sender: s.sender, visibility: EventVisibility.shared), s.timestamp);
         case PrivateEventSignal():
           // Private Termine stammen ausschließlich vom eigenen Konto.
           if (s.sender != _me) {
@@ -143,7 +168,7 @@ class CalendarSync {
             AppLog.w('sync', 'Fremder Absender im privaten Raum verworfen');
             return;
           }
-          await _apply(EventCodec.decode(s.content, sender: s.sender, visibility: EventVisibility.private));
+          await _apply(EventCodec.decode(s.content, sender: s.sender, visibility: EventVisibility.private), s.timestamp);
         case RsvpSignal():
           final r = EventCodec.decodeRsvp(s.content);
           if (r == null) {
@@ -174,20 +199,22 @@ class CalendarSync {
           // erledigt den Rest, auch nach Neustart.
           await store.requeueOwnShared(_me);
           kick();
+          await _retryDeferred(); // ein neues Mitglied ändert das Familienbild (E-112)
       }
     } catch (e) {
       AppLog.e('sync', 'Kalender-Ereignis konnte nicht verarbeitet werden', e);
     }
   }
 
-  Future<void> _apply(DecodeResult r) async {
+  Future<void> _apply(DecodeResult r, DateTime serverTime) async {
     final e = r.event;
-    if (e == null) {
+    final sender = r.sender;
+    if (e == null || sender == null) {
       rejected++;
       AppLog.w('sync', 'Ungültiges Kalender-Ereignis verworfen (${r.error})');
       return;
     }
-    final resolution = await service.applyIncoming(e);
+    final resolution = await service.applyFrom(e, sender: sender, serverTime: serverTime);
     // Nur neue und geänderte Termine laden den Kalender neu. Duplikate, ältere Fassungen (nur Verlauf) und
     // abgelehnte Absender ändern den Bestand nicht (#131).
     if (resolution == Resolution.insert || resolution == Resolution.replace) onChanged?.call();
