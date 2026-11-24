@@ -1004,7 +1004,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rsvpNone => 'No response';
 
   @override
-  String get eventHistory => 'History';
+  String get eventHistory => 'Recent changes on this device';
 
   @override
   String eventVersion(int version) {
@@ -1018,7 +1018,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventCancelled => 'Deleted';
 
   @override
-  String get eventReadOnly => 'Only the creator can change this event.';
+  String get eventReadOnly =>
+      'Only the creator and moderators can change this event.';
+
+  @override
+  String get eventDeleteOccurrenceConfirm =>
+      'Remove this occurrence from the series? The series stays.';
+
+  @override
+  String eventEditedLine(String name, String date) {
+    return '$name · $date (as reported by the sender)';
+  }
+
+  @override
+  String eventLastEditedBy(String name, String date) {
+    return 'Last changed by $name · $date (as reported by the sender)';
+  }
 
   @override
   String get eventYourReminders => 'Your reminders';
@@ -1695,7 +1710,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacy10Body =>
-      'The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. The read receipt (“Read” under your messages) is a public read marker, visible to the server and to the provider of your chat partners (who has read up to which message, and when); it is on by default, and you can switch it off in the settings, then you only send private markers and do not see who has read either. Receipts already sent cannot be taken back. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. Your avatar is an exception: the choice of one of the twelve built-in avatars is kept as room state in the family room and is not end-to-end encrypted. Your own photo as an avatar, however, is end-to-end encrypted: all family members see it, the server only sees size and time. Moderators can take it out of the display. When you change or remove it, earlier copies are only redacted at the server on a best-effort basis; anyone who already received the photo keeps it, including members who have left. For children, parents or guardians should consent. The server and all family members see which symbol you chose; the choice stays in the room even if you are removed or your account is deleted. Otherwise the server only sees the metadata it always sees (see “What does the server see?”).';
+      'The online status (“online” or “offline” with a time) is only sent as an end-to-end encrypted device message to devices of joined family members and is never stored; you can switch it off in the settings. The read receipt (“Read” under your messages) is a public read marker, visible to the server and to the provider of your chat partners (who has read up to which message, and when); it is on by default, and you can switch it off in the settings, then you only send private markers and do not see who has read either. Receipts already sent cannot be taken back. Direct chats are encrypted rooms between two family members. The shopping list is transferred encrypted in the family room like shared events and is stored encrypted on your device; all family members can change it. Besides you, moderators can change shared events (only you can delete them); the family then sees who changed them last, as reported by the sender. Your avatar is an exception: the choice of one of the twelve built-in avatars is kept as room state in the family room and is not end-to-end encrypted. Your own photo as an avatar, however, is end-to-end encrypted: all family members see it, the server only sees size and time. Moderators can take it out of the display. When you change or remove it, earlier copies are only redacted at the server on a best-effort basis; anyone who already received the photo keeps it, including members who have left. For children, parents or guardians should consent. The server and all family members see which symbol you chose; the choice stays in the room even if you are removed or your account is deleted. Otherwise the server only sees the metadata it always sees (see “What does the server see?”).';
 
   @override
   String onbFamilyFound(String name) {

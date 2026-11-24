@@ -669,7 +669,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Bens Termin'));
       await tester.pumpAndSettle();
-      expect(find.text('Nur der Ersteller kann diesen Termin ändern.'), findsOneWidget);
+      expect(find.text('Nur der Ersteller und Moderatoren können diesen Termin ändern.'), findsOneWidget);
       expect(find.byTooltip('Termin bearbeiten'), findsNothing);
       expect(find.byTooltip('Termin löschen'), findsNothing);
     });

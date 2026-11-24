@@ -313,12 +313,15 @@ class _EventEditorScreenState extends State<EventEditorScreen> {
               zoneName: widget.controller.zoneName,
             ),
             gap,
-            _VisibilityCard(
-              visibility: _visibility,
-              showChangeNote: _ex != null && _ex!.isShared && _visibility == EventVisibility.private,
-              onChanged: (v) => setState(() => _visibility = v),
-            ),
-            gap,
+            // Ein Moderator ändert fremde Termine nur; die Sichtbarkeit bleibt beim Besitzer (E-112).
+            if (_ex == null || _ex!.ownerId == widget.controller.me) ...<Widget>[
+              _VisibilityCard(
+                visibility: _visibility,
+                showChangeNote: _ex != null && _ex!.isShared && _visibility == EventVisibility.private,
+                onChanged: (v) => setState(() => _visibility = v),
+              ),
+              gap,
+            ],
             _PlaceNoteCard(location: _location, note: _note),
             gap,
             _RepeatCard(

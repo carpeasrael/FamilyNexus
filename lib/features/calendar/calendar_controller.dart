@@ -366,6 +366,7 @@ class CalendarController extends ChangeNotifier {
     // Sichtbarkeitswechsel zuerst: Der bearbeitete Inhalt wird nie kurz in der alten
     // Sichtbarkeit gespeichert und veröffentlicht.
     if (visibility != null && visibility != edited.visibility) {
+      // Die Sichtbarkeit wechselt nur der Besitzer; der Dienst lehnt den Wechsel für Fremde ab (E-112).
       final moved = await service.changeVisibility(edited.id, visibility);
       target = moved.copyWith(
         title: edited.title,
@@ -418,6 +419,8 @@ class CalendarController extends ChangeNotifier {
   }
 
   Future<void> shareInChat(CalendarEvent e) async {
+    // Nur der Besitzer teilt seinen Termin im Chat (E-112); die Oberfläche zeigt den Knopf nur ihm.
+    if (e.ownerId != me) throw const CalendarException(CalendarError.notAllowed);
     // Die Karte verwiese sonst in der neuen Familie auf einen Termin der alten (#140).
     if (!sync.sameFamily) throw const GatewayException(GatewayError.serverUnreachable);
     await gateway.shareEventInChat(e);

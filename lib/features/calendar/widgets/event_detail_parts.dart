@@ -12,16 +12,20 @@ class _EventSummaryCard extends StatelessWidget {
     required this.theme,
     required this.ownerId,
     required this.ownerColorIndex,
+    this.lastEdited,
   });
   final CalendarEvent event;
   final Color glow;
+
+  /// „Zuletzt geändert von …“ bei einer Moderatorfassung (E-112); sonst `null`.
+  final String? lastEdited;
   final String range;
   final String dateLong;
 
   /// „Von dir“ oder „Von {Name}“.
   final String owner;
 
-  /// Der Termin gehört der angemeldeten Person (bearbeitbar).
+  /// Die angemeldete Person darf den Termin ändern (Besitzer oder Moderator).
   final bool mine;
 
   /// Thema des geteilten Termins (E-99); `null` ohne Thema.
@@ -74,6 +78,8 @@ class _EventSummaryCard extends StatelessWidget {
           if (theme != null) ...<Widget>[MemberAvatarView(userId: ownerId, size: 20, colorIndex: ownerColorIndex, ring: true), const SizedBox(width: 6)],
           Expanded(child: Text(owner, style: Theme.of(context).textTheme.bodySmall)),
         ]),
+        if (lastEdited != null)
+          Padding(padding: const EdgeInsets.only(top: 4), child: Text(lastEdited!, style: Theme.of(context).textTheme.bodySmall)),
         if (!mine) Padding(padding: const EdgeInsets.only(top: 4), child: Text(l.eventReadOnly, style: Theme.of(context).textTheme.bodySmall)),
       ]),
     );
@@ -188,6 +194,13 @@ class _History extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final fmt = Fmt(context, controller.zone);
+    final family = AppScope.of(context).gateway.family;
+    // Bearbeiter laut Absender (E-112): bei Fassungen des Besitzers dieser selbst, sonst der `editor`.
+    String line(CalendarEvent v) => l.eventEditedLine(
+          memberLabel(l, family, v.editorId ?? v.ownerId, me: controller.me),
+          '${fmt.dateShort(fmt.local(v.updatedAt))} ${fmt.time(v.updatedAt)}',
+        );
     return FutureBuilder<List<CalendarEvent>>(
       future: controller.history(event.id),
       builder: (context, snap) {
@@ -204,7 +217,10 @@ class _History extends StatelessWidget {
                   ListTile(
                     dense: true,
                     title: Text(h.deleted ? l.eventCancelled : h.title),
-                    subtitle: Text(l.eventVersion(h.version), style: monoStyle(context, size: 12)),
+                    subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                      Text(line(h), style: Theme.of(context).textTheme.bodySmall),
+                      Text(l.eventVersion(h.version), style: monoStyle(context, size: 12)),
+                    ]),
                   ),
               ],
             ),
