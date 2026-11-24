@@ -1,6 +1,7 @@
 import 'package:family_nexus/data/sync/calendar_sync.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_service.dart';
+import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/server.dart';
 
 import 'fake_matrix.dart';
@@ -24,13 +25,25 @@ class Peer {
     String? familyRoomId,
     DateTime Function()? clock,
     String Function()? ids,
+    Role? Function(String userId)? roleOf,
   }) async {
     final gw = server.newDevice();
     await gw.login(server: ServerUrl.tryParse(server.host)!, username: user, password: password);
     if (familyRoomId != null) gw.attachFamilyRoom(familyRoomId);
     final store = MemoryEventStore();
-    final svc = CalendarService(store: store, myUserId: gw.userId!, clock: clock, idGenerator: ids);
-    final sync = CalendarSync(gateway: gw, service: svc, store: store, retryInterval: const Duration(hours: 1));
+    final svc = CalendarService(
+      store: store,
+      myUserId: gw.userId!,
+      clock: clock,
+      idGenerator: ids,
+      roleOf: roleOf ?? ((_) => null),
+    );
+    final sync = CalendarSync(
+      gateway: gw,
+      service: svc,
+      store: store,
+      retryInterval: const Duration(hours: 1),
+    );
     sync.start();
     return Peer._(gw, store, svc, sync);
   }

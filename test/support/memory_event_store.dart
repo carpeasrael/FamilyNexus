@@ -10,8 +10,14 @@ class MemoryEventStore implements EventStore {
       <String, Map<String, ({RsvpStatus status, DateTime ts, bool published})>>{};
   final Map<String, int> _colors = <String, int>{};
 
+  /// Anzahl der Leseaufrufe (Tests: kein Lesen ohne Anlass).
+  int getCalls = 0;
+
   @override
-  Future<CalendarEvent?> get(String id) async => events[id];
+  Future<CalendarEvent?> get(String id) async {
+    getCalls++;
+    return events[id];
+  }
 
   @override
   Future<List<CalendarEvent>> all() async => events.values.toList();
