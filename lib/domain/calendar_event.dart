@@ -34,6 +34,7 @@ class CalendarEvent {
     this.attendees = const <String>[],
     this.deleted = false,
     this.themeId,
+    this.editorId,
   });
 
   static const int maxTitle = 200;
@@ -68,6 +69,11 @@ class CalendarEvent {
   /// Kalender-Thema (E-99) eines geteilten Termins; `null` = ohne Thema. Private Termine haben keines.
   final String? themeId;
 
+  /// Moderator, der die aktuelle Fassung zuletzt geändert hat (#431, E-112); `null` = der Besitzer. Gilt nur für geteilte
+  /// Termine. Bei einer Fassung vom Besitzer selbst ist das eine Behauptung des Besitzers (Weitergabe einer
+  /// Moderatorfassung beim Resync), keine geprüfte Tatsache.
+  final String? editorId;
+
   bool get isShared => visibility == EventVisibility.shared;
 
   Duration get duration => allDay ? Duration(days: end.difference(start).inDays + 1) : end.difference(start);
@@ -99,6 +105,10 @@ class CalendarEvent {
     if (colorIndex < 0 || colorIndex >= colorCount) p.add('color');
     final theme = themeId;
     if (theme != null && !isValidId(theme)) p.add('theme');
+    final editor = editorId;
+    if (editor != null && (!MatrixIds.isUserId(editor) || editor == ownerId || visibility != EventVisibility.shared)) {
+      p.add('editor');
+    }
     if (!start.isUtc || !end.isUtc || !updatedAt.isUtc) p.add('utc');
     if (start.isBefore(minDate) || start.isAfter(maxDate) || end.isBefore(minDate) || end.isAfter(maxDate)) p.add('range');
     if (end.isBefore(start)) p.add('end-before-start');
@@ -135,6 +145,8 @@ class CalendarEvent {
     bool? deleted,
     String? themeId,
     bool clearTheme = false,
+    String? editorId,
+    bool clearEditor = false,
   }) =>
       CalendarEvent(
         id: id,
@@ -154,6 +166,7 @@ class CalendarEvent {
         updatedAt: updatedAt ?? this.updatedAt,
         deleted: deleted ?? this.deleted,
         themeId: clearTheme ? null : (themeId ?? this.themeId),
+        editorId: clearEditor ? null : (editorId ?? this.editorId),
       );
 
   /// Löschmarke (Tombstone): behält nur die ID und erhöht die Version. Zeitpunkt, Zeitzone und
@@ -190,7 +203,8 @@ class CalendarEvent {
       _listEq(other.attendees, attendees) &&
       other.updatedAt == updatedAt &&
       other.deleted == deleted &&
-      other.themeId == themeId;
+      other.themeId == themeId &&
+      other.editorId == editorId;
 
   @override
   int get hashCode => Object.hash(id, ownerId, version, title, start, end, timeZone, allDay, updatedAt, deleted);

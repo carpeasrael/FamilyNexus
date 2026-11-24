@@ -202,6 +202,7 @@ Future<AppServices> bootstrap({
         cashBookStore: SqlCashBookStore(database.db),
         familyRoom: familyRoom,
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
+        roleOf: (id) => Permissions.roleOf(gateway.family, id),
       );
     },
     shoppingBuilder: (userId, familyRoom) async {
