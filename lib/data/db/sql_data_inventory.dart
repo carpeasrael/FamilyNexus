@@ -43,6 +43,8 @@ class SqlDataInventory implements LocalDataInventory {
     'anniversaries',
     'avatar_photos',
     'avatar_resets',
+    'cash_books',
+    'cash_entries',
   ];
 
   static KeyStoreKind get _keyStoreKind {

@@ -165,6 +165,31 @@ class AppDatabase {
           PRIMARY KEY (room_id, target, photo_id)
         )''');
     },
+    // v8: Kassenbücher (#311, E-113): je Buch-Raum Titel und Währung, je Eintrag die aktuelle Fassung. `data` ist das
+    // JSON des Eintrags im Speicherformat, `complete` merkt, ob der Verlauf des Buchs vollständig geladen ist.
+    (db) async {
+      await db.execute('''
+        CREATE TABLE cash_books (
+          room_id TEXT NOT NULL PRIMARY KEY,
+          title TEXT NOT NULL,
+          currency TEXT NOT NULL,
+          owner TEXT NOT NULL,
+          version INTEGER NOT NULL,
+          published INTEGER NOT NULL DEFAULT 1,
+          complete INTEGER NOT NULL DEFAULT 0
+        )''');
+      await db.execute('''
+        CREATE TABLE cash_entries (
+          room_id TEXT NOT NULL,
+          author TEXT NOT NULL,
+          id TEXT NOT NULL,
+          version INTEGER NOT NULL,
+          deleted INTEGER NOT NULL,
+          published INTEGER NOT NULL DEFAULT 0,
+          data TEXT NOT NULL,
+          PRIMARY KEY (room_id, author, id)
+        )''');
+    },
   ];
 
   static int get schemaVersion => migrations.length;

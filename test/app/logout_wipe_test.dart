@@ -35,6 +35,8 @@ void main() {
     await db.insert('anniversaries', <String, Object?>{'id': 'an1', 'version': 1, 'deleted': 0, 'author': '@anna:example.org', 'data': '{}'});
     await db.insert('avatar_photos', <String, Object?>{'room_id': '!f:example.org', 'owner': '@anna:example.org', 'photo_id': '00000000-0000-4000-8000-000000000001', 'created_at': 1, 'cleared': 1});
     await db.insert('avatar_resets', <String, Object?>{'room_id': '!f:example.org', 'target': '@anna:example.org', 'photo_id': '00000000-0000-4000-8000-000000000002', 'photo_created_at': 1});
+    await db.insert('cash_books', <String, Object?>{'room_id': '!b:example.org', 'title': 'Haushalt', 'currency': 'EUR', 'owner': '@anna:example.org', 'version': 1});
+    await db.insert('cash_entries', <String, Object?>{'room_id': '!b:example.org', 'author': '@anna:example.org', 'id': '11111111-1111-4111-8111-111111111111', 'version': 1, 'deleted': 0, 'data': '{}'});
   }
 
   Future<int> rows(String table) async => (await db.query(table)).length;
@@ -42,7 +44,7 @@ void main() {
   test('entfernt Termine, Einkaufszettel, Aufgaben und den Besitzer; Einstellungen bleiben', () async {
     await fill();
     await AppServices.wipeAccountDataIn(db);
-    for (final t in <String>['events', 'event_history', 'rsvps', 'event_reminders', 'person_colors', 'shopping_items', 'task_lists', 'task_log', 'event_themes', 'anniversaries', 'avatar_photos', 'avatar_resets']) {
+    for (final t in <String>['events', 'event_history', 'rsvps', 'event_reminders', 'person_colors', 'shopping_items', 'task_lists', 'task_log', 'event_themes', 'anniversaries', 'avatar_photos', 'avatar_resets', 'cash_books', 'cash_entries']) {
       expect(await rows(t), 0, reason: t);
     }
     final settings = {for (final r in await db.query('settings')) r['key']: r['value']};
