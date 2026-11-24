@@ -103,8 +103,8 @@ Nach neuer Regel darf ein Issue dieser Gruppe schließen, wenn der Dart-Teil gr�
 | #528 Anmeldung und Registrierung ohne Browser (macOS, Linux, Windows) | Wunschfunktion für Linux und Windows auf Entscheidung der Nutzerin (18.11.2026) nicht umgesetzt (kein gepflegtes, baubares Paket; Nachtrag zu E-102); macOS eingebettet durch #441, Gerätenachtest offen; reine Dokumentation, kein Code-Test; Issue bleibt offen (Refs) |
 | #268 Registrierung über matrix.org | echtes Konto bei matrix.org nötig (verboten ohne Freigabe); Teile in #441 und `invite_onboarding_test.dart` |
 | #273 Android-Hintergrundmeldungen (v1.3) | nur am Gerät belegbar, Milestone v1.3 |
-| #311 (v1.3) | Teile 1 und 2a von 7 umgesetzt (1: Format, Ordnung, Dienst, Ablage, Migration 8, E-113, gesperrt: `cash_book_codec_test`, `cash_book_resolver_test`, `cash_book_service_test`, `sql_cash_book_store_test`; 2a: Einladungstrennung, ungesperrt: `book_invitation_test`); Teile 2b bis 4 folgen |
-| #119, #120, #121, #431, #434 (v1.3) | Entwürfe bzw. nicht umgesetzt; Plan erst mit der Umsetzung |
+| #431 (v1.3) | Teil 1 umgesetzt (Empfang, E-112): `event_editor_codec_test`, `conflict_editor_test`, `calendar_service_foreign_test`, `calendar_moderator_sync_test`, `sql_event_store_editor_test`, `calendar_roleof_wiring_test`, `calendar_apply_guard_test`; Teil 2 (Bearbeiten, Senden, Oberfläche) folgt |
+| #119, #120, #121, #311 (v1.3) | Entwürfe bzw. nicht umgesetzt; Plan erst mit der Umsetzung |
 
 ## Durchführung
 
