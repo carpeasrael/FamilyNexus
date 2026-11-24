@@ -130,6 +130,7 @@ Future<TestApp> buildTestApp({
   // Test (#434): Ablage der Avatar-Fotos. Ohne Angabe gibt es keine Foto-Funktion im Kalender-Controller.
   MemoryAvatarPhotoStore? avatarPhotoItems,
   bool avatarPhotosEnabled = true,
+  bool roleFromFamily = false,
   // Test: Meldungen zu Chat und Einkauf und Zahl am App-Symbol (#254). Ohne Angabe wie im Browser: keine.
   ActivityPlatform? activity,
   AppBadge? badge,
@@ -250,6 +251,8 @@ Future<TestApp> buildTestApp({
         familyRoom: room,
         avatarPhotosEnabled: avatarPhotosEnabled,
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
+        // #431: nur auf Wunsch kennt der Kalender die Rollen (sonst Standard: niemand, bestehende Tests unverändert).
+        roleOf: roleFromFamily ? (id) => Permissions.roleOf(gateway.family, id) : null,
       );
       builtCalendars.add(controller);
       return controller;
