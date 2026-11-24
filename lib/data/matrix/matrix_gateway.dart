@@ -3,8 +3,12 @@ import 'package:flutter/foundation.dart';
 import '../../domain/account_deletion.dart';
 import '../../domain/anniversaries.dart';
 import '../../domain/avatar_photo.dart';
+import '../../domain/book_policy.dart';
+import '../../domain/book_signal.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
+import '../../domain/cash_book.dart';
+import '../../domain/cash_receipt_check.dart';
 import '../../domain/chat.dart';
 import '../../domain/data_inventory.dart';
 import '../../domain/event_themes.dart';
@@ -344,6 +348,82 @@ abstract class MatrixGateway implements Listenable {
   Future<void> acceptInvitation(String roomId);
 
   Future<void> declineInvitation(String roomId);
+
+  // ------------------------------------------------------ Kassenbücher (#311)
+
+  /// Beigetretene Bücher der aktuellen Familie. Leer, solange das Kassenbuch gesperrt ist (`CashBookFlags`).
+  List<BookRoomInfo> get books;
+
+  /// Annehmbare Buch-Einladungen (Einladender == Ersteller, Moderator der eigenen Familie). Leer, solange gesperrt.
+  List<BookInvitationInfo> get bookInvitations;
+
+  /// Legt ein Buch an (eigener verschlüsselter Raum, nur ich als Mitglied) und liefert die Raum-ID. Nur Moderatoren,
+  /// höchstens zehn Bücher je Familie. Wirft `notAllowed`, solange das Kassenbuch gesperrt ist.
+  Future<String> createBook();
+
+  /// Lädt einen beigetretenen Moderator der Familie in mein Buch ein. Nur der Ersteller; das Gateway prüft die Regeln
+  /// selbst ([BookPolicy.canInvite]).
+  Future<void> inviteToBook(String roomId, String userId);
+
+  /// Entfernt ein Mitglied aus meinem Buch (nur der Ersteller).
+  Future<void> removeFromBook(String roomId, String userId);
+
+  /// Verlässt ein Buch.
+  Future<void> leaveBook(String roomId);
+
+  Future<void> acceptBookInvitation(String roomId);
+  Future<void> declineBookInvitation(String roomId);
+
+  /// Sendeschutz: Wirft `notAllowed`, wenn im Buch-Raum ein Mitglied ist, das kein beigetretener Moderator der Familie
+  /// ist (Mitglieder werden frisch gelesen, nie aus einem Zwischenspeicher).
+  Future<void> verifyBookRecipients(String roomId);
+
+  /// Abgleich (nur Ersteller): Entfernt Mitglieder, die zweimal hintereinander nicht mehr berechtigt waren. Läuft nur
+  /// bei belastbarem Stand (erster Sync, Familie und Mitgliederliste geladen). Liefert die Entfernten.
+  Future<List<String>> reconcileBook(String roomId);
+
+  /// Empfangene Ereignisse der Buch-Räume (#311, E-113): `bookmeta` (höchste Version je Raum, zuerst), Einträge (je
+  /// Absender und `id` die höchste Version) und Beitritte neuer Mitglieder. Eigener Strom, nie Teil von
+  /// [calendarSignals]; neue Zuhörer erhalten zuerst den bisherigen Stand. Leer, solange gesperrt.
+  Stream<BookSignal> get bookSignals;
+
+  /// Ist der Verlauf des Buchs vollständig geladen (Backfill zu Ende, nicht gekürzt)? Sonst stehen Summen unter Vorbehalt.
+  bool bookHistoryComplete(String roomId);
+
+  /// Anzahl der (noch) nicht entschlüsselbaren Ereignisse in der Zeitleiste des Buchs.
+  int bookUndecryptableCount(String roomId);
+
+  /// Ist das Buch lokal nachweislich nicht mehr beigetreten (verlassen, entfernt, gebannt oder nach dem Initial-Sync
+  /// unbekannt)? Nur dann darf der lokale Bestand verworfen werden; ein Buch, das nur kurz aus [books] fehlt, zählt nicht.
+  bool bookRoomGone(String roomId);
+
+  /// Nutzer, die im Buch-Raum je `join`, `leave`, `invite` oder `ban` waren (frisch vom Server). Wirft bei
+  /// unbrauchbarer Antwort (fail-closed).
+  Future<Set<String>> bookKnownMembers(String roomId);
+
+  /// Aktuelle Mitglieder des Buchs (beigetreten oder eingeladen), frisch vom Server. Wirft bei unbrauchbarer Antwort
+  /// (fail-closed) und für ein Buch einer anderen Familie `notAllowed`.
+  Future<List<BookMember>> bookMembers(String roomId);
+
+  /// Raum-IDs beigetretener Buch-Räume, die zu einer **anderen** Familie gehören als der aktuellen (Familienwechsel). Leer
+  /// bei gesperrtem Kassenbuch, unbekannter Familie, vor dem ersten Sync und ohne geladene Mitgliederliste: Ohne
+  /// belastbare Familie ist keine Aussage möglich.
+  List<String> get staleBooks;
+
+  /// Sendet Buch-Ereignisse (höchstens 50) in den Buch-Raum. Das Gateway prüft selbst: Familie, Verschlüsselung,
+  /// Sendeschutz, Typ, Autor, Größe. Ergebnis je Ereignis ([BookSendResult]).
+  Future<List<BookSendResult>> publishBookEvents(String roomId, List<BookOutgoing> events);
+
+  /// Sendet ein Bon-Foto (JPEG, höchstens 1 MiB) als **Datei** in den Buch-Raum und liefert die Ereignis-ID. Ohne
+  /// Vorschau und ohne Umkodierung des SDK. Prüft Familie, Verschlüsselung, Sendeschutz, Größe und JPEG-Kennung.
+  Future<String> sendBookReceipt(String roomId, Uint8List bytes);
+
+  /// Lädt und **prüft** die Bon-Datei eines Eintrags ([author] ist der Autor des Eintrags): Absender, Größe vor dem Laden,
+  /// Hash, Größe und Kennung der Bytes. Dekodiert nie ein Bild.
+  Future<BookReceiptLoad> loadBookReceipt(String roomId, String eventId, {required CashReceipt receipt, required String author});
+
+  /// Schwärzt eine **eigene** Bon-Datei (Aufräumen nach bestem Bemühen). Nie fremde Dateien, auch nicht als Ersteller.
+  Future<void> redactBookReceipt(String roomId, String eventId);
 
   // ------------------------------------------------------------ Kalender
 

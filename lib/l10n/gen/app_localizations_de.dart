@@ -469,7 +469,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get logoutBody =>
-      'Termine, Einkaufszettel und Aufgaben werden von diesem Gerät entfernt. Was schon gesendet ist, bleibt verschlüsselt in deiner Familie und kommt nach der nächsten Anmeldung zurück; noch nicht gesendete Änderungen gehen verloren.';
+      'Termine, Einkaufszettel, Aufgaben, Geburts- und Gedenktage, Avatar-Fotos und Kassenbücher werden beim Beenden der Sitzung von diesem Gerät entfernt. Was schon gesendet ist, bleibt verschlüsselt in deiner Familie und kommt nach der nächsten Anmeldung zurück; noch nicht gesendete Änderungen gehen verloren.';
 
   @override
   String get settingsAccount => 'Konto';
@@ -1335,7 +1335,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String privacy2Body(String keyStore, String cipher) {
-    return 'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Geburts- und Gedenktage (Name und Datum, auch von Dritten und Verstorbenen), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und, wenn gesetzt, ihr Avatar-Foto (quadratisch zugeschnitten und klein, verschlüsselt im Familienraum), den Lesestand der Mitglieder (bis zu welcher Nachricht jemand gelesen hat), das zuletzt geöffnete Gespräch (nur wenn eingeschaltet) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ($cipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: $keyStore – nicht in der Datenbankdatei.';
+    return 'Chatnachrichten, Dateien, geteilte und private Termine, Zusagen, Einkaufszettel, Aufgabenlisten mit ihrem Verlauf, Kalender-Themen (Name und Farbe), Geburts- und Gedenktage (Name und Datum, auch von Dritten und Verstorbenen), Kassenbücher (Datum, Geschäft, Betrag, Währung, Notiz und optional ein Foto des Bons, verschlüsselt in einem eigenen Raum je Buch), Familienmitglieder samt der Wahl ihres Avatars (nur die Kennung eines der zwölf eingebauten Avatare) und, wenn gesetzt, ihr Avatar-Foto (quadratisch zugeschnitten und klein, verschlüsselt im Familienraum), den Lesestand der Mitglieder (bis zu welcher Nachricht jemand gelesen hat), das zuletzt geöffnete Gespräch (nur wenn eingeschaltet) und deine Einstellungen. Termine und Nachrichten liegen verschlüsselt ($cipher) auf deinem Gerät. Der Schlüssel dafür liegt hier: $keyStore – nicht in der Datenbankdatei.';
   }
 
   @override
@@ -1343,7 +1343,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy3Body =>
-      'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, öffentliche Lesebestätigungen (wer bis zu welcher Nachricht und wann gelesen hat; nur wenn „Lesebestätigung senden“ eingeschaltet ist, sie sind für den Server und den Anbieter deiner Gesprächspartner sichtbar), die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt), Größe und Zeitpunkt eines Avatar-Fotos (das Foto selbst ist Ende-zu-Ende-verschlüsselt) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.';
+      'Nachrichten, Dateien und geteilte Termine werden Ende-zu-Ende-verschlüsselt (Matrix, Olm/Megolm); die Inhalte kann der Server nicht lesen. Sichtbar für den Betreiber bleiben Metadaten: Konto-ID, Geräte, Zeitpunkte, Raumgröße, Mitgliedschaften, öffentliche Lesebestätigungen (wer bis zu welcher Nachricht und wann gelesen hat; nur wenn „Lesebestätigung senden“ eingeschaltet ist, sie sind für den Server und den Anbieter deiner Gesprächspartner sichtbar), die Wahl deines Avatars (eines von zwölf Symbolen; ein Raumzustand, nicht Ende-zu-Ende-verschlüsselt), Größe und Zeitpunkt eines Avatar-Fotos (das Foto selbst ist Ende-zu-Ende-verschlüsselt), Mitglieder, Zeitpunkte und Größen der Ereignisse eines Kassenbuchs (nicht dessen Inhalt; dass ein Raum ein Kassenbuch der Familie ist, steht im Klartext im Raum) sowie Raum- und Profilnamen (etwa der Familienname). Mit einem eigenen Server bestimmst du selbst, wer diese Angaben sieht.';
 
   @override
   String get privacy4Title => 'Private Termine';
@@ -2016,7 +2016,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacy12Body =>
-      'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Ebenso werden Geburts- und Gedenktage (Name der Person und Datum, auch von Dritten und Verstorbenen) Ende-zu-Ende-verschlüsselt im Familienraum übertragen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“), dazu die Wahl deines Avatars (Raumzustand, nicht Ende-zu-Ende-verschlüsselt). Ein Avatar-Foto sieht er nicht, nur Größe und Zeitpunkt der verschlüsselten Ereignisse.';
+      'Aufgabenlisten und ihr Verlauf (wer wann welchen Punkt erledigt hat, inkl. optionalem Kommentar) werden wie geteilte Termine Ende-zu-Ende-verschlüsselt im Familienraum übertragen und liegen verschlüsselt auf deinem Gerät. Alle Familienmitglieder können sie lesen. Ebenso werden Geburts- und Gedenktage (Name der Person und Datum, auch von Dritten und Verstorbenen) Ende-zu-Ende-verschlüsselt im Familienraum übertragen. Der Server sieht nur die Metadaten, die er immer sieht (siehe „Was sieht der Server?“), dazu die Wahl deines Avatars (Raumzustand, nicht Ende-zu-Ende-verschlüsselt). Ein Avatar-Foto sieht er nicht, nur Größe und Zeitpunkt der verschlüsselten Ereignisse. Kassenbücher: Einträge (Datum, Geschäft, Betrag, Währung, Notiz) und Fotos von Bons liegen Ende-zu-Ende-verschlüsselt in einem eigenen Raum je Buch und verschlüsselt auf deinem Gerät. Nur Moderatoren der Familie nutzen sie; alle Mitglieder eines Buchs sehen alle Einträge und Bons. Wer später eingeladen wird, sieht auch den bisherigen Verlauf, auch frühere Fassungen von Einträgen. Bons werden vor dem Senden verkleinert, Kameradaten und Ortsangaben (EXIF) entfernt; sie können trotzdem Karten- oder Personendaten zeigen. Löschen oder Ändern eines Eintrags erzeugt ein neues Ereignis: Frühere Fassungen bleiben verschlüsselt im Verlauf, bei den Mitgliedern und beim Server; nur die eigene Bon-Datei wird nach bestem Bemühen geschwärzt, wer sie schon erhalten hat, behält sie. Wer entfernt wird oder ein Buch verlässt, behält, was er schon erhalten hat. Der Ersteller kann ein Buch nicht von Hand verlassen; wechselt er die Familie, verlässt sein Gerät das Buch automatisch, danach kann niemand mehr einladen oder entfernen. Tritt jemand aus der Familie aus, kann er im Buch bleiben und neue Einträge sehen, bis der Abgleich auf dem Gerät des Erstellers (online, selbst in der Familie) ihn entfernt; das gilt auch, wenn er nicht mehr Moderator ist.';
 
   @override
   String get webUnlockTitleCreate => 'Browser-Tresor einrichten';
@@ -3078,6 +3078,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get roomKindDirect => 'Einzelchat';
 
   @override
+  String get roomKindBook => 'Kassenbuch';
+
+  @override
   String get roomKindOther => 'Sonstiger Raum';
 
   @override
@@ -3106,7 +3109,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reportOnlineNote =>
-      'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder, Raum- und Profilnamen (Klartext), die Wahl des Avatars (ein Wert aus zwölf, Raumzustand im Klartext), Zeitpunkt und Größe eines Avatar-Fotos (das Foto selbst ist verschlüsselt), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.';
+      'Inhalte von Nachrichten, Terminen, Listen und Anhängen liegen beim Anbieter nur Ende-zu-Ende-verschlüsselt vor. Lesbar für den Anbieter sind Metadaten: Konto, Geräte, Raummitglieder (auch in Kassenbüchern; deren Einträge und Bons sind verschlüsselt), Raum- und Profilnamen (Klartext), die Wahl des Avatars (ein Wert aus zwölf, Raumzustand im Klartext), Zeitpunkt und Größe eines Avatar-Fotos (das Foto selbst ist verschlüsselt), Zeitpunkte und Größe der Ereignisse sowie die Arten der Kontodaten. Die Ereigniszahlen beruhen auf dem Abgleich dieses Geräts; beim Anbieter können ältere Ereignisse zusätzlich liegen.';
 
   @override
   String get eventTypeMessage => 'Nachrichten';
@@ -3167,7 +3170,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String accountDeleteBody(String userId, String server) {
-    return 'Dein Konto $userId wird bei $server dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar, ebenso die Wahl deines Avatars (ein Wert aus zwölf), die im Familienraum stehen bleibt. Ein Avatar-Foto bleibt verschlüsselt im Raumverlauf, bei den Mitgliedern, die es schon haben; entferne es vorher, wenn du das nicht möchtest. Geburts- und Gedenktage, die du angelegt hast, bleiben für die Familie bestehen (gemeinsame Familiendaten, jedes Mitglied darf sie ändern). Anschließend werden alle Daten auf diesem Gerät gelöscht.';
+    return 'Dein Konto $userId wird bei $server dauerhaft gelöscht. Die Benutzer-ID kann danach nicht wieder verwendet werden. Nachrichten, die du gesendet hast, bleiben für die anderen Familienmitglieder sichtbar, ebenso die Wahl deines Avatars (ein Wert aus zwölf), die im Familienraum stehen bleibt. Ein Avatar-Foto bleibt verschlüsselt im Raumverlauf, bei den Mitgliedern, die es schon haben; entferne es vorher, wenn du das nicht möchtest. Geburts- und Gedenktage, die du angelegt hast, bleiben für die Familie bestehen (gemeinsame Familiendaten, jedes Mitglied darf sie ändern). Einträge und Bons, die du in Kassenbüchern angelegt hast, bleiben verschlüsselt im Buch bei den Mitgliedern, auch frühere Fassungen; lösche sie vorher, wenn du das nicht möchtest (frühere Fassungen bleiben dennoch im Verlauf). Anschließend werden alle Daten auf diesem Gerät gelöscht.';
   }
 
   @override
@@ -3619,6 +3622,12 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get eventTypeBookMeta => 'Kassenbuch: Stammdaten';
+
+  @override
+  String get eventTypeCashEntry => 'Kassenbuch: Einträge';
+
+  @override
   String get eventTypeAnniversary => 'Geburts- und Gedenktage';
 
   @override
@@ -3737,4 +3746,287 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get eventTypeAvatarPhoto => 'Avatar-Fotos';
+
+  @override
+  String get cashTitle => 'Kassenbuch';
+
+  @override
+  String get cashTodayTitle => 'Kassenbuch';
+
+  @override
+  String get cashOpen => 'Öffnen';
+
+  @override
+  String cashTodayBook(String title, String amount) {
+    return '$title: $amount in diesem Monat';
+  }
+
+  @override
+  String get cashTodayNone => 'Noch kein Kassenbuch.';
+
+  @override
+  String get cashSettingsSubtitle =>
+      'Gemeinsame Ausgaben mit anderen Moderatoren, Ende-zu-Ende-verschlüsselt';
+
+  @override
+  String get cashBooksEmpty =>
+      'Noch kein Kassenbuch. Lege eines an oder warte auf eine Einladung.';
+
+  @override
+  String get cashNewBook => 'Neues Kassenbuch';
+
+  @override
+  String get cashNewBookTitleHint => 'Name des Buchs';
+
+  @override
+  String get cashNewBookCurrency => 'Währung';
+
+  @override
+  String get cashCreate => 'Anlegen';
+
+  @override
+  String get cashBookMine => 'Von dir';
+
+  @override
+  String cashBookBy(String name) {
+    return 'Von $name';
+  }
+
+  @override
+  String get cashBookPlaceholder =>
+      'Der Name dieses Buchs ist noch nicht bekannt.';
+
+  @override
+  String get cashIncomplete => 'Verlauf unvollständig – Summen unter Vorbehalt';
+
+  @override
+  String get cashBlocked =>
+      'Im Buch ist jemand, der nicht berechtigt ist. Gesendet wird erst, wenn der Ersteller das bereinigt hat. Deine Einträge bleiben gespeichert.';
+
+  @override
+  String cashPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Einträge noch nicht gesendet',
+      one: '1 Eintrag noch nicht gesendet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cashInvitationsTitle => 'Einladungen';
+
+  @override
+  String cashInvitationText(String name) {
+    return 'Einladung zum Kassenbuch von $name';
+  }
+
+  @override
+  String get cashAccept => 'Annehmen';
+
+  @override
+  String get cashDecline => 'Ablehnen';
+
+  @override
+  String get cashAcceptConfirmTitle => 'Einladung annehmen?';
+
+  @override
+  String get cashAcceptConfirmBody =>
+      'Alle Mitglieder des Buchs sehen alle Einträge und Bons. Möchtest du beitreten?';
+
+  @override
+  String cashMonthTotal(String amount) {
+    return 'Summe: $amount';
+  }
+
+  @override
+  String get cashMonthPrev => 'Vorheriger Monat';
+
+  @override
+  String get cashMonthNext => 'Nächster Monat';
+
+  @override
+  String get cashNoEntries => 'Keine Einträge in diesem Monat.';
+
+  @override
+  String get cashAddEntry => 'Eintrag hinzufügen';
+
+  @override
+  String get cashEditEntry => 'Eintrag bearbeiten';
+
+  @override
+  String get cashEntryDate => 'Datum';
+
+  @override
+  String get cashEntryStore => 'Geschäft';
+
+  @override
+  String get cashEntryAmount => 'Betrag';
+
+  @override
+  String get cashEntryNote => 'Notiz (optional)';
+
+  @override
+  String get cashEntryAmountInvalid =>
+      'Bitte einen Betrag größer als 0 und höchstens 999.999,99 eingeben.';
+
+  @override
+  String get cashEntryStoreRequired => 'Bitte ein Geschäft eingeben.';
+
+  @override
+  String get cashEntrySave => 'Speichern';
+
+  @override
+  String get cashEntryDelete => 'Löschen';
+
+  @override
+  String get cashEntryDeleteConfirm =>
+      'Der Eintrag wird bei den Mitgliedern entfernt, sobald ihr Gerät ihn empfängt. Die Bon-Datei wird nach Möglichkeit gelöscht.';
+
+  @override
+  String get cashDiscardTitle => 'Änderungen verwerfen?';
+
+  @override
+  String get cashDiscard => 'Verwerfen';
+
+  @override
+  String get cashKeepEditing => 'Weiter bearbeiten';
+
+  @override
+  String cashEntryBy(String name) {
+    return 'von $name';
+  }
+
+  @override
+  String get cashEntryByMe => 'von dir';
+
+  @override
+  String cashEntrySemantics(String store, String amount, String date) {
+    return '$store, $amount, $date';
+  }
+
+  @override
+  String get cashReceipt => 'Bon';
+
+  @override
+  String get cashReceiptAdd => 'Foto hinzufügen';
+
+  @override
+  String get cashReceiptReplace => 'Foto ersetzen';
+
+  @override
+  String get cashReceiptRemove => 'Foto entfernen';
+
+  @override
+  String get cashReceiptPrivacyTitle => 'Foto des Bons';
+
+  @override
+  String get cashReceiptPrivacyBody =>
+      'Bons können Karten- oder Personendaten zeigen. Das Foto wird verkleinert, ohne Ortsangaben gespeichert und ist für alle Mitglieder des Buchs sichtbar.';
+
+  @override
+  String get cashReceiptContinue => 'Foto wählen';
+
+  @override
+  String get cashReceiptMissing => 'Bon nicht verfügbar';
+
+  @override
+  String get cashReceiptInvalid => 'Bon konnte nicht geprüft werden';
+
+  @override
+  String get cashReceiptUnavailable => 'Bon momentan nicht abrufbar';
+
+  @override
+  String get cashRetry => 'Erneut versuchen';
+
+  @override
+  String get cashReceiptPreparing => 'Foto wird vorbereitet …';
+
+  @override
+  String get cashReceiptSemantics => 'Foto des Bons';
+
+  @override
+  String get cashReceiptAttached => 'Bon angehängt';
+
+  @override
+  String get cashPhotoErrFormat =>
+      'Dieses Format wird nicht unterstützt. Bitte JPEG, PNG oder WebP wählen.';
+
+  @override
+  String get cashPhotoErrTooLarge =>
+      'Die Datei ist zu groß (höchstens 15 MiB).';
+
+  @override
+  String get cashPhotoErrPixels =>
+      'Das Bild hat zu viele Pixel. Bitte ein kleineres Bild wählen.';
+
+  @override
+  String get cashPhotoErrDecode => 'Das Bild lässt sich nicht lesen.';
+
+  @override
+  String get cashPhotoErrShrink =>
+      'Das Foto lässt sich nicht klein genug speichern (höchstens 1 MiB). Bitte ein anderes wählen.';
+
+  @override
+  String get cashErrInvalid => 'Bitte die Eingaben prüfen.';
+
+  @override
+  String get cashErrLimit =>
+      'Das Limit für Einträge in diesem Buch ist erreicht.';
+
+  @override
+  String get cashMembersTitle => 'Mitglieder';
+
+  @override
+  String get cashMemberJoined => 'Beigetreten';
+
+  @override
+  String get cashMemberInvited => 'Eingeladen';
+
+  @override
+  String get cashMemberCreator => 'Ersteller';
+
+  @override
+  String get cashInvite => 'Mitglied einladen';
+
+  @override
+  String get cashInviteNone => 'Keine weiteren Moderatoren zum Einladen.';
+
+  @override
+  String cashInviteConfirmTitle(String name) {
+    return '$name einladen?';
+  }
+
+  @override
+  String get cashInviteConfirmBody =>
+      'Alle Mitglieder des Buchs sehen alle Einträge und Bons. Neu Eingeladene sehen auch den bisherigen Verlauf. Wer entfernt wird, behält den bisherigen Stand.';
+
+  @override
+  String get cashInviteAction => 'Einladen';
+
+  @override
+  String get cashRemove => 'Entfernen';
+
+  @override
+  String cashRemoveConfirm(String name) {
+    return '$name aus dem Buch entfernen?';
+  }
+
+  @override
+  String get cashLeave => 'Buch verlassen';
+
+  @override
+  String get cashLeaveConfirm =>
+      'Möchtest du dieses Buch verlassen? Ungesendete Einträge gehen verloren. Du kannst nur mit einer neuen Einladung wieder beitreten.';
+
+  @override
+  String get cashCreatorCannotLeave =>
+      'Als Ersteller kannst du das Buch nicht verlassen. Du kannst aber Mitglieder entfernen.';
+
+  @override
+  String get cashBookGone => 'Das Kassenbuch ist nicht mehr verfügbar.';
+
+  @override
+  String get cashLoading => 'Wird geladen …';
 }

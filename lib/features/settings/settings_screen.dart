@@ -14,6 +14,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../../ui/theme/tokens.dart';
 import '../../ui/widgets/glass.dart';
 import '../calendar/event_editor_screen.dart' show kReminderChoices;
+import '../cashbook/cash_book_entry_points.dart';
 import '../common/error_text.dart';
 import '../moderation/blocked_users_screen.dart';
 import '../onboarding/intro_tour.dart';
@@ -61,6 +62,7 @@ class SettingsScreen extends StatelessWidget {
               _ActivitySection(),
               const SizedBox(height: 16),
             ],
+            if (AppScope.of(context).calendar?.cashBookController != null) CashBookSettingsTile(controller: AppScope.of(context).calendar!.cashBookController!),
             _PrivacySection(settings: s, controller: controller),
             const SizedBox(height: 16),
             const _AboutSection(),

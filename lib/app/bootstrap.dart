@@ -9,6 +9,7 @@ import '../data/db/app_database.dart';
 import '../data/db/key_value_store.dart';
 import '../data/db/sql_anniversary_store.dart';
 import '../data/db/sql_avatar_photo_store.dart';
+import '../data/db/sql_cash_book_store.dart';
 import '../data/db/sql_data_inventory.dart';
 import '../data/db/sql_event_store.dart';
 import '../data/db/sql_event_theme_store.dart';
@@ -198,6 +199,8 @@ Future<AppServices> bootstrap({
         themeStore: SqlEventThemeStore(database.db),
         anniversaryStore: SqlAnniversaryStore(database.db),
         avatarPhotoStore: SqlAvatarPhotoStore(database.db),
+        cashBookStore: SqlCashBookStore(database.db),
+        files: fileAccess,
         familyRoom: familyRoom,
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
         roleOf: (id) => Permissions.roleOf(gateway.family, id),

@@ -56,6 +56,25 @@ class SqlCashBookStore implements CashBookStore {
       ).then((_) {});
 
   @override
+  Future<List<CashBookMeta>> pendingBooks(String owner) async => <CashBookMeta>[
+        for (final r in await _db.query('cash_books', where: 'owner = ? AND published = 0 AND version >= 1', whereArgs: <Object?>[owner]))
+          _meta(r),
+      ];
+
+  @override
+  Future<void> markBookPublished(CashBookMeta sent) => _db.update(
+        'cash_books',
+        <String, Object?>{'published': 1},
+        where: 'room_id = ? AND title = ? AND currency = ? AND version = ?',
+        whereArgs: <Object?>[sent.roomId, sent.title, sent.currency, sent.version],
+      ).then((_) {});
+
+  @override
+  Future<void> requeueBook(String roomId) => _db
+      .update('cash_books', <String, Object?>{'published': 0}, where: 'room_id = ? AND version >= 1', whereArgs: <Object?>[roomId])
+      .then((_) {});
+
+  @override
   Future<void> deleteBook(String roomId) => _db.transaction((txn) async {
         await txn.delete('cash_entries', where: 'room_id = ?', whereArgs: <Object?>[roomId]);
         await txn.delete('cash_books', where: 'room_id = ?', whereArgs: <Object?>[roomId]);

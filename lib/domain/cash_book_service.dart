@@ -31,6 +31,11 @@ class CashBookService {
 
   DateTime get _now => _clock().toUtc();
 
+  /// Wird nach dem Speichern gerufen, wenn ein **eigener** Eintrag seinen Bon-Verweis verliert oder ändert (Ersetzen,
+  /// Entfernen, Löschen): Die frühere Datei darf aufgeräumt werden (nach bestem Bemühen, E-111). Nie bei Fremdeinträgen,
+  /// beim Empfang oder bei [restamp].
+  void Function(String roomId, String entryId, String eventId)? onReceiptReleased;
+
   // Alle schreibenden Abläufe laufen nacheinander (Eingänge, lokale Änderungen).
   Future<void> _tail = Future<void>.value();
 
@@ -59,6 +64,18 @@ class CashBookService {
           if (!newer) return false;
         }
         await store.putBook(incoming, published: published);
+        return true;
+      });
+
+  /// Legt das **Platzhalter-Buch** an (Version 0, nie gesendet), wenn der Verlauf keine Metadaten liefert (Ersteller
+  /// gelöscht, Schlüssel fehlen). Nur wenn noch kein Buch existiert; jedes echte `bookmeta` (Version ≥ 1) ersetzt es über
+  /// [applyBook], unabhängig von der Feldordnung.
+  Future<bool> applyFallback(String roomId, {required String owner, required String currency}) => _serial(() async {
+        if (await store.getBook(roomId) != null) return false;
+        if ((await store.books()).length >= CashBookLimits.maxBooksPerFamily) return false;
+        final m = CashBookMeta(roomId: roomId, title: CashBookMeta.fallbackTitle, currency: currency, owner: owner, version: 0);
+        if (m.validate().any((p) => p != 'version')) return false;
+        await store.putBook(m, published: true);
         return true;
       });
 
@@ -110,6 +127,8 @@ class CashBookService {
         );
         _check(next);
         await store.putEntry(roomId, next);
+        final old = current.receipt;
+        if (old != null && old.eventId != next.receipt?.eventId) onReceiptReleased?.call(roomId, next.id, old.eventId);
         return next;
       });
 
@@ -119,6 +138,25 @@ class CashBookService {
         if (current == null) throw const CashBookException(CashBookError.notFound);
         if (current.deleted) return;
         await store.putEntry(roomId, current.tombstone(_now));
+        final old = current.receipt;
+        if (old != null) onReceiptReleased?.call(roomId, current.id, old.eventId);
+      });
+
+  /// Stempelt einen **eigenen** Eintrag (Version unverändert) neu, wenn sein `updated_at` mehr als einen Tag von jetzt
+  /// abweicht: Der Empfänger verwirft Abweichungen über [CashBookLimits.maxSkew], und ein erneut gesendeter oder lange
+  /// wartender Eintrag trüge sonst einen alten Zeitstempel. Liest den Eintrag **neu** (innerhalb der Serialisierung) und
+  /// stempelt nur, wenn Version und Löschmarke noch dem erwarteten Stand entsprechen; sonst `null` (zwischenzeitlich
+  /// geändert, der Aufrufer liest neu). Der Eintrag bleibt in der Warteschlange. Gibt die gespeicherte Fassung zurück.
+  Future<CashEntry?> restamp(String roomId, String id, {required int expectedVersion, required bool expectedDeleted}) =>
+      _serial(() async {
+        final current = await store.getEntry(roomId, myUserId, id);
+        if (current == null || current.author != myUserId) return null;
+        if (current.version != expectedVersion || current.deleted != expectedDeleted) return null;
+        final now = _now;
+        if (current.updatedAt.difference(now).abs() <= const Duration(days: 1)) return current;
+        final next = current.copyWith(updatedAt: now);
+        await store.putEntry(roomId, next);
+        return next;
       });
 
   /// Nimmt einen empfangenen Eintrag an (bereits dekodiert, Autor == Absender, Absender war Mitglied). Schlüssel

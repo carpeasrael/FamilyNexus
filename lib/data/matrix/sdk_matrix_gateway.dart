@@ -21,8 +21,13 @@ import '../../domain/anniversaries.dart';
 import '../../domain/anniversary_codec.dart';
 import '../../domain/attachment_policy.dart';
 import '../../domain/avatar_photo.dart';
+import '../../domain/book_policy.dart';
+import '../../domain/book_room.dart';
+import '../../domain/book_signal.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_signal.dart';
+import '../../domain/cash_book.dart';
+import '../../domain/cash_receipt_check.dart';
 import '../../domain/chat.dart';
 import '../../domain/data_inventory.dart';
 import '../../domain/event_codec.dart';
@@ -50,6 +55,8 @@ import '../db/app_database.dart';
 import '../db/encrypted_db.dart';
 import '../platform/key_store.dart';
 import 'background_image_work.dart';
+import 'book_room_spec.dart';
+import 'book_signal_scan.dart';
 import 'chat_mapper.dart';
 import 'event_trust.dart';
 import 'family_room_spec.dart';
@@ -65,6 +72,9 @@ import 'sync_relevance.dart';
 part 'gateway/account_deletion.dart';
 part 'gateway/app_client.dart';
 part 'gateway/avatars.dart';
+part 'gateway/book_receipts.dart';
+part 'gateway/book_sync.dart';
+part 'gateway/books.dart';
 part 'gateway/calendar_data.dart';
 part 'gateway/chat.dart';
 part 'gateway/connection.dart';
@@ -104,7 +114,7 @@ bool sessionEndedByServerFor(SessionClearReason reason) => switch (reason) {
 /// * Lesebestätigungen sind standardmäßig öffentlich (`m.read`), wenn „Lesebestätigung senden“ an ist (E-106, #526); aus: nur privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _AvatarsModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyncModule, _AccountDeletionModule, _BooksModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _AvatarsModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -121,7 +131,11 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     @visibleForTesting bool ensureAvatarPermission = true,
     @visibleForTesting DateTime Function()? now,
     this._shareReadReceipts = _readReceiptsOn,
-  })  : assert(_participantsRetryBase > Duration.zero),
+    @visibleForTesting bool cashBooksEnabled = CashBookFlags.enabled,
+    @visibleForTesting bool requireEncryptionForBooks = true,
+  })  : _cashBooksEnabledValue = cashBooksEnabled,
+        _requireEncryptionForBooksValue = requireEncryptionForBooks,
+        assert(_participantsRetryBase > Duration.zero),
         _ensureAvatarPermissionEnabled = ensureAvatarPermission,
         _now = now ?? DateTime.now,
         _probe = probe ?? ServerProbe(),
@@ -130,6 +144,17 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   final Future<sql.Database> Function(String path, String key)? _databaseOpener;
 
   static bool _readReceiptsOn() => true;
+
+  // ------------------------------------------------------------ Kassenbücher (#311, E-113)
+
+  final bool _cashBooksEnabledValue;
+  @override
+  bool get _cashBooksEnabled => _cashBooksEnabledValue;
+  final bool _requireEncryptionForBooksValue;
+  @override
+  bool get _requireEncryptionForBooks => _requireEncryptionForBooksValue;
+  @override
+  final BookReconciler _bookReconciler = BookReconciler();
 
   /// Eigene Lesebestätigung öffentlich senden und fremde anzeigen (Einstellung, #526, E-106); sonst nur private Marker.
   final bool Function() _shareReadReceipts;
@@ -948,6 +973,8 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     _echoRepair.clear();
     _plaintextWarned.clear();
     _confirmedBase.clear();
+    _resetBooks();
+    _bookReconciler.clear();
   }
 
   /// Die Familie hat gewechselt (auch nach „keine Familie“ und direkt von A nach B): Was aus dem bisherigen Raum
@@ -965,6 +992,8 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     _participantsRequested = false;
     _cancelParticipantsRetry();
     _resetDirectChats();
+    _resetBooks();
+    _bookReconciler.clear();
   }
 
   /// Hat der Abgleich den Raum [room] als Familie übernommen? `_familyRoom()` zeigt nach einem Sync sofort auf einen
@@ -1065,7 +1094,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
   /// behauptete Wert ist nicht vertrauenswürdig) oder [timeout] lang nichts kommt (#458).
   @visibleForTesting
   static Future<Uint8List> boundedDownload(http.Client client, Uri uri,
-      {required String? accessToken, Duration timeout = attachmentTimeout}) async {
+      {required String? accessToken, Duration timeout = attachmentTimeout, int maxBytes = AttachmentPolicy.maxBytes}) async {
     final req = http.Request('GET', uri)..headers['authorization'] = 'Bearer $accessToken';
     final res = await client.send(req).timeout(timeout);
     if (res.statusCode != 200) {
@@ -1074,7 +1103,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
       throw const GatewayException(GatewayError.notFound);
     }
     final declared = res.contentLength;
-    if (declared != null && declared > AttachmentPolicy.maxBytes + 1024) {
+    if (declared != null && declared > maxBytes + 1024) {
       unawaited(res.stream.listen(null).cancel());
       throw const GatewayException(GatewayError.attachmentRejected);
     }
@@ -1082,7 +1111,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     // `timeout` am Strom ist eine Leerlauf-Schranke und beendet beim Auslösen das Abo (wie invitations.dart, E-81).
     await for (final chunk in res.stream.timeout(timeout)) {
       buf.add(chunk);
-      if (buf.length > AttachmentPolicy.maxBytes + 1024) {
+      if (buf.length > maxBytes + 1024) {
         throw const GatewayException(GatewayError.attachmentRejected);
       }
     }
@@ -1369,6 +1398,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
     if (private != null && !await _repairEchoes(client, private)) return;
     _scanForSignals(_timeline, shared: true);
     _scanForSignals(_privateTimeline, shared: false);
+    await _syncBookTimelines(client);
     notifyListeners();
   }
 
@@ -1496,6 +1526,7 @@ class SdkMatrixGateway extends ChangeNotifier with _AccountDeletionModule, _Secu
       t.cancelSubscriptions();
     }
     _signals.close().ignore();
+    _disposeBooks();
     _presenceAsks.close().ignore();
     _avatarRevision.dispose();
     _client?.dispose().ignore();

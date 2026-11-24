@@ -20,6 +20,7 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
   void _scheduleRefresh();
   Set<String> get _signaled;
   bool get _syncedOnce;
+  bool get _cashBooksEnabled;
 
   @override
   Future<void> syncNow() async {
@@ -147,7 +148,8 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
   /// Einmal je Ereignis, ohne Inhalt, nur für die Typen, die etwas auslösen würden. Das lokale Echo einer eigenen
   /// Sendung ist bis zum Sync kein Vorfall.
   void _warnPlaintext(Event e) {
-    if (!e.status.isSynced || !_appEventTypes.contains(e.type) || !_plaintextWarned.add(e.eventId)) return;
+    final book = _cashBooksEnabled && BookSignalScan.types.contains(e.type);
+    if (!e.status.isSynced || !(_appEventTypes.contains(e.type) || book) || !_plaintextWarned.add(e.eventId)) return;
     AppLog.w('gateway', 'Klartext-Ereignis eines App-Typs verworfen');
   }
 

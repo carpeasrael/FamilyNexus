@@ -5,6 +5,8 @@ import '../../data/matrix/matrix_gateway.dart';
 import '../../data/sync/anniversary_sync.dart';
 import '../../data/sync/avatar_photo_sync.dart';
 import '../../data/sync/calendar_sync.dart';
+import '../../data/sync/cash_book_receipts.dart';
+import '../../data/sync/cash_book_sync.dart';
 import '../../data/sync/event_theme_sync.dart';
 import '../../domain/anniversaries.dart';
 import '../../domain/anniversary_calc.dart';
@@ -13,6 +15,7 @@ import '../../domain/avatar_photo_service.dart';
 import '../../domain/calendar_event.dart';
 import '../../domain/calendar_service.dart';
 import '../../domain/calendar_view.dart';
+import '../../domain/cash_book_service.dart';
 import '../../domain/event_store.dart';
 import '../../domain/event_theme_service.dart';
 import '../../domain/event_themes.dart';
@@ -20,6 +23,7 @@ import '../../domain/occurrence.dart';
 import '../../domain/recurrence.dart';
 import '../../domain/time_zones.dart';
 import '../../ui/theme/tokens.dart';
+import '../cashbook/cash_book_controller.dart';
 import '../family/avatar_photo_images.dart';
 
 /// Zustand und Aktionen des Kalenders für die Oberfläche.
@@ -38,6 +42,10 @@ class CalendarController extends ChangeNotifier {
     this.avatarPhotos,
     this.avatarPhotoSync,
     this.avatarPhotoImages,
+    this.cashBooks,
+    this.cashBookSync,
+    this.cashBookReceipts,
+    this.cashBookController,
   })  : zone = TimeZones.tryGet(zoneName) ?? TimeZones.utc,
         zoneName = TimeZones.tryGet(zoneName) == null ? 'UTC' : zoneName,
         _clock = clock ?? DateTime.now;
@@ -62,6 +70,17 @@ class CalendarController extends ChangeNotifier {
 
   /// Zwischenspeicher der Avatar-Fotos als Bilder für die Anzeige (#434); gehört dem Controller und endet mit ihm.
   final AvatarPhotoImages? avatarPhotoImages;
+
+  /// Kassenbuch (#311, E-113); `null`, wenn die Verdrahtung es nicht vorsieht. Die Sync-Klasse ist bis zur Freigabe
+  /// (`CashBookFlags.enabled`) inaktiv.
+  final CashBookService? cashBooks;
+  final CashBookSync? cashBookSync;
+
+  /// Bon-Fotos (Teil 3b); `null`, wenn die Verdrahtung kein Kassenbuch vorsieht.
+  final CashBookReceipts? cashBookReceipts;
+
+  /// Steuerung des Kassenbuchs für die Oberfläche (Teil 4); `null`, wenn die Verdrahtung kein Kassenbuch vorsieht.
+  final CashBookController? cashBookController;
 
   /// Zeitzone des Geräts (Betrachter).
   final tz.Location zone;
@@ -111,6 +130,8 @@ class CalendarController extends ChangeNotifier {
       photoSync.onChanged = () => avatarPhotoImages?.invalidate();
       photoSync.start();
     }
+    cashBookSync?.start();
+    cashBookController?.start();
     load().ignore();
   }
 
@@ -131,6 +152,9 @@ class CalendarController extends ChangeNotifier {
     }
     avatarPhotoSync?.onChanged = null;
     avatarPhotoSync?.dispose();
+    cashBookController?.dispose();
+    cashBookSync?.dispose();
+    cashBookReceipts?.dispose();
     avatarPhotoImages?.dispose();
     super.dispose();
   }
@@ -142,6 +166,7 @@ class CalendarController extends ChangeNotifier {
         themeSync?.idle() ?? Future<void>.value(),
         anniversarySync?.idle() ?? Future<void>.value(),
         avatarPhotoSync?.idle() ?? Future<void>.value(),
+        cashBookSync?.idle() ?? Future<void>.value(),
       ]);
 
   Future<void>? _loading;

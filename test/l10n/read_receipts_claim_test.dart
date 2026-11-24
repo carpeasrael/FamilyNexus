@@ -78,7 +78,7 @@ void main() {
 
   test('Datenschutzerklärung de: Datentabelle, Metadaten, Abschnitt Online-Status, Stand', () {
     final t = _flat(File('store/privacy/privacy-policy.de.md').readAsStringSync());
-    expect(t, contains('**Stand: 18. November 2026**'));
+    expect(t, contains('**Stand: 24. November 2026**'));
     expect(t, contains('| Lesestatus (öffentlicher Lesemarker'));
     expect(t, contains('nicht Ende-zu-Ende-verschlüsselt und für den Anbieter sowie den Anbieter deiner Gesprächspartner sichtbar'));
     expect(t, contains('Dazu gehören öffentliche Lesebestätigungen'));
@@ -88,7 +88,7 @@ void main() {
 
   test('Datenschutzerklärung en: Datentabelle, Metadaten, Abschnitt Online-Status, Stand', () {
     final t = _flat(File('store/privacy/privacy-policy.en.md').readAsStringSync());
-    expect(t, contains('**Last updated: 18 November 2026**'));
+    expect(t, contains('**Last updated: 24 November 2026**'));
     expect(t, contains('| Read state (public read marker'));
     expect(t, contains('not end-to-end encrypted and is visible to the provider and to the provider of your chat partners'));
     expect(t, contains('This includes public read receipts'));

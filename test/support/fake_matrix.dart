@@ -6,8 +6,12 @@ import 'package:family_nexus/domain/anniversaries.dart';
 import 'package:family_nexus/domain/anniversary_codec.dart';
 import 'package:family_nexus/domain/attachment_policy.dart';
 import 'package:family_nexus/domain/avatar_photo.dart';
+import 'package:family_nexus/domain/book_policy.dart';
+import 'package:family_nexus/domain/book_signal.dart';
 import 'package:family_nexus/domain/calendar_event.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
+import 'package:family_nexus/domain/cash_book.dart';
+import 'package:family_nexus/domain/cash_receipt_check.dart';
 import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/data_inventory.dart';
 import 'package:family_nexus/domain/event_codec.dart';
@@ -297,6 +301,220 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   FakeMatrixGateway(this.fake) {
     fake._register(this);
+  }
+
+  // ------------------------------------------------------ Kassenbücher (#311)
+  // Standard: gesperrt/leer. Tests setzen Bücher, Mitglieder und Sendeergebnisse und lösen Signale aus.
+
+  /// Beigetretene Bücher der aktuellen Familie (Test).
+  List<BookRoomInfo> fakeBooks = const <BookRoomInfo>[];
+
+  /// Zugriffe auf die Buch-Schnittstelle (Test: bei gesperrtem Kassenbuch darf nichts zugreifen).
+  int bookCalls = 0;
+
+  final StreamController<BookSignal> _bookSignals = StreamController<BookSignal>.broadcast(sync: true);
+
+  /// Wird neuen Zuhörern von [bookSignals] zuerst geliefert (wie die Historie des echten Gateways).
+  final List<BookSignal> bookReplay = <BookSignal>[];
+
+  /// Vollständige Verläufe, Zähler unentschlüsselbarer Ereignisse und „nicht mehr beigetreten“ (Test).
+  final Set<String> completeBooks = <String>{};
+  final Map<String, int> undecryptableBooks = <String, int>{};
+  final Set<String> goneBooks = <String>{};
+
+  /// Bekannte Mitglieder je Buch; `knownMembersError` lässt den Abruf scheitern (Test).
+  final Map<String, Set<String>> knownMembers = <String, Set<String>>{};
+  Object? knownMembersError;
+  int knownMembersCalls = 0;
+
+  /// Sendeergebnis je Aufruf (Standard: alles gesendet); `publishError` wirft.
+  List<BookSendResult> Function(String roomId, List<BookOutgoing> events)? publishHandler;
+  GatewayException? publishError;
+  final List<({String roomId, List<BookOutgoing> events})> bookPublished = <({String roomId, List<BookOutgoing> events})>[];
+
+  /// Ergebnis von [reconcileBook] (Test); zählt Aufrufe.
+  List<String> Function(String roomId)? reconcileHandler;
+  int reconcileCalls = 0;
+
+  /// Bon-Dateien (Test): Ergebnis von [loadBookReceipt], Fehler und Protokoll der Aufrufe.
+  BookReceiptLoad Function(String roomId, String eventId, CashReceipt receipt, String author)? loadReceiptHandler;
+  GatewayException? sendReceiptError;
+  GatewayException? Function(String roomId, String eventId)? redactReceiptHandler;
+  final List<({String roomId, Uint8List bytes})> sentReceipts = <({String roomId, Uint8List bytes})>[];
+  final List<({String roomId, String eventId})> redactedReceipts = <({String roomId, String eventId})>[];
+  int receiptCounter = 0;
+
+  @override
+  Future<String> sendBookReceipt(String roomId, Uint8List bytes) async {
+    bookCalls++;
+    final e = sendReceiptError;
+    if (e != null) throw e;
+    sentReceipts.add((roomId: roomId, bytes: bytes));
+    return '\$receipt${++receiptCounter}';
+  }
+
+  @override
+  Future<BookReceiptLoad> loadBookReceipt(String roomId, String eventId, {required CashReceipt receipt, required String author}) async {
+    bookCalls++;
+    return loadReceiptHandler?.call(roomId, eventId, receipt, author) ?? const BookReceiptLoad(BookReceiptStatus.missing);
+  }
+
+  @override
+  Future<void> redactBookReceipt(String roomId, String eventId) async {
+    bookCalls++;
+    final e = redactReceiptHandler?.call(roomId, eventId);
+    if (e != null) throw e;
+    redactedReceipts.add((roomId: roomId, eventId: eventId));
+  }
+
+  /// Mitglieder je Buch und „andere Familie“ (Test).
+  final Map<String, List<BookMember>> bookMemberList = <String, List<BookMember>>{};
+  GatewayException? bookMembersError;
+  List<String> fakeStaleBooks = const <String>[];
+  final List<String> leftBooks = <String>[];
+
+  @override
+  Future<List<BookMember>> bookMembers(String roomId) async {
+    bookCalls++;
+    final e = bookMembersError;
+    if (e != null) throw e;
+    return bookMemberList[roomId] ?? const <BookMember>[];
+  }
+
+  @override
+  List<String> get staleBooks {
+    bookCalls++;
+    return fakeStaleBooks;
+  }
+
+  void injectBookSignal(BookSignal s) => _bookSignals.add(s);
+
+  @override
+  List<BookRoomInfo> get books {
+    bookCalls++;
+    return fakeBooks;
+  }
+
+  /// Einladungen und Buchaktionen (Test): Standard wie gesperrt (`notAllowed`); mit [nextBookRoom] gelingt das Anlegen.
+  List<BookInvitationInfo> fakeInvitations = const <BookInvitationInfo>[];
+  String? nextBookRoom;
+  GatewayException? bookActionError;
+  final List<(String, String)> invitedToBook = <(String, String)>[];
+  final List<(String, String)> removedFromBook = <(String, String)>[];
+  final List<String> acceptedBooks = <String>[];
+  final List<String> declinedBooks = <String>[];
+
+  @override
+  List<BookInvitationInfo> get bookInvitations {
+    bookCalls++;
+    return fakeInvitations;
+  }
+
+  GatewayException _actionError() => bookActionError ?? const GatewayException(GatewayError.notAllowed);
+
+  @override
+  Future<String> createBook() async {
+    bookCalls++;
+    final r = nextBookRoom;
+    if (r == null || bookActionError != null) throw _actionError();
+    return r;
+  }
+
+  @override
+  Future<void> inviteToBook(String roomId, String userId) async {
+    bookCalls++;
+    if (nextBookRoom == null || bookActionError != null) throw _actionError();
+    invitedToBook.add((roomId, userId));
+  }
+
+  @override
+  Future<void> removeFromBook(String roomId, String userId) async {
+    bookCalls++;
+    if (nextBookRoom == null || bookActionError != null) throw _actionError();
+    removedFromBook.add((roomId, userId));
+  }
+
+  /// Test: wird vor jeder Buchaktion (`leave`) gerufen und darf werfen.
+  void Function(String op, String roomId)? bookActionHook;
+
+  @override
+  Future<void> leaveBook(String roomId) async {
+    bookCalls++;
+    bookActionHook?.call('leave', roomId);
+    if (nextBookRoom == null || bookActionError != null) throw _actionError();
+    leftBooks.add(roomId);
+  }
+
+  @override
+  Future<void> acceptBookInvitation(String roomId) async {
+    bookCalls++;
+    if (nextBookRoom == null || bookActionError != null) throw _actionError();
+    acceptedBooks.add(roomId);
+  }
+
+  @override
+  Future<void> declineBookInvitation(String roomId) async {
+    bookCalls++;
+    if (nextBookRoom == null || bookActionError != null) throw _actionError();
+    declinedBooks.add(roomId);
+  }
+
+  @override
+  Future<void> verifyBookRecipients(String roomId) => throw const GatewayException(GatewayError.notAllowed);
+
+  @override
+  Future<List<String>> reconcileBook(String roomId) async {
+    bookCalls++;
+    reconcileCalls++;
+    return reconcileHandler?.call(roomId) ?? const <String>[];
+  }
+
+  @override
+  Stream<BookSignal> get bookSignals {
+    bookCalls++;
+    return Stream<BookSignal>.multi((c) {
+      for (final s in List<BookSignal>.of(bookReplay)) {
+        c.add(s);
+      }
+      final sub = _bookSignals.stream.listen(c.add);
+      c.onCancel = sub.cancel;
+    });
+  }
+
+  @override
+  bool bookHistoryComplete(String roomId) {
+    bookCalls++;
+    return completeBooks.contains(roomId);
+  }
+
+  @override
+  int bookUndecryptableCount(String roomId) {
+    bookCalls++;
+    return undecryptableBooks[roomId] ?? 0;
+  }
+
+  @override
+  bool bookRoomGone(String roomId) {
+    bookCalls++;
+    return goneBooks.contains(roomId);
+  }
+
+  @override
+  Future<Set<String>> bookKnownMembers(String roomId) async {
+    bookCalls++;
+    knownMembersCalls++;
+    final e = knownMembersError;
+    if (e != null) throw e;
+    return knownMembers[roomId] ?? const <String>{};
+  }
+
+  @override
+  Future<List<BookSendResult>> publishBookEvents(String roomId, List<BookOutgoing> events) async {
+    bookCalls++;
+    final e = publishError;
+    if (e != null) throw e;
+    bookPublished.add((roomId: roomId, events: events));
+    return publishHandler?.call(roomId, events) ?? List<BookSendResult>.filled(events.length, BookSendResult.sent);
   }
 
   final FakeMatrixServer fake;

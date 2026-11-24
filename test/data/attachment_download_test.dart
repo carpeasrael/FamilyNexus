@@ -115,4 +115,39 @@ void main() {
     );
     expect(called, isFalse);
   });
+
+  group('maxBytes (Bon-Dateien, #311): Kappung bei maxBytes + 1 KiB', () {
+    Future<Uint8List> capped(http.Client c, int max) =>
+        SdkMatrixGateway.boundedDownload(c, _uri, accessToken: 'tok', timeout: _short, maxBytes: max).timeout(_guard, onTimeout: () => fail('Download hängt'));
+
+    http.StreamedResponse body(int length, {int? declared}) => http.StreamedResponse(
+          Stream<List<int>>.fromIterable(<List<int>>[for (var i = 0; i < length; i += 512) List<int>.filled(i + 512 <= length ? 512 : length - i, 1)]),
+          200,
+          contentLength: declared ?? length,
+        );
+
+    test('Strom: genau maxBytes + 1024 geht, ein Byte mehr wird abgelehnt', () async {
+      const max = 4096;
+      expect((await capped(_client((_) async => body(max + 1024)), max)).length, max + 1024);
+      await expectLater(capped(_client((_) async => body(max + 1025, declared: 0)), max), throwsA(_gatewayError(GatewayError.attachmentRejected)));
+    });
+
+    test('Content-Length: genau maxBytes + 1024 geht, ein Byte mehr wird vor dem Lesen abgelehnt', () async {
+      const max = 4096;
+      expect((await capped(_client((_) async => body(10, declared: max + 1024)), max)).length, 10);
+      var cancelled = false;
+      final client = _client((_) async => _hanging(200, contentLength: max + 1025, onCancel: () => cancelled = true));
+      await expectLater(capped(client, max), throwsA(_gatewayError(GatewayError.attachmentRejected)));
+      await pumpEventQueue();
+      expect(cancelled, isTrue);
+    });
+
+    test('ohne maxBytes bleibt es bei AttachmentPolicy.maxBytes + 1024 (nicht beim Bon-Limit)', () async {
+      final big = 2 * 1024 * 1024;
+      final bytes = await SdkMatrixGateway.boundedDownload(_client((_) async => body(big)), _uri, accessToken: 'tok', timeout: _short);
+      expect(bytes.length, big);
+      expect(AttachmentPolicy.maxBytes, greaterThan(big));
+      await expectLater(capped(_client((_) async => body(big)), 1024 * 1024), throwsA(_gatewayError(GatewayError.attachmentRejected)));
+    });
+  });
 }

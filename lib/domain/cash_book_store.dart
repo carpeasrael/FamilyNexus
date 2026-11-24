@@ -10,6 +10,17 @@ abstract class CashBookStore {
   /// Speichert Titel und Währung eines Buchs ([published]: dem Server bekannt).
   Future<void> putBook(CashBookMeta meta, {bool published = true});
 
+  /// Eigene Bücher (Ersteller [owner]) mit echten Metadaten (Version ≥ 1), die noch nicht gesendet wurden. Das
+  /// Platzhalter-Buch (Version 0) gehört nie dazu.
+  Future<List<CashBookMeta>> pendingBooks(String owner);
+
+  /// Markiert [sent] als gesendet, **nur** wenn Titel, Währung und Version des gespeicherten Buchs noch genau diesem
+  /// Stand entsprechen (eine zwischenzeitliche Änderung bleibt in der Warteschlange).
+  Future<void> markBookPublished(CashBookMeta sent);
+
+  /// Merkt die Metadaten des Buchs erneut zum Senden vor (Resync für neue Mitglieder); nie das Platzhalter-Buch.
+  Future<void> requeueBook(String roomId);
+
   /// Entfernt Buch und alle Einträge (Verlassen, Familienwechsel).
   Future<void> deleteBook(String roomId);
 

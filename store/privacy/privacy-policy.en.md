@@ -2,7 +2,7 @@
 
 **This is a translation of the German original (`privacy-policy.de.md`). If the two versions differ, the German version prevails.**
 
-**Last updated: 18 November 2026**
+**Last updated: 24 November 2026**
 
 **Platform: native apps for iOS, macOS, Windows, Linux, Flatpak and Android as well as web app.**
 
@@ -54,6 +54,7 @@ share with you or that your provider supplies for synchronization.
 | Read state (public read marker: up to which message a member has read, with time) | Optionally show “Sent” and “Read” or “Read by n” under your own messages. The marker is not end-to-end encrypted and is visible to the provider and to the provider of your chat partners. On by default, can be switched off under “Send read receipts”; markers already sent cannot be taken back. |
 | Calendar themes (freely chosen name up to 30 characters, color) | Assign events to a theme and show them in color. Like events, themes are sent end-to-end encrypted to the family. |
 | Birthdays and memorial days (freely chosen name up to 60 characters, date of birth and date of death, each with or without a year; including third parties and deceased people) | Show the family's birthdays and memorial days in the calendar and on “Today”, with age in years. Like events, the entries are sent end-to-end encrypted to the family. The advance notice of the display is a local setting. |
+| Cash books (date, store, amount, currency, note, optionally a reduced-size photo of the receipt without camera data and location data) | Record household expenses together in one book. Each book is a separate room; entries and receipts are sent end-to-end encrypted to the members of the book (family moderators only). All members of a book see all entries and receipts, including the earlier history. The app is not bookkeeping software. |
 | Choice of one of the twelve built-in avatars (only the identifier, no image, no text) | Show the avatar to other family members, including in the chat. The choice is kept as room state in the family room and is not end-to-end encrypted. |
 | Avatar photo (optional; cropped square, small, without location data and camera data) | Show the photo to other family members, including in the chat. It is kept end-to-end encrypted as an event in the family room; the provider only sees size and time. Moderators can take it out of the display. For children, parents or guardians should consent. |
 | Language, appearance, reminder, notification and security settings, locally blocked accounts, pending invitations and, only if “Reopen last conversation” is switched on, the ID of the conversation you last had open | Configure the app and continue processes already begun. |
@@ -108,6 +109,10 @@ The connections to the provider are additionally protected with HTTPS/TLS.
 - **Family room:** Shared messages, events, shopping lists, tasks
   including their history, and birthdays and memorial days are readable by authorized family members on their
   approved devices.
+- **Cash book:** Each book is a separate encrypted room. Entries and receipt photos are readable by all
+  members of the book, including those invited later (earlier history, including earlier versions of
+  entries). The provider sees members, times and sizes of the events and, in plain text, that the room is
+  a cash book of the family, but not the content.
 - **Direct chat:** Content is shared between the two accounts involved.
 - **Private events:** They are synchronized between your own devices via a separate
   encrypted room of your account. "Private" therefore does not mean
@@ -326,7 +331,7 @@ data**, the app and Matrix databases, the associated locally
 stored keys and the reminders and notifications managed by the app are removed.
 
 **Signing out:** When you sign out under **Settings → Account → Sign out**, the
-app removes the events (including private ones), shopping lists and tasks of this account from the device
+app removes the events (including private ones), shopping lists, tasks, birthdays and memorial days, avatar photos and cash books of this account from the device
 and cancels scheduled reminders, removes notifications and resets the number on the app icon.
 This also applies if the session ends in another
 way, for example because the device was signed out from another device.
@@ -352,7 +357,13 @@ An avatar photo stays encrypted in the room history, with the members who alread
 remove it beforehand in the app (“Remove photo first”). When you change or remove it, earlier
 copies are only redacted at the provider on a best-effort basis; anyone who already received the
 photo keeps it, including members who have left. Birthdays and memorial days you created remain
-for the family (shared family data, every member may change them).
+for the family (shared family data, every member may change them). Entries and receipts you created in cash
+books remain encrypted in the book with the members, including earlier versions; deleting or changing an
+entry creates a new event, earlier versions remain in the history, and only your own receipt file is
+redacted on a best-effort basis. The creator cannot leave a book by hand; if they switch families, their
+device leaves the book automatically, after which nobody can invite or remove anyone. If someone leaves
+the family, they can stay in the book and see new entries until the reconciliation on the creator's device
+(online, itself in the family) removes them; this also applies if they are no longer a moderator.
 
 **Remaining copies:** Neither local deletion nor account deletion guarantees
 the removal of content already delivered on other people's devices, federated
