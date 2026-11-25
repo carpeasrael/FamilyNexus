@@ -409,3 +409,24 @@ class ContactPolicy {
 
   static bool _sameSet(Set<String> a, Set<String> b) => a.length == b.length && a.containsAll(b);
 }
+
+/// Anzeigename eines Gegenübers außerhalb der Familie (#119, K3a-2, §8.6). Der Name stammt von einem Fremden und ist
+/// nicht vertrauenswürdig: Steuer-, Format- und Bidi-Zeichen und das Trennzeichen „·“ entfallen, Leerraum wird
+/// zusammengezogen, höchstens [maxName] Zeichen. Der Server stammt **immer aus der Matrix-ID**, nie aus dem Namen.
+class ContactNames {
+  const ContactNames._();
+
+  static const int maxName = 40;
+
+  /// Bereinigter Name; leer, wenn nichts übrig bleibt.
+  static String cleanName(String? name) =>
+      TextSanitizer.clean((name ?? '').replaceAll(RegExp('[\\u00B7\\u2022\\u2219\\u22C5\\u30FB]'), ' '), max: maxName);
+
+  /// „Name · server“; bei leerem Namen der lokale Teil der ID.
+  static String title(String? name, String userId) {
+    final n = cleanName(name);
+    final server = MatrixIds.serverName(userId) ?? '';
+    final shown = n.isEmpty ? MatrixIds.localpart(userId) : n;
+    return server.isEmpty ? shown : '$shown · $server';
+  }
+}

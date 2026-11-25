@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:family_nexus/domain/contacts.dart' show ContactFlags;
 import 'package:flutter_test/flutter_test.dart';
 
 /// #119, K2b/K2c (E-114): Bis zur Freigabe (K6) und den Datenschutztexten erzeugt oder nutzt kein Produktionscode den
@@ -99,6 +100,43 @@ void main() {
     expect(d.substring(i, d.indexOf('\n  }\n', i)), isNot(contains('_contactPolicy')));
     expect(RegExp(r'_contactPolicy\s*=').allMatches(t + d).length, 3, reason: 'Feld, setContactPolicy und _resetLocal');
     expect(d, contains('ContactPolicy _contactPolicy = ContactPolicy.off;'), reason: 'Standard ohne Anmeldung ist aus');
+  });
+
+  // ---- K3a-2: Kontakt-Einzelchats im Gateway ----
+
+  test('Freigabebedingung: ContactFlags.enabled nur, wenn K3b-2 (B8) und K3c (Kontakte ohne Familie) abgeschlossen sind', () {
+    if (!ContactFlags.enabled) return; // Der Freigabe-PR setzt die Marken bewusst in docs/ENTSCHEIDUNGEN.md.
+    final doc = File('docs/ENTSCHEIDUNGEN.md').readAsStringSync();
+    expect(doc, contains('K3b-2 abgeschlossen'));
+    expect(doc, contains('K3c abgeschlossen'));
+  });
+
+  test('Kontakt-Räume werden nur über ConversationPolicy eingestuft; die Test-Naht des Mitgliedszustands liegt nur dort', () {
+    final t = code(File('lib/data/matrix/gateway/contact_chats.dart').readAsStringSync());
+    expect(t, contains('RoomClass.contactDirect'));
+    expect(t, contains('RoomClass.contactRequest'));
+    expect(t, contains('ConversationPolicy.autoAcceptContact('));
+    final offenders = <String>[];
+    for (final f in libFiles()) {
+      if (f.path != 'lib/data/matrix/gateway/contact_chats.dart' && code(f.readAsStringSync()).contains('debugPeerMembershipLoader')) offenders.add(f.path);
+    }
+    expect(offenders, isEmpty);
+  });
+
+  test('Gateway: Lesebestätigung für Kontakte nie öffentlich; Kontakt-Zeitleisten in Wiederholung, close und dispose; Zurücksetzen leert sie', () {
+    final t = code(File('lib/data/matrix/sdk_matrix_gateway.dart').readAsStringSync());
+    expect(t, contains('public: !outside && _shareReadReceipts()'));
+    expect(t, contains('for (final e in _contacts.timelines.entries) (e.key, e.value),'));
+    expect('_contacts.clearAll();'.allMatches(t).length, 1, reason: 'close');
+    expect('_contacts.cancelTimelines();'.allMatches(t).length, 1, reason: 'dispose');
+    final d = code(File('lib/data/matrix/gateway/direct_chats.dart').readAsStringSync());
+    expect(d, contains('_contacts.clearAll();'));
+  });
+
+  test('Kontakt-Räume: keine App-Ereignisse hinein (Reaktion verweigert, Terminverweise nur im Familienraum, Lesebestätigung privat)', () {
+    final c = code(File('lib/data/matrix/gateway/chat.dart').readAsStringSync());
+    expect(c, contains('_contacts.peers.containsKey(threadId)) {\n      throw const GatewayException(GatewayError.notAllowed);'));
+    expect(c, contains('return _requireContactRoom(threadId, room);'));
   });
 
   test('bootstrap reicht den Blockierlisten-Adapter an die Factory durch', () {

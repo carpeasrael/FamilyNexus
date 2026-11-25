@@ -785,6 +785,16 @@
       }
     }
   },
+  "chatThreadContact": "Außerhalb der Familie: {name}",
+  "@chatThreadContact": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatContactNote": "Außerhalb der Familie. Termine, Listen und Online-Status werden hier nicht geteilt.",
+  "roomKindContact": "Kontakt-Chat",
   "chatThreadDirect": "Einzelchat mit {name}",
   "@chatThreadDirect": {
     "placeholders": {

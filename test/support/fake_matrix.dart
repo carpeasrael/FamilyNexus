@@ -14,6 +14,7 @@ import 'package:family_nexus/domain/cash_book.dart';
 import 'package:family_nexus/domain/cash_receipt_check.dart';
 import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/contacts.dart';
+import 'package:family_nexus/domain/conversation_policy.dart';
 import 'package:family_nexus/domain/data_inventory.dart';
 import 'package:family_nexus/domain/event_codec.dart';
 import 'package:family_nexus/domain/event_theme_codec.dart';
@@ -79,6 +80,9 @@ class FakeRoom {
 
   /// Nur Einzelchats: die zwei Beteiligten.
   final Set<String> dmMembers = <String>{};
+
+  /// Nur Kontakt-Räume (#119): Beteiligte, die nur eingeladen sind (noch nicht beigetreten).
+  final Set<String> invitedUsers = <String>{};
 }
 
 class _Account {
@@ -112,6 +116,18 @@ class FakeMatrixServer {
 
   /// Einzelchat-Räume (immer verschlüsselt, genau zwei Beteiligte).
   final Map<String, FakeRoom> dmRooms = <String, FakeRoom>{};
+
+  /// Einzelchat-Räume mit Personen außerhalb der Familie (#119, K3a-2); [FakeRoom.invitedUsers] sind nur eingeladen.
+  final Map<String, FakeRoom> contactRooms = <String, FakeRoom>{};
+
+  /// Legt einen Kontakt-Raum an: [from] ist beigetreten, [to] eingeladen (oder beigetreten mit [toJoined]).
+  FakeRoom createContactRoom(String from, String to, {bool toJoined = false}) {
+    final room = FakeRoom('${nextId('!ct')}:$host', 'ct')..dmMembers.addAll(<String>[from, to]);
+    if (!toJoined) room.invitedUsers.add(to);
+    contactRooms[room.id] = room;
+    notifyAll();
+    return room;
+  }
 
   /// Gesendete Statusmeldungen (Absender, online, ask, Empfänger) – nur Gerätenachrichten, nie Raumereignisse.
   final List<({String sender, bool online, bool ask, List<String> to})> presenceLog =
@@ -683,6 +699,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Raum eines Gesprächs aus Sicht dieses Nutzers (Einzelchats nur mit aktuellen Familienmitgliedern).
   FakeRoom? _roomOf(String threadId) {
     if (threadId == ChatThread.familyId) return familyRoom;
+    if (!fake.dmRooms.containsKey(threadId)) return _contactRoomOf(threadId);
     final room = fake.dmRooms[threadId];
     final me = _userId;
     if (room == null || me == null || !room.dmMembers.contains(me)) return null;
@@ -708,6 +725,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return <ChatThread>[
       ChatThread(id: ChatThread.familyId, kind: ThreadKind.family, title: f.name, unread: unreadIn(ChatThread.familyId)),
       ...dms,
+      ..._contactThreads(),
     ];
   }
 
@@ -715,6 +733,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   List<ChatMessage> messagesIn(String threadId) {
     final room = _roomOf(threadId);
     if (room == null) return const <ChatMessage>[];
+    // Kontakt-Zeitleisten gibt es erst nach `openThread` (Konzept §7.1).
+    if (fake.contactRooms.containsKey(threadId) && !_opened.contains(threadId)) return const <ChatMessage>[];
     final reactions = <String, Map<String, Set<String>>>{};
     for (final e in room.events.where((e) => e.type == 'm.reaction')) {
       final target = e.content['target']! as String;
@@ -1668,6 +1688,11 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _requireSession();
     final room = _roomOf(threadId);
     if (room == null) throw const GatewayException(GatewayError.notFound);
+    // Kontakt-Räume: Senden nur nach `openThread` und bei beigetretenem Gegenüber (nie in wartenden Räumen).
+    if (fake.contactRooms.containsKey(threadId)) {
+      final peer = room.dmMembers.firstWhere((m) => m != _userId);
+      if (!_opened.contains(threadId) || room.invitedUsers.contains(peer)) throw const GatewayException(GatewayError.notAllowed);
+    }
     return room;
   }
 
@@ -1684,6 +1709,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   @override
   Future<void> sendReaction(String messageId, String emoji, {String threadId = ChatThread.familyId}) async {
+    if (fake.contactRooms.containsKey(threadId)) throw const GatewayException(GatewayError.notAllowed);
     final room = _chatRoom(threadId);
     if (emoji.isEmpty || emoji.length > 16) throw const GatewayException(GatewayError.invalidInput);
     fake.post(room, _userId!, 'm.reaction', <String, Object?>{'target': messageId, 'emoji': emoji});
@@ -1962,7 +1988,136 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (policy == contactPolicy) return;
     contactPolicy = policy;
     contactPolicyChanges++;
+    _autoAcceptContacts();
     notifyListeners();
+  }
+
+  // ------------------------------------------------ Kontakt-Einzelchats (#119, K3a-2)
+
+  final Set<String> _opened = <String>{};
+
+  /// Dieselbe reine Einstufung wie im echten Gateway ([ConversationPolicy]), damit beide nicht auseinanderlaufen.
+  PolicyContext? _contactContext() {
+    final f = family;
+    final me = _userId;
+    if (f == null || me == null) return null;
+    return PolicyContext(
+      myUserId: me,
+      familyRoomId: f.roomId,
+      joinedMembers: <String>{for (final m in f.joined) m.userId},
+      membersLoaded: true,
+      contactsEnabled: contactPolicy.enabled,
+      contacts: contactPolicy.contacts,
+      blockedUsers: contactPolicy.blocked,
+      familyIds: <String>{for (final m in f.members) m.userId},
+    );
+  }
+
+  RoomFacts? _contactFacts(FakeRoom r) {
+    final me = _userId;
+    if (me == null || !r.dmMembers.contains(me)) return null;
+    final other = r.dmMembers.firstWhere((m) => m != me);
+    if (r.invitedUsers.contains(me)) {
+      return RoomFacts(id: r.id, membership: RoomMembership.invite, inviterId: other, inviteIsDirect: true, joinedCount: 1, invitedCount: 1, joinRule: 'invite');
+    }
+    return RoomFacts(
+      id: r.id,
+      membership: RoomMembership.join,
+      peerId: other,
+      megolm: true,
+      joinedCount: 2 - r.invitedUsers.length,
+      invitedCount: r.invitedUsers.length,
+      peerMembership: r.invitedUsers.contains(other) ? PeerMembership.invite : PeerMembership.join,
+    );
+  }
+
+  RoomClass _contactClass(FakeRoom r) {
+    final ctx = _contactContext();
+    final facts = _contactFacts(r);
+    if (ctx == null || facts == null) return RoomClass.ignored;
+    return ConversationPolicy.classify(facts, ctx);
+  }
+
+  FakeRoom? _contactRoomOf(String threadId) {
+    final r = fake.contactRooms[threadId];
+    return r != null && _contactClass(r) == RoomClass.contactDirect ? r : null;
+  }
+
+  List<ChatThread> _contactThreads() {
+    final me = _userId;
+    return <ChatThread>[
+      for (final r in fake.contactRooms.values)
+        if (_contactClass(r) == RoomClass.contactDirect)
+          ChatThread(
+            id: r.id,
+            kind: ThreadKind.contact,
+            title: ContactNames.title(fake.displayNameOf(r.dmMembers.firstWhere((m) => m != me)), r.dmMembers.firstWhere((m) => m != me)),
+            peerId: r.dmMembers.firstWhere((m) => m != me),
+            unread: unreadIn(r.id),
+            pending: r.invitedUsers.contains(r.dmMembers.firstWhere((m) => m != me)),
+          ),
+    ]..sort((a, b) => a.title.compareTo(b.title));
+  }
+
+  /// Einladungen eigener Kontakte werden angenommen (wie `autoAcceptContact` im Gateway), je Einladendem die kleinste ID.
+  void _autoAcceptContacts() {
+    final ctx = _contactContext();
+    final me = _userId;
+    if (ctx == null || me == null) return;
+    final byFrom = <String, FakeRoom>{};
+    for (final r in fake.contactRooms.values) {
+      final facts = _contactFacts(r);
+      if (facts == null || !ConversationPolicy.autoAcceptContact(facts, ctx)) continue;
+      final cur = byFrom[facts.inviterId!];
+      if (cur == null || r.id.compareTo(cur.id) < 0) byFrom[facts.inviterId!] = r;
+    }
+    for (final e in byFrom.entries) {
+      final hasJoined = fake.contactRooms.values.any((r) => r.dmMembers.contains(me) && r.dmMembers.contains(e.key) && !r.invitedUsers.contains(me) && !r.invitedUsers.contains(e.key));
+      if (!hasJoined) e.value.invitedUsers.remove(me);
+    }
+  }
+
+  @override
+  List<ContactRequest> get contactRequests {
+    final ctx = _contactContext();
+    if (ctx == null) return const <ContactRequest>[];
+    final bySender = <String, FakeRoom>{};
+    for (final r in fake.contactRooms.values) {
+      final facts = _contactFacts(r);
+      if (facts == null || ConversationPolicy.classify(facts, ctx) != RoomClass.contactRequest) continue;
+      final cur = bySender[facts.inviterId!];
+      if (cur == null || r.id.compareTo(cur.id) < 0) bySender[facts.inviterId!] = r;
+    }
+    return <ContactRequest>[
+      for (final e in bySender.entries) ContactRequest(roomId: e.value.id, fromUserId: e.key, fromName: ContactNames.title(fake.displayNameOf(e.key), e.key)),
+    ]..sort((a, b) => a.roomId.compareTo(b.roomId));
+  }
+
+  @override
+  int get contactRequestsHidden => 0;
+
+  @override
+  Future<void> openThread(String threadId) async {
+    if (_contactRoomOf(threadId) != null) _opened.add(threadId);
+  }
+
+  @override
+  Future<void> declineContactRequest(String roomId) async {
+    final r = fake.contactRooms[roomId];
+    if (r == null || _contactClass(r) != RoomClass.contactRequest) throw const GatewayException(GatewayError.notAllowed);
+    r.dmMembers.remove(_userId);
+    r.invitedUsers.remove(_userId);
+    fake.notifyAll();
+  }
+
+  @override
+  Future<void> leaveConversation(String threadId) async {
+    final r = _contactRoomOf(threadId);
+    if (r == null) throw const GatewayException(GatewayError.notAllowed);
+    r.dmMembers.remove(_userId);
+    r.invitedUsers.remove(_userId);
+    _opened.remove(threadId);
+    fake.notifyAll();
   }
 
   @override

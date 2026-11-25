@@ -63,13 +63,18 @@ class _ThreadRowTile extends StatelessWidget {
     final last = row.last;
     final unread = thread.unread;
     final peer = thread.peerId;
-    final presence = peer == null ? null : presenceOf(services, peer, now);
+    // Außerhalb der Familie gibt es nie einen Online-Status (Konzept §1) und keinen Mitglieder-Avatar.
+    final presence = peer == null || thread.isOutside ? null : presenceOf(services, peer, now);
     final status = presence == null ? null : presenceLabel(l, presence, now);
     final preview = last == null ? '' : threadPreviewText(l, last, mine: last.senderId == services.gateway.userId);
     final hasPreview = preview.isNotEmpty;
     // Ohne Nachricht: Online-Status (Einzelchat) bzw. „Noch keine Nachrichten“ (Familienchat).
     final second = hasPreview ? preview : (status ?? l.emptyChat);
-    final label = thread.isFamily ? l.chatThreadFamily(thread.title) : l.chatThreadDirect(thread.title);
+    final label = thread.isFamily
+        ? l.chatThreadFamily(thread.title)
+        : thread.isOutside
+        ? l.chatThreadContact(thread.title)
+        : l.chatThreadDirect(thread.title);
     final timeText = last == null ? null : _timeText(context, l, last.time);
     final semantic = <String>[
       label,
@@ -94,7 +99,9 @@ class _ThreadRowTile extends StatelessWidget {
               SizedBox(
                 width: 40,
                 child: Center(
-                  child: peer == null
+                  child: thread.isOutside
+                      ? const Icon(Icons.public, size: 28)
+                      : peer == null
                       ? const Icon(Icons.groups_outlined, size: 28)
                       : MemberAvatarView(
                           userId: peer,
@@ -158,7 +165,10 @@ class _ThreadHeader extends StatelessWidget {
       if (thread != null)
         Expanded(
           child: Row(children: <Widget>[
-            if (peer != null) ...<Widget>[
+            if (thread.isOutside) ...<Widget>[
+              const Icon(Icons.public, size: 24),
+              const SizedBox(width: 8),
+            ] else if (peer != null) ...<Widget>[
               MemberAvatarView(userId: peer, size: 28, colorIndex: personColorOf(AppScope.maybeOf(context), peer)),
               const SizedBox(width: 8),
             ],
@@ -173,7 +183,7 @@ class _ThreadHeader extends StatelessWidget {
                 ),
               ),
             ),
-            if (peer != null) ...<Widget>[
+            if (peer != null && !thread.isOutside) ...<Widget>[
               const SizedBox(width: 12),
               Flexible(child: PresenceStatusText(userId: peer, compact: true)),
             ],

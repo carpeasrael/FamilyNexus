@@ -41,6 +41,8 @@ List<ThreadRow> orderedThreadRows(
 
   rows.sort((a, b) {
     if (a.thread.isFamily != b.thread.isFamily) return a.thread.isFamily ? -1 : 1;
+    // Gespräche außerhalb der Familie stehen hinter Familie und Mitgliedern.
+    if (a.thread.isOutside != b.thread.isOutside) return a.thread.isOutside ? 1 : -1;
     final aUnread = a.thread.unread > 0;
     if (aUnread != (b.thread.unread > 0)) return aUnread ? -1 : 1;
     final at = a.last?.time;

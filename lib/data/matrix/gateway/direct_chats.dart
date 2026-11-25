@@ -13,7 +13,11 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
   Set<String> get _dmJoining;
   Map<String, List<ChatMessage>> get _dmMessages;
   Map<String, String> get _dmPeers;
+  _ContactState get _contacts;
   bool get _disposed;
+  PeerMembership _peerMembershipOf(Room r, String peer);
+  List<ChatThread> _contactThreads();
+  Future<void> _syncContactChats(Client client, Family f, Room familyRoom);
   Map<String, DateTime> get _dmRetryAfter;
   Map<String, Timeline> get _dmTimelines;
   Set<String> get _identityChanged;
@@ -40,6 +44,7 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
     _dmFailed.clear();
     _dmRetryAfter.clear();
     _dmCreating.clear();
+    _contacts.clearAll();
     _dmEpoch++;
     _threads = const <ChatThread>[];
   }
@@ -64,6 +69,9 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
       joinedCount: r.summary.mJoinedMemberCount,
       invitedCount: r.summary.mInvitedMemberCount,
       joinRule: rule is String ? rule : null,
+      peerMembership: r.membership == Membership.join && r.directChatMatrixID != null
+          ? _peerMembershipOf(r, r.directChatMatrixID!)
+          : PeerMembership.unknown,
     );
   }
 
@@ -76,6 +84,8 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
     if (_disposed || policy == _contactPolicy) return;
     _contactPolicy = policy;
     notifyListeners();
+    // Blockieren, Ausschalten und Annehmen wirken ohne weiteren Sync (Threads, Anfragen, Auto-Annahme).
+    _scheduleRefresh();
   }
 
   /// Kontext der Einstufung für ein Konto mit bekannter Familie.
@@ -158,6 +168,7 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
         _dmMessages[e.key] = ChatMapper.messages(e.value, threadId: e.key, sends: _localSends, showReadBy: _showReadBy);
       }
     }
+    await _syncContactChats(client, f, familyRoom);
     final dms = <ChatThread>[
       for (final e in _dmPeers.entries)
         if (_dmTimelines.containsKey(e.key))
@@ -172,6 +183,7 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
     _threads = <ChatThread>[
       ChatThread(id: ChatThread.familyId, kind: ThreadKind.family, title: f.name, unread: unreadIn(ChatThread.familyId)),
       ...dms,
+      ..._contactThreads(),
     ];
   }
 

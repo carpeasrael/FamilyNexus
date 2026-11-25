@@ -98,6 +98,13 @@ class ContactSync {
     _policyDone = _pushPolicy();
   }
 
+  /// Schiebt die Richtlinie jetzt und wartet, bis der Lauf (samt zwischenzeitlich angemeldeter Anstöße) fertig ist. Der
+  /// Controller ruft das nach `addAccepted`/`addOutgoing` auf, bevor er das Gateway braucht (Datensatz **vor** Raum).
+  Future<void> pushPolicyNow() async {
+    _schedulePolicy();
+    await _policyDone;
+  }
+
   Future<void> _pushPolicy() async {
     try {
       do {

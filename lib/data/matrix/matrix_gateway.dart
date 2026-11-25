@@ -512,6 +512,22 @@ abstract class MatrixGateway implements Listenable {
   /// [ContactPolicy.off]. Meldet nur bei echter Änderung; nach `dispose` ohne Wirkung. Nur der `ContactSync` ruft das.
   void setContactPolicy(ContactPolicy policy);
 
+  /// Eingehende Kontaktanfragen (nur Absender und Server, kein Rauminhalt): je Absender eine, je Server höchstens 5, in
+  /// Summe 50. Leer bei ausgeschaltetem Bereich, ohne Familie oder ohne geladene Mitgliederliste.
+  List<ContactRequest> get contactRequests;
+
+  /// Zahl der weiteren, nicht angezeigten Anfragen.
+  int get contactRequestsHidden;
+
+  /// Öffnet ein Kontakt-Gespräch (legt die Zeitleiste an; Konzept §7.1 „bei Bedarf“). Für andere Gespräche ohne Wirkung.
+  Future<void> openThread(String threadId);
+
+  /// Lehnt eine Kontaktanfrage ab (verlässt die Einladung); nur für die Einstufung `contactRequest`, sonst `notAllowed`.
+  Future<void> declineContactRequest(String roomId);
+
+  /// Verlässt ein Kontakt-Gespräch; nie den Familienchat und nie einen Einzelchat mit einem Mitglied (`notAllowed`).
+  Future<void> leaveConversation(String threadId);
+
   // ------------------------------------------------------------ Avatare
 
   /// Gültige Avatar-Kennung (`p01`…`p12`) der Person oder `null` („kein Avatar“, unbekannt, vor dem ersten Aufbau der

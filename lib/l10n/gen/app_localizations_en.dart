@@ -1551,6 +1551,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String chatThreadContact(String name) {
+    return 'Outside the family: $name';
+  }
+
+  @override
+  String get chatContactNote =>
+      'Outside the family. Calendar items, lists and online status are not shared here.';
+
+  @override
+  String get roomKindContact => 'Contact chat';
+
+  @override
   String chatThreadDirect(String name) {
     return 'Direct chat with $name';
   }

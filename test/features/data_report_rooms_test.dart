@@ -108,6 +108,24 @@ void main() {
       expect(k(d: true), InventoryRoomKind.direct);
     });
 
+    test('Kontakt-Einzelchat (#119): geht dem Einzelchat voran, nie der Familie und dem privaten Raum', () {
+      InventoryRoomKind k({bool f = false, bool p = false, bool d = false, bool c = false}) =>
+          inventoryRoomKind(isFamily: f, isPrivate: p, isDirect: d, isBook: false, isContact: c);
+      expect(k(c: true, d: true), InventoryRoomKind.contact);
+      expect(k(c: true), InventoryRoomKind.contact);
+      expect(k(f: true, c: true, d: true), InventoryRoomKind.family);
+      expect(k(p: true, c: true, d: true), InventoryRoomKind.private);
+      expect(k(d: true), InventoryRoomKind.direct, reason: 'ohne Kontakt-Kennzeichen unverändert');
+    });
+
+    test('Bericht: Kontakt-Chat trägt den Namen nur online mit Mitgliedern, nie die Raum-ID (de und en)', () {
+      final r = online('de', [room(InventoryRoomKind.contact, name: 'Carla')]);
+      expect(r, contains('- Kontakt-Chat „Carla“\n'));
+      expect(r, isNot(contains('!abc123')));
+      expect(online('en', [room(InventoryRoomKind.contact, name: 'Carla')]), contains('- Contact chat „Carla“\n'));
+      expect(local('de', [room(InventoryRoomKind.contact, name: 'Carla')]), isNot(contains('Carla')));
+    });
+
     test('Kassenbuch: Art ohne Namen (er ist der feste Raumname der App) und ohne Raum-ID, in beiden Sprachen und beiden Berichten', () {
       final rooms = [room(InventoryRoomKind.book, name: 'FamilyNexus', id: '!buch:fake.test')];
       for (final r in [online('de', rooms), local('de', rooms)]) {

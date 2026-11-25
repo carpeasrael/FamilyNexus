@@ -24,8 +24,17 @@ void main() {
     bool megolm = true,
     int? joinedCount = 2,
     int? invitedCount = 0,
+    PeerMembership peerMembership = PeerMembership.join,
   }) =>
-      RoomFacts(id: id, membership: RoomMembership.join, peerId: peer, megolm: megolm, joinedCount: joinedCount, invitedCount: invitedCount);
+      RoomFacts(
+        id: id,
+        membership: RoomMembership.join,
+        peerId: peer,
+        megolm: megolm,
+        joinedCount: joinedCount,
+        invitedCount: invitedCount,
+        peerMembership: peerMembership,
+      );
 
   RoomFacts invite({String? from = ben, bool direct = false, bool book = false, String? rule}) => RoomFacts(
         id: '!x:hs.example',
@@ -210,6 +219,27 @@ void main() {
       expect(ConversationPolicy.classify(joined(peer: carla, joinedCount: null), cc()), RoomClass.ignored);
       expect(ConversationPolicy.classify(joined(peer: me), cc(contacts: {me: ContactState.accepted})), RoomClass.ignored);
       expect(ConversationPolicy.classify(joined(peer: null), cc()), RoomClass.ignored);
+    });
+
+    test('Gegenüber muss im Raum sein: beigetreten ja, abgelehnt/verlassen (other) und unbekannt nie', () {
+      expect(ConversationPolicy.classify(joined(peer: carla, peerMembership: PeerMembership.join), cc()), RoomClass.contactDirect);
+      expect(ConversationPolicy.classify(joined(peer: carla, peerMembership: PeerMembership.other), cc()), RoomClass.ignored,
+          reason: 'Gegenüber ging, ein Dritter ist beigetreten (m.direct zeigt weiter auf das Gegenüber)');
+      expect(ConversationPolicy.classify(joined(peer: carla, peerMembership: PeerMembership.unknown), cc()), RoomClass.ignored,
+          reason: 'Zustand nicht geladen: fail-closed');
+    });
+
+    test('Gegenüber nur eingeladen: wartend nur bei outgoing, nie bei accepted', () {
+      expect(ConversationPolicy.classify(joined(peer: carla, peerMembership: PeerMembership.invite, joinedCount: 1, invitedCount: 1), cc(contacts: {carla: ContactState.outgoing})),
+          RoomClass.contactDirect);
+      expect(ConversationPolicy.classify(joined(peer: carla, peerMembership: PeerMembership.invite, joinedCount: 1, invitedCount: 1), cc()), RoomClass.ignored,
+          reason: 'accepted verlangt ein beigetretenes Gegenüber');
+    });
+
+    test('Standard von RoomFacts.peerMembership ist unknown (fail-closed)', () {
+      const f = RoomFacts(id: '!x', membership: RoomMembership.join, peerId: carla, megolm: true, joinedCount: 2, invitedCount: 0);
+      expect(f.peerMembership, PeerMembership.unknown);
+      expect(ConversationPolicy.classify(f, cc()), RoomClass.ignored);
     });
 
     test('ich selbst bin nie ein Kontakt, auch wenn ich nicht in familyIds stehe', () {

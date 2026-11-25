@@ -84,5 +84,14 @@ void main() {
       final out = visibleThreads(threads, <String>['@ben:fake.test']);
       expect(out.map((t) => t.title), <String>['Familie', 'Cara']);
     });
+
+    test('Kontakt-Threads blockierter Personen verschwinden (K3a-2), andere bleiben', () {
+      const threads = <ChatThread>[
+        ChatThread(id: ChatThread.familyId, kind: ThreadKind.family, title: 'Familie'),
+        ChatThread(id: '!c:fake.test', kind: ThreadKind.contact, title: 'Carla · example.org', peerId: '@carla:example.org'),
+        ChatThread(id: '!d:fake.test', kind: ThreadKind.contact, title: 'Dora · example.org', peerId: '@dora:example.org'),
+      ];
+      expect(visibleThreads(threads, <String>['@carla:example.org']).map((t) => t.id), <String>[ChatThread.familyId, '!d:fake.test']);
+    });
   });
 }

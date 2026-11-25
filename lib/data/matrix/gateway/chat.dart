@@ -5,6 +5,8 @@ part of '../sdk_matrix_gateway.dart';
 mixin _ChatModule on ChangeNotifier implements MatrixGateway {
   _AppClient? get _client;
   bool? get _encryptionOverride;
+  _ContactState get _contacts;
+  Room _requireContactRoom(String threadId, Room room);
   Map<String, String> get _dmPeers;
   Map<String, Timeline> get _dmTimelines;
   Family? get _family;
@@ -21,12 +23,14 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
   /// Raum eines Gesprächs: Familienraum oder ein bekannter Einzelchat-Raum.
   Room? _roomForThread(String threadId) {
     if (threadId == ChatThread.familyId) return _familyRoom();
-    if (!_dmTimelines.containsKey(threadId)) return null;
+    // Mitglieder-Pfad zuerst (unverändert); Kontakt-Threads sind auch ohne Zeitleiste bekannt (Ungelesenes).
+    if (!_dmTimelines.containsKey(threadId) && !_contacts.peers.containsKey(threadId)) return null;
     final room = _client?.getRoomById(threadId);
     return (room != null && room.membership == Membership.join) ? room : null;
   }
 
-  Timeline? _timelineFor(String threadId) => threadId == ChatThread.familyId ? _timeline : _dmTimelines[threadId];
+  Timeline? _timelineFor(String threadId) =>
+      threadId == ChatThread.familyId ? _timeline : (_dmTimelines[threadId] ?? _contacts.timelines[threadId]);
 
   /// Senden nur, wenn der Client Verschlüsselung kann UND der Raum Megolm nutzt.
   /// Das SDK würde sonst stillschweigend im Klartext senden. Einzelchats nur mit aktuellen
@@ -37,6 +41,9 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
     if (threadId == ChatThread.familyId && !_isCurrentFamily(room)) {
       throw const GatewayException(GatewayError.serverUnreachable);
     }
+    // Kein Mitglieder-Einzelchat: ein Kontakt-Thread, geprüft über die Einstufung (nur nach `openThread`, nur bei
+    // beigetretenem Gegenüber).
+    if (threadId != ChatThread.familyId && !_dmTimelines.containsKey(threadId)) return _requireContactRoom(threadId, room);
     final client = _client;
     if (client == null || !client.encryptionEnabled || room.encryptionAlgorithm != FamilyRoomSpec.megolm) {
       throw const GatewayException(GatewayError.encryptionUnavailable);
@@ -104,6 +111,10 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
   @override
   Future<void> sendReaction(String messageId, String emoji, {String threadId = ChatThread.familyId}) async {
     if (!TextSanitizer.isReactionKey(emoji)) throw const GatewayException(GatewayError.invalidInput);
+    // App-eigene Ereignistypen (Reaktionen) gehören nicht in Räume mit Fremden: sie erreichten Fremdclients.
+    if (threadId != ChatThread.familyId && !_dmTimelines.containsKey(threadId) && _contacts.peers.containsKey(threadId)) {
+      throw const GatewayException(GatewayError.notAllowed);
+    }
     final room = _requireEncryptedRoom(threadId);
     final target = _findEvent(messageId, threadId);
     if (target == null || !target.status.isSent || !ReactionCodec.isTarget(messageId)) {
@@ -112,7 +123,9 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
     // Im Chiffretext erkennt der Server Duplikate nicht. Bis zum `add` läuft alles ohne `await`.
     final me = room.client.userID!;
     final flight = '$threadId\n$messageId\n$emoji';
-    if (_reactionInFlight.contains(flight) || ChatMapper.hasOwnReaction(_timelineFor(threadId)!, target, emoji, me)) {
+    final tl = _timelineFor(threadId);
+    if (tl == null) throw const GatewayException(GatewayError.notFound);
+    if (_reactionInFlight.contains(flight) || ChatMapper.hasOwnReaction(tl, target, emoji, me)) {
       return;
     }
     _reactionInFlight.add(flight);
@@ -185,7 +198,9 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
     if (e == null || e.status.isSent) throw const GatewayException(GatewayError.notFound);
     if (!_canEncryptIn(_roomForThread(threadId))) throw const GatewayException(GatewayError.encryptionUnavailable);
     if (_localSends.isRunning(messageId)) return;
-    final roomId = _timelineFor(threadId)!.room.id;
+    final tl = _timelineFor(threadId);
+    if (tl == null) throw const GatewayException(GatewayError.notFound);
+    final roomId = tl.room.id;
     if (!_localSends.canRetry(messageId, threadId, roomId)) throw const GatewayException(GatewayError.notFound);
     try {
       await _retryTracked(messageId, threadId, roomId);

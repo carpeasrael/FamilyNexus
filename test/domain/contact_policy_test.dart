@@ -56,4 +56,34 @@ void main() {
     expect(() => p.contacts[dora] = ContactState.accepted, throwsUnsupportedError);
     expect(() => p.blocked.add(dora), throwsUnsupportedError);
   });
+
+  group('ContactNames (K3a-2)', () {
+    const id = '@anna:example.org';
+
+    test('Titel „Name · server“, der Server stammt aus der ID', () {
+      expect(ContactNames.title('Anna', id), 'Anna · example.org');
+    });
+
+    test('leerer oder nach der Bereinigung leerer Name: lokaler Teil der ID', () {
+      expect(ContactNames.title(null, id), 'anna · example.org');
+      expect(ContactNames.title('   ', id), 'anna · example.org');
+      expect(ContactNames.title('\u202E\u200B', id), 'anna · example.org');
+    });
+
+    test('feindliche Namen: Trennzeichen „·“, Steuer- und Bidi-Zeichen entfallen, der Server bleibt der aus der ID', () {
+      expect(ContactNames.title('Mama · familie.de', id), 'Mama familie.de · example.org');
+      expect(ContactNames.title('Ma\u202Ema\u0000\u200F', id), 'Ma ma · example.org');
+      expect(ContactNames.title('A\u2022B\u22C5C', id), 'A B C · example.org');
+      expect(ContactNames.title('Name\nzwei', id), 'Name zwei · example.org');
+    });
+
+    test('Länge begrenzt (40 Zeichen, nicht UTF-16-Einheiten)', () {
+      expect(ContactNames.cleanName('x' * 100).length, ContactNames.maxName);
+      expect(ContactNames.cleanName('😀' * 100).runes.length, ContactNames.maxName);
+    });
+
+    test('ungültige ID: nur der Name', () {
+      expect(ContactNames.title('Anna', 'kein-konto'), 'Anna');
+    });
+  });
 }
