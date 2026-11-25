@@ -671,6 +671,26 @@ void main() {
       expect(g.threads.where((t) => t.id == '!kontakt:hs.example'), isEmpty);
     });
 
+    test('Kontaktrichtlinie fließt in den Kontext der Einstufung: Bereich, Kontakte, Blockierte, Familie in jedem Status', () async {
+      final (_, g) = await _signedIn(encryption: true);
+      final before = g.debugPolicyContext;
+      expect(before, isNotNull, reason: 'Voraussetzung: Familie bekannt');
+      expect(before!.contactsEnabled, isFalse);
+      expect(before.contacts, isEmpty);
+      expect(before.blockedUsers, isEmpty);
+      g.setContactPolicy(const ContactPolicy(
+        enabled: true,
+        contacts: <String, ContactState>{_fremd: ContactState.accepted},
+        blocked: <String>{'@x:hs.example'},
+      ));
+      final c = g.debugPolicyContext!;
+      expect(c.contactsEnabled, isTrue);
+      expect(c.contacts, <String, ContactState>{_fremd: ContactState.accepted});
+      expect(c.blockedUsers, <String>{'@x:hs.example'});
+      expect(c.familyIds, containsAll(<String>[_me, _cara, _ben, _dora]), reason: 'auch Eingeladene (Dora)');
+      expect(c.joinedMembers, isNot(contains(_dora)), reason: 'beigetreten ist nur, wer beigetreten ist');
+    });
+
     test('Kontaktrichtlinie: gleiche Richtlinie meldet nicht erneut, eine andere schon; nach dispose ohne Wirkung und ohne Wurf', () async {
       final (_, g) = await _signedIn(encryption: true);
       var calls = 0;

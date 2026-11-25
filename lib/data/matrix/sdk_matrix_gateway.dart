@@ -404,6 +404,14 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   @visibleForTesting
   ContactPolicy get debugContactPolicy => _contactPolicy;
 
+  /// Nur für Tests: der Kontext der Einstufung für die aktuelle Familie (`null` ohne Familie).
+  @visibleForTesting
+  PolicyContext? get debugPolicyContext {
+    final f = _family;
+    final room = _familyRoom();
+    return f == null || room == null ? null : _policyContext(f, room.id);
+  }
+
   /// Nur für Tests: verlässt den Familienbereich wie bei einem Familienwechsel; die Kontaktrichtlinie bleibt dabei stehen.
   @visibleForTesting
   void debugLeaveFamilyScope() => _leaveFamilyScope();

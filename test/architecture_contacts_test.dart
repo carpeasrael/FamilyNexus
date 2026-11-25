@@ -98,6 +98,7 @@ void main() {
     expect(i, greaterThan(0));
     expect(d.substring(i, d.indexOf('\n  }\n', i)), isNot(contains('_contactPolicy')));
     expect(RegExp(r'_contactPolicy\s*=').allMatches(t + d).length, 3, reason: 'Feld, setContactPolicy und _resetLocal');
+    expect(d, contains('ContactPolicy _contactPolicy = ContactPolicy.off;'), reason: 'Standard ohne Anmeldung ist aus');
   });
 
   test('bootstrap reicht den Blockierlisten-Adapter an die Factory durch', () {

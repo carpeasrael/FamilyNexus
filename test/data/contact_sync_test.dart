@@ -14,6 +14,7 @@ import '../support/memory_contact_store.dart';
 /// ankommt (Race der Richtlinie, K3a-1).
 class _StaleStore extends MemoryContactStore {
   bool armed = false;
+  bool failNextAll = false;
   bool _delayNext = false;
   Completer<void>? gate;
 
@@ -25,6 +26,10 @@ class _StaleStore extends MemoryContactStore {
 
   @override
   Future<List<ContactRecord>> all([ContactKind? kind]) async {
+    if (failNextAll) {
+      failNextAll = false;
+      throw StateError('Speicher nicht lesbar');
+    }
     final snapshot = await super.all(kind);
     if (_delayNext) {
       _delayNext = false;
@@ -216,6 +221,94 @@ void main() {
       await peer.sync.idle();
       expect(peer.gateway.contactPolicy.contacts[_carla], ContactState.blocked, reason: 'der neueste Stand gewinnt');
       expect(peer.gateway.contactPolicy.blocked, <String>{_carla});
+    });
+
+    test('idle wartet auf einen laufenden Aufbau der Richtlinie', () async {
+      final store = _StaleStore();
+      final peer = await ContactPeer.create(server, 'anna', 'pw1', store: store);
+      addTearDown(peer.dispose);
+      await peer.sync.idle();
+      store.armed = true;
+      await peer.service.setEnabled(true);
+      await Future<void>.delayed(Duration.zero);
+      store.armed = false;
+      expect(store.gate, isNotNull, reason: 'Voraussetzung: der Aufbau hängt');
+      var done = false;
+      final idle = peer.sync.idle().then((_) => done = true);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(done, isFalse, reason: 'idle darf nicht vor dem Aufbau fertig sein');
+      store.gate!.complete();
+      await idle;
+      expect(peer.gateway.contactPolicy.enabled, isTrue);
+    });
+
+    test('dispose während eines laufenden Aufbaus: das späte Ergebnis erreicht das Gateway nicht mehr', () async {
+      final store = _StaleStore();
+      final peer = await ContactPeer.create(server, 'anna', 'pw1', store: store);
+      await peer.sync.idle();
+      store.armed = true;
+      await peer.service.setEnabled(true);
+      await Future<void>.delayed(Duration.zero);
+      store.armed = false;
+      expect(store.gate, isNotNull);
+      peer.sync.dispose();
+      store.gate!.complete();
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(peer.gateway.contactPolicy, ContactPolicy.off, reason: 'nach dispose bleibt es bei off');
+    });
+
+    test('dispose löst den eigenen Rückruf des Dienstes, lässt aber einen fremden stehen', () async {
+      expect(a.service.onChanged, isNotNull);
+      a.sync.dispose();
+      expect(a.service.onChanged, isNull);
+      a.sync.start();
+      void other() {}
+      a.service.onChanged = other;
+      a.sync.dispose();
+      expect(a.service.onChanged, same(other));
+      a.service.onChanged = null;
+    });
+
+    test('ein Fehler beim Aufbau wird abgefangen; der nächste Anstoß baut wieder auf', () async {
+      final store = _StaleStore();
+      final peer = await ContactPeer.create(server, 'anna', 'pw1', store: store);
+      addTearDown(peer.dispose);
+      await peer.sync.idle();
+      store.failNextAll = true;
+      await peer.service.setEnabled(true); // der Aufbau liest und scheitert
+      await peer.sync.idle();
+      expect(peer.gateway.contactPolicy, ContactPolicy.off, reason: 'der Fehlschlag ändert nichts');
+      await peer.service.addOutgoing(_carla);
+      await peer.sync.idle();
+      expect(peer.gateway.contactPolicy.enabled, isTrue);
+      expect(peer.gateway.contactPolicy.contacts.keys, <String>[_carla]);
+    });
+
+    test('Wechsel des Gateway-Zustands (Abmelden) baut die Richtlinie neu', () async {
+      await a.service.setEnabled(true);
+      await a.sync.idle();
+      expect(a.gateway.contactPolicy.enabled, isTrue);
+      a.gateway.setContactPolicy(ContactPolicy.off); // wie das Zurücksetzen des Gateways beim Abmelden
+      await a.sync.idle();
+      expect(a.gateway.contactPolicy, ContactPolicy.off, reason: 'ohne Zustandswechsel kein Aufbau');
+      await a.gateway.logout();
+      await a.sync.idle();
+      expect(a.gateway.contactPolicy.enabled, isTrue, reason: 'Zustandswechsel: neu aus dem Bestand gebaut');
+    });
+
+    test('lokale Blockierliste: ein Austausch bei gleicher Länge (A gegen B) erreicht die Richtlinie', () async {
+      await a.service.setEnabled(true);
+      await a.sync.idle();
+      a.blockedList.list.add(_ben);
+      a.gateway.setContactPolicy(ContactPolicy.off);
+      await a.sync.idle();
+      expect(a.gateway.contactPolicy.blocked, <String>{_ben});
+      a.blockedList.list
+        ..clear()
+        ..add(_carla);
+      a.gateway.setContactPolicy(ContactPolicy.off);
+      await a.sync.idle();
+      expect(a.gateway.contactPolicy.blocked, <String>{_carla});
     });
 
     test('dispose setzt die Richtlinie zurück und beendet den Rückruf; start danach baut sie wieder auf', () async {

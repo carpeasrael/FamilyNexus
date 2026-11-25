@@ -212,6 +212,18 @@ void main() {
       expect(ConversationPolicy.classify(joined(peer: null), cc()), RoomClass.ignored);
     });
 
+    test('ich selbst bin nie ein Kontakt, auch wenn ich nicht in familyIds stehe', () {
+      final c = cc(family: {ben}, contacts: {me: ContactState.accepted});
+      expect(ConversationPolicy.classify(joined(peer: me), c), RoomClass.ignored);
+      expect(ConversationPolicy.classify(invite(from: me, direct: true), cc(family: {ben})), RoomClass.ignored);
+      expect(ConversationPolicy.autoAcceptContact(invite(from: me, direct: true), c), isFalse);
+    });
+
+    test('Vorrang der Familie unabhängig von familyIds: beigetretenes Mitglied mit Kontaktdatensatz ist familyDirect', () {
+      final c = cc(family: const <String>{}, contacts: {ben: ContactState.outgoing});
+      expect(ConversationPolicy.classify(joined(peer: ben), c), RoomClass.familyDirect);
+    });
+
     test('die Familie hat Vorrang: Mitglied mit Kontaktdatensatz bleibt familyDirect; ohne Megolm ignoriert', () {
       final ctxBen = cc(contacts: {ben: ContactState.blocked});
       expect(ConversationPolicy.classify(joined(peer: ben), ctxBen), RoomClass.familyDirect);
