@@ -190,6 +190,24 @@ class AppDatabase {
           PRIMARY KEY (room_id, author, id)
         )''');
     },
+    // v9: Kontakte und Gruppen außerhalb der Familie (#119, E-114): je Datensatz die aktuelle Fassung. `data` ist das JSON
+    // im Ereignisformat, `published_version` die dem Server bekannte Version (Warteschlange: `version > published_version`).
+    (db) async {
+      await db.execute('''
+        CREATE TABLE contact_records (
+          rec TEXT NOT NULL,
+          id TEXT NOT NULL,
+          state TEXT NOT NULL DEFAULT '',
+          nick TEXT NOT NULL DEFAULT '',
+          room TEXT,
+          version INTEGER NOT NULL,
+          updated_ms INTEGER NOT NULL,
+          deleted INTEGER NOT NULL,
+          published_version INTEGER NOT NULL DEFAULT 0,
+          data TEXT NOT NULL,
+          PRIMARY KEY (rec, id)
+        )''');
+    },
   ];
 
   static int get schemaVersion => migrations.length;

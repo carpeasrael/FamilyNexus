@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:family_nexus/data/db/sql_data_inventory.dart';
 import 'package:family_nexus/domain/cash_book.dart';
+import 'package:family_nexus/l10n/gen/app_localizations_de.dart';
+import 'package:family_nexus/l10n/gen/app_localizations_en.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// #311, E-113 (Teil 4b): Pflichtinhalt der Datenschutztexte zum Kassenbuch (App und Store) und Wächter für die Store-Texte,
@@ -42,7 +44,7 @@ void main() {
       'reportOnlineNote': <String>['auch in Kassenbüchern'],
       'accountDeleteBody': <String>['Kassenbüchern angelegt hast, bleiben verschlüsselt im Buch bei den Mitgliedern, auch frühere Fassungen', '(frühere Fassungen bleiben dennoch im Verlauf)'],
       'cashInviteConfirmBody': <String>['bisherigen Verlauf'],
-      'logoutBody': <String>['Kassenbücher', 'Geburts- und Gedenktage', 'Avatar-Fotos', 'beim Beenden der Sitzung'],
+      'logoutBody': <String>['Kassenbücher', 'Kontakte', 'Geburts- und Gedenktage', 'Avatar-Fotos', 'beim Beenden der Sitzung'],
     },
     'en': <String, List<String>>{
       'privacy2Body': <String>['cash books (date, store, amount, currency, note and optionally a photo of the receipt'],
@@ -65,7 +67,7 @@ void main() {
       'reportOnlineNote': <String>['also in cash books'],
       'accountDeleteBody': <String>['cash books remain encrypted in the book with the members, including earlier versions', '(earlier versions still remain in the history)'],
       'cashInviteConfirmBody': <String>['earlier history'],
-      'logoutBody': <String>['cash books', 'birthdays and memorial days', 'avatar photos', 'when the session ends'],
+      'logoutBody': <String>['cash books', 'contacts', 'birthdays and memorial days', 'avatar photos', 'when the session ends'],
     },
   };
 
@@ -79,6 +81,13 @@ void main() {
       });
     });
   }
+
+  test('die erzeugten Texte (gen) stimmen mit den ARB-Dateien überein: logoutBody nennt Kontakte', () {
+    expect(AppLocalizationsDe().logoutBody, de['logoutBody']);
+    expect(AppLocalizationsEn().logoutBody, en['logoutBody']);
+    expect(AppLocalizationsDe().logoutBody, contains('Kontakte'));
+    expect(AppLocalizationsEn().logoutBody, contains('contacts'));
+  });
 
   test('accountDeleteBody bleibt frei von „Matrix-ID“ (wording_test), die Wortlisten des Stores gelten auch hier', () {
     for (final t in <String>[de['accountDeleteBody'] as String, en['accountDeleteBody'] as String]) {
@@ -162,6 +171,7 @@ void main() {
       'avatar_photos': ('Avatar-Fotos', 'avatar photos'),
       'cash_books': ('Kassenbücher', 'cash books'),
       'cash_entries': ('Kassenbücher', 'cash books'),
+      'contact_records': ('Kontakte', 'contacts'),
     };
     const accessory = <String>{
       'settings', // lokale Einstellungen bleiben (Sprache, Darstellung)

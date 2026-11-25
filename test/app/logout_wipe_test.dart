@@ -37,6 +37,7 @@ void main() {
     await db.insert('avatar_resets', <String, Object?>{'room_id': '!f:example.org', 'target': '@anna:example.org', 'photo_id': '00000000-0000-4000-8000-000000000002', 'photo_created_at': 1});
     await db.insert('cash_books', <String, Object?>{'room_id': '!b:example.org', 'title': 'Haushalt', 'currency': 'EUR', 'owner': '@anna:example.org', 'version': 1});
     await db.insert('cash_entries', <String, Object?>{'room_id': '!b:example.org', 'author': '@anna:example.org', 'id': '11111111-1111-4111-8111-111111111111', 'version': 1, 'deleted': 0, 'data': '{}'});
+    await db.insert('contact_records', <String, Object?>{'rec': 'contact', 'id': '@carla:example.org', 'version': 1, 'updated_ms': 1, 'deleted': 0, 'data': '{}'});
   }
 
   Future<int> rows(String table) async => (await db.query(table)).length;
@@ -44,7 +45,7 @@ void main() {
   test('entfernt Termine, Einkaufszettel, Aufgaben und den Besitzer; Einstellungen bleiben', () async {
     await fill();
     await AppServices.wipeAccountDataIn(db);
-    for (final t in <String>['events', 'event_history', 'rsvps', 'event_reminders', 'person_colors', 'shopping_items', 'task_lists', 'task_log', 'event_themes', 'anniversaries', 'avatar_photos', 'avatar_resets', 'cash_books', 'cash_entries']) {
+    for (final t in <String>['events', 'event_history', 'rsvps', 'event_reminders', 'person_colors', 'shopping_items', 'task_lists', 'task_log', 'event_themes', 'anniversaries', 'avatar_photos', 'avatar_resets', 'cash_books', 'cash_entries', 'contact_records']) {
       expect(await rows(t), 0, reason: t);
     }
     final settings = {for (final r in await db.query('settings')) r['key']: r['value']};
@@ -56,6 +57,14 @@ void main() {
     await fill();
     await db.delete('settings', where: 'key = ?', whereArgs: <Object>[AppServices.calendarOwnerKey]);
     await AppServices.wipeAccountDataIn(db);
+    expect(await rows('events'), 1, reason: 'Familiendaten ohne Besitzer bleiben (wie bisher)');
+  });
+
+  test('#119 Kontakte gehören zum Konto: sie werden beim Abmelden auch ohne gesetzten Besitzer entfernt', () async {
+    await fill();
+    await db.delete('settings', where: 'key = ?', whereArgs: <Object>[AppServices.calendarOwnerKey]);
+    await AppServices.wipeAccountDataIn(db);
+    expect(await rows('contact_records'), 0);
     expect(await rows('events'), 1);
   });
 

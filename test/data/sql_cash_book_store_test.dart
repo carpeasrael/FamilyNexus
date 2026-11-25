@@ -25,7 +25,7 @@ void main() {
   tearDown(() => db.close());
 
   test('Migration 8: Tabellen und Schlüssel; der Bestand eines Standes mit Version 7 bleibt unverändert', () async {
-    expect(AppDatabase.schemaVersion, 8);
+    expect(AppDatabase.schemaVersion, 9);
     Future<List<String>> pk(String t) async => <String>[
           for (final c in (await db.rawQuery('PRAGMA table_info($t)')).where((c) => (c['pk']! as int) > 0).toList()
             ..sort((a, b) => (a['pk']! as int).compareTo(b['pk']! as int)))

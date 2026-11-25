@@ -208,4 +208,65 @@ void main() {
       expect(await blocked(), isFalse);
     });
   });
+
+  // --- #119, K2b (E-114): Kontakte gehören zum Konto, nicht zur Familie ---
+
+  Future<void> fillContacts() => db.insert('contact_records', <String, Object?>{'rec': 'contact', 'id': '@carla:example.org', 'version': 1, 'updated_ms': 1, 'deleted': 0, 'data': '{}'});
+
+  group('Kontakte (#119)', () {
+    test('Konto aus dem Besitzerschlüssel: Teil vor dem ersten |, ohne | der ganze Text, leerer Raumteil', () {
+      expect(AppServices.accountOf('@anna:example.org|!a:example.org'), '@anna:example.org');
+      expect(AppServices.accountOf('@anna:example.org|'), '@anna:example.org');
+      expect(AppServices.accountOf('@anna:example.org'), '@anna:example.org');
+      expect(AppServices.accountOf(''), '');
+      expect(AppServices.accountOf('@anna:example.org|!a:example.org|rest'), '@anna:example.org', reason: 'Teil vor dem ersten |');
+    });
+
+    test('Familienwechsel desselben Kontos: Kontakte bleiben, die Familiendaten werden gewischt', () async {
+      await fill();
+      await fillContacts();
+      await own(annaA);
+      final wiped = await AppServices.claimFamilyData(db, annaB);
+      expect(wiped, isTrue, reason: 'der Rückgabewert gilt den Familiendaten');
+      for (final t in tables) {
+        expect(await rows(t), 0, reason: t);
+      }
+      expect(await rows('contact_records'), 1);
+    });
+
+    test('Kontowechsel (mit gleichem und mit anderem Raum): Kontakte werden gewischt', () async {
+      for (final next in <String>['@ben:example.org|!a:example.org', '@ben:example.org|!b:example.org']) {
+        await fill();
+        await fillContacts();
+        await own(annaA);
+        await AppServices.claimFamilyData(db, next);
+        expect(await rows('contact_records'), 0, reason: next);
+        await AppServices.wipeAccountDataIn(db);
+        await db.delete('settings', where: 'key = ?', whereArgs: <Object>['languageCode']);
+      }
+    });
+
+    test('gleicher Besitzer: Kontakte bleiben; ohne früheren Besitzer (erste Anmeldung) wird nichts gewischt', () async {
+      await fillContacts();
+      await AppServices.claimFamilyData(db, annaA);
+      expect(await rows('contact_records'), 1, reason: 'previous == null');
+      await AppServices.claimFamilyData(db, annaA);
+      expect(await rows('contact_records'), 1, reason: 'gleicher Besitzer');
+    });
+
+    test('unlesbarer alter Besitzer ohne | gilt als Kontowechsel (fail-closed)', () async {
+      await fillContacts();
+      await own('@anna:example.org');
+      await AppServices.claimFamilyData(db, annaA);
+      expect(await rows('contact_records'), 0);
+    });
+
+    test('Fehler beim Wischen der Kontakte: der Besitzer bleibt alt, der nächste Anspruch wischt erneut', () async {
+      await fillContacts();
+      await own(annaA);
+      await db.execute('DROP TABLE contact_records');
+      await expectLater(AppServices.claimFamilyData(db, '@ben:example.org|!a:example.org'), throwsA(anything));
+      expect(await owner(), annaA);
+    });
+  });
 }

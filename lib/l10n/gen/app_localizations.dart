@@ -917,7 +917,7 @@ abstract class AppLocalizations {
   /// No description provided for @logoutBody.
   ///
   /// In de, this message translates to:
-  /// **'Termine, Einkaufszettel, Aufgaben, Geburts- und Gedenktage, Avatar-Fotos und Kassenbücher werden beim Beenden der Sitzung von diesem Gerät entfernt. Was schon gesendet ist, bleibt verschlüsselt in deiner Familie und kommt nach der nächsten Anmeldung zurück; noch nicht gesendete Änderungen gehen verloren.'**
+  /// **'Termine, Einkaufszettel, Aufgaben, Geburts- und Gedenktage, Avatar-Fotos, Kassenbücher und Kontakte werden beim Beenden der Sitzung von diesem Gerät entfernt. Was schon gesendet ist, bleibt verschlüsselt in deiner Familie und kommt nach der nächsten Anmeldung zurück; noch nicht gesendete Änderungen gehen verloren.'**
   String get logoutBody;
 
   /// No description provided for @settingsAccount.

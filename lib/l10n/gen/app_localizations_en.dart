@@ -462,7 +462,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logoutBody =>
-      'Events, the shopping list, tasks, birthdays and memorial days, avatar photos and cash books are removed from this device when the session ends. Everything already sent stays encrypted in your family and comes back after you sign in again; changes not yet sent are lost.';
+      'Events, the shopping list, tasks, birthdays and memorial days, avatar photos, cash books and contacts are removed from this device when the session ends. Everything already sent stays encrypted in your family and comes back after you sign in again; changes not yet sent are lost.';
 
   @override
   String get settingsAccount => 'Account';

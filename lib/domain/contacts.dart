@@ -1,0 +1,349 @@
+import 'dart:convert';
+
+import 'server.dart';
+import 'text_sanitizer.dart';
+
+/// Grenzen der Kontakte außerhalb der Familie (#119, E-114). Alle Werte stützen die Annahme im Codec und im Dienst.
+class ContactLimits {
+  const ContactLimits._();
+
+  /// Aktive Kontakte (angefragt, bestätigt oder blockiert, ohne Löschmarken).
+  static const int maxContacts = 500;
+  static const int maxGroups = 50;
+
+  /// Alle Zeilen der Ablage **einschließlich** Löschmarken (Schutz vor beliebig vielen verschiedenen Kennungen).
+  static const int maxRecords = 2000;
+
+  /// Mitglieder einer Gruppe (Konzept §5; wirksam ab K4).
+  static const int maxGroupMembers = 50;
+
+  /// Zeichen des Spitznamens.
+  static const int maxNick = 40;
+
+  static const int maxVersion = 0x7fffffff;
+
+  /// Größter Versionssprung eines empfangenen Datensatzes über der gespeicherten Fassung desselben Schlüssels. Bei einem
+  /// unbekannten Schlüssel gilt jede gültige Version (ein neues Gerät lädt die Liste vollständig).
+  static const int maxVersionStep = 1000;
+
+  /// Höchste Abweichung von `ts` gegenüber der Serverzeit des Ereignisses (Empfänger verwerfen darüber hinaus).
+  static const Duration maxSkew = Duration(days: 2);
+
+  /// Gesamtgröße des Ereignisinhalts (UTF-8 als JSON), geprüft **vor** dem Zerlegen.
+  static const int maxContentBytes = 2048;
+
+  /// Zahl der jüngsten **veröffentlichten** Löschmarken, die beim Aufräumen bleiben.
+  static const int keepTombstones = 200;
+}
+
+/// Zustand eines Kontakts. `outgoing`: ich habe angefragt, die Gegenseite hat noch nicht beigetreten; `accepted`:
+/// bestätigt; `blocked`: blockiert (bleibt unbeantwortet, der Absender erfährt nichts).
+enum ContactState { outgoing, accepted, blocked }
+
+/// Art des Datensatzes (`rec` im Ereignis).
+enum ContactKind { contact, group, prefs }
+
+/// Gemeinsame Felder der drei Datensatzarten. Der Schlüssel ist `(kind, id)`.
+abstract class ContactRecord {
+  const ContactRecord({required this.id, required this.version, required this.updatedAt, this.deleted = false});
+
+  final String id;
+  final int version;
+
+  /// UTC, Millisekunden.
+  final DateTime updatedAt;
+  final bool deleted;
+
+  ContactKind get kind;
+
+  /// Leer = gültig. Nicht leer: Kürzel der verletzten Regeln.
+  List<String> validate();
+
+  /// Nur die Felder des Ereignisses (ohne `v`), zur Kodierung.
+  Map<String, Object?> get fields;
+
+  List<String> _common() {
+    final p = <String>[];
+    if (version < 1 || version > ContactLimits.maxVersion) p.add('version');
+    if (updatedAt.millisecondsSinceEpoch.abs() > 8640000000000000) p.add('ts');
+    return p;
+  }
+
+  @override
+  String toString() => '$runtimeType($id, v$version${deleted ? ', gelöscht' : ''})';
+}
+
+class Contact extends ContactRecord {
+  const Contact({
+    required super.id,
+    required this.state,
+    required super.version,
+    required super.updatedAt,
+    this.nick = '',
+    this.room,
+    super.deleted,
+  });
+
+  final ContactState state;
+  final String nick;
+
+  /// Raum des Einzelchats (bekannt, sobald angelegt oder angenommen).
+  final String? room;
+
+  @override
+  ContactKind get kind => ContactKind.contact;
+
+  @override
+  List<String> validate() {
+    final p = _common();
+    if (ContactId.parse(id) != id) p.add('id');
+    if (!_nickOk(nick)) p.add('nick');
+    final r = room;
+    if (r != null && !MatrixIds.isRoomId(r)) p.add('room');
+    return p;
+  }
+
+  Contact copyWith({ContactState? state, String? nick, Object? room = _keep, int? version, DateTime? updatedAt, bool? deleted}) => Contact(
+        id: id,
+        state: state ?? this.state,
+        nick: nick ?? this.nick,
+        room: identical(room, _keep) ? this.room : room as String?,
+        version: version ?? this.version,
+        updatedAt: updatedAt ?? this.updatedAt,
+        deleted: deleted ?? this.deleted,
+      );
+
+  @override
+  Map<String, Object?> get fields => <String, Object?>{
+        'rec': 'contact',
+        'id': id,
+        'state': state.name,
+        'nick': nick,
+        if (room != null) 'room': room,
+        'ver': version,
+        'ts': updatedAt.millisecondsSinceEpoch,
+        'del': deleted,
+      };
+
+  @override
+  bool operator ==(Object other) =>
+      other is Contact &&
+      other.id == id &&
+      other.state == state &&
+      other.nick == nick &&
+      other.room == room &&
+      other.version == version &&
+      other.updatedAt == updatedAt &&
+      other.deleted == deleted;
+
+  @override
+  int get hashCode => Object.hash(id, state, nick, room, version, updatedAt, deleted);
+}
+
+const Object _keep = Object();
+
+/// Eine Gruppe (Raum), die ich als Kontaktgruppe führe (wirksam ab K4).
+class GroupRecord extends ContactRecord {
+  const GroupRecord({required super.id, required super.version, required super.updatedAt, super.deleted});
+
+  @override
+  ContactKind get kind => ContactKind.group;
+
+  @override
+  List<String> validate() {
+    final p = _common();
+    if (!MatrixIds.isRoomId(id)) p.add('id');
+    return p;
+  }
+
+  GroupRecord copyWith({int? version, DateTime? updatedAt, bool? deleted}) => GroupRecord(
+        id: id,
+        version: version ?? this.version,
+        updatedAt: updatedAt ?? this.updatedAt,
+        deleted: deleted ?? this.deleted,
+      );
+
+  @override
+  Map<String, Object?> get fields => <String, Object?>{'rec': 'group', 'id': id, 'ver': version, 'ts': updatedAt.millisecondsSinceEpoch, 'del': deleted};
+
+  @override
+  bool operator ==(Object other) =>
+      other is GroupRecord && other.id == id && other.version == version && other.updatedAt == updatedAt && other.deleted == deleted;
+
+  @override
+  int get hashCode => Object.hash(id, version, updatedAt, deleted);
+}
+
+/// Einstellung „Kontakte und Gruppen einschalten“ (Standard aus). Die Kennung ist immer [prefsId].
+class ContactPrefs extends ContactRecord {
+  const ContactPrefs({required this.enabled, required super.version, required super.updatedAt}) : super(id: prefsId);
+
+  static const String prefsId = 'prefs';
+
+  final bool enabled;
+
+  @override
+  ContactKind get kind => ContactKind.prefs;
+
+  @override
+  List<String> validate() => _common();
+
+  ContactPrefs copyWith({bool? enabled, int? version, DateTime? updatedAt}) =>
+      ContactPrefs(enabled: enabled ?? this.enabled, version: version ?? this.version, updatedAt: updatedAt ?? this.updatedAt);
+
+  @override
+  Map<String, Object?> get fields => <String, Object?>{
+        'rec': 'prefs',
+        'id': prefsId,
+        'enabled': enabled,
+        'ver': version,
+        'ts': updatedAt.millisecondsSinceEpoch,
+        'del': false,
+      };
+
+  @override
+  bool operator ==(Object other) => other is ContactPrefs && other.enabled == enabled && other.version == version && other.updatedAt == updatedAt;
+
+  @override
+  int get hashCode => Object.hash(enabled, version, updatedAt);
+}
+
+/// Steuer-, Bidi- und Nullbreiten-Zeichen, die in Namen und Kennungen nie vorkommen dürfen.
+final RegExp _forbidden = RegExp(r'[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069\ufeff]');
+
+/// Spitzname: nicht leer nach dem Bereinigen ist nicht verlangt (leer ist erlaubt), aber unverändert durch
+/// [TextSanitizer], höchstens [ContactLimits.maxNick] Zeichen, ohne verbotene Zeichen.
+bool _nickOk(String nick) {
+  if (nick.runes.length > ContactLimits.maxNick) return false;
+  if (_forbidden.hasMatch(nick)) return false;
+  return TextSanitizer.clean(nick, max: 1000) == nick;
+}
+
+/// Eingabe einer Kontakt-Kennung: `@name:server` oder ein `matrix.to`-Link auf eine Nutzer-ID.
+class ContactId {
+  const ContactId._();
+
+  /// Kanonische Nutzer-ID oder `null`. Der Servername wird kleingeschrieben, der lokale Teil bleibt unverändert.
+  /// Links: nur `https://matrix.to/#/<id>` (Host genau `matrix.to`, kein Port, keine Zugangsdaten), die ID darf **einfach**
+  /// prozent-kodiert sein; Parameter nach `?` (z. B. `via`) werden verworfen; Raum-IDs und Aliasse liefern `null`.
+  static String? parse(String raw) {
+    final input = raw.trim();
+    if (input.isEmpty || input.length > 600 || _forbidden.hasMatch(input) || input.contains(RegExp(r'\s'))) return null;
+    String candidate;
+    if (input.startsWith('@')) {
+      candidate = input;
+    } else {
+      final uri = Uri.tryParse(input);
+      if (uri == null || uri.scheme != 'https' || uri.host != 'matrix.to' || uri.hasPort || uri.userInfo.isNotEmpty) return null;
+      if (uri.path.isNotEmpty && uri.path != '/') return null;
+      final fragment = uri.fragment;
+      if (!fragment.startsWith('/')) return null;
+      var target = fragment.substring(1);
+      final q = target.indexOf('?');
+      if (q >= 0) target = target.substring(0, q);
+      if (target.contains('/')) return null;
+      try {
+        target = Uri.decodeComponent(target);
+      } on FormatException {
+        return null; // ungültige Prozent-Folge oder Byte-Folge
+      } on ArgumentError {
+        return null;
+      }
+      if (target.contains('%')) return null; // doppelt kodiert
+      candidate = target;
+    }
+    if (_forbidden.hasMatch(candidate)) return null;
+    final colon = candidate.indexOf(':');
+    if (colon < 0) return null;
+    final id = '${candidate.substring(0, colon)}:${candidate.substring(colon + 1).toLowerCase()}';
+    return MatrixIds.isUserId(id) ? id : null;
+  }
+}
+
+/// Ereignisformat (`de.inneso.familynexus.contact`, Schema 1), nur im privaten Raum und nur vom eigenen Konto.
+class ContactCodec {
+  const ContactCodec._();
+
+  static const String type = 'de.inneso.familynexus.contact';
+  static const int schema = 1;
+
+  static Map<String, Object?> encode(ContactRecord r) {
+    final problems = r.validate();
+    if (problems.isNotEmpty) throw StateError('Ungültiger Kontaktdatensatz: ${problems.join(',')}');
+    return <String, Object?>{'v': schema, ...r.fields};
+  }
+
+  /// Ereignis: `null` bei ungültigem Inhalt, fremdem Absender (nur das eigene Konto [me]; leer oder ungleich = ablehnen),
+  /// übergroßem Inhalt oder `ts` mehr als [ContactLimits.maxSkew] neben [serverTime].
+  static ContactRecord? decode(Map<String, Object?> c, {required String sender, required String me, required DateTime serverTime}) {
+    if (me.isEmpty || sender != me || !MatrixIds.isUserId(sender)) return null;
+    final r = _decode(c);
+    if (r == null) return null;
+    if (r.updatedAt.difference(serverTime.toUtc()).abs() > ContactLimits.maxSkew) return null;
+    return r;
+  }
+
+  /// Lokale Ablage: dasselbe Format, ohne Absender- und Zeitprüfung.
+  static ContactRecord? decodeStored(Map<String, Object?> c) => _decode(c);
+
+  static ContactRecord? _decode(Map<String, Object?> c) {
+    try {
+      if (utf8.encode(json.encode(c)).length > ContactLimits.maxContentBytes) return null;
+    } on JsonUnsupportedObjectError {
+      return null; // nicht als JSON darstellbarer Inhalt
+    }
+    if (c['v'] != schema) return null;
+    final rec = c['rec'];
+    final id = c['id'];
+    final ver = c['ver'];
+    final ts = c['ts'];
+    final del = c['del'];
+    if (rec is! String || id is! String || ver is! int || ts is! int || del is! bool) return null;
+    if (ts.abs() > 8640000000000000) return null;
+    final at = DateTime.fromMillisecondsSinceEpoch(ts, isUtc: true);
+    final ContactRecord r;
+    switch (rec) {
+      case 'contact':
+        final state = c['state'];
+        final nick = c['nick'];
+        final room = c['room'];
+        if (state is! String || nick is! String) return null;
+        if (c.containsKey('room') && room is! String) return null;
+        final s = ContactState.values.where((e) => e.name == state);
+        if (s.isEmpty) return null;
+        r = Contact(id: id, state: s.first, nick: nick, room: room as String?, version: ver, updatedAt: at, deleted: del);
+      case 'group':
+        r = GroupRecord(id: id, version: ver, updatedAt: at, deleted: del);
+      case 'prefs':
+        final enabled = c['enabled'];
+        if (enabled is! bool || id != ContactPrefs.prefsId || del) return null;
+        r = ContactPrefs(enabled: enabled, version: ver, updatedAt: at);
+      default:
+        return null;
+    }
+    return r.validate().isEmpty ? r : null;
+  }
+}
+
+/// Konfliktregel für zwei Fassungen **desselben** Schlüssels `(kind, id)`: Totalordnung `(ver, ts, kanonische
+/// Darstellung)`, die größere gewinnt (E-40, E-113). Alle Geräte konvergieren damit auf dieselbe Fassung.
+class Contacts {
+  const Contacts._();
+
+  static String _canonical(ContactRecord r) {
+    final m = r.fields;
+    final keys = m.keys.toList()..sort();
+    return json.encode(<String, Object?>{for (final k in keys) k: m[k]});
+  }
+
+  /// Positiv, wenn [a] gewinnt, negativ, wenn [b] gewinnt, 0 nur bei Gleichheit.
+  static int compare(ContactRecord a, ContactRecord b) {
+    final v = a.version.compareTo(b.version);
+    if (v != 0) return v;
+    final t = a.updatedAt.millisecondsSinceEpoch.compareTo(b.updatedAt.millisecondsSinceEpoch);
+    if (t != 0) return t;
+    return _canonical(a).compareTo(_canonical(b));
+  }
+
+  static bool supersedes(ContactRecord a, ContactRecord b) => compare(a, b) > 0;
+}
