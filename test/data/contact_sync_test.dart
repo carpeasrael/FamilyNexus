@@ -118,6 +118,79 @@ void main() {
     });
   });
 
+  group('Lebenszyklus, Reihenfolge und Parallelität', () {
+    test('start ist mehrfach aufrufbar: genau ein Zuhörer, dispose entfernt ihn', () async {
+      final peer = await ContactPeer.create(server, 'anna', 'pw1', start: false);
+      peer.sync.start();
+      peer.sync.start();
+      // ignore: invalid_use_of_protected_member
+      expect(peer.gateway.hasListeners, isTrue);
+      peer.dispose();
+      // ignore: invalid_use_of_protected_member
+      expect(peer.gateway.hasListeners, isFalse, reason: 'nach zweimal start und einmal dispose bleibt kein Zuhörer hängen');
+      peer.dispose();
+    });
+
+    test('nach dispose kommen keine Signale mehr an und es wird nichts mehr abgeglichen', () async {
+      final peer = await ContactPeer.create(server, 'anna', 'pw1');
+      peer.dispose();
+      await a.service.addOutgoing(_carla);
+      await a.flush([b]);
+      await peer.sync.idle();
+      expect(await peer.store.all(), isEmpty);
+    });
+
+    test('fremde Signalarten werden ignoriert, ohne sie als ungültig zu zählen', () async {
+      final peer = await ContactPeer.create(server, 'anna', 'pw1', start: false);
+      addTearDown(peer.dispose);
+      await peer.sync.debugDeliver(RsvpSignal('@anna:fake.test', server.now(), const <String, Object?>{}));
+      expect(peer.sync.rejected, 0);
+      expect(await peer.store.all(), isEmpty);
+    });
+
+    test('ein fremdes Konto bekommt das Ereignis gar nicht erst (nichts abgelehnt, nichts gespeichert)', () async {
+      final d = await ContactPeer.create(server, 'dora', 'pw2');
+      addTearDown(d.dispose);
+      await a.service.addOutgoing(_carla);
+      await a.flush([b, d]);
+      expect(d.sync.rejected, 0);
+    });
+
+    test('wartende Datensätze gehen ältester zuerst hinaus (unabhängig von der Reihenfolge der Ablage)', () async {
+      final newer = Contact(id: _ben, state: ContactState.accepted, version: 1, updatedAt: server.now());
+      final older = Contact(id: _carla, state: ContactState.accepted, version: 1, updatedAt: server.now().subtract(const Duration(hours: 5)));
+      await a.store.put(newer);
+      await a.store.put(older);
+      await a.sync.publishPending();
+      final order = [
+        for (final e in server.log.where((e) => e.type == ContactCodec.type)) e.content['id'],
+      ];
+      expect(order, <Object?>[_carla, _ben]);
+    });
+
+    test('zwei gleichzeitige Durchläufe senden jeden Datensatz nur einmal', () async {
+      await a.service.addOutgoing(_carla);
+      await Future.wait<void>(<Future<void>>[a.sync.publishPending(), a.sync.publishPending(), a.sync.publishPending()]);
+      expect(server.log.where((e) => e.type == ContactCodec.type), hasLength(1));
+    });
+
+    test('ein während des Durchlaufs angemeldeter zweiter Anstoß wird nachgeholt', () async {
+      await a.service.addOutgoing(_carla);
+      final first = a.sync.publishPending();
+      await a.service.addOutgoing(_ben);
+      final second = a.sync.publishPending();
+      await Future.wait<void>(<Future<void>>[first, second]);
+      expect(await a.store.pending(), isEmpty);
+      expect(server.log.where((e) => e.type == ContactCodec.type), hasLength(2));
+    });
+
+    test('ein nicht sendbarer Datensatz löst keinen Backoff aus', () async {
+      await a.store.put(Contact(id: 'kein-konto', state: ContactState.accepted, version: 1, updatedAt: server.now()));
+      await a.sync.publishPending();
+      expect(a.sync.backoff.blocked, isFalse);
+    });
+  });
+
   group('Senden', () {
     test('die Warteschlange wartet bei einem Fehler, der Backoff greift, danach wird gesendet', () async {
       await a.service.addOutgoing(_carla);
@@ -256,6 +329,18 @@ void main() {
       addTearDown(second.dispose);
       await Future<void>.delayed(const Duration(milliseconds: 50));
       expect(restored.list, <String>[_ben]);
+    });
+
+    test('Teilfall: bleibt weniger Platz, als Datensätze fehlen, werden genau die kleinsten Kennungen eingetragen', () async {
+      final list = MemoryBlockedList(<String>[for (var i = 0; i < BlockedUsers.maxEntries - 2; i++) '@v$i:example.org'], 1000);
+      final peer = await ContactPeer.create(server, 'anna', 'pw1', blockedList: list, start: false);
+      addTearDown(peer.dispose);
+      for (final id in <String>['@z:example.org', '@m:example.org', '@a:example.org', '@q:example.org']) {
+        await peer.service.block(id);
+      }
+      await peer.sync.reconcileBlocked();
+      expect(list.list.length, BlockedUsers.maxEntries);
+      expect(list.list.skip(BlockedUsers.maxEntries - 2), <String>['@a:example.org', '@m:example.org']);
     });
 
     test('ohne Adapter tut der Abgleich nichts', () async {

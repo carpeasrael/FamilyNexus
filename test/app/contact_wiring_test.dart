@@ -45,6 +45,19 @@ void main() {
     expect(await store.all(), isEmpty);
   });
 
+  test('Standardwert der Factory: mit Ablage, aber ohne ausdrückliche Freigabe entsteht keine Synchronisation', () {
+    final c = buildCalendarController(
+      store: MemoryEventStore(),
+      gateway: gateway,
+      userId: gateway.userId!,
+      zoneName: 'UTC',
+      retryInterval: const Duration(hours: 1),
+      contactStore: store,
+    );
+    expect(c.contactSync, isNull);
+    c.dispose();
+  });
+
   test('freigeschaltet, aber ohne Ablage: keine Synchronisation', () {
     final c = build(enabled: true);
     expect(c.contactSync, isNull);
@@ -63,6 +76,21 @@ void main() {
     expect(blocked.list, <String>['@ben:example.org'], reason: 'der Start gleicht die Blockierliste ab');
     expect(server.log.where((e) => e.type == ContactCodec.type), hasLength(1), reason: 'der Datensatz wurde gesendet');
     c.dispose();
+  });
+
+  test('Lebenszyklus: idle wartet auf eingehende Datensätze, dispose beendet die Synchronisation', () async {
+    final c = build(contacts: store, enabled: true);
+    c.start();
+    final other = server.newDevice();
+    await other.login(server: ServerUrl.tryParse(server.host)!, username: 'anna', password: 'pw1');
+    await other.publishContactRecord(Contact(id: '@carla:example.org', state: ContactState.accepted, version: 1, updatedAt: server.now()));
+    await c.idle();
+    expect(await store.get(ContactKind.contact, '@carla:example.org'), isNotNull, reason: 'idle wartet auf die Verarbeitung');
+    // ignore: invalid_use_of_protected_member
+    expect(gateway.hasListeners, isTrue);
+    c.dispose();
+    // ignore: invalid_use_of_protected_member
+    expect(gateway.hasListeners, isFalse, reason: 'dispose beendet die Synchronisation');
   });
 
   test('mit Familie wie ohne Familie: dieselbe Synchronisation', () async {

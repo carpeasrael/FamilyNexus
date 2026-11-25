@@ -57,6 +57,7 @@ class ContactSync {
   Timer? _debounce;
   bool _publishing = false;
   bool _again = false;
+  bool _listening = false;
 
   String get _me => service.myUserId;
 
@@ -78,7 +79,10 @@ class ContactSync {
     _sub ??= gateway.calendarSignals.listen(_enqueue);
     _timer ??= Timer.periodic(retryInterval, (_) => kick());
     _backoff.changed(_gatewayState());
-    gateway.addListener(_onGatewayChanged);
+    if (!_listening) {
+      _listening = true; // start() darf mehrfach laufen: genau ein Zuhörer
+      gateway.addListener(_onGatewayChanged);
+    }
     reconcileBlocked().ignore();
     kick();
   }
@@ -96,7 +100,10 @@ class ContactSync {
     _sub?.cancel().ignore();
     _timer?.cancel();
     _debounce?.cancel();
-    gateway.removeListener(_onGatewayChanged);
+    if (_listening) {
+      _listening = false;
+      gateway.removeListener(_onGatewayChanged);
+    }
   }
 
   void kick() {

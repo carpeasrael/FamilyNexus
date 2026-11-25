@@ -54,6 +54,12 @@ void main() {
     expect('SqlContactStore(database.db)'.allMatches(t).length, 1);
   });
 
+  test('bootstrap reicht den Blockierlisten-Adapter an die Factory durch', () {
+    final t = File('lib/app/bootstrap.dart').readAsStringSync();
+    expect(t, contains('blockedList: SettingsBlockedList(settings),'));
+    expect(t, contains('contactStore: SqlContactStore(database.db),'));
+  });
+
   test('die Factory erzeugt ContactSync nur hinter der Sperre (contactsEnabled)', () {
     final t = File('lib/app/calendar_factory.dart').readAsStringSync();
     final at = t.indexOf('ContactSync(');
