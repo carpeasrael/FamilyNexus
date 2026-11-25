@@ -7,14 +7,21 @@ class _ChatOpening extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          const CircularProgressIndicator(),
-          const SizedBox(height: 12),
-          Text(text, textAlign: TextAlign.center),
-        ]),
+    return LayoutBuilder(
+      builder: (context, box) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: box.maxHeight),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                const CircularProgressIndicator(),
+                const SizedBox(height: 12),
+                Text(text, textAlign: TextAlign.center),
+              ]),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -176,9 +183,14 @@ class _Composer extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final blockedText = this.blockedText;
     if (blockedText != null) {
-      return Padding(
-        padding: const EdgeInsets.all(12),
-        child: Semantics(container: true, child: Text(blockedText, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall)),
+      return ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.3),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Semantics(container: true, child: Text(blockedText, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall)),
+          ),
+        ),
       );
     }
     return Padding(

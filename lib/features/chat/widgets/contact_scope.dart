@@ -115,14 +115,21 @@ class _ContactOpenFailed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          Text(l.chatContactOpenFailed, textAlign: TextAlign.center),
-          const SizedBox(height: 12),
-          FilledButton(onPressed: onRetry, child: Text(l.chatContactRetry)),
-        ]),
+    return LayoutBuilder(
+      builder: (context, box) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: box.maxHeight),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                Text(l.chatContactOpenFailed, textAlign: TextAlign.center),
+                const SizedBox(height: 12),
+                FilledButton(onPressed: onRetry, child: Text(l.chatContactRetry)),
+              ]),
+            ),
+          ),
+        ),
       ),
     );
   }

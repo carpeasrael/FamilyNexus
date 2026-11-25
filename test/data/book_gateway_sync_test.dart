@@ -654,6 +654,24 @@ void main() {
       expect(g.messagesIn(ct), isEmpty);
     });
 
+    test('K3b-2a: isThreadOpen (erst nach openThread) und peerName (bereinigter Anzeigename)', () async {
+      final g = await signedIn();
+      final t = await contactThread(g, dmJoined(ct, _fremd));
+      expect(t!.peerName, _fremd, reason: 'Anzeigename des Gegenübers, bereinigt, ohne Server');
+      expect(g.isThreadOpen(ct), isFalse);
+      await g.openThread(ct);
+      expect(g.isThreadOpen(ct), isTrue);
+      expect(g.isThreadOpen(ChatThread.familyId), isTrue);
+    });
+
+    test('K3b-2a: wartender Kontakt-Raum bekommt nie eine Zeitleiste (isThreadOpen bleibt false)', () async {
+      final g = await signedIn(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}));
+      final t = await contactThread(g, dmJoined(ct, _fremd, peerState: 'invite', joined: 1, invited: 1));
+      expect(t?.pending, isTrue);
+      await g.openThread(ct);
+      expect(g.isThreadOpen(ct), isFalse);
+    });
+
     test('Richtlinie aus oder Blockieren mitten in der Sitzung: der Thread verschwindet ohne weiteren Sync', () async {
       final g = await signedIn();
       expect(await contactThread(g, dmJoined(ct, _fremd)), isNotNull);

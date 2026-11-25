@@ -155,6 +155,38 @@ void main() {
       expect((await peer.service.contact(carla))!.state, ContactState.outgoing);
     });
 
+    ctest('K3b-2a: Name wie ein Familienmitglied: Warnung und Bestätigung vor „Hinzufügen“; Eingabeänderung setzt sie zurück', (tester) async {
+      server.addAccount('fritz', 'pw-fritz', displayName: 'Emil'); // Emil gehört zur Familie
+      const fritz = '@fritz:fake.test';
+      await openAdd(tester);
+      await tester.enterText(find.byType(TextField), fritz);
+      await tester.tap(find.text('Prüfen'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Nicht deine Familie'), findsOneWidget);
+      FilledButton addButton() => tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Hinzufügen'));
+      expect(addButton().onPressed, isNull, reason: 'ohne Bestätigung nicht aktiv');
+      await tester.tap(find.byType(CheckboxListTile));
+      await tester.pump();
+      expect(addButton().onPressed, isNotNull);
+      // Neue Prüfung (andere Eingabe und zurück) verlangt die Bestätigung erneut.
+      await tester.enterText(find.byType(TextField), '$fritz ');
+      await tester.pump();
+      await tester.enterText(find.byType(TextField), fritz);
+      await tester.tap(find.text('Prüfen'));
+      await tester.pumpAndSettle();
+      expect(addButton().onPressed, isNull);
+      expect(server.contactRooms, isEmpty);
+    });
+
+    ctest('K3b-2a: ohne Namensgleichheit keine Warnung und „Hinzufügen“ sofort aktiv', (tester) async {
+      await openAdd(tester);
+      await tester.enterText(find.byType(TextField), carla);
+      await tester.tap(find.text('Prüfen'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Nicht deine Familie'), findsNothing);
+      expect(find.byType(CheckboxListTile), findsNothing);
+    });
+
     ctest('eine geänderte Eingabe macht das Ergebnis ungültig, ohne Abfrage', (tester) async {
       await openAdd(tester);
       await tester.enterText(find.byType(TextField), carla);

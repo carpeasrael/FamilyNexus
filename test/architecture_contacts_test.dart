@@ -144,7 +144,7 @@ void main() {
     expect(screen, isNot(contains('_persistLast(_openContact')), reason: 'Kontakt-Gespräche werden nie gemerkt');
     final callers = <String>[
       for (final f in libFiles())
-        if (RegExp(r'\.openThread\(').hasMatch(code(f.readAsStringSync()))) f.path,
+        if (RegExp(r'(?<!Future<void> )(?<![\w])openThread\(').hasMatch(code(f.readAsStringSync()))) f.path,
     ];
     expect(callers, <String>['lib/features/chat/chat_screen.dart'], reason: 'openThread nur im Chat-Bildschirm (nie im Gateway selbst)');
   });

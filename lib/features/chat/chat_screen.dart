@@ -229,6 +229,12 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
   /// Das Kontakt-Gespräch wird nicht mehr gezeigt: Entwürfe und Antworten verwerfen (Datenschutz), Zustände löschen.
   void _dropContact(String id) {
+    // Gehört `_ctrl` noch diesem Gespräch, sonst schriebe der nächste Wechsel den Entwurf zurück in die Ablage.
+    if (_draftOwner == id) {
+      _draftOwner = null;
+      _ctrl.clear();
+      _replyTo = null;
+    }
     _drafts.remove(id);
     _replies.remove(id);
     _contactOpening.remove(id);
@@ -740,19 +746,33 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         final veryTight = box.maxHeight < 150;
         return Column(
           children: <Widget>[
-            if (view.showHeader && !tight)
-              _ThreadHeader(thread: view.current, onBack: outside ? _backToContacts : _backToList),
             if (outside && current != null)
-              _OutsideBanner(
-                name: ContactNames.title(current.peerName, current.peerId ?? ''),
-                userId: current.peerId ?? '',
-                collides: cc?.collides(current.peerName) ?? false,
-                onBlock: () =>
-                    _blockContact(current.peerId ?? '', ContactNames.title(current.peerName, current.peerId ?? '')),
-                onManage: _manageContacts,
+              // Kopfzeile und Banner scrollen zusammen, begrenzt auf einen Teil der Höhe: Bei großer Schrift und knapper
+              // Höhe sprengen sie die Spalte nicht (Banner bleibt immer sichtbar, §8.6).
+              ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: box.maxHeight * 0.35),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      if (view.showHeader && !tight) _ThreadHeader(thread: view.current, onBack: _backToContacts),
+                      _OutsideBanner(
+                        name: ContactNames.title(current.peerName, current.peerId ?? ''),
+                        userId: current.peerId ?? '',
+                        collides: cc?.collides(current.peerName) ?? false,
+                        onBlock: () => _blockContact(
+                          current.peerId ?? '',
+                          ContactNames.title(current.peerName, current.peerId ?? ''),
+                        ),
+                        onManage: _manageContacts,
+                      ),
+                    ],
+                  ),
+                ),
               )
-            else if (!tight)
-              _EncryptionNote(current: view.current),
+            else ...<Widget>[
+              if (view.showHeader && !tight) _ThreadHeader(thread: view.current, onBack: _backToList),
+              if (!tight) _EncryptionNote(current: view.current),
+            ],
             Expanded(
               child: outside && !contactOpen && !current!.pending
                   ? (_contactFailed.contains(current.id)
