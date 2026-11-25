@@ -189,9 +189,9 @@ class ContactService {
   // -------------------------------------------------------------- Hilfsmittel
 
   static ContactRecord _withTime(ContactRecord r, DateTime at) => switch (r) {
-        Contact c => c.copyWith(updatedAt: at),
-        GroupRecord g => g.copyWith(updatedAt: at),
-        ContactPrefs p => p.copyWith(updatedAt: at),
+        final Contact c => c.copyWith(updatedAt: at),
+        final GroupRecord g => g.copyWith(updatedAt: at),
+        final ContactPrefs p => p.copyWith(updatedAt: at),
         _ => r,
       };
 
