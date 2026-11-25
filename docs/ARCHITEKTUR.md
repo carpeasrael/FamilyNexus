@@ -11,7 +11,7 @@ lib/
                        (Modell, Format, Konfliktregel, Dienst), Server/Matrix-IDs, Anhangsrichtlinie,
                        Textbereinigung, Einstellungen
   data/
-    db/                SQLCipher-Datenbank, Migrationen (v1 settings, v2 Kalender, v3 Einkaufszettel, v4 Aufgabenlisten, v5 Kalender-Themen, v6 Geburts- und Gedenktage, v7 Avatar-Fotos, v8 Kassenbücher), SqlEventStore, SqlShoppingStore, SqlTaskStore, SqlEventThemeStore, SqlAnniversaryStore, SqlAvatarPhotoStore, SqlCashBookStore (#311, E-113), KeyValueStore
+    db/                SQLCipher-Datenbank, Migrationen (v1 settings, v2 Kalender, v3 Einkaufszettel, v4 Aufgabenlisten, v5 Kalender-Themen, v6 Geburts- und Gedenktage, v7 Avatar-Fotos, v8 Kassenbücher, v9 Kontakte), SqlEventStore, SqlShoppingStore, SqlTaskStore, SqlEventThemeStore, SqlAnniversaryStore, SqlAvatarPhotoStore, SqlCashBookStore (#311, E-113), SqlContactStore (#119, E-114), KeyValueStore
     matrix/            MatrixGateway (Schnittstelle) + SdkMatrixGateway (matrix-SDK, vodozemac), HttpsOnlyClient,
                        ServerProbe, ChatMapper, FamilyRoomSpec
     sync/              CalendarSync, ShoppingSync, TaskSync, EventThemeSync, AnniversarySync (Signale ↔ Dienst/Gateway, Warteschlange, Resync),

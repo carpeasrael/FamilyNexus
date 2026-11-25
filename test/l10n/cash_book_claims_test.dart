@@ -42,7 +42,7 @@ void main() {
       'reportOnlineNote': <String>['auch in Kassenbüchern'],
       'accountDeleteBody': <String>['Kassenbüchern angelegt hast, bleiben verschlüsselt im Buch bei den Mitgliedern, auch frühere Fassungen', '(frühere Fassungen bleiben dennoch im Verlauf)'],
       'cashInviteConfirmBody': <String>['bisherigen Verlauf'],
-      'logoutBody': <String>['Kassenbücher', 'Geburts- und Gedenktage', 'Avatar-Fotos', 'beim Beenden der Sitzung'],
+      'logoutBody': <String>['Kassenbücher', 'Kontakte', 'Geburts- und Gedenktage', 'Avatar-Fotos', 'beim Beenden der Sitzung'],
     },
     'en': <String, List<String>>{
       'privacy2Body': <String>['cash books (date, store, amount, currency, note and optionally a photo of the receipt'],
@@ -65,7 +65,7 @@ void main() {
       'reportOnlineNote': <String>['also in cash books'],
       'accountDeleteBody': <String>['cash books remain encrypted in the book with the members, including earlier versions', '(earlier versions still remain in the history)'],
       'cashInviteConfirmBody': <String>['earlier history'],
-      'logoutBody': <String>['cash books', 'birthdays and memorial days', 'avatar photos', 'when the session ends'],
+      'logoutBody': <String>['cash books', 'contacts', 'birthdays and memorial days', 'avatar photos', 'when the session ends'],
     },
   };
 
@@ -162,6 +162,7 @@ void main() {
       'avatar_photos': ('Avatar-Fotos', 'avatar photos'),
       'cash_books': ('Kassenbücher', 'cash books'),
       'cash_entries': ('Kassenbücher', 'cash books'),
+      'contact_records': ('Kontakte', 'contacts'),
     };
     const accessory = <String>{
       'settings', // lokale Einstellungen bleiben (Sprache, Darstellung)

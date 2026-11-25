@@ -469,7 +469,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get logoutBody =>
-      'Termine, Einkaufszettel, Aufgaben, Geburts- und Gedenktage, Avatar-Fotos und Kassenbücher werden beim Beenden der Sitzung von diesem Gerät entfernt. Was schon gesendet ist, bleibt verschlüsselt in deiner Familie und kommt nach der nächsten Anmeldung zurück; noch nicht gesendete Änderungen gehen verloren.';
+      'Termine, Einkaufszettel, Aufgaben, Geburts- und Gedenktage, Avatar-Fotos, Kassenbücher und Kontakte werden beim Beenden der Sitzung von diesem Gerät entfernt. Was schon gesendet ist, bleibt verschlüsselt in deiner Familie und kommt nach der nächsten Anmeldung zurück; noch nicht gesendete Änderungen gehen verloren.';
 
   @override
   String get settingsAccount => 'Konto';

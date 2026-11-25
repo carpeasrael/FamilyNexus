@@ -7,6 +7,7 @@ import '../data/db/key_value_store.dart';
 import '../data/db/sql_anniversary_store.dart';
 import '../data/db/sql_avatar_photo_store.dart';
 import '../data/db/sql_cash_book_store.dart';
+import '../data/db/sql_contact_store.dart';
 import '../data/db/sql_event_store.dart';
 import '../data/db/sql_event_theme_store.dart';
 import '../data/db/sql_shopping_store.dart';
@@ -346,6 +347,9 @@ class AppServices {
   /// [wipeAccountData] für die App-Datenbank [db].
   static Future<void> wipeAccountDataIn(Database db) async {
     final kv = SqlKeyValueStore(db);
+    // Kontakte gehören zum Konto (#119, E-114): Sie werden **immer** entfernt, auch ohne gesetzten Besitzer (der frühe
+    // Rückgabepunkt unten gilt nur den Familiendaten).
+    await SqlContactStore(db).wipe();
     if ((await kv.readAll())[calendarOwnerKey] == null) return;
     await SqlEventStore(db).wipe();
     await SqlShoppingStore(db).wipe();
@@ -377,12 +381,22 @@ class AppServices {
       await SqlAnniversaryStore(db).wipe();
       await SqlAvatarPhotoStore(db).wipe();
       await SqlCashBookStore(db).wipe();
+      // Kontakte gehören zum Konto, nicht zur Familie (#119, E-114): Ein Familienwechsel desselben Kontos lässt sie
+      // stehen, ein Kontowechsel (auch ein unlesbarer alter Besitzer, fail-closed) entfernt sie.
+      if (!previous.contains('|') || accountOf(previous) != accountOf(owner)) await SqlContactStore(db).wipe();
       await kv.apply(deletes: <String>[ReminderCoordinator.acknowledgedKey, AppSettings.blockedUsersKey, AppSettings.lastChatThreadKey]);
       await onWiped?.call();
       wiped = true;
     }
     await kv.write(calendarOwnerKey, owner);
     return wiped;
+  }
+
+  /// Konto im Besitzerschlüssel `'$uid|$room'` (Teil vor dem **ersten** `|`; ohne `|` der ganze Text, damit ein unlesbarer
+  /// Altstand als Kontowechsel gilt). Matrix-Nutzer- und Raum-IDs enthalten nie `|`; der Raumteil darf leer sein.
+  static String accountOf(String owner) {
+    final i = owner.indexOf('|');
+    return i < 0 ? owner : owner.substring(0, i);
   }
 
   /// Einstellungsschlüssel: Konto und Familie, denen die lokalen Familiendaten gehören.
