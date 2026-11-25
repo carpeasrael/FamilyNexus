@@ -128,6 +128,27 @@ void main() {
     }
   });
 
+  test('K3b-2a: Chat-Bildschirm kennt nur den Controller; openThread rufen nur Bildschirme; Familien-Bereich filtert Kontakt-Threads', () {
+    final chatFiles = <File>[
+      File('lib/features/chat/chat_screen.dart'),
+      ...Directory('lib/features/chat/widgets').listSync().whereType<File>(),
+    ];
+    for (final f in chatFiles) {
+      final t = code(f.readAsStringSync());
+      for (final banned in <String>['ContactSync', 'ContactService', 'ContactStore', 'probeContact', 'startContactChat', 'ContactController(']) {
+        expect(t.contains(banned), isFalse, reason: '${f.path} nennt $banned');
+      }
+    }
+    final screen = code(File('lib/features/chat/chat_screen.dart').readAsStringSync());
+    expect(screen, contains('if (!t.isOutside) t'), reason: 'Familien-Bereich ohne Kontakt-Threads');
+    expect(screen, isNot(contains('_persistLast(_openContact')), reason: 'Kontakt-Gespräche werden nie gemerkt');
+    final callers = <String>[
+      for (final f in libFiles())
+        if (RegExp(r'(?<!Future<void> )(?<![\w])openThread\(').hasMatch(code(f.readAsStringSync()))) f.path,
+    ];
+    expect(callers, <String>['lib/features/chat/chat_screen.dart'], reason: 'openThread nur im Chat-Bildschirm (nie im Gateway selbst)');
+  });
+
   test('Freigabebedingung: ContactFlags.enabled nur, wenn K3b-2 (B8) und K3c (Kontakte ohne Familie) abgeschlossen sind', () {
     if (!ContactFlags.enabled) return; // Der Freigabe-PR setzt die Marken bewusst in docs/ENTSCHEIDUNGEN.md.
     final doc = File('docs/ENTSCHEIDUNGEN.md').readAsStringSync();

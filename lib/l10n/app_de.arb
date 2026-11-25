@@ -232,6 +232,34 @@
   "contactErrNotFound": "Der Kontakt wurde nicht gefunden.",
   "contactErrLimit": "Die Grenze für Kontakte ist erreicht.",
   "contactErrDuplicate": "Diese Person ist schon in deiner Liste.",
+  "contactsNotYourFamily": "Nicht deine Familie: {id}",
+  "@contactsNotYourFamily": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "contactsConfirmNotFamily": "Ich weiß, dass das nicht meine Familie ist",
+  "chatScopeFamily": "Familie",
+  "chatScopeContacts": "Kontakte",
+  "chatScopeLabel": "{name}, {count} ungelesen",
+  "@chatScopeLabel": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "chatOutsideBanner": "Außerhalb der Familie: {name}. Termine, Listen und Online-Status werden hier nicht geteilt.",
+  "@chatOutsideBanner": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "chatContactOpening": "Gespräch wird geöffnet",
+  "chatContactOpenFailed": "Das Gespräch konnte nicht geöffnet werden.",
+  "chatContactRetry": "Erneut versuchen",
+  "chatContactWaiting": "Wartet auf Annahme. Du kannst schreiben, sobald die Person beigetreten ist.",
+  "chatContactsEmpty": "Noch keine Gespräche mit Kontakten.",
+  "chatContactsManage": "Kontakte verwalten",
   "errNotAllowed": "Dafür fehlt die Berechtigung.",
   "errAttachmentRejected": "Dieser Anhang ist nicht erlaubt (Typ oder Größe).",
   "errInvalidInput": "Bitte Eingabe prüfen.",

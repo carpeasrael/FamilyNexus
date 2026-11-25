@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/data/platform/file_access.dart';
 import 'package:family_nexus/domain/chat.dart';
-import 'package:family_nexus/domain/contacts.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/features/chat/chat_view_model.dart';
@@ -428,27 +427,38 @@ void main() {
       expect(find.descendant(of: _row(dm), matching: find.text('Status unbekannt')), findsNothing);
     });
 
-    testWidgets('Kontakt-Thread (K3a-2): „Außerhalb der Familie“, kein Online-Status, kein Mitglieder-Avatar, kein Familientext im Gespräch', (tester) async {
+    testWidgets('Kontakt-Thread (K3a-2, K3b-2a): im Kontakte-Bereich „Außerhalb der Familie“, kein Online-Status, kein Mitglieder-Avatar, kein Familientext im Gespräch', (tester) async {
       _wide(tester);
       final handle = tester.ensureSemantics();
-      final app = await buildTestApp();
+      final app = await buildTestApp(contactsEnabled: true);
       app.server.addAccount('carla', 'pw-carla', displayName: 'Carla');
       const carla = '@carla:fake.test';
-      final room = app.server.createContactRoom(carla, app.gateway.userId!);
-      app.gateway.setContactPolicy(const ContactPolicy(enabled: true, contacts: <String, ContactState>{carla: ContactState.accepted}));
-      await _start(tester, app);
+      final room = app.server.createContactRoom(carla, app.gateway.userId!, toJoined: true);
+      await _start(tester, app, chatTab: false);
+      final cal = app.builtCalendars.single;
+      await cal.contactController!.setEnabled(true);
+      await cal.contactSync!.service.addAccepted(carla);
+      await cal.contactSync!.pushPolicyNow();
+      await tester.pumpAndSettle();
+      await tester.tap(navTab('Chat'));
+      await tester.pumpAndSettle();
       expect(app.gateway.threads.where((t) => t.kind == ThreadKind.contact), hasLength(1));
+      expect(_row(room.id), findsNothing, reason: 'der Familien-Bereich zeigt keine Kontakte');
+      await tester.tap(find.descendant(of: find.byType(SegmentedButton<ChatScope>), matching: find.textContaining('Kontakte')));
+      await tester.pumpAndSettle();
       final row = _row(room.id);
       expect(row, findsOneWidget);
       expect(tester.getSemantics(row).label, startsWith('Außerhalb der Familie: Carla · fake.test'));
       expect(find.descendant(of: row, matching: find.text('Status unbekannt')), findsNothing, reason: 'nie ein Online-Status');
       expect(find.descendant(of: row, matching: find.byType(MemberAvatarView)), findsNothing);
       await _open(tester, room.id);
-      expect(find.text('Außerhalb der Familie. Termine, Listen und Online-Status werden hier nicht geteilt.'), findsOneWidget);
+      expect(find.textContaining('Termine, Listen und Online-Status werden hier nicht geteilt.'), findsOneWidget);
       expect(find.textContaining('Einzelchat mit Familienmitglied'), findsNothing);
       expect(find.byType(PresenceStatusText), findsNothing);
       expect(find.byType(MemberAvatarView), findsNothing);
       handle.dispose();
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump(const Duration(seconds: 1));
     });
 
     testWidgets('Zeit: heute Uhrzeit (24 und 12 Stunden), gestern „Gestern“, sonst Datum', (tester) async {

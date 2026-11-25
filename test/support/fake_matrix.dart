@@ -843,6 +843,11 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   @override
   int unreadIn(String threadId) {
+    // Wie die Raum-Zähler des SDK: Auch ein Kontakt-Gespräch ohne geöffnete Zeitleiste hat Ungelesenes.
+    final cr = fake.contactRooms[threadId];
+    if (cr != null && !_opened.contains(threadId)) {
+      return cr.events.where((e) => e.type == 'm.room.message' && e.sender != _userId).length;
+    }
     final list = messagesIn(threadId);
     var n = 0;
     for (var i = _read[threadId] ?? 0; i < list.length; i++) {
@@ -2069,6 +2074,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
             kind: ThreadKind.contact,
             title: ContactNames.title(fake.displayNameOf(r.dmMembers.firstWhere((m) => m != me)), r.dmMembers.firstWhere((m) => m != me)),
             peerId: r.dmMembers.firstWhere((m) => m != me),
+            peerName: ContactNames.cleanName(fake.displayNameOf(r.dmMembers.firstWhere((m) => m != me))),
             unread: unreadIn(r.id),
             pending: r.invitedUsers.contains(r.dmMembers.firstWhere((m) => m != me)),
             reachable: _reachOf(r.dmMembers.firstWhere((m) => m != me)) != ContactReachability.notReachable,
@@ -2106,7 +2112,13 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       if (cur == null || r.id.compareTo(cur.id) < 0) bySender[facts.inviterId!] = r;
     }
     return <ContactRequest>[
-      for (final e in bySender.entries) ContactRequest(roomId: e.value.id, fromUserId: e.key, fromName: ContactNames.title(fake.displayNameOf(e.key), e.key)),
+      for (final e in bySender.entries)
+        ContactRequest(
+          roomId: e.value.id,
+          fromUserId: e.key,
+          fromName: ContactNames.title(fake.displayNameOf(e.key), e.key),
+          name: ContactNames.cleanName(fake.displayNameOf(e.key)),
+        ),
     ]..sort((a, b) => a.roomId.compareTo(b.roomId));
   }
 
@@ -2183,8 +2195,23 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   @override
+  bool isThreadOpen(String threadId) {
+    if (threadId == ChatThread.familyId || fake.dmRooms.containsKey(threadId)) return true;
+    final r = fake.contactRooms[threadId];
+    // Wie das SDK: wartende Räume bekommen nie eine Zeitleiste.
+    return r != null && _opened.contains(threadId) && _contactRoomOf(threadId) != null && !r.invitedUsers.contains(r.dmMembers.firstWhere((m) => m != _userId));
+  }
+
+  /// Test: Zahl der Aufrufe von `openThread` (je Gespräch) und ein Schalter, der das Öffnen scheitern lässt.
+  final Map<String, int> openCalls = <String, int>{};
+  bool failOpenThread = false;
+
+  @override
   Future<void> openThread(String threadId) async {
-    if (_contactRoomOf(threadId) != null) _opened.add(threadId);
+    openCalls.update(threadId, (n) => n + 1, ifAbsent: () => 1);
+    if (failOpenThread) return;
+    final r = _contactRoomOf(threadId);
+    if (r != null && !r.invitedUsers.contains(r.dmMembers.firstWhere((m) => m != _userId))) _opened.add(threadId);
   }
 
   @override

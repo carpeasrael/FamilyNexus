@@ -22,6 +22,7 @@ class ChatView {
     this.followFamily = false,
     this.pin = false,
     this.endWaiting = false,
+    this.vanished = false,
   });
 
   final ChatViewKind kind;
@@ -46,6 +47,23 @@ class ChatView {
 
   /// Das gewartete Gespräch ist erschienen: Warten und Timer beenden.
   final bool endWaiting;
+
+  /// Nur Kontakte-Bereich: Das geöffnete Kontakt-Gespräch ist verschwunden (blockiert, entfernt, Familienwechsel): zurück zur
+  /// Kontakte-Liste, **nie** in den Familienchat.
+  final bool vanished;
+}
+
+/// Bereich des Chat-Tabs (#119, K3b-2a): Familie (Familienchat und Einzelchats mit Mitgliedern) oder Kontakte.
+enum ChatScope { family, contacts }
+
+/// Ansicht des Kontakte-Bereichs (#119, K3b-2a): die Liste (auch bei einem einzigen oder keinem Kontakt-Gespräch) oder ein
+/// geöffnetes Kontakt-Gespräch mit Kopfzeile. Kontakt-Gespräche **warten nie** (sie stehen schon in der Liste) und fallen nie
+/// auf den Familienchat zurück: Ist das geöffnete verschwunden, zeigt die Ansicht die Liste und meldet [ChatView.vanished].
+ChatView resolveContactView({required List<ChatThread> contactThreads, required String? open}) {
+  if (open == null) return const ChatView(kind: ChatViewKind.list);
+  final match = contactThreads.where((t) => t.id == open).firstOrNull;
+  if (match == null) return const ChatView(kind: ChatViewKind.list, vanished: true);
+  return ChatView(kind: ChatViewKind.conversation, shownId: match.id, current: match, showHeader: true);
 }
 
 /// Leitet die Ansicht aus den sichtbaren Gesprächen [threads], dem gewünschten Gespräch [open] (`null` = keines

@@ -103,6 +103,7 @@ class ChatThread {
     this.unread = 0,
     this.pending = false,
     this.reachable = true,
+    this.peerName = '',
   });
 
   /// Feste Kennung des Familienchats; Einzelchats tragen ihre Raum-ID.
@@ -124,6 +125,10 @@ class ChatThread {
   /// Nur [ThreadKind.contact]: Das Gegenüber kann Nachrichten entschlüsseln (K3a-2b; bis dahin `true`).
   final bool reachable;
 
+  /// Nur [ThreadKind.contact]: bereinigter Anzeigename des Gegenübers **ohne** Server (für den Vergleich mit Familiennamen,
+  /// §9.1); leer, wenn keiner bekannt ist.
+  final String peerName;
+
   bool get isFamily => kind == ThreadKind.family;
 
   /// Gespräch mit einer Person außerhalb der Familie: kein Online-Status, kein Familientext.
@@ -132,10 +137,13 @@ class ChatThread {
 
 /// Eingehende Kontaktanfrage (#119, K3a-2): nur Absender und Server, **kein** Rauminhalt vor der Annahme.
 class ContactRequest {
-  const ContactRequest({required this.roomId, required this.fromUserId, required this.fromName});
+  const ContactRequest({required this.roomId, required this.fromUserId, required this.fromName, this.name = ''});
 
   final String roomId;
   final String fromUserId;
+
+  /// Bereinigter Anzeigename **ohne** Server (für den Vergleich mit Familiennamen, §9.1).
+  final String name;
 
   /// Bereinigter Anzeigename mit Server („Name · server“, [ContactNames.title]).
   final String fromName;

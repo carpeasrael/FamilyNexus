@@ -571,6 +571,51 @@ class AppLocalizationsDe extends AppLocalizations {
   String get contactErrDuplicate => 'Diese Person ist schon in deiner Liste.';
 
   @override
+  String contactsNotYourFamily(String id) {
+    return 'Nicht deine Familie: $id';
+  }
+
+  @override
+  String get contactsConfirmNotFamily =>
+      'Ich weiß, dass das nicht meine Familie ist';
+
+  @override
+  String get chatScopeFamily => 'Familie';
+
+  @override
+  String get chatScopeContacts => 'Kontakte';
+
+  @override
+  String chatScopeLabel(String name, int count) {
+    return '$name, $count ungelesen';
+  }
+
+  @override
+  String chatOutsideBanner(String name) {
+    return 'Außerhalb der Familie: $name. Termine, Listen und Online-Status werden hier nicht geteilt.';
+  }
+
+  @override
+  String get chatContactOpening => 'Gespräch wird geöffnet';
+
+  @override
+  String get chatContactOpenFailed =>
+      'Das Gespräch konnte nicht geöffnet werden.';
+
+  @override
+  String get chatContactRetry => 'Erneut versuchen';
+
+  @override
+  String get chatContactWaiting =>
+      'Wartet auf Annahme. Du kannst schreiben, sobald die Person beigetreten ist.';
+
+  @override
+  String get chatContactsEmpty => 'Noch keine Gespräche mit Kontakten.';
+
+  @override
+  String get chatContactsManage => 'Kontakte verwalten';
+
+  @override
   String get errNotAllowed => 'Dafür fehlt die Berechtigung.';
 
   @override

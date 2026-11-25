@@ -522,6 +522,10 @@ abstract class MatrixGateway implements Listenable {
   /// Zahl der weiteren, nicht angezeigten Anfragen.
   int get contactRequestsHidden;
 
+  /// Ist das Gespräch lesbar und beschreibbar geöffnet? Familie und Einzelchats mit Mitgliedern: immer; Kontakt-Threads: nur
+  /// mit angelegter Zeitleiste (nach [openThread]; wartende Gespräche nie).
+  bool isThreadOpen(String threadId);
+
   /// Öffnet ein Kontakt-Gespräch (legt die Zeitleiste an; Konzept §7.1 „bei Bedarf“). Für andere Gespräche ohne Wirkung.
   Future<void> openThread(String threadId);
 

@@ -232,6 +232,34 @@
   "contactErrNotFound": "The contact was not found.",
   "contactErrLimit": "The limit for contacts has been reached.",
   "contactErrDuplicate": "This person is already in your list.",
+  "contactsNotYourFamily": "Not your family: {id}",
+  "@contactsNotYourFamily": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "contactsConfirmNotFamily": "I know this is not my family",
+  "chatScopeFamily": "Family",
+  "chatScopeContacts": "Contacts",
+  "chatScopeLabel": "{name}, {count} unread",
+  "@chatScopeLabel": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "chatOutsideBanner": "Outside the family: {name}. Events, lists and online status are not shared here.",
+  "@chatOutsideBanner": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "chatContactOpening": "Opening the chat",
+  "chatContactOpenFailed": "The chat could not be opened.",
+  "chatContactRetry": "Try again",
+  "chatContactWaiting": "Waiting for acceptance. You can write once the person has joined.",
+  "chatContactsEmpty": "No chats with contacts yet.",
+  "chatContactsManage": "Manage contacts",
   "errNotAllowed": "You do not have permission for this.",
   "errAttachmentRejected": "This attachment is not allowed (type or size).",
   "errInvalidInput": "Please check your input.",
