@@ -284,6 +284,18 @@ void main() {
     await end(tester);
   });
 
+  testWidgets('Abzeichen: lokal blockierter Kontakt (Thread bleibt im Gateway) zählt nicht mit', (tester) async {
+    final app = await setup(tester);
+    server.post(room, carla, 'm.room.message', <String, Object?>{'body': 'Hallo'});
+    await tester.pumpAndSettle();
+    expect(find.text('Kontakte (1)'), findsOneWidget);
+    await app.services.settings.update((c) => c.copyWith(blockedUsers: <String>[carla]));
+    await tester.pumpAndSettle();
+    expect(app.gateway.threads.any((x) => x.id == room.id), isTrue, reason: 'nur die Ansicht filtert');
+    expect(find.text('Kontakte (1)'), findsNothing);
+    await end(tester);
+  });
+
   testWidgets('Banner bleibt bei knapper Höhe sichtbar', (tester) async {
     await setup(tester);
     await toContacts(tester);
