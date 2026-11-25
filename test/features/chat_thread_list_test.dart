@@ -4,10 +4,13 @@ import 'dart:convert';
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/data/platform/file_access.dart';
 import 'package:family_nexus/domain/chat.dart';
+import 'package:family_nexus/domain/contacts.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/features/chat/chat_view_model.dart';
 import 'package:family_nexus/features/chat/thread_preview.dart';
+import 'package:family_nexus/features/family/member_avatar_view.dart';
+import 'package:family_nexus/features/presence/presence_view.dart';
 import 'package:family_nexus/l10n/gen/app_localizations_de.dart';
 import 'package:family_nexus/l10n/gen/app_localizations_en.dart';
 import 'package:flutter/material.dart';
@@ -293,6 +296,16 @@ void main() {
       });
     });
 
+    test('Kontakt-Threads stehen hinter Familie und Mitgliedern, auch mit Ungelesenem (K3a-2)', () {
+      const threads = <ChatThread>[
+        ChatThread(id: 'ct', kind: ThreadKind.contact, title: 'Carla · example.org', peerId: '@carla:example.org', unread: 5),
+        ChatThread(id: 'ben', kind: ThreadKind.direct, title: 'Ben', peerId: '@ben:fake.test'),
+        ChatThread(id: ChatThread.familyId, kind: ThreadKind.family, title: 'Familie'),
+      ];
+      final rows = orderedThreadRows(threads, (id) => const <ChatMessage>[], const <String>{}, null);
+      expect(rows.map((r) => r.thread.id), <String>[ChatThread.familyId, 'ben', 'ct']);
+    });
+
     test('Vorschautext: Text, Du:, Anhang, Termin, nicht lesbar, blockiert, Zeilenumbrüche (de)', () {
       final l = AppLocalizationsDe();
       String p(ChatMessage m, {bool mine = false}) => threadPreviewText(l, m, mine: mine);
@@ -413,6 +426,29 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.descendant(of: _row(dm), matching: find.text('Online')), findsOneWidget);
       expect(find.descendant(of: _row(dm), matching: find.text('Status unbekannt')), findsNothing);
+    });
+
+    testWidgets('Kontakt-Thread (K3a-2): „Außerhalb der Familie“, kein Online-Status, kein Mitglieder-Avatar, kein Familientext im Gespräch', (tester) async {
+      _wide(tester);
+      final handle = tester.ensureSemantics();
+      final app = await buildTestApp();
+      app.server.addAccount('carla', 'pw-carla', displayName: 'Carla');
+      const carla = '@carla:fake.test';
+      final room = app.server.createContactRoom(carla, app.gateway.userId!);
+      app.gateway.setContactPolicy(const ContactPolicy(enabled: true, contacts: <String, ContactState>{carla: ContactState.accepted}));
+      await _start(tester, app);
+      expect(app.gateway.threads.where((t) => t.kind == ThreadKind.contact), hasLength(1));
+      final row = _row(room.id);
+      expect(row, findsOneWidget);
+      expect(tester.getSemantics(row).label, startsWith('Außerhalb der Familie: Carla · fake.test'));
+      expect(find.descendant(of: row, matching: find.text('Status unbekannt')), findsNothing, reason: 'nie ein Online-Status');
+      expect(find.descendant(of: row, matching: find.byType(MemberAvatarView)), findsNothing);
+      await _open(tester, room.id);
+      expect(find.text('Außerhalb der Familie. Termine, Listen und Online-Status werden hier nicht geteilt.'), findsOneWidget);
+      expect(find.textContaining('Einzelchat mit Familienmitglied'), findsNothing);
+      expect(find.byType(PresenceStatusText), findsNothing);
+      expect(find.byType(MemberAvatarView), findsNothing);
+      handle.dispose();
     });
 
     testWidgets('Zeit: heute Uhrzeit (24 und 12 Stunden), gestern „Gestern“, sonst Datum', (tester) async {

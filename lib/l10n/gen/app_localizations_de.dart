@@ -1564,6 +1564,18 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String chatThreadContact(String name) {
+    return 'Außerhalb der Familie: $name';
+  }
+
+  @override
+  String get chatContactNote =>
+      'Außerhalb der Familie. Termine, Listen und Online-Status werden hier nicht geteilt.';
+
+  @override
+  String get roomKindContact => 'Kontakt-Chat';
+
+  @override
   String chatThreadDirect(String name) {
     return 'Einzelchat mit $name';
   }

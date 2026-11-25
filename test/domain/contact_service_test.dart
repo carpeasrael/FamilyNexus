@@ -24,6 +24,51 @@ void main() {
 
   String user(int i) => '@u${i.toString().padLeft(4, '0')}:example.org';
 
+  group('addAccepted (K3a-2: Datensatz zuerst)', () {
+    test('legt einen bestätigten Kontakt an und meldet die Änderung', () async {
+      var calls = 0;
+      svc.onChanged = () => calls++;
+      final c = await svc.addAccepted(carla, nick: 'Carla');
+      expect(c.state, ContactState.accepted);
+      expect(c.version, 1);
+      expect(calls, 1);
+      expect((await svc.contact(carla))!.nick, 'Carla');
+    });
+
+    test('ein vorhandener outgoing-Kontakt wird hochgestuft (Version +1)', () async {
+      await svc.addOutgoing(carla, nick: 'C');
+      final c = await svc.addAccepted(carla);
+      expect(c.state, ContactState.accepted);
+      expect(c.version, 2);
+      expect(c.nick, 'C');
+    });
+
+    test('bereits bestätigt: duplicate; blockiert: notAllowed (bleibt blockiert); eigenes Konto und ungültig', () async {
+      await svc.addAccepted(carla);
+      await expectLater(svc.addAccepted(carla), fails(ContactError.duplicate));
+      await svc.block(ben);
+      await expectLater(svc.addAccepted(ben), fails(ContactError.notAllowed));
+      expect((await svc.contact(ben))!.state, ContactState.blocked);
+      await expectLater(svc.addAccepted(me), fails(ContactError.notAllowed));
+      await expectLater(svc.addAccepted('kein-konto'), fails(ContactError.invalid));
+    });
+
+    test('Grenze: bei 500 aktiven Kontakten limit; nach einer Löschmarke wieder möglich', () async {
+      for (var i = 0; i < ContactLimits.maxContacts; i++) {
+        await store.put(Contact(id: user(i), state: ContactState.accepted, version: 1, updatedAt: now));
+      }
+      await expectLater(svc.addAccepted(carla), fails(ContactError.limit));
+    });
+
+    test('nach einer Löschmarke wieder hinzufügbar (Version +1)', () async {
+      await svc.addAccepted(carla);
+      await svc.remove(carla);
+      final c = await svc.addAccepted(carla);
+      expect(c.version, 3);
+      expect(c.deleted, isFalse);
+    });
+  });
+
   group('onChanged (K3a-1)', () {
     late int calls;
     setUp(() {

@@ -311,6 +311,30 @@ void main() {
       expect(a.gateway.contactPolicy.blocked, <String>{_carla});
     });
 
+    test('pushPolicyNow wartet, bis die Richtlinie im Gateway steht (Datensatz vor Raum)', () async {
+      await a.service.addAccepted(_carla);
+      await a.sync.pushPolicyNow();
+      expect(a.gateway.contactPolicy.contacts[_carla], ContactState.accepted, reason: 'sofort nach dem Warten, ohne idle');
+    });
+
+    test('pushPolicyNow mit hängendem Aufbau: wartet auf den neuesten Stand', () async {
+      final store = _StaleStore();
+      final peer = await ContactPeer.create(server, 'anna', 'pw1', store: store);
+      addTearDown(peer.dispose);
+      await peer.sync.idle();
+      store.armed = true;
+      await peer.service.addOutgoing(_carla);
+      await Future<void>.delayed(Duration.zero);
+      store.armed = false;
+      var done = false;
+      final push = peer.sync.pushPolicyNow().then((_) => done = true);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(done, isFalse);
+      store.gate!.complete();
+      await push;
+      expect(peer.gateway.contactPolicy.contacts.keys, <String>[_carla]);
+    });
+
     test('dispose setzt die Richtlinie zurück und beendet den Rückruf; start danach baut sie wieder auf', () async {
       await a.service.setEnabled(true);
       await a.service.addOutgoing(_carla);

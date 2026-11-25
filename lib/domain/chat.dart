@@ -90,7 +90,8 @@ class ChatMessage {
       );
 }
 
-enum ThreadKind { family, direct }
+/// [contact]: Einzelchat mit einer Person **außerhalb der Familie** (#119, K3a-2); nie mit Familientexten kennzeichnen.
+enum ThreadKind { family, direct, contact }
 
 /// Ein Gespräch: der Familienchat oder ein Einzelchat mit einem Mitglied (E-39).
 class ChatThread {
@@ -100,6 +101,8 @@ class ChatThread {
     required this.title,
     this.peerId,
     this.unread = 0,
+    this.pending = false,
+    this.reachable = true,
   });
 
   /// Feste Kennung des Familienchats; Einzelchats tragen ihre Raum-ID.
@@ -115,5 +118,25 @@ class ChatThread {
   final String? peerId;
   final int unread;
 
+  /// Nur [ThreadKind.contact]: Das Gegenüber ist noch nicht beigetreten (wartet auf Annahme); Senden ist gesperrt.
+  final bool pending;
+
+  /// Nur [ThreadKind.contact]: Das Gegenüber kann Nachrichten entschlüsseln (K3a-2b; bis dahin `true`).
+  final bool reachable;
+
   bool get isFamily => kind == ThreadKind.family;
+
+  /// Gespräch mit einer Person außerhalb der Familie: kein Online-Status, kein Familientext.
+  bool get isOutside => kind == ThreadKind.contact;
+}
+
+/// Eingehende Kontaktanfrage (#119, K3a-2): nur Absender und Server, **kein** Rauminhalt vor der Annahme.
+class ContactRequest {
+  const ContactRequest({required this.roomId, required this.fromUserId, required this.fromName});
+
+  final String roomId;
+  final String fromUserId;
+
+  /// Bereinigter Anzeigename mit Server („Name · server“, [ContactNames.title]).
+  final String fromName;
 }

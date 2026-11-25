@@ -784,6 +784,16 @@
       }
     }
   },
+  "chatThreadContact": "Outside the family: {name}",
+  "@chatThreadContact": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chatContactNote": "Outside the family. Calendar items, lists and online status are not shared here.",
+  "roomKindContact": "Contact chat",
   "chatThreadDirect": "Direct chat with {name}",
   "@chatThreadDirect": {
     "placeholders": {

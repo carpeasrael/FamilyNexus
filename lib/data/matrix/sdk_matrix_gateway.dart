@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection' show LinkedHashSet;
 import 'dart:convert';
 import 'dart:io' show SocketException, TlsException;
 import 'dart:math' show Random;
@@ -81,6 +82,7 @@ part 'gateway/book_sync.dart';
 part 'gateway/books.dart';
 part 'gateway/calendar_data.dart';
 part 'gateway/chat.dart';
+part 'gateway/contact_chats.dart';
 part 'gateway/connection.dart';
 part 'gateway/data_inventory.dart';
 part 'gateway/direct_chats.dart';
@@ -118,7 +120,7 @@ bool sessionEndedByServerFor(SessionClearReason reason) => switch (reason) {
 /// * Lesebestätigungen sind standardmäßig öffentlich (`m.read`), wenn „Lesebestätigung senden“ an ist (E-106, #526); aus: nur privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyncModule, _AccountDeletionModule, _BooksModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _AvatarsModule, _FamilyModule, _DirectChatsModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyncModule, _AccountDeletionModule, _BooksModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _AvatarsModule, _FamilyModule, _DirectChatsModule, _ContactChatsModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -253,6 +255,10 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   final Map<String, List<ChatMessage>> _dmMessages = <String, List<ChatMessage>>{};
   @override
   final Set<String> _dmJoining = <String>{};
+
+  /// Kontakt-Einzelchats (#119, K3a-2): Zustand in einem Halter, Logik in `gateway/contact_chats.dart`.
+  @override
+  final _ContactState _contacts = _ContactState();
   @override
   List<ChatThread> _threads = const <ChatThread>[];
 
@@ -553,7 +559,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
 
   @override
   List<ChatMessage> messagesIn(String threadId) =>
-      threadId == ChatThread.familyId ? _messages : (_dmMessages[threadId] ?? const <ChatMessage>[]);
+      threadId == ChatThread.familyId ? _messages : (_dmMessages[threadId] ?? _contacts.messages[threadId] ?? const <ChatMessage>[]);
 
   @override
   bool get initialSyncDone => _syncedOnce;
@@ -581,12 +587,12 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
       });
 
   @override
-  int get unreadCount => unreadIn(ChatThread.familyId) + _dmTimelines.keys.fold<int>(0, (a, id) => a + unreadIn(id));
+  int get unreadCount =>
+      familyUnreadCount + _contacts.peers.keys.where((id) => !_dmTimelines.containsKey(id)).fold<int>(0, (a, id) => a + unreadIn(id));
 
-  /// Bis zu den Kontakten (K2c/K3) sind `_dmTimelines` nur Einzelchats mit Mitgliedern: gleich [unreadCount]; mit Kontakten
-  /// zählt es nur den Bereich Familie.
+  /// Nur der Bereich Familie (Familienchat und Einzelchats mit Mitgliedern), nie Kontakte (B7).
   @override
-  int get familyUnreadCount => unreadCount;
+  int get familyUnreadCount => unreadIn(ChatThread.familyId) + _dmTimelines.keys.fold<int>(0, (a, id) => a + unreadIn(id));
 
   /// Nur lesbare Nachrichten anderer; der Serverzähler zählt auch nicht entschlüsselbare Ereignisse und
   /// App-Daten mit (#65). Ohne geladene Zeitleiste gilt der Serverzähler.
@@ -613,7 +619,9 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     final last = _timelineFor(threadId)?.events.where((e) => e.status.isSent).firstOrNull;
     if (room == null || last == null || room.notificationCount == 0) return;
     try {
-      await room.setReadMarker(last.eventId, mRead: last.eventId, public: _shareReadReceipts());
+      // Kontakte erfahren nie, ob und wann gelesen wurde (nie öffentlich), unabhängig von der Einstellung.
+      final outside = threadId != ChatThread.familyId && !_dmTimelines.containsKey(threadId);
+      await room.setReadMarker(last.eventId, mRead: last.eventId, public: !outside && _shareReadReceipts());
     } catch (e) {
       AppLog.e('gateway', 'Gelesen-Markierung fehlgeschlagen', e);
     }
@@ -851,6 +859,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
       t.cancelSubscriptions();
     }
     _dmTimelines.clear();
+    _contacts.clearAll();
     _dropOAuth();
     final c = _client;
     _client = null;
@@ -1284,6 +1293,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
       // Ein Sync kann die Kontodaten schon umgestellt haben, während die Zeitleiste noch den alten Raum zeigt.
       if (timeline != null && timeline.room.id == _familyRoom()?.id) (ChatThread.familyId, timeline),
       for (final e in _dmTimelines.entries) (e.key, e.value),
+      for (final e in _contacts.timelines.entries) (e.key, e.value),
     ];
     for (final (threadId, t) in lines) {
       final roomId = t.room.id;
@@ -1433,6 +1443,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     await _syncDirectChats(client, _family!, room);
     if (stale()) return;
     _acceptDirectInvites(client, _family!);
+    _acceptContactInvites(client, _family!);
     // Erst nach vollständig geladener Mitgliederliste als Basis (Lazy Loading liefert anfangs nur Teile).
     if (_participantsLoaded) _emitMemberJoins(_family!);
     await _ensurePrivateTimeline(client);
@@ -1567,6 +1578,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     for (final t in _dmTimelines.values) {
       t.cancelSubscriptions();
     }
+    _contacts.cancelTimelines();
     _signals.close().ignore();
     _disposeBooks();
     _presenceAsks.close().ignore();

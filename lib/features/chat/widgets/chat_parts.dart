@@ -36,7 +36,11 @@ class _EncryptionNote extends StatelessWidget {
         const SizedBox(width: 4),
         Flexible(
           child: Text(
-            current != null && !current.isFamily ? l.chatDirectNote(current.title) : l.chatEncryptedNote,
+            current == null || current.isFamily
+                ? l.chatEncryptedNote
+                : current.isOutside
+                ? l.chatContactNote
+                : l.chatDirectNote(current.title),
             style: Theme.of(context).textTheme.labelSmall,
           ),
         ),

@@ -82,6 +82,31 @@ class ContactService {
         return next;
       });
 
+  /// Nimmt eine Kontaktanfrage an (K3a-2, Datensatz **zuerst**): legt `accepted` an oder stuft einen vorhandenen
+  /// `outgoing`-Kontakt hoch. Ein Blockierter bleibt blockiert (`notAllowed`), ein bereits bestätigter Kontakt ist
+  /// `duplicate`. Ob [rawId] ein Familienmitglied ist, weiß der Dienst nicht: Das Gateway stuft solche Datensätze nie als
+  /// Kontakt ein, und der Controller prüft es vorab. Danach schiebt `ContactSync` die Richtlinie, und die Auto-Annahme des
+  /// Gateways tritt dem Raum bei.
+  Future<Contact> addAccepted(String rawId, {String nick = ''}) => _serial(() async {
+        final id = _requireId(rawId);
+        final current = (await store.get(ContactKind.contact, id)) as Contact?;
+        if (current != null && !current.deleted) {
+          if (current.state == ContactState.blocked) throw const ContactException(ContactError.notAllowed);
+          if (current.state == ContactState.accepted) throw const ContactException(ContactError.duplicate);
+          final next = current.copyWith(state: ContactState.accepted, version: _nextVersion(current), updatedAt: _now);
+          _requireValid(next);
+          await store.put(next);
+          _changed();
+          return next;
+        }
+        await _checkRoom(current, ContactKind.contact);
+        final next = Contact(id: id, state: ContactState.accepted, nick: nick, version: _nextVersion(current), updatedAt: _now, room: current?.room);
+        _requireValid(next);
+        await store.put(next);
+        _changed();
+        return next;
+      });
+
   /// `outgoing` → `accepted` (die Gegenseite ist beigetreten); [room] ist der Einzelchat.
   Future<Contact> markAccepted(String id, {String? room}) => _serial(() async {
         final current = await _active(id);

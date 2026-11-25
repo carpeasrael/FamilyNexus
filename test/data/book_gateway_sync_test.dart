@@ -12,8 +12,9 @@ import 'package:family_nexus/domain/book_policy.dart';
 import 'package:family_nexus/domain/book_room.dart';
 import 'package:family_nexus/domain/book_signal.dart';
 import 'package:family_nexus/domain/cash_book.dart';
-import 'package:family_nexus/domain/chat.dart' show ThreadKind;
+import 'package:family_nexus/domain/chat.dart' show ChatThread, ThreadKind;
 import 'package:family_nexus/domain/contacts.dart';
+import 'package:family_nexus/domain/conversation_policy.dart' show PeerMembership;
 import 'package:family_nexus/domain/data_inventory.dart' show InventoryRoomKind;
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -484,6 +485,7 @@ void main() {
     int invited = 0,
     int? summaryJoined,
     List<String>? members,
+    String peerState = 'join',
   }) =>
       <String, Object?>{
         if (direct)
@@ -500,7 +502,7 @@ void main() {
                 'events': <Object?>[
                   _state('m.room.create', _me, <String, Object?>{'room_version': '10'}),
                   if (megolm) _state('m.room.encryption', _me, <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2'}),
-                  for (final m in members ?? <String>[_me, peer]) _memberEvent(m, 'join'),
+                  for (final m in members ?? <String>[_me, peer]) _memberEvent(m, m == peer ? peerState : 'join'),
                 ],
               },
             },
@@ -527,6 +529,388 @@ void main() {
           },
         },
       };
+
+  group('Kontakt-Einzelchats (#119, K3a-2a)', () {
+    const ct = '!ct:hs.example';
+    const policy = ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.accepted});
+
+    Future<ChatThread?> contactThread(SdkMatrixGateway g, Map<String, Object?> update) async {
+      await _sync(g, update);
+      await Future<void>.delayed(_settle);
+      return g.threads.where((t) => t.id == ct && t.kind == ThreadKind.contact).firstOrNull;
+    }
+
+    Future<SdkMatrixGateway> signedIn([ContactPolicy p = policy]) async {
+      final (_, g) = await _signedIn(encryption: true);
+      g.setContactPolicy(p);
+      return g;
+    }
+
+    test('Kontrollfall: Kontakt mit Datensatz, beigetreten, Megolm, zwei Personen ⇒ Kontakt-Thread mit Titel „Name · server“', () async {
+      final g = await signedIn();
+      final t = await contactThread(g, dmJoined(ct, _fremd));
+      expect(t, isNotNull);
+      expect(t!.peerId, _fremd);
+      expect(t.pending, isFalse);
+      expect(t.isOutside, isTrue);
+      expect(t.title, '$_fremd · hs.example');
+    });
+
+    test('Gegenproben je einzeln: kein Thread', () async {
+      final cases = <String, (ContactPolicy, Map<String, Object?>)>{
+        'ohne Datensatz': (const ContactPolicy(enabled: true), dmJoined(ct, _fremd)),
+        'Bereich aus': (ContactPolicy.off, dmJoined(ct, _fremd)),
+        'blockiert (Datensatz)': (const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.blocked}, blocked: {_fremd}), dmJoined(ct, _fremd)),
+        'lokal blockiert': (const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.accepted}, blocked: {_fremd}), dmJoined(ct, _fremd)),
+        'ohne Megolm': (policy, dmJoined(ct, _fremd, megolm: false)),
+        'drei Personen': (policy, dmJoined(ct, _fremd, joined: 3, members: <String>[_me, _fremd, _cara])),
+        'Gegenüber hat den Raum verlassen': (policy, dmJoined(ct, _fremd, peerState: 'leave', joined: 1)),
+        'Gegenüber abgelehnt/verbannt': (policy, dmJoined(ct, _fremd, peerState: 'ban', joined: 1)),
+      };
+      for (final e in cases.entries) {
+        final g = await signedIn(e.value.$1);
+        expect(await contactThread(g, e.value.$2), isNull, reason: e.key);
+      }
+    });
+
+    test('Familienmitglied mit Kontaktdatensatz bleibt ein Einzelchat mit Mitglied, nie ein Kontakt-Thread', () async {
+      final g = await signedIn(const ContactPolicy(enabled: true, contacts: {_ben: ContactState.accepted}));
+      await _sync(g, dmJoined(ct, _ben));
+      await Future<void>.delayed(_settle);
+      expect(g.threads.where((t) => t.id == ct).map((t) => t.kind), <ThreadKind>[ThreadKind.direct]);
+    });
+
+    test('Mitgliedszustand des Gegenübers fehlt: kein Thread, bis die Test-Naht ihn liefert; ein Fehler bleibt unbekannt', () async {
+      final g = await signedIn();
+      var calls = 0;
+      g.debugPeerMembershipLoader = (room, peer) async {
+        calls++;
+        throw StateError('Netz');
+      };
+      expect(await contactThread(g, dmJoined(ct, _fremd, members: <String>[_me])), isNull, reason: 'unbekannt ⇒ ignoriert');
+      expect(calls, 1);
+      expect(g.threads.where((t) => t.kind == ThreadKind.contact), isEmpty);
+      // Später liefert die Anforderung `join`: der nächste Abgleich zeigt den Thread (Wartezeit je Raum umgehen).
+      g.debugPeerMembershipLoader = (room, peer) async => PeerMembership.join;
+      final g2 = await signedIn();
+      g2.debugPeerMembershipLoader = (room, peer) async => PeerMembership.join;
+      await _sync(g2, dmJoined(ct, _fremd, members: <String>[_me]));
+      await Future<void>.delayed(_settle);
+      await _sync(g2, <String, Object?>{});
+      await Future<void>.delayed(_settle);
+      expect(g2.threads.where((t) => t.id == ct && t.kind == ThreadKind.contact), hasLength(1));
+    });
+
+    test('Gegenüber nur eingeladen und outgoing: Thread wartet (pending); Senden verweigert', () async {
+      final g = await signedIn(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}));
+      final t = await contactThread(g, dmJoined(ct, _fremd, peerState: 'invite', joined: 1, invited: 1));
+      expect(t, isNotNull);
+      expect(t!.pending, isTrue);
+      await g.openThread(ct);
+      await expectLater(g.sendMessage('Hallo', threadId: ct), _notAllowed());
+    });
+
+    test('Senden vor openThread und Reaktionen im Kontaktraum sind verweigert; nach openThread liest messagesIn', () async {
+      final g = await signedIn();
+      expect(await contactThread(g, dmJoined(ct, _fremd)), isNotNull);
+      await expectLater(g.sendMessage('Hallo', threadId: ct), _notAllowed());
+      await expectLater(g.sendReaction('\$e', '👍', threadId: ct), _notAllowed());
+      expect(g.messagesIn(ct), isEmpty);
+      await g.openThread(ct);
+      await g.openThread(ct); // idempotent
+      expect(g.messagesIn(ct), isEmpty);
+    });
+
+    test('Richtlinie aus oder Blockieren mitten in der Sitzung: der Thread verschwindet ohne weiteren Sync', () async {
+      final g = await signedIn();
+      expect(await contactThread(g, dmJoined(ct, _fremd)), isNotNull);
+      g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.blocked}, blocked: {_fremd}));
+      await Future<void>.delayed(_settle);
+      expect(g.threads.where((t) => t.kind == ThreadKind.contact), isEmpty);
+      g.setContactPolicy(policy);
+      await Future<void>.delayed(_settle);
+      expect(g.threads.where((t) => t.kind == ThreadKind.contact), hasLength(1));
+      g.setContactPolicy(ContactPolicy.off);
+      await Future<void>.delayed(_settle);
+      expect(g.threads.where((t) => t.kind == ThreadKind.contact), isEmpty);
+    });
+
+    test('Familienwechsel: ohne geladene Mitgliederliste keine Kontakt-Threads, danach wieder; die Richtlinie bleibt', () async {
+      final g = await signedIn();
+      expect(await contactThread(g, dmJoined(ct, _fremd)), isNotNull);
+      g.debugLeaveFamilyScope();
+      expect(g.debugContactPolicy, policy);
+      expect(g.threads.where((t) => t.kind == ThreadKind.contact), isEmpty, reason: '_resetDirectChats leert die Kontaktzustände');
+      expect(g.contactRequests, isEmpty);
+    });
+
+    test('Anfrage: Einladung is_direct von Fremden ohne Datensatz; kein Rauminhalt, keine Zeitleiste; Ablehnen verlässt sie', () async {
+      final g = await signedIn(const ContactPolicy(enabled: true));
+      await _sync(g, dmInvite('!rq:hs.example', _fremd));
+      await Future<void>.delayed(_settle);
+      expect(g.contactRequests.map((r) => r.roomId), <String>['!rq:hs.example']);
+      expect(g.contactRequests.single.fromUserId, _fremd);
+      expect(g.contactRequests.single.fromName, 'fremd · hs.example', reason: 'ohne Anzeigename der lokale Teil, Server aus der ID');
+      expect(g.threads.where((t) => t.kind == ThreadKind.contact), isEmpty);
+      await g.declineContactRequest('!rq:hs.example');
+      await expectLater(g.declineContactRequest('!rq:hs.example'), _notAllowed(), reason: 'nur für die Einstufung contactRequest');
+    });
+
+    test('keine Anfragen bei Bereich aus; Ablehnen ohne Bereich verweigert', () async {
+      final g = await signedIn(ContactPolicy.off);
+      await _sync(g, dmInvite('!rq:hs.example', _fremd));
+      await Future<void>.delayed(_settle);
+      expect(g.contactRequests, isEmpty);
+      await expectLater(g.declineContactRequest('!rq:hs.example'), _notAllowed());
+    });
+
+    test('Einladung eines Kontakts mit Datensatz wird angenommen (/join), eines Fremden nie', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      g.setContactPolicy(policy);
+      await _sync(g, dmInvite('!fr:hs.example', _dora));
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '/join'), isEmpty, reason: 'Fremder ohne Datensatz: nie ohne Tipp');
+      await _sync(g, dmInvite('!ok:hs.example', _fremd));
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '/join'), isNotEmpty);
+    });
+
+    Map<String, Object?> invites(Map<String, String> fromByRoom) => <String, Object?>{
+          'rooms': <String, Object?>{
+            'invite': <String, Object?>{
+              for (final e in fromByRoom.entries)
+                e.key: <String, Object?>{
+                  'invite_state': <String, Object?>{
+                    'events': <Object?>[
+                      <String, Object?>{
+                        'type': 'm.room.member',
+                        'state_key': _me,
+                        'sender': e.value,
+                        'content': <String, Object?>{'membership': 'invite', 'is_direct': true},
+                      },
+                    ],
+                  },
+                },
+            },
+          },
+        };
+
+    test('Identitätsvertauschung: Gegenüber verlässt, ein Dritter tritt bei (m.direct zeigt weiter auf das Gegenüber) ⇒ kein Thread', () async {
+      final g = await signedIn();
+      final update = dmJoined(ct, _fremd, members: <String>[_me, _dora], joined: 2);
+      // m.direct zeigt auf _fremd, im Raum sind aber ich und _dora; _fremd ist als „leave“ eingetragen.
+      (((update['rooms']! as Map)['join']! as Map)[ct]! as Map)['state'] = <String, Object?>{
+        'events': <Object?>[
+          _state('m.room.create', _me, <String, Object?>{'room_version': '10'}),
+          _state('m.room.encryption', _me, <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2'}),
+          _memberEvent(_me, 'join'),
+          _memberEvent(_dora, 'join'),
+          _memberEvent(_fremd, 'leave'),
+        ],
+      };
+      expect(await contactThread(g, update), isNull);
+    });
+
+    test('gegenseitiges Hinzufügen: der eigene wartende Raum hindert die Annahme nicht (beide Reihenfolgen der Raum-IDs)', () async {
+      for (final ids in <(String, String)>[('!a:hs.example', '!z:hs.example'), ('!z:hs.example', '!a:hs.example')]) {
+        final (hs, g) = await _signedIn(encryption: true);
+        g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}));
+        final own = dmJoined(ids.$1, _fremd, peerState: 'invite', joined: 1, invited: 1);
+        await _sync(g, own);
+        await _sync(g, invites(<String, String>{ids.$2: _fremd}));
+        await Future<void>.delayed(_settle);
+        expect(hs.where('POST', '${ids.$2}/join'), isNotEmpty, reason: 'Einladung der Gegenseite wird angenommen: $ids');
+        expect(hs.where('POST', '${ids.$1}/join'), isEmpty);
+        expect(hs.where('POST', '/leave'), isEmpty, reason: 'nie destruktiv: der eigene Raum wird nicht verlassen');
+      }
+    });
+
+    test('ein beigetretener Raum des Einladenden blockiert eine weitere Einladung (nur ein Raum je Gegenüber)', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      g.setContactPolicy(policy);
+      expect(await contactThread(g, dmJoined(ct, _fremd)), isNotNull);
+      await _sync(g, invites(<String, String>{'!zweit:hs.example': _fremd}));
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '!zweit:hs.example/join'), isEmpty);
+    });
+
+    test('je Einladendem die Einladung mit der kleinsten Raum-ID, auch wenn die größere zuerst im Update steht', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      g.setContactPolicy(policy);
+      await _sync(g, invites(<String, String>{'!zzz:hs.example': _fremd, '!bbb:hs.example': _fremd}));
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '!bbb:hs.example/join'), isNotEmpty);
+      expect(hs.where('POST', '!zzz:hs.example/join'), isEmpty);
+    });
+
+    test('600 Fremdeinladungen verdrängen die Annahme eines Kontakts nicht; Anfragen: höchstens 5 je Server', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      g.setContactPolicy(policy);
+      await _sync(g, invites(<String, String>{
+        for (var i = 0; i < 600; i++) '!s${i.toString().padLeft(4, '0')}:hs.example': '@s${i.toString().padLeft(4, '0')}:hs.example',
+        '!kontakt:hs.example': _fremd,
+      }));
+      await Future<void>.delayed(const Duration(seconds: 1));
+      expect(hs.where('POST', '!kontakt:hs.example/join'), isNotEmpty);
+      expect(hs.where('POST', '/join').where((c) => !c.$2.contains('!kontakt')), isEmpty, reason: 'Fremde nie ohne Tipp');
+      expect(g.contactRequests.length, 5, reason: 'je Server höchstens 5');
+      expect(g.contactRequestsHidden, greaterThan(0));
+    });
+
+    test('Anfragen: insgesamt höchstens 50 bei vielen Servern; Ablehnen gibt den Platz frei (die nächste rückt nach)', () async {
+      final g = await signedIn(const ContactPolicy(enabled: true));
+      await _sync(g, invites(<String, String>{
+        for (var i = 0; i < 60; i++) '!r${i.toString().padLeft(3, '0')}:s$i.example': '@x$i:s$i.example',
+      }));
+      await Future<void>.delayed(_settle);
+      expect(g.contactRequests.length, 50);
+      expect(g.contactRequestsHidden, 10);
+      final first = g.contactRequests.first.roomId;
+      await g.declineContactRequest(first);
+      await Future<void>.delayed(_settle);
+      expect(g.contactRequests.map((r) => r.roomId), isNot(contains(first)));
+      expect(g.contactRequests.length, 50, reason: 'die nächste Anfrage rückt nach');
+    });
+
+    test('Anfragen: je Absender eine (kleinste Raum-ID); die Reihenfolge der Erstsichtung bleibt, neue verdrängen nie ältere', () async {
+      final g = await signedIn(const ContactPolicy(enabled: true));
+      const anna = '@anna2:hs.example';
+      const bert = '@bert2:hs.example';
+      await _sync(g, invites(<String, String>{'!zz:hs.example': anna, '!aa:hs.example': anna}));
+      await Future<void>.delayed(_settle);
+      expect(g.contactRequests.map((r) => r.roomId), <String>['!aa:hs.example']);
+      await _sync(g, invites(<String, String>{'!b1:hs.example': bert}));
+      await Future<void>.delayed(_settle);
+      expect(g.contactRequests.map((r) => r.fromUserId), <String>[anna, bert], reason: 'Erstsichtung: Anna zuerst');
+    });
+
+    test('Anfrage mit feindlichem Anzeigenamen: bereinigt, Server aus der ID', () async {
+      final g = await signedIn(const ContactPolicy(enabled: true));
+      final update = invites(<String, String>{'!h:hs.example': '@evil:evil.example'});
+      ((((update['rooms']! as Map)['invite']! as Map)['!h:hs.example']! as Map)['invite_state']! as Map<String, Object?>)['events'] = <Object?>[
+        <String, Object?>{
+          'type': 'm.room.member',
+          'state_key': _me,
+          'sender': '@evil:evil.example',
+          'content': <String, Object?>{'membership': 'invite', 'is_direct': true},
+        },
+        <String, Object?>{
+          'type': 'm.room.member',
+          'state_key': '@evil:evil.example',
+          'sender': '@evil:evil.example',
+          'content': <String, Object?>{'membership': 'join', 'displayname': 'Mama \u202E· familie.de'},
+        },
+      ];
+      await _sync(g, update);
+      await Future<void>.delayed(_settle);
+      expect(g.contactRequests.single.fromName, 'Mama familie.de · evil.example');
+    });
+
+    group('Nachprüfung nach dem Beitritt (Auto-Annahme)', () {
+      const room = '!neu:hs.example';
+
+      /// Der Server beantwortet `/join` und liefert den beigetretenen Raum im nächsten Sync.
+      Future<(_Hs, SdkMatrixGateway)> joined(Map<String, Object?> after, {void Function(SdkMatrixGateway g)? during}) async {
+        final (hs, g) = await _signedIn(encryption: true);
+        g.setContactPolicy(policy);
+        hs.onJoin = (r) {
+          during?.call(g);
+          // Das Echo kommt erst nach der Antwort auf `/join` (sonst verpasst `join(waitForSync: true)` es).
+          Future<void>.delayed(const Duration(milliseconds: 150), () => _syncJoined(g, after)).ignore();
+        };
+        await _sync(g, dmInvite(room, _fremd));
+        await Future<void>.delayed(const Duration(seconds: 1));
+        return (hs, g);
+      }
+
+      test('in Ordnung: Raum bleibt, Thread erscheint, nicht verlassen', () async {
+        final (hs, g) = await joined(dmJoined(room, _fremd));
+        expect(hs.where('POST', '$room/leave'), isEmpty);
+        expect(g.threads.where((t) => t.id == room && t.kind == ThreadKind.contact), hasLength(1));
+      });
+
+      test('sicherer Verstoß (kein Megolm): sofort verlassen', () async {
+        final (hs, _) = await joined(dmJoined(room, _fremd, megolm: false));
+        expect(hs.where('POST', '$room/leave'), isNotEmpty);
+      });
+
+      test('sicherer Verstoß (drei Personen): sofort verlassen', () async {
+        final (hs, _) = await joined(dmJoined(room, _fremd, joined: 3, members: <String>[_me, _fremd, _cara]));
+        expect(hs.where('POST', '$room/leave'), isNotEmpty);
+      });
+
+      test('unbekannt (Mitgliedszustand des Gegenübers fehlt): nie verlassen; später geladen ⇒ Thread', () async {
+        final (hs, g) = await _signedIn(encryption: true);
+        g.setContactPolicy(policy);
+        g.debugPeerMembershipLoader = (r, p) async => PeerMembership.join;
+        hs.onJoin = (r) => Future<void>.delayed(const Duration(milliseconds: 150), () => _syncJoined(g, dmJoined(room, _fremd, members: <String>[_me]))).ignore();
+        await _sync(g, dmInvite(room, _fremd));
+        await Future<void>.delayed(const Duration(seconds: 1));
+        expect(hs.where('POST', '$room/leave'), isEmpty, reason: 'unbekannt ist kein Verstoß');
+        await _sync(g, <String, Object?>{});
+        await Future<void>.delayed(_settle);
+        expect(g.threads.where((t) => t.id == room && t.kind == ThreadKind.contact), hasLength(1));
+      });
+
+      test('Familienwechsel während des Beitritts: der Raum wird verlassen', () async {
+        final (hs, _) = await joined(dmJoined(room, _fremd), during: (g) => g.debugLeaveFamilyScope());
+        expect(hs.where('POST', '$room/leave'), isNotEmpty);
+      });
+
+      test('Blockieren während des Beitritts: der Raum wird verlassen', () async {
+        final (hs, _) = await joined(
+          dmJoined(room, _fremd),
+          during: (g) => g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.blocked}, blocked: {_fremd})),
+        );
+        expect(hs.where('POST', '$room/leave'), isNotEmpty);
+      });
+    });
+
+    test('leaveConversation verlässt den Raum und räumt den Thread auf', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      g.setContactPolicy(policy);
+      expect(await contactThread(g, dmJoined(ct, _fremd)), isNotNull);
+      await g.openThread(ct);
+      await g.leaveConversation(ct);
+      expect(hs.where('POST', '$ct/leave'), isNotEmpty);
+      await Future<void>.delayed(_settle);
+      expect(g.threads.where((t) => t.kind == ThreadKind.contact), isEmpty);
+      expect(g.messagesIn(ct), isEmpty);
+    });
+
+    test('leaveConversation nur für Kontakt-Threads: nicht für Familienchat und Einzelchat mit Mitglied', () async {
+      final g = await signedIn();
+      await _sync(g, dmJoined('!mdm:hs.example', _ben));
+      await Future<void>.delayed(_settle);
+      await expectLater(g.leaveConversation(ChatThread.familyId), _notAllowed());
+      await expectLater(g.leaveConversation('!mdm:hs.example'), _notAllowed());
+      await expectLater(g.leaveConversation('!unbekannt:hs.example'), _notAllowed());
+    });
+
+    test('Mitglieder-Einzelchats bleiben bei Richtlinie off unverändert (Verhaltensgleichheit)', () async {
+      final (_, a) = await _signedIn(encryption: true);
+      final (_, b) = await _signedIn(encryption: true);
+      b.setContactPolicy(ContactPolicy.off);
+      for (final g in <SdkMatrixGateway>[a, b]) {
+        await _sync(g, dmJoined('!mdm:hs.example', _ben));
+        await Future<void>.delayed(_settle);
+      }
+      expect(<(String, ThreadKind, String)>[for (final t in b.threads) (t.id, t.kind, t.title)],
+          <(String, ThreadKind, String)>[for (final t in a.threads) (t.id, t.kind, t.title)]);
+    });
+
+    test('Ungelesenes: Kontakt-Räume zählen in unreadCount, nie in familyUnreadCount', () async {
+      final g = await signedIn();
+      final update = dmJoined(ct, _fremd);
+      ((update['rooms']! as Map)['join']! as Map)[ct] = <String, Object?>{
+        ...((update['rooms']! as Map)['join']! as Map)[ct]! as Map<String, Object?>,
+        'unread_notifications': <String, Object?>{'notification_count': 3},
+      };
+      expect(await contactThread(g, update), isNotNull);
+      expect(g.unreadIn(ct), 3);
+      expect(g.unreadCount, g.familyUnreadCount + 3);
+    });
+  });
 
   group('Einzelchat-Einstufung (#119, K2a)', () {
     const dm = '!dm:hs.example';
@@ -659,7 +1043,7 @@ void main() {
       expect(g.familyUnreadCount, g.unreadCount);
     });
 
-    test('Kontaktrichtlinie (K3a-1): Standard aus; sie ändert in diesem Stand weder Einzelchats noch Einladungen (Gateway liest sie noch nicht)', () async {
+    test('Kontaktrichtlinie: Standard aus; Familien-Einzelchats bleiben unverändert (ab K3a-2 nimmt das Gateway Einladungen eigener Kontakte an)', () async {
       final (hs, g) = await _signedIn(encryption: true);
       expect(g.debugContactPolicy, ContactPolicy.off);
       g.setContactPolicy(const ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.accepted}));
@@ -667,7 +1051,9 @@ void main() {
       expect(await shown(g, dmJoined(dm, _ben)), isTrue, reason: 'Familien-Einzelchat unverändert');
       await _sync(g, dmInvite('!kontakt:hs.example', _fremd));
       await Future<void>.delayed(_settle);
-      expect(hs.where('POST', '/join'), isEmpty, reason: 'Kontakt-Einladungen nimmt erst K3a-2 an');
+      // Seit K3a-2: Einladung eines Kontakts mit Datensatz (accepted) wird über `autoAcceptContact` angenommen; der Raum
+      // bleibt aber ohne beigetretenes Gegenüber im Raumzustand unsichtbar (kein Thread).
+      expect(hs.where('POST', '/join'), isNotEmpty);
       expect(g.threads.where((t) => t.id == '!kontakt:hs.example'), isEmpty);
     });
 

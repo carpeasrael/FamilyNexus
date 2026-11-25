@@ -32,6 +32,7 @@ class DataReport {
         InventoryRoomKind.family => l.roomKindFamily,
         InventoryRoomKind.private => l.roomKindPrivate,
         InventoryRoomKind.direct => l.roomKindDirect,
+        InventoryRoomKind.contact => l.roomKindContact,
         InventoryRoomKind.book => l.roomKindBook,
         InventoryRoomKind.other => l.roomKindOther,
       };
@@ -114,7 +115,9 @@ class DataReport {
       // Raum-IDs stehen nicht in der Übersicht (#555, E-109): Die des Familienraums ist der Familien-Code (E-65). Nur
       // unbekannte Räume tragen sie, sonst wären sie nicht zu unterscheiden. Namen der Gegenseite nur online (E-89).
       // Ein Kassenbuch trägt nur den festen Raumnamen der App, er sagt nichts (#311, E-113).
-      final name = (r.kind == InventoryRoomKind.direct && !withMembers) || r.kind == InventoryRoomKind.book ? '' : r.name;
+      final name = ((r.kind == InventoryRoomKind.direct || r.kind == InventoryRoomKind.contact) && !withMembers) || r.kind == InventoryRoomKind.book
+          ? ''
+          : r.name;
       b
         ..writeln()
         ..writeln('- ${_roomKind(l, r.kind)}${name.isEmpty ? '' : ' „$name“'}${r.kind == InventoryRoomKind.other ? ' (${r.id})' : ''}');

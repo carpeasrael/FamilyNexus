@@ -8,6 +8,11 @@ import 'family_invitation.dart';
 /// ab K3a-1 nur bei eingeschaltetem Bereich ([PolicyContext.contactsEnabled]); [contactGroup] gibt es ab K4.
 enum RoomClass { family, private, familyDirect, contactDirect, contactGroup, familyInvite, contactRequest, ignored }
 
+/// Mitgliedschaft des **Gegenübers** im Raum (aus `m.room.member`, nicht aus Zählern): [join] beigetreten, [invite] nur
+/// eingeladen, [other] abgelehnt/verlassen/verbannt, [unknown] Zustand nicht geladen (Lazy Loading, Neustart). Nur sie
+/// schließt aus, dass das Gegenüber ging und ein Dritter beitrat, während `m.direct` weiter auf das Gegenüber zeigt.
+enum PeerMembership { join, invite, other, unknown }
+
 /// Mitgliedschaft des eigenen Kontos im Raum; alles außer `join` und `invite` (`leave`, `ban`, `knock`) zählt nicht.
 enum RoomMembership { join, invite, other }
 
@@ -29,6 +34,7 @@ class RoomFacts {
     this.joinedCount,
     this.invitedCount,
     this.joinRule,
+    this.peerMembership = PeerMembership.unknown,
   });
 
   final String id;
@@ -41,6 +47,9 @@ class RoomFacts {
   final int? joinedCount;
   final int? invitedCount;
   final String? joinRule;
+
+  /// Mitgliedschaft des Gegenübers ([peerId]); `unknown` ist der Standard und führt für Kontakte zu `ignored`.
+  final PeerMembership peerMembership;
 
   /// Höchstens zwei Personen (beigetreten oder eingeladen). **Fail-closed:** unbekannte beigetretene Zahl ist kein Paar;
   /// eine unbekannte Zahl eingeladener zählt als 0.
@@ -125,9 +134,14 @@ class ConversationPolicy {
           return RoomClass.familyDirect;
         }
         // Kontakt-Einzelchat (K3a-1): nur mit eigenem Datensatz, nie für Familienmitglieder (jeder Status).
+        // Das Gegenüber muss im Raum **beigetreten** sein (oder bei `outgoing` noch eingeladen: wartet auf Annahme).
         if (peer != null && _contactPeerOk(peer, c) && r.megolm && r.isPair) {
           final state = c.contacts[peer];
-          if (state == ContactState.outgoing || state == ContactState.accepted) return RoomClass.contactDirect;
+          final joinedPeer = r.peerMembership == PeerMembership.join;
+          final waiting = r.peerMembership == PeerMembership.invite && state == ContactState.outgoing;
+          if ((state == ContactState.outgoing || state == ContactState.accepted) && (joinedPeer || waiting)) {
+            return RoomClass.contactDirect;
+          }
         }
         return RoomClass.ignored;
       case RoomMembership.invite:

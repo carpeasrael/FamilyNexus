@@ -2672,6 +2672,24 @@ abstract class AppLocalizations {
   /// **'Familienchat {name}'**
   String chatThreadFamily(String name);
 
+  /// No description provided for @chatThreadContact.
+  ///
+  /// In de, this message translates to:
+  /// **'Außerhalb der Familie: {name}'**
+  String chatThreadContact(String name);
+
+  /// No description provided for @chatContactNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Außerhalb der Familie. Termine, Listen und Online-Status werden hier nicht geteilt.'**
+  String get chatContactNote;
+
+  /// No description provided for @roomKindContact.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakt-Chat'**
+  String get roomKindContact;
+
   /// No description provided for @chatThreadDirect.
   ///
   /// In de, this message translates to:
