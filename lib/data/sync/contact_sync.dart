@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import '../../core/app_log.dart';
 import '../../domain/calendar_signal.dart';
+import '../../domain/chat.dart' show ThreadKind;
 import '../../domain/contact_service.dart';
 import '../../domain/contact_store.dart';
 import '../../domain/contacts.dart';
@@ -66,6 +67,11 @@ class ContactSync {
   bool _policyAgain = false;
   Future<void> _policyDone = Future<void>.value();
   Set<String> _lastLocalBlocked = const <String>{};
+
+  // Abgleich `outgoing` → `accepted` (K3a-2b): ein Lauf, Anstöße fassen zusammen.
+  bool _reconciling = false;
+  bool _reconcileAgain = false;
+  Future<void> _reconcileDone = Future<void>.value();
   Object? _lastState;
 
   String get _me => service.myUserId;
@@ -85,6 +91,63 @@ class ContactSync {
   Future<void> idle() async {
     await _queue;
     await _policyDone;
+    await _reconcileDone;
+  }
+
+  /// Rückruf des Dienstes bei jeder inhaltlichen Änderung: Richtlinie neu bauen und den Abgleich prüfen.
+  void _onServiceChanged() {
+    _schedulePolicy();
+    _scheduleReconcile();
+  }
+
+  void _scheduleReconcile() {
+    if (_disposed) return;
+    if (_reconciling) {
+      _reconcileAgain = true;
+      return;
+    }
+    _reconciling = true;
+    _reconcileDone = _reconcile();
+  }
+
+  /// Setzt `outgoing` auf `accepted`, sobald das Gegenüber **positiv beigetreten** ist (Kontakt-Thread ohne `pending`,
+  /// K3a-2a): auch wenn die Gegenseite den Raum zuerst angelegt hat und wir ihn per Auto-Annahme betreten haben
+  /// (gegenseitiges Hinzufügen). Ein lokal Blockierter wird nie `accepted`. Abgelehnt/verlassen ⇒ kein Thread ⇒ nie.
+  Future<void> _reconcile() async {
+    try {
+      do {
+        _reconcileAgain = false;
+        if (_disposed) return;
+        final outgoing = <Contact>[
+          for (final c in await service.contacts())
+            if (c.state == ContactState.outgoing) c,
+        ];
+        if (_disposed) return;
+        final blocked = blockedList?.blocked ?? const <String>{};
+        for (final c in outgoing) {
+          if (blocked.contains(c.id)) continue;
+          String? room;
+          for (final t in gateway.threads) {
+            if (t.kind == ThreadKind.contact && t.peerId == c.id && !t.pending) {
+              room = t.id;
+              break;
+            }
+          }
+          if (room == null) continue;
+          try {
+            await service.markAccepted(c.id, room: room);
+            if (_disposed) return;
+            kick();
+          } on ContactException {
+            // Zwischenzeitlich geändert (entfernt, blockiert, schon bestätigt): der nächste Lauf entscheidet neu.
+          }
+        }
+      } while (_reconcileAgain);
+    } catch (e) {
+      AppLog.e('contacts', 'Abgleich der Kontakte gescheitert', e);
+    } finally {
+      _reconciling = false;
+    }
   }
 
   /// Plant den Aufbau der Richtlinie (läuft nie parallel; wirft nie).
@@ -114,6 +177,7 @@ class ContactSync {
         final policy = ContactPolicy.of(await store.all(), localBlocked: local);
         if (_disposed) break;
         gateway.setContactPolicy(policy);
+        _scheduleReconcile();
       } while (_policyAgain);
     } catch (e) {
       AppLog.e('contacts', 'Kontaktrichtlinie konnte nicht aufgebaut werden', e);
@@ -124,7 +188,7 @@ class ContactSync {
 
   void start() {
     _disposed = false;
-    service.onChanged = _schedulePolicy;
+    service.onChanged = _onServiceChanged;
     _sub ??= gateway.calendarSignals.listen(_enqueue);
     _timer ??= Timer.periodic(retryInterval, (_) => kick());
     _backoff.changed(_gatewayState());
@@ -134,6 +198,7 @@ class ContactSync {
     }
     reconcileBlocked().ignore();
     _schedulePolicy();
+    _scheduleReconcile();
     kick();
   }
 
@@ -149,6 +214,7 @@ class ContactSync {
       _lastState = state;
       _schedulePolicy();
     }
+    _scheduleReconcile();
     final changed = _backoff.changed(state);
     if (!changed && _backoff.blocked) return;
     kick();
@@ -156,7 +222,7 @@ class ContactSync {
 
   void dispose() {
     _disposed = true;
-    if (identical(service.onChanged, _schedulePolicy) || service.onChanged == _schedulePolicy) service.onChanged = null;
+    if (service.onChanged == _onServiceChanged) service.onChanged = null;
     try {
       gateway.setContactPolicy(ContactPolicy.off);
     } catch (e) {

@@ -38,6 +38,7 @@ String errorText(AppLocalizations l, Object error) {
       GatewayError.oauthCancelled || GatewayError.oauthStateMismatch => l.errOAuthCancelled,
       GatewayError.oauthAborted => l.errOAuthAborted,
       GatewayError.passwordChangeUnavailable => l.passwordChangeUnavailable,
+      GatewayError.peerNotReachable => l.errPeerNotReachable,
       GatewayError.unknown => l.errUnknown,
     };
   }

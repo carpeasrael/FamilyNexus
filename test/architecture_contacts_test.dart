@@ -133,6 +133,23 @@ void main() {
     expect(d, contains('_contacts.clearAll();'));
   });
 
+  test('probeContact/startContactChat nur im Gateway; Profil über den direkten Endpunkt, nie über den SDK-Cache (kein Fremdprofil in der Datenbank)', () {
+    const allowed = <String>{'lib/data/matrix/matrix_gateway.dart', 'lib/data/matrix/gateway/contact_add.dart'};
+    final offenders = <String>[];
+    for (final f in libFiles()) {
+      if (allowed.contains(f.path)) continue;
+      final t = code(f.readAsStringSync());
+      if (t.contains('probeContact(') || t.contains('startContactChat(')) offenders.add(f.path);
+    }
+    expect(offenders, isEmpty);
+    final t = code(File('lib/data/matrix/gateway/contact_add.dart').readAsStringSync());
+    expect(t, contains("RequestType.GET, '/client/v3/profile/\${Uri.encodeComponent(userId)}'"));
+    expect(t, isNot(contains('getProfileFromUserId')));
+    expect(t, isNot(contains('getUserProfile')));
+    // Fehler nur als Art und errcode, nie die Ausnahme, Kennung, Name oder Raum-ID.
+    expect(RegExp(r"AppLog\.[dwe]\('gateway',[^;]*\$userId").hasMatch(t), isFalse);
+  });
+
   test('Kontakt-Räume: keine App-Ereignisse hinein (Reaktion verweigert, Terminverweise nur im Familienraum, Lesebestätigung privat)', () {
     final c = code(File('lib/data/matrix/gateway/chat.dart').readAsStringSync());
     expect(c, contains('_contacts.peers.containsKey(threadId)) {\n      throw const GatewayException(GatewayError.notAllowed);'));

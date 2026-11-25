@@ -36,6 +36,17 @@ class _ContactState {
   final Map<String, DateTime> peerRetryAfter = <String, DateTime>{};
   final Map<String, PeerMembership> peerCache = <String, PeerMembership>{};
 
+  /// Kontakt hinzufügen (K3a-2b): Abfragen begrenzen, Ergebnisse kurz merken, Anlegen nie doppelt.
+  final Map<String, ({DateTime at, ContactProbe probe})> probeCache = <String, ({DateTime at, ContactProbe probe})>{};
+  final Map<String, Future<ContactProbe>> probeInFlight = <String, Future<ContactProbe>>{};
+  final Set<Future<void>> probeSlots = <Future<void>>{};
+  final List<DateTime> probeTimes = <DateTime>[];
+  final Set<String> probedIds = <String>{};
+  final Set<String> creating = <String>{};
+
+  /// Erreichbarkeit je Gegenüber kurz merken (die Signaturprüfung je Gerät ist teuer): Zeit und Ergebnis.
+  final Map<String, ({DateTime at, ContactReachability reach})> reachCache = <String, ({DateTime at, ContactReachability reach})>{};
+
   void rememberFailed(String roomId) {
     failed.remove(roomId);
     failed.add(roomId);
@@ -75,6 +86,13 @@ class _ContactState {
     peerLoading.clear();
     peerRetryAfter.clear();
     peerCache.clear();
+    probeCache.clear();
+    probeInFlight.clear();
+    probeSlots.clear();
+    probeTimes.clear();
+    probedIds.clear();
+    creating.clear();
+    reachCache.clear();
   }
 }
 
@@ -102,6 +120,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
   PolicyContext _policyContext(Family f, String familyRoomId);
   RoomFacts _roomFacts(Room r, String me);
   GatewayException _map(Object e);
+  ContactReachability _reachabilityOf(String peer);
   void _scheduleRefresh();
 
   /// Nur für Tests: lädt den Mitgliedszustand des Gegenübers (Harness ohne diesen HTTP-Weg).
@@ -180,6 +199,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
               peerId: e.value,
               unread: unreadIn(e.key),
               pending: _contacts.pending.contains(e.key),
+              reachable: _reachabilityOf(e.value) != ContactReachability.notReachable,
             ),
       ]..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
 
@@ -452,6 +472,8 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     if (peer == null || !_contacts.timelines.containsKey(threadId)) throw const GatewayException(GatewayError.notAllowed);
     if (!_canEncryptIn(room)) throw const GatewayException(GatewayError.encryptionUnavailable);
     if (!_stillContact(room, peer)) throw const GatewayException(GatewayError.notAllowed);
+    // Ohne Schlüssel, mit denen das Gegenüber lesen kann, käme die Nachricht still unlesbar an (B5).
+    if (_reachabilityOf(peer) == ContactReachability.notReachable) throw const GatewayException(GatewayError.peerNotReachable);
     return room;
   }
 

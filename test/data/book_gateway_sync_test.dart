@@ -128,6 +128,18 @@ class _Hs {
   Completer<void> release = Completer<void>();
   int _syncs = 0;
   void Function(String room)? onJoin;
+
+  /// Antworten auf `GET /profile/{id}` (Status, Körper); ohne Eintrag `M_NOT_FOUND`.
+  final Map<String, (int, Map<String, Object?>)> profiles = <String, (int, Map<String, Object?>)>{};
+
+  /// Hält `createRoom`, bis die Zukunft endet (Wettlauf beim Anlegen).
+  Completer<void>? holdCreate;
+
+  /// Nach `createRoom`: liefert den Sync mit dem angelegten Raum (sonst wartet das SDK darauf).
+  void Function(String room)? onCreate;
+
+  /// Hält die Antworten auf `GET /profile/{id}`, bis die Zukunft endet (gleichzeitige Abfragen).
+  Completer<void>? holdProfile;
   List<String> members = <String>[];
   Set<String> left = <String>{};
 
@@ -181,7 +193,18 @@ class _Hs {
           if (_syncs++ > 0) await release.future;
           return _json(<String, Object?>{'next_batch': 's$_syncs'});
         }
-        if (path == '/_matrix/client/v3/createRoom') return _json(<String, Object?>{'room_id': createdRoom});
+        if (path == '/_matrix/client/v3/createRoom') {
+          await holdCreate?.future;
+          onCreate?.call(createdRoom);
+          return _json(<String, Object?>{'room_id': createdRoom});
+        }
+        if (path.startsWith('/_matrix/client/v3/profile/')) {
+          await holdProfile?.future;
+          final user = path.substring('/_matrix/client/v3/profile/'.length);
+          final p = profiles[user];
+          if (p == null) return _json(<String, Object?>{'errcode': 'M_NOT_FOUND', 'error': 'Profil nicht gefunden'}, 404);
+          return _json(p.$2, p.$1);
+        }
         final join = RegExp(r'/rooms/([^/]+)/join$').firstMatch(path);
         if (join != null) {
           onJoin?.call(join.group(1)!);
@@ -337,6 +360,12 @@ Future<void> _syncJoined(SdkMatrixGateway g, Map<String, Object?> update) async 
   await _sync(g, update);
   await Future<void>.delayed(const Duration(milliseconds: 80));
   g.sdkClient!.onSyncStatus.add(const SyncStatusUpdate(SyncStatus.finished));
+}
+
+Future<ChatThread?> contactThreadFor(SdkMatrixGateway g, String room, Map<String, Object?> update) async {
+  await _sync(g, update);
+  await Future<void>.delayed(_settle);
+  return g.threads.where((t) => t.id == room && t.kind == ThreadKind.contact).firstOrNull;
 }
 
 Matcher _notAllowed() => throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.notAllowed));
@@ -1070,6 +1099,277 @@ void main() {
       expect(await contactThread(g, update), isNotNull);
       expect(g.unreadIn(ct), 3);
       expect(g.unreadCount, g.familyUnreadCount + 3);
+    });
+  });
+
+  group('Kontakt hinzufügen (#119, K3a-2b)', () {
+    const policyOut = ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.outgoing});
+
+    Future<(_Hs, SdkMatrixGateway)> ready([ContactPolicy p = policyOut, bool encryption = true]) async {
+      final (hs, g) = await _signedIn(encryption: encryption);
+      g.setContactPolicy(p);
+      g.debugDevicesOf = (id) => <bool>[true];
+      return (hs, g);
+    }
+
+    int profileCalls(_Hs hs) => hs.where('GET', '/profile/').length;
+
+    /// Nach dem Anlegen liefert der Server den Raum im Sync (Gegenüber nur eingeladen).
+    void armCreate(_Hs hs, SdkMatrixGateway g) => hs.onCreate = (room) => Future<void>.delayed(
+          const Duration(milliseconds: 150),
+          () => _syncJoined(g, dmJoined(room, _fremd, peerState: 'invite', joined: 1, invited: 1)),
+        ).ignore();
+
+    int keyQueriesFor(_Hs hs, String id) => hs.where('POST', '/keys/query').where((c) => c.$3.contains(id)).length;
+
+    group('probeContact', () {
+      test('Familienmitglied (jeder Status): ohne Netzabfrage beantwortet', () async {
+        final (hs, g) = await ready();
+        for (final id in <String>[_ben, _cara, _dora]) {
+          final p = await g.probeContact(id);
+          expect(p.isFamilyMember, isTrue, reason: id);
+        }
+        expect(profileCalls(hs), 0);
+        for (final id in <String>[_ben, _cara, _dora]) {
+          expect(keyQueriesFor(hs, id), 0, reason: id);
+        }
+      });
+
+      test('Vorbedingungen: ungültige ID, eigenes Konto, Bereich aus, blockiert, Liste nicht geladen', () async {
+        final (_, g) = await ready();
+        await expectLater(g.probeContact('kein-konto'), _error(GatewayError.invalidInput));
+        await expectLater(g.probeContact(_me), _notAllowed());
+        g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.blocked}, blocked: {_fremd}));
+        await expectLater(g.probeContact(_fremd), _notAllowed());
+        g.setContactPolicy(ContactPolicy.off);
+        await expectLater(g.probeContact(_fremd), _notAllowed());
+        final (hs2, g2) = await _signedIn(encryption: true, familyMembersFail: true);
+        g2.setContactPolicy(policyOut);
+        await expectLater(g2.probeContact(_fremd), _notAllowed());
+        expect(profileCalls(hs2), 0, reason: 'bei unvollständiger Mitgliederliste keine Netzabfrage');
+      });
+
+      test('Profil: vorhanden ⇒ Name bereinigt; nicht gefunden ⇒ no; verboten/Serverfehler ⇒ unknown (blockiert nichts)', () async {
+        final (hs, g) = await ready();
+        hs.profiles[_fremd] = (200, <String, Object?>{'displayname': 'Mama \u202E· familie.de'});
+        var p = await g.probeContact(_fremd);
+        expect((p.existence, p.displayName), (ContactExistence.yes, 'Mama familie.de'));
+        for (final c in <(String, int, ContactExistence)>[('@nf:hs.example', 404, ContactExistence.no), ('@fb:hs.example', 403, ContactExistence.unknown), ('@se:hs.example', 500, ContactExistence.unknown)]) {
+          hs.profiles[c.$1] = (c.$2, <String, Object?>{'errcode': c.$2 == 404 ? 'M_NOT_FOUND' : (c.$2 == 403 ? 'M_FORBIDDEN' : 'M_UNKNOWN'), 'error': 'x'});
+          p = await g.probeContact(c.$1);
+          expect(p.existence, c.$3, reason: c.$1);
+        }
+      });
+
+      test('Erreichbarkeit: Gerät mit Schlüsseln ⇒ erreichbar; keine verschlüsselbaren Geräte ⇒ nicht erreichbar; Schlüssel unbekannt ⇒ unknown', () async {
+        final (hs, g) = await ready();
+        hs.profiles[_fremd] = (200, <String, Object?>{'displayname': 'F'});
+        g.debugDevicesOf = (id) => <bool>[false, true];
+        expect((await g.probeContact(_fremd)).reachability, ContactReachability.reachable);
+        g.debugDevicesOf = (id) => <bool>[false, false];
+        hs.profiles['@b:hs.example'] = (200, <String, Object?>{'displayname': 'B'});
+        expect((await g.probeContact('@b:hs.example')).reachability, ContactReachability.notReachable, reason: 'Gerät ohne gültige Signaturkette');
+        g.debugDevicesOf = (id) => <bool>[];
+        hs.profiles['@c:hs.example'] = (200, <String, Object?>{'displayname': 'C'});
+        expect((await g.probeContact('@c:hs.example')).reachability, ContactReachability.notReachable, reason: 'Schlüssel da, kein Gerät');
+        g.debugDevicesOf = (id) => null;
+        hs.profiles['@d:hs.example'] = (200, <String, Object?>{'displayname': 'D'});
+        expect((await g.probeContact('@d:hs.example')).reachability, ContactReachability.unknown, reason: 'Abfragefehler ist nie „nicht erreichbar“');
+      });
+
+      test('Zwischenspeicher: gleiche Kennung innerhalb einer Minute ohne neue Abfrage; Unbekanntes wird nicht gemerkt', () async {
+        final (hs, g) = await ready();
+        hs.profiles[_fremd] = (200, <String, Object?>{'displayname': 'F'});
+        await g.probeContact(_fremd);
+        await g.probeContact(_fremd);
+        expect(profileCalls(hs), 1);
+        hs.profiles['@u:hs.example'] = (403, <String, Object?>{'errcode': 'M_FORBIDDEN', 'error': 'x'});
+        await g.probeContact('@u:hs.example');
+        await g.probeContact('@u:hs.example');
+        expect(hs.where('GET', '/profile/@u').length, 2, reason: 'unknown wird nicht zwischengespeichert');
+      });
+
+      test('Grenzen: höchstens 20 Abfragen je Stunde (rateLimited), Familienmitglieder und Zwischenspeicher zählen nicht', () async {
+        final (hs, g) = await ready();
+        for (var i = 0; i < 20; i++) {
+          final id = '@p$i:hs.example';
+          hs.profiles[id] = (200, <String, Object?>{'displayname': 'P$i'});
+          await g.probeContact(id);
+          await g.probeContact(_ben);
+          await g.probeContact(id);
+        }
+        await expectLater(g.probeContact('@p99:hs.example'), _error(GatewayError.rateLimited));
+        expect((await g.probeContact('@p3:hs.example')).displayName, 'P3', reason: 'aus dem Zwischenspeicher');
+      });
+
+      test('Log: nie Kennung, Name oder Raum-ID im Fehlerfall', () async {
+        AppLog.captured.clear();
+        AppLog.capture = true;
+        addTearDown(() => AppLog.capture = false);
+        final (hs, g) = await ready();
+        hs.profiles[_fremd] = (500, <String, Object?>{'errcode': 'M_UNKNOWN', 'error': 'User $_fremd kaputt'});
+        await g.probeContact(_fremd);
+        final text = AppLog.captured.join('\n');
+        expect(text, isNot(contains('fremd')));
+        expect(text, isNot(contains('kaputt')));
+      });
+    });
+
+    test('Schlüssel unbekannt: der Thread bleibt erreichbar (nie eine falsche Warnung) und Senden wird nicht als „nicht erreichbar“ verweigert', () async {
+      final (_, g) = await ready(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.accepted}));
+      expect(await contactThreadFor(g, '!ct:hs.example', dmJoined('!ct:hs.example', _fremd)), isNotNull);
+      await g.openThread('!ct:hs.example');
+      g.debugDevicesOf = (id) => null;
+      await _sync(g, <String, Object?>{});
+      await Future<void>.delayed(_settle);
+      expect(g.threads.firstWhere((t) => t.kind == ThreadKind.contact).reachable, isTrue);
+      try {
+        await g.sendMessage('Hallo', threadId: '!ct:hs.example').timeout(const Duration(seconds: 3));
+      } catch (e) {
+        expect(e, isNot(isA<GatewayException>().having((x) => x.error, 'error', GatewayError.peerNotReachable)));
+      }
+    });
+
+    test('gleichzeitige Abfragen: dieselbe Kennung teilt eine Anfrage; höchstens 4 verschiedene gleichzeitig (rateLimited)', () async {
+      final (hs, g) = await ready();
+      hs.holdProfile = Completer<void>();
+      hs.profiles[_fremd] = (200, <String, Object?>{'displayname': 'F'});
+      final a = g.probeContact(_fremd);
+      final b = g.probeContact(_fremd);
+      final others = <Future<ContactProbe>>[
+        for (var i = 0; i < 3; i++) g.probeContact('@x$i:hs.example'),
+      ];
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      await expectLater(g.probeContact('@x9:hs.example'), _error(GatewayError.rateLimited));
+      hs.holdProfile!.complete();
+      await Future.wait<ContactProbe>(<Future<ContactProbe>>[a, b, ...others]);
+      expect(hs.where('GET', '/profile/@fremd').length, 1, reason: 'dieselbe Kennung teilt eine Anfrage');
+    });
+
+    group('startContactChat', () {
+      test('Vorbedingungen je einzeln: ohne Datensatz, accepted, blockiert, Familienmitglied, eigenes Konto', () async {
+        final (hs, g) = await ready(const ContactPolicy(enabled: true));
+        var keyChecks = 0;
+        g.debugDevicesOf = (id) {
+          keyChecks++;
+          return <bool>[true];
+        };
+        await expectLater(g.startContactChat(_fremd), _notAllowed(), reason: 'ohne Datensatz');
+        g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.accepted}));
+        await expectLater(g.startContactChat(_fremd), _notAllowed(), reason: 'accepted');
+        g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}, blocked: {_fremd}));
+        await expectLater(g.startContactChat(_fremd), _notAllowed(), reason: 'blockiert');
+        g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_ben: ContactState.outgoing, _dora: ContactState.outgoing}));
+        await expectLater(g.startContactChat(_ben), _notAllowed(), reason: 'Familienmitglied');
+        await expectLater(g.startContactChat(_dora), _notAllowed(), reason: 'eingeladenes Familienmitglied');
+        await expectLater(g.startContactChat(_me), _notAllowed());
+        expect(hs.where('POST', '/createRoom'), isEmpty);
+        expect(keyChecks, 0, reason: 'Vorbedingungen scheitern vor jeder Schlüsselabfrage');
+      });
+
+      test('Schreibweise des Servernamens: eigene Kennung und Familienmitglied bleiben erkannt', () async {
+        final (hs, g) = await ready(const ContactPolicy(enabled: true, contacts: {'@n2:hs.example': ContactState.outgoing, _ben: ContactState.outgoing}));
+        await expectLater(g.startContactChat('@n2:HS.Example'), _notAllowed(), reason: 'eigenes Konto');
+        await expectLater(g.startContactChat('@ben:HS.EXAMPLE'), _notAllowed(), reason: 'Familienmitglied');
+        await expectLater(g.probeContact('@n2:HS.Example'), _notAllowed());
+        expect((await g.probeContact('@ben:HS.EXAMPLE')).isFamilyMember, isTrue);
+        expect(profileCalls(hs), 0);
+        await expectLater(g.startContactChat('@Gross:hs.example'), _error(GatewayError.invalidInput), reason: 'Großbuchstaben im lokalen Teil');
+      });
+
+      test('Liste nicht geladen: nie ein Raum', () async {
+        final (hs, g) = await _signedIn(encryption: true, familyMembersFail: true);
+        g.setContactPolicy(policyOut);
+        await expectLater(g.startContactChat(_fremd), _notAllowed());
+        expect(hs.where('POST', '/createRoom'), isEmpty);
+      });
+
+      test('ohne Verschlüsselung: encryptionUnavailable, kein Raum', () async {
+        final (hs, g) = await ready(policyOut, false);
+        await expectLater(g.startContactChat(_fremd), _error(GatewayError.encryptionUnavailable));
+        expect(hs.where('POST', '/createRoom'), isEmpty);
+      });
+
+      test('nicht erreichbar ⇒ peerNotReachable, Abfragefehler ⇒ serverUnreachable; beide ohne Raum; danach ist ein neuer Versuch möglich', () async {
+        final (hs, g) = await ready();
+        g.debugDevicesOf = (id) => <bool>[false];
+        await expectLater(g.startContactChat(_fremd), _error(GatewayError.peerNotReachable));
+        g.debugDevicesOf = (id) => null;
+        await expectLater(g.startContactChat(_fremd), _error(GatewayError.serverUnreachable));
+        expect(hs.where('POST', '/createRoom'), isEmpty);
+        g.debugDevicesOf = (id) => <bool>[true];
+        hs.createdRoom = '!neu:hs.example';
+        armCreate(hs, g);
+        expect(await g.startContactChat(_fremd), isNotEmpty);
+        expect(hs.where('POST', '/createRoom'), hasLength(1));
+      });
+
+      test('Anlegen: verschlüsselt, is_direct, Verlauf „shared“; gibt die Raum-ID zurück', () async {
+        final (hs, g) = await ready();
+        hs.createdRoom = '!neu:hs.example';
+        armCreate(hs, g);
+        final id = await g.startContactChat(_fremd);
+        expect(id, '!neu:hs.example');
+        final body = hs.where('POST', '/createRoom').single.$3;
+        expect(body, contains('"is_direct":true'));
+        expect(body, contains('m.megolm.v1.aes-sha2'));
+        expect(body, contains('"history_visibility":"shared"'));
+        expect(body, contains('"preset":"private_chat"'));
+      });
+
+      test('ein vorhandener Kontakt-Raum wird wiederverwendet, ohne neue Abfrage und ohne neuen Raum', () async {
+        final (hs, g) = await ready();
+        g.debugDevicesOf = (id) => <bool>[false]; // wäre „nicht erreichbar“: darf einen bestehenden Raum nicht blockieren
+        await _sync(g, dmJoined('!alt:hs.example', _fremd));
+        await Future<void>.delayed(_settle);
+        expect(await g.startContactChat(_fremd), '!alt:hs.example');
+        expect(hs.where('POST', '/createRoom'), isEmpty);
+      });
+
+      test('zweiter gleichzeitiger Aufruf für dieselbe Person: alreadyExists', () async {
+        final (hs, g) = await ready();
+        hs.holdCreate = Completer<void>();
+        hs.createdRoom = '!neu:hs.example';
+        armCreate(hs, g);
+        final first = g.startContactChat(_fremd);
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await expectLater(g.startContactChat(_fremd), _error(GatewayError.alreadyExists));
+        hs.holdCreate!.complete();
+        expect(await first, isNotEmpty);
+      });
+
+      test('Blockieren oder Familienwechsel während des Anlegens: der Raum wird verlassen, nicht verwaist', () async {
+        for (final blockInsteadOfLeave in <bool>[true, false]) {
+          final (hs, g) = await ready();
+          hs.holdCreate = Completer<void>();
+          hs.createdRoom = '!neu:hs.example';
+          armCreate(hs, g);
+          final f = g.startContactChat(_fremd);
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          if (blockInsteadOfLeave) {
+            g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.blocked}, blocked: {_fremd}));
+          } else {
+            g.debugLeaveFamilyScope();
+          }
+          final done = expectLater(f, _notAllowed());
+          hs.holdCreate!.complete();
+          await done;
+          expect(hs.where('POST', '!neu:hs.example/leave'), isNotEmpty, reason: blockInsteadOfLeave ? 'blockiert' : 'Familienwechsel');
+        }
+      });
+    });
+
+    test('Senden an nicht erreichbare Kontakte: peerNotReachable; Anzeige reachable=false (ohne Netz)', () async {
+      final (hs, g) = await ready(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.accepted}));
+      expect(await contactThreadFor(g, '!ct:hs.example', dmJoined('!ct:hs.example', _fremd)), isNotNull);
+      expect(g.threads.firstWhere((t) => t.kind == ThreadKind.contact).reachable, isTrue);
+      await g.openThread('!ct:hs.example');
+      g.debugDevicesOf = (id) => <bool>[false];
+      await _sync(g, <String, Object?>{});
+      await Future<void>.delayed(_settle);
+      expect(g.threads.firstWhere((t) => t.kind == ThreadKind.contact).reachable, isFalse);
+      await expectLater(g.sendMessage('Hallo', threadId: '!ct:hs.example'), _error(GatewayError.peerNotReachable));
+      expect(keyQueriesFor(hs, _fremd), 0, reason: 'Lesen von threads fragt nie das Netz');
     });
   });
 
