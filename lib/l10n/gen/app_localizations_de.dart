@@ -344,6 +344,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dieser Anbieter wird von FamilyNexus nicht unterstützt. Bitte wähle unter „Erweitert“ einen anderen.';
 
   @override
+  String get errPeerNotReachable =>
+      'Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.';
+
+  @override
   String get errNotAllowed => 'Dafür fehlt die Berechtigung.';
 
   @override

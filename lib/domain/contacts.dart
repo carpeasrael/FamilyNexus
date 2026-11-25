@@ -430,3 +430,45 @@ class ContactNames {
     return server.isEmpty ? shown : '$shown · $server';
   }
 }
+
+/// Gibt es das Konto? [unknown]: Der Server konnte nicht oder nicht verlässlich antworten (Netz, Zeitablauf,
+/// `M_FORBIDDEN` bei Servern, die Profile nur bei gemeinsamen Räumen herausgeben); das blockiert das Hinzufügen nie.
+enum ContactExistence { yes, no, unknown }
+
+/// Kann die Person Nachrichten entschlüsseln? [unknown]: Die Schlüsselabfrage ist gescheitert oder veraltet (nie als
+/// „nicht erreichbar“ melden). [notReachable]: Schlüssel liegen vor, aber kein Gerät hat eine gültige Signaturkette des
+/// eigenen Cross-Signing der Person (die App teilt Raumschlüssel nur mit solchen Geräten).
+enum ContactReachability { reachable, notReachable, unknown, identityChanged }
+
+/// Ergebnis von `probeContact` (#119, K3a-2b): nur Anzeige, nie Entscheidungsgrundlage für Zugriffe.
+class ContactProbe {
+  const ContactProbe({
+    required this.userId,
+    required this.existence,
+    required this.displayName,
+    required this.reachability,
+    this.isFamilyMember = false,
+  });
+
+  final String userId;
+  final ContactExistence existence;
+
+  /// Bereinigter Anzeigename (leer, wenn keiner bekannt ist).
+  final String displayName;
+  final ContactReachability reachability;
+
+  /// Familienmitglied (jeder Status): ohne Netzabfrage beantwortet; der Weg ist „Nachricht schreiben“.
+  final bool isFamilyMember;
+}
+
+/// Erreichbarkeit aus den Geräten der Person (reine Funktion, #119 K3a-2b, §8.3).
+class ContactReach {
+  const ContactReach._();
+
+  /// [keysKnown]: aktuelle Schlüssel der Person liegen vor (sonst [ContactReachability.unknown]); [encryptable] je Gerät, ob
+  /// das SDK Raumschlüssel dorthin teilt.
+  static ContactReachability of({required bool keysKnown, required List<bool> encryptable}) {
+    if (!keysKnown) return ContactReachability.unknown;
+    return encryptable.any((e) => e) ? ContactReachability.reachable : ContactReachability.notReachable;
+  }
+}

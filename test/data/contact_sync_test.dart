@@ -150,6 +150,124 @@ void main() {
     });
   });
 
+  group('Abgleich outgoing → accepted (K3a-2b)', () {
+    const dora = '@dora:fake.test';
+
+    Future<ContactPeer> withFamily({bool start = true}) async {
+      final p = await ContactPeer.create(server, 'dora', 'pw2', start: start);
+      await p.gateway.createFamily('Familie');
+      addTearDown(p.dispose);
+      return p;
+    }
+
+    Future<void> settle(ContactPeer p) async {
+      for (var i = 0; i < 4; i++) {
+        await p.sync.idle();
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+    }
+
+    test('Gegenüber beigetreten: outgoing wird accepted, die Raum-ID ist die des Kontakt-Threads', () async {
+      final p = await withFamily();
+      final room = server.createContactRoom(dora, _carla, toJoined: true);
+      await p.service.setEnabled(true);
+      await p.service.addOutgoing(_carla);
+      await settle(p);
+      final c = (await p.service.contact(_carla))!;
+      expect(c.state, ContactState.accepted);
+      expect(c.room, room.id);
+    });
+
+    test('Gegenüber nur eingeladen (pending): bleibt outgoing, bis es beitritt', () async {
+      final p = await withFamily();
+      final room = server.createContactRoom(dora, _carla);
+      await p.service.setEnabled(true);
+      await p.service.addOutgoing(_carla);
+      await settle(p);
+      expect((await p.service.contact(_carla))!.state, ContactState.outgoing);
+      room.invitedUsers.clear();
+      server.notifyAll();
+      await settle(p);
+      expect((await p.service.contact(_carla))!.state, ContactState.accepted);
+    });
+
+    test('Gegenüber hat abgelehnt oder verlassen (kein Thread): nie accepted', () async {
+      final p = await withFamily();
+      final room = server.createContactRoom(dora, _carla);
+      await p.service.setEnabled(true);
+      await p.service.addOutgoing(_carla);
+      room.dmMembers.remove(_carla);
+      server.notifyAll();
+      await settle(p);
+      expect((await p.service.contact(_carla))!.state, ContactState.outgoing);
+    });
+
+    test('lokal blockiert: wird nie accepted', () async {
+      final p = await withFamily();
+      p.blockedList.list.add(_carla);
+      server.createContactRoom(dora, _carla, toJoined: true);
+      await p.service.setEnabled(true);
+      await p.service.addOutgoing(_carla);
+      await settle(p);
+      expect((await p.service.contact(_carla))!.state, ContactState.outgoing);
+    });
+
+    test('die Gegenseite hat den Raum zuerst angelegt (gegenseitiges Hinzufügen): wir nehmen an, dann accepted', () async {
+      final p = await withFamily();
+      final room = server.createContactRoom(_carla, dora); // Gegenseite lädt uns ein
+      await p.service.setEnabled(true);
+      await p.service.addOutgoing(_carla);
+      await settle(p);
+      final c = (await p.service.contact(_carla))!;
+      expect(c.state, ContactState.accepted);
+      expect(c.room, room.id);
+    });
+
+    test('Neustart mit bereits beigetretenem Gegenüber: der Abgleich läuft beim Start', () async {
+      final p = await withFamily(start: false);
+      server.createContactRoom(dora, _carla, toJoined: true);
+      await p.service.setEnabled(true);
+      await p.service.addOutgoing(_carla);
+      expect((await p.service.contact(_carla))!.state, ContactState.outgoing, reason: 'Voraussetzung: noch nicht gestartet');
+      p.sync.start();
+      await settle(p);
+      expect((await p.service.contact(_carla))!.state, ContactState.accepted);
+    });
+
+    test('beigetretener Raum vor wartendem: die Raum-ID im Datensatz ist die des beigetretenen', () async {
+      final p = await withFamily();
+      server.createContactRoom(dora, _carla); // wartend
+      final joined = server.createContactRoom(_carla, dora, toJoined: true);
+      await p.service.setEnabled(true);
+      await p.service.addOutgoing(_carla);
+      await settle(p);
+      expect((await p.service.contact(_carla))!.room, joined.id);
+    });
+
+    test('nach dispose kein Abgleich mehr', () async {
+      final p = await withFamily();
+      await p.service.setEnabled(true);
+      await p.service.addOutgoing(_carla);
+      await settle(p);
+      p.sync.dispose();
+      server.createContactRoom(dora, _carla, toJoined: true);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect((await p.service.contact(_carla))!.state, ContactState.outgoing);
+    });
+
+    test('accepted und blocked bleiben unverändert', () async {
+      final p = await withFamily();
+      await p.service.setEnabled(true);
+      await p.service.addAccepted(_carla);
+      await p.service.block(_ben);
+      server.createContactRoom(dora, _carla, toJoined: true);
+      server.createContactRoom(dora, _ben, toJoined: true);
+      await settle(p);
+      expect((await p.service.contact(_carla))!.state, ContactState.accepted);
+      expect((await p.service.contact(_ben))!.state, ContactState.blocked);
+    });
+  });
+
   group('Richtlinie fürs Gateway (K3a-1)', () {
     test('ohne Datensätze bleibt es bei off, nichts wird geschoben; mit Datensätzen folgt die Richtlinie dem Bestand', () async {
       await a.sync.idle();

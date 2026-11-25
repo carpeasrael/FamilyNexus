@@ -129,6 +129,7 @@
   "errInvalidCredentials": "Username or password is wrong.",
   "errServerUnreachable": "Server not reachable. Check your connection.",
   "errServerUnsupported": "FamilyNexus does not support this provider. Please choose another one under “Advanced”.",
+  "errPeerNotReachable": "This person needs to set up the security check in their app before you can message each other.",
   "errNotAllowed": "You do not have permission for this.",
   "errAttachmentRejected": "This attachment is not allowed (type or size).",
   "errInvalidInput": "Please check your input.",

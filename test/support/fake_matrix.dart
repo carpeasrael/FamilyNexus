@@ -184,6 +184,15 @@ class FakeMatrixServer {
 
   bool hasAccount(String localpart) => _accounts.containsKey('@$localpart:$host');
 
+  /// Konten ohne Cross-Signing (nicht erreichbar), mit gescheiterter Schlüsselabfrage und mit unbekanntem Profil
+  /// (z. B. `M_FORBIDDEN`) für `probeContact`/`startContactChat` (#119, K3a-2b).
+  final Set<String> unreachableUsers = <String>{};
+  final Set<String> keyQueryFailures = <String>{};
+  final Set<String> profileUnknown = <String>{};
+
+  /// Zahl der Profil- und Schlüsselabfragen (Tests: Familienmitglieder werden ohne Netz beantwortet).
+  int probeNetworkCalls = 0;
+
   /// Test-Uhr (für Ablauf von Einladungslinks).
   DateTime Function() now = () => DateTime.utc(2026, 10, 21, 12);
 
@@ -1692,6 +1701,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (fake.contactRooms.containsKey(threadId)) {
       final peer = room.dmMembers.firstWhere((m) => m != _userId);
       if (!_opened.contains(threadId) || room.invitedUsers.contains(peer)) throw const GatewayException(GatewayError.notAllowed);
+      if (_reachOf(peer) == ContactReachability.notReachable) throw const GatewayException(GatewayError.peerNotReachable);
     }
     return room;
   }
@@ -2055,6 +2065,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
             peerId: r.dmMembers.firstWhere((m) => m != me),
             unread: unreadIn(r.id),
             pending: r.invitedUsers.contains(r.dmMembers.firstWhere((m) => m != me)),
+            reachable: _reachOf(r.dmMembers.firstWhere((m) => m != me)) != ContactReachability.notReachable,
           ),
     ]..sort((a, b) => a.title.compareTo(b.title));
   }
@@ -2095,6 +2106,53 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   @override
   int get contactRequestsHidden => 0;
+
+  void _requireProbeable(String userId) {
+    _requireSession();
+    final f = family;
+    if (f == null || _userId == null) throw const GatewayException(GatewayError.notAllowed);
+    if (!MatrixIds.isUserId(userId)) throw const GatewayException(GatewayError.invalidInput);
+    if (userId == _userId || !contactPolicy.enabled || contactPolicy.blocked.contains(userId)) {
+      throw const GatewayException(GatewayError.notAllowed);
+    }
+  }
+
+  ContactReachability _reachOf(String userId) {
+    if (fake.keyQueryFailures.contains(userId)) return ContactReachability.unknown;
+    return fake.unreachableUsers.contains(userId) ? ContactReachability.notReachable : ContactReachability.reachable;
+  }
+
+  @override
+  Future<ContactProbe> probeContact(String userId) async {
+    _requireProbeable(userId);
+    if (family!.member(userId) != null) {
+      return ContactProbe(userId: userId, existence: ContactExistence.unknown, displayName: '', reachability: ContactReachability.unknown, isFamilyMember: true);
+    }
+    fake.probeNetworkCalls++;
+    final known = fake.hasAccount(MatrixIds.localpart(userId)) && MatrixIds.serverName(userId) == fake.host;
+    return ContactProbe(
+      userId: userId,
+      existence: fake.profileUnknown.contains(userId) ? ContactExistence.unknown : (known ? ContactExistence.yes : ContactExistence.no),
+      displayName: known ? ContactNames.cleanName(fake.displayNameOf(userId)) : '',
+      reachability: _reachOf(userId),
+    );
+  }
+
+  @override
+  Future<String> startContactChat(String userId) async {
+    _requireProbeable(userId);
+    if (family!.member(userId) != null || contactPolicy.contacts[userId] != ContactState.outgoing) {
+      throw const GatewayException(GatewayError.notAllowed);
+    }
+    for (final r in fake.contactRooms.values) {
+      if (r.dmMembers.contains(_userId) && r.dmMembers.contains(userId) && _contactClass(r) == RoomClass.contactDirect) return r.id;
+    }
+    fake.probeNetworkCalls++;
+    final reach = _reachOf(userId);
+    if (reach == ContactReachability.notReachable) throw const GatewayException(GatewayError.peerNotReachable);
+    if (reach == ContactReachability.unknown) throw const GatewayException(GatewayError.serverUnreachable);
+    return fake.createContactRoom(_userId!, userId).id;
+  }
 
   @override
   Future<void> openThread(String threadId) async {

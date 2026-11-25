@@ -63,6 +63,9 @@ enum GatewayError {
 
   /// Der Anbieter erlaubt keine Passwortänderung über die App (#117).
   passwordChangeUnavailable,
+
+  /// Das Gegenüber hat keine Schlüssel, mit denen es Nachrichten lesen könnte (Cross-Signing fehlt, #119, §8.3).
+  peerNotReachable,
   unknown,
 }
 
@@ -524,6 +527,17 @@ abstract class MatrixGateway implements Listenable {
 
   /// Lehnt eine Kontaktanfrage ab (verlässt die Einladung); nur für die Einstufung `contactRequest`, sonst `notAllowed`.
   Future<void> declineContactRequest(String roomId);
+
+  /// Prüft eine Person vor dem Hinzufügen (K3a-2b): Profil und Schlüssel. **Nur nach ausdrücklicher Eingabe** aufrufen, nie je
+  /// Tastendruck: Die Abfragen zeigen dem eigenen und dem Fremd-Homeserver, wen man sucht. Familienmitglieder und Blockierte
+  /// werden ohne Netz beantwortet bzw. abgelehnt; Grenzen: eine Abfrage je Kennung und Minute, 20 je Stunde, 50 Kennungen je
+  /// Sitzung, 4 gleichzeitig (`rateLimited`).
+  Future<ContactProbe> probeContact(String userId);
+
+  /// Legt den Einzelchat mit einer Person außerhalb der Familie an und gibt die Raum-ID zurück. Verlangt den Datensatz
+  /// `outgoing` (sonst `notAllowed`: keine Räume ohne Datensatz), nie für Familienmitglieder, das eigene Konto oder
+  /// Blockierte; nicht erreichbare Personen ergeben `peerNotReachable`, ein Abfragefehler `serverUnreachable`.
+  Future<String> startContactChat(String userId);
 
   /// Verlässt ein Kontakt-Gespräch; nie den Familienchat und nie einen Einzelchat mit einem Mitglied (`notAllowed`).
   Future<void> leaveConversation(String threadId);

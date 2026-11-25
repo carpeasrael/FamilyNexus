@@ -129,6 +129,7 @@
   "errInvalidCredentials": "Benutzername oder Passwort stimmen nicht.",
   "errServerUnreachable": "Server nicht erreichbar. Prüfe die Verbindung.",
   "errServerUnsupported": "Dieser Anbieter wird von FamilyNexus nicht unterstützt. Bitte wähle unter „Erweitert“ einen anderen.",
+  "errPeerNotReachable": "Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.",
   "errNotAllowed": "Dafür fehlt die Berechtigung.",
   "errAttachmentRejected": "Dieser Anhang ist nicht erlaubt (Typ oder Größe).",
   "errInvalidInput": "Bitte Eingabe prüfen.",

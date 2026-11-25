@@ -86,4 +86,15 @@ void main() {
       expect(ContactNames.title('Anna', 'kein-konto'), 'Anna');
     });
   });
+
+  group('ContactReach (K3a-2b)', () {
+    test('Wahrheitstabelle: unbekannte Schlüssel sind nie „nicht erreichbar“', () {
+      expect(ContactReach.of(keysKnown: false, encryptable: const <bool>[]), ContactReachability.unknown);
+      expect(ContactReach.of(keysKnown: false, encryptable: const <bool>[true]), ContactReachability.unknown, reason: 'veralteter Stand zählt nicht');
+      expect(ContactReach.of(keysKnown: true, encryptable: const <bool>[]), ContactReachability.notReachable);
+      expect(ContactReach.of(keysKnown: true, encryptable: const <bool>[false, false]), ContactReachability.notReachable);
+      expect(ContactReach.of(keysKnown: true, encryptable: const <bool>[false, true]), ContactReachability.reachable);
+      expect(ContactReach.of(keysKnown: true, encryptable: const <bool>[true]), ContactReachability.reachable);
+    });
+  });
 }

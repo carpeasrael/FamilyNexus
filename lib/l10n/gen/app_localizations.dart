@@ -698,6 +698,12 @@ abstract class AppLocalizations {
   /// **'Dieser Anbieter wird von FamilyNexus nicht unterstützt. Bitte wähle unter „Erweitert“ einen anderen.'**
   String get errServerUnsupported;
 
+  /// No description provided for @errPeerNotReachable.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.'**
+  String get errPeerNotReachable;
+
   /// No description provided for @errNotAllowed.
   ///
   /// In de, this message translates to:
