@@ -87,6 +87,14 @@ void main() {
       expect((rec.deleted, rec.version), (true, 2));
     });
 
+    test('nur die Version weicht ab (gleicher Zustand): keine Löschung', () async {
+      final c = await svc.addOutgoing(carla);
+      await svc.rename(carla, 'C'); // Version 2, weiter outgoing
+      expect(await svc.removeIfVersion(carla, version: c.version, state: ContactState.outgoing), isFalse);
+      expect((await svc.contact(carla))!.deleted, isFalse);
+      expect(await svc.removeIfVersion(carla, version: 2, state: ContactState.outgoing), isTrue);
+    });
+
     test('ein anderer Stand bleibt: andere Version, anderer Zustand, schon gelöscht, unbekannt, ungültige Kennung', () async {
       final c = await svc.addOutgoing(carla);
       await svc.markAccepted(carla); // Version 2, accepted

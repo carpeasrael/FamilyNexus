@@ -196,6 +196,9 @@ class FakeMatrixServer {
   /// Test: `probeContact` scheitert mit diesem Fehler (z. B. `rateLimited`).
   GatewayError? probeError;
 
+  /// Test: Konten, deren Sicherheitsschlüssel sich geändert hat (`probeContact` meldet `identityChanged`).
+  final Set<String> identityChangedUsers = <String>{};
+
   /// Test-Uhr (für Ablauf von Einladungslinks).
   DateTime Function() now = () => DateTime.utc(2026, 10, 21, 12);
 
@@ -2113,6 +2116,14 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Test: `leaveConversation` scheitert, ohne etwas zu verändern.
   bool failLeaveConversation = false;
 
+  /// Test: `startContactChat` scheitert **vor** dem Anlegen mit diesem Fehler (z. B. `alreadyExists`), oder — mit
+  /// [startFailsAfterCreate] — **nachdem** der Raum angelegt wurde.
+  GatewayError? startError;
+  bool startFailsAfterCreate = false;
+
+  /// Test: `declineContactRequest` scheitert mit diesem Fehler.
+  GatewayError? declineError;
+
   @override
   int get contactRequestsHidden => hiddenRequests;
 
@@ -2128,6 +2139,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   ContactReachability _reachOf(String userId) {
     if (fake.keyQueryFailures.contains(userId)) return ContactReachability.unknown;
+    if (fake.identityChangedUsers.contains(userId)) return ContactReachability.identityChanged;
     return fake.unreachableUsers.contains(userId) ? ContactReachability.notReachable : ContactReachability.reachable;
   }
 
@@ -2162,7 +2174,12 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final reach = _reachOf(userId);
     if (reach == ContactReachability.notReachable) throw const GatewayException(GatewayError.peerNotReachable);
     if (reach == ContactReachability.unknown) throw const GatewayException(GatewayError.serverUnreachable);
-    return fake.createContactRoom(_userId!, userId).id;
+    if (reach == ContactReachability.identityChanged) throw const GatewayException(GatewayError.notAllowed);
+    final failure = startError;
+    if (failure != null && !startFailsAfterCreate) throw GatewayException(failure);
+    final room = fake.createContactRoom(_userId!, userId);
+    if (failure != null) throw GatewayException(failure);
+    return room.id;
   }
 
   @override
@@ -2172,6 +2189,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   @override
   Future<void> declineContactRequest(String roomId) async {
+    final failure = declineError;
+    if (failure != null) throw GatewayException(failure);
     final r = fake.contactRooms[roomId];
     if (r == null || _contactClass(r) != RoomClass.contactRequest) throw const GatewayException(GatewayError.notAllowed);
     r.dmMembers.remove(_userId);

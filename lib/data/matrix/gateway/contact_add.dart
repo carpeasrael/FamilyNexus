@@ -213,6 +213,8 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
       final reach = await _freshReachability(userId);
       if (reach == ContactReachability.notReachable) throw const GatewayException(GatewayError.peerNotReachable);
       if (reach == ContactReachability.unknown) throw const GatewayException(GatewayError.serverUnreachable);
+      // Geänderter Sicherheitsschlüssel: erst nach der Prüfung (B8, K3b-2) ein Raum.
+      if (reach == ContactReachability.identityChanged) throw const GatewayException(GatewayError.notAllowed);
       if (_disposed || epoch != _dmEpoch || _client != client || !_stillOutgoing(userId)) throw const GatewayException(GatewayError.notAllowed);
       // Nie einen vorhandenen, womöglich unverschlüsselten Raum wiederverwenden (wie `startDirectChat`).
       final roomId = await client.startDirectChat(

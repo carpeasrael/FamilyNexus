@@ -383,6 +383,30 @@ void main() {
       expect(find.text(isolateText('@mallory:fake.test')), findsOneWidget);
     });
 
+    testWidgets('Unicode-Isolierung als Literal (FSI … PDI) für Titel, Kennung, eigene Kennung und die Dialoge', (tester) async {
+      await init();
+      expect(isolateText('x'), '\u2068x\u2069');
+      await show(tester);
+      await turnOn(tester);
+      server.createContactRoom(carla, me, toJoined: true);
+      await peer.service.addAccepted(carla);
+      await peer.sync.pushPolicyNow();
+      await tester.pumpAndSettle();
+      expect(find.text('\u2068Carla · fake.test\u2069'), findsOneWidget, reason: 'Titel in der Liste');
+      expect(find.text('\u2068$carla\u2069'), findsOneWidget, reason: 'Kennung in der Liste');
+      await tester.scrollUntilVisible(find.byType(SelectableText), 200, scrollable: find.byType(Scrollable).first);
+      expect(find.text('\u2068$me\u2069'), findsOneWidget, reason: 'eigene Kennung');
+      await tester.scrollUntilVisible(find.widgetWithText(TextButton, 'Entfernen'), -200, scrollable: find.byType(Scrollable).first);
+      await tester.tap(find.widgetWithText(TextButton, 'Entfernen'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('\u2068Carla · fake.test\u2069'), findsWidgets, reason: 'Dialog Entfernen');
+      expect(find.textContaining('\u2068$carla\u2069'), findsWidgets);
+      await tapDialog(tester, 'Abbrechen');
+      await tester.tap(find.widgetWithText(TextButton, 'Blockieren'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('\u2068$carla\u2069'), findsWidgets, reason: 'Dialog Blockieren');
+    });
+
     testWidgets('Semantik: Zeilen als ein Label (Name, Kennung, Zustand); Überschriften', (tester) async {
       await init();
       final handle = tester.ensureSemantics();

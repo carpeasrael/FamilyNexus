@@ -65,7 +65,9 @@ void main() {
     await c.idle();
     expect(c.enabled, isFalse);
     expect(c.requests, isEmpty);
-    expect(await peer.service.contact(carla), isNotNull, reason: 'nichts gelöscht');
+    final kept = (await peer.service.contact(carla))!;
+    expect((kept.deleted, kept.version), (false, 1), reason: 'nichts gelöscht, nichts verändert');
+    expect(server.contactRooms, hasLength(1), reason: 'der Raum bleibt');
     expect(peer.gateway.contactPolicy.enabled, isFalse);
   });
 
@@ -239,6 +241,101 @@ void main() {
       expect(c.requests, isEmpty);
       expect(room.invitedUsers, contains(me), reason: 'nicht abgelehnt, nicht verlassen');
       expect(room.dmMembers, contains(me));
+    });
+  });
+
+  group('weitere Fälle (Lücken der Mutationsprobe)', () {
+    test('Schlüssel geändert: nicht „bereit“, add scheitert ohne Raum', () async {
+      await on();
+      server.identityChangedUsers.add(carla);
+      expect((await c.check(carla)).outcome, ContactCheckOutcome.identityChanged);
+      await expectLater(c.add(carla), throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.notAllowed)));
+      expect(server.contactRooms, isEmpty);
+    });
+
+    test('lokal blockiertes Familienmitglied: „Familienmitglied“, nicht „lokal blockiert“', () async {
+      await on();
+      peer.blockedList.list.add(emil);
+      expect((await c.check(emil)).outcome, ContactCheckOutcome.familyMember);
+    });
+
+    test('Rücknahme unterbleibt, wenn der Raum schon existiert (Fehler nach dem Anlegen)', () async {
+      await on();
+      peer.gateway.startError = GatewayError.serverUnreachable;
+      peer.gateway.startFailsAfterCreate = true;
+      await expectLater(c.add(carla), throwsA(isA<GatewayException>()));
+      await c.idle();
+      final rec = (await peer.store.get(ContactKind.contact, carla))!;
+      expect(rec.deleted, isFalse, reason: 'der Raum existiert: Datensatz bleibt, „Erneut senden“ findet ihn');
+      expect(server.contactRooms, hasLength(1));
+    });
+
+    test('Rücknahme unterbleibt bei alreadyExists (paralleles Anlegen)', () async {
+      await on();
+      peer.gateway.startError = GatewayError.alreadyExists;
+      await expectLater(c.add(carla), throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.alreadyExists)));
+      expect((await peer.store.get(ContactKind.contact, carla))!.deleted, isFalse);
+    });
+
+    test('nach einem Fehler ist ein erneutes add und retry möglich (die Sperre je Kennung wird frei)', () async {
+      await on();
+      server.unreachableUsers.add(carla);
+      await expectLater(c.add(carla), throwsA(isA<GatewayException>()));
+      server.unreachableUsers.clear();
+      await c.add(carla);
+      expect(server.contactRooms, hasLength(1));
+      await c.retry(carla); // der Raum ist da: Wiederverwendung, kein zweiter Raum
+      expect(server.contactRooms, hasLength(1));
+    });
+
+    test('retry nur für outgoing: bestätigte Kontakte ⇒ notFound', () async {
+      await on();
+      await peer.service.addAccepted(carla);
+      await expectLater(c.retry(carla), fails(ContactError.notFound));
+    });
+
+    test('Entfernen eines Kontakts ohne Raum (nicht gesendet): kein Verlassen nötig, Datensatz wird gelöscht', () async {
+      await on();
+      await peer.service.addOutgoing(carla);
+      await c.idle();
+      expect(c.contacts.single.state, ContactStateView.notSent);
+      await c.remove(carla);
+      expect((await peer.service.contact(carla))!.deleted, isTrue);
+    });
+
+    test('annehmen: unbekannter Raum ⇒ notFound; blockierter Absender ⇒ notAllowed', () async {
+      await on();
+      await expectLater(c.accept('!nix:fake.test'), fails(ContactError.notFound));
+      await expectLater(c.blockRequest('!nix:fake.test'), fails(ContactError.notFound));
+      final room = server.createContactRoom(carla, me);
+      server.notifyAll();
+      await c.idle();
+      await peer.service.block(carla); // zwischenzeitlich blockiert
+      await expectLater(c.accept(room.id), fails(ContactError.notAllowed));
+    });
+
+    test('ablehnen: andere Fehler als „schon weg“ werden gemeldet', () async {
+      await on();
+      peer.gateway.declineError = GatewayError.serverUnreachable;
+      await expectLater(c.decline('!x:fake.test'), throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.serverUnreachable)));
+      peer.gateway.declineError = GatewayError.notAllowed;
+      await c.decline('!x:fake.test'); // kein Fehler
+    });
+
+    test('die Sperre nach rateLimited dauert 60 s: nach 30 s noch gesperrt', () async {
+      var now = DateTime.utc(2026, 11, 25, 12);
+      c.dispose();
+      c = ContactController(gateway: peer.gateway, sync: peer.sync, clock: () => now)..start();
+      await c.idle();
+      await on();
+      peer.gateway.hiddenRequests = 0;
+      server.probeError = GatewayError.rateLimited;
+      expect((await c.check(carla)).outcome, ContactCheckOutcome.rateLimited);
+      server.probeError = null;
+      now = now.add(const Duration(seconds: 30));
+      expect((await c.check(carla)).outcome, ContactCheckOutcome.rateLimited);
+      now = now.add(const Duration(seconds: 31));
+      expect((await c.check(carla)).outcome, ContactCheckOutcome.ready);
     });
   });
 
