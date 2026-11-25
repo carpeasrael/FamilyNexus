@@ -51,7 +51,7 @@ class TodayScreen extends StatelessWidget {
         listenable: Listenable.merge(<Listenable>[c, services.gateway, services.settings, ?reminders, ?services.shopping, ?services.tasks]),
         builder: (context, _) {
           final upcoming = c.upcoming(limit: maxUpcoming);
-          final unread = services.gateway.unreadCount;
+          final unread = services.gateway.familyUnreadCount;
           final perm = reminders?.permission ?? ReminderPermission.granted;
           return ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, 96), children: <Widget>[
             if (perm != ReminderPermission.granted)

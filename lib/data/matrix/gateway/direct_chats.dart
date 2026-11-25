@@ -43,17 +43,50 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
     _threads = const <ChatThread>[];
   }
 
+  /// Tatsachen eines Raums für die Einstufung ([ConversationPolicy]); liest nur, ändert nichts. [me] ist das eigene Konto.
+  RoomFacts _roomFacts(Room r, String me) {
+    final own = r.membership == Membership.invite ? r.getState(EventTypes.RoomMember, me) : null;
+    final rule = r.getState(EventTypes.RoomJoinRules)?.content['join_rule'];
+    return RoomFacts(
+      id: r.id,
+      membership: switch (r.membership) {
+        Membership.join => RoomMembership.join,
+        Membership.invite => RoomMembership.invite,
+        _ => RoomMembership.other,
+      },
+      isBook: BookRoomMarker.isBook(r.getState(EventTypes.RoomCreate)?.content),
+      // `_canEncryptIn` (Verschlüsselung verfügbar und Megolm), damit die Test-Naht des Gateways auch hier wirkt.
+      megolm: _canEncryptIn(r),
+      peerId: r.membership == Membership.join ? r.directChatMatrixID : null,
+      inviterId: own?.senderId,
+      inviteIsDirect: own?.content['is_direct'] == true,
+      joinedCount: r.summary.mJoinedMemberCount,
+      invitedCount: r.summary.mInvitedMemberCount,
+      joinRule: rule is String ? rule : null,
+    );
+  }
+
+  /// Kontext der Einstufung für ein Konto mit bekannter Familie.
+  PolicyContext _policyContext(Family f, String familyRoomId) => PolicyContext(
+        myUserId: f.myUserId,
+        familyRoomId: familyRoomId,
+        privateRoomId: _privateRoom()?.id,
+        joinedMembers: <String>{for (final m in f.joined) m.userId},
+        membersLoaded: _participantsLoaded,
+        identityChanged: _identityChanged,
+      );
+
   /// Verschlüsselte Einzelchat-Räume mit aktuellen, beigetretenen Familienmitgliedern
   /// (Raum-ID → Gegenüber). Bei mehreren Räumen für dasselbe Gegenüber gilt der mit der
   /// kleinsten Raum-ID, damit beide Seiten denselben Raum wählen.
   Map<String, String> _eligibleDirectRooms(Client client, Family f, Room familyRoom) {
     final byPeer = <String, String>{};
-    final privateId = _privateRoom()?.id;
+    final ctx = _policyContext(f, familyRoom.id);
     for (final r in client.rooms) {
-      if (r.membership != Membership.join || r.id == familyRoom.id || r.id == privateId) continue;
-      final peer = r.directChatMatrixID;
-      if (peer == null || peer == f.myUserId || f.member(peer)?.status != MemberStatus.joined) continue;
-      if (!_canEncryptIn(r) || !SdkMatrixGateway._isPairRoom(r)) continue;
+      // Eine Entscheidungsstelle (#119, K2a): beigetreten, nicht Familie/privat, m.direct mit beigetretenem Mitglied,
+      // Megolm, höchstens zwei Personen. Die kleinste Raum-ID je Person wählt weiter dieses Gateway.
+      if (ConversationPolicy.classify(_roomFacts(r, f.myUserId), ctx) != RoomClass.familyDirect) continue;
+      final peer = r.directChatMatrixID!;
       final cur = byPeer[peer];
       if (cur == null || r.id.compareTo(cur) < 0) byPeer[peer] = r.id;
     }
@@ -131,14 +164,16 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
   void _acceptDirectInvites(Client client, Family f) {
     if (!_participantsLoaded) return;
     final me = f.myUserId;
+    final ctx = _policyContext(f, f.roomId);
     for (final r in client.rooms) {
       if (r.membership != Membership.invite || _dmFailed.contains(r.id)) continue;
       final retry = _dmRetryAfter[r.id];
       if (retry != null && DateTime.now().isBefore(retry)) continue;
-      final inv = r.getState(EventTypes.RoomMember, me);
-      if (inv == null || inv.content['is_direct'] != true) continue;
-      final from = inv.senderId;
-      if (from == me || f.member(from)?.status != MemberStatus.joined || _identityChanged.contains(from)) continue;
+      // Eine Entscheidungsstelle (#119, K2a): Einladung `is_direct` von einem beigetretenen Mitglied (nicht ich),
+      // ohne ungeklärte Identitätsänderung.
+      final facts = _roomFacts(r, me);
+      if (!ConversationPolicy.autoAcceptDirect(facts, ctx)) continue;
+      final from = facts.inviterId!;
       // Höchstens ein Einzelchat je anderem Mitglied und wenige gleichzeitige Beitritte.
       if (_dmTimelines.length + _dmJoining.length >= f.joined.length || _dmJoining.length >= 4) continue;
       // Pro Mitglied nur ein Einzelchat: weitere Einladungen desselben Einladenden werden ignoriert.

@@ -29,6 +29,7 @@ import '../../domain/calendar_signal.dart';
 import '../../domain/cash_book.dart';
 import '../../domain/cash_receipt_check.dart';
 import '../../domain/chat.dart';
+import '../../domain/conversation_policy.dart';
 import '../../domain/data_inventory.dart';
 import '../../domain/event_codec.dart';
 import '../../domain/event_theme_codec.dart';
@@ -134,7 +135,9 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     this._shareReadReceipts = _readReceiptsOn,
     @visibleForTesting bool cashBooksEnabled = CashBookFlags.enabled,
     @visibleForTesting bool requireEncryptionForBooks = true,
+    @visibleForTesting bool? encryptionAvailable,
   })  : _cashBooksEnabledValue = cashBooksEnabled,
+        _encryptionAvailableOverride = encryptionAvailable,
         _requireEncryptionForBooksValue = requireEncryptionForBooks,
         assert(_participantsRetryBase > Duration.zero),
         _ensureAvatarPermissionEnabled = ensureAvatarPermission,
@@ -151,6 +154,11 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   final bool _cashBooksEnabledValue;
   @override
   bool get _cashBooksEnabled => _cashBooksEnabledValue;
+  /// Test-Naht (#119, K2a): Der Harness läuft ohne vodozemac, dort ist `Client.encryptionEnabled` immer `false`. `null` (Standard,
+  /// Produktion) heißt: `client.encryptionEnabled`. Wirkt nur in `_canEncryptIn`.
+  final bool? _encryptionAvailableOverride;
+  @override
+  bool? get _encryptionOverride => _encryptionAvailableOverride;
   final bool _requireEncryptionForBooksValue;
   @override
   bool get _requireEncryptionForBooks => _requireEncryptionForBooksValue;
@@ -373,6 +381,11 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   @visibleForTesting
   Future<void> Function()? debugAfterFamilyTimeline;
 
+  /// Nur für Tests: Mitglieder mit ungeklärter Identitätsänderung (#119, K2a); Einträge hier sperren die automatische
+  /// Annahme ihrer Einzelchat-Einladungen.
+  @visibleForTesting
+  Set<String> get debugIdentityChanged => _identityChanged;
+
   /// Nur für Tests: läuft als Erstes in jedem Abgleich (#412: ein scheiternder Abgleich nach der Anmeldung).
   @visibleForTesting
   Future<void> Function()? debugBeforeRefresh;
@@ -551,6 +564,11 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
 
   @override
   int get unreadCount => unreadIn(ChatThread.familyId) + _dmTimelines.keys.fold<int>(0, (a, id) => a + unreadIn(id));
+
+  /// Bis zu den Kontakten (K2c/K3) sind `_dmTimelines` nur Einzelchats mit Mitgliedern: gleich [unreadCount]; mit Kontakten
+  /// zählt es nur den Bereich Familie.
+  @override
+  int get familyUnreadCount => unreadCount;
 
   /// Nur lesbare Nachrichten anderer; der Serverzähler zählt auch nicht entschlüsselbare Ereignisse und
   /// App-Daten mit (#65). Ohne geladene Zeitleiste gilt der Serverzähler.

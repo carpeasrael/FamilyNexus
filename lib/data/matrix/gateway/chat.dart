@@ -4,6 +4,7 @@ part of '../sdk_matrix_gateway.dart';
 /// abstrakte Member am Anfang.
 mixin _ChatModule on ChangeNotifier implements MatrixGateway {
   _AppClient? get _client;
+  bool? get _encryptionOverride;
   Map<String, String> get _dmPeers;
   Map<String, Timeline> get _dmTimelines;
   Family? get _family;
@@ -50,7 +51,7 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
   }
 
   bool _canEncryptIn(Room? room) =>
-      room != null && (_client?.encryptionEnabled ?? false) && room.encryptionAlgorithm == FamilyRoomSpec.megolm;
+      room != null && (_encryptionOverride ?? _client?.encryptionEnabled ?? false) && room.encryptionAlgorithm == FamilyRoomSpec.megolm;
 
   Event? _findEvent(String id, [String threadId = ChatThread.familyId]) {
     final t = _timelineFor(threadId);
