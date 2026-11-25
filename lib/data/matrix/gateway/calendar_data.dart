@@ -124,6 +124,13 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
         _emit(AvatarResetSignal(e.senderId, e.originServerTs, c));
       } else if (!shared && e.type == EventCodec.privateType) {
         _emit(PrivateEventSignal(e.senderId, e.originServerTs, c));
+      } else if (e.type == ContactCodec.type) {
+        // Kontaktdatensätze (#119, I3/I4): nur aus dem privaten Raum und nur vom eigenen Konto; sonst verworfen, ohne Inhalt.
+        if (ContactSignalScan.accepts(e.type, e.senderId, _client?.userID, shared: shared)) {
+          _emit(ContactSignal(e.senderId, e.originServerTs, c));
+        } else {
+          AppLog.w('gateway', 'Kontaktdatensatz verworfen (kein privater Raum oder fremder Absender)');
+        }
       } else if (e.type == EventTypes.Encrypted) {
         // Noch nicht entschlüsselt: später erneut betrachten.
         _signaled.remove(e.eventId);
@@ -142,6 +149,7 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
     AnniversaryCodec.type,
     AvatarPhotoCodec.type,
     AvatarResetCodec.type,
+    ContactCodec.type,
     InviteTicket.type,
   };
 
@@ -261,6 +269,28 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
       rethrow;
     } catch (e) {
       AppLog.e('gateway', 'Privater Termin konnte nicht gesendet werden', e);
+      throw _map(e);
+    }
+  }
+
+  @override
+  Future<void> publishContactRecord(ContactRecord record) async {
+    final Map<String, Object?> content;
+    try {
+      content = ContactCodec.encode(record);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    try {
+      await _ensurePrivateRoom();
+      final room = _privateRoom();
+      if (room == null) throw const GatewayException(GatewayError.serverUnreachable);
+      await _verifyPrivateRoom(room);
+      await _sendCalendar(room, ContactCodec.type, content);
+    } on GatewayException {
+      rethrow;
+    } catch (e) {
+      AppLog.e('gateway', 'Kontaktdatensatz konnte nicht gesendet werden', e);
       throw _map(e);
     }
   }

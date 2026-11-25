@@ -10,6 +10,7 @@ import '../../domain/calendar_signal.dart';
 import '../../domain/cash_book.dart';
 import '../../domain/cash_receipt_check.dart';
 import '../../domain/chat.dart';
+import '../../domain/contacts.dart';
 import '../../domain/data_inventory.dart';
 import '../../domain/event_themes.dart';
 import '../../domain/family.dart';
@@ -500,6 +501,12 @@ abstract class MatrixGateway implements Listenable {
 
   /// Sendet einen Geburts-/Gedenktag-Eintrag (ein Ereignis je Person) verschlüsselt in den Familienraum (E-104).
   Future<void> publishAnniversary(AnniversaryPerson person);
+
+  // ------------------------------------------------------------ Kontakte (#119, E-114)
+
+  /// Sendet einen eigenen Kontaktdatensatz verschlüsselt in den **privaten** Raum des Kontos. Es gibt keinen Weg, eine
+  /// Raum-ID anzugeben (I3); ungültige Datensätze liefern `invalidInput`.
+  Future<void> publishContactRecord(ContactRecord record);
 
   // ------------------------------------------------------------ Avatare
 

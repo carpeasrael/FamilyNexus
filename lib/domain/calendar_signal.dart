@@ -53,6 +53,12 @@ class AnniversarySignal extends CalendarSignal {
   final Map<String, Object?> content;
 }
 
+/// Kontaktdatensatz aus dem **privaten** Raum des eigenen Kontos, nur vom eigenen Absender (#119, E-114).
+class ContactSignal extends CalendarSignal {
+  const ContactSignal(super.sender, super.timestamp, this.content);
+  final Map<String, Object?> content;
+}
+
 /// Kalender-Thema (ein Datensatz je Thema) aus dem Familienraum (E-99).
 class EventThemeSignal extends CalendarSignal {
   const EventThemeSignal(super.sender, super.timestamp, this.content);

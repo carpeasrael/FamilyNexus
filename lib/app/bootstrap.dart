@@ -10,6 +10,7 @@ import '../data/db/key_value_store.dart';
 import '../data/db/sql_anniversary_store.dart';
 import '../data/db/sql_avatar_photo_store.dart';
 import '../data/db/sql_cash_book_store.dart';
+import '../data/db/sql_contact_store.dart';
 import '../data/db/sql_data_inventory.dart';
 import '../data/db/sql_event_store.dart';
 import '../data/db/sql_event_theme_store.dart';
@@ -29,9 +30,11 @@ import '../data/platform/reminder_scheduler.dart';
 import '../data/platform/screen_protection.dart';
 import '../data/platform/vault_key_store.dart';
 import '../data/platform/website_data.dart';
+import '../data/sync/contact_sync.dart';
 import '../data/sync/shopping_sync.dart';
 import '../data/sync/task_sync.dart';
 import '../domain/key_value_store.dart';
+import '../domain/moderation.dart';
 import '../domain/permissions.dart';
 import '../domain/shopping.dart';
 import '../domain/tasks.dart';
@@ -59,6 +62,26 @@ bool _cryptoReady = false;
 
 /// Initialisiert die Krypto-Bibliothek (vodozemac) genau einmal pro Prozess;
 /// ein zweiter Aufruf (z. B. „Erneut versuchen“) würde sonst einen Fehler werfen.
+/// Adapter der lokalen Blockierliste für die Kontakt-Synchronisation (#119, E-114): trägt nur ein, über die Einstellungen.
+class SettingsBlockedList implements BlockedListPort {
+  SettingsBlockedList(this._settings);
+  final SettingsController _settings;
+
+  @override
+  Set<String> get blocked => _settings.settings.blockedUsers.toSet();
+
+  @override
+  Future<void> add(Iterable<String> ids) async {
+    await _settings.update((c) {
+      var list = c.blockedUsers;
+      for (final id in ids) {
+        list = BlockedUsers.add(list, id);
+      }
+      return list == c.blockedUsers ? c : c.copyWith(blockedUsers: list);
+    });
+  }
+}
+
 Future<void> ensureCryptoInitialized() async {
   if (_cryptoReady) return;
   await vod.init();
@@ -200,6 +223,8 @@ Future<AppServices> bootstrap({
         anniversaryStore: SqlAnniversaryStore(database.db),
         avatarPhotoStore: SqlAvatarPhotoStore(database.db),
         cashBookStore: SqlCashBookStore(database.db),
+        contactStore: SqlContactStore(database.db),
+        blockedList: SettingsBlockedList(settings),
         files: fileAccess,
         familyRoom: familyRoom,
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),

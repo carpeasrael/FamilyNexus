@@ -3,6 +3,13 @@ import 'dart:convert';
 import 'server.dart';
 import 'text_sanitizer.dart';
 
+/// Technische Sperre der Kontakte außerhalb der Familie (#119, E-114). Bis zur Freigabe `false`: Es entstehen weder
+/// Dienst noch Synchronisation, der Kontaktspeicher bleibt in der Produktion leer (nur die Wipe-Pfade greifen auf ihn zu).
+class ContactFlags {
+  const ContactFlags._();
+  static const bool enabled = false;
+}
+
 /// Grenzen der Kontakte außerhalb der Familie (#119, E-114). Alle Werte stützen die Annahme im Codec und im Dienst.
 class ContactLimits {
   const ContactLimits._();
