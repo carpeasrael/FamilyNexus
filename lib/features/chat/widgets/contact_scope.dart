@@ -35,26 +35,53 @@ class _ScopeSwitcher extends StatelessWidget {
   }
 }
 
-/// Dauerhafter Hinweis „Außerhalb der Familie“ (§8.6): Symbol, Rand **und** Text, auch bei knapper Höhe; trägt den Namen
-/// und das Menü (Blockieren, Kontakte verwalten).
+/// Dauerhafter Hinweis „Außerhalb der Familie“ (§8.6): Symbol, Rand **und** Text, auch bei knapper Höhe; trägt den Namen,
+/// den Identitätszustand (K3b-2b, B8: Symbol **und** Text, `Wrap` ohne festen Höhenansatz) und das Menü (Person prüfen,
+/// Änderung akzeptieren, Blockieren, Kontakte verwalten).
 class _OutsideBanner extends StatelessWidget {
-  const _OutsideBanner({required this.name, required this.userId, required this.collides, required this.onBlock, required this.onManage});
+  const _OutsideBanner({
+    required this.name,
+    required this.userId,
+    required this.collides,
+    required this.onBlock,
+    required this.onManage,
+    this.identity = IdentityStatus.unknown,
+    this.pending = false,
+    this.onVerify,
+    this.onAccept,
+  });
 
   final String name;
   final String userId;
   final bool collides;
+  final IdentityStatus identity;
+
+  /// Gegenüber noch nicht beigetreten: kein Schlüsselstatus, keine Prüfung.
+  final bool pending;
   final VoidCallback onBlock;
   final VoidCallback onManage;
+  final VoidCallback? onVerify;
+  final VoidCallback? onAccept;
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = AuroraTokens.of(context);
     final text = l.chatOutsideBanner(isolateText(name));
+    final canVerify = !pending && identity != IdentityStatus.unknown && onVerify != null;
+    final canAccept = !pending && identity == IdentityStatus.changed && onAccept != null;
+    final (IconData, String, Color)? status = pending
+        ? null
+        : switch (identity) {
+            IdentityStatus.verified => (Icons.verified_user_outlined, l.contactIdentityVerified, t.success),
+            IdentityStatus.pinned => (Icons.shield_outlined, l.contactIdentityPinned, t.textSecondary),
+            IdentityStatus.unknown => (Icons.help_outline, l.contactIdentityUnknown, t.textSecondary),
+            IdentityStatus.changed => (Icons.gpp_maybe_outlined, l.contactIdentityChangedBanner(isolateText(name)), t.danger),
+          };
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: DecoratedBox(
-        decoration: BoxDecoration(border: Border.all(color: t.warning), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(border: Border.all(color: identity == IdentityStatus.changed && !pending ? t.danger : t.warning), borderRadius: BorderRadius.circular(8)),
         child: Padding(
           padding: const EdgeInsets.only(left: 8),
           child: Row(children: <Widget>[
@@ -63,18 +90,39 @@ class _OutsideBanner extends StatelessWidget {
             Expanded(
               child: Semantics(
                 container: true,
-                label: collides ? '$text ${l.contactsNotYourFamily(isolateText(userId))}' : text,
+                label: <String>[
+                  collides ? '$text ${l.contactsNotYourFamily(isolateText(userId))}' : text,
+                  if (status != null) status.$2,
+                ].join(' '),
                 excludeSemantics: true,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
                   Text(text, maxLines: 2, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.labelSmall),
                   if (collides) NotYourFamilyWarning(userId: userId),
+                  if (status != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Tooltip(
+                        message: status.$2,
+                        child: Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 4, children: <Widget>[
+                          Icon(status.$1, size: 16, color: status.$3),
+                          Text(status.$2, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: status.$3)),
+                        ]),
+                      ),
+                    ),
                 ]),
               ),
             ),
             PopupMenuButton<int>(
               tooltip: l.chatContactsManage,
-              onSelected: (v) => v == 0 ? onBlock() : onManage(),
+              onSelected: (v) => switch (v) {
+                0 => onBlock(),
+                2 => onVerify?.call(),
+                3 => onAccept?.call(),
+                _ => onManage(),
+              },
               itemBuilder: (_) => <PopupMenuEntry<int>>[
+                if (canVerify) PopupMenuItem<int>(value: 2, child: Text(l.contactVerifyAction)),
+                if (canAccept) PopupMenuItem<int>(value: 3, child: Text(l.contactAcceptChangeAction)),
                 PopupMenuItem<int>(value: 0, child: Text(l.contactsBlock)),
                 PopupMenuItem<int>(value: 1, child: Text(l.chatContactsManage)),
               ],

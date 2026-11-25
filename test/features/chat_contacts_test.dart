@@ -1,6 +1,7 @@
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/contacts.dart';
+import 'package:family_nexus/domain/family.dart' show IdentityStatus;
 import 'package:family_nexus/features/chat/chat_view_model.dart';
 import 'package:family_nexus/features/contacts/contact_controller.dart';
 import 'package:family_nexus/features/contacts/not_your_family_warning.dart';
@@ -340,5 +341,122 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('geheimer Entwurf'), findsNothing);
     await end(tester);
+  });
+
+  // ---- K3b-2b: Identität des Gegenübers (B8) ----
+  group('Identität des Kontakts (K3b-2b)', () {
+    Future<void> openContact(WidgetTester tester) async {
+      await toContacts(tester);
+      await tester.tap(find.byKey(ValueKey<String>('thread-${room.id}')));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> openMenu(WidgetTester tester) async {
+      await tester.tap(find.byType(PopupMenuButton<int>));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('Statuszeile mit Symbol und Text für unbekannt, nicht geprüft und geprüft; „Person prüfen“ erst mit Schlüsseln', (tester) async {
+      final app = await setup(tester);
+      await openContact(tester);
+      expect(find.text('Noch keine Schlüssel bekannt'), findsOneWidget);
+      expect(find.byIcon(Icons.help_outline), findsOneWidget);
+      await openMenu(tester);
+      expect(find.text('Person prüfen'), findsNothing);
+      await tester.tapAt(const Offset(5, 5));
+      await tester.pumpAndSettle();
+      app.server.contactIdentities[carla] = IdentityStatus.pinned;
+      app.server.notifyAll();
+      await tester.pumpAndSettle();
+      expect(find.text('Nicht persönlich geprüft'), findsOneWidget);
+      expect(find.byIcon(Icons.shield_outlined), findsOneWidget);
+      await openMenu(tester);
+      expect(find.text('Person prüfen'), findsOneWidget);
+      expect(find.text('Änderung akzeptieren'), findsNothing);
+      await tester.tapAt(const Offset(5, 5));
+      await tester.pumpAndSettle();
+      app.server.contactIdentities[carla] = IdentityStatus.verified;
+      app.server.notifyAll();
+      await tester.pumpAndSettle();
+      expect(find.text('Persönlich geprüft'), findsOneWidget);
+      expect(find.byIcon(Icons.verified_user_outlined), findsOneWidget);
+      await end(tester);
+    });
+
+    testWidgets('geändert: Warnung im Banner, Eingabeleiste ersetzt (Vorrang vor „nicht erreichbar“), Akzeptieren mit Bestätigung', (tester) async {
+      final app = await setup(tester);
+      app.server.identityChangedUsers.add(carla);
+      app.server.unreachableUsers.add(carla);
+      app.server.notifyAll();
+      await tester.pumpAndSettle();
+      await openContact(tester);
+      expect(find.textContaining('Der Sicherheitsschlüssel von'), findsOneWidget);
+      expect(find.byIcon(Icons.gpp_maybe_outlined), findsOneWidget);
+      expect(find.textContaining('Senden ist gesperrt, bis du die Änderung akzeptierst'), findsOneWidget);
+      expect(find.textContaining('Sicherheitsprüfung einrichten'), findsNothing, reason: 'geändert vor nicht erreichbar');
+      expect(find.byType(TextField), findsNothing);
+      await openMenu(tester);
+      expect(find.text('Person prüfen'), findsOneWidget);
+      await tester.tap(find.text('Änderung akzeptieren'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Erst akzeptieren, wenn ihr euch persönlich geprüft habt'), findsOneWidget);
+      await tester.tap(find.text('Abbrechen'));
+      await tester.pumpAndSettle();
+      expect(app.server.identityChangedUsers, contains(carla));
+      await openMenu(tester);
+      await tester.tap(find.text('Änderung akzeptieren'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.byType(FilledButton)));
+      await tester.pumpAndSettle();
+      expect(app.server.identityChangedUsers, isEmpty);
+      expect(find.textContaining('Senden ist gesperrt'), findsNothing);
+      await end(tester);
+    });
+
+    testWidgets('wartendes Gespräch: keine Statuszeile, kein „Person prüfen“', (tester) async {
+      final app = await setup(tester, toJoined: false);
+      app.server.identityChangedUsers.add(carla);
+      app.server.notifyAll();
+      await tester.pumpAndSettle();
+      await openContact(tester);
+      expect(find.text('Noch keine Schlüssel bekannt'), findsNothing);
+      expect(find.byIcon(Icons.gpp_maybe_outlined), findsNothing);
+      await openMenu(tester);
+      expect(find.text('Person prüfen'), findsNothing);
+      expect(find.text('Änderung akzeptieren'), findsNothing);
+      await end(tester);
+    });
+
+    testWidgets('keine Familienbegriffe in den neuen Texten (außer „Außerhalb der Familie“)', (tester) async {
+      final app = await setup(tester);
+      app.server.identityChangedUsers.add(carla);
+      app.server.notifyAll();
+      await tester.pumpAndSettle();
+      await openContact(tester);
+      for (final t in tester.widgetList<Text>(find.byType(Text))) {
+        final d = t.data ?? '';
+        if (d.contains('Sicherheitsschlüssel') || d.contains('Senden ist gesperrt')) expect(d.contains('Famil'), isFalse, reason: d);
+      }
+      await end(tester);
+    });
+
+    testWidgets('große Schrift (2,0) und schmale Breite: Banner, Menü und Warnung ohne Überlauf', (tester) async {
+      final app = await setup(tester, carlaName: 'Anna');
+      app.server.identityChangedUsers.add(carla);
+      app.server.notifyAll();
+      await tester.pumpAndSettle();
+      await openContact(tester);
+      tester.view.physicalSize = const Size(320, 568);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.ensureVisible(find.byType(PopupMenuButton<int>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(PopupMenuButton<int>), warnIfMissed: false);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await end(tester);
+    });
   });
 }

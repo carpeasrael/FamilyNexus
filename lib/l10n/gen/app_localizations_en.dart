@@ -606,6 +606,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatContactsManage => 'Manage contacts';
 
   @override
+  String get contactIdentityVerified => 'Checked in person';
+
+  @override
+  String get contactIdentityPinned => 'Not checked in person';
+
+  @override
+  String get contactIdentityUnknown => 'No keys known yet';
+
+  @override
+  String contactIdentityChangedBanner(String name) {
+    return 'The security key of $name has changed. Check each other in person before you keep writing.';
+  }
+
+  @override
+  String get contactIdentityChangedComposer =>
+      'This person’s security key has changed. Sending is blocked until you accept the change.';
+
+  @override
+  String get contactVerifyAction => 'Check person';
+
+  @override
+  String get contactAcceptChangeAction => 'Accept change';
+
+  @override
+  String get contactAcceptChangeConfirm =>
+      'Only accept after you have checked in person (e.g. via emoji comparison). Continue?';
+
+  @override
+  String get contactSendBlockedChanged =>
+      'Sending blocked: this person’s security key has changed.';
+
+  @override
+  String get contactAcceptChangeFailed => 'The change could not be accepted.';
+
+  @override
   String get errNotAllowed => 'You do not have permission for this.';
 
   @override
