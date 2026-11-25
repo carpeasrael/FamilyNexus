@@ -827,6 +827,13 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   int get unreadCount => threads.fold<int>(0, (a, t) => a + t.unread);
 
+  /// Test (#119, B7): Zahl des Bereichs Familie, wenn sie von [unreadCount] abweichen soll (später mit Kontakten).
+  int? familyUnreadOverride;
+
+  @override
+  int get familyUnreadCount =>
+      familyUnreadOverride ?? threads.where((t) => t.kind == ThreadKind.family || t.kind == ThreadKind.direct).fold<int>(0, (a, t) => a + t.unread);
+
   @override
   Future<void> markChatRead({String threadId = ChatThread.familyId}) async {
     markedRead.add(threadId);

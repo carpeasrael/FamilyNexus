@@ -155,7 +155,7 @@ Stand: 2026-11-18. Alles, was nicht (oder nur eingeschränkt) umgesetzt ist, mit
 - `person_colors`/`setPersonColor` und `CalendarSync.resyncOwnShared` sind ungenutzt (Personenfarbe wird aus der ID abgeleitet).
 - „Effekte reduzieren“ ist eine eigene Einstellung und folgt nicht automatisch der Systemeinstellung.
 
-- Nicht als Unit-Test mit SDK-Fake abgedeckt (nur Synapse-E2E): `_acceptDirectInvites`, `_eligibleDirectRooms`, `_onToDevice`.
+- Nicht als Unit-Test mit SDK-Fake abgedeckt (nur Synapse-E2E): `_onToDevice`. Die **Einstufung** der Einzelchats (`_eligibleDirectRooms`, `_acceptDirectInvites`, #119 K2a, E-114) ist seit K2a durch `ConversationPolicy` (`test/domain/conversation_policy_test.dart`) und Gateway-Harness-Tests (`test/data/book_gateway_sync_test.dart`, Gruppe „Einzelchat-Einstufung“, Test-Naht `encryptionAvailable`) belegt; die Kryptografie selbst bleibt dem E2E vorbehalten.
 
 ## Veröffentlichung (E-47, `docs/STORE.md`)
 

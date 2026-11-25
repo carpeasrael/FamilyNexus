@@ -12,6 +12,7 @@ import 'package:family_nexus/domain/book_policy.dart';
 import 'package:family_nexus/domain/book_room.dart';
 import 'package:family_nexus/domain/book_signal.dart';
 import 'package:family_nexus/domain/cash_book.dart';
+import 'package:family_nexus/domain/chat.dart' show ThreadKind;
 import 'package:family_nexus/domain/data_inventory.dart' show InventoryRoomKind;
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -269,6 +270,7 @@ Future<(_Hs, SdkMatrixGateway)> _signedIn({
   bool familySynced = true,
   bool familyMembersFail = false,
   bool requireEncryption = false,
+  bool? encryption,
 }) async {
   final hs = _Hs()..familyMembersFail = familyMembersFail;
   final dir = await Directory.systemTemp.createTemp('fn_bookgw');
@@ -283,6 +285,7 @@ Future<(_Hs, SdkMatrixGateway)> _signedIn({
           joinOpTimeout: const Duration(milliseconds: 800),
           joinPollInterval: const Duration(hours: 1),
           requireEncryptionForBooks: requireEncryption,
+          encryptionAvailable: encryption,
         )
       : SdkMatrixGateway(
           keyStore: MemoryKeyStore(),
@@ -294,6 +297,7 @@ Future<(_Hs, SdkMatrixGateway)> _signedIn({
           joinPollInterval: const Duration(hours: 1),
           cashBooksEnabled: flag,
           requireEncryptionForBooks: requireEncryption,
+          encryptionAvailable: encryption,
         );
   final g = make(flag: enabled);
   addTearDown(() async {
@@ -450,6 +454,143 @@ void main() {
       await expectLater(g.bookKnownMembers('!anderes:hs.example'), _notAllowed());
       await expectLater(g.bookKnownMembers('!gibtsnicht:hs.example'), _error(GatewayError.notFound));
       await expectLater(g.bookKnownMembers('kein-raum'), _error(GatewayError.invalidInput));
+    });
+  });
+
+  // ---- #119, K2a: Einzelchat-Einstufung im echten Gateway (Verhaltensgleichheit der Überführung in `ConversationPolicy`) ----
+
+  /// Beigetretener Raum mit Gegenüber [peer] (m.direct), Megolm, Zählern und Mitgliedern.
+  Map<String, Object?> dmJoined(
+    String room,
+    String peer, {
+    bool direct = true,
+    bool megolm = true,
+    int joined = 2,
+    int invited = 0,
+    int? summaryJoined,
+    List<String>? members,
+  }) =>
+      <String, Object?>{
+        if (direct)
+          'account_data': <String, Object?>{
+            'events': <Object?>[
+              <String, Object?>{'type': 'm.direct', 'content': <String, Object?>{peer: <String>[room]}},
+            ],
+          },
+        'rooms': <String, Object?>{
+          'join': <String, Object?>{
+            room: <String, Object?>{
+              'summary': <String, Object?>{'m.joined_member_count': summaryJoined ?? joined, 'm.invited_member_count': invited},
+              'state': <String, Object?>{
+                'events': <Object?>[
+                  _state('m.room.create', _me, <String, Object?>{'room_version': '10'}),
+                  if (megolm) _state('m.room.encryption', _me, <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2'}),
+                  for (final m in members ?? <String>[_me, peer]) _memberEvent(m, 'join'),
+                ],
+              },
+            },
+          },
+        },
+      };
+
+  /// Einladung in einen Raum; [direct] setzt `is_direct` im eigenen Mitgliedsereignis, [from] ist der Einladende.
+  Map<String, Object?> dmInvite(String room, String from, {bool direct = true}) => <String, Object?>{
+        'rooms': <String, Object?>{
+          'invite': <String, Object?>{
+            room: <String, Object?>{
+              'invite_state': <String, Object?>{
+                'events': <Object?>[
+                  <String, Object?>{
+                    'type': 'm.room.member',
+                    'state_key': _me,
+                    'sender': from,
+                    'content': <String, Object?>{'membership': 'invite', if (direct) 'is_direct': true},
+                  },
+                ],
+              },
+            },
+          },
+        },
+      };
+
+  group('Einzelchat-Einstufung (#119, K2a)', () {
+    const dm = '!dm:hs.example';
+
+    Future<bool> shown(SdkMatrixGateway g, Map<String, Object?> update) async {
+      await _sync(g, update);
+      await Future<void>.delayed(_settle);
+      return g.threads.any((t) => t.id == dm && t.kind == ThreadKind.direct);
+    }
+
+    test('Kontrollfall: beigetretener, verschlüsselter Raum mit m.direct, zwei Personen, Gegenüber beigetretenes Mitglied: Einzelchat', () async {
+      final (_, g) = await _signedIn(encryption: true);
+      expect(g.debugParticipantsLoaded, isTrue, reason: 'Voraussetzung: Mitgliederliste geladen');
+      expect(await shown(g, dmJoined(dm, _ben)), isTrue);
+    });
+
+    test('ohne Verschlüsselung im Client (Standard der Naht) wird kein Raum zum Einzelchat', () async {
+      final (_, g) = await _signedIn();
+      expect(await shown(g, dmJoined(dm, _ben)), isFalse);
+    });
+
+    test('Gegenproben: nie Einzelchat bei fehlendem m.direct, ohne Megolm, drei Personen, unbekannter Anzahl, Gegenüber kein oder nur eingeladenes Mitglied, Gegenüber = ich', () async {
+      final cases = <String, Map<String, Object?>>{
+        'kein m.direct': dmJoined(dm, _ben, direct: false),
+        'ohne Megolm': dmJoined(dm, _ben, megolm: false),
+        'drei Personen': dmJoined(dm, _ben, joined: 3, members: <String>[_me, _ben, _cara]),
+        'zwei beigetreten und einer eingeladen': dmJoined(dm, _ben, invited: 1),
+        'Gegenüber kein Mitglied der Familie': dmJoined(dm, _fremd),
+        'Gegenüber nur eingeladen (Dora)': dmJoined(dm, _dora),
+        'Gegenüber ich selbst': dmJoined(dm, _me, members: <String>[_me]),
+      };
+      for (final e in cases.entries) {
+        final (_, g) = await _signedIn(encryption: true);
+        expect(await shown(g, e.value), isFalse, reason: e.key);
+      }
+    });
+
+    test('Familien- und privater Raum werden nie Einzelchat (Vorrang), auch nicht mit m.direct auf ihre ID', () async {
+      final (_, g) = await _signedIn(encryption: true);
+      await _sync(g, <String, Object?>{
+        'account_data': <String, Object?>{
+          'events': <Object?>[
+            <String, Object?>{'type': 'm.direct', 'content': <String, Object?>{_ben: <String>[_familyRoom]}},
+          ],
+        },
+      });
+      await Future<void>.delayed(_settle);
+      expect(g.threads.where((t) => t.kind == ThreadKind.direct), isEmpty);
+    });
+
+    test('Einladung is_direct von einem beigetretenen Mitglied: wird angenommen (/join)', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      await _sync(g, dmInvite(dm, _ben));
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '/join'), isNotEmpty);
+    });
+
+    test('Einladung is_direct nie angenommen: Fremder, Nur-eingeladener, ich selbst, ohne is_direct', () async {
+      for (final c in <(String, String, bool)>[('Fremder', _fremd, true), ('nur eingeladen', _dora, true), ('ich selbst', _me, true), ('ohne is_direct', _ben, false)]) {
+        final (hs, g) = await _signedIn(encryption: true);
+        await _sync(g, dmInvite(dm, c.$2, direct: c.$3));
+        await Future<void>.delayed(_settle);
+        expect(hs.where('POST', '/join'), isEmpty, reason: c.$1);
+      }
+    });
+
+    test('Einladung is_direct bei unvollständiger Mitgliederliste: keine Annahme (B6)', () async {
+      final (hs, g) = await _signedIn(encryption: true, familyMembersFail: true);
+      expect(g.debugParticipantsLoaded, isFalse);
+      await _sync(g, dmInvite(dm, _ben));
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '/join'), isEmpty);
+    });
+
+    test('Einladung ohne is_direct von einem Mitglied erscheint nicht als Familieneinladung, solange Familie bekannt ist (kein Beitritt)', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      await _sync(g, dmInvite(dm, _ben, direct: false));
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '/join'), isEmpty);
     });
   });
 

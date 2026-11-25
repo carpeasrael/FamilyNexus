@@ -756,6 +756,22 @@ void main() {
   });
 
   group('Heute', () {
+    testWidgets('#119 B7: die Karte zählt nur den Bereich Familie (familyUnreadCount), nicht alle Gespräche', (tester) async {
+      final app = await _app();
+      final ben = await _joinBen(app);
+      await _start(tester, app);
+      await ben.sendMessage('Hallo');
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      expect(app.gateway.unreadCount, 1);
+      expect(app.gateway.familyUnreadCount, 1, reason: 'ohne Kontakte gleich');
+      app.gateway.familyUnreadOverride = 3;
+      app.gateway.notifyListeners();
+      await tester.pumpAndSettle();
+      expect(find.text('3 ungelesene Nachrichten'), findsOneWidget, reason: 'Heute liest familyUnreadCount');
+      expect(find.text('1 ungelesene Nachricht'), findsNothing);
+    });
+
     testWidgets('zeigt nächste Termine, geplante Erinnerungen und ungelesene Nachrichten', (tester) async {
       final app = await _app();
       final ben = await _joinBen(app);

@@ -124,6 +124,10 @@ abstract class MatrixGateway implements Listenable {
   /// Anzahl ungelesener Chatnachrichten aller Gespräche (ohne eigene).
   int get unreadCount;
 
+  /// Ungelesene Nachrichten nur im Bereich Familie (Familienchat und Einzelchats mit Mitgliedern), ohne Kontakte und
+  /// Gruppen (#119, B7): Die Karte auf „Heute“ zeigt nur Familiennachrichten. Ohne Kontakte gleich [unreadCount].
+  int get familyUnreadCount;
+
   /// Ungelesene Nachrichten eines Gesprächs.
   int unreadIn(String threadId);
 

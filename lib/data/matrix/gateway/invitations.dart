@@ -17,16 +17,13 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
   void _scheduleRefresh();
   Future<String?> _sendCalendar(Room room, String type, Map<String, Object?> content);
   Future<Map<String, Object?>?> _serverState(String roomId, String type);
+  RoomFacts _roomFacts(Room r, String me);
   void _warnPlaintext(Event e);
 
   /// Einladungsfilter, siehe [isFamilyInvitation]; der `join_rule` stammt aus dem Einladungszustand (`null` ohne Angabe).
-  bool _isFamilyInvitation(Room r, String me) => isFamilyInvitation(
-        joinRule: _stringOrNull(r.getState(EventTypes.RoomJoinRules)?.content['join_rule']),
-        isDirect: r.getState(EventTypes.RoomMember, me)?.content['is_direct'] == true,
-        isBook: BookRoomMarker.isBook(r.getState(EventTypes.RoomCreate)?.content),
-      );
-
-  static String? _stringOrNull(Object? v) => v is String ? v : null;
+  /// Seit K2a über die gemeinsame Einstufung ([ConversationPolicy]); unabhängig von der Familie (Einrichtung).
+  bool _isFamilyInvitation(Room r, String me) =>
+      ConversationPolicy.classify(_roomFacts(r, me), PolicyContext(myUserId: me)) == RoomClass.familyInvite;
 
   @override
   List<PendingInvitation> get invitations {
