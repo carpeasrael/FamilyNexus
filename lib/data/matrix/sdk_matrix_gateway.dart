@@ -381,6 +381,11 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   @visibleForTesting
   Future<void> Function()? debugAfterFamilyTimeline;
 
+  /// Nur für Tests: Mitglieder mit ungeklärter Identitätsänderung (#119, K2a); Einträge hier sperren die automatische
+  /// Annahme ihrer Einzelchat-Einladungen.
+  @visibleForTesting
+  Set<String> get debugIdentityChanged => _identityChanged;
+
   /// Nur für Tests: läuft als Erstes in jedem Abgleich (#412: ein scheiternder Abgleich nach der Anmeldung).
   @visibleForTesting
   Future<void> Function()? debugBeforeRefresh;

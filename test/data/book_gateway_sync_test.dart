@@ -271,11 +271,25 @@ Future<(_Hs, SdkMatrixGateway)> _signedIn({
   bool familyMembersFail = false,
   bool requireEncryption = false,
   bool? encryption,
+  bool defaultEncryption = false,
 }) async {
   final hs = _Hs()..familyMembersFail = familyMembersFail;
   final dir = await Directory.systemTemp.createTemp('fn_bookgw');
   addTearDown(() => dir.delete(recursive: true));
-  SdkMatrixGateway make({bool? flag}) => flag == null
+  SdkMatrixGateway make({bool? flag}) => defaultEncryption
+      ? SdkMatrixGateway(
+          // Ohne `encryptionAvailable`: der Standard der Produktion (`client.encryptionEnabled`).
+          keyStore: MemoryKeyStore(),
+          dbDirectory: dir.path,
+          probe: ServerProbe(client: hs.client),
+          databaseOpener: (path, key) => databaseFactoryFfi.openDatabase(path),
+          httpClient: hs.client,
+          joinOpTimeout: const Duration(milliseconds: 800),
+          joinPollInterval: const Duration(hours: 1),
+          cashBooksEnabled: true,
+          requireEncryptionForBooks: requireEncryption,
+        )
+      : flag == null
       ? SdkMatrixGateway(
           keyStore: MemoryKeyStore(),
           dbDirectory: dir.path,
@@ -528,8 +542,13 @@ void main() {
       expect(await shown(g, dmJoined(dm, _ben)), isTrue);
     });
 
-    test('ohne Verschlüsselung im Client (Standard der Naht) wird kein Raum zum Einzelchat', () async {
-      final (_, g) = await _signedIn();
+    test('ohne Verschlüsselung im Client wird kein Raum zum Einzelchat (Naht ausdrücklich aus)', () async {
+      final (_, g) = await _signedIn(encryption: false);
+      expect(await shown(g, dmJoined(dm, _ben)), isFalse);
+    });
+
+    test('Standard der Produktion (Gateway ohne die Naht): im Harness ohne vodozemac ist die Verschlüsselung nicht verfügbar, kein Einzelchat', () async {
+      final (_, g) = await _signedIn(defaultEncryption: true);
       expect(await shown(g, dmJoined(dm, _ben)), isFalse);
     });
 
@@ -549,17 +568,94 @@ void main() {
       }
     });
 
-    test('Familien- und privater Raum werden nie Einzelchat (Vorrang), auch nicht mit m.direct auf ihre ID', () async {
+    test('Familien- und privater Raum werden nie Einzelchat (Vorrang), auch wenn sie sonst alle Bedingungen erfüllen', () async {
+      const priv = '!privat:hs.example';
       final (_, g) = await _signedIn(encryption: true);
+      // Der Familienraum meldet zwei Personen (Paar) und steht in m.direct auf Ben: ohne Vorrang wäre er ein Einzelchat.
       await _sync(g, <String, Object?>{
         'account_data': <String, Object?>{
           'events': <Object?>[
-            <String, Object?>{'type': 'm.direct', 'content': <String, Object?>{_ben: <String>[_familyRoom]}},
+            <String, Object?>{'type': 'm.direct', 'content': <String, Object?>{_ben: <String>[_familyRoom, priv]}},
+            <String, Object?>{'type': 'de.inneso.familynexus.private_room', 'content': <String, Object?>{'room_id': priv}},
           ],
+        },
+        'rooms': <String, Object?>{
+          'join': <String, Object?>{
+            _familyRoom: <String, Object?>{
+              'summary': <String, Object?>{'m.joined_member_count': 2, 'm.invited_member_count': 0},
+            },
+            priv: <String, Object?>{
+              'summary': <String, Object?>{'m.joined_member_count': 2, 'm.invited_member_count': 0},
+              'state': <String, Object?>{
+                'events': <Object?>[
+                  _state('m.room.create', _me, <String, Object?>{'room_version': '10'}),
+                  _state('m.room.encryption', _me, <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2'}),
+                  _memberEvent(_me, 'join'),
+                  _memberEvent(_ben, 'join'),
+                ],
+              },
+            },
+          },
         },
       });
       await Future<void>.delayed(_settle);
       expect(g.threads.where((t) => t.kind == ThreadKind.direct), isEmpty);
+      // Gegenprobe: derselbe private Raum ohne den Vermerk in den Kontodaten wäre ein Einzelchat.
+      final (_, g2) = await _signedIn(encryption: true);
+      await _sync(g2, <String, Object?>{
+        'account_data': <String, Object?>{
+          'events': <Object?>[
+            <String, Object?>{'type': 'm.direct', 'content': <String, Object?>{_ben: <String>[priv]}},
+          ],
+        },
+        'rooms': (dmJoined(priv, _ben)['rooms']! as Map<String, Object?>),
+      });
+      await Future<void>.delayed(_settle);
+      expect(g2.threads.any((t) => t.id == priv && t.kind == ThreadKind.direct), isTrue);
+    });
+
+    test('bei mehreren Räumen mit demselben Gegenüber gilt der mit der kleinsten Raum-ID', () async {
+      final (_, g) = await _signedIn(encryption: true);
+      final a = dmJoined('!a-dm:hs.example', _ben);
+      final b = dmJoined('!b-dm:hs.example', _ben);
+      await _sync(g, <String, Object?>{
+        'account_data': <String, Object?>{
+          'events': <Object?>[
+            <String, Object?>{'type': 'm.direct', 'content': <String, Object?>{_ben: <String>['!b-dm:hs.example', '!a-dm:hs.example']}},
+          ],
+        },
+        'rooms': <String, Object?>{
+          'join': <String, Object?>{
+            ...((a['rooms']! as Map)['join']! as Map<String, Object?>),
+            ...((b['rooms']! as Map)['join']! as Map<String, Object?>),
+          },
+        },
+      });
+      await Future<void>.delayed(_settle);
+      expect(g.threads.where((t) => t.kind == ThreadKind.direct).map((t) => t.id), <String>['!a-dm:hs.example']);
+    });
+
+    test('Einladung von einem Mitglied mit ungeklärter Identitätsänderung wird nicht angenommen', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      g.debugIdentityChanged.add(_ben);
+      await _sync(g, dmInvite(dm, _ben));
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '/join'), isEmpty);
+    });
+
+    test('familyUnreadCount des Gateways gleich unreadCount (ohne Kontakte); lesbare Nachrichten lassen sich im Harness ohne Entschlüsselung nicht erzeugen, die Zahl ist hier 0', () async {
+      final (_, g) = await _signedIn(encryption: true);
+      await _sync(g, <String, Object?>{
+        'rooms': <String, Object?>{
+          'join': <String, Object?>{
+            _familyRoom: <String, Object?>{
+              'unread_notifications': <String, Object?>{'notification_count': 2},
+            },
+          },
+        },
+      });
+      await Future<void>.delayed(_settle);
+      expect(g.familyUnreadCount, g.unreadCount);
     });
 
     test('Einladung is_direct von einem beigetretenen Mitglied: wird angenommen (/join)', () async {

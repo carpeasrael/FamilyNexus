@@ -121,6 +121,11 @@ void main() {
       expect(ConversationPolicy.autoAcceptDirect(joined(), ctx), isFalse, reason: 'kein Einladungszustand');
     });
 
+    test('nur Einladungen: ein beigetretener Raum mit gesetztem is_direct wird nie „angenommen“', () {
+      const j = RoomFacts(id: '!x', membership: RoomMembership.join, inviterId: ben, inviteIsDirect: true);
+      expect(ConversationPolicy.autoAcceptDirect(j, ctx), isFalse);
+    });
+
     test('keine Prüfung auf Buch (wie bisher: Buch-Einladungen tragen kein is_direct)', () {
       expect(ConversationPolicy.autoAcceptDirect(invite(direct: true, book: true), ctx), isTrue);
     });
