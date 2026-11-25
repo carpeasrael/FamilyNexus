@@ -704,6 +704,390 @@ abstract class AppLocalizations {
   /// **'Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.'**
   String get errPeerNotReachable;
 
+  /// No description provided for @contactsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakte'**
+  String get contactsTitle;
+
+  /// No description provided for @contactsSettingsSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Chats mit Personen außerhalb der Familie'**
+  String get contactsSettingsSubtitle;
+
+  /// No description provided for @contactsIntroTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakte einschalten?'**
+  String get contactsIntroTitle;
+
+  /// No description provided for @contactsIntroBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Mit Kontakten kannst du mit Personen außerhalb deiner Familie schreiben, auf jedem Matrix-Server.\n\nWas sich ändert:\n• Nachrichten sind Ende-zu-Ende verschlüsselt. Wer mit wem schreibt, sehen aber dein Server und der Server der anderen Person.\n• Termine, Listen, Zusagen und Online-Status werden nie mit Kontakten geteilt.\n• Die andere Person sieht deinen Anzeigenamen und deine Kontakt-ID.\n• „Prüfen“ fragt deinen Server und den Server der gesuchten Person. Beide erfahren so, wen du suchst. Es sind höchstens 20 Prüfungen je Stunde möglich.\n• Die Liste deiner Kontakte und diese Einstellung liegen verschlüsselt im privaten Raum deines Kontos und gelten auf allen deinen Geräten.\n• Ausschalten löscht nichts: Der Bereich wird verborgen und neue Anfragen werden ignoriert.\n• Die App prüft kein Alter.'**
+  String get contactsIntroBody;
+
+  /// No description provided for @contactsTurnOn.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakte einschalten'**
+  String get contactsTurnOn;
+
+  /// No description provided for @contactsTurnOff.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakte ausschalten'**
+  String get contactsTurnOff;
+
+  /// No description provided for @contactsTurnOffTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakte ausschalten?'**
+  String get contactsTurnOffTitle;
+
+  /// No description provided for @contactsTurnOffBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Bereich und neue Anfragen werden verborgen. Es wird nichts gelöscht.'**
+  String get contactsTurnOffBody;
+
+  /// No description provided for @contactsRequestsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Anfragen'**
+  String get contactsRequestsTitle;
+
+  /// No description provided for @contactsRequestFrom.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} möchte dir schreiben'**
+  String contactsRequestFrom(String name);
+
+  /// No description provided for @contactsRequestsMore.
+  ///
+  /// In de, this message translates to:
+  /// **'Weitere Anfragen: {count}'**
+  String contactsRequestsMore(int count);
+
+  /// No description provided for @contactsAccept.
+  ///
+  /// In de, this message translates to:
+  /// **'Annehmen'**
+  String get contactsAccept;
+
+  /// No description provided for @contactsDecline.
+  ///
+  /// In de, this message translates to:
+  /// **'Ablehnen'**
+  String get contactsDecline;
+
+  /// No description provided for @contactsBlock.
+  ///
+  /// In de, this message translates to:
+  /// **'Blockieren'**
+  String get contactsBlock;
+
+  /// No description provided for @contactsAcceptTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Anfrage annehmen?'**
+  String get contactsAcceptTitle;
+
+  /// No description provided for @contactsAcceptBody.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} kann dir dann schreiben und sieht deinen Anzeigenamen und deine Kontakt-ID. Kennung: {id}'**
+  String contactsAcceptBody(String name, String id);
+
+  /// No description provided for @contactsBlockTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Blockieren?'**
+  String get contactsBlockTitle;
+
+  /// No description provided for @contactsBlockBody.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} wird ausgeblendet und erfährt nichts davon. Kennung: {id}'**
+  String contactsBlockBody(String name, String id);
+
+  /// No description provided for @contactsListTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Deine Kontakte'**
+  String get contactsListTitle;
+
+  /// No description provided for @contactsListEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Kontakte.'**
+  String get contactsListEmpty;
+
+  /// No description provided for @contactsAdd.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakt hinzufügen'**
+  String get contactsAdd;
+
+  /// No description provided for @contactsMyId.
+  ///
+  /// In de, this message translates to:
+  /// **'Meine Kontakt-ID'**
+  String get contactsMyId;
+
+  /// No description provided for @contactsCopy.
+  ///
+  /// In de, this message translates to:
+  /// **'Kopieren'**
+  String get contactsCopy;
+
+  /// No description provided for @contactsCopied.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakt-ID kopiert'**
+  String get contactsCopied;
+
+  /// No description provided for @contactsStateWaiting.
+  ///
+  /// In de, this message translates to:
+  /// **'Wartet auf Annahme'**
+  String get contactsStateWaiting;
+
+  /// No description provided for @contactsStateConfirmed.
+  ///
+  /// In de, this message translates to:
+  /// **'Bestätigt'**
+  String get contactsStateConfirmed;
+
+  /// No description provided for @contactsStateNotSent.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch nicht gesendet'**
+  String get contactsStateNotSent;
+
+  /// No description provided for @contactsStateSearching.
+  ///
+  /// In de, this message translates to:
+  /// **'Gespräch wird gesucht'**
+  String get contactsStateSearching;
+
+  /// No description provided for @contactsStateBlocked.
+  ///
+  /// In de, this message translates to:
+  /// **'Blockiert'**
+  String get contactsStateBlocked;
+
+  /// No description provided for @contactsRetry.
+  ///
+  /// In de, this message translates to:
+  /// **'Erneut senden'**
+  String get contactsRetry;
+
+  /// No description provided for @contactsRetryWait.
+  ///
+  /// In de, this message translates to:
+  /// **'Bitte kurz warten, bevor du es erneut sendest.'**
+  String get contactsRetryWait;
+
+  /// No description provided for @contactsRemove.
+  ///
+  /// In de, this message translates to:
+  /// **'Entfernen'**
+  String get contactsRemove;
+
+  /// No description provided for @contactsRemoveTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakt entfernen?'**
+  String get contactsRemoveTitle;
+
+  /// No description provided for @contactsRemoveBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Du verlässt das Gespräch mit {name}. Kennung: {id}'**
+  String contactsRemoveBody(String name, String id);
+
+  /// No description provided for @contactsUnblock.
+  ///
+  /// In de, this message translates to:
+  /// **'Entsperren'**
+  String get contactsUnblock;
+
+  /// No description provided for @contactsUnblockLocal.
+  ///
+  /// In de, this message translates to:
+  /// **'Blockierung aufheben'**
+  String get contactsUnblockLocal;
+
+  /// No description provided for @contactsAddTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakt hinzufügen'**
+  String get contactsAddTitle;
+
+  /// No description provided for @contactsAddHint.
+  ///
+  /// In de, this message translates to:
+  /// **'@name:server oder matrix.to-Link'**
+  String get contactsAddHint;
+
+  /// No description provided for @contactsCheck.
+  ///
+  /// In de, this message translates to:
+  /// **'Prüfen'**
+  String get contactsCheck;
+
+  /// No description provided for @contactsCheckAgain.
+  ///
+  /// In de, this message translates to:
+  /// **'Erneut prüfen'**
+  String get contactsCheckAgain;
+
+  /// No description provided for @contactsCheckPrivacy.
+  ///
+  /// In de, this message translates to:
+  /// **'Beim Prüfen werden dein Server und der Server der gesuchten Person gefragt. Beide erfahren, wen du suchst.'**
+  String get contactsCheckPrivacy;
+
+  /// No description provided for @contactsFoundTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Gefunden'**
+  String get contactsFoundTitle;
+
+  /// No description provided for @contactsFoundName.
+  ///
+  /// In de, this message translates to:
+  /// **'Name: {name}'**
+  String contactsFoundName(String name);
+
+  /// No description provided for @contactsFoundId.
+  ///
+  /// In de, this message translates to:
+  /// **'Kennung: {id}'**
+  String contactsFoundId(String id);
+
+  /// No description provided for @contactsAddConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Hinzufügen'**
+  String get contactsAddConfirm;
+
+  /// No description provided for @contactsAdded.
+  ///
+  /// In de, this message translates to:
+  /// **'Anfrage gesendet. Das Gespräch beginnt, sobald die Person beitritt.'**
+  String get contactsAdded;
+
+  /// No description provided for @contactsCheckInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Das ist keine gültige Kontakt-ID. Sie sieht so aus: @name:server.'**
+  String get contactsCheckInvalid;
+
+  /// No description provided for @contactsCheckSelf.
+  ///
+  /// In de, this message translates to:
+  /// **'Das ist deine eigene Kontakt-ID.'**
+  String get contactsCheckSelf;
+
+  /// No description provided for @contactsCheckDuplicate.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Person ist schon in deiner Liste.'**
+  String get contactsCheckDuplicate;
+
+  /// No description provided for @contactsCheckBlockedRecord.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Person ist blockiert. Entsperre sie zuerst in der Liste.'**
+  String get contactsCheckBlockedRecord;
+
+  /// No description provided for @contactsCheckBlockedLocal.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Person ist auf diesem Gerät blockiert.'**
+  String get contactsCheckBlockedLocal;
+
+  /// No description provided for @contactsCheckFamily.
+  ///
+  /// In de, this message translates to:
+  /// **'Das ist ein Mitglied deiner Familie. Schreibe der Person über den Chat der Familie.'**
+  String get contactsCheckFamily;
+
+  /// No description provided for @contactsCheckNotFound.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieses Konto wurde nicht gefunden. Prüfe die Schreibweise.'**
+  String get contactsCheckNotFound;
+
+  /// No description provided for @contactsCheckNotReachable.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.'**
+  String get contactsCheckNotReachable;
+
+  /// No description provided for @contactsCheckIdentity.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Sicherheitsschlüssel dieser Person hat sich geändert. Hinzufügen ist erst nach der Prüfung möglich.'**
+  String get contactsCheckIdentity;
+
+  /// No description provided for @contactsCheckUnknown.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Person konnte gerade nicht geprüft werden. Bitte später erneut prüfen.'**
+  String get contactsCheckUnknown;
+
+  /// No description provided for @contactsCheckRateLimited.
+  ///
+  /// In de, this message translates to:
+  /// **'Zu viele Prüfungen (höchstens 20 je Stunde). Bitte später erneut versuchen.'**
+  String get contactsCheckRateLimited;
+
+  /// No description provided for @contactsCheckNotReady.
+  ///
+  /// In de, this message translates to:
+  /// **'Das ist gerade nicht möglich (die Familie wird noch geladen oder die Person ist gesperrt). Bitte kurz warten und erneut versuchen.'**
+  String get contactsCheckNotReady;
+
+  /// No description provided for @contactsLoading.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakte werden geladen'**
+  String get contactsLoading;
+
+  /// No description provided for @contactErrInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Angabe ist ungültig.'**
+  String get contactErrInvalid;
+
+  /// No description provided for @contactErrNotAllowed.
+  ///
+  /// In de, this message translates to:
+  /// **'Das ist nicht erlaubt.'**
+  String get contactErrNotAllowed;
+
+  /// No description provided for @contactErrNotFound.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Kontakt wurde nicht gefunden.'**
+  String get contactErrNotFound;
+
+  /// No description provided for @contactErrLimit.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Grenze für Kontakte ist erreicht.'**
+  String get contactErrLimit;
+
+  /// No description provided for @contactErrDuplicate.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Person ist schon in deiner Liste.'**
+  String get contactErrDuplicate;
+
   /// No description provided for @errNotAllowed.
   ///
   /// In de, this message translates to:

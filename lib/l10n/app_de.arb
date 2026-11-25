@@ -130,6 +130,108 @@
   "errServerUnreachable": "Server nicht erreichbar. Prüfe die Verbindung.",
   "errServerUnsupported": "Dieser Anbieter wird von FamilyNexus nicht unterstützt. Bitte wähle unter „Erweitert“ einen anderen.",
   "errPeerNotReachable": "Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.",
+  "contactsTitle": "Kontakte",
+  "contactsSettingsSubtitle": "Chats mit Personen außerhalb der Familie",
+  "contactsIntroTitle": "Kontakte einschalten?",
+  "contactsIntroBody": "Mit Kontakten kannst du mit Personen außerhalb deiner Familie schreiben, auf jedem Matrix-Server.\n\nWas sich ändert:\n• Nachrichten sind Ende-zu-Ende verschlüsselt. Wer mit wem schreibt, sehen aber dein Server und der Server der anderen Person.\n• Termine, Listen, Zusagen und Online-Status werden nie mit Kontakten geteilt.\n• Die andere Person sieht deinen Anzeigenamen und deine Kontakt-ID.\n• „Prüfen“ fragt deinen Server und den Server der gesuchten Person. Beide erfahren so, wen du suchst. Es sind höchstens 20 Prüfungen je Stunde möglich.\n• Die Liste deiner Kontakte und diese Einstellung liegen verschlüsselt im privaten Raum deines Kontos und gelten auf allen deinen Geräten.\n• Ausschalten löscht nichts: Der Bereich wird verborgen und neue Anfragen werden ignoriert.\n• Die App prüft kein Alter.",
+  "contactsTurnOn": "Kontakte einschalten",
+  "contactsTurnOff": "Kontakte ausschalten",
+  "contactsTurnOffTitle": "Kontakte ausschalten?",
+  "contactsTurnOffBody": "Der Bereich und neue Anfragen werden verborgen. Es wird nichts gelöscht.",
+  "contactsRequestsTitle": "Anfragen",
+  "contactsRequestFrom": "{name} möchte dir schreiben",
+  "@contactsRequestFrom": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "contactsRequestsMore": "Weitere Anfragen: {count}",
+  "@contactsRequestsMore": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "contactsAccept": "Annehmen",
+  "contactsDecline": "Ablehnen",
+  "contactsBlock": "Blockieren",
+  "contactsAcceptTitle": "Anfrage annehmen?",
+  "contactsAcceptBody": "{name} kann dir dann schreiben und sieht deinen Anzeigenamen und deine Kontakt-ID. Kennung: {id}",
+  "@contactsAcceptBody": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "id": {"type": "String"}
+    }
+  },
+  "contactsBlockTitle": "Blockieren?",
+  "contactsBlockBody": "{name} wird ausgeblendet und erfährt nichts davon. Kennung: {id}",
+  "@contactsBlockBody": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "id": {"type": "String"}
+    }
+  },
+  "contactsListTitle": "Deine Kontakte",
+  "contactsListEmpty": "Noch keine Kontakte.",
+  "contactsAdd": "Kontakt hinzufügen",
+  "contactsMyId": "Meine Kontakt-ID",
+  "contactsCopy": "Kopieren",
+  "contactsCopied": "Kontakt-ID kopiert",
+  "contactsStateWaiting": "Wartet auf Annahme",
+  "contactsStateConfirmed": "Bestätigt",
+  "contactsStateNotSent": "Noch nicht gesendet",
+  "contactsStateSearching": "Gespräch wird gesucht",
+  "contactsStateBlocked": "Blockiert",
+  "contactsRetry": "Erneut senden",
+  "contactsRetryWait": "Bitte kurz warten, bevor du es erneut sendest.",
+  "contactsRemove": "Entfernen",
+  "contactsRemoveTitle": "Kontakt entfernen?",
+  "contactsRemoveBody": "Du verlässt das Gespräch mit {name}. Kennung: {id}",
+  "@contactsRemoveBody": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "id": {"type": "String"}
+    }
+  },
+  "contactsUnblock": "Entsperren",
+  "contactsUnblockLocal": "Blockierung aufheben",
+  "contactsAddTitle": "Kontakt hinzufügen",
+  "contactsAddHint": "@name:server oder matrix.to-Link",
+  "contactsCheck": "Prüfen",
+  "contactsCheckAgain": "Erneut prüfen",
+  "contactsCheckPrivacy": "Beim Prüfen werden dein Server und der Server der gesuchten Person gefragt. Beide erfahren, wen du suchst.",
+  "contactsFoundTitle": "Gefunden",
+  "contactsFoundName": "Name: {name}",
+  "@contactsFoundName": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "contactsFoundId": "Kennung: {id}",
+  "@contactsFoundId": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "contactsAddConfirm": "Hinzufügen",
+  "contactsAdded": "Anfrage gesendet. Das Gespräch beginnt, sobald die Person beitritt.",
+  "contactsCheckInvalid": "Das ist keine gültige Kontakt-ID. Sie sieht so aus: @name:server.",
+  "contactsCheckSelf": "Das ist deine eigene Kontakt-ID.",
+  "contactsCheckDuplicate": "Diese Person ist schon in deiner Liste.",
+  "contactsCheckBlockedRecord": "Diese Person ist blockiert. Entsperre sie zuerst in der Liste.",
+  "contactsCheckBlockedLocal": "Diese Person ist auf diesem Gerät blockiert.",
+  "contactsCheckFamily": "Das ist ein Mitglied deiner Familie. Schreibe der Person über den Chat der Familie.",
+  "contactsCheckNotFound": "Dieses Konto wurde nicht gefunden. Prüfe die Schreibweise.",
+  "contactsCheckNotReachable": "Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.",
+  "contactsCheckIdentity": "Der Sicherheitsschlüssel dieser Person hat sich geändert. Hinzufügen ist erst nach der Prüfung möglich.",
+  "contactsCheckUnknown": "Die Person konnte gerade nicht geprüft werden. Bitte später erneut prüfen.",
+  "contactsCheckRateLimited": "Zu viele Prüfungen (höchstens 20 je Stunde). Bitte später erneut versuchen.",
+  "contactsCheckNotReady": "Das ist gerade nicht möglich (die Familie wird noch geladen oder die Person ist gesperrt). Bitte kurz warten und erneut versuchen.",
+  "contactsLoading": "Kontakte werden geladen",
+  "contactErrInvalid": "Die Angabe ist ungültig.",
+  "contactErrNotAllowed": "Das ist nicht erlaubt.",
+  "contactErrNotFound": "Der Kontakt wurde nicht gefunden.",
+  "contactErrLimit": "Die Grenze für Kontakte ist erreicht.",
+  "contactErrDuplicate": "Diese Person ist schon in deiner Liste.",
   "errNotAllowed": "Dafür fehlt die Berechtigung.",
   "errAttachmentRejected": "Dieser Anhang ist nicht erlaubt (Typ oder Größe).",
   "errInvalidInput": "Bitte Eingabe prüfen.",

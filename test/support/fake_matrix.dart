@@ -193,6 +193,9 @@ class FakeMatrixServer {
   /// Zahl der Profil- und Schlüsselabfragen (Tests: Familienmitglieder werden ohne Netz beantwortet).
   int probeNetworkCalls = 0;
 
+  /// Test: `probeContact` scheitert mit diesem Fehler (z. B. `rateLimited`).
+  GatewayError? probeError;
+
   /// Test-Uhr (für Ablauf von Einladungslinks).
   DateTime Function() now = () => DateTime.utc(2026, 10, 21, 12);
 
@@ -2104,8 +2107,14 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     ]..sort((a, b) => a.roomId.compareTo(b.roomId));
   }
 
+  /// Test: Zahl der weiteren, nicht angezeigten Anfragen (K3b-1).
+  int hiddenRequests = 0;
+
+  /// Test: `leaveConversation` scheitert, ohne etwas zu verändern.
+  bool failLeaveConversation = false;
+
   @override
-  int get contactRequestsHidden => 0;
+  int get contactRequestsHidden => hiddenRequests;
 
   void _requireProbeable(String userId) {
     _requireSession();
@@ -2128,6 +2137,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (family!.member(userId) != null) {
       return ContactProbe(userId: userId, existence: ContactExistence.unknown, displayName: '', reachability: ContactReachability.unknown, isFamilyMember: true);
     }
+    final failure = fake.probeError;
+    if (failure != null) throw GatewayException(failure);
     fake.probeNetworkCalls++;
     final known = fake.hasAccount(MatrixIds.localpart(userId)) && MatrixIds.serverName(userId) == fake.host;
     return ContactProbe(
@@ -2170,6 +2181,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   @override
   Future<void> leaveConversation(String threadId) async {
+    if (failLeaveConversation) throw const GatewayException(GatewayError.serverUnreachable);
     final r = _contactRoomOf(threadId);
     if (r == null) throw const GatewayException(GatewayError.notAllowed);
     r.dmMembers.remove(_userId);

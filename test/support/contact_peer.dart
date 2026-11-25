@@ -11,9 +11,16 @@ class MemoryBlockedList implements BlockedListPort {
   final List<String> list;
   final int limit;
   int adds = 0;
+  int removes = 0;
 
   @override
   Set<String> get blocked => list.toSet();
+
+  @override
+  Future<void> remove(Iterable<String> ids) async {
+    removes++;
+    list.removeWhere(ids.contains);
+  }
 
   @override
   Future<void> add(Iterable<String> ids) async {

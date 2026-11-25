@@ -22,6 +22,7 @@ import 'package:family_nexus/features/shopping/shopping_controller.dart';
 import 'package:family_nexus/features/tasks/tasks_controller.dart';
 import 'package:flutter/widgets.dart' show GlobalKey, NavigatorState;
 
+import 'contact_peer.dart' show MemoryBlockedList;
 import 'fake_browser.dart';
 import 'fake_device_auth.dart';
 import 'fake_links.dart';
@@ -32,6 +33,7 @@ import 'fake_store.dart';
 import 'memory_anniversary_store.dart';
 import 'memory_avatar_photo_store.dart';
 import 'memory_cash_book_store.dart';
+import 'memory_contact_store.dart';
 import 'memory_event_store.dart';
 import 'memory_event_theme_store.dart';
 import 'memory_shopping_store.dart';
@@ -51,6 +53,8 @@ class TestApp {
     required this.themeStore,
     required this.anniversaryStore,
     this.avatarPhotoStore,
+    this.contactStore,
+    this.contactBlockedList,
     required this.scheduler,
     required this.links,
     required this.auth,
@@ -79,6 +83,10 @@ class TestApp {
   final MemoryEventThemeStore themeStore;
   final MemoryAnniversaryStore anniversaryStore;
   final MemoryAvatarPhotoStore? avatarPhotoStore;
+
+  /// Kontakte (#119): nur mit `contactsEnabled: true` gesetzt (Ablage und lokale Blockierliste des Tests).
+  final MemoryContactStore? contactStore;
+  final MemoryBlockedList? contactBlockedList;
   final FakeReminderScheduler scheduler;
   final FakeLinkSource links;
   final FakeDeviceAuth auth;
@@ -134,6 +142,10 @@ Future<TestApp> buildTestApp({
   // Test (#311): Ablage des Kassenbuchs und Freischaltung. Ohne Angabe gibt es keinen Kassenbuch-Controller.
   MemoryCashBookStore? cashBookItems,
   bool cashBooksEnabled = false,
+  // Test (#119, K3b-1): schaltet die Kontakte frei (Standard aus, wie in der Produktion): Ablage, Blockierliste, Controller.
+  bool contactsEnabled = false,
+  MemoryContactStore? contactItems,
+  MemoryBlockedList? contactBlocked,
   bool roleFromFamily = false,
   // Test: Meldungen zu Chat und Einkauf und Zahl am App-Symbol (#254). Ohne Angabe wie im Browser: keine.
   ActivityPlatform? activity,
@@ -153,6 +165,8 @@ Future<TestApp> buildTestApp({
   if (lang != null) store.data['language'] = lang;
   store.data['tourSeen'] = '$tourSeen';
   final fake = server ?? FakeMatrixServer();
+  final contactStoreInUse = contactItems ?? MemoryContactStore();
+  final contactBlockedInUse = contactBlocked ?? MemoryBlockedList();
   if (server == null) {
     fake.addAccount('anna', 'geheim123', displayName: 'Anna');
     fake.addAccount('ben', 'geheim456', displayName: 'Ben');
@@ -256,6 +270,9 @@ Future<TestApp> buildTestApp({
         avatarPhotosEnabled: avatarPhotosEnabled,
         cashBookStore: cashBookItems,
         cashBooksEnabled: cashBooksEnabled,
+        contactStore: contactsEnabled ? contactStoreInUse : null,
+        contactsEnabled: contactsEnabled,
+        blockedList: contactsEnabled ? contactBlockedInUse : null,
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
         // #431: nur auf Wunsch kennt der Kalender die Rollen (sonst Standard: niemand, bestehende Tests unverändert).
         roleOf: roleFromFamily ? (id) => Permissions.roleOf(gateway.family, id) : null,
@@ -276,6 +293,8 @@ Future<TestApp> buildTestApp({
     themeStore: themeStore,
     anniversaryStore: anniversaryStore,
     avatarPhotoStore: avatarPhotoItems,
+    contactStore: contactsEnabled ? contactStoreInUse : null,
+    contactBlockedList: contactsEnabled ? contactBlockedInUse : null,
     scheduler: scheduler,
     links: links,
     auth: auth,

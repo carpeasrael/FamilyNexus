@@ -343,6 +343,226 @@ class AppLocalizationsEn extends AppLocalizations {
       'This person needs to set up the security check in their app before you can message each other.';
 
   @override
+  String get contactsTitle => 'Contacts';
+
+  @override
+  String get contactsSettingsSubtitle => 'Chats with people outside the family';
+
+  @override
+  String get contactsIntroTitle => 'Turn on contacts?';
+
+  @override
+  String get contactsIntroBody =>
+      'With contacts you can write to people outside your family, on any Matrix server.\n\nWhat changes:\n• Messages are end-to-end encrypted. Your server and the other person’s server can still see who writes to whom.\n• Events, lists, replies and online status are never shared with contacts.\n• The other person sees your display name and your contact ID.\n• “Check” asks your server and the server of the person you look up. Both learn whom you are looking for. At most 20 checks per hour are possible.\n• Your contact list and this setting are stored encrypted in your account’s private room and apply on all your devices.\n• Turning it off deletes nothing: the area is hidden and new requests are ignored.\n• The app does not check age.';
+
+  @override
+  String get contactsTurnOn => 'Turn on contacts';
+
+  @override
+  String get contactsTurnOff => 'Turn off contacts';
+
+  @override
+  String get contactsTurnOffTitle => 'Turn off contacts?';
+
+  @override
+  String get contactsTurnOffBody =>
+      'The area and new requests are hidden. Nothing is deleted.';
+
+  @override
+  String get contactsRequestsTitle => 'Requests';
+
+  @override
+  String contactsRequestFrom(String name) {
+    return '$name would like to write to you';
+  }
+
+  @override
+  String contactsRequestsMore(int count) {
+    return 'More requests: $count';
+  }
+
+  @override
+  String get contactsAccept => 'Accept';
+
+  @override
+  String get contactsDecline => 'Decline';
+
+  @override
+  String get contactsBlock => 'Block';
+
+  @override
+  String get contactsAcceptTitle => 'Accept request?';
+
+  @override
+  String contactsAcceptBody(String name, String id) {
+    return '$name will then be able to write to you and will see your display name and contact ID. ID: $id';
+  }
+
+  @override
+  String get contactsBlockTitle => 'Block?';
+
+  @override
+  String contactsBlockBody(String name, String id) {
+    return '$name will be hidden and will not be told. ID: $id';
+  }
+
+  @override
+  String get contactsListTitle => 'Your contacts';
+
+  @override
+  String get contactsListEmpty => 'No contacts yet.';
+
+  @override
+  String get contactsAdd => 'Add contact';
+
+  @override
+  String get contactsMyId => 'My contact ID';
+
+  @override
+  String get contactsCopy => 'Copy';
+
+  @override
+  String get contactsCopied => 'Contact ID copied';
+
+  @override
+  String get contactsStateWaiting => 'Waiting for acceptance';
+
+  @override
+  String get contactsStateConfirmed => 'Confirmed';
+
+  @override
+  String get contactsStateNotSent => 'Not sent yet';
+
+  @override
+  String get contactsStateSearching => 'Looking for the chat';
+
+  @override
+  String get contactsStateBlocked => 'Blocked';
+
+  @override
+  String get contactsRetry => 'Send again';
+
+  @override
+  String get contactsRetryWait => 'Please wait a moment before sending again.';
+
+  @override
+  String get contactsRemove => 'Remove';
+
+  @override
+  String get contactsRemoveTitle => 'Remove contact?';
+
+  @override
+  String contactsRemoveBody(String name, String id) {
+    return 'You will leave the chat with $name. ID: $id';
+  }
+
+  @override
+  String get contactsUnblock => 'Unblock';
+
+  @override
+  String get contactsUnblockLocal => 'Remove block';
+
+  @override
+  String get contactsAddTitle => 'Add contact';
+
+  @override
+  String get contactsAddHint => '@name:server or matrix.to link';
+
+  @override
+  String get contactsCheck => 'Check';
+
+  @override
+  String get contactsCheckAgain => 'Check again';
+
+  @override
+  String get contactsCheckPrivacy =>
+      'Checking asks your server and the server of the person you look up. Both learn whom you are looking for.';
+
+  @override
+  String get contactsFoundTitle => 'Found';
+
+  @override
+  String contactsFoundName(String name) {
+    return 'Name: $name';
+  }
+
+  @override
+  String contactsFoundId(String id) {
+    return 'ID: $id';
+  }
+
+  @override
+  String get contactsAddConfirm => 'Add';
+
+  @override
+  String get contactsAdded =>
+      'Request sent. The chat starts when the person joins.';
+
+  @override
+  String get contactsCheckInvalid =>
+      'This is not a valid contact ID. It looks like this: @name:server.';
+
+  @override
+  String get contactsCheckSelf => 'This is your own contact ID.';
+
+  @override
+  String get contactsCheckDuplicate => 'This person is already in your list.';
+
+  @override
+  String get contactsCheckBlockedRecord =>
+      'This person is blocked. Unblock them in the list first.';
+
+  @override
+  String get contactsCheckBlockedLocal =>
+      'This person is blocked on this device.';
+
+  @override
+  String get contactsCheckFamily =>
+      'This is a member of your family. Write to them in the family chat.';
+
+  @override
+  String get contactsCheckNotFound =>
+      'This account was not found. Check the spelling.';
+
+  @override
+  String get contactsCheckNotReachable =>
+      'This person needs to set up the security check in their app before you can message each other.';
+
+  @override
+  String get contactsCheckIdentity =>
+      'This person’s security key has changed. Adding is only possible after verification.';
+
+  @override
+  String get contactsCheckUnknown =>
+      'The person could not be checked right now. Please check again later.';
+
+  @override
+  String get contactsCheckRateLimited =>
+      'Too many checks (at most 20 per hour). Please try again later.';
+
+  @override
+  String get contactsCheckNotReady =>
+      'This is not possible right now (the family is still loading or the person is blocked). Please wait a moment and try again.';
+
+  @override
+  String get contactsLoading => 'Loading contacts';
+
+  @override
+  String get contactErrInvalid => 'The entry is invalid.';
+
+  @override
+  String get contactErrNotAllowed => 'This is not allowed.';
+
+  @override
+  String get contactErrNotFound => 'The contact was not found.';
+
+  @override
+  String get contactErrLimit => 'The limit for contacts has been reached.';
+
+  @override
+  String get contactErrDuplicate => 'This person is already in your list.';
+
+  @override
   String get errNotAllowed => 'You do not have permission for this.';
 
   @override

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:flutter/foundation.dart' show ValueNotifier, visibleForTesting;
 
 import '../../core/app_log.dart';
 import '../../domain/calendar_signal.dart';
@@ -18,6 +18,9 @@ abstract class BlockedListPort {
 
   /// Trägt [ids] ein (Dubletten ignorieren; die Liste kennt eine Obergrenze).
   Future<void> add(Iterable<String> ids);
+
+  /// Nimmt [ids] zurück (Entsperren eines Kontakts); Unbekanntes ändert nichts.
+  Future<void> remove(Iterable<String> ids);
 }
 
 /// Verbindet die Kontaktliste mit dem **privaten** Raum des Kontos (#119, K2c, E-114), nach dem Muster von
@@ -49,6 +52,12 @@ class ContactSync {
 
   /// Wird nach jeder Änderung des lokalen Bestands aufgerufen.
   void Function()? onChanged;
+
+  /// Zähler, der nach jeder inhaltlichen Änderung (lokal, Abgleich, Empfang, Richtlinie, Blockierliste) steigt: Die
+  /// Oberfläche hört darauf (K3b-1). Wird nie freigegeben, weil [start] wiederholbar ist.
+  final ValueNotifier<int> revision = ValueNotifier<int>(0);
+
+  void _bump() => revision.value++;
 
   /// Verworfene (ungültige) Ereignisse.
   int rejected = 0;
@@ -98,6 +107,7 @@ class ContactSync {
   void _onServiceChanged() {
     _schedulePolicy();
     _scheduleReconcile();
+    _bump();
   }
 
   void _scheduleReconcile() {
@@ -178,6 +188,7 @@ class ContactSync {
         if (_disposed) break;
         gateway.setContactPolicy(policy);
         _scheduleReconcile();
+        _bump();
       } while (_policyAgain);
     } catch (e) {
       AppLog.e('contacts', 'Kontaktrichtlinie konnte nicht aufgebaut werden', e);
@@ -262,8 +273,13 @@ class ContactSync {
         AppLog.w('contacts', 'Ungültiger Kontaktdatensatz verworfen');
         return;
       }
+      // Vorzustand vor dem Zusammenführen: nur die Löschmarke eines **blockierten** Kontakts gibt die lokale Liste frei.
+      final prior = record is Contact ? await service.contact(record.id) : null;
       if (await service.applyIncoming(record)) {
         onChanged?.call();
+        if (record is Contact && record.deleted && prior != null && !prior.deleted && prior.state == ContactState.blocked) {
+          await forgetBlocked(record.id);
+        }
         await reconcileBlocked();
       }
     } catch (e) {
@@ -274,22 +290,54 @@ class ContactSync {
   /// Trägt alle aktiven `blocked`-Datensätze in die lokale Blockierliste ein: nur hinzufügen (nie entfernen, die Liste
   /// kann auch lokal blockierte Mitglieder enthalten, E-48), nach Kennung sortiert, höchstens bis zur Obergrenze der Liste.
   /// Das stellt die bei einem Familienwechsel gelöschte Liste wieder her.
-  Future<void> reconcileBlocked() async {
-    final port = blockedList;
-    if (port == null) return;
-    try {
-      final current = port.blocked;
-      final missing = <String>[
-        for (final c in await service.contacts())
-          if (c.state == ContactState.blocked && !current.contains(c.id)) c.id,
-      ]..sort();
-      final room = BlockedUsers.maxEntries - current.length;
-      if (missing.isEmpty || room <= 0) return;
-      await port.add(missing.take(room));
-    } catch (e) {
-      AppLog.e('contacts', 'Blockierliste konnte nicht abgeglichen werden', e);
-    }
+  Future<void> reconcileBlocked() => _blockedSerial(() async {
+        final port = blockedList;
+        if (port == null) return;
+        try {
+          // Die Datensätze werden **unmittelbar vor** dem Eintragen gelesen (und nur, was jetzt noch `blocked` ist, wird
+          // eingetragen): ein vor dem Entsperren begonnener Lauf kann die Kennung nicht wieder eintragen.
+          final contacts = await service.contacts();
+          final current = port.blocked;
+          final missing = <String>[
+            for (final c in contacts)
+              if (c.state == ContactState.blocked && !current.contains(c.id)) c.id,
+          ]..sort();
+          final room = BlockedUsers.maxEntries - current.length;
+          if (missing.isEmpty || room <= 0) return;
+          await port.add(missing.take(room));
+          _bump();
+        } catch (e) {
+          AppLog.e('contacts', 'Blockierliste konnte nicht abgeglichen werden', e);
+        }
+      });
+
+  // `reconcileBlocked` und `forgetBlocked` laufen nacheinander, in der Reihenfolge des Eintreffens.
+  Future<void> _blockedQueue = Future<void>.value();
+
+  Future<T> _blockedSerial<T>(Future<T> Function() op) {
+    final next = _blockedQueue.then((_) => op());
+    _blockedQueue = next.then<void>((_) {}, onError: (Object _) {});
+    return next;
   }
+
+  /// Ist die Kennung in der lokalen Blockierliste (E-48)?
+  bool isLocallyBlocked(String id) => blockedList?.blocked.contains(id) ?? false;
+
+  /// Nimmt die Kennung aus der lokalen Blockierliste (Entsperren eines Kontakts). Familienmitglieder bleiben blockiert
+  /// (E-48: lokal blockierte Mitglieder gehören nicht zu den Kontakten). `true`, wenn die Kennung entfernt wurde.
+  Future<bool> forgetBlocked(String id) => _blockedSerial(() async {
+        final port = blockedList;
+        if (port == null || !port.blocked.contains(id) || gateway.family?.member(id) != null) return false;
+        try {
+          await port.remove(<String>[id]);
+        } catch (e) {
+          AppLog.e('contacts', 'Blockierliste konnte nicht bereinigt werden', e);
+          return false;
+        }
+        _schedulePolicy();
+        _bump();
+        return true;
+      });
 
   bool get _canPublish => gateway.session == SessionState.ready && gateway.initialSyncDone;
 

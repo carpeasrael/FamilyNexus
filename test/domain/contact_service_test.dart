@@ -75,6 +75,40 @@ void main() {
     });
   });
 
+  group('removeIfVersion (K3b-1: Rücknahme nur, wenn sie sicher ist)', () {
+    test('löscht (Löschmarke, Version +1, onChanged) nur bei gleicher Version und gleichem Zustand', () async {
+      var calls = 0;
+      svc.onChanged = () => calls++;
+      final c = await svc.addOutgoing(carla);
+      calls = 0;
+      expect(await svc.removeIfVersion(carla, version: c.version, state: ContactState.outgoing), isTrue);
+      expect(calls, 1);
+      final rec = (await svc.contact(carla))!;
+      expect((rec.deleted, rec.version), (true, 2));
+    });
+
+    test('ein anderer Stand bleibt: andere Version, anderer Zustand, schon gelöscht, unbekannt, ungültige Kennung', () async {
+      final c = await svc.addOutgoing(carla);
+      await svc.markAccepted(carla); // Version 2, accepted
+      expect(await svc.removeIfVersion(carla, version: c.version, state: ContactState.outgoing), isFalse, reason: 'andere Version und Zustand');
+      expect(await svc.removeIfVersion(carla, version: 2, state: ContactState.outgoing), isFalse, reason: 'anderer Zustand');
+      expect((await svc.contact(carla))!.state, ContactState.accepted);
+      await svc.remove(carla);
+      expect(await svc.removeIfVersion(carla, version: 3, state: ContactState.accepted), isFalse, reason: 'schon gelöscht');
+      expect(await svc.removeIfVersion(ben, version: 1, state: ContactState.outgoing), isFalse, reason: 'unbekannt');
+      expect(await svc.removeIfVersion('kein-konto', version: 1, state: ContactState.outgoing), isFalse);
+    });
+
+    test('lässt sich nicht von einem Empfang überholen: ein dazwischen angenommener Stand bleibt (serialisiert)', () async {
+      final c = await svc.addOutgoing(carla);
+      final removal = svc.removeIfVersion(carla, version: c.version, state: ContactState.outgoing);
+      final incoming = svc.applyIncoming(Contact(id: carla, state: ContactState.accepted, version: 5, updatedAt: now));
+      expect(await removal, isTrue, reason: 'die Löschung kam zuerst');
+      expect(await incoming, isTrue, reason: 'der neuere Empfang gewinnt danach');
+      expect((await svc.contact(carla))!.deleted, isFalse);
+    });
+  });
+
   group('onChanged (K3a-1)', () {
     late int calls;
     setUp(() {

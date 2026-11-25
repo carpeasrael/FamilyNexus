@@ -169,6 +169,18 @@ class ContactService {
         _changed();
       });
 
+  /// Bedingte Löschung für die Rücknahme eines gescheiterten Hinzufügens (K3b-1): löscht (Löschmarke) **nur**, wenn der
+  /// Datensatz aktiv ist und genau diese [version] und diesen [state] hat; sonst `false`. Ein Empfang oder eine
+  /// Bestätigung dazwischen macht die Rücknahme damit zu einem No-op (innerhalb der Serialisierung des Dienstes).
+  Future<bool> removeIfVersion(String id, {required int version, required ContactState state}) => _serial(() async {
+        final canonical = ContactId.parse(id);
+        final current = canonical == null ? null : (await store.get(ContactKind.contact, canonical)) as Contact?;
+        if (current == null || current.deleted || current.version != version || current.state != state) return false;
+        await store.put(current.copyWith(version: _nextVersion(current), updatedAt: _now, deleted: true));
+        _changed();
+        return true;
+      });
+
   Future<GroupRecord> addGroup(String roomId) => _serial(() async {
         final current = (await store.get(ContactKind.group, roomId)) as GroupRecord?;
         if (current != null && !current.deleted) throw const ContactException(ContactError.duplicate);

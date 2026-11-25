@@ -40,6 +40,18 @@ class _StaleStore extends MemoryContactStore {
   }
 }
 
+/// Blockierliste, deren `add` hängt, bis das Tor geöffnet wird (Race zwischen Abgleich und Entsperren).
+class _SlowBlockedList extends MemoryBlockedList {
+  _SlowBlockedList(this.gate);
+  final Completer<void> gate;
+
+  @override
+  Future<void> add(Iterable<String> ids) async {
+    await gate.future;
+    await super.add(ids);
+  }
+}
+
 const String _carla = '@carla:example.org';
 const String _ben = '@ben:example.org';
 
@@ -656,13 +668,49 @@ void main() {
       expect(list.adds, 1, reason: 'ein zweiter Abgleich ohne Neues schreibt nicht');
     });
 
-    test('die Aufhebung entfernt nichts aus der Liste', () async {
+    // Seit K3b-1 (E-114): Entsperren räumt auch die lokale Liste. Auf dem anderen Gerät nur, wenn der Vorzustand `blocked` war.
+    test('die Löschmarke eines blockierten Kontakts räumt die lokale Liste des anderen Geräts', () async {
       await a.service.block(_ben);
       await a.flush([b]);
       expect(b.blockedList.list, <String>[_ben]);
       await a.service.unblock(_ben);
       await a.flush([b]);
-      expect(b.blockedList.list, <String>[_ben]);
+      expect(b.blockedList.list, isEmpty);
+    });
+
+    test('die Löschmarke eines bloß entfernten (nie blockierten) Kontakts lässt eine lokal blockierte Kennung stehen (E-48)', () async {
+      await a.service.addOutgoing(_carla);
+      await a.flush([b]);
+      b.blockedList.list.add(_carla);
+      await a.service.remove(_carla);
+      await a.flush([b]);
+      expect(b.blockedList.list, <String>[_carla]);
+    });
+
+    test('Race: ein laufendes reconcileBlocked trägt die Kennung nach dem Entsperren nicht wieder ein', () async {
+      final gate = Completer<void>();
+      final list = _SlowBlockedList(gate);
+      final peer = await ContactPeer.create(server, 'anna', 'pw1', blockedList: list, start: false);
+      addTearDown(peer.dispose);
+      await peer.service.block(_ben);
+      final reconcile = peer.sync.reconcileBlocked(); // hängt im add
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      await peer.service.unblock(_ben);
+      final forget = peer.sync.forgetBlocked(_ben); // wartet in der Warteschlange
+      gate.complete();
+      await reconcile;
+      expect(await forget, isTrue);
+      expect(list.list, isEmpty, reason: 'erst eingetragen, dann (in dieser Reihenfolge) wieder entfernt');
+      await peer.sync.reconcileBlocked();
+      expect(list.list, isEmpty, reason: 'ein späterer Lauf liest die Löschmarke und trägt nichts ein');
+    });
+
+    test('forgetBlocked: nichts zu tun ohne Eintrag; isLocallyBlocked', () async {
+      expect(await a.sync.forgetBlocked(_ben), isFalse);
+      a.blockedList.list.add(_ben);
+      expect(a.sync.isLocallyBlocked(_ben), isTrue);
+      expect(await a.sync.forgetBlocked(_ben), isTrue);
+      expect(a.sync.isLocallyBlocked(_ben), isFalse);
     });
 
     test('ist die Liste voll, werden keine Kontakt-Blockierten eingetragen (bewusste Grenze), ohne Absturz', () async {
