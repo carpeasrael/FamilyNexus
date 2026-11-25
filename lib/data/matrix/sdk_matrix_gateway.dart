@@ -399,6 +399,22 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   /// Nur für Tests: Ist die Mitgliederliste der aktuellen Familie vollständig geladen?
   @visibleForTesting
   bool get debugParticipantsLoaded => _participantsLoaded;
+
+  /// Nur für Tests: die zuletzt gesetzte Kontaktrichtlinie (K3a-1).
+  @visibleForTesting
+  ContactPolicy get debugContactPolicy => _contactPolicy;
+
+  /// Nur für Tests: der Kontext der Einstufung für die aktuelle Familie (`null` ohne Familie).
+  @visibleForTesting
+  PolicyContext? get debugPolicyContext {
+    final f = _family;
+    final room = _familyRoom();
+    return f == null || room == null ? null : _policyContext(f, room.id);
+  }
+
+  /// Nur für Tests: verlässt den Familienbereich wie bei einem Familienwechsel; die Kontaktrichtlinie bleibt dabei stehen.
+  @visibleForTesting
+  void debugLeaveFamilyScope() => _leaveFamilyScope();
   /// Nur für Tests: die offenen Chat-Sendungen.
   @visibleForTesting
   LocalSends get debugLocalSends => _localSends;
@@ -963,6 +979,8 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     _privateTimeline = null;
     _privateTimelineRoomId = null;
     _resetDirectChats();
+    // Nur hier (Abmelden, Kontowechsel), nicht beim Familienwechsel: Kontakte gehören zum Konto (E-114).
+    _contactPolicy = ContactPolicy.off;
     _presence.clear();
     _presenceRoomId = null;
     _signaled.clear();

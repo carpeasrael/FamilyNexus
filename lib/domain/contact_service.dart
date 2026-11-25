@@ -23,6 +23,13 @@ class ContactService {
 
   DateTime get _now => _clock().toUtc();
 
+  /// Wird nach jeder **inhaltlichen** Änderung des Bestands gerufen (lokale Schreibvorgänge und angenommene Empfänge),
+  /// nicht nach [restamp] und nicht nach abgelehnten Empfängen. Der Rückruf des Besitzers darf nicht werfen (der
+  /// `ContactSync` setzt darin nur ein Flag und plant einen Lauf).
+  void Function()? onChanged;
+
+  void _changed() => onChanged?.call();
+
   // Alle schreibenden Abläufe laufen nacheinander (Eingänge, lokale Änderungen).
   Future<void> _tail = Future<void>.value();
 
@@ -57,6 +64,7 @@ class ContactService {
         if ((current?.enabled ?? false) == enabled) return; // ohne Datensatz gilt „aus“
         final next = ContactPrefs(enabled: enabled, version: _nextVersion(current), updatedAt: _now);
         await store.put(next);
+        _changed();
       });
 
   /// Legt einen ausgehenden Kontakt an (Datensatz `outgoing`). [rawId]: `@name:server` oder `matrix.to`-Link.
@@ -70,6 +78,7 @@ class ContactService {
         final next = Contact(id: id, state: ContactState.outgoing, nick: nick, version: _nextVersion(current), updatedAt: _now, room: current?.room);
         _requireValid(next);
         await store.put(next);
+        _changed();
         return next;
       });
 
@@ -80,6 +89,7 @@ class ContactService {
         final next = current.copyWith(state: ContactState.accepted, room: room ?? current.room, version: _nextVersion(current), updatedAt: _now);
         _requireValid(next);
         await store.put(next);
+        _changed();
         return next;
       });
 
@@ -103,6 +113,7 @@ class ContactService {
         );
         _requireValid(next);
         await store.put(next);
+        _changed();
         return next;
       });
 
@@ -112,6 +123,7 @@ class ContactService {
         final current = await _active(id);
         if (current.state != ContactState.blocked) throw const ContactException(ContactError.notAllowed);
         await store.put(current.copyWith(version: _nextVersion(current), updatedAt: _now, deleted: true));
+        _changed();
       });
 
   Future<Contact> rename(String id, String nick) => _serial(() async {
@@ -120,6 +132,7 @@ class ContactService {
         final next = current.copyWith(nick: nick, version: _nextVersion(current), updatedAt: _now);
         _requireValid(next);
         await store.put(next);
+        _changed();
         return next;
       });
 
@@ -128,6 +141,7 @@ class ContactService {
         final current = await _active(id);
         if (current.state == ContactState.blocked) throw const ContactException(ContactError.notAllowed);
         await store.put(current.copyWith(version: _nextVersion(current), updatedAt: _now, deleted: true));
+        _changed();
       });
 
   Future<GroupRecord> addGroup(String roomId) => _serial(() async {
@@ -137,6 +151,7 @@ class ContactService {
         final next = GroupRecord(id: roomId, version: _nextVersion(current), updatedAt: _now);
         _requireValid(next);
         await store.put(next);
+        _changed();
         return next;
       });
 
@@ -144,6 +159,7 @@ class ContactService {
         final current = (await store.get(ContactKind.group, roomId)) as GroupRecord?;
         if (current == null || current.deleted) throw const ContactException(ContactError.notFound);
         await store.put(current.copyWith(version: _nextVersion(current), updatedAt: _now, deleted: true));
+        _changed();
       });
 
   // --------------------------------------------------------------- Empfang
@@ -168,6 +184,7 @@ class ContactService {
           if (await _blockedCount() >= BlockedUsers.maxEntries) return false;
         }
         await store.put(incoming, publishedVersion: incoming.version);
+        _changed();
         return true;
       });
 

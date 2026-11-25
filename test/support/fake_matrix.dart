@@ -1953,6 +1953,18 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     fake.post(room, _userId!, AnniversaryCodec.type, content);
   }
 
+  /// Zuletzt gesetzte Kontaktrichtlinie und die Zahl der Änderungen (Tests).
+  ContactPolicy contactPolicy = ContactPolicy.off;
+  int contactPolicyChanges = 0;
+
+  @override
+  void setContactPolicy(ContactPolicy policy) {
+    if (policy == contactPolicy) return;
+    contactPolicy = policy;
+    contactPolicyChanges++;
+    notifyListeners();
+  }
+
   @override
   Future<void> publishContactRecord(ContactRecord record) async {
     _requireSession();

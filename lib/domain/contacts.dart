@@ -354,3 +354,58 @@ class Contacts {
 
   static bool supersedes(ContactRecord a, ContactRecord b) => compare(a, b) > 0;
 }
+
+/// Was das Gateway über die Kontakte wissen darf (#119, K3a-1, E-114): ein reiner Wert, aus den Datensätzen gebaut
+/// ([ContactPolicy.of]) und vom [ContactSync] ins Gateway geschoben. Das Gateway liest ihn nur. Standard und Rückfall:
+/// [off] (Bereich ausgeschaltet, nichts bekannt).
+class ContactPolicy {
+  const ContactPolicy({this.enabled = false, this.contacts = const <String, ContactState>{}, this.blocked = const <String>{}});
+
+  static const ContactPolicy off = ContactPolicy();
+
+  /// Der Bereich ist für dieses Konto eingeschaltet (`ContactPrefs.enabled`).
+  final bool enabled;
+
+  /// Aktive Kontakte mit Zustand; Löschmarken fehlen.
+  final Map<String, ContactState> contacts;
+
+  /// Blockierte Kennungen: aktive `blocked`-Datensätze und die lokale Blockierliste (E-48).
+  final Set<String> blocked;
+
+  /// Baut den Wert aus allen Datensätzen. [localBlocked]: die lokale Blockierliste.
+  factory ContactPolicy.of(Iterable<ContactRecord> records, {Iterable<String> localBlocked = const <String>[]}) {
+    var enabled = false;
+    final contacts = <String, ContactState>{};
+    final blocked = <String>{...localBlocked};
+    for (final r in records) {
+      if (r.deleted) continue;
+      switch (r) {
+        case final ContactPrefs p:
+          enabled = p.enabled;
+        case final Contact c:
+          contacts[c.id] = c.state;
+          if (c.state == ContactState.blocked) blocked.add(c.id);
+        default:
+          break;
+      }
+    }
+    return ContactPolicy(enabled: enabled, contacts: Map<String, ContactState>.unmodifiable(contacts), blocked: Set<String>.unmodifiable(blocked));
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is ContactPolicy && other.enabled == enabled && _sameMap(other.contacts, contacts) && _sameSet(other.blocked, blocked);
+
+  @override
+  int get hashCode => Object.hash(enabled, contacts.length, blocked.length);
+
+  static bool _sameMap(Map<String, ContactState> a, Map<String, ContactState> b) {
+    if (a.length != b.length) return false;
+    for (final e in a.entries) {
+      if (b[e.key] != e.value) return false;
+    }
+    return true;
+  }
+
+  static bool _sameSet(Set<String> a, Set<String> b) => a.length == b.length && a.containsAll(b);
+}

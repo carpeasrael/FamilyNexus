@@ -58,6 +58,15 @@ class ContactSync {
   bool _publishing = false;
   bool _again = false;
   bool _listening = false;
+  bool _disposed = false;
+
+  // Richtlinie fürs Gateway (K3a-1): ein einziger Lauf, Anstöße während des Laufs werden zusammengefasst; jeder Lauf liest
+  // den **aktuellen** Bestand, ein älterer Aufbau kann so nie nach einem neueren im Gateway landen.
+  bool _policyRunning = false;
+  bool _policyAgain = false;
+  Future<void> _policyDone = Future<void>.value();
+  Set<String> _lastLocalBlocked = const <String>{};
+  Object? _lastState;
 
   String get _me => service.myUserId;
 
@@ -73,9 +82,42 @@ class ContactSync {
   }
 
   /// Wartet, bis alle bisher eingegangenen Signale verarbeitet sind (Schließen, Tests).
-  Future<void> idle() => _queue;
+  Future<void> idle() async {
+    await _queue;
+    await _policyDone;
+  }
+
+  /// Plant den Aufbau der Richtlinie (läuft nie parallel; wirft nie).
+  void _schedulePolicy() {
+    if (_disposed) return;
+    if (_policyRunning) {
+      _policyAgain = true;
+      return;
+    }
+    _policyRunning = true;
+    _policyDone = _pushPolicy();
+  }
+
+  Future<void> _pushPolicy() async {
+    try {
+      do {
+        _policyAgain = false;
+        final local = blockedList?.blocked ?? const <String>{};
+        _lastLocalBlocked = <String>{...local};
+        final policy = ContactPolicy.of(await store.all(), localBlocked: local);
+        if (_disposed) break;
+        gateway.setContactPolicy(policy);
+      } while (_policyAgain);
+    } catch (e) {
+      AppLog.e('contacts', 'Kontaktrichtlinie konnte nicht aufgebaut werden', e);
+    } finally {
+      _policyRunning = false;
+    }
+  }
 
   void start() {
+    _disposed = false;
+    service.onChanged = _schedulePolicy;
     _sub ??= gateway.calendarSignals.listen(_enqueue);
     _timer ??= Timer.periodic(retryInterval, (_) => kick());
     _backoff.changed(_gatewayState());
@@ -84,6 +126,7 @@ class ContactSync {
       gateway.addListener(_onGatewayChanged);
     }
     reconcileBlocked().ignore();
+    _schedulePolicy();
     kick();
   }
 
@@ -91,12 +134,28 @@ class ContactSync {
 
   /// Im Wartefenster nach einem Sendefehler löst eine Meldung des Gateways keinen neuen Versuch aus.
   void _onGatewayChanged() {
-    final changed = _backoff.changed(_gatewayState());
+    final state = _gatewayState();
+    // Sitzung, Konto oder lokale Blockierliste haben sich geändert: Richtlinie neu bauen (nach Abmelden setzt das Gateway
+    // sie zurück; ein lokal Blockierter erreicht sie sonst erst mit der nächsten Datensatzänderung).
+    final list = blockedList?.blocked ?? const <String>{};
+    if (state != _lastState || list.length != _lastLocalBlocked.length || !list.containsAll(_lastLocalBlocked)) {
+      _lastState = state;
+      _schedulePolicy();
+    }
+    final changed = _backoff.changed(state);
     if (!changed && _backoff.blocked) return;
     kick();
   }
 
   void dispose() {
+    _disposed = true;
+    if (identical(service.onChanged, _schedulePolicy) || service.onChanged == _schedulePolicy) service.onChanged = null;
+    try {
+      gateway.setContactPolicy(ContactPolicy.off);
+    } catch (e) {
+      // Ein bereits zerstörtes Gateway nimmt nichts mehr an; das ist hier gewollt und ohne Folgen.
+      AppLog.w('contacts', 'Richtlinie beim Beenden nicht zurückgesetzt ($e)');
+    }
     _sub?.cancel().ignore();
     _timer?.cancel();
     _debounce?.cancel();

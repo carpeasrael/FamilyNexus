@@ -13,6 +13,7 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
   Set<String> get _dmJoining;
   Map<String, List<ChatMessage>> get _dmMessages;
   Map<String, String> get _dmPeers;
+  bool get _disposed;
   Map<String, DateTime> get _dmRetryAfter;
   Map<String, Timeline> get _dmTimelines;
   Set<String> get _identityChanged;
@@ -66,6 +67,17 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
     );
   }
 
+  /// Was die Kontaktliste dem Gateway erlaubt (K3a-1): nur im Speicher, Standard und Rückfall [ContactPolicy.off].
+  /// Das Gateway **liest** sie nur (Einstufung); gebaut und geschoben wird sie vom `ContactSync`.
+  ContactPolicy _contactPolicy = ContactPolicy.off;
+
+  @override
+  void setContactPolicy(ContactPolicy policy) {
+    if (_disposed || policy == _contactPolicy) return;
+    _contactPolicy = policy;
+    notifyListeners();
+  }
+
   /// Kontext der Einstufung für ein Konto mit bekannter Familie.
   PolicyContext _policyContext(Family f, String familyRoomId) => PolicyContext(
         myUserId: f.myUserId,
@@ -74,6 +86,10 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
         joinedMembers: <String>{for (final m in f.joined) m.userId},
         membersLoaded: _participantsLoaded,
         identityChanged: _identityChanged,
+        contactsEnabled: _contactPolicy.enabled,
+        contacts: _contactPolicy.contacts,
+        blockedUsers: _contactPolicy.blocked,
+        familyIds: <String>{for (final m in f.members) m.userId},
       );
 
   /// Verschlüsselte Einzelchat-Räume mit aktuellen, beigetretenen Familienmitgliedern

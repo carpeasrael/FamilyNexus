@@ -24,6 +24,78 @@ void main() {
 
   String user(int i) => '@u${i.toString().padLeft(4, '0')}:example.org';
 
+  group('onChanged (K3a-1)', () {
+    late int calls;
+    setUp(() {
+      calls = 0;
+      svc.onChanged = () => calls++;
+    });
+
+    test('nach jeder schreibenden Methode genau einmal', () async {
+      await svc.setEnabled(true);
+      expect(calls, 1);
+      await svc.addOutgoing(carla);
+      expect(calls, 2);
+      await svc.markAccepted(carla);
+      expect(calls, 3);
+      await svc.rename(carla, 'C');
+      expect(calls, 4);
+      await svc.block(ben);
+      expect(calls, 5);
+      await svc.unblock(ben);
+      expect(calls, 6);
+      await svc.remove(carla);
+      expect(calls, 7);
+      await svc.addGroup('!g:example.org');
+      expect(calls, 8);
+      await svc.removeGroup('!g:example.org');
+      expect(calls, 9);
+    });
+
+    test('nicht ohne Wirkung: Gleiches einstellen, abgelehnte Änderung, bereits Blockiertes', () async {
+      await svc.setEnabled(false);
+      expect(calls, 0);
+      await expectLater(svc.addOutgoing('kein-konto'), fails(ContactError.invalid));
+      await svc.block(ben);
+      calls = 0;
+      await svc.block(ben);
+      await expectLater(svc.addOutgoing(ben), fails(ContactError.notAllowed));
+      expect(calls, 0);
+    });
+
+    test('angenommener Empfang meldet, abgelehnter (gleich, älter) nicht', () async {
+      final r = Contact(id: carla, state: ContactState.accepted, version: 3, updatedAt: now);
+      expect(await svc.applyIncoming(r), isTrue);
+      expect(calls, 1);
+      expect(await svc.applyIncoming(r), isFalse);
+      expect(await svc.applyIncoming(Contact(id: carla, state: ContactState.outgoing, version: 2, updatedAt: now)), isFalse);
+      expect(calls, 1);
+    });
+
+    test('restamp meldet nicht (nur der Zeitstempel ändert sich)', () async {
+      await svc.addOutgoing(carla);
+      calls = 0;
+      now = now.add(const Duration(days: 3));
+      final fresh = await svc.restamp(ContactKind.contact, carla, expectedVersion: 1, expectedDeleted: false);
+      expect(fresh, isNotNull);
+      expect(fresh!.updatedAt, now);
+      expect(calls, 0);
+    });
+
+    test('der Rückruf läuft nach dem Speichern: er sieht den neuen Stand', () async {
+      Object? seen;
+      svc.onChanged = () => seen = 'x';
+      await svc.addOutgoing(carla);
+      expect(seen, 'x');
+      expect(await svc.contact(carla), isNotNull);
+      Contact? atCall;
+      svc.onChanged = () => store.get(ContactKind.contact, ben).then((v) => atCall = v as Contact?);
+      await svc.block(ben);
+      await Future<void>.delayed(Duration.zero);
+      expect(atCall?.state, ContactState.blocked);
+    });
+  });
+
   group('Einstellung', () {
     test('Standard aus; einschalten und ausschalten erhöht die Version, Gleiches tut nichts', () async {
       expect(await svc.isEnabled(), isFalse);

@@ -508,6 +508,10 @@ abstract class MatrixGateway implements Listenable {
   /// Raum-ID anzugeben (I3); ungültige Datensätze liefern `invalidInput`.
   Future<void> publishContactRecord(ContactRecord record);
 
+  /// Setzt, was die Kontaktliste dem Gateway erlaubt (K3a-1): Bereich an/aus, Kontakte, Blockierte. Standard
+  /// [ContactPolicy.off]. Meldet nur bei echter Änderung; nach `dispose` ohne Wirkung. Nur der `ContactSync` ruft das.
+  void setContactPolicy(ContactPolicy policy);
+
   // ------------------------------------------------------------ Avatare
 
   /// Gültige Avatar-Kennung (`p01`…`p12`) der Person oder `null` („kein Avatar“, unbekannt, vor dem ersten Aufbau der

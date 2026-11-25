@@ -13,6 +13,7 @@ import 'package:family_nexus/domain/book_room.dart';
 import 'package:family_nexus/domain/book_signal.dart';
 import 'package:family_nexus/domain/cash_book.dart';
 import 'package:family_nexus/domain/chat.dart' show ThreadKind;
+import 'package:family_nexus/domain/contacts.dart';
 import 'package:family_nexus/domain/data_inventory.dart' show InventoryRoomKind;
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -656,6 +657,63 @@ void main() {
       });
       await Future<void>.delayed(_settle);
       expect(g.familyUnreadCount, g.unreadCount);
+    });
+
+    test('Kontaktrichtlinie (K3a-1): Standard aus; sie ändert in diesem Stand weder Einzelchats noch Einladungen (Gateway liest sie noch nicht)', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      expect(g.debugContactPolicy, ContactPolicy.off);
+      g.setContactPolicy(const ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.accepted}));
+      expect(g.debugContactPolicy.enabled, isTrue);
+      expect(await shown(g, dmJoined(dm, _ben)), isTrue, reason: 'Familien-Einzelchat unverändert');
+      await _sync(g, dmInvite('!kontakt:hs.example', _fremd));
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '/join'), isEmpty, reason: 'Kontakt-Einladungen nimmt erst K3a-2 an');
+      expect(g.threads.where((t) => t.id == '!kontakt:hs.example'), isEmpty);
+    });
+
+    test('Kontaktrichtlinie fließt in den Kontext der Einstufung: Bereich, Kontakte, Blockierte, Familie in jedem Status', () async {
+      final (_, g) = await _signedIn(encryption: true);
+      final before = g.debugPolicyContext;
+      expect(before, isNotNull, reason: 'Voraussetzung: Familie bekannt');
+      expect(before!.contactsEnabled, isFalse);
+      expect(before.contacts, isEmpty);
+      expect(before.blockedUsers, isEmpty);
+      g.setContactPolicy(const ContactPolicy(
+        enabled: true,
+        contacts: <String, ContactState>{_fremd: ContactState.accepted},
+        blocked: <String>{'@x:hs.example'},
+      ));
+      final c = g.debugPolicyContext!;
+      expect(c.contactsEnabled, isTrue);
+      expect(c.contacts, <String, ContactState>{_fremd: ContactState.accepted});
+      expect(c.blockedUsers, <String>{'@x:hs.example'});
+      expect(c.familyIds, containsAll(<String>[_me, _cara, _ben, _dora]), reason: 'auch Eingeladene (Dora)');
+      expect(c.joinedMembers, isNot(contains(_dora)), reason: 'beigetreten ist nur, wer beigetreten ist');
+    });
+
+    test('Kontaktrichtlinie: gleiche Richtlinie meldet nicht erneut, eine andere schon; nach dispose ohne Wirkung und ohne Wurf', () async {
+      final (_, g) = await _signedIn(encryption: true);
+      var calls = 0;
+      g.addListener(() => calls++);
+      const p = ContactPolicy(enabled: true);
+      g.setContactPolicy(p);
+      g.setContactPolicy(const ContactPolicy(enabled: true));
+      expect(calls, 1);
+      g.setContactPolicy(ContactPolicy.off);
+      expect(calls, 2);
+      g.dispose();
+      expect(() => g.setContactPolicy(p), returnsNormally);
+      expect(g.debugContactPolicy, ContactPolicy.off);
+    });
+
+    test('Kontaktrichtlinie: ein Familienwechsel lässt sie stehen, Abmelden setzt sie zurück (Kontakte gehören zum Konto)', () async {
+      final (_, g) = await _signedIn(encryption: true);
+      const p = ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.accepted});
+      g.setContactPolicy(p);
+      g.debugLeaveFamilyScope();
+      expect(g.debugContactPolicy, p);
+      await g.logout();
+      expect(g.debugContactPolicy, ContactPolicy.off);
     });
 
     test('Einladung is_direct von einem beigetretenen Mitglied: wird angenommen (/join)', () async {

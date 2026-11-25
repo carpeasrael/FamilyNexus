@@ -54,6 +54,53 @@ void main() {
     expect('SqlContactStore(database.db)'.allMatches(t).length, 1);
   });
 
+  // ---- K3a-1: Kontaktrichtlinie. Nur `ContactSync` baut und setzt sie, das Gateway liest sie nur. ----
+
+  String code(String t) => t.split('\n').where((l) => !l.trimLeft().startsWith('//')).join('\n');
+
+  test('setContactPolicy( wird nur von ContactSync gerufen; sonst nur Deklaration und Umsetzung im Gateway', () {
+    const declared = <String>{'lib/data/matrix/matrix_gateway.dart', 'lib/data/matrix/gateway/direct_chats.dart'};
+    final callers = <String>[];
+    for (final f in libFiles()) {
+      final t = code(f.readAsStringSync());
+      if (!t.contains('setContactPolicy(')) continue;
+      if (declared.contains(f.path)) continue;
+      callers.add(f.path);
+    }
+    expect(callers, <String>['lib/data/sync/contact_sync.dart']);
+  });
+
+  test('ContactPolicy.of( nur in der Definition und in ContactSync (das Gateway baut sie nie)', () {
+    final offenders = <String>[];
+    for (final f in libFiles()) {
+      if (f.path == 'lib/domain/contacts.dart' || f.path == 'lib/data/sync/contact_sync.dart') continue;
+      if (code(f.readAsStringSync()).contains('ContactPolicy.of(')) offenders.add(f.path);
+    }
+    expect(offenders, isEmpty);
+  });
+
+  test('die Einstufung kennt ContactPolicy nicht (nur Werte im PolicyContext)', () {
+    expect(code(File('lib/domain/conversation_policy.dart').readAsStringSync()), isNot(contains('ContactPolicy')));
+  });
+
+  test('das Gateway setzt die Richtlinie nur in _resetLocal zurück, nie beim Familienwechsel (Kontakte gehören zum Konto)', () {
+    final t = File('lib/data/matrix/sdk_matrix_gateway.dart').readAsStringSync();
+    String body(String sig) {
+      final i = t.indexOf(sig);
+      expect(i, greaterThan(0), reason: sig);
+      return t.substring(i, t.indexOf('\n  }\n', i));
+    }
+
+    expect(body('void _resetLocal() {'), contains('_contactPolicy = ContactPolicy.off;'));
+    expect(body('void _leaveFamilyScope() {'), isNot(contains('_contactPolicy')));
+    final d = File('lib/data/matrix/gateway/direct_chats.dart').readAsStringSync();
+    final i = d.indexOf('void _resetDirectChats()');
+    expect(i, greaterThan(0));
+    expect(d.substring(i, d.indexOf('\n  }\n', i)), isNot(contains('_contactPolicy')));
+    expect(RegExp(r'_contactPolicy\s*=').allMatches(t + d).length, 3, reason: 'Feld, setContactPolicy und _resetLocal');
+    expect(d, contains('ContactPolicy _contactPolicy = ContactPolicy.off;'), reason: 'Standard ohne Anmeldung ist aus');
+  });
+
   test('bootstrap reicht den Blockierlisten-Adapter an die Factory durch', () {
     final t = File('lib/app/bootstrap.dart').readAsStringSync();
     expect(t, contains('blockedList: SettingsBlockedList(settings),'));
