@@ -16,7 +16,17 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
   Future<void> _refresh();
   void _scheduleRefresh();
   Future<String?> _sendCalendar(Room room, String type, Map<String, Object?> content);
+  Future<Map<String, Object?>?> _serverState(String roomId, String type);
   void _warnPlaintext(Event e);
+
+  /// Einladungsfilter, siehe [isFamilyInvitation]; der `join_rule` stammt aus dem Einladungszustand (`null` ohne Angabe).
+  bool _isFamilyInvitation(Room r, String me) => isFamilyInvitation(
+        joinRule: _stringOrNull(r.getState(EventTypes.RoomJoinRules)?.content['join_rule']),
+        isDirect: r.getState(EventTypes.RoomMember, me)?.content['is_direct'] == true,
+        isBook: BookRoomMarker.isBook(r.getState(EventTypes.RoomCreate)?.content),
+      );
+
+  static String? _stringOrNull(Object? v) => v is String ? v : null;
 
   @override
   List<PendingInvitation> get invitations {
@@ -26,10 +36,9 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
     return <PendingInvitation>[
       for (final r in client.rooms)
         // Einladungen in Einzelchats (is_direct) sind keine Familieneinladungen (E-39); Einladungen in Buch-Räume
-        // (Kassenbuch, E-113) ebenso nicht: Sie erscheinen hier nie, damit Annehmen den Familienzeiger nicht überschreibt.
-        if (r.membership == Membership.invite &&
-            r.getState(EventTypes.RoomMember, me)?.content['is_direct'] != true &&
-            !BookRoomMarker.isBook(r.getState(EventTypes.RoomCreate)?.content))
+        // (Kassenbuch, E-113) und in Gruppen fremder Clients (`join_rule` nicht `knock`, #119) ebenso nicht: Sie erscheinen
+        // hier nie, damit Annehmen den Familienzeiger nicht überschreibt.
+        if (r.membership == Membership.invite && _isFamilyInvitation(r, me))
           PendingInvitation(
             roomId: r.id,
             roomName: TextSanitizer.clean(r.getLocalizedDisplayname(), max: FamilyRoomSpec.nameMax),
@@ -597,6 +606,8 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
     if (BookRoomMarker.isBook(room.getState(EventTypes.RoomCreate)?.content)) {
       throw const GatewayException(GatewayError.notAllowed);
     }
+    // Nur was als Familieneinladung angezeigt würde, lässt sich annehmen (#119, B1): Einzelchat, Gruppe fremder Clients.
+    if (!_isFamilyInvitation(room, client.userID!)) throw const GatewayException(GatewayError.notAllowed);
     final existing = _familyRoomAnyState();
     if (existing != null && existing.membership != Membership.leave && existing.membership != Membership.ban) {
       throw const GatewayException(GatewayError.alreadyExists);
@@ -619,6 +630,14 @@ mixin _InvitationsModule on ChangeNotifier implements MatrixGateway {
       // Fail-safe (E-113): Enthielt die Einladung keinen `m.room.create` (Server ohne `room_prejoin_state`), zeigt sich
       // das Buch-Kennzeichen erst jetzt: Raum verlassen, der Familienvermerk wird unten zurückgesetzt.
       if (BookRoomMarker.isBook(joinedRoom?.getState(EventTypes.RoomCreate)?.content)) {
+        await joinedRoom?.leave();
+        throw const GatewayException(GatewayError.notAllowed);
+      }
+      // Fail-closed (#119, B1): Nur ein Raum mit `join_rule: knock` wird zur Familie. Der Zustand kommt **vom Server**
+      // (das SDK hält `m.room.join_rules` bei einem partiellen Raum nicht im Speicher, und ein Heimserver kann es aus
+      // der Einladung weglassen); fehlt er oder ist er nicht abrufbar, wird der Raum verlassen.
+      final rule = await _serverState(roomId, EventTypes.RoomJoinRules);
+      if (rule?['join_rule'] != knockJoinRule) {
         await joinedRoom?.leave();
         throw const GatewayException(GatewayError.notAllowed);
       }

@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/data/platform/file_access.dart';
+import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +12,8 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/shell_finders.dart';
 import '../support/fake_matrix.dart';
 import '../support/test_app.dart';
+
+const _png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
 /// #410: Das Eingabefeld gehört allen Gesprächen und bleibt beim Senden beschreibbar. Nach dem Senden darf nur der
 /// unveränderte, schon gesendete Stand geleert werden, nicht, was der Nutzer inzwischen getippt oder gewählt hat.
@@ -108,5 +113,141 @@ void main() {
     await _release(tester, t.gate);
     expect(_field(tester), isEmpty);
     expect(find.byIcon(Icons.close), findsNothing);
+  });
+
+  // --- #119, K1, B4: Entwurf und Antwortbezug gehören dem Gespräch, in dem sie entstanden sind ---
+
+  testWidgets('D1 gesendeter Entwurf wird nicht wieder sichtbar: Senden im Familienchat, Wechsel, zurück', (tester) async {
+    final t = await _open(tester);
+    await _sendHeld(tester, t.gate, t.app.server, 'hallo');
+    await _switchTo(tester, t.dm);
+    await _release(tester, t.gate);
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    expect(_field(tester), isEmpty, reason: 'gesendet, nicht als Entwurf zurückgekehrt');
+  });
+
+  testWidgets('D2 Entwürfe je Gespräch: Senden im Einzelchat sendet nie den Familienentwurf', (tester) async {
+    final t = await _open(tester);
+    await tester.enterText(find.byType(TextField), 'Familien-Entwurf');
+    await _switchTo(tester, t.dm, settle: true);
+    expect(_field(tester), isEmpty);
+    await tester.enterText(find.byType(TextField), 'Hi Ben');
+    await tester.tap(find.byIcon(Icons.send));
+    await tester.pumpAndSettle();
+    expect(t.app.gateway.messagesIn(t.dm).map((m) => m.body), contains('Hi Ben'));
+    expect(t.app.gateway.messages.map((m) => m.body), isNot(contains('Familien-Entwurf')));
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    expect(_field(tester), 'Familien-Entwurf');
+  });
+
+  testWidgets('D3 Antwortbezug je Gespräch: im Einzelchat gewählt, in der Familie nicht da, zurück wieder da', (tester) async {
+    final t = await _open(tester);
+    await _switchTo(tester, t.dm, settle: true);
+    await tester.longPress(find.text('Hallo Anna'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Antworten'));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.close), findsOneWidget);
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    expect(find.byIcon(Icons.close), findsNothing, reason: 'der Bezug gehört dem Einzelchat');
+    await _switchTo(tester, t.dm, settle: true);
+    expect(find.byIcon(Icons.close), findsOneWidget);
+  });
+
+  testWidgets('D4 verschwindet das Gespräch (blockiert), fällt die Anzeige auf die Familie zurück: der Entwurf geht nicht mit', (tester) async {
+    final t = await _open(tester);
+    await tester.enterText(find.byType(TextField), 'Familie');
+    await _switchTo(tester, t.dm, settle: true);
+    await tester.enterText(find.byType(TextField), 'Ben-Entwurf');
+    await t.app.services.settings.update((s) => s.copyWith(blockedUsers: <String>[t.ben.userId!]));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.send), findsOneWidget, reason: 'ein Gespräch ist offen (Familie)');
+    expect(_field(tester), isNot('Ben-Entwurf'), reason: 'der Entwurf des Einzelchats gelangt nie in die Familie');
+  });
+
+  testWidgets('D5 Anhang nach einem Wechsel: die Antwort gehört dem Gespräch der Auswahl, der Bezug des neuen bleibt', (tester) async {
+    final t = await _open(tester);
+    final files = t.app.services.files as FakeFileAccess;
+    files.next = PickedFile(name: 'foto.png', bytes: base64Decode(_png));
+    final pick = Completer<void>();
+    files.pickGate = pick;
+    addTearDown(() {
+      if (!pick.isCompleted) pick.complete();
+    });
+    await _switchTo(tester, t.dm, settle: true);
+    await tester.longPress(find.text('Hallo Anna'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Antworten'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Datei anhängen'));
+    await tester.pump();
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    pick.complete();
+    await tester.pumpAndSettle();
+    expect(t.app.gateway.messagesIn(t.dm).where((m) => m.attachment?.name == 'foto.png'), hasLength(1));
+    expect(t.app.gateway.messages.where((m) => m.attachment != null), isEmpty);
+    await _switchTo(tester, t.dm, settle: true);
+    expect(find.byIcon(Icons.close), findsNothing, reason: 'der gesendete Antwortbezug des Einzelchats ist verbraucht');
+  });
+
+  testWidgets('D6 gelöschter Entwurf kehrt nicht zurück (Text und Antwortbezug)', (tester) async {
+    final t = await _open(tester);
+    await tester.enterText(find.byType(TextField), 'alt');
+    await _switchTo(tester, t.dm, settle: true);
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    expect(_field(tester), 'alt');
+    await tester.enterText(find.byType(TextField), '');
+    await _switchTo(tester, t.dm, settle: true);
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    expect(_field(tester), isEmpty, reason: 'gelöscht bleibt gelöscht');
+    // Antwortbezug: wählen, wechseln, zurück, mit dem Kreuz schließen, wechseln, zurück.
+    await _switchTo(tester, t.dm, settle: true);
+    await tester.longPress(find.text('Hallo Anna'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Antworten'));
+    await tester.pumpAndSettle();
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    await _switchTo(tester, t.dm, settle: true);
+    expect(find.byIcon(Icons.close), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    await _switchTo(tester, t.dm, settle: true);
+    expect(find.byIcon(Icons.close), findsNothing, reason: 'geschlossen bleibt geschlossen');
+  });
+
+  testWidgets('D7 Randfälle beim Senden: der geänderte Entwurf des gesendeten Gesprächs und die während des Sendens gewählte Antwort bleiben', (tester) async {
+    final t = await _open(tester);
+    // Senden im Familienchat, dann dort weitertippen, weg wechseln und erst dann abschließen.
+    await _sendHeld(tester, t.gate, t.app.server, 'hallo');
+    await _switchTo(tester, t.dm, settle: false);
+    await _switchTo(tester, ChatThread.familyId);
+    await tester.enterText(find.byType(TextField), 'hallo welt');
+    await _switchTo(tester, t.dm);
+    await _release(tester, t.gate);
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    expect(_field(tester), 'hallo welt', reason: 'das Sendeergebnis löscht nur den unveränderten, gesendeten Stand');
+  });
+
+  testWidgets('D8 während des Sendens gewählte Antwort bleibt', (tester) async {
+    final t = await _open(tester);
+    await _switchTo(tester, t.dm, settle: true);
+    await _sendHeld(tester, t.gate, t.app.server, 'x');
+    await tester.longPress(find.text('Hallo Anna'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Antworten'));
+    await tester.pump();
+    await _release(tester, t.gate);
+    expect(find.byIcon(Icons.close), findsOneWidget, reason: 'die inzwischen gewählte Antwort wurde nicht mit dem Sendeergebnis gelöscht');
+  });
+
+  testWidgets('D9 ein Neuaufbau ohne Gesprächswechsel lässt Cursor und Auswahl im Eingabefeld unberührt', (tester) async {
+    final t = await _open(tester);
+    await tester.enterText(find.byType(TextField), 'abcdef');
+    final c = tester.widget<TextField>(find.byType(TextField)).controller!;
+    c.selection = const TextSelection(baseOffset: 2, extentOffset: 4);
+    await t.app.services.settings.update((s) => s.copyWith(blockedUsers: <String>['@niemand:fake.test']));
+    await tester.pumpAndSettle();
+    expect(c.selection, const TextSelection(baseOffset: 2, extentOffset: 4));
   });
 }

@@ -54,6 +54,49 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   ChatMessage? _replyTo;
   bool _sending = false;
 
+  /// Entwurf und Antwortbezug **je Gespräch** (#119, B4): `_ctrl` und `_replyTo` gehören immer dem Gespräch
+  /// [_draftOwner]; beim Wechsel des gezeigten Gesprächs (egal auf welchem Weg) wandern sie in diese Ablagen und der
+  /// Stand des neuen Gesprächs wird geladen. Nur im Speicher, nie auf der Platte. So gelangt ein Entwurf nie in ein
+  /// anderes Gespräch (Familie ↔ Einzelchat, später Kontakte und Gruppen).
+  final Map<String, String> _drafts = <String, String>{};
+  final Map<String, ChatMessage> _replies = <String, ChatMessage>{};
+  String? _draftOwner;
+
+  /// Sichert den Stand des bisherigen Gesprächs und lädt den des neuen ([shown], `null` = Gesprächsliste).
+  void _switchDraft(String? shown) {
+    if (shown == _draftOwner) return;
+    final old = _draftOwner;
+    if (old != null) {
+      if (_ctrl.text.isEmpty) {
+        _drafts.remove(old);
+      } else {
+        _drafts[old] = _ctrl.text;
+      }
+      final reply = _replyTo;
+      if (reply == null) {
+        _replies.remove(old);
+      } else {
+        _replies[old] = reply;
+      }
+    }
+    _draftOwner = shown;
+    _ctrl.value = TextEditingValue(text: shown == null ? '' : (_drafts[shown] ?? ''));
+    _replyTo = shown == null ? null : _replies[shown];
+  }
+
+  /// Nach dem Senden: den gesendeten Stand des Gesprächs [threadId] verwerfen, aber nur wenn er unverändert ist; Neues
+  /// (weitergetippt, nach einem Wechsel) bleibt. Gehört `_ctrl` inzwischen einem anderen Gespräch, liegt der Stand in
+  /// den Ablagen.
+  void _clearSent(String threadId, String? sentText, ChatMessage? sentReply) {
+    if (_draftOwner == threadId) {
+      if (sentText != null && _ctrl.text == sentText) _ctrl.clear();
+      if (identical(_replyTo, sentReply)) setState(() => _replyTo = null);
+    } else {
+      if (sentText != null && _drafts[threadId] == sentText) _drafts.remove(threadId);
+      if (sentReply != null && identical(_replies[threadId], sentReply)) _replies.remove(threadId);
+    }
+  }
+
   /// Vom Nutzer gewähltes Gespräch (#423): `null` = keines geöffnet, dann zeigt der Tab die Gesprächsliste (bei
   /// mehreren Gesprächen). Nur der **Wunsch**: Was gezeigt wird, entscheidet [resolveChatView] in `build`.
   String? _open;
@@ -174,7 +217,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     _restoreId = null;
     _persistLast(id);
     _open = id;
-    _replyTo = null;
     _resetMarker();
     _waitTimer?.cancel();
     _waitingFor = null;
@@ -200,6 +242,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     _collapseQuotes.dispose();
     _scroll.dispose();
     _listScroll.dispose();
+    _drafts.clear();
+    _replies.clear();
     _ctrl.dispose();
     super.dispose();
   }
@@ -221,7 +265,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     setState(() {
       _restoreId = null;
       _open = null;
-      _replyTo = null;
       _waitTimer?.cancel();
       _waitingFor = null;
       _resetMarker();
@@ -241,9 +284,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     try {
       await g.sendMessage(text, replyToId: sentReply?.id, threadId: threadId);
       if (!mounted) return;
-      // Nur der unveränderte, schon gesendete Stand wird geleert; Neues (weitergetippt, nach einem Wechsel) bleibt.
-      if (_ctrl.text == sentText) _ctrl.clear();
-      if (identical(_replyTo, sentReply)) setState(() => _replyTo = null);
+      // Nur der unveränderte, schon gesendete Stand des gesendeten Gesprächs wird geleert (#119, B4).
+      _clearSent(threadId, sentText, sentReply);
     } catch (e) {
       _toast(errorText(l, e));
     } finally {
@@ -256,11 +298,13 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     // Gespräch vor der Dateiauswahl festhalten: ein Wechsel währenddessen darf das Ziel nicht ändern (#423).
     final threadId = _shown;
     if (threadId == null) return;
+    // Antwortbezug ebenfalls vor dem Warten festhalten (#119, B4): Nach einem Wechsel gehört `_replyTo` einem anderen Gespräch.
+    final sentReply = _replyTo;
     try {
       final file = await s.files.pickFile();
       if (file == null) return;
-      await s.gateway.sendAttachment(fileName: file.name, bytes: file.bytes, replyToId: _replyTo?.id, threadId: threadId);
-      if (mounted) setState(() => _replyTo = null);
+      await s.gateway.sendAttachment(fileName: file.name, bytes: file.bytes, replyToId: sentReply?.id, threadId: threadId);
+      if (mounted) _clearSent(threadId, null, sentReply);
     } on FileTooLargeException {
       _toast(l.errAttachmentRejected);
     } catch (e) {
@@ -405,6 +449,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
           initialSyncDone: g.initialSyncDone,
         );
         _shown = view.shownId;
+        _switchDraft(view.shownId);
         if (view.followFamily) _followFamily(_open!);
         if (view.pin) _open = ChatThread.familyId;
         if (view.endWaiting) {

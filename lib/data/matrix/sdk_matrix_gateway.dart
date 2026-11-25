@@ -35,6 +35,7 @@ import '../../domain/event_theme_codec.dart';
 import '../../domain/event_themes.dart';
 import '../../domain/family.dart';
 import '../../domain/family_code.dart';
+import '../../domain/family_invitation.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/invite_ticket.dart';
 import '../../domain/key_value_store.dart';
@@ -649,6 +650,9 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     // Der Sync-Loop meldet das Konto nicht als online (#451): Ohne `set_presence` gälte es am Server als online,
     // auch wenn „Online-Status teilen“ aus ist. Der Familienstatus läuft über Gerätenachrichten (E-38).
     client.syncPresence = PresenceType.offline;
+    // `m.room.join_rules` bleibt im Speicher (#119, B1): Sonst fehlt der Einladungszustand eines Raums nach einem
+    // Neustart, und eine Gruppe fremder Clients erschiene wieder als Familieneinladung.
+    client.importantStateEvents.add(EventTypes.RoomJoinRules);
     _client = client;
     _syncSub = client.onSync.stream.listen((update) {
       _trackLive(client, update);
@@ -1379,7 +1383,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     _family = _buildFamily(room, client.userID!);
     _updateAvatarSnapshot();
     _ensureAvatarPermission();
-    _messages = ChatMapper.messages(timeline, threadId: ChatThread.familyId, sends: _localSends, showReadBy: _showReadBy);
+    _messages = ChatMapper.messages(timeline, threadId: ChatThread.familyId, sends: _localSends, showReadBy: _showReadBy, allowEventRefs: true);
     if (_presenceRoomId != room.id) {
       // Andere Familie: der Status der alten gilt nicht weiter.
       _presence.clear();

@@ -728,7 +728,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
           time: e.time,
           body: (e.content['body'] as String?) ?? '',
           replyToId: e.content['reply_to'] as String?,
-          sharedEventId: e.content['event_ref'] as String?,
+          // Terminverweise gelten nur im Familienraum (#119, B3), wie im Gateway (`allowEventRefs`).
+          sharedEventId: threadId == ChatThread.familyId ? e.content['event_ref'] as String? : null,
           undecryptable: undecryptable.contains(e.id),
           reactions: reactions[e.id] ?? const <String, Set<String>>{},
           attachment: e.content['file_name'] == null

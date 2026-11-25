@@ -42,12 +42,16 @@ Map<String, Object?> _member(String membership, {bool direct = false}) => <Strin
     };
 
 /// Einladung wie vom Server: gestrippter Zustand mit oder ohne `m.room.create`.
-Map<String, Object?> _invite(String room, {Map<String, Object?>? create, bool direct = false}) => <String, Object?>{
+Map<String, Object?> _invite(String room, {Map<String, Object?>? create, bool direct = false, String? joinRule}) => <String, Object?>{
       'rooms': <String, Object?>{
         'invite': <String, Object?>{
           room: <String, Object?>{
             'invite_state': <String, Object?>{
-              'events': <Object?>[if (create != null) _create(room, create), _member('invite', direct: direct)],
+              'events': <Object?>[
+                if (create != null) _create(room, create),
+                if (joinRule != null) <String, Object?>{'type': 'm.room.join_rules', 'state_key': '', 'sender': _inviter, 'content': <String, Object?>{'join_rule': joinRule}},
+                _member('invite', direct: direct),
+              ],
             },
           },
         },
@@ -85,6 +89,9 @@ class _Hs {
   final List<http.BaseRequest> requests = <http.BaseRequest>[];
   final List<(String, String)> bodies = <(String, String)>[];
   void Function(String room)? onJoin;
+
+  /// Antwort auf `GET /rooms/<id>/state/m.room.join_rules` nach dem Beitritt: Familienräume haben `knock`; `null` = 404 (Abruf scheitert).
+  String? joinRuleState = 'knock';
   Completer<void> release = Completer<void>();
   int _syncs = 0;
 
@@ -106,6 +113,9 @@ class _Hs {
         if (path == '/_matrix/client/v3/sync') {
           if (_syncs++ > 0) await release.future;
           return _json(<String, Object?>{'next_batch': 's$_syncs'});
+        }
+        if (req.method == 'GET' && path.contains('/state/m.room.join_rules') && joinRuleState != null) {
+          return _json(<String, Object?>{'join_rule': joinRuleState});
         }
         final joinMatch = RegExp(r'/rooms/([^/]+)/join$').firstMatch(path);
         if (joinMatch != null) {
@@ -167,6 +177,23 @@ void main() {
       expect(g.invitations.map((i) => i.roomId), <String>[_family]);
     });
 
+    test('Gruppe eines fremden Clients (join_rule nicht knock) ist keine Familieneinladung (#119, B1); knock und fehlende Angabe schon', () async {
+      final (_, g) = await _signedIn();
+      await _sync(g, _invite(_family, create: <String, Object?>{}, joinRule: 'knock'));
+      await _sync(g, _invite('!gruppe:hs.example', create: <String, Object?>{}, joinRule: 'invite'));
+      await _sync(g, _invite('!oeffentlich:hs.example', create: <String, Object?>{}, joinRule: 'public'));
+      await _sync(g, _invite('!eingeschraenkt:hs.example', create: <String, Object?>{}, joinRule: 'restricted'));
+      await _sync(g, _invite('!ohne:hs.example', create: <String, Object?>{}));
+      expect(g.invitations.map((i) => i.roomId).toSet(), <String>{_family, '!ohne:hs.example'});
+      await Future<void>.delayed(_settle); // das SDK löst Anzeigenamen im Hintergrund auf, bevor die Datenbank schließt
+    });
+
+    test('knock zusammen mit is_direct bleibt ausgeblendet (Einzelchat geht vor)', () async {
+      final (_, g) = await _signedIn();
+      await _sync(g, _invite(_dm, direct: true, joinRule: 'knock'));
+      expect(g.invitations, isEmpty);
+    });
+
     test('Einladung ohne gestrippte Create sieht wie eine Familieneinladung aus (Verfügbarkeitsgrenze, E-113)', () async {
       final (_, g) = await _signedIn();
       await _sync(g, _invite(_book));
@@ -213,6 +240,53 @@ void main() {
       expect(pointer, hasLength(2), reason: 'erst gesetzt, dann zurückgesetzt');
       expect((json.decode(pointer.first.$2) as Map)['room_id'], _book);
       expect(json.decode(pointer.last.$2), isEmpty, reason: 'Familienvermerk wie vorher (leer)');
+    });
+
+    test('Gruppe (join_rule invite) lässt sich nicht annehmen: notAllowed, nichts geschrieben, kein Beitritt (#119, B1)', () async {
+      final (hs, g) = await _signedIn();
+      await _sync(g, _invite('!gruppe:hs.example', create: <String, Object?>{}, joinRule: 'invite'));
+      final before = hs.requests.length;
+      await expectLater(
+        g.acceptInvitation('!gruppe:hs.example'),
+        throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.notAllowed)),
+      );
+      expect(hs.requests.length, before, reason: 'weder Familienvermerk noch Beitritt');
+      expect(hs.where('POST', '/join'), isEmpty);
+    });
+
+    test('Einzelchat-Einladung lässt sich nicht als Familie annehmen (#119, B1)', () async {
+      final (hs, g) = await _signedIn();
+      await _sync(g, _invite(_dm, direct: true));
+      final before = hs.requests.length;
+      await expectLater(g.acceptInvitation(_dm), throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.notAllowed)));
+      expect(hs.requests.length, before);
+    });
+
+    test('Fail-closed (#119, B1): join_rules fehlte in der Einladung, ist nach dem Beitritt invite: Raum verlassen, Vermerk zurückgesetzt, notAllowed', () async {
+      final (hs, g) = await _signedIn();
+      await _sync(g, _invite('!gruppe:hs.example', create: <String, Object?>{}));
+      hs.joinRuleState = 'invite';
+      hs.onJoin = (room) => Timer(const Duration(milliseconds: 100), () => unawaited(_syncJoined(g, _joined(room))));
+      await expectLater(
+        g.acceptInvitation('!gruppe:hs.example'),
+        throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.notAllowed)),
+      );
+      expect(hs.where('POST', '/leave'), isNotEmpty, reason: 'Raum verlassen');
+      final pointer = hs.bodies.where((b) => b.$1.contains('de.inneso.familynexus.family')).toList();
+      expect(pointer, hasLength(2), reason: 'erst gesetzt, dann zurückgesetzt');
+      expect(json.decode(pointer.last.$2), isEmpty, reason: 'Familienvermerk wie vorher (leer)');
+    });
+
+    test('Fail-closed (#119, B1): der Abruf des Zustands scheitert (404): ebenfalls Austritt und notAllowed', () async {
+      final (hs, g) = await _signedIn();
+      await _sync(g, _invite(_family, create: <String, Object?>{}));
+      hs.joinRuleState = null;
+      hs.onJoin = (room) => Timer(const Duration(milliseconds: 100), () => unawaited(_syncJoined(g, _joined(room))));
+      await expectLater(
+        g.acceptInvitation(_family),
+        throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.notAllowed)),
+      );
+      expect(hs.where('POST', '/leave'), isNotEmpty);
     });
 
     test('Kontrollfall: dieselbe Abfolge mit einem Familienraum ohne Buch-Kennzeichen nimmt die Einladung an', () async {
