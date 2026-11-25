@@ -9,6 +9,7 @@ import '../common/error_text.dart';
 import 'add_contact_screen.dart';
 import 'contact_controller.dart';
 import 'contact_text.dart';
+import 'not_your_family_warning.dart';
 
 /// Kontakte (#119, K3b-1, §8.1, §8.4): ausgeschaltet eine Erklärseite mit Einwilligung, eingeschaltet Anfragen, Liste,
 /// „Kontakt hinzufügen“ und die eigene Kontakt-ID. Alles läuft über den [ContactController].
@@ -139,6 +140,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
                               Text(l.contactsRequestFrom(isolateText(r.fromName))),
                               Text(isolateText(r.fromUserId), style: Theme.of(context).textTheme.bodySmall),
+                              if (c.requestCollides(r.roomId)) NotYourFamilyWarning(userId: r.fromUserId),
                             ]),
                           ),
                           Wrap(spacing: 8, children: <Widget>[
@@ -169,6 +171,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                             Text(isolateText(e.title), style: Theme.of(context).textTheme.titleMedium),
                             Text(isolateText(e.id), style: Theme.of(context).textTheme.bodySmall),
                             Text(_stateText(l, e.state), style: Theme.of(context).textTheme.bodySmall),
+                            if (e.collides) NotYourFamilyWarning(userId: e.id),
                           ]),
                         ),
                         Wrap(spacing: 8, children: <Widget>[

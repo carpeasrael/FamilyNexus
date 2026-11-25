@@ -61,8 +61,10 @@ class _MessageList extends StatelessWidget {
     required this.services,
     required this.threadId,
     required this.onLongPress,
+    this.outside = false,
   });
 
+  final bool outside;
   final List<ChatEntry> entries;
   final Map<String, ChatMessage> byId;
   final ScrollController scroll;
@@ -113,6 +115,7 @@ class _MessageList extends StatelessWidget {
                   services: services,
                   threadId: threadId,
                   onLongPress: () => onLongPress(m),
+                  outside: outside,
                 );
             }
           },
@@ -159,9 +162,10 @@ class _ReplyPreview extends StatelessWidget {
   }
 }
 
-/// Eingabeleiste: Anhängen, Textfeld, Senden.
+/// Eingabeleiste: Anhängen, Textfeld, Senden. [blockedText] ersetzt sie durch eine Erklärzeile (wartend, nicht erreichbar).
 class _Composer extends StatelessWidget {
-  const _Composer({required this.controller, required this.sending, required this.onAttach, required this.onSend});
+  const _Composer({required this.controller, required this.sending, required this.onAttach, required this.onSend, this.blockedText});
+  final String? blockedText;
   final TextEditingController controller;
   final bool sending;
   final VoidCallback onAttach;
@@ -170,6 +174,13 @@ class _Composer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final blockedText = this.blockedText;
+    if (blockedText != null) {
+      return Padding(
+        padding: const EdgeInsets.all(12),
+        child: Semantics(container: true, child: Text(blockedText, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall)),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.all(8),
       // Anhängen und Senden gehören zum Eingabefeld: die Tastatur bleibt dabei offen.

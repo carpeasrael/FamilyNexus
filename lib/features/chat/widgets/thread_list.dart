@@ -70,6 +70,8 @@ class _ThreadRowTile extends StatelessWidget {
     final hasPreview = preview.isNotEmpty;
     // Ohne Nachricht: Online-Status (Einzelchat) bzw. „Noch keine Nachrichten“ (Familienchat).
     final second = hasPreview ? preview : (status ?? l.emptyChat);
+    // Namensgleichheit mit einem Familienmitglied (§9.1): Warnung in der Zeile, live berechnet.
+    final collides = thread.isOutside && (services.calendar?.contactController?.collides(thread.peerName) ?? false);
     final label = thread.isFamily
         ? l.chatThreadFamily(thread.title)
         : thread.isOutside
@@ -80,6 +82,7 @@ class _ThreadRowTile extends StatelessWidget {
       label,
       ?(hasPreview ? status : null),
       second,
+      if (collides) l.contactsNotYourFamily(thread.peerId ?? ''),
       if (unread > 0) l.chatUnreadCount(unread),
     ].join(', ');
     return Semantics(
@@ -127,6 +130,7 @@ class _ThreadRowTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary),
                   ),
+                  if (collides) NotYourFamilyWarning(userId: peer ?? ''),
                 ]),
               ),
               const SizedBox(width: 8),

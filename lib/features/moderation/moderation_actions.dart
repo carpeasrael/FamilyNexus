@@ -48,6 +48,7 @@ class ModerationActions {
     AppServices services, {
     required ChatMessage message,
     required String threadId,
+    Future<void> Function(String userId, String name)? onBlockOffer,
   }) async {
     final l = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -73,7 +74,15 @@ class ModerationActions {
       action: canBlock
           ? SnackBarAction(
               label: l.reportBlockOffer,
-              onPressed: () => block(context, services, userId: message.senderId, name: message.senderLabel(l, inSentence: true)),
+              onPressed: () {
+                final name = message.senderLabel(l, inSentence: true);
+                // Kontakte außerhalb der Familie blockiert der Aufrufer über den Kontakt-Datensatz (#119, K3b-2a).
+                if (onBlockOffer != null) {
+                  onBlockOffer(message.senderId, name).ignore();
+                } else {
+                  block(context, services, userId: message.senderId, name: name).ignore();
+                }
+              },
             )
           : null,
     ));

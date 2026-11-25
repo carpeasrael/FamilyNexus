@@ -8,6 +8,7 @@ import '../../data/sync/contact_sync.dart';
 import '../../domain/chat.dart';
 import '../../domain/contact_service.dart';
 import '../../domain/contacts.dart';
+import '../../domain/family.dart' show FamilyMember;
 
 /// Zustand eines Kontakts in der Liste (Text, nie nur Farbe).
 enum ContactStateView {
@@ -28,7 +29,7 @@ enum ContactStateView {
 /// Ein Kontakt für die Liste.
 @immutable
 class ContactEntry {
-  const ContactEntry({required this.id, required this.title, required this.state, this.threadId});
+  const ContactEntry({required this.id, required this.title, required this.state, this.threadId, this.collides = false});
 
   final String id;
 
@@ -37,11 +38,15 @@ class ContactEntry {
   final ContactStateView state;
   final String? threadId;
 
-  @override
-  bool operator ==(Object other) => other is ContactEntry && other.id == id && other.title == title && other.state == state && other.threadId == threadId;
+  /// Der Name gleicht einem Familienmitglied (§9.1): Warnung „Nicht deine Familie“.
+  final bool collides;
 
   @override
-  int get hashCode => Object.hash(id, title, state, threadId);
+  bool operator ==(Object other) =>
+      other is ContactEntry && other.id == id && other.title == title && other.state == state && other.threadId == threadId && other.collides == collides;
+
+  @override
+  int get hashCode => Object.hash(id, title, state, threadId, collides);
 }
 
 /// Ergebnis von [ContactController.check]: alle Fälle, in denen das Hinzufügen nicht möglich ist, mit eigenem Text; nur
@@ -65,7 +70,7 @@ enum ContactCheckOutcome {
 
 @immutable
 class ContactCheck {
-  const ContactCheck(this.outcome, {this.userId = '', this.displayName = '', this.title = ''});
+  const ContactCheck(this.outcome, {this.userId = '', this.displayName = '', this.title = '', this.collides = false});
 
   final ContactCheckOutcome outcome;
   final String userId;
@@ -73,6 +78,9 @@ class ContactCheck {
 
   /// „Name · server“ (Name bereinigt, Server aus der Kennung).
   final String title;
+
+  /// Der Name gleicht einem Familienmitglied (§9.1): Das Hinzufügen verlangt eine ausdrückliche Bestätigung.
+  final bool collides;
 }
 
 /// Oberfläche der Kontakte (#119, K3b-1, E-114): Dienst, Synchronisation und Gateway zu einer Ansicht. Die Reihenfolge der
@@ -97,6 +105,7 @@ class ContactController extends ChangeNotifier {
   bool _started = false;
   List<ContactEntry> _contacts = const <ContactEntry>[];
   List<ContactRequest> _requests = const <ContactRequest>[];
+  Set<String> _collidingRequests = const <String>{};
   int _hidden = 0;
   DateTime? _checkBlockedUntil;
   final Set<String> _busy = <String>{};
@@ -116,6 +125,12 @@ class ContactController extends ChangeNotifier {
   List<ContactEntry> get contacts => _contacts;
   List<ContactRequest> get requests => _requests;
   int get requestsHidden => _hidden;
+
+  /// Gleicht der Name der Anfrage [roomId] einem Familienmitglied (§9.1)? Wird bei jedem Neuaufbau berechnet.
+  bool requestCollides(String roomId) => _collidingRequests.contains(roomId);
+
+  /// Gleicht [name] dem Anzeigenamen eines Familienmitglieds (§9.1)? Live aus der Familie des Gateways, nie gespeichert.
+  bool collides(String? name) => ContactNames.collides(name, <String>[for (final m in gateway.family?.members ?? const <FamilyMember>[]) m.displayName]);
 
   /// Bis dahin sind „Prüfen“ und „Erneut prüfen“ gesperrt (nach `rateLimited`).
   DateTime? get checkBlockedUntil => _checkBlockedUntil;
@@ -161,7 +176,9 @@ class ContactController extends ChangeNotifier {
         final entries = <ContactEntry>[for (final c in records) _entryOf(c)]..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
         final requests = enabled ? gateway.contactRequests : const <ContactRequest>[];
         final hidden = enabled ? gateway.contactRequestsHidden : 0;
+        final colliding = <String>{for (final r in requests) if (collides(r.name)) r.roomId};
         final changed = !_loaded ||
+            !setEquals(colliding, _collidingRequests) ||
             enabled != _enabled ||
             hidden != _hidden ||
             !listEquals(entries, _contacts) ||
@@ -171,6 +188,7 @@ class ContactController extends ChangeNotifier {
         _enabled = enabled;
         _contacts = entries;
         _requests = List<ContactRequest>.unmodifiable(requests);
+        _collidingRequests = colliding;
         _hidden = hidden;
         if (changed) notifyListeners();
       } while (_again && !_disposed);
@@ -199,7 +217,7 @@ class ContactController extends ChangeNotifier {
       ContactState.outgoing => thread == null ? ContactStateView.notSent : (thread.pending ? ContactStateView.waiting : ContactStateView.confirmed),
       ContactState.accepted => thread == null ? ContactStateView.searching : (thread.pending ? ContactStateView.waiting : ContactStateView.confirmed),
     };
-    return ContactEntry(id: c.id, title: title, state: state, threadId: thread?.id);
+    return ContactEntry(id: c.id, title: title, state: state, threadId: thread?.id, collides: thread != null && collides(thread.peerName));
   }
 
   Future<void> _pushPolicy() => _sync.pushPolicyNow();
@@ -251,7 +269,8 @@ class ContactController extends ChangeNotifier {
         }
       }
       final title = ContactNames.title(probe.displayName, id);
-      ContactCheck result(ContactCheckOutcome o) => ContactCheck(o, userId: id, displayName: probe.displayName, title: title);
+      ContactCheck result(ContactCheckOutcome o) =>
+          ContactCheck(o, userId: id, displayName: probe.displayName, title: title, collides: collides(probe.displayName));
       if (probe.isFamilyMember) return result(ContactCheckOutcome.familyMember);
       if (probe.existence == ContactExistence.no) return result(ContactCheckOutcome.notFound);
       return switch (probe.reachability) {

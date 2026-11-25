@@ -10,6 +10,7 @@ import '../../data/matrix/matrix_gateway.dart';
 import '../../data/platform/file_access.dart';
 import '../../domain/chat.dart';
 import '../../domain/chat_read.dart';
+import '../../domain/contacts.dart';
 import '../../domain/moderation.dart';
 import '../../domain/presence.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -21,6 +22,9 @@ import '../../ui/widgets/length_limit.dart';
 import '../calendar/event_detail_screen.dart' show RsvpButtons;
 import '../calendar/formatting.dart';
 import '../common/error_text.dart';
+import '../contacts/contact_text.dart';
+import '../contacts/contacts_screen.dart';
+import '../contacts/not_your_family_warning.dart';
 import '../family/member_avatar_view.dart';
 import '../moderation/moderation_actions.dart';
 import '../presence/presence_view.dart';
@@ -31,6 +35,7 @@ import 'thread_preview.dart';
 
 part 'widgets/attachment_view.dart';
 part 'widgets/chat_parts.dart';
+part 'widgets/contact_scope.dart';
 part 'widgets/delivery_status.dart';
 part 'widgets/message_bubble.dart';
 part 'widgets/thread_and_lines.dart';
@@ -114,6 +119,14 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
   /// Eigener Controller der Liste; [_scroll] gehört nur dem Verlauf.
   final ScrollController _listScroll = ScrollController();
+  final ScrollController _contactListScroll = ScrollController();
+
+  /// Bereich des Tabs und geöffnetes Kontakt-Gespräch (#119, K3b-2a). Kontakt-Gespräche warten nie, werden nie als „letztes
+  /// Gespräch“ gemerkt und fallen nie auf den Familienchat zurück; [_open] gehört nur dem Familien-Bereich.
+  ChatScope _scope = ChatScope.family;
+  String? _openContact;
+  final Set<String> _contactOpening = <String>{};
+  final Set<String> _contactFailed = <String>{};
   late final AppServices _services;
 
   /// Angefordertes Gespräch, das noch nicht in der Liste steht (z. B. gerade eröffneter
@@ -161,7 +174,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     if (pending == null && saved.restoreLastChat) _restoreId = saved.lastChatThread;
     if (pending != null) {
       _services.chatRequest.value = null;
-      _select(pending);
+      _selectAny(pending);
     }
     _scroll.addListener(() {
       // Liste ist umgekehrt: Ende = älteste geladene Nachricht.
@@ -179,7 +192,109 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     _restoreId = null;
     _services.chatRequest.value = null;
     // Immer öffnen, auch bei schon gewähltem Gespräch oder offener Liste (#423).
-    if (mounted) setState(() => _select(id));
+    if (mounted) setState(() => _selectAny(id));
+  }
+
+  /// Ein bekanntes Kontakt-Gespräch öffnet den Kontakte-Bereich, alles andere läuft wie bisher.
+  void _selectAny(String id) {
+    final cc = _services.calendar?.contactController;
+    final known = (cc?.enabled ?? false) && _services.gateway.threads.any((t) => t.id == id && t.isOutside);
+    if (known) {
+      _selectContact(id);
+    } else {
+      _select(id);
+    }
+  }
+
+  void _selectContact(String id) {
+    _scope = ChatScope.contacts;
+    _openContact = id;
+    _restoreId = null;
+    _waitTimer?.cancel();
+    _waitingFor = null;
+    _resetMarker();
+  }
+
+  void _setScope(ChatScope scope) {
+    if (scope == _scope) return;
+    setState(() {
+      _scope = scope;
+      _waitTimer?.cancel();
+      _waitingFor = null;
+      _openContact = null;
+      _resetMarker();
+    });
+    _services.visibleChatThread = null;
+  }
+
+  /// Das Kontakt-Gespräch wird nicht mehr gezeigt: Entwürfe und Antworten verwerfen (Datenschutz), Zustände löschen.
+  void _dropContact(String id) {
+    _drafts.remove(id);
+    _replies.remove(id);
+    _contactOpening.remove(id);
+    _contactFailed.remove(id);
+  }
+
+  void _backToContacts() {
+    final scaffold = Scaffold.maybeOf(context);
+    if (scaffold != null && scaffold.isEndDrawerOpen) {
+      scaffold.closeEndDrawer();
+      return;
+    }
+    // Bewusst kein `_persistLast`: Das gemerkte Familiengespräch bleibt unberührt.
+    setState(() {
+      _openContact = null;
+      _resetMarker();
+    });
+    _services.visibleChatThread = null;
+  }
+
+  /// Legt die Zeitleiste des Kontakt-Gesprächs an (nach dem Frame, nie im Build); wartende Gespräche bekommen keine.
+  void _ensureContactOpen(MatrixGateway g, ChatThread thread) {
+    final id = thread.id;
+    if (thread.pending || g.isThreadOpen(id) || _contactOpening.contains(id) || _contactFailed.contains(id)) return;
+    _contactOpening.add(id);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await g.openThread(id);
+      } catch (_) {
+        // Zustand unten: nicht offen = fehlgeschlagen.
+      }
+      if (!mounted) return;
+      setState(() {
+        _contactOpening.remove(id);
+        if (!g.isThreadOpen(id)) _contactFailed.add(id);
+      });
+    });
+  }
+
+  Future<void> _blockContact(String userId, String name) async {
+    final cc = _services.calendar?.contactController;
+    if (cc == null) return;
+    final l = AppLocalizations.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(l.contactsBlockTitle),
+        content: Text(l.contactsBlockBody(isolateText(name), isolateText(userId))),
+        actions: <Widget>[
+          TextButton(onPressed: () => Navigator.pop(c, false), child: Text(l.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(c, true), child: Text(l.contactsBlock)),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    try {
+      await cc.block(userId);
+    } catch (e) {
+      _toast(errorText(l, e));
+    }
+  }
+
+  void _manageContacts() {
+    final cc = _services.calendar?.contactController;
+    if (cc == null) return;
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ContactsScreen(controller: cc)));
   }
 
   @override
@@ -242,6 +357,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     _collapseQuotes.dispose();
     _scroll.dispose();
     _listScroll.dispose();
+    _contactListScroll.dispose();
     _drafts.clear();
     _replies.clear();
     _ctrl.dispose();
@@ -312,7 +428,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _actions(MatrixGateway g, ChatMessage m) async {
+  Future<void> _actions(MatrixGateway g, ChatMessage m, {bool outside = false}) async {
     final l = AppLocalizations.of(context);
     final threadId = _shown;
     if (threadId == null) return;
@@ -320,60 +436,86 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     await showModalBottomSheet<void>(
       context: context,
       builder: (c) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          // Nicht Entschlüsseltes ist kein Antwortziel, das Gateway wiese es ab.
-          if (!m.undecryptable)
-            ListTile(
-              leading: const Icon(Icons.reply),
-              title: Text(l.chatReply),
-              onTap: () {
-                Navigator.pop(c);
-                setState(() => _replyTo = m);
-              },
-            ),
-          // Ungesendetes ist kein Reaktionsziel, das Gateway wiese es ab (E-86, #224).
-          if (m.status == MessageStatus.sent)
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Wrap(spacing: 8, children: <Widget>[
-                for (final e in _quickReactions)
-                  Semantics(
-                    label: '${l.chatReact} $e',
-                    button: true,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(24),
-                      onTap: () async {
-                        Navigator.pop(c);
-                        try {
-                          await g.sendReaction(m.id, e, threadId: threadId);
-                        } catch (err) {
-                          _toast(errorText(l, err));
-                        }
-                      },
-                      child: Padding(padding: const EdgeInsets.all(10), child: Text(e, style: const TextStyle(fontSize: 24))),
-                    ),
-                  ),
-              ]),
-            ),
-          if (foreign) ...<Widget>[
-            ListTile(
-              leading: const Icon(Icons.flag_outlined),
-              title: Text(l.chatReport),
-              onTap: () {
-                Navigator.pop(c);
-                ModerationActions.report(context, _services, message: m, threadId: threadId).ignore();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.block),
-              title: Text(l.chatBlockSender(m.senderLabel(l, inSentence: true))),
-              onTap: () {
-                Navigator.pop(c);
-                ModerationActions.block(context, _services, userId: m.senderId, name: m.senderLabel(l, inSentence: true)).ignore();
-              },
-            ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            // Nicht Entschlüsseltes ist kein Antwortziel, das Gateway wiese es ab.
+            if (!m.undecryptable)
+              ListTile(
+                leading: const Icon(Icons.reply),
+                title: Text(l.chatReply),
+                onTap: () {
+                  Navigator.pop(c);
+                  setState(() => _replyTo = m);
+                },
+              ),
+            // Ungesendetes ist kein Reaktionsziel, das Gateway wiese es ab (E-86, #224).
+            if (m.status == MessageStatus.sent && !outside)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Wrap(
+                  spacing: 8,
+                  children: <Widget>[
+                    for (final e in _quickReactions)
+                      Semantics(
+                        label: '${l.chatReact} $e',
+                        button: true,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(24),
+                          onTap: () async {
+                            Navigator.pop(c);
+                            try {
+                              await g.sendReaction(m.id, e, threadId: threadId);
+                            } catch (err) {
+                              _toast(errorText(l, err));
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Text(e, style: const TextStyle(fontSize: 24)),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            if (foreign) ...<Widget>[
+              ListTile(
+                leading: const Icon(Icons.flag_outlined),
+                title: Text(l.chatReport),
+                onTap: () {
+                  Navigator.pop(c);
+                  ModerationActions.report(
+                    context,
+                    _services,
+                    message: m,
+                    threadId: threadId,
+                    onBlockOffer: outside
+                        ? (id, name) => _blockContact(id, ContactNames.title(m.senderName, id))
+                        : null,
+                  ).ignore();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.block),
+                title: Text(l.chatBlockSender(m.senderLabel(l, inSentence: true))),
+                onTap: () {
+                  Navigator.pop(c);
+                  if (outside) {
+                    _blockContact(m.senderId, ContactNames.title(m.senderName, m.senderId)).ignore();
+                    return;
+                  }
+                  ModerationActions.block(
+                    context,
+                    _services,
+                    userId: m.senderId,
+                    name: m.senderLabel(l, inSentence: true),
+                  ).ignore();
+                },
+              ),
+            ],
           ],
-        ]),
+        ),
       ),
     );
   }
@@ -436,37 +578,113 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final services = AppScope.of(context);
     final g = services.gateway;
+    final cc = services.calendar?.contactController;
     return ListenableBuilder(
-      listenable: Listenable.merge(<Listenable>[g, services.settings, services.lock]),
+      listenable: Listenable.merge(<Listenable>[g, services.settings, services.lock, ?cc]),
       builder: (context, _) {
-        final threads = visibleThreads(g.threads, services.settings.settings.blockedUsers);
-        _applyRestore(services, threads, g.initialSyncDone);
-        final view = resolveChatView(
-          threads: threads,
-          open: _open,
-          waitingFor: _waitingFor,
-          active: widget.active,
-          initialSyncDone: g.initialSyncDone,
-        );
-        _shown = view.shownId;
-        _switchDraft(view.shownId);
-        if (view.followFamily) _followFamily(_open!);
-        if (view.pin) _open = ChatThread.familyId;
-        if (view.endWaiting) {
-          _waitingFor = null;
-          _waitTimer?.cancel();
+        final visible = visibleThreads(g.threads, services.settings.settings.blockedUsers);
+        final enabled = cc?.enabled ?? false;
+        // Familien-Bereich ohne Kontakt-Threads; ohne Freigabe ist das genau `visible` (Bestandsverhalten).
+        final threads = <ChatThread>[
+          for (final t in visible)
+            if (!t.isOutside) t,
+        ];
+        final contactThreads = <ChatThread>[
+          if (enabled)
+            for (final t in visible)
+              if (t.isOutside) t,
+        ];
+        if (!enabled && (_scope == ChatScope.contacts || _openContact != null)) {
+          // Kontakte ausgeschaltet: zurück zur Familie, Kontakt-Gespräche verworfen.
+          if (_openContact != null) _dropContact(_openContact!);
+          _scope = ChatScope.family;
+          _openContact = null;
         }
-        // Zurück-Taste nur im offenen Gespräch des aktiven Tabs bei mehreren Gesprächen; sonst unverändert, auch
-        // bei App-Sperre (die Sperre liegt über der App, ihr Zurück gehört nicht dem Chat).
-        final canPop = !(widget.active && threads.length > 1 && _open != null && !services.lock.locked);
-        return PopScope(
-          canPop: canPop,
-          onPopInvokedWithResult: (didPop, _) {
-            if (!didPop) _backToList();
-          },
-          child: _body(context, services, view, threads),
+        final Widget content = _scope == ChatScope.contacts
+            ? _contactsContent(services, contactThreads)
+            : _familyContent(services, threads);
+        return Column(
+          children: <Widget>[
+            if (enabled)
+              _ScopeSwitcher(
+                scope: _scope,
+                familyUnread: g.familyUnreadCount,
+                contactUnread: <int>[for (final t in contactThreads) t.unread].fold(0, (a, b) => a + b),
+                onChanged: _setScope,
+              ),
+            Expanded(child: content),
+          ],
         );
       },
+    );
+  }
+
+  Widget _contactsContent(AppServices services, List<ChatThread> contactThreads) {
+    final view = resolveContactView(contactThreads: contactThreads, open: _openContact);
+    _shown = view.shownId;
+    _switchDraft(view.shownId);
+    if (view.vanished) {
+      final gone = _openContact!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _openContact != gone) return;
+        setState(() {
+          _dropContact(gone);
+          _openContact = null;
+        });
+      });
+    }
+    final canPop = !(widget.active && !services.lock.locked && _openContact != null);
+    return PopScope(
+      canPop: canPop,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _backToContacts();
+      },
+      child: switch (view.kind) {
+        ChatViewKind.conversation => _conversation(context, services, view, outside: true),
+        _ => Builder(
+          builder: (context) {
+            _resetMarker();
+            services.visibleChatThread = null;
+            return contactThreads.isEmpty
+                ? _ContactsEmpty(onManage: _manageContacts)
+                : _ThreadList(
+                    threads: contactThreads,
+                    scroll: _contactListScroll,
+                    onOpen: (id) => setState(() => _selectContact(id)),
+                  );
+          },
+        ),
+      },
+    );
+  }
+
+  Widget _familyContent(AppServices services, List<ChatThread> threads) {
+    final g = services.gateway;
+    _applyRestore(services, threads, g.initialSyncDone);
+    final view = resolveChatView(
+      threads: threads,
+      open: _open,
+      waitingFor: _waitingFor,
+      active: widget.active,
+      initialSyncDone: g.initialSyncDone,
+    );
+    _shown = view.shownId;
+    _switchDraft(view.shownId);
+    if (view.followFamily) _followFamily(_open!);
+    if (view.pin) _open = ChatThread.familyId;
+    if (view.endWaiting) {
+      _waitingFor = null;
+      _waitTimer?.cancel();
+    }
+    // Zurück-Taste nur im offenen Gespräch des aktiven Tabs bei mehreren Gesprächen; sonst unverändert, auch
+    // bei App-Sperre (die Sperre liegt über der App, ihr Zurück gehört nicht dem Chat).
+    final canPop = !(widget.active && threads.length > 1 && _open != null && !services.lock.locked);
+    return PopScope(
+      canPop: canPop,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _backToList();
+      },
+      child: _body(context, services, view, threads),
     );
   }
 
@@ -489,9 +707,23 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     }
   }
 
-  Widget _conversation(BuildContext context, AppServices services, ChatView view) {
+  Widget _conversation(BuildContext context, AppServices services, ChatView view, {bool outside = false}) {
     final l = AppLocalizations.of(context);
     final g = services.gateway;
+    final current = view.current;
+    if (outside && current != null) _ensureContactOpen(g, current);
+    final contactOpen = !outside || g.isThreadOpen(view.shownId!);
+    final cc = services.calendar?.contactController;
+    // Eingabe gesperrt, solange das Gespräch nicht benutzbar ist (wartend, nicht erreichbar, öffnet, fehlgeschlagen).
+    final String? composerNote = !outside || current == null
+        ? null
+        : current.pending
+        ? l.chatContactWaiting
+        : !current.reachable
+        ? l.errPeerNotReachable
+        : !contactOpen
+        ? (_contactFailed.contains(current.id) ? l.chatContactOpenFailed : l.chatContactOpening)
+        : null;
     final blocked = services.settings.settings.blockedUsers;
     final threadId = view.shownId!;
     final all = g.messagesIn(threadId);
@@ -502,31 +734,58 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     // Querformat mit Tastatur (#548): Bei knapper Höhe entfallen Kopfzeile und Hinweis (sie kommen zurück, sobald die
     // Tastatur weg ist), unter 150 dp auch die Antwortvorschau (die Antwort bleibt gesetzt); die Eingabeleiste bleibt immer sichtbar. Das Eingabefeld behält dabei
     // den Fokus (Test).
-    return LayoutBuilder(builder: (context, box) {
-      final tight = box.maxHeight < 200;
-      final veryTight = box.maxHeight < 150;
-      return Column(children: <Widget>[
-        if (view.showHeader && !tight) _ThreadHeader(thread: view.current, onBack: _backToList),
-        if (!tight) _EncryptionNote(current: view.current),
-        Expanded(
-          child: msgs.isEmpty
-              ? Center(child: Text(l.emptyChat))
-              : _MessageList(
-                  entries: entries,
-                  byId: <String, ChatMessage>{for (final m in msgs) m.id: m},
-                  scroll: _scroll,
-                  markerKey: _markerKey,
-                  collapseQuotes: _collapseQuotes,
-                  gateway: g,
-                  services: services,
-                  threadId: threadId,
-                  onLongPress: (m) => _actions(g, m),
-                ),
-        ),
-        if (_replyTo != null && !veryTight) _ReplyPreview(message: _replyTo!, onCancel: () => setState(() => _replyTo = null)),
-        _Composer(controller: _ctrl, sending: _sending, onAttach: () => _attach(services), onSend: () => _send(g)),
-      ]);
-    });
+    return LayoutBuilder(
+      builder: (context, box) {
+        final tight = box.maxHeight < 200;
+        final veryTight = box.maxHeight < 150;
+        return Column(
+          children: <Widget>[
+            if (view.showHeader && !tight)
+              _ThreadHeader(thread: view.current, onBack: outside ? _backToContacts : _backToList),
+            if (outside && current != null)
+              _OutsideBanner(
+                name: ContactNames.title(current.peerName, current.peerId ?? ''),
+                userId: current.peerId ?? '',
+                collides: cc?.collides(current.peerName) ?? false,
+                onBlock: () =>
+                    _blockContact(current.peerId ?? '', ContactNames.title(current.peerName, current.peerId ?? '')),
+                onManage: _manageContacts,
+              )
+            else if (!tight)
+              _EncryptionNote(current: view.current),
+            Expanded(
+              child: outside && !contactOpen && !current!.pending
+                  ? (_contactFailed.contains(current.id)
+                        ? _ContactOpenFailed(onRetry: () => setState(() => _contactFailed.remove(current.id)))
+                        : _ChatOpening(text: l.chatContactOpening))
+                  : msgs.isEmpty
+                  ? Center(child: Text(l.emptyChat))
+                  : _MessageList(
+                      entries: entries,
+                      byId: <String, ChatMessage>{for (final m in msgs) m.id: m},
+                      scroll: _scroll,
+                      markerKey: _markerKey,
+                      collapseQuotes: _collapseQuotes,
+                      gateway: g,
+                      services: services,
+                      threadId: threadId,
+                      onLongPress: (m) => _actions(g, m, outside: outside),
+                      outside: outside,
+                    ),
+            ),
+            if (_replyTo != null && !veryTight)
+              _ReplyPreview(message: _replyTo!, onCancel: () => setState(() => _replyTo = null)),
+            _Composer(
+              controller: _ctrl,
+              sending: _sending,
+              onAttach: () => _attach(services),
+              onSend: () => _send(g),
+              blockedText: composerNote,
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 

@@ -23,9 +23,14 @@ class _Bubble extends StatelessWidget {
     required this.services,
     required this.threadId,
     required this.onLongPress,
+    this.outside = false,
   });
 
   final ChatMessage message;
+
+  /// Gespräch außerhalb der Familie (#119, K3b-2a, §9.1): Name immer mit Server, neutrales Symbol statt Avatar, Warnung bei
+  /// Namensgleichheit mit einem Familienmitglied.
+  final bool outside;
   final bool mine;
   final ChatMessage? replied;
   final String? myUserId;
@@ -52,6 +57,9 @@ class _Bubble extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final t = AuroraTokens.of(context);
     final m = message;
+    final contacts = outside ? services.calendar?.contactController : null;
+    final from = outside ? isolateText(ContactNames.title(m.senderName, m.senderId)) : m.senderLabel(l);
+    final collides = outside && !mine && (contacts?.collides(m.senderName) ?? false);
     // Nachrichten anderer: Avatar links neben der Blase (#422); die Blase nimmt den Platz des Avatars aus `maxWidth`.
     // Eigene Blasen behalten `maxWidth` unverändert.
     Widget wrap(Widget card) => mine
@@ -61,7 +69,9 @@ class _Bubble extends StatelessWidget {
             child: Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(top: 2),
-                child: MemberAvatarView(userId: m.senderId, size: avatarSize, colorIndex: personColorOf(services, m.senderId), fallbackName: m.senderName),
+                child: outside
+                    ? const SizedBox(width: avatarSize, height: avatarSize, child: Icon(Icons.person_outline, size: 24))
+                    : MemberAvatarView(userId: m.senderId, size: avatarSize, colorIndex: personColorOf(services, m.senderId), fallbackName: m.senderName),
               ),
               const SizedBox(width: avatarGap),
               Flexible(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: maxWidth - avatarSpace), child: card)),
@@ -73,7 +83,7 @@ class _Bubble extends StatelessWidget {
           Semantics(
             container: true,
             // Eigene Nachricht: „von dir“ (Dativ), nicht „von Du“ (#332).
-            label: mine ? l.chatMessageFromYou : l.chatMessageFrom(m.senderLabel(l, inSentence: true)),
+            label: mine ? l.chatMessageFromYou : l.chatMessageFrom(outside ? from : m.senderLabel(l, inSentence: true)),
             child: GestureDetector(
               onLongPress: onLongPress,
               child: GlassCard(
@@ -81,7 +91,8 @@ class _Bubble extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
                   if (!mine)
-                    Text(m.senderLabel(l), style: Theme.of(context).textTheme.labelMedium?.copyWith(color: t.primary)),
+                    Text(from, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: t.primary)),
+                  if (collides) NotYourFamilyWarning(userId: m.senderId),
                   if (m.replyToId != null) _Quote(replied: replied, myUserId: myUserId, collapse: collapseQuotes),
                   if (m.blockedAttachment)
                     Row(mainAxisSize: MainAxisSize.min, children: <Widget>[

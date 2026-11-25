@@ -5,6 +5,7 @@ import '../../ui/widgets/glass.dart';
 import '../common/error_text.dart';
 import 'contact_controller.dart';
 import 'contact_text.dart';
+import 'not_your_family_warning.dart';
 
 /// Kontakt hinzufügen (#119, K3b-1, §8.2): Eingabe, **Prüfen nur auf ausdrücklichen Tipp** (nie je Tastendruck: die Abfrage
 /// zeigt dem eigenen und dem Fremd-Homeserver, wen man sucht), dann eine Karte mit Name **und** voller Kennung und der Taste
@@ -22,6 +23,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
   final TextEditingController _input = TextEditingController();
   ContactCheck? _result;
   bool _busy = false;
+  bool _confirmedNotFamily = false;
 
   ContactController get c => widget.controller;
 
@@ -36,7 +38,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
     setState(() => _busy = true);
     try {
       final r = await c.check(_input.text);
-      if (mounted) setState(() => _result = r);
+      if (mounted) {
+        setState(() {
+          _result = r;
+          _confirmedNotFamily = false;
+        });
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -44,7 +51,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
   Future<void> _add() async {
     final r = _result;
-    if (r == null || r.outcome != ContactCheckOutcome.ready || _busy) return;
+    if (r == null || r.outcome != ContactCheckOutcome.ready || _busy || (r.collides && !_confirmedNotFamily)) return;
     final l = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final nav = Navigator.of(context);
@@ -110,7 +117,12 @@ class _AddContactScreenState extends State<AddContactScreen> {
                   decoration: InputDecoration(labelText: l.contactsAddHint),
                   onChanged: (_) {
                     // Eine geänderte Eingabe macht das bisherige Ergebnis ungültig; es wird nichts abgefragt.
-                    if (_result != null) setState(() => _result = null);
+                    if (_result != null) {
+                      setState(() {
+                        _result = null;
+                        _confirmedNotFamily = false;
+                      });
+                    }
                   },
                   onSubmitted: (_) => _check(),
                 ),
@@ -136,8 +148,18 @@ class _AddContactScreenState extends State<AddContactScreen> {
                           Text(l.contactsFoundId(isolateText(r.userId))),
                         ]),
                       ),
+                      if (r.collides) ...<Widget>[
+                        NotYourFamilyWarning(userId: r.userId),
+                        CheckboxListTile(
+                          contentPadding: EdgeInsets.zero,
+                          controlAffinity: ListTileControlAffinity.leading,
+                          value: _confirmedNotFamily,
+                          onChanged: (v) => setState(() => _confirmedNotFamily = v ?? false),
+                          title: Text(l.contactsConfirmNotFamily),
+                        ),
+                      ],
                       const SizedBox(height: 12),
-                      FilledButton(onPressed: _busy ? null : _add, child: Text(l.contactsAddConfirm)),
+                      FilledButton(onPressed: _busy || (r.collides && !_confirmedNotFamily) ? null : _add, child: Text(l.contactsAddConfirm)),
                     ] else ...<Widget>[
                       Semantics(liveRegion: true, child: Text(_text(l, r.outcome))),
                       if (r.outcome == ContactCheckOutcome.blockedLocal)

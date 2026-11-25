@@ -1088,6 +1088,78 @@ abstract class AppLocalizations {
   /// **'Diese Person ist schon in deiner Liste.'**
   String get contactErrDuplicate;
 
+  /// No description provided for @contactsNotYourFamily.
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht deine Familie: {id}'**
+  String contactsNotYourFamily(String id);
+
+  /// No description provided for @contactsConfirmNotFamily.
+  ///
+  /// In de, this message translates to:
+  /// **'Ich weiß, dass das nicht meine Familie ist'**
+  String get contactsConfirmNotFamily;
+
+  /// No description provided for @chatScopeFamily.
+  ///
+  /// In de, this message translates to:
+  /// **'Familie'**
+  String get chatScopeFamily;
+
+  /// No description provided for @chatScopeContacts.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakte'**
+  String get chatScopeContacts;
+
+  /// No description provided for @chatScopeLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'{name}, {count} ungelesen'**
+  String chatScopeLabel(String name, int count);
+
+  /// No description provided for @chatOutsideBanner.
+  ///
+  /// In de, this message translates to:
+  /// **'Außerhalb der Familie: {name}. Termine, Listen und Online-Status werden hier nicht geteilt.'**
+  String chatOutsideBanner(String name);
+
+  /// No description provided for @chatContactOpening.
+  ///
+  /// In de, this message translates to:
+  /// **'Gespräch wird geöffnet'**
+  String get chatContactOpening;
+
+  /// No description provided for @chatContactOpenFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Gespräch konnte nicht geöffnet werden.'**
+  String get chatContactOpenFailed;
+
+  /// No description provided for @chatContactRetry.
+  ///
+  /// In de, this message translates to:
+  /// **'Erneut versuchen'**
+  String get chatContactRetry;
+
+  /// No description provided for @chatContactWaiting.
+  ///
+  /// In de, this message translates to:
+  /// **'Wartet auf Annahme. Du kannst schreiben, sobald die Person beigetreten ist.'**
+  String get chatContactWaiting;
+
+  /// No description provided for @chatContactsEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Gespräche mit Kontakten.'**
+  String get chatContactsEmpty;
+
+  /// No description provided for @chatContactsManage.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakte verwalten'**
+  String get chatContactsManage;
+
   /// No description provided for @errNotAllowed.
   ///
   /// In de, this message translates to:

@@ -429,6 +429,71 @@ class ContactNames {
     final shown = n.isEmpty ? MatrixIds.localpart(userId) : n;
     return server.isEmpty ? shown : '$shown · $server';
   }
+
+  /// Gleicht der Name eines Fremden einem Familienmitglied (§9.1, Schutz vor Namensgleichheit)? Vergleich über ein
+  /// „Skelett“ (Kleinschreibung, ohne Diakritika, häufige Homoglyphen abgebildet, nur Buchstaben und Ziffern); Treffer bei
+  /// **Gleichheit** oder wenn ein **ganzes Wort** (mindestens 3 Zeichen) des einen dem anderen entspricht („Mama Anna“ und
+  /// „Mama“). Bewusst vorsichtig: lieber eine Warnung zu viel. **Grenze:** kein vollständiger Unicode-Vergleich (UTS 39).
+  static bool collides(String? name, Iterable<String> familyNames) {
+    final mine = _skeleton(name ?? '');
+    if (mine.isEmpty) return false;
+    final myWords = _words(name ?? '');
+    for (final other in familyNames) {
+      final theirs = _skeleton(other);
+      if (theirs.isEmpty) continue;
+      if (mine == theirs) return true;
+      final theirWords = _words(other);
+      if (theirWords.any((w) => w.length >= 3 && (mine == w || myWords.contains(w)))) return true;
+      if (myWords.any((w) => w.length >= 3 && theirs == w)) return true;
+    }
+    return false;
+  }
+
+  static const Map<String, String> _fold = <String, String>{
+    'ä': 'a', 'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'å': 'a', 'ā': 'a',
+    'ö': 'o', 'ò': 'o', 'ó': 'o', 'ô': 'o', 'õ': 'o', 'ø': 'o', 'ō': 'o',
+    'ü': 'u', 'ù': 'u', 'ú': 'u', 'û': 'u', 'ū': 'u',
+    'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e', 'ē': 'e',
+    'í': 'i', 'ì': 'i', 'î': 'i', 'ï': 'i', 'ī': 'i',
+    'ñ': 'n', 'ç': 'c', 'ß': 'ss', 'ý': 'y', 'ÿ': 'y', 'ž': 'z', 'š': 's', 'č': 'c',
+    // Homoglyphen (kyrillisch, griechisch) → lateinisch
+    'а': 'a', 'е': 'e', 'о': 'o', 'р': 'p', 'с': 'c', 'х': 'x', 'у': 'y', 'і': 'i', 'ј': 'j', 'ѕ': 's', 'м': 'm', 'н': 'h', 'к': 'k', 'т': 't', 'в': 'b',
+    'α': 'a', 'ε': 'e', 'ο': 'o', 'ν': 'v', 'ι': 'i', 'κ': 'k', 'τ': 't', 'ρ': 'p', 'υ': 'u', 'χ': 'x', 'μ': 'm', 'η': 'n', 'β': 'b',
+  };
+
+  /// Vollbreite und mathematische Buchstaben/Ziffern (NFKC-Ersatz): Codepoint-Bereiche auf ASCII abbilden.
+  static String _ascii(int r) {
+    if (r >= 0xFF21 && r <= 0xFF3A) return String.fromCharCode(r - 0xFF21 + 0x61); // Ａ–Ｚ
+    if (r >= 0xFF41 && r <= 0xFF5A) return String.fromCharCode(r - 0xFF41 + 0x61); // ａ–ｚ
+    if (r >= 0xFF10 && r <= 0xFF19) return String.fromCharCode(r - 0xFF10 + 0x30); // ０–９
+    // mathematische Alphanumerika (fett, kursiv, …): Blöcke zu je 26 Buchstaben ab 0x1D400 (A–Z, a–z im Wechsel)
+    if (r >= 0x1D400 && r <= 0x1D6A3) {
+      final i = (r - 0x1D400) % 52;
+      return String.fromCharCode(i < 26 ? 0x61 + i : 0x61 + i - 26);
+    }
+    return String.fromCharCode(r);
+  }
+
+  static List<String> _words(String s) {
+    final cleaned = cleanName(s);
+    return <String>[
+      for (final w in cleaned.split(RegExp(r'\s+')))
+        if (_skeleton(w).isNotEmpty) _skeleton(w),
+    ];
+  }
+
+  static String _skeleton(String s) {
+    final b = StringBuffer();
+    for (final rune in cleanName(s).runes) {
+      var ch = _ascii(rune).toLowerCase();
+      ch = _fold[ch] ?? ch;
+      for (final c in ch.runes) {
+        final u = String.fromCharCode(c);
+        if (RegExp(r'[\p{L}\p{N}]', unicode: true).hasMatch(u)) b.write(u);
+      }
+    }
+    return b.toString();
+  }
 }
 
 /// Gibt es das Konto? [unknown]: Der Server konnte nicht oder nicht verlässlich antworten (Netz, Zeitablauf,

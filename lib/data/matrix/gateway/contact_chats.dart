@@ -10,6 +10,7 @@ class _ContactState {
   final Map<String, Timeline> timelines = <String, Timeline>{};
   final Map<String, List<ChatMessage>> messages = <String, List<ChatMessage>>{};
   final Map<String, String> titles = <String, String>{};
+  final Map<String, String> names = <String, String>{}; // bereinigter Name ohne Server (Vergleich mit Familiennamen)
 
   /// Gegenüber nur eingeladen (wartet auf Annahme): Senden gesperrt.
   final Set<String> pending = <String>{};
@@ -69,6 +70,7 @@ class _ContactState {
     peers.clear();
     messages.clear();
     titles.clear();
+    names.clear();
     pending.clear();
     requests = const <ContactRequest>[];
     requestsHidden = 0;
@@ -110,6 +112,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
   int get _dmEpoch;
   Map<String, String> get _dmPeers;
   bool get _disposed;
+  Map<String, Timeline> get _dmTimelines;
   Family? get _family;
   Room? _familyRoom();
   bool get _participantsLoaded;
@@ -196,6 +199,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
               id: e.key,
               kind: ThreadKind.contact,
               title: _contacts.titles[e.key] ?? e.value,
+              peerName: _contacts.names[e.key] ?? '',
               peerId: e.value,
               unread: unreadIn(e.key),
               pending: _contacts.pending.contains(e.key),
@@ -242,6 +246,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
         c.peers.remove(id);
         c.messages.remove(id);
         c.titles.remove(id);
+        c.names.remove(id);
         c.pending.remove(id);
       }
     }
@@ -250,6 +255,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
       c.peers[r.id] = e.key;
       final name = r.getState(EventTypes.RoomMember, e.key)?.content['displayname'];
       c.titles[r.id] = ContactNames.title(name is String ? name : null, e.key);
+      c.names[r.id] = ContactNames.cleanName(name is String ? name : null);
       if (chosenPending[e.key] ?? false) {
         c.pending.add(r.id);
       } else {
@@ -317,7 +323,12 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
       }
       perServer[server] = n + 1;
       final name = r.getState(EventTypes.RoomMember, from)?.content['displayname'];
-      out.add(ContactRequest(roomId: r.id, fromUserId: from, fromName: ContactNames.title(name is String ? name : null, from)));
+      out.add(ContactRequest(
+        roomId: r.id,
+        fromUserId: from,
+        fromName: ContactNames.title(name is String ? name : null, from),
+        name: ContactNames.cleanName(name is String ? name : null),
+      ));
     }
     c.requests = out;
     c.requestsHidden = hidden;
@@ -420,6 +431,10 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
       AppLog.e('gateway', 'Kontakt-Raum konnte nicht verlassen werden', e);
     }
   }
+
+  @override
+  bool isThreadOpen(String threadId) =>
+      threadId == ChatThread.familyId || _dmTimelines.containsKey(threadId) || _contacts.timelines.containsKey(threadId);
 
   @override
   Future<void> openThread(String threadId) async {
@@ -530,6 +545,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     c.peers.remove(threadId);
     c.messages.remove(threadId);
     c.titles.remove(threadId);
+    c.names.remove(threadId);
     c.pending.remove(threadId);
     _scheduleRefresh();
   }
