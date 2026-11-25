@@ -82,6 +82,14 @@ void main() {
     expect(await store.pending(), isEmpty);
   });
 
+  test('lokal geändert (ohne publishedVersion): die bereits gemeldete Version bleibt erhalten', () async {
+    await store.put(c('@a:x.org', v: 3), publishedVersion: 3);
+    await store.put(c('@a:x.org', v: 3, s: ContactState.blocked));
+    expect(await store.pending(), isEmpty, reason: 'gleiche Version, schon gesendet: bleibt gesendet');
+    final row = (await db.query('contact_records')).single;
+    expect(row['published_version'], 3);
+  });
+
   test('empfangene Fassung (publishedVersion) wartet nicht', () async {
     await store.put(c('@a:x.org', v: 4), publishedVersion: 4);
     expect(await store.pending(), isEmpty);

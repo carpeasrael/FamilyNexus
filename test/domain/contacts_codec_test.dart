@@ -95,6 +95,45 @@ void main() {
     });
   });
 
+  group('Grenzwerte und Randfälle des Codecs', () {
+    test('Grenzen: ver == maxVersion und ts == ±8,64e15 sind gültig, ein Schritt darüber nicht', () {
+      Map<String, Object?> m(Map<String, Object?> change) => <String, Object?>{...content(contact), ...change};
+      expect(ContactCodec.decodeStored(m(<String, Object?>{'ver': ContactLimits.maxVersion})), isNotNull);
+      expect(ContactCodec.decodeStored(m(<String, Object?>{'ver': ContactLimits.maxVersion + 1})), isNull);
+      expect(ContactCodec.decodeStored(m(<String, Object?>{'ts': 8640000000000000})), isNotNull);
+      expect(ContactCodec.decodeStored(m(<String, Object?>{'ts': -8640000000000000})), isNotNull);
+      expect(ContactCodec.decodeStored(m(<String, Object?>{'ts': 8640000000000001})), isNull);
+      expect(ContactCodec.decodeStored(<String, Object?>{...content(prefs), 'ver': ContactLimits.maxVersion}), isNotNull);
+      expect(ContactCodec.decodeStored(<String, Object?>{...content(prefs), 'ver': ContactLimits.maxVersion + 1}), isNull);
+      expect(ContactCodec.decodeStored(<String, Object?>{...content(prefs), 'ver': 0}), isNull);
+      expect(ContactCodec.decodeStored(<String, Object?>{...content(prefs), 'ts': 8640000000000001}), isNull);
+      expect(() => ContactCodec.encode(prefs.copyWith(version: 0)), throwsStateError);
+    });
+
+    test('Spitzname: genau 40 Zeichen ist gültig, 41 nicht; Zeichen statt Bytes; kein Randleerraum, kein doppelter Leerraum', () {
+      Contact withNick(String n) => contact.copyWith(nick: n);
+      expect(withNick('x' * 40).validate(), isEmpty);
+      expect(withNick('x' * 41).validate(), contains('nick'));
+      expect(withNick('\u{1F600}' * 40).validate(), isEmpty, reason: '40 Zeichen, auch wenn jedes zwei UTF-16-Einheiten hat');
+      expect(withNick('\u{1F600}' * 41).validate(), contains('nick'));
+      expect(withNick(' Carla').validate(), contains('nick'));
+      expect(withNick('Carla ').validate(), contains('nick'));
+      expect(withNick('a  b').validate(), contains('nick'));
+      expect(withNick('').validate(), isEmpty, reason: 'leer ist erlaubt');
+    });
+
+    test('rec unbekannt wird auch mit gültiger Raum-ID als Kennung abgelehnt (nicht als Gruppe gelesen)', () {
+      expect(ContactCodec.decodeStored(<String, Object?>{...content(grp), 'rec': 'fremd'}), isNull);
+    });
+
+    test('Größe zählt UTF-8-Bytes, nicht Zeichen; nicht als JSON darstellbarer Inhalt liefert null statt einer Ausnahme', () {
+      final multibyte = <String, Object?>{...content(contact), 'extra': '\u00e4' * 1100};
+      expect(multibyte['extra'].toString().length, lessThan(ContactLimits.maxContentBytes));
+      expect(ContactCodec.decodeStored(multibyte), isNull);
+      expect(ContactCodec.decodeStored(<String, Object?>{...content(contact), 'extra': DateTime(2026)}), isNull);
+    });
+  });
+
   group('Konfliktregel (Totalordnung)', () {
     test('höhere Version gewinnt, dann späterer Zeitstempel', () {
       expect(Contacts.supersedes(contact.copyWith(version: 4), contact), isTrue);
@@ -134,6 +173,16 @@ void main() {
       expect(winners, hasLength(1));
     });
 
+    test('die Version geht vor dem Zeitstempel; bei gleicher Version entscheidet der spätere Zeitstempel vor dem Inhalt', () {
+      final olderButHigher = contact.copyWith(version: 4, updatedAt: t0.subtract(const Duration(days: 1)));
+      expect(Contacts.supersedes(olderButHigher, contact), isTrue, reason: 'höhere Version gewinnt trotz älterem ts');
+      expect(Contacts.supersedes(contact, olderButHigher), isFalse);
+      final laterOther = contact.copyWith(state: ContactState.outgoing, nick: 'A', updatedAt: t0.add(const Duration(seconds: 1)));
+      final earlierOther = contact.copyWith(state: ContactState.blocked, nick: 'Z');
+      expect(Contacts.supersedes(laterOther, earlierOther), isTrue, reason: 'späterer ts vor Zustand und Name');
+      expect(Contacts.supersedes(earlierOther, laterOther), isFalse);
+    });
+
     test('Einstellung: Wert entscheidet bei gleicher Version und Zeit', () {
       final on = ContactPrefs(enabled: true, version: 1, updatedAt: t0);
       final off = ContactPrefs(enabled: false, version: 1, updatedAt: t0);
@@ -142,6 +191,11 @@ void main() {
   });
 
   group('ContactId.parse', () {
+    test('Großbuchstaben im lokalen Teil sind keine gültige Nutzer-ID (Matrix-Regel): null, nie stillschweigend umgedeutet', () {
+      expect(ContactId.parse('@Carla:example.org'), isNull);
+      expect(ContactId.parse('https://matrix.to/#/@Carla:example.org'), isNull);
+    });
+
     test('Nutzer-ID: getrimmt, Servername klein, lokaler Teil unverändert', () {
       expect(ContactId.parse('@carla:example.org'), '@carla:example.org');
       expect(ContactId.parse('  @carla:example.org \n'), '@carla:example.org');
@@ -182,6 +236,8 @@ void main() {
         'https://matrix.to/@carla:example.org',
         'https://matrix.to/other/#/@carla:example.org',
         'https://matrix.to/#@carla:example.org',
+        'https://matrix.to/#x@carla:example.org',
+        'https://matrix.to/#/@car/la:example.org',
         'https://matrix.to/#/!raum:example.org',
         'https://matrix.to/#/#alias:example.org',
         'https://matrix.to/#/%2540carla%253Aexample.org',

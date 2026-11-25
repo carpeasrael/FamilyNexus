@@ -260,4 +260,117 @@ void main() {
       expect(await svc.restamp(ContactKind.contact, ben, expectedVersion: 1, expectedDeleted: false), isNull);
     });
   });
+
+  // --- Lücken der Mutationsprobe (K2b) ---
+
+  group('Randfälle', () {
+    test('Blockieren eines bestehenden Kontakts geht auch bei voller Kontaktliste; Aufheben schafft Platz in der Blockgrenze', () async {
+      for (var i = 0; i < ContactLimits.maxContacts; i++) {
+        await store.put(Contact(id: user(i), state: ContactState.accepted, version: 1, updatedAt: now));
+      }
+      final b = await svc.block(user(3));
+      expect(b.state, ContactState.blocked);
+      await svc.unblock(user(3));
+      // 200 Blockierte, einer wird aufgehoben: der Platz ist frei (Löschmarken zählen nicht).
+      final s2 = ContactService(store: MemoryContactStore(), myUserId: me, clock: () => now);
+      for (var i = 0; i < BlockedUsers.maxEntries; i++) {
+        await s2.block(user(i));
+      }
+      await expectLater(s2.block(user(900)), fails(ContactError.limit));
+      await s2.unblock(user(0));
+      expect((await s2.block(user(900))).state, ContactState.blocked);
+    });
+
+    test('markAccepted ohne Raum behält den bekannten Raum', () async {
+      await store.put(Contact(id: carla, state: ContactState.outgoing, room: '!r:example.org', version: 1, updatedAt: now));
+      final a = await svc.markAccepted(carla);
+      expect(a.room, '!r:example.org');
+    });
+
+    test('Kennung wird kanonisiert gesucht (Servername in Großschreibung)', () async {
+      await svc.addOutgoing(carla);
+      expect((await svc.rename('@carla:EXAMPLE.org', 'C')).nick, 'C');
+      await svc.markAccepted('@carla:EXAMPLE.org');
+      await svc.remove('@carla:EXAMPLE.ORG');
+      expect(await svc.contacts(), isEmpty);
+    });
+
+    test('Versionsüberlauf: bei maxVersion ist keine weitere Änderung möglich (limit)', () async {
+      await store.put(Contact(id: carla, state: ContactState.outgoing, version: ContactLimits.maxVersion, updatedAt: now));
+      await expectLater(svc.markAccepted(carla), fails(ContactError.limit));
+      await expectLater(svc.rename(carla, 'x'), fails(ContactError.limit));
+    });
+  });
+
+  group('Grenzen beim Empfang', () {
+    Contact inc(String id, {int v = 2, ContactState s = ContactState.accepted, bool del = false}) =>
+        Contact(id: id, state: s, version: v, updatedAt: now, deleted: del);
+
+    test('Zeilengrenze 2000: eine neue Kennung wird abgelehnt, eine bestehende angenommen', () async {
+      for (var i = 0; i < ContactLimits.maxRecords; i++) {
+        await store.put(Contact(id: user(i), state: ContactState.accepted, version: 1, updatedAt: now, deleted: i >= 100), publishedVersion: 0);
+      }
+      expect(await svc.applyIncoming(inc(carla, v: 1)), isFalse, reason: 'neue Zeile, alle Löschmarken unveröffentlicht');
+      expect(await svc.applyIncoming(inc(user(1), v: 2)), isTrue, reason: 'bestehende Kennung');
+    });
+
+    test('Reaktivierung einer Löschmarke am Limit 500 wird abgelehnt', () async {
+      for (var i = 0; i < ContactLimits.maxContacts; i++) {
+        await store.put(Contact(id: user(i), state: ContactState.accepted, version: 1, updatedAt: now));
+      }
+      await store.put(Contact(id: carla, state: ContactState.accepted, version: 2, updatedAt: now, deleted: true));
+      expect(await svc.applyIncoming(inc(carla, v: 3)), isFalse);
+      expect(await svc.applyIncoming(inc(user(0), v: 2, s: ContactState.outgoing)), isTrue, reason: 'bestehender aktiver Kontakt ändert sich');
+    });
+
+    test('Blockgrenze 200 beim Empfang: neue blockierte Zeile und Übergang aktiv → blockiert werden abgelehnt', () async {
+      for (var i = 0; i < BlockedUsers.maxEntries; i++) {
+        await store.put(Contact(id: user(i), state: ContactState.blocked, version: 1, updatedAt: now));
+      }
+      await store.put(Contact(id: carla, state: ContactState.accepted, version: 1, updatedAt: now));
+      expect(await svc.applyIncoming(inc(ben, s: ContactState.blocked)), isFalse, reason: 'neue blockierte Zeile');
+      expect(await svc.applyIncoming(inc(carla, s: ContactState.blocked)), isFalse, reason: 'Übergang aktiv → blockiert');
+      expect(await svc.applyIncoming(inc(user(0), v: 2, s: ContactState.blocked)), isTrue, reason: 'bleibt blockiert');
+    });
+
+    test('Gruppengrenze 50 beim Empfang', () async {
+      for (var i = 0; i < ContactLimits.maxGroups; i++) {
+        await store.put(GroupRecord(id: '!g$i:example.org', version: 1, updatedAt: now));
+      }
+      expect(await svc.applyIncoming(GroupRecord(id: '!neu:example.org', version: 1, updatedAt: now)), isFalse);
+      expect(await svc.applyIncoming(GroupRecord(id: '!g1:example.org', version: 2, updatedAt: now)), isTrue);
+    });
+
+    test('beim Aufräumen bleiben genau 200 veröffentlichte Löschmarken', () async {
+      for (var i = 0; i < ContactLimits.maxRecords; i++) {
+        await store.put(
+          Contact(id: user(i), state: ContactState.accepted, version: 2, updatedAt: now.subtract(Duration(minutes: i)), deleted: true),
+          publishedVersion: 2,
+        );
+      }
+      await svc.addOutgoing(carla);
+      expect((await store.all()).length, ContactLimits.keepTombstones + 1);
+    });
+  });
+
+  group('restamp: Randfälle und alle Arten', () {
+    test('genau ein Tag Abweichung bleibt, eine Millisekunde mehr wird neu gestempelt', () async {
+      final c = await svc.addOutgoing(carla);
+      now = now.add(const Duration(days: 1));
+      expect((await svc.restamp(ContactKind.contact, carla, expectedVersion: 1, expectedDeleted: false))!.updatedAt, c.updatedAt);
+      now = now.add(const Duration(milliseconds: 1));
+      expect((await svc.restamp(ContactKind.contact, carla, expectedVersion: 1, expectedDeleted: false))!.updatedAt, now);
+    });
+
+    test('Gruppen und die Einstellung werden ebenfalls neu gestempelt', () async {
+      await svc.addGroup('!g:example.org');
+      await svc.setEnabled(true);
+      now = now.add(const Duration(days: 3));
+      final g = await svc.restamp(ContactKind.group, '!g:example.org', expectedVersion: 1, expectedDeleted: false);
+      final p = await svc.restamp(ContactKind.prefs, 'prefs', expectedVersion: 1, expectedDeleted: false);
+      expect(g!.updatedAt, now);
+      expect(p!.updatedAt, now);
+      expect((p as ContactPrefs).enabled, isTrue);
+    });
+  });
 }

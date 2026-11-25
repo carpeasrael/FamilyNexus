@@ -219,6 +219,7 @@ void main() {
       expect(AppServices.accountOf('@anna:example.org|'), '@anna:example.org');
       expect(AppServices.accountOf('@anna:example.org'), '@anna:example.org');
       expect(AppServices.accountOf(''), '');
+      expect(AppServices.accountOf('@anna:example.org|!a:example.org|rest'), '@anna:example.org', reason: 'Teil vor dem ersten |');
     });
 
     test('Familienwechsel desselben Kontos: Kontakte bleiben, die Familiendaten werden gewischt', () async {

@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:family_nexus/data/db/sql_data_inventory.dart';
 import 'package:family_nexus/domain/cash_book.dart';
+import 'package:family_nexus/l10n/gen/app_localizations_de.dart';
+import 'package:family_nexus/l10n/gen/app_localizations_en.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// #311, E-113 (Teil 4b): Pflichtinhalt der Datenschutztexte zum Kassenbuch (App und Store) und Wächter für die Store-Texte,
@@ -79,6 +81,13 @@ void main() {
       });
     });
   }
+
+  test('die erzeugten Texte (gen) stimmen mit den ARB-Dateien überein: logoutBody nennt Kontakte', () {
+    expect(AppLocalizationsDe().logoutBody, de['logoutBody']);
+    expect(AppLocalizationsEn().logoutBody, en['logoutBody']);
+    expect(AppLocalizationsDe().logoutBody, contains('Kontakte'));
+    expect(AppLocalizationsEn().logoutBody, contains('contacts'));
+  });
 
   test('accountDeleteBody bleibt frei von „Matrix-ID“ (wording_test), die Wortlisten des Stores gelten auch hier', () {
     for (final t in <String>[de['accountDeleteBody'] as String, en['accountDeleteBody'] as String]) {
