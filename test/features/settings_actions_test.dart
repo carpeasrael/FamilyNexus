@@ -141,11 +141,17 @@ void main() {
       s.actions.refreshSecurity();
     });
 
-    test('verifyDevice: unbekanntes Gerät ergibt den Fehler des Gateways', () async {
+    test('verifyDevice: unbekanntes Gerät des eigenen Kontos ergibt den Fehler des Gateways', () async {
       final s = await _setup();
-      final error = await s.actions.verifyDevice(const DeviceEntry(userId: '@niemand:fake.test', deviceId: 'X', name: 'X', verified: false, isCurrent: false));
+      final error = await s.actions.verifyDevice(const DeviceEntry(userId: '@anna:fake.test', deviceId: 'X', name: 'X', verified: false, isCurrent: false));
       expect(error, isA<GatewayException>());
       expect((error! as GatewayException).error, GatewayError.notFound);
+    });
+
+    test('verifyDevice: Gerät eines Fremden (weder Mitglied noch Kontakt) wird verweigert (K3b-2b)', () async {
+      final s = await _setup();
+      final error = await s.actions.verifyDevice(const DeviceEntry(userId: '@niemand:fake.test', deviceId: 'X', name: 'X', verified: false, isCurrent: false));
+      expect((error! as GatewayException).error, GatewayError.notAllowed);
     });
 
     test('verifyDevice: vorhandenes zweites Gerät startet die Verifizierung, ohne Fehler', () async {

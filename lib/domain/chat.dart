@@ -1,3 +1,5 @@
+import 'family.dart' show IdentityStatus;
+
 enum MessageStatus { sending, sent, failed }
 
 class AttachmentInfo {
@@ -104,6 +106,7 @@ class ChatThread {
     this.pending = false,
     this.reachable = true,
     this.peerName = '',
+    this.identity = IdentityStatus.unknown,
   });
 
   /// Feste Kennung des Familienchats; Einzelchats tragen ihre Raum-ID.
@@ -128,6 +131,10 @@ class ChatThread {
   /// Nur [ThreadKind.contact]: bereinigter Anzeigename des Gegenübers **ohne** Server (für den Vergleich mit Familiennamen,
   /// §9.1); leer, wenn keiner bekannt ist.
   final String peerName;
+
+  /// Nur [ThreadKind.contact]: Zustand der kryptografischen Identität des Gegenübers (K3b-2b, B8). `changed`: Der
+  /// Hauptschlüssel hat sich geändert, Senden ist gesperrt, bis die Änderung akzeptiert wird.
+  final IdentityStatus identity;
 
   bool get isFamily => kind == ThreadKind.family;
 

@@ -12,6 +12,9 @@ class _ContactState {
   final Map<String, String> titles = <String, String>{};
   final Map<String, String> names = <String, String>{}; // bereinigter Name ohne Server (Vergleich mit Familiennamen)
 
+  /// Identitätszustand je Gespräch (Raum-ID), im Abgleich gesetzt (K3b-2b); nur bei beigetretenem Gegenüber.
+  final Map<String, IdentityStatus> identity = <String, IdentityStatus>{};
+
   /// Gegenüber nur eingeladen (wartet auf Annahme): Senden gesperrt.
   final Set<String> pending = <String>{};
   final Set<String> joining = <String>{};
@@ -71,6 +74,7 @@ class _ContactState {
     messages.clear();
     titles.clear();
     names.clear();
+    identity.clear();
     pending.clear();
     requests = const <ContactRequest>[];
     requestsHidden = 0;
@@ -124,6 +128,8 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
   RoomFacts _roomFacts(Room r, String me);
   GatewayException _map(Object e);
   ContactReachability _reachabilityOf(String peer);
+  IdentityStatus _identityOf(String uid, String me, {bool mirror = true});
+  Set<String> get _identityChanged;
   void _scheduleRefresh();
 
   /// Nur für Tests: lädt den Mitgliedszustand des Gegenübers (Harness ohne diesen HTTP-Weg).
@@ -180,6 +186,18 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     }().ignore();
   }
 
+  /// Der gewählte Kontakt-Raum des Gegenübers (beigetretenes Gegenüber), sonst `null`; wartende Räume zählen nicht.
+  // ignore: unused_element
+  String? _contactRoomOf(String peer) {
+    final c = _contacts;
+    String? best;
+    for (final e in c.peers.entries) {
+      if (e.value != peer || c.pending.contains(e.key)) continue;
+      if (best == null || e.key.compareTo(best) < 0) best = e.key;
+    }
+    return best;
+  }
+
   /// Einladender und `is_direct` einer Einladung, aus dem Zwischenspeicher oder einmal aus dem Zustand gelesen.
   ({String? from, bool direct}) _inviteMetaOf(Room r, String me) {
     final cached = _contacts.inviteMeta[r.id];
@@ -204,6 +222,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
               unread: unreadIn(e.key),
               pending: _contacts.pending.contains(e.key),
               reachable: _reachabilityOf(e.value) != ContactReachability.notReachable,
+              identity: _identityChanged.contains(e.value) ? IdentityStatus.changed : (_contacts.identity[e.key] ?? IdentityStatus.unknown),
             ),
       ]..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
 
@@ -247,6 +266,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
         c.messages.remove(id);
         c.titles.remove(id);
         c.names.remove(id);
+        c.identity.remove(id);
         c.pending.remove(id);
       }
     }
@@ -258,8 +278,11 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
       c.names[r.id] = ContactNames.cleanName(name is String ? name : null);
       if (chosenPending[e.key] ?? false) {
         c.pending.add(r.id);
+        c.identity.remove(r.id); // wartende Räume werden nicht gepinnt (Grenze (a) aus E-37)
       } else {
         c.pending.remove(r.id);
+        // Nur mit Familie (der lokale Anteil im Spiegel bleibt sonst leer, Kontakte gehören aber zum Konto).
+        c.identity[r.id] = _identityOf(e.key, me, mirror: false);
       }
     }
     // Zeitleisten, die nicht mehr zulässig sind, sind mit den Räumen entfernt; offene werden neu abgebildet.
@@ -487,6 +510,11 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     if (peer == null || !_contacts.timelines.containsKey(threadId)) throw const GatewayException(GatewayError.notAllowed);
     if (!_canEncryptIn(room)) throw const GatewayException(GatewayError.encryptionUnavailable);
     if (!_stillContact(room, peer)) throw const GatewayException(GatewayError.notAllowed);
+    // Geänderter Hauptschlüssel (B8): synchron neu auswerten (kein Netz) und vor „nicht erreichbar“ prüfen; alle Sendewege
+    // (Text, Anhänge) laufen hierüber.
+    final me = _family?.myUserId;
+    if (me != null) _identityOf(peer, me, mirror: false);
+    if (_identityChanged.contains(peer)) throw const GatewayException(GatewayError.notAllowed);
     // Ohne Schlüssel, mit denen das Gegenüber lesen kann, käme die Nachricht still unlesbar an (B5).
     if (_reachabilityOf(peer) == ContactReachability.notReachable) throw const GatewayException(GatewayError.peerNotReachable);
     return room;
@@ -546,6 +574,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     c.messages.remove(threadId);
     c.titles.remove(threadId);
     c.names.remove(threadId);
+    c.identity.remove(threadId);
     c.pending.remove(threadId);
     _scheduleRefresh();
   }

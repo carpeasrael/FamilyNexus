@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:family_nexus/domain/contacts.dart' show ContactFlags;
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support/release_markers.dart';
+
 /// #119, K2b/K2c (E-114): Bis zur Freigabe (K6) und den Datenschutztexten erzeugt oder nutzt kein Produktionscode den
 /// Kontaktspeicher und -dienst, außer dort, wo es nötig ist. Die Aussage „`contact_records` bleibt bis dahin leer“ in
 /// `store/privacy` und den App-Texten stützt sich darauf. Der Freigabe-PR ändert diese Liste und die Sperre bewusst.
@@ -151,9 +153,32 @@ void main() {
 
   test('Freigabebedingung: ContactFlags.enabled nur, wenn K3b-2 (B8) und K3c (Kontakte ohne Familie) abgeschlossen sind', () {
     if (!ContactFlags.enabled) return; // Der Freigabe-PR setzt die Marken bewusst in docs/ENTSCHEIDUNGEN.md.
+    // Die Marken stehen als eigene Zeile `MARKE: …`; eine Erwähnung im Fließtext zählt nicht (`missingReleaseMarkers`, eigene Tests).
     final doc = File('docs/ENTSCHEIDUNGEN.md').readAsStringSync();
-    expect(doc, contains('K3b-2 abgeschlossen'));
-    expect(doc, contains('K3c abgeschlossen'));
+    expect(missingReleaseMarkers(doc), isEmpty);
+  });
+
+  test('K3b-2b: Verifizierung und Akzeptieren laufen über VerificationPolicy; Kontakte nutzen nie die SDK-Raumwahl; Spiegel nur mit Mitgliedern', () {
+    final v = code(File('lib/data/matrix/gateway/security_verification.dart').readAsStringSync());
+    expect(v, contains('_incomingAllowed(v.userId, v.room?.id)'), reason: 'Raum der eingehenden Anfrage wird geprüft');
+    expect(v, contains('VerificationPolicy.allowed('));
+    expect(v, contains('_verificationAllowed(userId, null)'), reason: 'startVerification prüft für jede ID vor encryptionUnavailable');
+    expect(v.indexOf('_verificationAllowed(userId, null)'), lessThan(v.indexOf('GatewayError.encryptionUnavailable')));
+    final contactBranch = v.substring(v.indexOf('_family?.member(userId) == null'), v.indexOf('v = await list.startVerification();'));
+    expect(contactBranch, contains('KeyVerification('));
+    expect(contactBranch, contains('room: room'));
+    expect(contactBranch, contains('_contactRoomOf(userId)'));
+    expect(contactBranch, isNot(contains('list.startVerification()')), reason: 'Kontakte: nie die SDK-Raumwahl');
+    final i = code(File('lib/data/matrix/gateway/identities.dart').readAsStringSync());
+    expect(i, contains('VerificationPolicy.contactAllowed('));
+    expect(i, contains('local: _memberPins()'), reason: 'Kontakt-Pins gelangen nie in den Spiegel der Kontodaten');
+    expect(i, isNot(contains('local: _localPins.pins')));
+    final c = code(File('lib/data/matrix/gateway/contact_chats.dart').readAsStringSync());
+    expect(c, contains('_identityOf(e.key, me, mirror: false)'));
+    expect(c, contains('_identityOf(peer, me, mirror: false)'));
+    final g = code(File('lib/data/matrix/sdk_matrix_gateway.dart').readAsStringSync());
+    expect(g, contains('_contactSessionPins.clear();'));
+    expect(g, contains('_contactAcceptedPins.clear();'));
   });
 
   test('Kontakt-Räume werden nur über ConversationPolicy eingestuft; die Test-Naht des Mitgliedszustands liegt nur dort', () {

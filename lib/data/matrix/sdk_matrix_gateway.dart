@@ -55,6 +55,7 @@ import '../../domain/shopping.dart';
 import '../../domain/tasks.dart';
 import '../../domain/text_sanitizer.dart';
 import '../../domain/username_suggestion.dart';
+import '../../domain/verification_policy.dart';
 import '../db/app_database.dart';
 import '../db/encrypted_db.dart';
 import '../platform/key_store.dart';
@@ -394,6 +395,14 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   /// Annahme ihrer Einzelchat-Einladungen.
   @visibleForTesting
   Set<String> get debugIdentityChanged => _identityChanged;
+
+  /// Nur für Tests: Würde eine eingehende Verifizierungsanfrage von [userId] im Raum [roomId] (`null` = To-Device) angenommen?
+  @visibleForTesting
+  bool debugIncomingAllowed(String userId, String? roomId) => _incomingAllowed(userId, roomId);
+
+  /// Nur für Tests: der gewählte Kontakt-Raum des Gegenübers (`null` ohne beigetretenes Kontakt-Gespräch).
+  @visibleForTesting
+  String? debugContactRoomOf(String peer) => _contactRoomOf(peer);
 
   /// Nur für Tests: läuft als Erstes in jedem Abgleich (#412: ein scheiternder Abgleich nach der Anmeldung).
   @visibleForTesting
@@ -1015,6 +1024,8 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     _avatarPauseUntil = null;
     _verification = null;
     _identityChanged.clear();
+    _contactSessionPins.clear();
+    _contactAcceptedPins.clear();
     _pinBook.clear();
     _participantsLoaded = false;
     _participantsRequested = false;
@@ -1506,6 +1517,13 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   final Set<String> _identityChanged = <String>{};
   @override
   final IdentityPinBook _pinBook = IdentityPinBook();
+
+  /// Kontakte außerhalb der Familie (K3b-2b): erster gesehener Schlüssel (Sitzungs-Pin) und ausdrücklich akzeptierter
+  /// Schlüssel, nur im Speicher, nie in den Kontodaten; geleert in [_resetLocal].
+  @override
+  final Map<String, String> _contactSessionPins = <String, String>{};
+  @override
+  final Map<String, String> _contactAcceptedPins = <String, String>{};
 
   /// Lokale Kopie der Vermerke mit Vorrang vor den Kontodaten (#142); überlebt [_resetLocal].
   @override
