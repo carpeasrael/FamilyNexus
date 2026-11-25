@@ -250,6 +250,7 @@ class ContactSync {
   }
 
   void kick() {
+    if (_disposed) return; // nach dispose entsteht kein neuer Timer mehr
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 200), () => publishPending().ignore());
   }

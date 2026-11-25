@@ -39,9 +39,21 @@ void main() {
     server.rooms.values.first.membership[emil] = MemberStatus.joined;
     me = peer.gateway.userId!;
     c = ContactController(gateway: peer.gateway, sync: peer.sync);
-    addTearDown(() {
-      c.dispose();
-      peer.dispose();
+  }
+
+  /// Wie `testWidgets`, beendet aber Controller und Synchronisation **im** Test: Deren Timer (Wiederholung, Entprellung)
+  /// dürfen am Ende der Testzone nicht mehr laufen (die ältere Flutter-Version der CI prüft das vor dem Abbau).
+  void ctest(String name, Future<void> Function(WidgetTester tester) body) {
+    testWidgets(name, (tester) async {
+      await init();
+      try {
+        await body(tester);
+      } finally {
+        await tester.pumpWidget(const SizedBox());
+        c.dispose();
+        peer.dispose();
+        await tester.pump(const Duration(seconds: 1));
+      }
     });
   }
 
@@ -73,8 +85,7 @@ void main() {
   }
 
   group('Erklärseite und Einwilligung', () {
-    testWidgets('Standard aus: Erklärseite, nichts abgefragt, nichts gesendet; erst die Taste schaltet ein', (tester) async {
-      await init();
+    ctest('Standard aus: Erklärseite, nichts abgefragt, nichts gesendet; erst die Taste schaltet ein', (tester) async {
       await show(tester);
       expect(find.text('Kontakte einschalten?'), findsOneWidget);
       expect(find.textContaining('Beide erfahren so, wen du suchst'), findsOneWidget, reason: 'Abfluss der Prüfung an beide Server');
@@ -91,8 +102,7 @@ void main() {
       expect(peer.gateway.contactPolicy.enabled, isTrue);
     });
 
-    testWidgets('bis der Zustand gelesen ist: Ladeanzeige, weder Erklärseite noch Einschalten', (tester) async {
-      await init();
+    ctest('bis der Zustand gelesen ist: Ladeanzeige, weder Erklärseite noch Einschalten', (tester) async {
       await tester.pumpWidget(host(ContactsScreen(controller: c)));
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(find.text('Kontakte einschalten'), findsNothing);
@@ -101,8 +111,7 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
-    testWidgets('Ausschalten verlangt eine Bestätigung und löscht nichts', (tester) async {
-      await init();
+    ctest('Ausschalten verlangt eine Bestätigung und löscht nichts', (tester) async {
       await show(tester);
       await turnOn(tester);
       await tester.scrollUntilVisible(find.text('Kontakte ausschalten'), 200, scrollable: find.byType(Scrollable).first);
@@ -127,8 +136,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('Prüfen nur auf Tipp: Tippen und Öffnen fragen nichts ab; dann Karte mit Name und voller Kennung; Hinzufügen', (tester) async {
-      await init();
+    ctest('Prüfen nur auf Tipp: Tippen und Öffnen fragen nichts ab; dann Karte mit Name und voller Kennung; Hinzufügen', (tester) async {
       await openAdd(tester);
       expect(find.textContaining('Beim Prüfen werden dein Server und der Server der gesuchten Person gefragt'), findsOneWidget);
       await tester.enterText(find.byType(TextField), '@carla:fake.test');
@@ -147,8 +155,7 @@ void main() {
       expect((await peer.service.contact(carla))!.state, ContactState.outgoing);
     });
 
-    testWidgets('eine geänderte Eingabe macht das Ergebnis ungültig, ohne Abfrage', (tester) async {
-      await init();
+    ctest('eine geänderte Eingabe macht das Ergebnis ungültig, ohne Abfrage', (tester) async {
       await openAdd(tester);
       await tester.enterText(find.byType(TextField), carla);
       await tester.tap(find.text('Prüfen'));
@@ -161,8 +168,7 @@ void main() {
       expect(server.probeNetworkCalls, calls);
     });
 
-    testWidgets('jede Ausnahme hat einen eigenen Text und sperrt das Hinzufügen', (tester) async {
-      await init();
+    ctest('jede Ausnahme hat einen eigenen Text und sperrt das Hinzufügen', (tester) async {
       await openAdd(tester);
       Future<void> check(String id) async {
         await tester.enterText(find.byType(TextField), id);
@@ -189,8 +195,7 @@ void main() {
       expect(find.text('Hinzufügen'), findsNothing, reason: 'in keinem dieser Fälle gibt es „Hinzufügen“');
     });
 
-    testWidgets('rateLimited sperrt die Taste mit Text', (tester) async {
-      await init();
+    ctest('rateLimited sperrt die Taste mit Text', (tester) async {
       await openAdd(tester);
       server.probeError = GatewayError.rateLimited;
       await tester.enterText(find.byType(TextField), carla);
@@ -200,8 +205,7 @@ void main() {
       expect(tester.widget<FilledButton>(find.byType(FilledButton).first).onPressed, isNull);
     });
 
-    testWidgets('lokal blockiert ohne Datensatz: Hinweis mit „Blockierung aufheben“ (keine Sackgasse)', (tester) async {
-      await init();
+    ctest('lokal blockiert ohne Datensatz: Hinweis mit „Blockierung aufheben“ (keine Sackgasse)', (tester) async {
       await openAdd(tester);
       peer.blockedList.list.add(dora);
       await tester.enterText(find.byType(TextField), dora);
@@ -216,8 +220,7 @@ void main() {
   });
 
   group('Anfragen', () {
-    testWidgets('Anfrage: Name und volle Kennung; Annehmen verlangt Bestätigung mit der Kennung; danach bestätigt', (tester) async {
-      await init();
+    ctest('Anfrage: Name und volle Kennung; Annehmen verlangt Bestätigung mit der Kennung; danach bestätigt', (tester) async {
       await show(tester);
       await turnOn(tester);
       final room = server.createContactRoom(carla, me);
@@ -240,8 +243,7 @@ void main() {
       expect(room.invitedUsers, isNot(contains(me)));
     });
 
-    testWidgets('Ablehnen; Blockieren verlangt Bestätigung und lässt die Einladung unbeantwortet', (tester) async {
-      await init();
+    ctest('Ablehnen; Blockieren verlangt Bestätigung und lässt die Einladung unbeantwortet', (tester) async {
       await show(tester);
       await turnOn(tester);
       final a = server.createContactRoom(carla, me);
@@ -263,8 +265,7 @@ void main() {
       expect(find.text('Blockiert'), findsOneWidget);
     });
 
-    testWidgets('„Weitere Anfragen: n“', (tester) async {
-      await init();
+    ctest('„Weitere Anfragen: n“', (tester) async {
       await show(tester);
       await turnOn(tester);
       server.createContactRoom(carla, me);
@@ -276,8 +277,7 @@ void main() {
   });
 
   group('Verwalten', () {
-    testWidgets('Entfernen und Blockieren verlangen Bestätigung; Blockierte nur „Entsperren“; Entsperren wirkt', (tester) async {
-      await init();
+    ctest('Entfernen und Blockieren verlangen Bestätigung; Blockierte nur „Entsperren“; Entsperren wirkt', (tester) async {
       await show(tester);
       await turnOn(tester);
       server.createContactRoom(carla, me, toJoined: true);
@@ -296,8 +296,7 @@ void main() {
       expect(peer.blockedList.list, isNot(contains(carla)));
     });
 
-    testWidgets('Entfernen: Bestätigung, verlässt den Raum, Eintrag weg', (tester) async {
-      await init();
+    ctest('Entfernen: Bestätigung, verlässt den Raum, Eintrag weg', (tester) async {
       await show(tester);
       await turnOn(tester);
       final room = server.createContactRoom(carla, me, toJoined: true);
@@ -312,8 +311,7 @@ void main() {
       expect(room.dmMembers, isNot(contains(me)));
     });
 
-    testWidgets('„Erneut senden“ für einen nicht gesendeten Kontakt; wiederholtes Tippen wird gebremst', (tester) async {
-      await init();
+    ctest('„Erneut senden“ für einen nicht gesendeten Kontakt; wiederholtes Tippen wird gebremst', (tester) async {
       await show(tester);
       await turnOn(tester);
       await peer.service.addOutgoing(carla);
@@ -325,8 +323,7 @@ void main() {
       expect(find.text('Wartet auf Annahme'), findsOneWidget);
     });
 
-    testWidgets('accepted ohne Gespräch: „Gespräch wird gesucht“ mit Entfernen', (tester) async {
-      await init();
+    ctest('accepted ohne Gespräch: „Gespräch wird gesucht“ mit Entfernen', (tester) async {
       await show(tester);
       await turnOn(tester);
       await peer.service.addAccepted(carla);
@@ -335,8 +332,7 @@ void main() {
       expect(find.widgetWithText(TextButton, 'Entfernen'), findsOneWidget);
     });
 
-    testWidgets('Fehler zeigen einen Text, nie Rohtexte', (tester) async {
-      await init();
+    ctest('Fehler zeigen einen Text, nie Rohtexte', (tester) async {
       await show(tester);
       await turnOn(tester);
       server.createContactRoom(carla, me, toJoined: true);
@@ -352,8 +348,7 @@ void main() {
       expect(find.text('Bestätigt'), findsOneWidget, reason: 'unverändert');
     });
 
-    testWidgets('eigene Kontakt-ID kopieren', (tester) async {
-      await init();
+    ctest('eigene Kontakt-ID kopieren', (tester) async {
       String? copied;
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
         if (call.method == 'Clipboard.setData') copied = (call.arguments as Map<Object?, Object?>)['text'] as String?;
@@ -371,8 +366,7 @@ void main() {
   });
 
   group('Darstellung', () {
-    testWidgets('Name und Kennung mit Unicode-Isolierung; ein feindlicher Name verfälscht nichts', (tester) async {
-      await init();
+    ctest('Name und Kennung mit Unicode-Isolierung; ein feindlicher Name verfälscht nichts', (tester) async {
       server.addAccount('mallory', 'pw-m', displayName: 'Mama \u202E· familie.de');
       await show(tester);
       await turnOn(tester);
@@ -383,8 +377,7 @@ void main() {
       expect(find.text(isolateText('@mallory:fake.test')), findsOneWidget);
     });
 
-    testWidgets('Unicode-Isolierung als Literal (FSI … PDI) für Titel, Kennung, eigene Kennung und die Dialoge', (tester) async {
-      await init();
+    ctest('Unicode-Isolierung als Literal (FSI … PDI) für Titel, Kennung, eigene Kennung und die Dialoge', (tester) async {
       expect(isolateText('x'), '\u2068x\u2069');
       await show(tester);
       await turnOn(tester);
@@ -407,8 +400,7 @@ void main() {
       expect(find.textContaining('\u2068$carla\u2069'), findsWidgets, reason: 'Dialog Blockieren');
     });
 
-    testWidgets('Semantik: Zeilen als ein Label (Name, Kennung, Zustand); Überschriften', (tester) async {
-      await init();
+    ctest('Semantik: Zeilen als ein Label (Name, Kennung, Zustand); Überschriften', (tester) async {
       final handle = tester.ensureSemantics();
       await show(tester);
       await turnOn(tester);
@@ -424,8 +416,7 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('Textskalierung 2.0: kein Überlauf in Erklärseite, Liste und Hinzufügen', (tester) async {
-      await init();
+    ctest('Textskalierung 2.0: kein Überlauf in Erklärseite, Liste und Hinzufügen', (tester) async {
       await show(tester, textScale: 2);
       expect(tester.takeException(), isNull);
       await turnOn(tester);
@@ -439,8 +430,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Englisch: Erklärseite und Zustände', (tester) async {
-      await init();
+    ctest('Englisch: Erklärseite und Zustände', (tester) async {
       await show(tester, lang: 'en');
       expect(find.text('Turn on contacts?'), findsOneWidget);
       expect(find.textContaining('Both learn whom you are looking for'), findsOneWidget);
@@ -450,8 +440,7 @@ void main() {
       expect(find.text('Add contact'), findsWidgets);
     });
 
-    testWidgets('Mindestgröße der Tasten 48 dp', (tester) async {
-      await init();
+    ctest('Mindestgröße der Tasten 48 dp', (tester) async {
       await show(tester);
       await turnOn(tester);
       await peer.service.addOutgoing(carla);
