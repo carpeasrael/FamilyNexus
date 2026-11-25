@@ -8,7 +8,7 @@ void main() {
   test('knock und fehlende Angabe gelten, jede andere Regel nicht', () {
     expect(f(rule: 'knock'), isTrue);
     expect(f(), isTrue);
-    for (final r in <String>['invite', 'public', 'restricted', 'knock_restricted', 'private', '']) {
+    for (final r in <String>['invite', 'public', 'restricted', 'knock_restricted', 'private', '', 'Knock', 'KNOCK', ' knock', 'knock ']) {
       expect(f(rule: r), isFalse, reason: r);
     }
   });

@@ -189,4 +189,65 @@ void main() {
     await _switchTo(tester, t.dm, settle: true);
     expect(find.byIcon(Icons.close), findsNothing, reason: 'der gesendete Antwortbezug des Einzelchats ist verbraucht');
   });
+
+  testWidgets('D6 gelöschter Entwurf kehrt nicht zurück (Text und Antwortbezug)', (tester) async {
+    final t = await _open(tester);
+    await tester.enterText(find.byType(TextField), 'alt');
+    await _switchTo(tester, t.dm, settle: true);
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    expect(_field(tester), 'alt');
+    await tester.enterText(find.byType(TextField), '');
+    await _switchTo(tester, t.dm, settle: true);
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    expect(_field(tester), isEmpty, reason: 'gelöscht bleibt gelöscht');
+    // Antwortbezug: wählen, wechseln, zurück, mit dem Kreuz schließen, wechseln, zurück.
+    await _switchTo(tester, t.dm, settle: true);
+    await tester.longPress(find.text('Hallo Anna'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Antworten'));
+    await tester.pumpAndSettle();
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    await _switchTo(tester, t.dm, settle: true);
+    expect(find.byIcon(Icons.close), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    await _switchTo(tester, t.dm, settle: true);
+    expect(find.byIcon(Icons.close), findsNothing, reason: 'geschlossen bleibt geschlossen');
+  });
+
+  testWidgets('D7 Randfälle beim Senden: der geänderte Entwurf des gesendeten Gesprächs und die während des Sendens gewählte Antwort bleiben', (tester) async {
+    final t = await _open(tester);
+    // Senden im Familienchat, dann dort weitertippen, weg wechseln und erst dann abschließen.
+    await _sendHeld(tester, t.gate, t.app.server, 'hallo');
+    await _switchTo(tester, t.dm, settle: false);
+    await _switchTo(tester, ChatThread.familyId);
+    await tester.enterText(find.byType(TextField), 'hallo welt');
+    await _switchTo(tester, t.dm);
+    await _release(tester, t.gate);
+    await _switchTo(tester, ChatThread.familyId, settle: true);
+    expect(_field(tester), 'hallo welt', reason: 'das Sendeergebnis löscht nur den unveränderten, gesendeten Stand');
+  });
+
+  testWidgets('D8 während des Sendens gewählte Antwort bleibt', (tester) async {
+    final t = await _open(tester);
+    await _switchTo(tester, t.dm, settle: true);
+    await _sendHeld(tester, t.gate, t.app.server, 'x');
+    await tester.longPress(find.text('Hallo Anna'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Antworten'));
+    await tester.pump();
+    await _release(tester, t.gate);
+    expect(find.byIcon(Icons.close), findsOneWidget, reason: 'die inzwischen gewählte Antwort wurde nicht mit dem Sendeergebnis gelöscht');
+  });
+
+  testWidgets('D9 ein Neuaufbau ohne Gesprächswechsel lässt Cursor und Auswahl im Eingabefeld unberührt', (tester) async {
+    final t = await _open(tester);
+    await tester.enterText(find.byType(TextField), 'abcdef');
+    final c = tester.widget<TextField>(find.byType(TextField)).controller!;
+    c.selection = const TextSelection(baseOffset: 2, extentOffset: 4);
+    await t.app.services.settings.update((s) => s.copyWith(blockedUsers: <String>['@niemand:fake.test']));
+    await tester.pumpAndSettle();
+    expect(c.selection, const TextSelection(baseOffset: 2, extentOffset: 4));
+  });
 }
