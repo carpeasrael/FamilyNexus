@@ -1,3 +1,4 @@
+import 'package:family_nexus/domain/contacts.dart';
 import 'package:family_nexus/domain/conversation_policy.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -131,7 +132,7 @@ void main() {
     });
   });
 
-  test('Kontakt-Klassen liefert die Einstufung in K2a nie, für keine Kombination', () {
+  test('Kontakt-Klassen liefert die Einstufung bei ausgeschaltetem Bereich nie, für keine Kombination', () {
     final facts = <RoomFacts>[
       for (final m in RoomMembership.values)
         for (final peer in <String?>[null, ben, fremd, me])
@@ -156,5 +157,212 @@ void main() {
     for (final f in facts) {
       expect(contact.contains(ConversationPolicy.classify(f, ctx)), isFalse);
     }
+  });
+
+  // ----------------------------------------------------------------------------- K3a-1: Kontaktklassen
+  const carla = '@carla:other.example';
+  const dora = '@dora:other.example';
+
+  PolicyContext cc({
+    bool enabled = true,
+    bool loaded = true,
+    Map<String, ContactState> contacts = const <String, ContactState>{carla: ContactState.accepted},
+    Set<String> blocked = const <String>{},
+    Set<String> family = const <String>{me, ben},
+    Set<String> identity = const <String>{},
+    Set<String> joinedMembers = const <String>{me, ben},
+  }) =>
+      PolicyContext(
+        myUserId: me,
+        familyRoomId: '!familie:hs.example',
+        privateRoomId: priv,
+        joinedMembers: joinedMembers,
+        membersLoaded: loaded,
+        identityChanged: identity,
+        contactsEnabled: enabled,
+        contacts: contacts,
+        blockedUsers: blocked,
+        familyIds: family,
+      );
+
+  group('contactDirect', () {
+    test('mit Bereich, eigenem Datensatz, Megolm und zwei Personen', () {
+      expect(ConversationPolicy.classify(joined(peer: carla), cc()), RoomClass.contactDirect);
+      expect(ConversationPolicy.classify(joined(peer: carla), cc(contacts: {carla: ContactState.outgoing})), RoomClass.contactDirect,
+          reason: 'wartet auf Annahme (§8.2, bewusste Abweichung von §6.2)');
+    });
+
+    test('jede Bedingung einzeln', () {
+      final cases = <String, PolicyContext>{
+        'Bereich aus': cc(enabled: false),
+        'Liste unvollständig': cc(loaded: false),
+        'kein Datensatz': cc(contacts: const <String, ContactState>{}),
+        'Datensatz blockiert': cc(contacts: {carla: ContactState.blocked}),
+        'lokal blockiert': cc(blocked: {carla}),
+        'Familienmitglied (beigetreten, mit Datensatz)': cc(contacts: {ben: ContactState.accepted}),
+      };
+      for (final e in cases.entries) {
+        final peer = e.key.startsWith('Familienmitglied') ? ben : carla;
+        expect(ConversationPolicy.classify(joined(peer: peer), e.value), isNot(RoomClass.contactDirect), reason: e.key);
+      }
+      expect(ConversationPolicy.classify(joined(peer: carla, megolm: false), cc()), RoomClass.ignored);
+      expect(ConversationPolicy.classify(joined(peer: carla, joinedCount: 3), cc()), RoomClass.ignored);
+      expect(ConversationPolicy.classify(joined(peer: carla, joinedCount: null), cc()), RoomClass.ignored);
+      expect(ConversationPolicy.classify(joined(peer: me), cc(contacts: {me: ContactState.accepted})), RoomClass.ignored);
+      expect(ConversationPolicy.classify(joined(peer: null), cc()), RoomClass.ignored);
+    });
+
+    test('die Familie hat Vorrang: Mitglied mit Kontaktdatensatz bleibt familyDirect; ohne Megolm ignoriert', () {
+      final ctxBen = cc(contacts: {ben: ContactState.blocked});
+      expect(ConversationPolicy.classify(joined(peer: ben), ctxBen), RoomClass.familyDirect);
+      expect(ConversationPolicy.classify(joined(peer: ben, megolm: false), ctxBen), RoomClass.ignored);
+    });
+
+    test('eingeladenes oder angefragtes Familienmitglied ist nie ein Kontakt', () {
+      final c = cc(family: {me, ben, dora}, contacts: {dora: ContactState.accepted});
+      expect(ConversationPolicy.classify(joined(peer: dora), c), RoomClass.ignored);
+    });
+
+    test('ein entferntes Mitglied (nicht in familyIds) gilt als Fremder: nur mit ausdrücklichem Datensatz', () {
+      final c = cc(contacts: {dora: ContactState.accepted});
+      expect(ConversationPolicy.classify(joined(peer: dora), c), RoomClass.contactDirect);
+      expect(ConversationPolicy.classify(joined(peer: dora), cc()), RoomClass.ignored);
+    });
+  });
+
+  group('contactRequest', () {
+    test('Einladung mit is_direct von einem Fremden ohne Datensatz', () {
+      expect(ConversationPolicy.classify(invite(from: dora, direct: true), cc()), RoomClass.contactRequest);
+    });
+
+    test('jede Bedingung einzeln', () {
+      expect(ConversationPolicy.classify(invite(from: dora, direct: true), cc(enabled: false)), RoomClass.ignored);
+      expect(ConversationPolicy.classify(invite(from: dora, direct: true), cc(loaded: false)), RoomClass.ignored);
+      expect(ConversationPolicy.classify(invite(from: dora, direct: true), cc(blocked: {dora})), RoomClass.ignored);
+      expect(ConversationPolicy.classify(invite(from: dora, direct: true), cc(contacts: {dora: ContactState.blocked})), RoomClass.ignored);
+      expect(ConversationPolicy.classify(invite(from: me, direct: true), cc()), RoomClass.ignored);
+      expect(ConversationPolicy.classify(invite(from: null, direct: true), cc()), RoomClass.ignored);
+      expect(ConversationPolicy.classify(invite(from: dora, direct: true, book: true), cc()), RoomClass.ignored);
+      expect(ConversationPolicy.classify(invite(from: dora, rule: 'invite'), cc()), RoomClass.ignored, reason: 'ohne is_direct (Gruppe, K4)');
+      expect(ConversationPolicy.classify(invite(from: dora), cc()), isNot(RoomClass.contactRequest));
+    });
+
+    test('bekannter Kontakt: keine Anfrage (die Annahme übernimmt autoAcceptContact)', () {
+      expect(ConversationPolicy.classify(invite(from: carla, direct: true), cc()), RoomClass.ignored);
+    });
+
+    test('Familienmitglied in jedem Status ist keine Anfrage', () {
+      final c = cc(family: {me, ben, dora});
+      expect(ConversationPolicy.classify(invite(from: dora, direct: true), c), RoomClass.ignored);
+      expect(ConversationPolicy.classify(invite(from: ben, direct: true), c), RoomClass.ignored);
+    });
+
+    test('bei bekannter Zählung nur ein Paar', () {
+      const big = RoomFacts(id: '!g', membership: RoomMembership.invite, inviterId: dora, inviteIsDirect: true, joinedCount: 3);
+      const pair = RoomFacts(id: '!g', membership: RoomMembership.invite, inviterId: dora, inviteIsDirect: true, joinedCount: 1);
+      expect(ConversationPolicy.classify(big, cc()), RoomClass.ignored);
+      expect(ConversationPolicy.classify(pair, cc()), RoomClass.contactRequest);
+    });
+
+    test('ein gelöschter Kontakt (Löschmarke fehlt in contacts) wird wieder zur Anfrage', () {
+      expect(ConversationPolicy.classify(invite(from: carla, direct: true), cc(contacts: const <String, ContactState>{})), RoomClass.contactRequest);
+    });
+
+    test('Einladung ohne is_direct von einem eigenen Kontakt ist nie Anfrage und nie Annahme', () {
+      expect(ConversationPolicy.classify(invite(from: carla, rule: 'invite'), cc()), RoomClass.ignored);
+      expect(ConversationPolicy.classify(invite(from: carla), cc()), isNot(RoomClass.contactRequest));
+      expect(ConversationPolicy.autoAcceptContact(invite(from: carla), cc()), isFalse);
+    });
+  });
+
+  group('autoAcceptContact', () {
+    test('nur für einen eigenen Datensatz outgoing/accepted', () {
+      expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc()), isTrue);
+      expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc(contacts: {carla: ContactState.outgoing})), isTrue);
+      expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc(contacts: {carla: ContactState.blocked})), isFalse);
+      expect(ConversationPolicy.autoAcceptContact(invite(from: dora, direct: true), cc()), isFalse, reason: 'ohne Datensatz nie ohne Tipp (I6)');
+    });
+
+    test('jede Bedingung einzeln', () {
+      expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc(enabled: false)), isFalse);
+      expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc(loaded: false)), isFalse);
+      expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc(blocked: {carla})), isFalse);
+      expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc(identity: {carla})), isFalse);
+      expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true, book: true), cc()), isFalse);
+      expect(ConversationPolicy.autoAcceptContact(invite(from: null, direct: true), cc()), isFalse);
+      expect(ConversationPolicy.autoAcceptContact(invite(from: me, direct: true), cc(contacts: {me: ContactState.accepted})), isFalse);
+      expect(ConversationPolicy.autoAcceptContact(invite(from: ben, direct: true), cc(contacts: {ben: ContactState.accepted})), isFalse,
+          reason: 'Familienmitglied nie');
+      const joinedRoom = RoomFacts(id: '!x', membership: RoomMembership.join, inviterId: carla, inviteIsDirect: true);
+      expect(ConversationPolicy.autoAcceptContact(joinedRoom, cc()), isFalse);
+    });
+  });
+
+  test('ohne eingeschalteten Bereich nie eine Kontaktklasse und nie eine Annahme, auch nicht mit allen Daten', () {
+    final c = cc(enabled: false, contacts: {carla: ContactState.accepted, dora: ContactState.outgoing});
+    for (final m in RoomMembership.values) {
+      for (final peer in <String?>[null, ben, carla, dora, me]) {
+        for (final direct in <bool>[true, false]) {
+          final f = RoomFacts(
+            id: '!r',
+            membership: m,
+            peerId: peer,
+            inviterId: peer,
+            inviteIsDirect: direct,
+            megolm: true,
+            joinedCount: 2,
+          );
+          final k = ConversationPolicy.classify(f, c);
+          expect(k == RoomClass.contactDirect || k == RoomClass.contactRequest || k == RoomClass.contactGroup, isFalse);
+          expect(ConversationPolicy.autoAcceptContact(f, c), isFalse);
+        }
+      }
+    }
+  });
+
+  test('mit Bereich: Familienmitglieder werden nie zu einer Kontaktklasse, in keiner Kombination', () {
+    final c = cc(contacts: {ben: ContactState.accepted, dora: ContactState.outgoing}, family: {me, ben, dora});
+    for (final m in RoomMembership.values) {
+      for (final peer in <String>[ben, dora]) {
+        for (final direct in <bool>[true, false]) {
+          final f = RoomFacts(id: '!r', membership: m, peerId: peer, inviterId: peer, inviteIsDirect: direct, megolm: true, joinedCount: 2);
+          final k = ConversationPolicy.classify(f, c);
+          expect(k == RoomClass.contactDirect || k == RoomClass.contactRequest, isFalse, reason: '$m $peer $direct');
+          expect(ConversationPolicy.autoAcceptContact(f, c), isFalse);
+        }
+      }
+    }
+  });
+
+  test('bei unvollständiger Liste (familyIds leer, membersLoaded falsch) nie eine Kontaktklasse', () {
+    final c = cc(loaded: false, family: const <String>{});
+    expect(ConversationPolicy.classify(joined(peer: carla), c), RoomClass.ignored);
+    expect(ConversationPolicy.classify(invite(from: dora, direct: true), c), RoomClass.ignored);
+    expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), c), isFalse);
+  });
+
+  group('ContactScope.membersComplete', () {
+    test('Wahrheitstabelle (alle 16 Kombinationen)', () {
+      for (final hasFamily in <bool>[true, false]) {
+        for (final loaded in <bool>[true, false]) {
+          for (final synced in <bool>[true, false]) {
+            for (final resolved in <bool>[true, false]) {
+              final expected = hasFamily ? loaded : (synced && resolved);
+              expect(
+                ContactScope.membersComplete(hasFamily: hasFamily, participantsLoaded: loaded, syncedOnce: synced, familyResolved: resolved),
+                expected,
+                reason: 'Familie=$hasFamily geladen=$loaded sync=$synced ermittelt=$resolved',
+              );
+            }
+          }
+        }
+      }
+    });
+
+    test('ohne Familie nie vollständig, solange die Familie nicht ermittelt oder nicht synchronisiert ist', () {
+      expect(ContactScope.membersComplete(hasFamily: false, participantsLoaded: true, syncedOnce: false, familyResolved: true), isFalse);
+      expect(ContactScope.membersComplete(hasFamily: false, participantsLoaded: true, syncedOnce: true, familyResolved: false), isFalse);
+      expect(ContactScope.membersComplete(hasFamily: false, participantsLoaded: false, syncedOnce: true, familyResolved: true), isTrue);
+    });
   });
 }

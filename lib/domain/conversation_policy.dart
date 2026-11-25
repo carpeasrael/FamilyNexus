@@ -1,10 +1,11 @@
+import 'contacts.dart' show ContactState;
 import 'family_invitation.dart';
 
 /// Wie ein Raum eingestuft wird (#119, K2a, E-114): Eine Entscheidungsstelle für alle Räume des Kontos. Reine
 /// Domäne, ohne SDK-Typen: Das Gateway liest die [RoomFacts] aus dem Raum und fragt [ConversationPolicy].
 ///
-/// Unbekanntes ist immer [ignored] (I2: Positivliste). Die Klassen [contactDirect], [contactGroup] und [contactRequest]
-/// gibt es ab K2c/K3 (Kontakte und Gruppen); [ConversationPolicy.classify] liefert sie in diesem Stand nie.
+/// Unbekanntes ist immer [ignored] (I2: Positivliste). [contactDirect] und [contactRequest] liefert [ConversationPolicy.classify]
+/// ab K3a-1 nur bei eingeschaltetem Bereich ([PolicyContext.contactsEnabled]); [contactGroup] gibt es ab K4.
 enum RoomClass { family, private, familyDirect, contactDirect, contactGroup, familyInvite, contactRequest, ignored }
 
 /// Mitgliedschaft des eigenen Kontos im Raum; alles außer `join` und `invite` (`leave`, `ban`, `knock`) zählt nicht.
@@ -55,6 +56,10 @@ class PolicyContext {
     this.joinedMembers = const <String>{},
     this.membersLoaded = false,
     this.identityChanged = const <String>{},
+    this.contactsEnabled = false,
+    this.contacts = const <String, ContactState>{},
+    this.blockedUsers = const <String>{},
+    this.familyIds = const <String>{},
   });
 
   final String myUserId;
@@ -69,6 +74,35 @@ class PolicyContext {
 
   /// Mitglieder, deren Cross-Signing-Schlüssel sich geändert hat und noch nicht bestätigt wurde.
   final Set<String> identityChanged;
+
+  /// Kontakte (#119, K3a-1): Der Bereich ist eingeschaltet. Standard aus: ohne ihn nie eine Kontaktklasse.
+  final bool contactsEnabled;
+
+  /// Aktive Kontakte mit Zustand (Löschmarken fehlen).
+  final Map<String, ContactState> contacts;
+
+  /// Blockierte Kennungen (lokale Liste und Datensätze).
+  final Set<String> blockedUsers;
+
+  /// Alle Mitglieder der Familie in jedem Status (beigetreten, eingeladen, angefragt): nie ein Kontakt. Entfernte
+  /// Mitglieder gehören nicht dazu und gelten als Fremde (E-114).
+  final Set<String> familyIds;
+}
+
+/// Wann die Mitgliederliste für Kontaktentscheidungen vollständig ist (B6, fail-closed). Mit Familie: erst wenn ihre Liste
+/// geladen ist. **Ohne** Familie nur nach der Erstsynchronisation **und** abgeschlossener Familienermittlung; „keine
+/// Familie“ darf nie mit „Familie noch nicht ermittelt“ verwechselt werden, sonst wäre ein Familienmitglied ein Kontakt.
+/// In K3a-1 nur getestete reine Funktion; das Gateway bindet sie in K3a-2 an.
+class ContactScope {
+  const ContactScope._();
+
+  static bool membersComplete({
+    required bool hasFamily,
+    required bool participantsLoaded,
+    required bool syncedOnce,
+    required bool familyResolved,
+  }) =>
+      hasFamily ? participantsLoaded : (syncedOnce && familyResolved);
 }
 
 class ConversationPolicy {
@@ -90,16 +124,41 @@ class ConversationPolicy {
             r.isPair) {
           return RoomClass.familyDirect;
         }
+        // Kontakt-Einzelchat (K3a-1): nur mit eigenem Datensatz, nie für Familienmitglieder (jeder Status).
+        if (peer != null && _contactPeerOk(peer, c) && r.megolm && r.isPair) {
+          final state = c.contacts[peer];
+          if (state == ContactState.outgoing || state == ContactState.accepted) return RoomClass.contactDirect;
+        }
         return RoomClass.ignored;
       case RoomMembership.invite:
         // Buch-Räume und Einladungen in Einzelchats sind nie eine Familieneinladung; Letztere entscheidet
         // [autoAcceptDirect]. Unabhängig von `membersLoaded` und von der Familie: Konten ohne Familie sehen in der
         // Einrichtung ihre Einladung (K1, B1).
-        if (r.isBook || r.inviteIsDirect) return RoomClass.ignored;
+        if (r.isBook) return RoomClass.ignored;
+        if (r.inviteIsDirect) {
+          // Anfrage nur von Fremden ohne aktiven Datensatz; Kontakte nimmt [autoAcceptContact] an, Blockierte sind unsichtbar.
+          final from = r.inviterId;
+          if (from == null || !_contactPeerOk(from, c) || !(r.joinedCount == null || r.isPair)) return RoomClass.ignored;
+          return c.contacts.containsKey(from) ? RoomClass.ignored : RoomClass.contactRequest;
+        }
         return isFamilyInvitation(joinRule: r.joinRule, isDirect: false, isBook: false) ? RoomClass.familyInvite : RoomClass.ignored;
       case RoomMembership.other:
         return RoomClass.ignored;
     }
+  }
+
+  /// Gemeinsame Vorbedingung der Kontaktklassen: Bereich an, Liste vollständig, nicht ich, nicht Familie, nicht blockiert.
+  static bool _contactPeerOk(String peer, PolicyContext c) =>
+      c.contactsEnabled && c.membersLoaded && peer != c.myUserId && !c.familyIds.contains(peer) && !c.blockedUsers.contains(peer);
+
+  /// Wird eine Einzelchat-Einladung eines **Kontakts** automatisch angenommen (K3a-1)? Nur für einen eigenen Datensatz
+  /// `outgoing`/`accepted`, nie für Familienmitglieder, Blockierte oder bei ungeklärter Identitätsänderung.
+  static bool autoAcceptContact(RoomFacts r, PolicyContext c) {
+    if (r.membership != RoomMembership.invite || !r.inviteIsDirect || r.isBook) return false;
+    final from = r.inviterId;
+    if (from == null || !_contactPeerOk(from, c) || c.identityChanged.contains(from)) return false;
+    final state = c.contacts[from];
+    return state == ContactState.outgoing || state == ContactState.accepted;
   }
 
   /// Wird eine Einzelchat-Einladung automatisch angenommen (E-39)? Nur von einem beigetretenen Mitglied (nicht ich),
