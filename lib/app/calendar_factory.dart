@@ -5,6 +5,7 @@ import '../data/sync/avatar_photo_sync.dart';
 import '../data/sync/calendar_sync.dart';
 import '../data/sync/cash_book_receipts.dart';
 import '../data/sync/cash_book_sync.dart';
+import '../data/sync/contact_sync.dart';
 import '../data/sync/event_theme_sync.dart';
 import '../domain/anniversary_service.dart';
 import '../domain/anniversary_store.dart';
@@ -15,6 +16,9 @@ import '../domain/calendar_service.dart';
 import '../domain/cash_book.dart';
 import '../domain/cash_book_service.dart';
 import '../domain/cash_book_store.dart';
+import '../domain/contact_service.dart';
+import '../domain/contact_store.dart';
+import '../domain/contacts.dart';
 import '../domain/event_store.dart';
 import '../domain/event_theme_service.dart';
 import '../domain/event_theme_store.dart';
@@ -44,6 +48,9 @@ CalendarController buildCalendarController({
   bool avatarPhotosEnabled = AvatarPhotoFlags.enabled,
   CashBookStore? cashBookStore,
   bool cashBooksEnabled = CashBookFlags.enabled,
+  ContactStore? contactStore,
+  bool contactsEnabled = ContactFlags.enabled,
+  BlockedListPort? blockedList,
   FileAccess? files,
   String cashBookCurrency = 'EUR',
 }) {
@@ -152,6 +159,19 @@ CalendarController buildCalendarController({
       currencyFallback: cashBookCurrency,
     );
   }
+  // Kontakte außerhalb der Familie (#119, E-114): gehören zum Konto, nicht zur Familie (auch ohne Familie); bis zur Freigabe
+  // (`ContactFlags.enabled`) entstehen weder Dienst noch Synchronisation.
+  ContactSync? contactSync;
+  if (contactStore != null && contactsEnabled) {
+    contactSync = ContactSync(
+      gateway: gateway,
+      service: ContactService(store: contactStore, myUserId: userId, clock: clock),
+      store: contactStore,
+      blockedList: blockedList,
+      clock: clock,
+      retryInterval: retryInterval,
+    );
+  }
   controller = CalendarController(
     service: service,
     store: store,
@@ -170,6 +190,7 @@ CalendarController buildCalendarController({
     cashBookSync: cashBookSync,
     cashBookReceipts: cashBookReceipts,
     cashBookController: cashBookController,
+    contactSync: contactSync,
   );
   return controller;
 }

@@ -192,6 +192,8 @@ class CalendarSync {
           break; // gehört EventThemeSync (E-99)
         case AnniversarySignal():
           break; // gehört AnniversarySync (E-104)
+        case ContactSignal():
+          break; // gehört ContactSync (#119, E-114)
         case AvatarPhotoSignal():
         case AvatarResetSignal():
           break; // gehört AvatarPhotoSync (#434, E-111)

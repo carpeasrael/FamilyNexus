@@ -13,6 +13,7 @@ import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/cash_book.dart';
 import 'package:family_nexus/domain/cash_receipt_check.dart';
 import 'package:family_nexus/domain/chat.dart';
+import 'package:family_nexus/domain/contacts.dart';
 import 'package:family_nexus/domain/data_inventory.dart';
 import 'package:family_nexus/domain/event_codec.dart';
 import 'package:family_nexus/domain/event_theme_codec.dart';
@@ -224,7 +225,11 @@ class FakeMatrixServer {
       final CalendarSignal? sig;
       if (isPrivate) {
         if (privateRooms[uid] != room) continue;
-        sig = e.type == EventCodec.privateType ? PrivateEventSignal(e.sender, e.time, e.content) : null;
+        sig = switch (e.type) {
+          EventCodec.privateType => PrivateEventSignal(e.sender, e.time, e.content),
+          ContactCodec.type => ContactSignal(e.sender, e.time, e.content),
+          _ => null,
+        };
       } else {
         if (room.membership[uid] != MemberStatus.joined) continue;
         sig = switch (e.type) {
@@ -1946,6 +1951,21 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       throw const GatewayException(GatewayError.invalidInput);
     }
     fake.post(room, _userId!, AnniversaryCodec.type, content);
+  }
+
+  @override
+  Future<void> publishContactRecord(ContactRecord record) async {
+    _requireSession();
+    _require();
+    publishAttempts++;
+    if (failPublishes) throw const GatewayException(GatewayError.serverUnreachable);
+    final Map<String, Object?> content;
+    try {
+      content = ContactCodec.encode(record);
+    } on StateError {
+      throw const GatewayException(GatewayError.invalidInput);
+    }
+    fake.post(_privateRoom(), _userId!, ContactCodec.type, content);
   }
 
   @override
