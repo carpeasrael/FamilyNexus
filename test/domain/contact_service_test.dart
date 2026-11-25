@@ -41,6 +41,12 @@ void main() {
       expect(c.state, ContactState.accepted);
       expect(c.version, 2);
       expect(c.nick, 'C');
+      var calls = 0;
+      svc.onChanged = () => calls++;
+      await svc.addOutgoing(ben);
+      calls = 0;
+      await svc.addAccepted(ben);
+      expect(calls, 1, reason: 'auch die Hochstufung meldet die Änderung');
     });
 
     test('bereits bestätigt: duplicate; blockiert: notAllowed (bleibt blockiert); eigenes Konto und ungültig', () async {

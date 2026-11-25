@@ -418,6 +418,10 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     return f == null || room == null ? null : _policyContext(f, room.id);
   }
 
+  /// Nur für Tests: die Räume der geöffneten Kontakt-Zeitleisten.
+  @visibleForTesting
+  Set<String> get debugContactTimelines => _contacts.timelines.keys.toSet();
+
   /// Nur für Tests: verlässt den Familienbereich wie bei einem Familienwechsel; die Kontaktrichtlinie bleibt dabei stehen.
   @visibleForTesting
   void debugLeaveFamilyScope() => _leaveFamilyScope();

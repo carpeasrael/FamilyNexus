@@ -806,6 +806,160 @@ void main() {
       expect(g.contactRequests.single.fromName, 'Mama familie.de · evil.example');
     });
 
+    /// Zwei Räume mit demselben Gegenüber in einem Update (m.direct nennt beide).
+    Map<String, Object?> twoRooms(String r1, String r2, {String peerState1 = 'join', int joined1 = 2, int invited1 = 0}) {
+      final a = dmJoined(r1, _fremd, peerState: peerState1, joined: joined1, invited: invited1);
+      final b = dmJoined(r2, _fremd);
+      (((a['account_data']! as Map)['events']! as List).first as Map)['content'] = <String, Object?>{_fremd: <String>[r1, r2]};
+      ((a['rooms']! as Map)['join']! as Map).addAll(((b['rooms']! as Map)['join']! as Map).cast<String, Object?>());
+      return a;
+    }
+
+    test('Auswahl je Gegenüber: ein beigetretenes Gegenüber geht einem wartenden vor, auch mit größerer Raum-ID', () async {
+      // Der wartende Raum (peerState invite) ist jeweils der erste Raum im Update; beide Zuordnungen der Raum-IDs.
+      for (final (waiting, joined) in <(String, String)>[('!a:hs.example', '!z:hs.example'), ('!z:hs.example', '!a:hs.example')]) {
+        final g = await signedIn(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}));
+        await _sync(g, twoRooms(waiting, joined, peerState1: 'invite', joined1: 1, invited1: 1));
+        await Future<void>.delayed(_settle);
+        expect(g.threads.where((t) => t.kind == ThreadKind.contact).map((t) => t.id), <String>[joined], reason: 'wartend $waiting, beigetreten $joined');
+      }
+      // Umgekehrte Reihenfolge im Update: der beigetretene Raum steht zuerst.
+      for (final (waiting, joined) in <(String, String)>[('!a:hs.example', '!z:hs.example'), ('!z:hs.example', '!a:hs.example')]) {
+        final g = await signedIn(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}));
+        final u = twoRooms(joined, waiting);
+        // Im zweiten Raum (waiting) ist das Gegenüber nur eingeladen.
+        final w = dmJoined(waiting, _fremd, peerState: 'invite', joined: 1, invited: 1);
+        (((u['rooms']! as Map)['join']! as Map))[waiting] = ((w['rooms']! as Map)['join']! as Map)[waiting];
+        await _sync(g, u);
+        await Future<void>.delayed(_settle);
+        expect(g.threads.where((t) => t.kind == ThreadKind.contact).map((t) => t.id), <String>[joined], reason: 'beigetreten zuerst: $joined, wartend $waiting');
+      }
+    });
+
+    test('Auswahl je Gegenüber: unter mehreren beigetretenen Räumen die kleinste Raum-ID', () async {
+      final g = await signedIn();
+      await _sync(g, twoRooms('!z:hs.example', '!a:hs.example'));
+      await Future<void>.delayed(_settle);
+      expect(g.threads.where((t) => t.kind == ThreadKind.contact).map((t) => t.id), <String>['!a:hs.example']);
+    });
+
+    test('Auto-Annahme prüft vor dem /join: Blockierte und Eingeladene der Familie werden nie angenommen', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      g.setContactPolicy(const ContactPolicy(
+        enabled: true,
+        contacts: {_fremd: ContactState.accepted, _dora: ContactState.accepted},
+        blocked: {_fremd},
+      ));
+      await _sync(g, invites(<String, String>{'!bl:hs.example': _fremd, '!fam:hs.example': _dora}));
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '/join'), isEmpty, reason: 'blockiert und Familienmitglied (eingeladen): nie ein /join');
+    });
+
+    test('der eigene wartende Raum blockiert die Annahme nicht: erst der Thread (pending), dann die Einladung der Gegenseite', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}));
+      expect(await contactThread(g, dmJoined('!own:hs.example', _fremd, peerState: 'invite', joined: 1, invited: 1)), isNull);
+      await _sync(g, dmJoined('!own:hs.example', _fremd, peerState: 'invite', joined: 1, invited: 1));
+      await Future<void>.delayed(_settle);
+      expect(g.threads.where((t) => t.kind == ThreadKind.contact && t.pending), hasLength(1), reason: 'Voraussetzung: der wartende Thread steht');
+      await _sync(g, invites(<String, String>{'!gegen:hs.example': _fremd}));
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '!gegen:hs.example/join'), isNotEmpty);
+    });
+
+    test('Anfragen: je Absender die kleinste Raum-ID, unabhängig von der Reihenfolge im Update', () async {
+      for (final order in <List<String>>[<String>['!aa:hs.example', '!zz:hs.example'], <String>['!zz:hs.example', '!aa:hs.example']]) {
+        final g = await signedIn(const ContactPolicy(enabled: true));
+        await _sync(g, invites(<String, String>{for (final r in order) r: '@anna3:hs.example'}));
+        await Future<void>.delayed(_settle);
+        expect(g.contactRequests.map((r) => r.roomId), <String>['!aa:hs.example'], reason: '$order');
+      }
+    });
+
+    test('Anfragen: ausgewertet werden höchstens 500 Einladungen (600 Server ⇒ 50 angezeigt, 450 weitere)', () async {
+      final g = await signedIn(const ContactPolicy(enabled: true));
+      await _sync(g, invites(<String, String>{
+        for (var i = 0; i < 600; i++) '!q${i.toString().padLeft(4, '0')}:hs.example': '@u$i:srv$i.example',
+      }));
+      await Future<void>.delayed(const Duration(seconds: 1));
+      expect(g.contactRequests.length, 50);
+      expect(g.contactRequestsHidden, 450);
+    });
+
+    test('familyUnreadCount absolut: Kontakte zählen nie hinein, unreadCount zählt sie', () async {
+      final g = await signedIn();
+      final update = dmJoined(ct, _fremd);
+      ((update['rooms']! as Map)['join']! as Map)[ct] = <String, Object?>{
+        ...((update['rooms']! as Map)['join']! as Map)[ct]! as Map<String, Object?>,
+        'unread_notifications': <String, Object?>{'notification_count': 3},
+      };
+      expect(await contactThread(g, update), isNotNull);
+      expect(g.familyUnreadCount, 0);
+      expect(g.unreadCount, 3);
+    });
+
+    test('leaveConversation verlässt nie einen beigetretenen Raum, der kein Kontakt-Thread ist', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      g.setContactPolicy(policy);
+      await _sync(g, dmJoined('!plain:hs.example', _dora, direct: false));
+      await Future<void>.delayed(_settle);
+      await expectLater(g.leaveConversation('!plain:hs.example'), _notAllowed());
+      expect(hs.where('POST', '!plain:hs.example/leave'), isEmpty);
+    });
+
+    test('Blockieren nach openThread, vor dem nächsten Abgleich: Senden sofort verweigert (frische Prüfung)', () async {
+      final g = await signedIn();
+      expect(await contactThread(g, dmJoined(ct, _fremd)), isNotNull);
+      await g.openThread(ct);
+      g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.blocked}, blocked: {_fremd}));
+      await expectLater(g.sendMessage('Hallo', threadId: ct), _notAllowed());
+    });
+
+    test('openThread: Blockieren oder Familienwechsel während des Öffnens ⇒ keine Zeitleiste', () async {
+      final g = await signedIn();
+      expect(await contactThread(g, dmJoined(ct, _fremd)), isNotNull);
+      final open = g.openThread(ct);
+      g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.blocked}, blocked: {_fremd}));
+      await open;
+      expect(g.debugContactTimelines, isEmpty);
+      g.setContactPolicy(policy);
+      await Future<void>.delayed(_settle);
+      final open2 = g.openThread(ct);
+      g.debugLeaveFamilyScope();
+      await open2;
+      expect(g.debugContactTimelines, isEmpty);
+      await g.openThread(ct);
+      await g.openThread(ct);
+      expect(g.debugContactTimelines.length, lessThanOrEqualTo(1));
+    });
+
+    test('Mitgliedszustand des Gegenübers wird je Raum höchstens einmal je Minute angefordert', () async {
+      final g = await signedIn();
+      var calls = 0;
+      g.debugPeerMembershipLoader = (room, peer) async {
+        calls++;
+        return null;
+      };
+      await _sync(g, dmJoined(ct, _fremd, members: <String>[_me]));
+      await Future<void>.delayed(_settle);
+      await _sync(g, <String, Object?>{});
+      await Future<void>.delayed(_settle);
+      await _sync(g, <String, Object?>{});
+      await Future<void>.delayed(_settle);
+      expect(calls, 1);
+    });
+
+    test('Senden in Mitglieder-Einzelchats läuft über den Mitglieder-Pfad (Vorrang vor dem Kontakt-Pfad)', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      g.setContactPolicy(policy);
+      await _sync(g, dmJoined('!mdm:hs.example', _ben));
+      await Future<void>.delayed(_settle);
+      // Im Harness ohne vodozemac meldet der **Mitglieder-Pfad** `encryptionUnavailable`; der Kontakt-Pfad würde `notAllowed`
+      // melden. Das belegt, dass der Mitglieder-Pfad zuerst gilt.
+      await expectLater(g.sendMessage('Hallo Ben', threadId: '!mdm:hs.example'), _error(GatewayError.encryptionUnavailable));
+      expect(hs.sends, isEmpty);
+    });
+
     group('Nachprüfung nach dem Beitritt (Auto-Annahme)', () {
       const room = '!neu:hs.example';
 
@@ -850,6 +1004,13 @@ void main() {
         await _sync(g, <String, Object?>{});
         await Future<void>.delayed(_settle);
         expect(g.threads.where((t) => t.id == room && t.kind == ThreadKind.contact), hasLength(1));
+      });
+
+      test('unbekannt (Zähler fehlen): nie verlassen', () async {
+        final update = dmJoined(room, _fremd);
+        (((update['rooms']! as Map)['join']! as Map)[room]! as Map).remove('summary');
+        final (hs, _) = await joined(update);
+        expect(hs.where('POST', '$room/leave'), isEmpty, reason: 'ohne Zähler ist die Größe unbekannt, kein Verstoß');
       });
 
       test('Familienwechsel während des Beitritts: der Raum wird verlassen', () async {
