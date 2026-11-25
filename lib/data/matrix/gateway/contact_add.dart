@@ -93,6 +93,15 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
     }
   }
 
+  /// Kanonische Kennung (Servername kleingeschrieben, wie `ContactId.parse`): Servernamen sind nicht groß-/
+  /// kleinschreibungsabhängig, sonst würde die eigene Kennung oder die eines Familienmitglieds mit anderer Schreibweise
+  /// des Servers als Fremder gelten.
+  String _canonical(String raw) {
+    final id = ContactId.parse(raw);
+    if (id == null) throw const GatewayException(GatewayError.invalidInput);
+    return id;
+  }
+
   void _requireUsable(Family f, String userId) {
     final c = _client;
     if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
@@ -103,8 +112,9 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
   }
 
   @override
-  Future<ContactProbe> probeContact(String userId) async {
+  Future<ContactProbe> probeContact(String rawUserId) async {
     final f = _requireFamily();
+    final userId = _canonical(rawUserId);
     _requireUsable(f, userId);
     if (f.member(userId) != null) {
       return ContactProbe(
@@ -176,8 +186,9 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
   }
 
   @override
-  Future<String> startContactChat(String userId) async {
+  Future<String> startContactChat(String rawUserId) async {
     final f = _requireFamily();
+    final userId = _canonical(rawUserId);
     _requireUsable(f, userId);
     if (f.member(userId) != null || _contactPolicy.contacts[userId] != ContactState.outgoing) {
       throw const GatewayException(GatewayError.notAllowed); // ohne Datensatz kein Raum

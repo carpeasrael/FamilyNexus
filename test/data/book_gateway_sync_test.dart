@@ -137,6 +137,9 @@ class _Hs {
 
   /// Nach `createRoom`: liefert den Sync mit dem angelegten Raum (sonst wartet das SDK darauf).
   void Function(String room)? onCreate;
+
+  /// Hält die Antworten auf `GET /profile/{id}`, bis die Zukunft endet (gleichzeitige Abfragen).
+  Completer<void>? holdProfile;
   List<String> members = <String>[];
   Set<String> left = <String>{};
 
@@ -196,6 +199,7 @@ class _Hs {
           return _json(<String, Object?>{'room_id': createdRoom});
         }
         if (path.startsWith('/_matrix/client/v3/profile/')) {
+          await holdProfile?.future;
           final user = path.substring('/_matrix/client/v3/profile/'.length);
           final p = profiles[user];
           if (p == null) return _json(<String, Object?>{'errcode': 'M_NOT_FOUND', 'error': 'Profil nicht gefunden'}, 404);
@@ -1211,9 +1215,45 @@ void main() {
       });
     });
 
+    test('Schlüssel unbekannt: der Thread bleibt erreichbar (nie eine falsche Warnung) und Senden wird nicht als „nicht erreichbar“ verweigert', () async {
+      final (_, g) = await ready(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.accepted}));
+      expect(await contactThreadFor(g, '!ct:hs.example', dmJoined('!ct:hs.example', _fremd)), isNotNull);
+      await g.openThread('!ct:hs.example');
+      g.debugDevicesOf = (id) => null;
+      await _sync(g, <String, Object?>{});
+      await Future<void>.delayed(_settle);
+      expect(g.threads.firstWhere((t) => t.kind == ThreadKind.contact).reachable, isTrue);
+      try {
+        await g.sendMessage('Hallo', threadId: '!ct:hs.example').timeout(const Duration(seconds: 3));
+      } catch (e) {
+        expect(e, isNot(isA<GatewayException>().having((x) => x.error, 'error', GatewayError.peerNotReachable)));
+      }
+    });
+
+    test('gleichzeitige Abfragen: dieselbe Kennung teilt eine Anfrage; höchstens 4 verschiedene gleichzeitig (rateLimited)', () async {
+      final (hs, g) = await ready();
+      hs.holdProfile = Completer<void>();
+      hs.profiles[_fremd] = (200, <String, Object?>{'displayname': 'F'});
+      final a = g.probeContact(_fremd);
+      final b = g.probeContact(_fremd);
+      final others = <Future<ContactProbe>>[
+        for (var i = 0; i < 3; i++) g.probeContact('@x$i:hs.example'),
+      ];
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      await expectLater(g.probeContact('@x9:hs.example'), _error(GatewayError.rateLimited));
+      hs.holdProfile!.complete();
+      await Future.wait<ContactProbe>(<Future<ContactProbe>>[a, b, ...others]);
+      expect(hs.where('GET', '/profile/@fremd').length, 1, reason: 'dieselbe Kennung teilt eine Anfrage');
+    });
+
     group('startContactChat', () {
       test('Vorbedingungen je einzeln: ohne Datensatz, accepted, blockiert, Familienmitglied, eigenes Konto', () async {
         final (hs, g) = await ready(const ContactPolicy(enabled: true));
+        var keyChecks = 0;
+        g.debugDevicesOf = (id) {
+          keyChecks++;
+          return <bool>[true];
+        };
         await expectLater(g.startContactChat(_fremd), _notAllowed(), reason: 'ohne Datensatz');
         g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.accepted}));
         await expectLater(g.startContactChat(_fremd), _notAllowed(), reason: 'accepted');
@@ -1224,6 +1264,17 @@ void main() {
         await expectLater(g.startContactChat(_dora), _notAllowed(), reason: 'eingeladenes Familienmitglied');
         await expectLater(g.startContactChat(_me), _notAllowed());
         expect(hs.where('POST', '/createRoom'), isEmpty);
+        expect(keyChecks, 0, reason: 'Vorbedingungen scheitern vor jeder Schlüsselabfrage');
+      });
+
+      test('Schreibweise des Servernamens: eigene Kennung und Familienmitglied bleiben erkannt', () async {
+        final (hs, g) = await ready(const ContactPolicy(enabled: true, contacts: {'@n2:hs.example': ContactState.outgoing, _ben: ContactState.outgoing}));
+        await expectLater(g.startContactChat('@n2:HS.Example'), _notAllowed(), reason: 'eigenes Konto');
+        await expectLater(g.startContactChat('@ben:HS.EXAMPLE'), _notAllowed(), reason: 'Familienmitglied');
+        await expectLater(g.probeContact('@n2:HS.Example'), _notAllowed());
+        expect((await g.probeContact('@ben:HS.EXAMPLE')).isFamilyMember, isTrue);
+        expect(profileCalls(hs), 0);
+        await expectLater(g.startContactChat('@Gross:hs.example'), _error(GatewayError.invalidInput), reason: 'Großbuchstaben im lokalen Teil');
       });
 
       test('Liste nicht geladen: nie ein Raum', () async {
@@ -1263,6 +1314,7 @@ void main() {
         expect(body, contains('"is_direct":true'));
         expect(body, contains('m.megolm.v1.aes-sha2'));
         expect(body, contains('"history_visibility":"shared"'));
+        expect(body, contains('"preset":"private_chat"'));
       });
 
       test('ein vorhandener Kontakt-Raum wird wiederverwendet, ohne neue Abfrage und ohne neuen Raum', () async {
