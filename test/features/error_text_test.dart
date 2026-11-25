@@ -1,6 +1,7 @@
 import 'package:family_nexus/data/matrix/matrix_gateway.dart' show GatewayError, GatewayException;
 import 'package:family_nexus/domain/anniversaries.dart';
 import 'package:family_nexus/domain/anniversary_service.dart';
+import 'package:family_nexus/domain/contact_service.dart';
 import 'package:family_nexus/features/common/error_text.dart';
 import 'package:family_nexus/l10n/gen/app_localizations.dart';
 import 'package:family_nexus/l10n/gen/app_localizations_de.dart';
@@ -33,5 +34,28 @@ void main() {
     expect(errorText(en, e), 'This person needs to set up the security check in their app before you can message each other.');
     expect(errorText(de, e), isNot(de.errUnknown));
     expect(errorText(en, e), isNot(en.errUnknown));
+  });
+
+  test('ContactException (#119, K3b-1): jeder Fall hat seinen eigenen Text, de und en', () {
+    final de = AppLocalizationsDe();
+    final en = AppLocalizationsEn();
+    final expectedDe = <ContactError, String>{
+      ContactError.invalid: 'Die Angabe ist ungültig.',
+      ContactError.notAllowed: 'Das ist nicht erlaubt.',
+      ContactError.notFound: 'Der Kontakt wurde nicht gefunden.',
+      ContactError.limit: 'Die Grenze für Kontakte ist erreicht.',
+      ContactError.duplicate: 'Diese Person ist schon in deiner Liste.',
+    };
+    final expectedEn = <ContactError, String>{
+      ContactError.invalid: 'The entry is invalid.',
+      ContactError.notAllowed: 'This is not allowed.',
+      ContactError.notFound: 'The contact was not found.',
+      ContactError.limit: 'The limit for contacts has been reached.',
+      ContactError.duplicate: 'This person is already in your list.',
+    };
+    for (final e in ContactError.values) {
+      expect(errorText(de, ContactException(e)), expectedDe[e], reason: 'de ${e.name}');
+      expect(errorText(en, ContactException(e)), expectedEn[e], reason: 'en ${e.name}');
+    }
   });
 }

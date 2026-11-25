@@ -5,6 +5,7 @@ import '../../domain/anniversary_service.dart';
 import '../../domain/avatar_photo_processing.dart';
 import '../../domain/avatar_photo_service.dart';
 import '../../domain/cash_book_service.dart';
+import '../../domain/contact_service.dart';
 import '../../domain/event_theme_service.dart';
 import '../../domain/event_themes.dart';
 import '../../domain/receipt_photo_processing.dart';
@@ -40,6 +41,15 @@ String errorText(AppLocalizations l, Object error) {
       GatewayError.passwordChangeUnavailable => l.passwordChangeUnavailable,
       GatewayError.peerNotReachable => l.errPeerNotReachable,
       GatewayError.unknown => l.errUnknown,
+    };
+  }
+  if (error is ContactException) {
+    return switch (error.error) {
+      ContactError.invalid => l.contactErrInvalid,
+      ContactError.notAllowed => l.contactErrNotAllowed,
+      ContactError.notFound => l.contactErrNotFound,
+      ContactError.limit => l.contactErrLimit,
+      ContactError.duplicate => l.contactErrDuplicate,
     };
   }
   if (error is AvatarPhotoProcessingException) {

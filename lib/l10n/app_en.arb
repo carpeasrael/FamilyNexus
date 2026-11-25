@@ -130,6 +130,108 @@
   "errServerUnreachable": "Server not reachable. Check your connection.",
   "errServerUnsupported": "FamilyNexus does not support this provider. Please choose another one under “Advanced”.",
   "errPeerNotReachable": "This person needs to set up the security check in their app before you can message each other.",
+  "contactsTitle": "Contacts",
+  "contactsSettingsSubtitle": "Chats with people outside the family",
+  "contactsIntroTitle": "Turn on contacts?",
+  "contactsIntroBody": "With contacts you can write to people outside your family, on any Matrix server.\n\nWhat changes:\n• Messages are end-to-end encrypted. Your server and the other person’s server can still see who writes to whom.\n• Events, lists, replies and online status are never shared with contacts.\n• The other person sees your display name and your contact ID.\n• “Check” asks your server and the server of the person you look up. Both learn whom you are looking for. At most 20 checks per hour are possible.\n• Your contact list and this setting are stored encrypted in your account’s private room and apply on all your devices.\n• Turning it off deletes nothing: the area is hidden and new requests are ignored.\n• The app does not check age.",
+  "contactsTurnOn": "Turn on contacts",
+  "contactsTurnOff": "Turn off contacts",
+  "contactsTurnOffTitle": "Turn off contacts?",
+  "contactsTurnOffBody": "The area and new requests are hidden. Nothing is deleted.",
+  "contactsRequestsTitle": "Requests",
+  "contactsRequestFrom": "{name} would like to write to you",
+  "@contactsRequestFrom": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "contactsRequestsMore": "More requests: {count}",
+  "@contactsRequestsMore": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "contactsAccept": "Accept",
+  "contactsDecline": "Decline",
+  "contactsBlock": "Block",
+  "contactsAcceptTitle": "Accept request?",
+  "contactsAcceptBody": "{name} will then be able to write to you and will see your display name and contact ID. ID: {id}",
+  "@contactsAcceptBody": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "id": {"type": "String"}
+    }
+  },
+  "contactsBlockTitle": "Block?",
+  "contactsBlockBody": "{name} will be hidden and will not be told. ID: {id}",
+  "@contactsBlockBody": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "id": {"type": "String"}
+    }
+  },
+  "contactsListTitle": "Your contacts",
+  "contactsListEmpty": "No contacts yet.",
+  "contactsAdd": "Add contact",
+  "contactsMyId": "My contact ID",
+  "contactsCopy": "Copy",
+  "contactsCopied": "Contact ID copied",
+  "contactsStateWaiting": "Waiting for acceptance",
+  "contactsStateConfirmed": "Confirmed",
+  "contactsStateNotSent": "Not sent yet",
+  "contactsStateSearching": "Looking for the chat",
+  "contactsStateBlocked": "Blocked",
+  "contactsRetry": "Send again",
+  "contactsRetryWait": "Please wait a moment before sending again.",
+  "contactsRemove": "Remove",
+  "contactsRemoveTitle": "Remove contact?",
+  "contactsRemoveBody": "You will leave the chat with {name}. ID: {id}",
+  "@contactsRemoveBody": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "id": {"type": "String"}
+    }
+  },
+  "contactsUnblock": "Unblock",
+  "contactsUnblockLocal": "Remove block",
+  "contactsAddTitle": "Add contact",
+  "contactsAddHint": "@name:server or matrix.to link",
+  "contactsCheck": "Check",
+  "contactsCheckAgain": "Check again",
+  "contactsCheckPrivacy": "Checking asks your server and the server of the person you look up. Both learn whom you are looking for.",
+  "contactsFoundTitle": "Found",
+  "contactsFoundName": "Name: {name}",
+  "@contactsFoundName": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "contactsFoundId": "ID: {id}",
+  "@contactsFoundId": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "contactsAddConfirm": "Add",
+  "contactsAdded": "Request sent. The chat starts when the person joins.",
+  "contactsCheckInvalid": "This is not a valid contact ID. It looks like this: @name:server.",
+  "contactsCheckSelf": "This is your own contact ID.",
+  "contactsCheckDuplicate": "This person is already in your list.",
+  "contactsCheckBlockedRecord": "This person is blocked. Unblock them in the list first.",
+  "contactsCheckBlockedLocal": "This person is blocked on this device.",
+  "contactsCheckFamily": "This is a member of your family. Write to them in the family chat.",
+  "contactsCheckNotFound": "This account was not found. Check the spelling.",
+  "contactsCheckNotReachable": "This person needs to set up the security check in their app before you can message each other.",
+  "contactsCheckIdentity": "This person’s security key has changed. Adding is only possible after verification.",
+  "contactsCheckUnknown": "The person could not be checked right now. Please check again later.",
+  "contactsCheckRateLimited": "Too many checks (at most 20 per hour). Please try again later.",
+  "contactsCheckNotReady": "This is not possible right now (the family is still loading or the person is blocked). Please wait a moment and try again.",
+  "contactsLoading": "Loading contacts",
+  "contactErrInvalid": "The entry is invalid.",
+  "contactErrNotAllowed": "This is not allowed.",
+  "contactErrNotFound": "The contact was not found.",
+  "contactErrLimit": "The limit for contacts has been reached.",
+  "contactErrDuplicate": "This person is already in your list.",
   "errNotAllowed": "You do not have permission for this.",
   "errAttachmentRejected": "This attachment is not allowed (type or size).",
   "errInvalidInput": "Please check your input.",

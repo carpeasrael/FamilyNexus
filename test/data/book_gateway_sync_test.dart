@@ -132,6 +132,9 @@ class _Hs {
   /// Antworten auf `GET /profile/{id}` (Status, Körper); ohne Eintrag `M_NOT_FOUND`.
   final Map<String, (int, Map<String, Object?>)> profiles = <String, (int, Map<String, Object?>)>{};
 
+  /// `POST …/leave` schlägt mit 403 fehl (nicht 500/M_UNKNOWN: das SDK löscht den Raum dann lokal) (Wiederholbarkeit von `leaveConversation`).
+  bool failLeave = false;
+
   /// Hält `createRoom`, bis die Zukunft endet (Wettlauf beim Anlegen).
   Completer<void>? holdCreate;
 
@@ -193,6 +196,7 @@ class _Hs {
           if (_syncs++ > 0) await release.future;
           return _json(<String, Object?>{'next_batch': 's$_syncs'});
         }
+        if (failLeave && path.endsWith('/leave')) return _json(<String, Object?>{'errcode': 'M_FORBIDDEN', 'error': 'x'}, 403);
         if (path == '/_matrix/client/v3/createRoom') {
           await holdCreate?.future;
           onCreate?.call(createdRoom);
@@ -1054,6 +1058,23 @@ void main() {
         );
         expect(hs.where('POST', '$room/leave'), isNotEmpty);
       });
+    });
+
+    test('leaveConversation: scheitert leave(), bleibt alles unverändert (Thread, m.direct); der zweite Versuch gelingt und bereinigt danach m.direct', () async {
+      final (hs, g) = await _signedIn(encryption: true);
+      g.setContactPolicy(policy);
+      expect(await contactThread(g, dmJoined(ct, _fremd)), isNotNull);
+      hs.failLeave = true;
+      await expectLater(g.leaveConversation(ct), throwsA(isA<GatewayException>()));
+      await Future<void>.delayed(_settle);
+      expect(g.threads.where((t) => t.kind == ThreadKind.contact), hasLength(1), reason: 'unverändert, nicht verschwunden');
+      final directBefore = hs.where('PUT', 'account_data/m.direct').length;
+      hs.failLeave = false;
+      await g.leaveConversation(ct);
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '$ct/leave'), isNotEmpty);
+      expect(hs.where('PUT', 'account_data/m.direct').length, greaterThan(directBefore), reason: 'm.direct erst nach dem Verlassen bereinigt');
+      expect(g.threads.where((t) => t.kind == ThreadKind.contact), isEmpty);
     });
 
     test('leaveConversation verlässt den Raum und räumt den Thread auf', () async {

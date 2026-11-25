@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:family_nexus/data/sync/contact_sync.dart';
 import 'package:family_nexus/domain/calendar_signal.dart';
 import 'package:family_nexus/domain/contacts.dart';
+import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/moderation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -37,6 +38,26 @@ class _StaleStore extends MemoryContactStore {
       await gate!.future;
     }
     return snapshot;
+  }
+}
+
+/// Blockierliste, deren `remove` scheitert.
+class _FailingRemoveList extends MemoryBlockedList {
+  _FailingRemoveList(super.initial);
+
+  @override
+  Future<void> remove(Iterable<String> ids) async => throw StateError('Einstellungen nicht schreibbar');
+}
+
+/// Blockierliste, deren `add` hängt, bis das Tor geöffnet wird (Race zwischen Abgleich und Entsperren).
+class _SlowBlockedList extends MemoryBlockedList {
+  _SlowBlockedList(this.gate);
+  final Completer<void> gate;
+
+  @override
+  Future<void> add(Iterable<String> ids) async {
+    await gate.future;
+    await super.add(ids);
   }
 }
 
@@ -656,13 +677,83 @@ void main() {
       expect(list.adds, 1, reason: 'ein zweiter Abgleich ohne Neues schreibt nicht');
     });
 
-    test('die Aufhebung entfernt nichts aus der Liste', () async {
+    // Seit K3b-1 (E-114): Entsperren räumt auch die lokale Liste. Auf dem anderen Gerät nur, wenn der Vorzustand `blocked` war.
+    test('die Löschmarke eines blockierten Kontakts räumt die lokale Liste des anderen Geräts', () async {
       await a.service.block(_ben);
       await a.flush([b]);
       expect(b.blockedList.list, <String>[_ben]);
       await a.service.unblock(_ben);
       await a.flush([b]);
-      expect(b.blockedList.list, <String>[_ben]);
+      expect(b.blockedList.list, isEmpty);
+    });
+
+    test('die Löschmarke eines bloß entfernten (nie blockierten) Kontakts lässt eine lokal blockierte Kennung stehen (E-48)', () async {
+      await a.service.addOutgoing(_carla);
+      await a.flush([b]);
+      b.blockedList.list.add(_carla);
+      await a.service.remove(_carla);
+      await a.flush([b]);
+      expect(b.blockedList.list, <String>[_carla]);
+    });
+
+    test('Race: ein laufendes reconcileBlocked trägt die Kennung nach dem Entsperren nicht wieder ein', () async {
+      final gate = Completer<void>();
+      final list = _SlowBlockedList(gate);
+      final peer = await ContactPeer.create(server, 'anna', 'pw1', blockedList: list, start: false);
+      addTearDown(peer.dispose);
+      await peer.service.block(_ben);
+      final reconcile = peer.sync.reconcileBlocked(); // hängt im add
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      await peer.service.unblock(_ben);
+      final forget = peer.sync.forgetBlocked(_ben); // wartet in der Warteschlange
+      gate.complete();
+      await reconcile;
+      expect(await forget, isTrue);
+      expect(list.list, isEmpty, reason: 'erst eingetragen, dann (in dieser Reihenfolge) wieder entfernt');
+      await peer.sync.reconcileBlocked();
+      expect(list.list, isEmpty, reason: 'ein späterer Lauf liest die Löschmarke und trägt nichts ein');
+    });
+
+    test('forgetBlocked gibt ein Familienmitglied nie frei (E-48); ein Fehler des Ports wirft nicht', () async {
+      final fam = await ContactPeer.create(server, 'dora', 'pw2');
+      addTearDown(fam.dispose);
+      await fam.gateway.createFamily('Familie');
+      server.rooms.values.last.membership[_ben] = MemberStatus.joined;
+      fam.blockedList.list.add(_ben);
+      expect(await fam.sync.forgetBlocked(_ben), isFalse);
+      expect(fam.blockedList.list, <String>[_ben], reason: 'Mitglieder bleiben lokal blockiert');
+      final failing = _FailingRemoveList(<String>[_carla]);
+      final peer = await ContactPeer.create(server, 'anna', 'pw1', blockedList: failing, start: false);
+      addTearDown(peer.dispose);
+      expect(await peer.sync.forgetBlocked(_carla), isFalse, reason: 'Fehler beim Entfernen: false, kein Wurf');
+      expect(failing.list, <String>[_carla]);
+    });
+
+    test('Löschmarke ohne Vorzustand oder eine verworfene ältere Löschmarke gibt die lokale Blockierung nicht frei', () async {
+      b.blockedList.list.add(_carla);
+      final me = b.gateway.userId!;
+      Contact tomb(String id, int v, ContactState s) => Contact(id: id, state: s, version: v, updatedAt: server.now(), deleted: true);
+      // ohne Vorzustand: eine Löschmarke eines nie gesehenen Kontakts
+      await b.sync.debugDeliver(ContactSignal(me, server.now(), ContactCodec.encode(tomb(_carla, 2, ContactState.outgoing))));
+      expect(b.blockedList.list, <String>[_carla], reason: 'kein Vorzustand blocked');
+      // ältere (verworfene) Löschmarke nach einem blockierten Stand v3
+      await b.sync.debugDeliver(ContactSignal(me, server.now(), ContactCodec.encode(Contact(id: _ben, state: ContactState.blocked, version: 3, updatedAt: server.now()))));
+      await b.sync.reconcileBlocked();
+      expect(b.blockedList.list, containsAll(<String>[_ben, _carla]));
+      await b.sync.debugDeliver(ContactSignal(me, server.now(), ContactCodec.encode(tomb(_ben, 2, ContactState.blocked))));
+      expect(b.blockedList.list, contains(_ben), reason: 'die ältere Löschmarke wurde verworfen und gibt nichts frei');
+      // eine neuere Löschmarke eines blockierten Kontakts gibt frei
+      await b.sync.debugDeliver(ContactSignal(me, server.now(), ContactCodec.encode(tomb(_ben, 4, ContactState.blocked))));
+      expect(b.blockedList.list, isNot(contains(_ben)));
+      expect(b.blockedList.list, contains(_carla));
+    });
+
+    test('forgetBlocked: nichts zu tun ohne Eintrag; isLocallyBlocked', () async {
+      expect(await a.sync.forgetBlocked(_ben), isFalse);
+      a.blockedList.list.add(_ben);
+      expect(a.sync.isLocallyBlocked(_ben), isTrue);
+      expect(await a.sync.forgetBlocked(_ben), isTrue);
+      expect(a.sync.isLocallyBlocked(_ben), isFalse);
     });
 
     test('ist die Liste voll, werden keine Kontakt-Blockierten eingetragen (bewusste Grenze), ohne Absturz', () async {

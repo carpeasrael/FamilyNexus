@@ -502,8 +502,10 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
   }
 
   /// Verlässt ein Kontakt-Gespräch (nie den Familienchat, nie einen Einzelchat mit einem Mitglied). **Reihenfolge für den
-  /// Controller:** erst den Datensatz entfernen oder blockieren, dann hier verlassen; sonst nimmt die Auto-Annahme eine
-  /// Neueinladung derselben Person sofort wieder an.
+  /// Controller:** erst hier verlassen, dann den Datensatz löschen (nach dem Löschen wäre der Raum nicht mehr
+  /// `contactDirect` und damit nicht mehr erreichbar). Scheitert `leave()`, bleibt **alles unverändert** (auch `m.direct`,
+  /// der Raum bleibt Kontakt-Thread, ein zweiter Versuch ist möglich); nur bei Erfolg wird `m.direct` bereinigt
+  /// (bestmöglich), der Raum als verlassen gemerkt und der Zustand geräumt.
   @override
   Future<void> leaveConversation(String threadId) async {
     final c = _contacts;
@@ -511,23 +513,24 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     if (threadId == ChatThread.familyId || _dmPeers.containsKey(threadId) || !c.peers.containsKey(threadId) || room == null) {
       throw const GatewayException(GatewayError.notAllowed);
     }
-    c.rememberFailed(threadId);
-    c.timelines.remove(threadId)?.cancelSubscriptions();
-    c.peers.remove(threadId);
-    c.messages.remove(threadId);
-    c.titles.remove(threadId);
-    c.pending.remove(threadId);
-    try {
-      await room.removeFromDirectChat();
-    } catch (e) {
-      AppLog.e('gateway', 'Kontakt-Gespräch konnte nicht aus den Direktchats entfernt werden', e);
-    }
     try {
       await room.leave();
     } catch (e) {
       AppLog.e('gateway', 'Kontakt-Gespräch konnte nicht verlassen werden', e);
       throw _map(e);
     }
+    // Erst nach dem Verlassen: `m.direct` bereinigen (bestmöglich, wirft nie) und den Zustand räumen.
+    try {
+      await room.removeFromDirectChat();
+    } catch (e) {
+      AppLog.e('gateway', 'Kontakt-Gespräch konnte nicht aus den Direktchats entfernt werden', e);
+    }
+    c.rememberFailed(threadId);
+    c.timelines.remove(threadId)?.cancelSubscriptions();
+    c.peers.remove(threadId);
+    c.messages.remove(threadId);
+    c.titles.remove(threadId);
+    c.pending.remove(threadId);
     _scheduleRefresh();
   }
 }

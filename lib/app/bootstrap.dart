@@ -62,7 +62,8 @@ bool _cryptoReady = false;
 
 /// Initialisiert die Krypto-Bibliothek (vodozemac) genau einmal pro Prozess;
 /// ein zweiter Aufruf (z. B. „Erneut versuchen“) würde sonst einen Fehler werfen.
-/// Adapter der lokalen Blockierliste für die Kontakt-Synchronisation (#119, E-114): trägt nur ein, über die Einstellungen.
+/// Adapter der lokalen Blockierliste für die Kontakt-Synchronisation (#119, E-114): trägt ein und nimmt zurück (Entsperren),
+/// über die Einstellungen.
 class SettingsBlockedList implements BlockedListPort {
   SettingsBlockedList(this._settings);
   final SettingsController _settings;
@@ -76,6 +77,17 @@ class SettingsBlockedList implements BlockedListPort {
       var list = c.blockedUsers;
       for (final id in ids) {
         list = BlockedUsers.add(list, id);
+      }
+      return list == c.blockedUsers ? c : c.copyWith(blockedUsers: list);
+    });
+  }
+
+  @override
+  Future<void> remove(Iterable<String> ids) async {
+    await _settings.update((c) {
+      var list = c.blockedUsers;
+      for (final id in ids) {
+        list = BlockedUsers.remove(list, id);
       }
       return list == c.blockedUsers ? c : c.copyWith(blockedUsers: list);
     });

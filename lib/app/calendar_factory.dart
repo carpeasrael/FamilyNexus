@@ -25,6 +25,7 @@ import '../domain/event_theme_store.dart';
 import '../domain/family.dart';
 import '../features/calendar/calendar_controller.dart';
 import '../features/cashbook/cash_book_controller.dart';
+import '../features/contacts/contact_controller.dart';
 import '../features/family/avatar_photo_images.dart';
 
 /// Baut Dienst, Synchronisation und Controller für einen Nutzer zusammen.
@@ -162,6 +163,7 @@ CalendarController buildCalendarController({
   // Kontakte außerhalb der Familie (#119, E-114): gehören zum Konto, nicht zur Familie (auch ohne Familie); bis zur Freigabe
   // (`ContactFlags.enabled`) entstehen weder Dienst noch Synchronisation.
   ContactSync? contactSync;
+  ContactController? contactController;
   if (contactStore != null && contactsEnabled) {
     contactSync = ContactSync(
       gateway: gateway,
@@ -171,6 +173,7 @@ CalendarController buildCalendarController({
       clock: clock,
       retryInterval: retryInterval,
     );
+    contactController = ContactController(gateway: gateway, sync: contactSync, clock: clock);
   }
   controller = CalendarController(
     service: service,
@@ -191,6 +194,7 @@ CalendarController buildCalendarController({
     cashBookReceipts: cashBookReceipts,
     cashBookController: cashBookController,
     contactSync: contactSync,
+    contactController: contactController,
   );
   return controller;
 }

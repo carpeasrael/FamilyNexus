@@ -29,6 +29,16 @@ void main() {
     expect(settings.settings.blockedUsers, hasLength(2));
   });
 
+  test('zurücknehmen (Entsperren): nur die genannten Kennungen, Unbekanntes ändert nichts', () async {
+    final (settings, port) = await make(<String>['@lokal:example.org', '@ben:example.org']);
+    await port.remove(<String>['@ben:example.org', '@unbekannt:example.org']);
+    expect(settings.settings.blockedUsers, <String>['@lokal:example.org']);
+    await port.remove(const <String>[]);
+    await port.remove(<String>['@unbekannt:example.org']);
+    expect(settings.settings.blockedUsers, <String>['@lokal:example.org']);
+    expect(port.blocked, <String>{'@lokal:example.org'});
+  });
+
   test('die Obergrenze der Liste bleibt erhalten', () async {
     final (settings, port) = await make(<String>[for (var i = 0; i < BlockedUsers.maxEntries; i++) '@v$i:example.org']);
     await port.add(<String>['@ben:example.org']);

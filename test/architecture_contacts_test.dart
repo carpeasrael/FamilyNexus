@@ -15,6 +15,7 @@ void main() {
       'lib/domain/contact_store.dart',
       'lib/data/db/sql_contact_store.dart',
       'lib/data/sync/contact_sync.dart', // ContactService, ContactStore
+      'lib/features/contacts/contact_controller.dart', // Oberfläche (K3b-1): Dienst über ContactSync, nur hier
       'lib/app/calendar_factory.dart', // erzeugt den Dienst (hinter der Sperre)
       'lib/app/bootstrap.dart', // reicht SqlContactStore durch
       'lib/app/app_services.dart', // Wipe-Pfade (wipeAccountDataIn, claimFamilyData)
@@ -104,6 +105,29 @@ void main() {
 
   // ---- K3a-2: Kontakt-Einzelchats im Gateway ----
 
+  test('K3b-1: ContactController( nur in der Factory und hinter contactsEnabled; die Bildschirme kennen nur den Controller', () {
+    final factory = code(File('lib/app/calendar_factory.dart').readAsStringSync());
+    expect(RegExp(r'if \(contactStore != null && contactsEnabled\) \{[\s\S]*?contactController = ContactController\(').hasMatch(factory), isTrue);
+    final offenders = <String>[];
+    for (final f in libFiles()) {
+      if (f.path == 'lib/features/contacts/contact_controller.dart' || f.path == 'lib/app/calendar_factory.dart') continue;
+      if (RegExp(r'(?<![\w.])ContactController\(').hasMatch(code(f.readAsStringSync()))) offenders.add(f.path);
+    }
+    expect(offenders, isEmpty);
+    // Bildschirme: weder Dienst noch Speicher noch Gateway-Methoden noch ContactSync.
+    for (final name in <String>['contacts_screen.dart', 'add_contact_screen.dart', 'contact_entry_points.dart']) {
+      final t = code(File('lib/features/contacts/$name').readAsStringSync());
+      for (final banned in <String>['ContactService', 'ContactStore', 'ContactSync', 'probeContact', 'startContactChat', 'declineContactRequest', 'leaveConversation', 'MatrixGateway']) {
+        expect(t.contains(banned), isFalse, reason: '$name nennt $banned');
+      }
+    }
+    // `ContactSync.service`/`.store` liest in lib/features nur der Controller.
+    for (final f in libFiles().where((f) => f.path.startsWith('lib/features/') && f.path != 'lib/features/contacts/contact_controller.dart')) {
+      final t = code(f.readAsStringSync());
+      expect(RegExp(r'ontactSync\??\.(service|store)\b').hasMatch(t), isFalse, reason: f.path);
+    }
+  });
+
   test('Freigabebedingung: ContactFlags.enabled nur, wenn K3b-2 (B8) und K3c (Kontakte ohne Familie) abgeschlossen sind', () {
     if (!ContactFlags.enabled) return; // Der Freigabe-PR setzt die Marken bewusst in docs/ENTSCHEIDUNGEN.md.
     final doc = File('docs/ENTSCHEIDUNGEN.md').readAsStringSync();
@@ -134,7 +158,8 @@ void main() {
   });
 
   test('probeContact/startContactChat nur im Gateway; Profil über den direkten Endpunkt, nie über den SDK-Cache (kein Fremdprofil in der Datenbank)', () {
-    const allowed = <String>{'lib/data/matrix/matrix_gateway.dart', 'lib/data/matrix/gateway/contact_add.dart'};
+    // K3b-1: genau der Controller ruft beide auf (ausdrücklich, nach Tipp); die Oberfläche (Screens) nie.
+    const allowed = <String>{'lib/data/matrix/matrix_gateway.dart', 'lib/data/matrix/gateway/contact_add.dart', 'lib/features/contacts/contact_controller.dart'};
     final offenders = <String>[];
     for (final f in libFiles()) {
       if (allowed.contains(f.path)) continue;

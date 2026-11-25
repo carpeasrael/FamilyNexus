@@ -348,6 +348,229 @@ class AppLocalizationsDe extends AppLocalizations {
       'Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.';
 
   @override
+  String get contactsTitle => 'Kontakte';
+
+  @override
+  String get contactsSettingsSubtitle =>
+      'Chats mit Personen außerhalb der Familie';
+
+  @override
+  String get contactsIntroTitle => 'Kontakte einschalten?';
+
+  @override
+  String get contactsIntroBody =>
+      'Mit Kontakten kannst du mit Personen außerhalb deiner Familie schreiben, auf jedem Matrix-Server.\n\nWas sich ändert:\n• Nachrichten sind Ende-zu-Ende verschlüsselt. Wer mit wem schreibt, sehen aber dein Server und der Server der anderen Person.\n• Termine, Listen, Zusagen und Online-Status werden nie mit Kontakten geteilt.\n• Die andere Person sieht deinen Anzeigenamen und deine Kontakt-ID.\n• „Prüfen“ fragt deinen Server und den Server der gesuchten Person. Beide erfahren so, wen du suchst. Es sind höchstens 20 Prüfungen je Stunde möglich.\n• Die Liste deiner Kontakte und diese Einstellung liegen verschlüsselt im privaten Raum deines Kontos und gelten auf allen deinen Geräten.\n• Ausschalten löscht nichts: Der Bereich wird verborgen und neue Anfragen werden ignoriert.\n• Die App prüft kein Alter.';
+
+  @override
+  String get contactsTurnOn => 'Kontakte einschalten';
+
+  @override
+  String get contactsTurnOff => 'Kontakte ausschalten';
+
+  @override
+  String get contactsTurnOffTitle => 'Kontakte ausschalten?';
+
+  @override
+  String get contactsTurnOffBody =>
+      'Der Bereich und neue Anfragen werden verborgen. Es wird nichts gelöscht.';
+
+  @override
+  String get contactsRequestsTitle => 'Anfragen';
+
+  @override
+  String contactsRequestFrom(String name) {
+    return '$name möchte dir schreiben';
+  }
+
+  @override
+  String contactsRequestsMore(int count) {
+    return 'Weitere Anfragen: $count';
+  }
+
+  @override
+  String get contactsAccept => 'Annehmen';
+
+  @override
+  String get contactsDecline => 'Ablehnen';
+
+  @override
+  String get contactsBlock => 'Blockieren';
+
+  @override
+  String get contactsAcceptTitle => 'Anfrage annehmen?';
+
+  @override
+  String contactsAcceptBody(String name, String id) {
+    return '$name kann dir dann schreiben und sieht deinen Anzeigenamen und deine Kontakt-ID. Kennung: $id';
+  }
+
+  @override
+  String get contactsBlockTitle => 'Blockieren?';
+
+  @override
+  String contactsBlockBody(String name, String id) {
+    return '$name wird ausgeblendet und erfährt nichts davon. Kennung: $id';
+  }
+
+  @override
+  String get contactsListTitle => 'Deine Kontakte';
+
+  @override
+  String get contactsListEmpty => 'Noch keine Kontakte.';
+
+  @override
+  String get contactsAdd => 'Kontakt hinzufügen';
+
+  @override
+  String get contactsMyId => 'Meine Kontakt-ID';
+
+  @override
+  String get contactsCopy => 'Kopieren';
+
+  @override
+  String get contactsCopied => 'Kontakt-ID kopiert';
+
+  @override
+  String get contactsStateWaiting => 'Wartet auf Annahme';
+
+  @override
+  String get contactsStateConfirmed => 'Bestätigt';
+
+  @override
+  String get contactsStateNotSent => 'Noch nicht gesendet';
+
+  @override
+  String get contactsStateSearching => 'Gespräch wird gesucht';
+
+  @override
+  String get contactsStateBlocked => 'Blockiert';
+
+  @override
+  String get contactsRetry => 'Erneut senden';
+
+  @override
+  String get contactsRetryWait =>
+      'Bitte kurz warten, bevor du es erneut sendest.';
+
+  @override
+  String get contactsRemove => 'Entfernen';
+
+  @override
+  String get contactsRemoveTitle => 'Kontakt entfernen?';
+
+  @override
+  String contactsRemoveBody(String name, String id) {
+    return 'Du verlässt das Gespräch mit $name. Kennung: $id';
+  }
+
+  @override
+  String get contactsUnblock => 'Entsperren';
+
+  @override
+  String get contactsUnblockLocal => 'Blockierung aufheben';
+
+  @override
+  String get contactsAddTitle => 'Kontakt hinzufügen';
+
+  @override
+  String get contactsAddHint => '@name:server oder matrix.to-Link';
+
+  @override
+  String get contactsCheck => 'Prüfen';
+
+  @override
+  String get contactsCheckAgain => 'Erneut prüfen';
+
+  @override
+  String get contactsCheckPrivacy =>
+      'Beim Prüfen werden dein Server und der Server der gesuchten Person gefragt. Beide erfahren, wen du suchst.';
+
+  @override
+  String get contactsFoundTitle => 'Gefunden';
+
+  @override
+  String contactsFoundName(String name) {
+    return 'Name: $name';
+  }
+
+  @override
+  String contactsFoundId(String id) {
+    return 'Kennung: $id';
+  }
+
+  @override
+  String get contactsAddConfirm => 'Hinzufügen';
+
+  @override
+  String get contactsAdded =>
+      'Anfrage gesendet. Das Gespräch beginnt, sobald die Person beitritt.';
+
+  @override
+  String get contactsCheckInvalid =>
+      'Das ist keine gültige Kontakt-ID. Sie sieht so aus: @name:server.';
+
+  @override
+  String get contactsCheckSelf => 'Das ist deine eigene Kontakt-ID.';
+
+  @override
+  String get contactsCheckDuplicate =>
+      'Diese Person ist schon in deiner Liste.';
+
+  @override
+  String get contactsCheckBlockedRecord =>
+      'Diese Person ist blockiert. Entsperre sie zuerst in der Liste.';
+
+  @override
+  String get contactsCheckBlockedLocal =>
+      'Diese Person ist auf diesem Gerät blockiert.';
+
+  @override
+  String get contactsCheckFamily =>
+      'Das ist ein Mitglied deiner Familie. Schreibe der Person über den Chat der Familie.';
+
+  @override
+  String get contactsCheckNotFound =>
+      'Dieses Konto wurde nicht gefunden. Prüfe die Schreibweise.';
+
+  @override
+  String get contactsCheckNotReachable =>
+      'Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.';
+
+  @override
+  String get contactsCheckIdentity =>
+      'Der Sicherheitsschlüssel dieser Person hat sich geändert. Hinzufügen ist erst nach der Prüfung möglich.';
+
+  @override
+  String get contactsCheckUnknown =>
+      'Die Person konnte gerade nicht geprüft werden. Bitte später erneut prüfen.';
+
+  @override
+  String get contactsCheckRateLimited =>
+      'Zu viele Prüfungen (höchstens 20 je Stunde). Bitte später erneut versuchen.';
+
+  @override
+  String get contactsCheckNotReady =>
+      'Das ist gerade nicht möglich (die Familie wird noch geladen oder die Person ist gesperrt). Bitte kurz warten und erneut versuchen.';
+
+  @override
+  String get contactsLoading => 'Kontakte werden geladen';
+
+  @override
+  String get contactErrInvalid => 'Die Angabe ist ungültig.';
+
+  @override
+  String get contactErrNotAllowed => 'Das ist nicht erlaubt.';
+
+  @override
+  String get contactErrNotFound => 'Der Kontakt wurde nicht gefunden.';
+
+  @override
+  String get contactErrLimit => 'Die Grenze für Kontakte ist erreicht.';
+
+  @override
+  String get contactErrDuplicate => 'Diese Person ist schon in deiner Liste.';
+
+  @override
   String get errNotAllowed => 'Dafür fehlt die Berechtigung.';
 
   @override
