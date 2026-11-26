@@ -154,4 +154,18 @@ void main() {
       expect(const AppSettings().copyWith(lastChatThread: ''), isNot(predicate<AppSettings>((s) => s.lastChatThread == '')));
     });
   });
+
+  test('contactsOnly (K3c-3): Standard aus, nie im Standardstand gespeichert, nur der Wert „true“ gilt', () {
+    const d = AppSettings();
+    expect(d.contactsOnly, isFalse);
+    expect(d.toMap().containsKey(AppSettings.contactsOnlyKey), isFalse);
+    final on = d.copyWith(contactsOnly: true);
+    expect(on.toMap()[AppSettings.contactsOnlyKey], 'true');
+    expect(AppSettings.fromMap(on.toMap()).contactsOnly, isTrue);
+    for (final bad in <String>['1', 'TRUE', 'yes', '', 'false']) {
+      expect(AppSettings.fromMap(<String, String>{AppSettings.contactsOnlyKey: bad}).contactsOnly, isFalse, reason: bad);
+    }
+    expect(on.copyWith(contactsOnly: false), d);
+    expect(on == d, isFalse);
+  });
 }

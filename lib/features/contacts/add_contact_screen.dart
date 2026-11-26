@@ -66,6 +66,36 @@ class _AddContactScreenState extends State<AddContactScreen> {
     }
   }
 
+  /// „Trotzdem hinzufügen“ (K3c-3): nur für `identityChanged`, nach ausdrücklicher Bestätigung mit eigenem Hinweistext.
+  Future<void> _addAnyway() async {
+    final r = _result;
+    if (r == null || r.outcome != ContactCheckOutcome.identityChanged || _busy || (r.collides && !_confirmedNotFamily)) return;
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (d) => AlertDialog(
+        title: Text(l.contactsAddAnywayTitle),
+        content: Text(l.contactsAddAnywayBody(isolateText(r.title.isNotEmpty ? r.title : r.userId), isolateText(r.userId))),
+        actions: <Widget>[
+          TextButton(onPressed: () => Navigator.pop(d, false), child: Text(l.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(d, true), child: Text(l.contactsAddAnyway)),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    setState(() => _busy = true);
+    try {
+      await c.addAnyway(r.userId);
+      messenger.showSnackBar(SnackBar(content: Text(l.contactsAdded)));
+      nav.pop();
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(errorText(l, e))));
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _unblockLocal(String id) async {
     final l = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -162,6 +192,28 @@ class _AddContactScreenState extends State<AddContactScreen> {
                       FilledButton(onPressed: _busy || (r.collides && !_confirmedNotFamily) ? null : _add, child: Text(l.contactsAddConfirm)),
                     ] else ...<Widget>[
                       Semantics(liveRegion: true, child: Text(_text(l, r.outcome))),
+                      // Pin-Sackgasse (K3c-3): nur bei geändertem Schlüssel oder gesperrten Geräten, nie bei nicht erreichbar,
+                      // unbekannt, nicht gefunden oder Familienmitglied.
+                      if (r.outcome == ContactCheckOutcome.identityChanged && r.userId.isNotEmpty) ...<Widget>[
+                        MergeSemantics(
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                            if (r.displayName.isNotEmpty) Text(l.contactsFoundName(isolateText(r.displayName))),
+                            Text(l.contactsFoundId(isolateText(r.userId))),
+                          ]),
+                        ),
+                        if (r.collides) ...<Widget>[
+                          NotYourFamilyWarning(userId: r.userId),
+                          CheckboxListTile(
+                            contentPadding: EdgeInsets.zero,
+                            controlAffinity: ListTileControlAffinity.leading,
+                            value: _confirmedNotFamily,
+                            onChanged: (v) => setState(() => _confirmedNotFamily = v ?? false),
+                            title: Text(l.contactsConfirmNotFamily),
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        OutlinedButton(onPressed: _busy || (r.collides && !_confirmedNotFamily) ? null : _addAnyway, child: Text(l.contactsAddAnyway)),
+                      ],
                       if (r.outcome == ContactCheckOutcome.blockedLocal)
                         TextButton(onPressed: () => _unblockLocal(r.userId), child: Text(l.contactsUnblockLocal)),
                     ],

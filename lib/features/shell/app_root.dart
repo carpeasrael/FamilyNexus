@@ -11,6 +11,7 @@ import '../../domain/security.dart';
 import '../../domain/server.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../common/invite_link_text.dart';
+import '../contacts/contacts_screen.dart' show ContactsHome;
 import '../onboarding/onboarding_screen.dart';
 import '../security/verification_dialog.dart';
 import 'home_shell.dart';
@@ -32,6 +33,28 @@ class _AppRootState extends State<AppRoot> {
 
   /// Post-Frame der vollständigen Löschung ist eingeplant (einmal je Übergang, #272).
   bool _resetScheduled = false;
+
+  /// Die schlanke Kontakte-Hülle ohne Familie war im vorigen Aufbau zu sehen (#119, K3c-3).
+  bool _wasContactsHome = false;
+
+  /// Das Öffnen der Kontakt-Dienste ohne Familie läuft oder ist versucht (je Anmeldung einmal; ohne Freigabe entsteht nichts).
+  bool _contactsOpenTried = false;
+  bool _contactsOpening = false;
+
+  /// Öffnet die Kontakt-Dienste des Kontos ohne Familie (#119, K3c-3), damit Einrichtung und Kontakte-Hülle sie finden.
+  /// Ohne Freigabe geschieht nichts (keine Ablage, kein Anspruch).
+  void _openContactsAccount(AppServices services) {
+    if (_contactsOpening || _contactsOpenTried) return;
+    _contactsOpening = true;
+    services
+        .openContactsAccount()
+        .catchError((Object e) => AppLog.e('app', 'Kontakt-Dienste konnten nicht geöffnet werden', e))
+        .whenComplete(() {
+      _contactsOpening = false;
+      _contactsOpenTried = true;
+      if (mounted) setState(() {});
+    });
+  }
 
   @override
   void initState() {
@@ -91,7 +114,7 @@ class _AppRootState extends State<AppRoot> {
   Widget build(BuildContext context) {
     final services = AppScope.of(context);
     return ListenableBuilder(
-      listenable: Listenable.merge(<Listenable>[services.settings, services.gateway, services.resetting]),
+      listenable: Listenable.merge(<Listenable>[services.settings, services.gateway, services.resetting, services.contactsRevision]),
       builder: (context, _) {
         final session = services.gateway.session == SessionState.ready;
         final sessionEnded = _hadSession && !session;
@@ -107,6 +130,27 @@ class _AppRootState extends State<AppRoot> {
         final open = services.openFamilyRoom;
         final familyChanged = open != null && family != null && open != family.roomId;
         final ready = services.settings.settings.onboardingDone && session && family != null && secure && !familyChanged;
+        // Ohne Familie nur nach der ausdrücklichen Wahl „nur Kontakte“ (#119, K3c-3): Die Familie gewinnt immer, ohne
+        // freigeschaltete Kontakte (`services.contacts == null`) gibt es die Hülle nicht.
+        final contactsOnlyWanted = !ready && services.settings.settings.onboardingDone && session && secure && family == null && services.settings.settings.contactsOnly;
+        final readyContactsOnly = contactsOnlyWanted && services.contacts != null;
+        // Familie da: die Wahl „nur Kontakte“ ist erledigt (sonst käme sie nach einem späteren Austritt ungefragt zurück).
+        if (family != null && services.settings.settings.contactsOnly) {
+          Future<void>.microtask(() => services.settings.update((c) => c.copyWith(contactsOnly: false))).ignore();
+        }
+        if (!(session && secure && family == null)) _contactsOpenTried = false;
+        // Nur wenn feststeht, dass es keine Familie gibt (erster Abgleich fertig) oder die Person „nur Kontakte“ gewählt hat:
+        // Der Anspruch auf die lokalen Daten für ein Konto ohne Familie darf die Daten einer Familie nie vorzeitig entfernen.
+        final noFamilyKnown = services.gateway.initialSyncDone || services.settings.settings.contactsOnly;
+        if (session && secure && family == null && noFamilyKnown && services.contacts == null && !_contactsOpenTried) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _openContactsAccount(services);
+          });
+        }
+        if (contactsOnlyWanted && !readyContactsOnly && !_contactsOpenTried) {
+          // Beim Start wird gerade geprüft, ob die Kontakt-Dienste öffnen: neutral laden statt kurz die Einrichtung zu zeigen.
+          return Scaffold(body: Center(child: Semantics(label: AppLocalizations.of(context).loading, child: const CircularProgressIndicator())));
+        }
         if (session && services.settings.settings.onboardingDone && services.gateway.securityState == SecurityState.unknown) {
           return Scaffold(body: Center(child: Semantics(label: AppLocalizations.of(context).loading, child: const CircularProgressIndicator())));
         }
@@ -136,6 +180,7 @@ class _AppRootState extends State<AppRoot> {
           // Nicht bereit: Synchronisation stoppen. Geplante Erinnerungen werden nur bei Abmeldung
           // entfernt, nicht bei vorübergehenden Zuständen (z. B. Kaltstart offline).
           final lostReady = _wasReady;
+          final lostContactsHome = _wasContactsHome && !readyContactsOnly;
           WidgetsBinding.instance.addPostFrameCallback((_) {
             services.closeCalendar(cancelReminders: !session && !services.keepAccountData);
             if (!session) services.closeContacts(); // Abmelden: Kontakt-Dienste vor dem Löschen der lokalen Daten
@@ -149,12 +194,18 @@ class _AppRootState extends State<AppRoot> {
             }
             // Beim Verlassen der Hauptansicht geöffnete Seiten (z. B. Einstellungen) schließen, sonst
             // blieben sie über der Einrichtung stehen. Dialoge der Einrichtung bleiben unberührt.
-            if (lostReady && mounted) Navigator.of(context).popUntil((r) => r.isFirst);
+            if ((lostReady || lostContactsHome) && mounted) Navigator.of(context).popUntil((r) => r.isFirst);
             if (familyChanged && mounted) setState(() {});
+          });
+        } else if (_wasContactsHome) {
+          // Von der Kontakte-Hülle zur Hauptansicht (Familie gewonnen): Seiten der Hülle schließen.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
           });
         }
         _wasReady = ready;
-        return VerificationListener(child: ready ? const HomeShell() : const OnboardingScreen());
+        _wasContactsHome = readyContactsOnly;
+        return VerificationListener(child: ready ? const HomeShell() : (readyContactsOnly ? const ContactsHome() : const OnboardingScreen()));
       },
     );
   }

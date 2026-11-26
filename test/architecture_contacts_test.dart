@@ -161,6 +161,14 @@ void main() {
     expect(missingReleaseMarkers(doc), isEmpty);
   });
 
+  test('K3c-3: die drei Freigabemarken stehen als eigene Zeile in docs/ENTSCHEIDUNGEN.md (die Freigabe selbst bleibt ein eigener PR)', () {
+    final doc = File('docs/ENTSCHEIDUNGEN.md').readAsStringSync();
+    expect(missingReleaseMarkers(doc), isEmpty);
+    for (final m in <String>['K3c Pin-Sackgasse gelöst', 'K3c abgeschlossen']) {
+      expect(RegExp('^MARKE: ${RegExp.escape(m)}\\s*\$', multiLine: true).allMatches(doc).length, 1, reason: 'genau eine eigene Zeile: $m');
+    }
+  });
+
   test('K3b-2b: Verifizierung und Akzeptieren laufen über VerificationPolicy; Kontakte nutzen nie die SDK-Raumwahl; Spiegel nur mit Mitgliedern', () {
     final v = code(File('lib/data/matrix/gateway/security_verification.dart').readAsStringSync());
     expect(v, contains('_incomingAllowed(v.userId, v.room?.id)'), reason: 'Raum der eingehenden Anfrage wird geprüft');
@@ -281,6 +289,41 @@ void main() {
     expect(RegExp(r'if \(_contactPolicy\.enabled\) \{[^}]*_trackContactRow2\(countSync: relevant\);[^}]*if \(firstAnswer\) _scheduleRefresh\(\);').hasMatch(main), isTrue);
     expect(main, contains('_accountDataFresh = true;'));
     expect(main.indexOf('_accountDataFresh = true;'), lessThan(main.indexOf('_trackLive(client, update);')), reason: 'erste Anweisung im Listener');
+  });
+
+  test('K3c-3 (Textwächter, folgen aus der Umsetzung): Hülle nur nach ausdrücklicher Wahl, Familie gewinnt, Karten nehmen nie an, Taste nur für identityChanged', () {
+    final all = <String, String>{for (final f in libFiles()) f.path: code(f.readAsStringSync())};
+    final root = all['lib/features/shell/app_root.dart']!;
+    // Hülle ohne Familie: nur mit Sitzung, Sicherheit, Einrichtung, ohne Familie, gewählt und mit freigeschalteten Kontakten.
+    expect(root, contains('final contactsOnlyWanted = !ready && services.settings.settings.onboardingDone && session && secure && family == null && services.settings.settings.contactsOnly;'));
+    expect(root, contains('final readyContactsOnly = contactsOnlyWanted && services.contacts != null;'));
+    expect(RegExp(r'ready \? const HomeShell\(\) : \(readyContactsOnly \? const ContactsHome\(\) : const OnboardingScreen\(\)\)').hasMatch(root), isTrue, reason: 'Familie gewinnt immer');
+    // Die Wahl wird nur an einer Stelle gesetzt (ausdrücklicher Knopf), nie automatisch.
+    final setters = <String>[
+      for (final e in all.entries)
+        if (e.key != 'lib/domain/app_settings.dart' && RegExp(r'copyWith\([^)]*contactsOnly:\s*true').hasMatch(e.value)) e.key,
+    ];
+    expect(setters, <String>['lib/app/app_services.dart']);
+    expect(all['lib/app/app_services.dart']!, contains('Future<bool> enterContactsOnly()'));
+    expect('enterContactsOnly('.allMatches(all.values.join('\n')).length, 2, reason: 'Definition und genau ein Aufruf (Knopf in der Einrichtung)');
+    expect(all['lib/features/onboarding/onboarding_screen.dart']!, contains('if (_s.contacts == null || _s.gateway.family != null) return family;'));
+    // Karten der Hülle: Familie, Einladung, Beitrittsanfrage werden nie angenommen, abgelehnt oder zurückgezogen.
+    final home = all['lib/features/contacts/contacts_home.dart']!;
+    for (final banned in <String>['acceptInvitation', 'declineInvitation', 'cancelJoinRequest', 'requestToJoin', 'createFamily', 'acceptBookInvitation', '.accept(', '.decline(']) {
+      expect(home, isNot(contains(banned)), reason: 'contacts_home.dart nennt $banned');
+    }
+    // Taste „Trotzdem hinzufügen“: nur im Zweig identityChanged; der Controller erlaubt sie nur nach genau diesem Prüfergebnis.
+    final add = all['lib/features/contacts/add_contact_screen.dart']!;
+    expect(RegExp(r'l\.contactsAddAnyway\b').allMatches(add).length, 2, reason: 'Taste und Dialog-Bestätigung');
+    expect(RegExp(r'if \(r\.outcome == ContactCheckOutcome\.identityChanged && r\.userId\.isNotEmpty\) \.\.\.<Widget>\[[\s\S]*?l\.contactsAddAnyway\)\)').hasMatch(add), isTrue);
+    expect(add, contains('r.outcome != ContactCheckOutcome.identityChanged || _busy'));
+    final ctl = all['lib/features/contacts/contact_controller.dart']!;
+    expect('_identityChecked.add('.allMatches(ctl).length, 1);
+    expect(RegExp(r'ContactReachability\.identityChanged => \(\) \{\s*_identityChecked\.add\(id\);').hasMatch(ctl), isTrue, reason: 'nur im Zweig identityChanged');
+    expect(ctl, contains('if (!_identityChecked.contains(id)) throw const ContactException(ContactError.notAllowed);'));
+    expect(ctl, contains('if (_identityChecked.contains(id)) throw const GatewayException(GatewayError.notAllowed);'), reason: 'der normale Weg bleibt gesperrt');
+    // Keine neue Oberflächen-Datei importiert material.dart (Analyse-Basis): die Hülle ist ein `part` von contacts_screen.dart.
+    expect(File('lib/features/contacts/contacts_home.dart').readAsStringSync(), startsWith('part of \'contacts_screen.dart\';'));
   });
 
   test('die Sperre ist an (Freigabe-PR ändert diesen Test bewusst)', () {

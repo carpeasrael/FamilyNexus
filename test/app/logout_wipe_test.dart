@@ -53,6 +53,17 @@ void main() {
     expect(settings['languageCode'], 'de');
   });
 
+  test('K3c-3: die Wahl „nur Kontakte“ wird gelöscht, auch ohne Besitzer; andere Einstellungen bleiben', () async {
+    await fill();
+    await db.insert('settings', <String, Object?>{'key': AppSettings.contactsOnlyKey, 'value': 'true'});
+    await db.delete('settings', where: 'key = ?', whereArgs: <Object>[AppServices.calendarOwnerKey]);
+    await AppServices.wipeAccountDataIn(db);
+    final settings = {for (final r in await db.query('settings')) r['key']: r['value']};
+    expect(settings.containsKey(AppSettings.contactsOnlyKey), isFalse);
+    expect(settings['languageCode'], 'de');
+    expect(await rows('events'), 1, reason: 'ohne Besitzer bleiben die Familiendaten (wie bisher)');
+  });
+
   test('ohne frühere Anmeldung (kein Besitzer) bleibt alles unangetastet', () async {
     await fill();
     await db.delete('settings', where: 'key = ?', whereArgs: <Object>[AppServices.calendarOwnerKey]);

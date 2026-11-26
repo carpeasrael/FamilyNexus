@@ -111,6 +111,10 @@ class ContactController extends ChangeNotifier {
   final Set<String> _busy = <String>{};
   bool _checking = false;
 
+  /// Kennungen, deren letzte Prüfung `identityChanged` ergab (Schlüssel geändert oder Geräte von der App gesperrt, K3c-3):
+  /// nur für sie gilt [addAnyway]. Jede neue Prüfung derselben Kennung ersetzt den Eintrag.
+  final Set<String> _identityChecked = <String>{};
+
   // Neuladung: ein Lauf, Anstöße fassen zusammen.
   bool _reloading = false;
   bool _again = false;
@@ -241,6 +245,7 @@ class ContactController extends ChangeNotifier {
   Future<ContactCheck> check(String raw) async {
     final id = ContactId.parse(raw);
     if (id == null) return const ContactCheck(ContactCheckOutcome.invalid);
+    _identityChecked.remove(id);
     if (id == myContactId) return ContactCheck(ContactCheckOutcome.self, userId: id);
     final existing = await _service.contact(id);
     if (existing != null && !existing.deleted) {
@@ -276,7 +281,10 @@ class ContactController extends ChangeNotifier {
       return switch (probe.reachability) {
         ContactReachability.reachable => result(ContactCheckOutcome.ready),
         ContactReachability.notReachable => result(ContactCheckOutcome.notReachable),
-        ContactReachability.identityChanged => result(ContactCheckOutcome.identityChanged),
+        ContactReachability.identityChanged => () {
+            _identityChecked.add(id);
+            return result(ContactCheckOutcome.identityChanged);
+          }(),
         ContactReachability.unknown => result(ContactCheckOutcome.unknown),
       };
     } finally {
@@ -300,6 +308,12 @@ class ContactController extends ChangeNotifier {
   Future<void> add(String rawId, {String nick = ''}) async {
     final id = ContactId.parse(rawId);
     if (id == null) throw const ContactException(ContactError.invalid);
+    // Geänderter Schlüssel oder gesperrte Geräte: nie auf dem normalen Weg, nur über [addAnyway] (mit Bestätigung, K3c-3).
+    if (_identityChecked.contains(id)) throw const GatewayException(GatewayError.notAllowed);
+    await _add(id, nick: nick);
+  }
+
+  Future<void> _add(String id, {String nick = ''}) async {
     _requireAddable(id);
     if (!_busy.add(id)) return; // Doppeltipp
     try {
@@ -314,6 +328,21 @@ class ContactController extends ChangeNotifier {
     } finally {
       _busy.remove(id);
       _onChanged();
+    }
+  }
+
+  /// „Trotzdem hinzufügen“ (#119, K3c-3, Pin-Sackgasse): Wie [add], aber **nur** für eine Kennung, deren letzte Prüfung
+  /// `identityChanged` ergab (Schlüssel geändert oder Geräte gesperrt). Für alles andere (nicht erreichbar, unbekannt,
+  /// Familienmitglied, nie geprüft) gilt `notAllowed`. Das Gateway legt den Raum an (K3c-1); **Senden bleibt gesperrt**, bis
+  /// die Person geprüft und die Änderung akzeptiert ist. Scheitert das Anlegen, nimmt [add] den Datensatz zurück.
+  Future<void> addAnyway(String rawId, {String nick = ''}) async {
+    final id = ContactId.parse(rawId);
+    if (id == null) throw const ContactException(ContactError.invalid);
+    if (!_identityChecked.contains(id)) throw const ContactException(ContactError.notAllowed);
+    try {
+      await _add(id, nick: nick);
+    } finally {
+      _identityChecked.remove(id);
     }
   }
 

@@ -1031,7 +1031,7 @@ abstract class AppLocalizations {
   /// No description provided for @contactsCheckIdentity.
   ///
   /// In de, this message translates to:
-  /// **'Der Sicherheitsschlüssel dieser Person hat sich geändert. Hinzufügen ist erst nach der Prüfung möglich.'**
+  /// **'Der Sicherheitsschlüssel dieser Person hat sich geändert. Du kannst sie trotzdem hinzufügen; schreiben kannst du erst, nachdem du die Änderung geprüft und akzeptiert hast.'**
   String get contactsCheckIdentity;
 
   /// No description provided for @contactsCheckUnknown.
@@ -1147,6 +1147,108 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Wartet auf Annahme. Du kannst schreiben, sobald die Person beigetreten ist.'**
   String get chatContactWaiting;
+
+  /// No description provided for @contactsAddAnyway.
+  ///
+  /// In de, this message translates to:
+  /// **'Trotzdem hinzufügen'**
+  String get contactsAddAnyway;
+
+  /// No description provided for @contactsAddAnywayTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Trotzdem hinzufügen?'**
+  String get contactsAddAnywayTitle;
+
+  /// No description provided for @contactsAddAnywayBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Sicherheitsschlüssel von {name} ({id}) hat sich geändert oder wurde von der App gesperrt. Das kann ein neues Gerät sein, aber auch ein Angriff.\n\nEs entsteht ein Gespräch. Schreiben kannst du erst, nachdem du die Person geprüft (z. B. per Emoji-Vergleich) und die Änderung akzeptiert hast.'**
+  String contactsAddAnywayBody(String name, String id);
+
+  /// No description provided for @contactsHomeNoFamily.
+  ///
+  /// In de, this message translates to:
+  /// **'Du nutzt die App ohne Familie. Hier gibt es nur Kontakte, keine Termine, Einkäufe oder Familienchat.'**
+  String get contactsHomeNoFamily;
+
+  /// No description provided for @contactsHomeSetupFamily.
+  ///
+  /// In de, this message translates to:
+  /// **'Familie gründen oder beitreten'**
+  String get contactsHomeSetupFamily;
+
+  /// No description provided for @contactsHomeInviteTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Einladung in eine Familie'**
+  String get contactsHomeInviteTitle;
+
+  /// No description provided for @contactsHomeInviteBody.
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“, eingeladen von {inviter}. Angenommen wird sie nur in der Einrichtung, nicht hier.'**
+  String contactsHomeInviteBody(String name, String inviter);
+
+  /// No description provided for @contactsHomeInviteAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Einrichtung öffnen'**
+  String get contactsHomeInviteAction;
+
+  /// No description provided for @contactsHomeJoinPending.
+  ///
+  /// In de, this message translates to:
+  /// **'Deine Beitrittsanfrage wartet auf Bestätigung. Mehr dazu in der Einrichtung.'**
+  String get contactsHomeJoinPending;
+
+  /// No description provided for @contactsHomeJoinRejected.
+  ///
+  /// In de, this message translates to:
+  /// **'Deine Beitrittsanfrage wurde abgelehnt. Mehr dazu in der Einrichtung.'**
+  String get contactsHomeJoinRejected;
+
+  /// No description provided for @contactsHomeRequests.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 neue Kontaktanfrage} other{{count} neue Kontaktanfragen}}'**
+  String contactsHomeRequests(int count);
+
+  /// No description provided for @contactsHomeRequestsAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Anfragen ansehen'**
+  String get contactsHomeRequestsAction;
+
+  /// No description provided for @contactsHomeAdd.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontakt hinzufügen'**
+  String get contactsHomeAdd;
+
+  /// No description provided for @contactsHomeSettings.
+  ///
+  /// In de, this message translates to:
+  /// **'Einstellungen öffnen'**
+  String get contactsHomeSettings;
+
+  /// No description provided for @onbContactsOnly.
+  ///
+  /// In de, this message translates to:
+  /// **'Ohne Familie fortfahren (nur Kontakte)'**
+  String get onbContactsOnly;
+
+  /// No description provided for @onbContactsOnlyHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Du kannst später jederzeit eine Familie gründen oder beitreten. Bis dahin gibt es nur Kontakte außerhalb der Familie.'**
+  String get onbContactsOnlyHint;
+
+  /// No description provided for @onbContactsOnlyFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Auswahl konnte nicht gespeichert werden. Versuche es noch einmal.'**
+  String get onbContactsOnlyFailed;
 
   /// No description provided for @chatContactsEmpty.
   ///

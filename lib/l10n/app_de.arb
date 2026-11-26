@@ -222,7 +222,7 @@
   "contactsCheckFamily": "Das ist ein Mitglied deiner Familie. Schreibe der Person über den Chat der Familie.",
   "contactsCheckNotFound": "Dieses Konto wurde nicht gefunden. Prüfe die Schreibweise.",
   "contactsCheckNotReachable": "Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.",
-  "contactsCheckIdentity": "Der Sicherheitsschlüssel dieser Person hat sich geändert. Hinzufügen ist erst nach der Prüfung möglich.",
+  "contactsCheckIdentity": "Der Sicherheitsschlüssel dieser Person hat sich geändert. Du kannst sie trotzdem hinzufügen; schreiben kannst du erst, nachdem du die Änderung geprüft und akzeptiert hast.",
   "contactsCheckUnknown": "Die Person konnte gerade nicht geprüft werden. Bitte später erneut prüfen.",
   "contactsCheckRateLimited": "Zu viele Prüfungen (höchstens 20 je Stunde). Bitte später erneut versuchen.",
   "contactsCheckNotReady": "Das ist gerade nicht möglich (die Familie wird noch geladen oder die Person ist gesperrt). Bitte kurz warten und erneut versuchen.",
@@ -258,6 +258,40 @@
   "chatContactOpenFailed": "Das Gespräch konnte nicht geöffnet werden.",
   "chatContactRetry": "Erneut versuchen",
   "chatContactWaiting": "Wartet auf Annahme. Du kannst schreiben, sobald die Person beigetreten ist.",
+  "contactsAddAnyway": "Trotzdem hinzufügen",
+  "contactsAddAnywayTitle": "Trotzdem hinzufügen?",
+  "contactsAddAnywayBody": "Der Sicherheitsschlüssel von {name} ({id}) hat sich geändert oder wurde von der App gesperrt. Das kann ein neues Gerät sein, aber auch ein Angriff.\n\nEs entsteht ein Gespräch. Schreiben kannst du erst, nachdem du die Person geprüft (z. B. per Emoji-Vergleich) und die Änderung akzeptiert hast.",
+  "@contactsAddAnywayBody": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "id": {"type": "String"}
+    }
+  },
+  "contactsHomeNoFamily": "Du nutzt die App ohne Familie. Hier gibt es nur Kontakte, keine Termine, Einkäufe oder Familienchat.",
+  "contactsHomeSetupFamily": "Familie gründen oder beitreten",
+  "contactsHomeInviteTitle": "Einladung in eine Familie",
+  "contactsHomeInviteBody": "„{name}“, eingeladen von {inviter}. Angenommen wird sie nur in der Einrichtung, nicht hier.",
+  "@contactsHomeInviteBody": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "inviter": {"type": "String"}
+    }
+  },
+  "contactsHomeInviteAction": "Einrichtung öffnen",
+  "contactsHomeJoinPending": "Deine Beitrittsanfrage wartet auf Bestätigung. Mehr dazu in der Einrichtung.",
+  "contactsHomeJoinRejected": "Deine Beitrittsanfrage wurde abgelehnt. Mehr dazu in der Einrichtung.",
+  "contactsHomeRequests": "{count, plural, =1{1 neue Kontaktanfrage} other{{count} neue Kontaktanfragen}}",
+  "@contactsHomeRequests": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "contactsHomeRequestsAction": "Anfragen ansehen",
+  "contactsHomeAdd": "Kontakt hinzufügen",
+  "contactsHomeSettings": "Einstellungen öffnen",
+  "onbContactsOnly": "Ohne Familie fortfahren (nur Kontakte)",
+  "onbContactsOnlyHint": "Du kannst später jederzeit eine Familie gründen oder beitreten. Bis dahin gibt es nur Kontakte außerhalb der Familie.",
+  "onbContactsOnlyFailed": "Die Auswahl konnte nicht gespeichert werden. Versuche es noch einmal.",
   "chatContactsEmpty": "Noch keine Gespräche mit Kontakten.",
   "chatContactsManage": "Kontakte verwalten",
   "contactIdentityVerified": "Persönlich geprüft",

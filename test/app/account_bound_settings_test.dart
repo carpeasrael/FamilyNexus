@@ -45,6 +45,27 @@ void main() {
       expect(app.store.data['restoreLastChat'], 'true');
     });
 
+    test('wipeAccountData (K3c-3): die Wahl „nur Kontakte“ endet mit der Sitzung, in Speicher und Ablage', () async {
+      final app = await buildTestApp();
+      final s = app.services;
+      await s.settings.update((c) => c.copyWith(contactsOnly: true));
+      expect(app.store.data[AppSettings.contactsOnlyKey], 'true');
+      s.debugWipeAccountData = () async {};
+      await s.wipeAccountData();
+      expect(s.settings.settings.contactsOnly, isFalse);
+      expect(app.store.data, isNot(contains(AppSettings.contactsOnlyKey)));
+    });
+
+    test('keepAccountData (#134): die Wahl „nur Kontakte“ bleibt wie die übrigen lokalen Familiendaten', () async {
+      final app = await buildTestApp();
+      final s = app.services;
+      await s.settings.update((c) => c.copyWith(contactsOnly: true));
+      s.debugWipeAccountData = () async {};
+      s.keepAccountData = true;
+      await s.wipeAccountData();
+      expect(s.settings.settings.contactsOnly, isTrue);
+    });
+
     test('wiederholter Aufruf ohne Blockierliste benachrichtigt niemanden (keine Schleife über AppRoot)', () async {
       final app = await buildTestApp();
       final s = app.services;
