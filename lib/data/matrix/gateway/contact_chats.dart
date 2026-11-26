@@ -113,18 +113,18 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
   bool _canEncryptIn(Room? room);
   _ContactState get _contacts;
   ContactPolicy get _contactPolicy;
-  int get _dmEpoch;
+  int get _contactEpoch;
+  bool _contactMembersComplete();
+  PolicyContext _contactPolicyContext();
+  bool _isFamilyId(String userId);
+  bool _anyDeviceBlocked(String uid);
   Map<String, String> get _dmPeers;
   bool get _disposed;
   Map<String, Timeline> get _dmTimelines;
-  Family? get _family;
-  Room? _familyRoom();
-  bool get _participantsLoaded;
   LocalSends get _localSends;
   bool get _showReadBy;
   Future<void> _backfill(Timeline t, {int pages = SdkMatrixGateway.backfillPages});
   Future<bool> _repairEchoes(Client client, Timeline t);
-  PolicyContext _policyContext(Family f, String familyRoomId);
   RoomFacts _roomFacts(Room r, String me);
   GatewayException _map(Object e);
   ContactReachability _reachabilityOf(String peer);
@@ -165,18 +165,18 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     if (retry != null && DateTime.now().isBefore(retry)) return;
     if (c.peerLoading.length >= 4 || !c.peerLoading.add(r.id)) return;
     c.peerRetryAfter[r.id] = DateTime.now().add(const Duration(minutes: 1));
-    final epoch = _dmEpoch;
+    final epoch = _contactEpoch;
     final client = _client;
     () async {
       try {
         final loader = debugPeerMembershipLoader;
         if (loader != null) {
           final m = await loader(r, peer);
-          if (m != null && epoch == _dmEpoch) c.peerCache['${r.id}|$peer'] = m;
+          if (m != null && epoch == _contactEpoch) c.peerCache['${r.id}|$peer'] = m;
         } else {
           await r.requestUser(peer, ignoreErrors: true);
         }
-        if (_disposed || epoch != _dmEpoch || _client != client) return;
+        if (_disposed || epoch != _contactEpoch || _client != client) return;
         _scheduleRefresh();
       } catch (e) {
         AppLog.e('gateway', 'Mitgliedszustand konnte nicht geladen werden', e);
@@ -222,22 +222,22 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
               unread: unreadIn(e.key),
               pending: _contacts.pending.contains(e.key),
               reachable: _reachabilityOf(e.value) != ContactReachability.notReachable,
-              identity: _identityChanged.contains(e.value) ? IdentityStatus.changed : (_contacts.identity[e.key] ?? IdentityStatus.unknown),
+              identity: (_identityChanged.contains(e.value) || _anyDeviceBlocked(e.value)) ? IdentityStatus.changed : (_contacts.identity[e.key] ?? IdentityStatus.unknown),
             ),
       ]..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
 
   /// Gleicht Kontakt-Räume, Zeitleisten und Anfragen mit der Richtlinie ab. Solange die Mitgliederliste der Familie nicht
   /// geladen ist (auch nach einem Familienwechsel), gibt es **keine** Kontakt-Threads und keine Anfragen (fail-closed).
   // ignore: unused_element
-  Future<void> _syncContactChats(Client client, Family f, Room familyRoom) async {
+  Future<void> _syncContactChats(Client client) async {
     final c = _contacts;
-    if (!_participantsLoaded || !_contactPolicy.enabled) {
+    final me = client.userID;
+    if (me == null || !_contactMembersComplete() || !_contactPolicy.enabled) {
       c.clearRooms();
       if (!_contactPolicy.enabled) c.inviteMeta.clear();
       return;
     }
-    final ctx = _policyContext(f, familyRoom.id);
-    final me = f.myUserId;
+    final ctx = _contactPolicyContext();
 
     // 1. Beigetretene Räume: je Gegenüber ein Raum (beigetretenes Gegenüber vor wartendem, dann kleinste Raum-ID).
     final chosen = <String, Room>{};
@@ -245,7 +245,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     for (final r in client.rooms) {
       if (r.membership != Membership.join || c.failed.contains(r.id)) continue; // bewusst verlassene Räume nie wieder zeigen
       final peer = r.directChatMatrixID;
-      if (peer == null || !_contactPolicy.contacts.containsKey(peer) || f.member(peer) != null || peer == me) continue;
+      if (peer == null || !_contactPolicy.contacts.containsKey(peer) || _isFamilyId(peer) || peer == me) continue;
       final facts = _roomFacts(r, me);
       if (facts.peerMembership == PeerMembership.unknown) _requestPeerMembership(r, peer);
       if (ConversationPolicy.classify(facts, ctx) != RoomClass.contactDirect) continue;
@@ -281,7 +281,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
         c.identity.remove(r.id); // wartende Räume werden nicht gepinnt (Grenze (a) aus E-37)
       } else {
         c.pending.remove(r.id);
-        // Nur mit Familie (der lokale Anteil im Spiegel bleibt sonst leer, Kontakte gehören aber zum Konto).
+        // Ohne Spiegel der Kontodaten (`mirror: false`): Kontakte gehören zum Konto, nicht zur Familie.
         c.identity[r.id] = _identityOf(e.key, me, mirror: false);
       }
     }
@@ -293,10 +293,10 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     }
 
     // 2. Anfragen: Einladungen `is_direct` von Fremden ohne Datensatz, ohne Rauminhalt.
-    _rebuildRequests(client, f, ctx, me);
+    _rebuildRequests(client, ctx, me);
   }
 
-  void _rebuildRequests(Client client, Family f, PolicyContext ctx, String me) {
+  void _rebuildRequests(Client client, PolicyContext ctx, String me) {
     final c = _contacts;
     final invites = <Room>[];
     final liveIds = <String>{};
@@ -361,11 +361,11 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
   /// Absendern mit Datensatz (Kartenzugriff, ohne Obergrenze), je Einladendem die kleinste Raum-ID unter den zulässigen;
   /// ein beigetretener Raum des Einladenden blockiert, ein nur wartender nicht (gegenseitiges Hinzufügen).
   // ignore: unused_element
-  void _acceptContactInvites(Client client, Family f) {
-    if (!_participantsLoaded || !_contactPolicy.enabled) return;
+  void _acceptContactInvites(Client client) {
+    final me = client.userID;
+    if (me == null || !_contactMembersComplete() || !_contactPolicy.enabled) return;
     final c = _contacts;
-    final me = f.myUserId;
-    final ctx = _policyContext(f, f.roomId);
+    final ctx = _contactPolicyContext();
     final byFrom = <String, Room>{};
     for (final r in client.rooms) {
       if (r.membership != Membership.invite || c.failed.contains(r.id)) continue;
@@ -392,13 +392,14 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
 
   Future<void> _joinContact(Room r, String from) async {
     final c = _contacts;
-    final epoch = _dmEpoch;
+    final epoch = _contactEpoch;
     final client = _client;
     try {
       await r.join(waitForSync: true).timeout(SdkMatrixGateway.roomOpTimeout);
       final joined = _client?.getRoomById(r.id);
-      if (_disposed || epoch != _dmEpoch || _client != client) {
-        // Familienwechsel oder Abmelden während des Beitritts: der Raum gehört nicht mehr in diesen Zustand.
+      if (_disposed || epoch != _contactEpoch || _client != client) {
+        // Abmelden oder Kontowechsel während des Beitritts: der Raum gehört nicht mehr in diesen Zustand. Ein Familienwechsel
+        // bricht nicht ab; die Nachprüfung unten entscheidet mit frischem Kontext (fail-closed).
         await _leaveContactRoom(joined ?? r);
         return;
       }
@@ -421,21 +422,20 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
 
   /// Nachprüfung nach dem Beitritt mit **neu** gebautem Kontext: sicherer Verstoß, in Ordnung oder noch unbekannt.
   _ContactVerdict _verifyJoined(Room? joined, String from) {
-    final f = _family;
-    final familyRoom = _familyRoom();
-    if (joined == null || f == null || familyRoom == null || !_participantsLoaded) return _ContactVerdict.unknown;
+    final me = _client?.userID;
+    if (joined == null || me == null || !_contactMembersComplete()) return _ContactVerdict.unknown;
     final p = _contactPolicy;
     final state = p.contacts[from];
-    if (!p.enabled || p.blocked.contains(from) || f.member(from) != null || from == f.myUserId) return _ContactVerdict.violation;
+    if (!p.enabled || p.blocked.contains(from) || _isFamilyId(from) || from == me) return _ContactVerdict.violation;
     if (state != ContactState.outgoing && state != ContactState.accepted) return _ContactVerdict.violation;
     if (!_canEncryptIn(joined)) return _ContactVerdict.violation;
     final count = joined.summary.mJoinedMemberCount;
     if (count == null) return _ContactVerdict.unknown;
     if (count + (joined.summary.mInvitedMemberCount ?? 0) > 2) return _ContactVerdict.violation;
-    final facts = _roomFacts(joined, f.myUserId);
+    final facts = _roomFacts(joined, me);
     if (facts.peerId != from) return facts.peerId == null ? _ContactVerdict.unknown : _ContactVerdict.violation;
     if (facts.peerMembership == PeerMembership.unknown) return _ContactVerdict.unknown;
-    return ConversationPolicy.classify(facts, _policyContext(f, familyRoom.id)) == RoomClass.contactDirect
+    return ConversationPolicy.classify(facts, _contactPolicyContext()) == RoomClass.contactDirect
         ? _ContactVerdict.ok
         : _ContactVerdict.violation;
   }
@@ -464,7 +464,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     final c = _contacts;
     if (!c.peers.containsKey(threadId) || _dmPeers.containsKey(threadId) || c.timelines.containsKey(threadId)) return;
     if (!c.opening.add(threadId)) return;
-    final epoch = _dmEpoch;
+    final epoch = _contactEpoch;
     final client = _client;
     try {
       final room = client?.getRoomById(threadId);
@@ -476,9 +476,9 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
         onRemove: (_) => _scheduleRefresh(),
         onNewEvent: _scheduleRefresh,
       );
-      // Nach dem Warten erneut prüfen: Familienwechsel, Blockieren, Richtlinie aus, Gegenüber nicht mehr beigetreten.
+      // Nach dem Warten erneut prüfen: Abmelden, Familienwechsel (Mitgliederliste), Blockieren, Richtlinie aus, Gegenüber nicht mehr beigetreten.
       final peer = c.peers[threadId];
-      if (_disposed || epoch != _dmEpoch || _client != client || peer == null || !_stillContact(room, peer)) {
+      if (_disposed || epoch != _contactEpoch || _client != client || peer == null || !_stillContact(room, peer)) {
         t.cancelSubscriptions();
         return;
       }
@@ -494,13 +494,12 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
 
   /// Ist [room] jetzt (mit frischem Kontext) ein beigetretener, zulässiger Kontakt-Einzelchat?
   bool _stillContact(Room room, String peer) {
-    final f = _family;
-    final familyRoom = _familyRoom();
-    if (f == null || familyRoom == null || !_participantsLoaded) return false;
-    final facts = _roomFacts(room, f.myUserId);
+    final me = _client?.userID;
+    if (me == null || !_contactMembersComplete()) return false;
+    final facts = _roomFacts(room, me);
     return facts.peerId == peer &&
         facts.peerMembership == PeerMembership.join &&
-        ConversationPolicy.classify(facts, _policyContext(f, familyRoom.id)) == RoomClass.contactDirect;
+        ConversationPolicy.classify(facts, _contactPolicyContext()) == RoomClass.contactDirect;
   }
 
   /// Raum eines Kontakt-Threads zum Senden: nur nach `openThread`, nur bei beigetretenem Gegenüber und eingestuftem Raum.
@@ -512,9 +511,11 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     if (!_stillContact(room, peer)) throw const GatewayException(GatewayError.notAllowed);
     // Geänderter Hauptschlüssel (B8): synchron neu auswerten (kein Netz) und vor „nicht erreichbar“ prüfen; alle Sendewege
     // (Text, Anhänge) laufen hierüber.
-    final me = _family?.myUserId;
+    // `me` kommt vom Client, nie aus der Familie (auch ohne Familie bekannt, K3c-1). Gesperrte Geräte (App-Sperre, überlebt
+    // Neustarts) sperren das Senden ebenso (Pin-Sackgasse Variante C): kein Schlüssel an ein Gerät, das die Person nicht kennt.
+    final me = _client?.userID;
     if (me != null) _identityOf(peer, me, mirror: false);
-    if (_identityChanged.contains(peer)) throw const GatewayException(GatewayError.notAllowed);
+    if (_identityChanged.contains(peer) || _anyDeviceBlocked(peer)) throw const GatewayException(GatewayError.notAllowed);
     // Ohne Schlüssel, mit denen das Gegenüber lesen kann, käme die Nachricht still unlesbar an (B5).
     if (_reachabilityOf(peer) == ContactReachability.notReachable) throw const GatewayException(GatewayError.peerNotReachable);
     return room;
@@ -522,16 +523,15 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
 
   @override
   Future<void> declineContactRequest(String roomId) async {
-    final f = _family;
-    final familyRoom = _familyRoom();
     final client = _client;
+    final me = client?.userID;
     final room = client?.getRoomById(roomId);
-    if (f == null || familyRoom == null || client == null || room == null || !_participantsLoaded || !_contactPolicy.enabled) {
+    if (me == null || client == null || room == null || !_contactMembersComplete() || !_contactPolicy.enabled) {
       throw const GatewayException(GatewayError.notAllowed);
     }
     if (_contacts.failed.contains(roomId)) throw const GatewayException(GatewayError.notAllowed); // schon abgelehnt
     if (room.membership != Membership.invite ||
-        ConversationPolicy.classify(_roomFacts(room, f.myUserId), _policyContext(f, familyRoom.id)) != RoomClass.contactRequest) {
+        ConversationPolicy.classify(_roomFacts(room, me), _contactPolicyContext()) != RoomClass.contactRequest) {
       throw const GatewayException(GatewayError.notAllowed);
     }
     _contacts.rememberFailed(roomId);

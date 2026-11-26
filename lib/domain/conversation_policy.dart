@@ -112,6 +112,34 @@ class ContactScope {
     required bool familyResolved,
   }) =>
       hasFamily ? participantsLoaded : (syncedOnce && familyResolved);
+
+  /// Ist „keine Familie“ gesichert (K3c-1, I2)? Wahrheitstabelle (jede Zeile mit [accountDataFresh] `true` und `false`):
+  ///
+  /// | # | Zeiger | Raum im Client | Mitgliedschaft | Familie gebaut | fresh | nicht fresh |
+  /// |---|--------|----------------|----------------|----------------|-------|-------------|
+  /// | 1 | fehlt | – | – | nein | wahr | falsch |
+  /// | 2 | gesetzt | unbekannt | – | nein | [row2Settled] | falsch |
+  /// | 3, 4 | gesetzt | bekannt | Einladung, verlassen, verbannt, angeklopft | nein | wahr | falsch |
+  /// | 5 | gesetzt | bekannt | beigetreten | nein (Zwischenzustand) | falsch | falsch |
+  /// | 6 | gesetzt | bekannt | beigetreten | ja | wahr | wahr (die gebaute Familie belegt den Stand) |
+  ///
+  /// [accountDataFresh]: die erste Serverantwort dieser Sitzung ist da, die Kontodaten (Zeiger) sind auf dem Stand des
+  /// Servers. [row2Settled] ist die Außenregel des Gateways (60 s **und** 3 zählende Syncs) für ein Zeiger-Relikt; die Zeit
+  /// ist kein Begriff dieser reinen Funktion.
+  static bool familyResolved({
+    required bool pointerSet,
+    required bool roomKnown,
+    required RoomMembership? membership,
+    required bool familyBuilt,
+    required bool accountDataFresh,
+    required bool row2Settled,
+  }) {
+    if (familyBuilt) return true; // Zeile 6
+    if (!accountDataFresh) return false;
+    if (!pointerSet) return true; // Zeile 1
+    if (!roomKnown) return row2Settled; // Zeile 2
+    return membership != RoomMembership.join; // Zeilen 3 und 4 wahr, Zeile 5 falsch
+  }
 }
 
 class ConversationPolicy {
@@ -166,11 +194,14 @@ class ConversationPolicy {
       c.contactsEnabled && c.membersLoaded && peer != c.myUserId && !c.familyIds.contains(peer) && !c.blockedUsers.contains(peer);
 
   /// Wird eine Einzelchat-Einladung eines **Kontakts** automatisch angenommen (K3a-1)? Nur für einen eigenen Datensatz
-  /// `outgoing`/`accepted`, nie für Familienmitglieder, Blockierte oder bei ungeklärter Identitätsänderung.
+  /// `outgoing`/`accepted`, nie für Familienmitglieder oder Blockierte. Eine ungeklärte Identitätsänderung hindert die
+  /// Annahme seit K3c-1 nicht mehr (der Raum entsteht, Senden bleibt gesperrt).
   static bool autoAcceptContact(RoomFacts r, PolicyContext c) {
     if (r.membership != RoomMembership.invite || !r.inviteIsDirect || r.isBook) return false;
     final from = r.inviterId;
-    if (from == null || !_contactPeerOk(from, c) || c.identityChanged.contains(from)) return false;
+    // Kein Ausschluss bei `identityChanged` (K3c-1, Revision K3b-1): sonst bliebe die Einladung des Gegenübers nach einem
+    // Schlüsselwechsel liegen (Pin-Sackgasse, Variante B). Die Sendesperre (`changed`) trägt den Schutz.
+    if (from == null || !_contactPeerOk(from, c)) return false;
     final state = c.contacts[from];
     return state == ContactState.outgoing || state == ContactState.accepted;
   }

@@ -6,7 +6,7 @@ mixin _SecurityVerificationModule on ChangeNotifier implements MatrixGateway {
   _AppClient? get _client;
   Family? get _family;
   ContactPolicy get _contactPolicy;
-  bool get _participantsLoaded;
+  bool _contactMembersComplete();
   String? _contactRoomOf(String peer);
   bool get _syncedOnce;
   KeyVerification? get _verification;
@@ -95,7 +95,7 @@ mixin _SecurityVerificationModule on ChangeNotifier implements MatrixGateway {
     final c = _client;
     final f = _family;
     final p = _contactPolicy;
-    final contactsOn = p.enabled && _participantsLoaded;
+    final contactsOn = p.enabled && _contactMembersComplete();
     return VerificationPolicy.allowed(
       userId: userId,
       roomId: roomId,

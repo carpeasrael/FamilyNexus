@@ -15,13 +15,12 @@ mixin _IdentitiesModule on ChangeNotifier implements MatrixGateway {
   String? _contactRoomOf(String peer);
   Family? get _family;
   ContactPolicy get _contactPolicy;
-  bool get _participantsLoaded;
+  bool _contactMembersComplete();
   LocalIdentityPins get _localPins;
   IdentityPinBook get _pinBook;
   Set<String> get _pinConflictLogged;
   bool get _pinsPersisting;
   set _pinsPersisting(bool value);
-  Family _requireFamily();
   FamilyMember _requireMember(Family f, String userId);
   GatewayException _map(Object e);
   void _scheduleRefresh();
@@ -140,9 +139,10 @@ mixin _IdentitiesModule on ChangeNotifier implements MatrixGateway {
 
   @override
   Future<void> acceptIdentityChange(String userId) async {
-    final f = _requireFamily();
-    if (f.member(userId) == null) {
-      _acceptContactIdentityChange(f, userId);
+    // Ohne Familie (K3c-1) gibt es nur Kontakte; die Richtlinie ohne Raumbindung entscheidet.
+    final f = _family;
+    if (f == null || f.member(userId) == null) {
+      _acceptContactIdentityChange(userId);
       return;
     }
     _requireMember(f, userId);
@@ -168,14 +168,14 @@ mixin _IdentitiesModule on ChangeNotifier implements MatrixGateway {
 
   /// Ob [userId] ein Kontakt ist, dessen Änderung akzeptiert werden darf (Richtlinie ohne Raumbindung).
   bool _contactAcceptable(String userId) => VerificationPolicy.contactAllowed(
-        contactState: _contactPolicy.enabled && _participantsLoaded ? _contactPolicy.contacts[userId] : null,
+        contactState: _contactPolicy.enabled && _contactMembersComplete() ? _contactPolicy.contacts[userId] : null,
         blocked: _contactPolicy.blocked.contains(userId),
         contactRoomId: _contactRoomOf(userId),
       );
 
   /// Akzeptieren für einen **Kontakt**: kein `setAccountData`, kein `await` (keine Race zwischen Prüfung und Wirkung);
   /// der Schlüssel gilt nur im Speicher ([_contactAcceptedPins], höchster Vorrang) und lokal ([_localPins], wenn aktiv).
-  void _acceptContactIdentityChange(Family f, String userId) {
+  void _acceptContactIdentityChange(String userId) {
     final c = _client;
     final pub = c?.userDeviceKeys[userId]?.masterKey?.publicKey;
     if (c == null || pub == null || !_contactAcceptable(userId) || !canAccept(identityChanged: _identityChanged.contains(userId), anyBlocked: _anyDeviceBlocked(userId))) {
