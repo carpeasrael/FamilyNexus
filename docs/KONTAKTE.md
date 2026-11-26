@@ -191,8 +191,15 @@ wachsen, kommt die Raumlogik in `data/matrix/contact_rooms.dart` (intern vom Gat
 - Bestehende Prüfungen bleiben unverändert: `startDirectChat` nur für Mitglieder, `announcePresence` und `_onToDevice`
   nur für `f.joined`, `_scanForSignals` nur auf Familien- und privater Zeitleiste, `shareEventInChat` nur Familienraum.
   Das sichert I3 und I4 ohne neuen Code; Tests halten es fest.
-- `_resetDirectChats` setzt auch die Kontaktzustände zurück. Ohne Familie ist die App auf die Einrichtung beschränkt
-  (`AppRoot`), damit sind auch Kontakte nicht erreichbar; die Räume bleiben auf dem Server erhalten.
+- **K3c-1:** `_resetDirectChats` ist geteilt: `_resetFamilyChats()` räumt nur Familien-Einzelchats,
+  `_resetContacts(full:)` den Kontaktzustand (`full: false` beim Familienwechsel: nur Räume, Zeitleisten, Anfragen und die
+  Zwischenspeicher der Prüfung, `failed` und `creating` bleiben; `full: true` beim Abmelden). Der Kontaktpfad (Räume,
+  Anfragen, Auto-Annahme, privater Raum, Probe, Anlegen, Akzeptieren) läuft bei eingeschaltetem Bereich **auch ohne Familie**;
+  `me` kommt vom Client. „Keine Familie“ gilt erst als gesichert (`ContactScope.familyResolved`, `_accountDataFresh`, Rückfall
+  für ein Zeiger-Relikt nach 60 s und 3 zählenden Syncs), sonst keine Kontakt-Threads und keine Anfragen (fail-closed).
+  Die Kontakt-Epoche (`_contactEpoch`) steigt nur beim Abmelden, die Nachprüfung entscheidet nach jedem `await`. Die App-Hülle
+  ohne Familie (`AppRoot`, `ContactsHome`) und die Kontakt-Dienste ohne Kalender folgen in K3c-2 und K3c-3; bis dahin ist die
+  Oberfläche ohne Familie auf die Einrichtung beschränkt, die Räume bleiben auf dem Server erhalten.
 - `dataInventory`: `InventoryRoomKind` + `contact`, `group`.
 
 ### 7.2 Neue Schnittstelle
@@ -241,6 +248,14 @@ Anfragen; Räume und Datensätze bleiben, nichts wird gelöscht.
 | erreichbar | mindestens ein Gerät mit `encryptToDevice` | normal |
 | nicht erreichbar | keine Schlüssel oder kein cross-signiertes Gerät | Senden gesperrt (neuer Fehler `peerNotReachable`), Hinweis „Diese Person muss in ihrer App die Sicherheitsprüfung einrichten“ |
 | Identität geändert | `_identityChanged` | Geräte gesperrt wie bei Mitgliedern, Warnung, Auflösung über Emoji-Vergleich; **K3b-2b:** hat Vorrang vor „nicht erreichbar“, Senden (Text und Anhänge) mit `notAllowed` gesperrt, Banner und Eingabeleiste nennen den Grund, Menü „Person prüfen“ und „Änderung akzeptieren“ (mit Bestätigung) |
+
+**Pin-Sackgasse (K3c-1, Gateway-Seite, Revision der K3b-1-Regel „kein Raum bei geändertem Schlüssel“):** Ein Raum zum Kontakt
+darf auch bei `identityChanged` oder von der App gesperrten Geräten **angelegt** (A: Wiederhinzufügen nach Entfernen; C: Neustart,
+Sperre bleibt in der SDK-Datenbank, Sitzungsvermerk leer) oder **beigetreten** werden (B: Einladung der Gegenseite). Er entsteht
+`pending` mit Banner `changed`; **Senden bleibt gesperrt**, solange `changed` oder gesperrt (`_requireContactRoom`), Akzeptieren
+nach dem Beitritt des Gegenübers über das Banner. Beim bloßen Prüfen einer Person ohne Sperre und ohne Pin entsteht kein Pin.
+Die Taste „Trotzdem hinzufügen“ in der Oberfläche folgt in K3c-3; bis dahin ist der Pfad nur über das Gateway erreichbar.
+**Restrisiko B:** Das Gegenüber kann nach der automatischen Annahme Nachrichten in den Thread schreiben (sichtbar, Senden gesperrt).
 
 **Pinning von Kontakten (K3b-2b):** Der erste gesehene Hauptschlüssel gilt lokal (verschlüsselte Ablage dieses Geräts) und als Sitzungs-Pin im Speicher (kein Fail-open bei inaktiver Ablage). Kontakt-Pins stehen **nie** im Konto-Spiegel `identity_pins`. Akzeptieren schreibt keine Kontodaten, sondern setzt einen Vorrang-Eintrag im Speicher und ersetzt den lokalen Pin. Wartende Räume werden nicht gepinnt. **Restrisiken:** Fenster, bis die Schlüssel erstmals bekannt sind (TOFU); auf einem zweiten Gerät beginnt TOFU neu; Kontakt-Pins bleiben nach dem Entfernen des Kontakts bis zum Abmelden lokal; ein später zum Mitglied gewordener Kontakt hat keinen Kontodaten-Eintrag; das Sendefenster zwischen Schlüsselwechsel und nächster Auswertung (nicht Code-testbar); bei falschem Raum sendet der Abbruch `m.user` ein Ereignis in diesen Raum; der Familienpfad von `startVerification` ohne `deviceId` nutzt weiter die SDK-Raumwahl; die Sackgasse bei entferntem Kontakt im Zustand „geändert“ löst K3c.
 
