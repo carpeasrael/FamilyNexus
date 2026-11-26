@@ -2065,6 +2065,16 @@ void main() {
         expect(onTimer, isTrue);
       });
 
+      test('(iv-b) Gate: Bereich aus + nicht-leere Antwort mit Zeiger auf unbekannten Raum (Zeile 2) startet keinen Timer; Einschalten danach schon', () async {
+        final (_, g) = await _signedIn(encryption: true, familySynced: false);
+        await settle(g, pointer('!gone:hs.example'));
+        await Future<void>.delayed(_settle * 2);
+        expect(g.debugContactRow2TimerPending, isFalse, reason: 'Bereich aus: Zeile 2 wird nicht beobachtet (#150)');
+        g.setContactPolicy(policy);
+        await Future<void>.delayed(_settle * 2);
+        expect(g.debugContactRow2TimerPending, isTrue, reason: 'Gegenprobe: mit Bereich beobachtet');
+      });
+
       test('(v) Einschalten nach der ersten Antwort: setContactPolicy löst den Abgleich aus, Kontakte erscheinen', () async {
         final (_, g) = await _signedIn(encryption: true, familySynced: false);
         await settle(g, dmJoined(ct, _fremd));
