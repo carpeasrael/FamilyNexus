@@ -2382,6 +2382,19 @@ void main() {
         await settle(g2, dmJoined('!neu2:hs.example', _fremd));
         expect(contacts(g2).single.identity, IdentityStatus.pinned, reason: 'k2 ist der erste gesehene Schlüssel, k1 wurde nie gepinnt');
 
+        // Nur gesperrte Geräte, kein Hauptschlüssel bekannt (Identität nicht berechenbar): die Sperre allein zählt.
+        final (hs4, g4) = await ready(policyOut);
+        g4.debugDevicesOf = (id) => <bool>[false];
+        blockedDevice(g4, _fremd);
+        expect(g4.debugIdentityChanged, isEmpty);
+        armCreate(hs4, g4, room: '!neu4:hs.example');
+        final id4 = await g4.startContactChat(_fremd);
+        expect(id4, '!neu4:hs.example');
+        await Future<void>.delayed(_settle);
+        expect(contacts(g4).single.identity, IdentityStatus.changed, reason: 'Banner allein wegen gesperrter Geräte');
+        await g4.openThread(id4);
+        await noSend(g4.sendMessage('Hallo', threadId: id4));
+
         // Echtes notReachable (ohne Sperre) bleibt peerNotReachable.
         final (_, g3) = await ready(policyOut);
         g3.debugDevicesOf = (id) => <bool>[false];
