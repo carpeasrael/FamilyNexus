@@ -7,7 +7,6 @@ import '../../data/sync/avatar_photo_sync.dart';
 import '../../data/sync/calendar_sync.dart';
 import '../../data/sync/cash_book_receipts.dart';
 import '../../data/sync/cash_book_sync.dart';
-import '../../data/sync/contact_sync.dart';
 import '../../data/sync/event_theme_sync.dart';
 import '../../domain/anniversaries.dart';
 import '../../domain/anniversary_calc.dart';
@@ -25,7 +24,6 @@ import '../../domain/recurrence.dart';
 import '../../domain/time_zones.dart';
 import '../../ui/theme/tokens.dart';
 import '../cashbook/cash_book_controller.dart';
-import '../contacts/contact_controller.dart';
 import '../family/avatar_photo_images.dart';
 
 /// Zustand und Aktionen des Kalenders für die Oberfläche.
@@ -46,8 +44,6 @@ class CalendarController extends ChangeNotifier {
     this.avatarPhotoImages,
     this.cashBooks,
     this.cashBookSync,
-    this.contactSync,
-    this.contactController,
     this.cashBookReceipts,
     this.cashBookController,
   })  : zone = TimeZones.tryGet(zoneName) ?? TimeZones.utc,
@@ -79,12 +75,6 @@ class CalendarController extends ChangeNotifier {
   /// (`CashBookFlags.enabled`) inaktiv.
   final CashBookService? cashBooks;
   final CashBookSync? cashBookSync;
-
-  /// Kontakte außerhalb der Familie (#119, E-114): nur mit Freigabe und Ablage; gehört zum Konto, nicht zur Familie.
-  final ContactSync? contactSync;
-
-  /// Oberfläche der Kontakte (#119, K3b-1): nur mit Synchronisation, also nur hinter `ContactFlags.enabled`.
-  final ContactController? contactController;
 
   /// Bon-Fotos (Teil 3b); `null`, wenn die Verdrahtung kein Kassenbuch vorsieht.
   final CashBookReceipts? cashBookReceipts;
@@ -142,8 +132,6 @@ class CalendarController extends ChangeNotifier {
     }
     cashBookSync?.start();
     cashBookController?.start();
-    contactSync?.start();
-    contactController?.start(); // nach der Synchronisation (sie liefert Richtlinie und Änderungen)
     load().ignore();
   }
 
@@ -166,8 +154,6 @@ class CalendarController extends ChangeNotifier {
     avatarPhotoSync?.dispose();
     cashBookController?.dispose();
     cashBookSync?.dispose();
-    contactController?.dispose(); // zuerst: danach darf kein Aufruf mehr an Gateway oder Dienst gehen
-    contactSync?.dispose();
     cashBookReceipts?.dispose();
     avatarPhotoImages?.dispose();
     super.dispose();
@@ -181,7 +167,6 @@ class CalendarController extends ChangeNotifier {
         anniversarySync?.idle() ?? Future<void>.value(),
         avatarPhotoSync?.idle() ?? Future<void>.value(),
         cashBookSync?.idle() ?? Future<void>.value(),
-        contactSync?.idle() ?? Future<void>.value(),
       ]);
 
   Future<void>? _loading;
