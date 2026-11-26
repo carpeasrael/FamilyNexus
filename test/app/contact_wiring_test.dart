@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui' show Size;
 
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/app/bootstrap.dart';
@@ -8,7 +9,6 @@ import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/domain/contact_service.dart';
 import 'package:family_nexus/domain/contacts.dart';
 import 'package:family_nexus/domain/server.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/contact_peer.dart';
