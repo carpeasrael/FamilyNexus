@@ -198,8 +198,12 @@ wachsen, kommt die Raumlogik in `data/matrix/contact_rooms.dart` (intern vom Gat
   `me` kommt vom Client. „Keine Familie“ gilt erst als gesichert (`ContactScope.familyResolved`, `_accountDataFresh`, Rückfall
   für ein Zeiger-Relikt nach 60 s und 3 zählenden Syncs), sonst keine Kontakt-Threads und keine Anfragen (fail-closed).
   Die Kontakt-Epoche (`_contactEpoch`) steigt nur beim Abmelden, die Nachprüfung entscheidet nach jedem `await`. Die App-Hülle
-  ohne Familie (`AppRoot`, `ContactsHome`) und die Kontakt-Dienste ohne Kalender folgen in K3c-2 und K3c-3; bis dahin ist die
+  ohne Familie (`AppRoot`, `ContactsHome`) folgt in K3c-3; bis dahin ist die
   Oberfläche ohne Familie auf die Einrichtung beschränkt, die Räume bleiben auf dem Server erhalten.
+- **K3c-2:** Die Kontakt-Dienste (`ContactSync`, `ContactController`) hängen nicht mehr am Kalender: `AppServices.contacts`
+  (`openContacts`/`closeContacts`), Bündel `ContactServices` in `lib/app/contact_factory.dart`. Sie überleben den Familienwechsel,
+  schließen beim Abmelden vor dem Löschen der lokalen Daten und stellen die Blockierliste nach dem Anspruch der Familiendaten aus
+  den `blocked`-Datensätzen wieder her, auch ohne Familie. Verhalten unverändert, `ContactFlags.enabled` bleibt `false`.
 - `dataInventory`: `InventoryRoomKind` + `contact`, `group`.
 
 ### 7.2 Neue Schnittstelle
