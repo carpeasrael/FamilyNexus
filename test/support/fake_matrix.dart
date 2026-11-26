@@ -1761,6 +1761,11 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final room = _chatRoom(threadId);
     if (text.trim().isEmpty) throw const GatewayException(GatewayError.invalidInput);
     await fake.sendGate?.future;
+    // Wie das Gateway: bei geändertem Schlüssel des Kontakts (auch erst während des Sendens) `notAllowed`.
+    final cr = fake.contactRooms[threadId];
+    if (cr != null && fake.identityChangedUsers.contains(cr.dmMembers.firstWhere((m) => m != _userId))) {
+      throw const GatewayException(GatewayError.notAllowed);
+    }
     fake.post(room, _userId!, 'm.room.message', <String, Object?>{
       'body': text,
       'reply_to': ?replyToId,

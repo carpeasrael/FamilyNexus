@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:family_nexus/app/app.dart';
 import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/contacts.dart';
@@ -410,6 +412,38 @@ void main() {
       await tester.pumpAndSettle();
       expect(app.server.identityChangedUsers, isEmpty);
       expect(find.textContaining('Senden ist gesperrt'), findsNothing);
+      await end(tester);
+    });
+
+    testWidgets('Senden scheitert, weil sich der Schlüssel währenddessen geändert hat: Hinweis nennt den Grund (nicht der allgemeine Fehler)', (tester) async {
+      final app = await setup(tester);
+      await openContact(tester);
+      final gate = Completer<void>();
+      app.server.sendGate = gate;
+      await tester.enterText(find.byType(TextField), 'Hallo Carla');
+      await tester.tap(find.byTooltip('Senden'));
+      await tester.pump();
+      app.server.identityChangedUsers.add(carla); // ohne notifyAll: Eingabeleiste und Zustand der Liste bleiben
+      gate.complete();
+      await tester.pumpAndSettle();
+      expect(find.text('Senden gesperrt: Der Sicherheitsschlüssel dieser Person hat sich geändert.'), findsOneWidget);
+      expect(room.events.where((e) => e.type == 'm.room.message'), isEmpty);
+      await end(tester);
+    });
+
+    testWidgets('Akzeptieren scheitert (Änderung schon weg): Hinweis „konnte nicht akzeptiert werden“', (tester) async {
+      final app = await setup(tester);
+      app.server.identityChangedUsers.add(carla);
+      app.server.notifyAll();
+      await tester.pumpAndSettle();
+      await openContact(tester);
+      await openMenu(tester);
+      await tester.tap(find.text('Änderung akzeptieren'));
+      await tester.pumpAndSettle();
+      app.server.identityChangedUsers.remove(carla); // ohne notifyAll: der Dialog akzeptiert, das Gateway verweigert (notFound)
+      await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.byType(FilledButton)));
+      await tester.pumpAndSettle();
+      expect(find.text('Die Änderung konnte nicht akzeptiert werden.'), findsOneWidget);
       await end(tester);
     });
 

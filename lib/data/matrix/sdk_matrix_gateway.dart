@@ -400,6 +400,10 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   @visibleForTesting
   bool debugIncomingAllowed(String userId, String? roomId) => _incomingAllowed(userId, roomId);
 
+  /// Nur für Tests: eine laufende Verifizierung setzen (eine eingehende Anfrage wird dann als „belegt“ abgewiesen, S4).
+  @visibleForTesting
+  set debugVerification(KeyVerification? v) => _verification = v;
+
   /// Nur für Tests: der gewählte Kontakt-Raum des Gegenübers (`null` ohne beigetretenes Kontakt-Gespräch).
   @visibleForTesting
   String? debugContactRoomOf(String peer) => _contactRoomOf(peer);

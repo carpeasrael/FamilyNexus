@@ -22,6 +22,7 @@ import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:matrix/encryption.dart' show Encryption, KeyVerification, KeyVerificationState;
 import 'package:matrix/matrix.dart' show CrossSigningKey, DeviceKeysList, Event, SyncStatus, SyncStatusUpdate, SyncUpdate;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -1635,6 +1636,23 @@ void main() {
       expect(g.debugIncomingAllowed(_fremd, ct), isFalse, reason: 'Bereich aus');
     });
 
+    test('eingehende Anfrage bei laufender Verifizierung abgewiesen (S4: nur eine zur Zeit), danach wieder erlaubt', () async {
+      final (_, g) = await ready();
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd)), isNotNull);
+      expect(g.debugIncomingAllowed(_fremd, ct), isTrue);
+      final v = KeyVerification(encryption: _NoEncryption(), userId: _fremd);
+      g.debugVerification = v;
+      expect(g.debugIncomingAllowed(_fremd, ct), isFalse, reason: 'läuft (waitingAccept)');
+      expect(g.debugIncomingAllowed(_me, null), isFalse, reason: 'gilt für jeden Absender');
+      v.state = KeyVerificationState.error;
+      expect(g.debugIncomingAllowed(_fremd, ct), isTrue, reason: 'Fehler beendet die Sperre');
+      v.state = KeyVerificationState.askSas;
+      expect(g.debugIncomingAllowed(_fremd, ct), isFalse);
+      v.state = KeyVerificationState.done;
+      expect(g.debugIncomingAllowed(_fremd, ct), isTrue, reason: 'fertig');
+      g.debugVerification = null;
+    });
+
     test('eingehende Anfrage bei wartendem Raum (outgoing) abgelehnt, nach dem Beitritt erlaubt', () async {
       final (_, g) = await ready(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}));
       expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd, peerState: 'invite', joined: 1, invited: 1)), isNotNull);
@@ -2393,4 +2411,10 @@ void main() {
       expect(g.debugBookTimelineIds, isEmpty);
     });
   });
+}
+
+/// Nur als Platzhalter für `KeyVerification.encryption`: `isDone` und `state` fassen die Verschlüsselung nicht an.
+class _NoEncryption implements Encryption {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError('${invocation.memberName}');
 }
