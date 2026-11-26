@@ -329,7 +329,14 @@ void main() {
       expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc(enabled: false)), isFalse);
       expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc(loaded: false)), isFalse);
       expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc(blocked: {carla})), isFalse);
-      expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc(identity: {carla})), isFalse);
+      // K3c-1 (Revision K3b-1, bewusst gedreht, ersetzt durch den Gatewaytest 7B „Einladung der Gegenseite bei identityChanged“):
+      // ein geänderter Schlüssel verhindert die Annahme nicht mehr (Pin-Sackgasse Variante B); die Sendesperre trägt den Schutz.
+      expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc(identity: {carla})), isTrue,
+          reason: 'identityChanged hindert die Annahme eines eigenen Kontakts nicht mehr');
+      expect(ConversationPolicy.autoAcceptContact(invite(from: dora, direct: true), cc(identity: {dora})), isFalse, reason: 'ohne Datensatz weiter nie');
+      expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true), cc(identity: {carla}, blocked: {carla})), isFalse, reason: 'blockiert weiter nie');
+      expect(ConversationPolicy.autoAcceptContact(invite(from: ben, direct: true), cc(contacts: {ben: ContactState.accepted}, identity: {ben})), isFalse,
+          reason: 'Familienmitglied nie, auch mit identityChanged (dort gilt autoAcceptDirect, E-37)');
       expect(ConversationPolicy.autoAcceptContact(invite(from: carla, direct: true, book: true), cc()), isFalse);
       expect(ConversationPolicy.autoAcceptContact(invite(from: null, direct: true), cc()), isFalse);
       expect(ConversationPolicy.autoAcceptContact(invite(from: me, direct: true), cc(contacts: {me: ContactState.accepted})), isFalse);
@@ -407,4 +414,44 @@ void main() {
       expect(ContactScope.membersComplete(hasFamily: false, participantsLoaded: false, syncedOnce: true, familyResolved: true), isTrue);
     });
   });
+
+  group('ContactScope.familyResolved (K3c-1)', () {
+    // (Zeiger, Raum bekannt, Mitgliedschaft, gebaut, row2Settled) je Tabellenzeile; Erwartung für fresh true / false.
+    final rows = <String, (bool, bool, RoomMembership?, bool, bool?, bool, bool)>{
+      '1 Zeiger fehlt': (false, false, null, false, null, true, false),
+      '2 Zeiger gesetzt, Raum unbekannt, nicht settled': (true, false, null, false, false, false, false),
+      '2 Zeiger gesetzt, Raum unbekannt, settled': (true, false, null, false, true, true, false),
+      '3 Raum bekannt, Einladung': (true, true, RoomMembership.invite, false, null, true, false),
+      '4 Raum bekannt, verlassen/verbannt/angeklopft': (true, true, RoomMembership.other, false, null, true, false),
+      '5 beigetreten, Familie nicht gebaut': (true, true, RoomMembership.join, false, null, false, false),
+      '6 beigetreten, Familie gebaut': (true, true, RoomMembership.join, true, null, true, true),
+    };
+    for (final e in rows.entries) {
+      final (pointer, known, membership, built, settled, whenFresh, whenStale) = e.value;
+      for (final fresh in <bool>[true, false]) {
+        test('${e.key}, fresh=$fresh', () {
+          expect(
+            ContactScope.familyResolved(
+              pointerSet: pointer,
+              roomKnown: known,
+              membership: membership,
+              familyBuilt: built,
+              accountDataFresh: fresh,
+              row2Settled: settled ?? false,
+            ),
+            fresh ? whenFresh : whenStale,
+          );
+        });
+      }
+    }
+
+    test('row2Settled wirkt nur in Zeile 2 und nur mit fresh', () {
+      for (final settled in <bool>[true, false]) {
+        expect(ContactScope.familyResolved(pointerSet: false, roomKnown: false, membership: null, familyBuilt: false, accountDataFresh: true, row2Settled: settled), isTrue);
+        expect(ContactScope.familyResolved(pointerSet: true, roomKnown: true, membership: RoomMembership.join, familyBuilt: false, accountDataFresh: true, row2Settled: settled), isFalse);
+        expect(ContactScope.familyResolved(pointerSet: true, roomKnown: false, membership: null, familyBuilt: false, accountDataFresh: false, row2Settled: settled), isFalse);
+      }
+    });
+  });
+
 }

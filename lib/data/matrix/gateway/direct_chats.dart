@@ -8,6 +8,8 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
   bool _canEncryptIn(Room? room);
   int get _dmEpoch;
   set _dmEpoch(int value);
+  Future<void> _syncContactChats(Client client);
+  void _cancelContactRow2();
   Set<String> get _dmCreating;
   Set<String> get _dmFailed;
   Set<String> get _dmJoining;
@@ -17,7 +19,6 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
   bool get _disposed;
   PeerMembership _peerMembershipOf(Room r, String peer);
   List<ChatThread> _contactThreads();
-  Future<void> _syncContactChats(Client client, Family f, Room familyRoom);
   Map<String, DateTime> get _dmRetryAfter;
   Map<String, Timeline> get _dmTimelines;
   Set<String> get _identityChanged;
@@ -33,7 +34,9 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
   void _scheduleRefresh();
   set _threads(List<ChatThread> value);
 
-  void _resetDirectChats() {
+  /// Familien-Einzelchats räumen (Familienwechsel, Abmelden, keine Familie). Der Kontaktzustand bleibt unberührt
+  /// ([_resetContacts]); Kontakte gehören zum Konto, nicht zur Familie (K3c-1, E-114).
+  void _resetFamilyChats() {
     for (final t in _dmTimelines.values) {
       t.cancelSubscriptions();
     }
@@ -44,9 +47,22 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
     _dmFailed.clear();
     _dmRetryAfter.clear();
     _dmCreating.clear();
-    _contacts.clearAll();
     _dmEpoch++;
     _threads = const <ChatThread>[];
+  }
+
+  /// Kontaktzustand räumen. [full] `false` (Familienwechsel, Bereich aus): nur was an der Familie hängt (Räume, Zeitleisten,
+  /// Anfragen, Zwischenspeicher der Prüfung und Erreichbarkeit); bewusst verlassene Räume (`failed`), laufende Anlagen
+  /// (`creating`), Einladungszustand, Missbrauchsgrenzen und Mitgliedszustand im Raum überleben (kein doppeltes Anlegen,
+  /// nie wieder sichtbar). [full] `true` (Abmelden, Kontowechsel, `_resetLocal`): alles.
+  void _resetContacts({required bool full}) {
+    if (full) {
+      _contacts.clearAll();
+      return;
+    }
+    _contacts.clearRooms();
+    _contacts.probeCache.clear();
+    _contacts.reachCache.clear();
   }
 
   /// Tatsachen eines Raums für die Einstufung ([ConversationPolicy]); liest nur, ändert nichts. [me] ist das eigene Konto.
@@ -83,12 +99,14 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
   void setContactPolicy(ContactPolicy policy) {
     if (_disposed || policy == _contactPolicy) return;
     _contactPolicy = policy;
+    // Ausschalten beendet das Warten auf ein Zeiger-Relikt (Zeile 2, K3c-1): kein Timer, kein Zähler ohne Bereich.
+    if (!policy.enabled) _cancelContactRow2();
     notifyListeners();
     // Blockieren, Ausschalten und Annehmen wirken ohne weiteren Sync (Threads, Anfragen, Auto-Annahme).
     _scheduleRefresh();
   }
 
-  /// Kontext der Einstufung für ein Konto mit bekannter Familie.
+  /// Kontext der Einstufung für ein Konto mit bekannter Familie (`membersLoaded` ist die Liste der Familie).
   PolicyContext _policyContext(Family f, String familyRoomId) => PolicyContext(
         myUserId: f.myUserId,
         familyRoomId: familyRoomId,
@@ -168,7 +186,7 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
         _dmMessages[e.key] = ChatMapper.messages(e.value, threadId: e.key, sends: _localSends, showReadBy: _showReadBy);
       }
     }
-    await _syncContactChats(client, f, familyRoom);
+    await _syncContactChats(client);
     final dms = <ChatThread>[
       for (final e in _dmPeers.entries)
         if (_dmTimelines.containsKey(e.key))

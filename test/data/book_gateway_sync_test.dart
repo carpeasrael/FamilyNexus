@@ -12,6 +12,7 @@ import 'package:family_nexus/data/matrix/server_probe.dart';
 import 'package:family_nexus/domain/book_policy.dart';
 import 'package:family_nexus/domain/book_room.dart';
 import 'package:family_nexus/domain/book_signal.dart';
+import 'package:family_nexus/domain/calendar_signal.dart' show CalendarSignal, ContactSignal, PrivateEventSignal;
 import 'package:family_nexus/domain/cash_book.dart';
 import 'package:family_nexus/domain/chat.dart' show ChatThread, ThreadKind;
 import 'package:family_nexus/domain/contacts.dart';
@@ -23,7 +24,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:matrix/encryption.dart' show Encryption, KeyVerification, KeyVerificationState;
-import 'package:matrix/matrix.dart' show CrossSigningKey, DeviceKeysList, Event, SyncStatus, SyncStatusUpdate, SyncUpdate;
+import 'package:matrix/matrix.dart' show CrossSigningKey, DeviceKeys, DeviceKeysList, Event, SyncStatus, SyncStatusUpdate, SyncUpdate;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../support/memory_stores.dart';
@@ -129,6 +130,9 @@ Map<String, Object?> _bookJoin(String room, {String creator = _me, Map<String, O
 class _Hs {
   final List<(String, String, String)> calls = <(String, String, String)>[]; // Methode, Pfad, Körper
   Completer<void> release = Completer<void>();
+
+  /// Hält die erste Antwort auf `/sync`, bis die Zukunft endet (Zustand „vor der ersten Serverantwort“, K3c-1).
+  Completer<void>? holdFirst;
   int _syncs = 0;
   void Function(String room)? onJoin;
 
@@ -196,6 +200,7 @@ class _Hs {
         }
         if (path.endsWith('/filter')) return _json(<String, Object?>{'filter_id': '1'});
         if (path == '/_matrix/client/v3/sync') {
+          if (_syncs == 0) await holdFirst?.future;
           if (_syncs++ > 0) await release.future;
           return _json(<String, Object?>{'next_batch': 's$_syncs'});
         }
@@ -304,14 +309,19 @@ Future<(_Hs, SdkMatrixGateway)> _signedIn({
   bool requireEncryption = false,
   bool? encryption,
   bool defaultEncryption = false,
+  Duration row2Delay = const Duration(seconds: 60),
+  bool holdFirstSync = false,
 }) async {
   final hs = _Hs()..familyMembersFail = familyMembersFail;
+  if (holdFirstSync) hs.holdFirst = Completer<void>();
   final dir = await Directory.systemTemp.createTemp('fn_bookgw');
+  _lastDir = dir;
+  final keys = _lastKeys = MemoryKeyStore();
   addTearDown(() => dir.delete(recursive: true));
   SdkMatrixGateway make({bool? flag}) => defaultEncryption
       ? SdkMatrixGateway(
           // Ohne `encryptionAvailable`: der Standard der Produktion (`client.encryptionEnabled`).
-          keyStore: MemoryKeyStore(),
+          keyStore: keys,
           dbDirectory: dir.path,
           probe: ServerProbe(client: hs.client),
           databaseOpener: (path, key) => databaseFactoryFfi.openDatabase(path),
@@ -320,10 +330,11 @@ Future<(_Hs, SdkMatrixGateway)> _signedIn({
           joinPollInterval: const Duration(hours: 1),
           cashBooksEnabled: true,
           requireEncryptionForBooks: requireEncryption,
+          contactRow2Delay: row2Delay,
         )
       : flag == null
       ? SdkMatrixGateway(
-          keyStore: MemoryKeyStore(),
+          keyStore: keys,
           dbDirectory: dir.path,
           probe: ServerProbe(client: hs.client),
           databaseOpener: (path, key) => databaseFactoryFfi.openDatabase(path),
@@ -332,9 +343,10 @@ Future<(_Hs, SdkMatrixGateway)> _signedIn({
           joinPollInterval: const Duration(hours: 1),
           requireEncryptionForBooks: requireEncryption,
           encryptionAvailable: encryption,
+          contactRow2Delay: row2Delay,
         )
       : SdkMatrixGateway(
-          keyStore: MemoryKeyStore(),
+          keyStore: keys,
           dbDirectory: dir.path,
           probe: ServerProbe(client: hs.client),
           databaseOpener: (path, key) => databaseFactoryFfi.openDatabase(path),
@@ -344,10 +356,12 @@ Future<(_Hs, SdkMatrixGateway)> _signedIn({
           cashBooksEnabled: flag,
           requireEncryptionForBooks: requireEncryption,
           encryptionAvailable: encryption,
+          contactRow2Delay: row2Delay,
         );
   final g = make(flag: enabled);
   addTearDown(() async {
     if (!hs.release.isCompleted) hs.release.complete();
+    if (hs.holdFirst != null && !hs.holdFirst!.isCompleted) hs.holdFirst!.complete();
     await g.close();
   });
   await g.restore();
@@ -358,6 +372,35 @@ Future<(_Hs, SdkMatrixGateway)> _signedIn({
     await Future<void>.delayed(_settle);
   }
   return (hs, g);
+}
+
+/// Verzeichnis der Datenbank des zuletzt angelegten Gateways (für den Neustart auf demselben Stand).
+Directory? _lastDir;
+MemoryKeyStore? _lastKeys;
+
+/// Neustart auf demselben Datenbankstand (kein Login): die Sitzung wird wiederhergestellt, `_syncedOnce` gilt durch den
+/// gespeicherten Stand, bevor der Server geantwortet hat. [hs] ist der Server des Neustarts (frisch: erste Antwort sofort,
+/// mit `holdFirst`: erst auf Freigabe).
+Future<SdkMatrixGateway> _restarted(_Hs hs, Directory dir, {Duration row2Delay = const Duration(seconds: 60)}) async {
+  final g = SdkMatrixGateway(
+    keyStore: _lastKeys!,
+    dbDirectory: dir.path,
+    probe: ServerProbe(client: hs.client),
+    databaseOpener: (path, key) => databaseFactoryFfi.openDatabase(path),
+    httpClient: hs.client,
+    joinOpTimeout: const Duration(milliseconds: 800),
+    joinPollInterval: const Duration(hours: 1),
+    requireEncryptionForBooks: false,
+    encryptionAvailable: true,
+    contactRow2Delay: row2Delay,
+  );
+  addTearDown(() async {
+    if (!hs.release.isCompleted) hs.release.complete();
+    if (hs.holdFirst != null && !hs.holdFirst!.isCompleted) hs.holdFirst!.complete();
+    await g.close();
+  });
+  await g.restore();
+  return g;
 }
 
 Future<void> _sync(SdkMatrixGateway g, Map<String, Object?> update) =>
@@ -694,7 +737,7 @@ void main() {
       expect(await contactThread(g, dmJoined(ct, _fremd)), isNotNull);
       g.debugLeaveFamilyScope();
       expect(g.debugContactPolicy, policy);
-      expect(g.threads.where((t) => t.kind == ThreadKind.contact), isEmpty, reason: '_resetDirectChats leert die Kontaktzustände');
+      expect(g.threads.where((t) => t.kind == ThreadKind.contact), isEmpty, reason: '_resetFamilyChats und _resetContacts(full: false) räumen die Kontakt-Räume (failed und creating bleiben, Test 6 b)');
       expect(g.contactRequests, isEmpty);
     });
 
@@ -1067,9 +1110,14 @@ void main() {
         expect(hs.where('POST', '$room/leave'), isEmpty, reason: 'ohne Zähler ist die Größe unbekannt, kein Verstoß');
       });
 
-      test('Familienwechsel während des Beitritts: der Raum wird verlassen', () async {
-        final (hs, _) = await joined(dmJoined(room, _fremd), during: (g) => g.debugLeaveFamilyScope());
-        expect(hs.where('POST', '$room/leave'), isNotEmpty);
+      test('Familienwechsel während des Beitritts (K3c-1): kein Abbruch per Epoche; die Nachprüfung entscheidet, unvollständige Liste ⇒ unbekannt, nie verlassen', () async {
+        // Vorher (Familien-Epoche): der Raum wurde verlassen. Jetzt: `_verifyJoined` meldet „unbekannt“, solange die Liste der neuen
+        // Familie unvollständig ist (fail-closed, kein Verlassen); mit vollständiger Liste und Nichtmitglied erscheint der Thread.
+        final (hs, g) = await joined(dmJoined(room, _fremd), during: (g) => g.debugLeaveFamilyScope());
+        expect(hs.where('POST', '$room/leave'), isEmpty, reason: 'unbekannt ist kein Verstoß');
+        await _sync(g, <String, Object?>{'account_data': <String, Object?>{'events': <Object?>[<String, Object?>{'type': 'x.k', 'content': <String, Object?>{}}]}});
+        await Future<void>.delayed(_settle);
+        expect(g.threads.where((t) => t.id == room && t.kind == ThreadKind.contact), hasLength(1), reason: 'Liste nachgeladen, Person Nichtmitglied');
       });
 
       test('Blockieren während des Beitritts: der Raum wird verlassen', () async {
@@ -1391,6 +1439,9 @@ void main() {
           if (blockInsteadOfLeave) {
             g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.blocked}, blocked: {_fremd}));
           } else {
+            // Familienwechsel mit unvollständiger Liste der neuen Familie (K3c-1: die Nachprüfung entscheidet, nicht die Epoche);
+            // lädt die Liste dagegen nach und die Person ist Nichtmitglied, bleibt der Raum (Test 6, a3 unten).
+            hs.familyMembersFail = true;
             g.debugLeaveFamilyScope();
           }
           final done = expectLater(f, _notAllowed());
@@ -1684,6 +1735,795 @@ void main() {
       final (_, g2) = await ready(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}));
       await kick(g2, both('invite', 'join'));
       expect(g2.debugContactRoomOf(_fremd), z, reason: 'der wartende Raum mit der kleineren ID zählt nicht');
+    });
+  });
+
+  group('Kontakte ohne Familie (#119, K3c-1)', () {
+    const ct = '!ct:hs.example';
+    const priv = '!privat:hs.example';
+    const k1 = 'KEYONE00000000000000000000000000000000000000';
+    const k2 = 'KEYTWO00000000000000000000000000000000000000';
+    const policy = ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.accepted});
+    const policyOut = ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.outgoing});
+    const short = Duration(milliseconds: 700);
+
+    /// Konto ohne Familie, Bereich an, Schlüssel der Person erreichbar (Test-Naht).
+    Future<(_Hs, SdkMatrixGateway)> noFamily([ContactPolicy p = policy, Duration row2Delay = const Duration(seconds: 60)]) async {
+      final (hs, g) = await _signedIn(encryption: true, familySynced: false, row2Delay: row2Delay);
+      g.setContactPolicy(p);
+      g.debugDevicesOf = (id) => <bool>[true];
+      return (hs, g);
+    }
+
+    List<ChatThread> contacts(SdkMatrixGateway g) => g.threads.where((t) => t.kind == ThreadKind.contact).toList();
+
+    Future<void> settle(SdkMatrixGateway g, Map<String, Object?> update) async {
+      await _sync(g, update);
+      await Future<void>.delayed(_settle);
+    }
+
+    // Ein Sync mit Kontodaten löst den Abgleich aus (ein leerer Sync tut es nicht).
+    Map<String, Object?> kickUpdate() => <String, Object?>{
+          'account_data': <String, Object?>{
+            'events': <Object?>[
+              <String, Object?>{'type': 'x.kick', 'content': <String, Object?>{'n': _n++}},
+            ],
+          },
+        };
+    Future<void> kick(SdkMatrixGateway g) => settle(g, kickUpdate());
+
+    Map<String, Object?> pointer(String room) => <String, Object?>{
+          'account_data': <String, Object?>{
+            'events': <Object?>[
+              <String, Object?>{'type': 'de.inneso.familynexus.family', 'content': <String, Object?>{'room_id': room}},
+            ],
+          },
+        };
+
+    /// Wie `_familySync()`, aber mit [extra] als weiterem beigetretenen Mitglied.
+    Map<String, Object?> familyWith(String? extra) {
+      final u = _familySync();
+      final events = ((((u['rooms']! as Map)['join']! as Map)[_familyRoom]! as Map)['state']! as Map)['events']! as List<Object?>;
+      if (extra != null) events.add(_memberEvent(extra, 'join'));
+      return u;
+    }
+
+    Map<String, Object?> withUnread(Map<String, Object?> update, String room, int n) {
+      (((update['rooms']! as Map)['join']! as Map)[room]! as Map<String, Object?>)['unread_notifications'] = <String, Object?>{'notification_count': n, 'highlight_count': 0};
+      return update;
+    }
+
+    Map<String, Object?> privateRoom() => <String, Object?>{
+          'account_data': <String, Object?>{
+            'events': <Object?>[
+              <String, Object?>{'type': 'de.inneso.familynexus.private_room', 'content': <String, Object?>{'room_id': priv}},
+            ],
+          },
+          'rooms': <String, Object?>{
+            'join': <String, Object?>{
+              priv: <String, Object?>{
+                'summary': <String, Object?>{'m.joined_member_count': 1, 'm.invited_member_count': 0},
+                'state': <String, Object?>{
+                  'events': <Object?>[
+                    _state('m.room.create', _me, <String, Object?>{'room_version': '10'}),
+                    _state('m.room.encryption', _me, <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2'}),
+                    _memberEvent(_me, 'join'),
+                  ],
+                },
+              },
+            },
+          },
+        };
+
+    void master(SdkMatrixGateway g, String uid, String pub) {
+      final c = g.sdkClient!;
+      final list = c.userDeviceKeys[uid] ?? (c.userDeviceKeys[uid] = DeviceKeysList(uid, c));
+      list.crossSigningKeys
+        ..clear()
+        ..[pub] = CrossSigningKey.fromJson(<String, Object?>{
+          'user_id': uid,
+          'usage': <String>['master'],
+          'keys': <String, String>{'ed25519:$pub': pub},
+        }, c);
+    }
+
+    /// Ein von der App gesperrtes Gerät mit (im Harness ohne vodozemac als gültig geltender) Selbstsignatur.
+    void blockedDevice(SdkMatrixGateway g, String uid) {
+      final c = g.sdkClient!;
+      final list = c.userDeviceKeys[uid] ?? (c.userDeviceKeys[uid] = DeviceKeysList(uid, c));
+      final d = DeviceKeys.fromJson(<String, Object?>{
+        'user_id': uid,
+        'device_id': 'D1',
+        'algorithms': <String>['m.olm.v1.curve25519-aes-sha2', 'm.megolm.v1.aes-sha2'],
+        'keys': <String, String>{'ed25519:D1': 'ED25519KEY', 'curve25519:D1': 'CURVEKEY'},
+        'signatures': <String, Object?>{
+          uid: <String, String>{'ed25519:D1': 'SIGNATURE'},
+        },
+      }, c);
+      d.blocked = true;
+      list.deviceKeys['D1'] = d;
+    }
+
+    Future<void> noSend(Future<Object?> f) => expectLater(f.timeout(const Duration(seconds: 3)), _notAllowed());
+
+    /// Nach dem Anlegen liefert der Server den Raum im Sync (Gegenüber nur eingeladen).
+    void armCreate(_Hs hs, SdkMatrixGateway g, {String room = '!neu:hs.example'}) {
+      hs.createdRoom = room;
+      hs.onCreate = (r) => Future<void>.delayed(
+            const Duration(milliseconds: 150),
+            () => _syncJoined(g, dmJoined(r, _fremd, peerState: 'invite', joined: 1, invited: 1)),
+          ).ignore();
+    }
+
+    test('1: Kontaktzustand ohne Familie bleibt über mehrere Abgleiche; probeContact liefert ein Ergebnis (Funktionstest des neuen Pfads)', () async {
+      final (hs, g) = await noFamily();
+      expect(g.family, isNull);
+      await settle(g, dmJoined(ct, _fremd));
+      expect(contacts(g), hasLength(1), reason: 'Thread ohne Familie');
+      for (var i = 0; i < 3; i++) {
+        await kick(g);
+        expect(contacts(g), hasLength(1), reason: 'Abgleich $i');
+      }
+      expect(g.family, isNull);
+      hs.profiles[_fremd] = (200, <String, Object?>{'displayname': 'Fremd'});
+      final p = await g.probeContact(_fremd);
+      expect((p.existence, p.isFamilyMember), (ContactExistence.yes, false));
+    });
+
+    group('familyResolved im Gateway (Wahrheitstabelle)', () {
+      test('Zeile 2 (Zeiger auf unbekannten Raum): keine Kontakt-Threads, keine Anfragen, probe/start notAllowed', () async {
+        final (_, g) = await noFamily(policyOut);
+        await settle(g, dmJoined(ct, _fremd, peerState: 'invite', joined: 1, invited: 1));
+        await settle(g, dmInvite('!rq:hs.example', '@fremd2:hs.example'));
+        expect(contacts(g), hasLength(1));
+        expect(g.contactRequests, hasLength(1));
+        await settle(g, pointer('!gone:hs.example'));
+        expect(g.debugContactFamilyResolved, isFalse);
+        expect(contacts(g), isEmpty);
+        expect(g.contactRequests, isEmpty);
+        await expectLater(g.probeContact(_fremd), _notAllowed());
+        await expectLater(g.startContactChat(_fremd), _notAllowed());
+      });
+
+      test('Zeile 5 (Familienraum beigetreten, Familie noch nicht gebaut): nicht aufgelöst; danach wieder Kontakte', () async {
+        final (_, g) = await noFamily();
+        await settle(g, dmJoined(ct, _fremd));
+        expect(contacts(g), hasLength(1));
+        final inHook = Completer<void>();
+        final gate = Completer<void>();
+        g.debugBeforeFamilyTimeline = () async {
+          if (!inHook.isCompleted) inHook.complete();
+          await gate.future;
+        };
+        await _sync(g, familyWith(null));
+        await inHook.future;
+        expect(g.family, isNull, reason: 'Zwischenzustand');
+        expect(g.debugContactFamilyResolved, isFalse);
+        expect(g.debugContactMembersComplete, isFalse);
+        await expectLater(g.probeContact(_fremd), _notAllowed());
+        g.debugBeforeFamilyTimeline = null;
+        gate.complete();
+        await Future<void>.delayed(_settle * 2);
+        expect(g.family, isNotNull);
+        expect(g.debugContactMembersComplete, isTrue);
+        expect(contacts(g), hasLength(1), reason: 'Fremder bleibt Kontakt, Liste der Familie geladen');
+      });
+
+      test('Zeile 1 vor der ersten Serverantwort nicht aufgelöst (auch mit _syncedOnce), danach aufgelöst: Abgleich auch bei leerer Antwort', () async {
+        final (_, g1) = await _signedIn(encryption: true, familySynced: false);
+        final dir = _lastDir!;
+        await settle(g1, dmJoined(ct, _fremd));
+        await g1.close();
+        final hs2 = _Hs()..holdFirst = Completer<void>();
+        final g = await _restarted(hs2, dir);
+        expect(g.initialSyncDone, isTrue, reason: 'gespeicherter Stand: _syncedOnce vor der Serverantwort');
+        g.setContactPolicy(policy);
+        g.debugDevicesOf = (id) => <bool>[true];
+        await Future<void>.delayed(_settle);
+        expect(g.debugContactFamilyResolved, isFalse);
+        expect(contacts(g), isEmpty, reason: 'unaufgelöst ⇒ keine Kontakt-Threads');
+        await expectLater(g.probeContact(_fremd), _notAllowed());
+        hs2.holdFirst!.complete();
+        await Future<void>.delayed(_settle * 3);
+        expect(g.debugContactFamilyResolved, isTrue);
+        expect(contacts(g), hasLength(1), reason: 'Übergang fresh false→true löst den Abgleich aus (auch bei leerer Antwort)');
+      });
+
+      test('Kontowechsel: nach Abmelden und neuer Anmeldung gilt „keine Familie“ erst nach der ersten Antwort des neuen Kontos', () async {
+        final (hs, g) = await noFamily();
+        expect(g.debugContactFamilyResolved, isTrue);
+        await g.logout();
+        expect(g.debugContactFamilyResolved, isFalse);
+        await g.login(server: ServerUrl.tryParse('hs.example')!, username: 'n2', password: 'geheim123');
+        g.setContactPolicy(policy);
+        await Future<void>.delayed(_settle);
+        // `release` hält jede weitere Antwort: das neue Konto hat noch nicht geantwortet.
+        expect(hs.release.isCompleted, isFalse);
+        expect(g.debugContactFamilyResolved, isFalse);
+        expect(g.debugContactMembersComplete, isFalse);
+      });
+    });
+
+    group('Rückfall für Zeile 2 (60 s UND 3 zählende Syncs, hier mit kurzer Zeit)', () {
+      test('3 Syncs, aber vor Ablauf der Zeit ⇒ nicht aufgelöst; nach Ablauf aufgelöst', () async {
+        final (_, g) = await noFamily(policy, short);
+        await _sync(g, pointer('!gone:hs.example')); // Eintritt (zählt nicht)
+        for (var i = 0; i < 3; i++) {
+          await _sync(g, kickUpdate());
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        expect(g.debugContactFamilyResolved, isFalse, reason: 'Zähler ≥ 3, aber Zeit nicht erreicht');
+        await Future<void>.delayed(short + _settle);
+        expect(g.debugContactFamilyResolved, isTrue);
+      });
+
+      test('nur leere Long-Polls: nie aufgelöst (zählen nicht), auch nach Ablauf der Zeit', () async {
+        final (_, g) = await noFamily(policy, short);
+        await _sync(g, pointer('!gone:hs.example'));
+        for (var i = 0; i < 6; i++) {
+          await _sync(g, <String, Object?>{});
+        }
+        await Future<void>.delayed(short + _settle);
+        expect(g.debugContactFamilyResolved, isFalse);
+      });
+
+      test('3 zählende Syncs mit leeren Long-Polls dazwischen: nach Ablauf aufgelöst (leere brechen die Zählung nicht ab)', () async {
+        final (_, g) = await noFamily(policy, short);
+        await _sync(g, pointer('!gone:hs.example'));
+        for (var i = 0; i < 3; i++) {
+          await _sync(g, kickUpdate());
+          await _sync(g, <String, Object?>{});
+        }
+        await Future<void>.delayed(short + _settle);
+        expect(g.debugContactFamilyResolved, isTrue);
+      });
+
+      test('Zeigeränderung setzt zurück: keine kumulative Zählung über den Wechsel', () async {
+        final (_, g) = await noFamily(policy, short);
+        await _sync(g, pointer('!gone:hs.example'));
+        await _sync(g, kickUpdate());
+        await _sync(g, kickUpdate());
+        await _sync(g, pointer('!other:hs.example')); // anderer Zeiger: Eintritt, Zähler 0
+        await _sync(g, kickUpdate());
+        await Future<void>.delayed(short + _settle);
+        expect(g.debugContactFamilyResolved, isFalse, reason: '1 Sync seit dem Wechsel');
+        await _sync(g, kickUpdate());
+        await _sync(g, kickUpdate());
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        expect(g.debugContactFamilyResolved, isTrue, reason: '3 Syncs seit dem Wechsel und Zeit abgelaufen');
+      });
+    });
+
+    group('Neuauswertung: Auslöser, Timer, Gate', () {
+      test('(ii) Zeile 2 ohne weiteren Sync: der Timer startet erst ab fresh = true und löst nach der Zeit einen Abgleich aus', () async {
+        final (_, g1) = await _signedIn(encryption: true, familySynced: false);
+        final dir = _lastDir!;
+        await settle(g1, pointer('!gone:hs.example'));
+        await g1.close();
+        final hs2 = _Hs()..holdFirst = Completer<void>();
+        final g = await _restarted(hs2, dir, row2Delay: short);
+        g.setContactPolicy(policy);
+        await Future<void>.delayed(_settle);
+        expect(g.debugContactRow2TimerPending, isFalse, reason: 'vor der ersten Antwort kein Timer');
+        hs2.holdFirst!.complete();
+        await Future<void>.delayed(const Duration(milliseconds: 150));
+        expect(g.debugContactRow2TimerPending, isTrue);
+        var refreshes = 0;
+        g.debugBeforeRefresh = () async => refreshes++;
+        await Future<void>.delayed(short + _settle);
+        expect(refreshes, greaterThanOrEqualTo(1), reason: 'der Timer löst einen Abgleich aus');
+        expect(g.debugContactRow2TimerPending, isFalse);
+      });
+
+      test('(iii) Abmelden, Ausschalten, Familie gefunden und dispose brechen den Timer ab', () async {
+        Future<SdkMatrixGateway> armed() async {
+          final (_, g) = await noFamily(policy, const Duration(seconds: 30));
+          await _sync(g, pointer('!gone:hs.example'));
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+          expect(g.debugContactRow2TimerPending, isTrue);
+          return g;
+        }
+
+        final off = await armed();
+        off.setContactPolicy(ContactPolicy.off);
+        expect(off.debugContactRow2TimerPending, isFalse, reason: 'Ausschalten');
+        final out = await armed();
+        await out.logout();
+        expect(out.debugContactRow2TimerPending, isFalse, reason: 'Abmelden');
+        final scope = await armed();
+        await settle(scope, familyWith(null));
+        expect(scope.debugContactRow2TimerPending, isFalse, reason: 'Zeiger zeigt auf beigetretene Familie (Raumzustand geändert)');
+        final disposed = await armed();
+        disposed.dispose();
+        expect(disposed.debugContactRow2TimerPending, isFalse, reason: 'dispose');
+      });
+
+      test('(iv) Gate: ohne eingeschalteten Bereich kein zusätzlicher Abgleich nach der ersten leeren Antwort und kein Timer; mit Bereich einer', () async {
+        Future<(int, bool)> run({required bool enabled, required bool row2}) async {
+          final (_, g1) = await _signedIn(encryption: true, familySynced: false);
+          final dir = _lastDir!;
+          await settle(g1, row2 ? pointer('!gone:hs.example') : dmJoined(ct, _fremd));
+          await g1.close();
+          final hs2 = _Hs()..holdFirst = Completer<void>();
+          final g = await _restarted(hs2, dir, row2Delay: short);
+          if (enabled) {
+            g.setContactPolicy(policy);
+          }
+          await Future<void>.delayed(_settle * 2);
+          var refreshes = 0;
+          g.debugBeforeRefresh = () async => refreshes++;
+          hs2.holdFirst!.complete();
+          await Future<void>.delayed(_settle * 2);
+          return (refreshes, g.debugContactRow2TimerPending);
+        }
+
+        final (offRefresh, offTimer) = await run(enabled: false, row2: true);
+        expect(offRefresh, 0, reason: 'Bereich aus: kein Abgleich nach der leeren Antwort (I1, #150)');
+        expect(offTimer, isFalse, reason: 'Bereich aus: kein Timer');
+        final (onRefresh, onTimer) = await run(enabled: true, row2: true);
+        expect(onRefresh, greaterThanOrEqualTo(1), reason: 'Gegenprobe: mit Bereich löst der Übergang den Abgleich aus');
+        expect(onTimer, isTrue);
+      });
+
+      test('(iv-b) Gate: Bereich aus + nicht-leere Antwort mit Zeiger auf unbekannten Raum (Zeile 2) startet keinen Timer; Einschalten danach schon', () async {
+        final (_, g) = await _signedIn(encryption: true, familySynced: false);
+        await settle(g, pointer('!gone:hs.example'));
+        await Future<void>.delayed(_settle * 2);
+        expect(g.debugContactRow2TimerPending, isFalse, reason: 'Bereich aus: Zeile 2 wird nicht beobachtet (#150)');
+        g.setContactPolicy(policy);
+        await Future<void>.delayed(_settle * 2);
+        expect(g.debugContactRow2TimerPending, isTrue, reason: 'Gegenprobe: mit Bereich beobachtet');
+      });
+
+      test('(v) Einschalten nach der ersten Antwort: setContactPolicy löst den Abgleich aus, Kontakte erscheinen', () async {
+        final (_, g) = await _signedIn(encryption: true, familySynced: false);
+        await settle(g, dmJoined(ct, _fremd));
+        expect(contacts(g), isEmpty);
+        g.setContactPolicy(policy);
+        await Future<void>.delayed(_settle);
+        expect(contacts(g), hasLength(1));
+      });
+    });
+
+    test('3: Anfragen ohne Familie: Fremder ⇒ Anfrage; Kontakt mit Datensatz wird angenommen; Gruppeneinladung nie', () async {
+      final (hs, g) = await noFamily();
+      await settle(g, dmInvite('!rq:hs.example', '@fremd2:hs.example'));
+      expect(g.contactRequests.map((r) => r.roomId), <String>['!rq:hs.example']);
+      expect(hs.where('POST', '/join'), isEmpty, reason: 'Fremde nie angenommen');
+      final group = dmInvite('!gr:hs.example', '@fremd3:hs.example', direct: false);
+      (((group['rooms']! as Map)['invite']! as Map)['!gr:hs.example']! as Map<String, Object?>)['invite_state'] = <String, Object?>{
+        'events': <Object?>[
+          <String, Object?>{
+            'type': 'm.room.member',
+            'state_key': _me,
+            'sender': '@fremd3:hs.example',
+            'content': <String, Object?>{'membership': 'invite'},
+          },
+          <String, Object?>{'type': 'm.room.join_rules', 'state_key': '', 'sender': '@fremd3:hs.example', 'content': <String, Object?>{'join_rule': 'invite'}},
+        ],
+      };
+      await settle(g, group);
+      expect(g.contactRequests.map((r) => r.roomId), <String>['!rq:hs.example'], reason: 'Gruppe ist keine Kontaktanfrage');
+      expect(g.invitations, isEmpty, reason: 'Gruppe ohne knock ist nie eine Familieneinladung');
+      expect(hs.where('POST', '!gr:hs.example/join'), isEmpty);
+      hs.onJoin = (_) {};
+      await settle(g, dmInvite('!von-kontakt:hs.example', _fremd));
+      await Future<void>.delayed(_settle);
+      expect(hs.where('POST', '!von-kontakt:hs.example/join'), isNotEmpty, reason: 'eigener Kontakt wird angenommen');
+    });
+
+    test('4: privater Raum ohne Familie: ContactSignal erreicht die Zuhörer; fremder Absender, Familienraum-Logik und Kontakt-Räume nie', () async {
+      final (_, g) = await noFamily();
+      await settle(g, <String, Object?>{
+        ...privateRoom(),
+        'rooms': <String, Object?>{
+          'join': <String, Object?>{
+            ...(((privateRoom()['rooms']! as Map)['join']!) as Map<String, Object?>),
+            ...(((dmJoined(ct, _fremd)['rooms']! as Map)['join']!) as Map<String, Object?>),
+          },
+        },
+        'account_data': <String, Object?>{
+          'events': <Object?>[
+            <String, Object?>{'type': 'de.inneso.familynexus.private_room', 'content': <String, Object?>{'room_id': priv}},
+            <String, Object?>{'type': 'm.direct', 'content': <String, Object?>{_fremd: <String>[ct]}},
+          ],
+        },
+      });
+      final timeline = g.debugPrivateTimeline;
+      expect(timeline, isNotNull, reason: 'privater Raum wird ohne Familie abonniert');
+      await g.openThread(ct);
+      final inContact = g.debugContactTimeline(ct)!;
+      final seen = <ContactSignal>[];
+      final sub = g.calendarSignals.listen((s) {
+        if (s is ContactSignal) seen.add(s);
+      });
+      addTearDown(sub.cancel);
+      timeline!.events.insert(0, _arrived(g, priv, 'de.inneso.familynexus.contact', _me, <String, Object?>{'marker': 'privat-eigen'}));
+      timeline.events.insert(0, _arrived(g, priv, 'de.inneso.familynexus.contact', _cara, <String, Object?>{'marker': 'privat-fremd'}));
+      inContact.events.insert(0, _arrived(g, ct, 'de.inneso.familynexus.contact', _me, <String, Object?>{'marker': 'kontakt-raum'}));
+      await kick(g);
+      expect(seen.map((s) => s.content['marker']), <Object?>['privat-eigen']);
+    });
+
+    group('5: Schlüsselwechsel ohne Familie (me aus dem Client)', () {
+      test('geändert ⇒ Banner, Senden (Text, Anhang) notAllowed, Akzeptieren wirkt, ein erneuter Wechsel sperrt synchron', () async {
+        final (hs, g) = await noFamily();
+        await settle(g, dmJoined(ct, _fremd));
+        await g.openThread(ct);
+        master(g, _fremd, k1);
+        await kick(g);
+        ChatThread thread() => contacts(g).single;
+        expect(thread().identity, IdentityStatus.pinned);
+        master(g, _fremd, k2);
+        await kick(g);
+        expect(thread().identity, IdentityStatus.changed);
+        await noSend(g.sendMessage('Hallo', threadId: ct));
+        await noSend(g.sendAttachment(fileName: 'a.pdf', bytes: Uint8List.fromList('%PDF-1.4\n1 0 obj\n'.codeUnits), threadId: ct));
+        await g.acceptIdentityChange(_fremd);
+        await Future<void>.delayed(_settle);
+        expect(thread().identity, IdentityStatus.pinned);
+        expect(hs.where('PUT', '/account_data/${SdkMatrixGateway.pinsAccountData}'), isEmpty);
+        // Zwischen zwei Abgleichen: nur die frische Auswertung im Sendeweg (mit `me` vom Client) sperrt.
+        master(g, _fremd, k1);
+        await noSend(g.sendMessage('Hallo', threadId: ct));
+        expect(g.debugIdentityChanged, contains(_fremd));
+      });
+    });
+
+    group('6: Kontakt-Epoche getrennt von der Familien-Epoche (Nachprüfung entscheidet)', () {
+      test('(a1) keine → keine: Abgleich während der Anlage, der Raum bleibt, Rückgabe ok', () async {
+        final (hs, g) = await noFamily(policyOut);
+        hs.holdCreate = Completer<void>();
+        armCreate(hs, g);
+        final f = g.startContactChat(_fremd);
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await kick(g); // Abgleich ohne Wechsel (in `_resetFamilyChats` steigt `_dmEpoch`, die Kontakt-Epoche nicht)
+        hs.holdCreate!.complete();
+        expect(await f, '!neu:hs.example');
+        expect(hs.where('POST', '!neu:hs.example/leave'), isEmpty);
+      });
+
+      test('(a2) keine → A mit unvollständiger Liste: der Raum wird verlassen, notAllowed', () async {
+        final (hs, g) = await noFamily(policyOut);
+        hs.holdCreate = Completer<void>();
+        armCreate(hs, g);
+        final f = g.startContactChat(_fremd);
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        hs.familyMembersFail = true;
+        await settle(g, familyWith(null));
+        final done = expectLater(f, _notAllowed());
+        hs.holdCreate!.complete();
+        await done;
+        expect(hs.where('POST', '!neu:hs.example/leave'), isNotEmpty);
+      });
+
+      test('(a3) keine → A, Liste nachgeladen, Person Nichtmitglied: der Raum bleibt', () async {
+        final (hs, g) = await noFamily(policyOut);
+        hs.holdCreate = Completer<void>();
+        armCreate(hs, g);
+        final f = g.startContactChat(_fremd);
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await settle(g, familyWith(null));
+        expect(g.debugContactMembersComplete, isTrue);
+        hs.holdCreate!.complete();
+        expect(await f, '!neu:hs.example');
+        expect(hs.where('POST', '!neu:hs.example/leave'), isEmpty);
+      });
+
+      test('(a4) keine → A, die Person ist Mitglied der neuen Familie: der Raum wird verlassen', () async {
+        final (hs, g) = await noFamily(policyOut);
+        hs.holdCreate = Completer<void>();
+        armCreate(hs, g);
+        final f = g.startContactChat(_fremd);
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await settle(g, familyWith(_fremd));
+        final done = expectLater(f, _notAllowed());
+        hs.holdCreate!.complete();
+        await done;
+        expect(hs.where('POST', '!neu:hs.example/leave'), isNotEmpty);
+      });
+
+      test('(b) creating überlebt den Familienwechsel (kein doppeltes Anlegen), failed bleibt verlassen und unsichtbar', () async {
+        final (hs, g) = await noFamily(policyOut);
+        hs.holdCreate = Completer<void>();
+        armCreate(hs, g);
+        final f = g.startContactChat(_fremd);
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await settle(g, familyWith(null));
+        await expectLater(g.startContactChat(_fremd), _error(GatewayError.alreadyExists));
+        hs.holdCreate!.complete();
+        await f;
+        expect(hs.where('POST', '/createRoom'), hasLength(1));
+        // `failed`: bewusst verlassener Raum erscheint nach einem Familienwechsel nicht wieder.
+        final (_, g2) = await noFamily();
+        await settle(g2, dmJoined(ct, _fremd));
+        expect(contacts(g2), hasLength(1));
+        await g2.leaveConversation(ct);
+        await settle(g2, dmJoined(ct, _fremd));
+        expect(contacts(g2), isEmpty);
+        await settle(g2, familyWith(null));
+        await settle(g2, dmJoined(ct, _fremd));
+        expect(contacts(g2), isEmpty, reason: 'failed überlebt den Familienwechsel');
+      });
+
+      test('(c0) Scope-Wechsel während einer Probe: Person wird Mitglied ⇒ notAllowed, kein Eintrag im Zwischenspeicher; Nichtmitglied ⇒ Ergebnis', () async {
+        for (final member in <bool>[true, false]) {
+          final (hs, g) = await noFamily(policyOut);
+          hs.profiles[_fremd] = (200, <String, Object?>{'displayname': 'Fremd'});
+          hs.holdProfile = Completer<void>();
+          final f = g.probeContact(_fremd);
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          await settle(g, familyWith(member ? _fremd : null));
+          hs.holdProfile!.complete();
+          if (member) {
+            await expectLater(f, _notAllowed());
+            expect(g.debugProbeCacheLength, 0, reason: 'nichts zwischengespeichert');
+          } else {
+            expect((await f).existence, ContactExistence.yes);
+            expect(g.debugProbeCacheLength, 1);
+          }
+        }
+      });
+
+      test('(c) probeCache wird beim Familienwechsel verworfen (zweite Probe fragt neu), peerCache bleibt (Anforderung nicht wiederholt)', () async {
+        final (hs, g) = await noFamily();
+        hs.profiles[_fremd] = (200, <String, Object?>{'displayname': 'Fremd'});
+        await g.probeContact(_fremd);
+        await g.probeContact(_fremd);
+        expect(hs.where('GET', '/profile/@fremd').length, 1, reason: 'aus dem Zwischenspeicher');
+        var loads = 0;
+        g.debugPeerMembershipLoader = (room, peer) async {
+          loads++;
+          return PeerMembership.join;
+        };
+        await settle(g, dmJoined(ct, _fremd, members: <String>[_me]));
+        await kick(g);
+        expect(loads, 1);
+        expect(contacts(g), hasLength(1));
+        await settle(g, familyWith(null));
+        await kick(g);
+        expect(contacts(g), hasLength(1), reason: 'peerCache überlebt');
+        expect(loads, 1, reason: 'Mitgliedszustand wird nicht erneut angefordert');
+        await g.probeContact(_fremd);
+        expect(hs.where('GET', '/profile/@fremd').length, 2, reason: 'probeCache verworfen');
+      });
+
+      test('(d) Abmelden verwirft alles: Epoche steigt, failed und Pins sind weg; ein Familienwechsel hebt die Epoche nicht', () async {
+        final (_, g) = await noFamily();
+        await settle(g, dmJoined(ct, _fremd));
+        final epoch = g.debugContactEpoch;
+        g.debugLeaveFamilyScope();
+        expect(g.debugContactEpoch, epoch, reason: 'Familienwechsel: keine neue Kontakt-Epoche');
+        await g.openThread(ct);
+        master(g, _fremd, k1);
+        await kick(g);
+        master(g, _fremd, k2);
+        await kick(g);
+        expect(contacts(g).single.identity, IdentityStatus.changed);
+        await g.leaveConversation(ct);
+        await g.logout();
+        expect(g.debugContactEpoch, greaterThan(epoch));
+        await g.login(server: ServerUrl.tryParse('hs.example')!, username: 'n2', password: 'geheim123');
+        g.setContactPolicy(policy);
+        await settle(g, dmJoined(ct, _fremd));
+        expect(contacts(g), hasLength(1), reason: 'failed wurde verworfen');
+        master(g, _fremd, k2);
+        await kick(g);
+        expect(contacts(g).single.identity, IdentityStatus.pinned, reason: 'Sitzungs-Pin und Änderungsvermerk wurden verworfen (k2 gilt als erster Schlüssel)');
+      });
+    });
+
+    group('7: Pin-Sackgasse (Gateway), je Variante', () {
+      Future<(_Hs, SdkMatrixGateway)> ready([ContactPolicy p = policy]) async {
+        final (hs, g) = await _signedIn(encryption: true);
+        g.setContactPolicy(p);
+        g.debugDevicesOf = (id) => <bool>[true];
+        return (hs, g);
+      }
+
+      test('A: Entfernen und Wiederhinzufügen eines Kontakts mit geändertem Schlüssel legt den Raum an; Senden gesperrt; nach Beitritt Akzeptieren', () async {
+        final (hs, g) = await ready();
+        await settle(g, dmJoined(ct, _fremd));
+        await g.openThread(ct);
+        master(g, _fremd, k1);
+        await kick(g);
+        master(g, _fremd, k2);
+        await kick(g);
+        expect(contacts(g).single.identity, IdentityStatus.changed);
+        await g.leaveConversation(ct);
+        g.setContactPolicy(policyOut); // neuer Datensatz outgoing
+        armCreate(hs, g);
+        final id = await g.startContactChat(_fremd);
+        expect(id, '!neu:hs.example');
+        expect(hs.where('POST', '/createRoom'), isNotEmpty, reason: 'vor K3c-1: notAllowed vor dem Anlegen');
+        await Future<void>.delayed(_settle);
+        final t = contacts(g).singleWhere((t) => t.id == '!neu:hs.example');
+        expect((t.pending, t.identity), (true, IdentityStatus.changed));
+        await g.openThread(t.id);
+        await noSend(g.sendMessage('Hallo', threadId: t.id));
+        // Das Gegenüber tritt bei: Banner bleibt `changed`, Akzeptieren möglich.
+        await kick(g);
+        await settle(g, dmJoined('!neu:hs.example', _fremd));
+        expect(contacts(g).singleWhere((t) => t.id == '!neu:hs.example').pending, isFalse);
+        expect(contacts(g).singleWhere((t) => t.id == '!neu:hs.example').identity, IdentityStatus.changed);
+        await g.acceptIdentityChange(_fremd);
+        await Future<void>.delayed(_settle);
+        expect(contacts(g).singleWhere((t) => t.id == '!neu:hs.example').identity, IdentityStatus.pinned);
+      });
+
+      test('B: Einladung der Gegenseite bei identityChanged wird angenommen; Senden gesperrt; Fremder ohne Datensatz weiter nur Anfrage', () async {
+        final (hs, g) = await ready();
+        g.debugIdentityChanged.add(_fremd);
+        hs.onJoin = (r) => Future<void>.delayed(const Duration(milliseconds: 150), () => _syncJoined(g, dmJoined(r, _fremd))).ignore();
+        await _sync(g, dmInvite('!neu:hs.example', _fremd));
+        await Future<void>.delayed(const Duration(seconds: 1));
+        expect(hs.where('POST', '!neu:hs.example/join'), isNotEmpty, reason: 'vor K3c-1 liegt die Einladung unbeantwortet');
+        final t = contacts(g).singleWhere((t) => t.id == '!neu:hs.example');
+        expect(t.identity, IdentityStatus.changed);
+        await g.openThread(t.id);
+        await noSend(g.sendMessage('Hallo', threadId: t.id));
+        g.debugIdentityChanged.add('@fremd2:hs.example');
+        await settle(g, dmInvite('!rq:hs.example', '@fremd2:hs.example'));
+        expect(hs.where('POST', '!rq:hs.example/join'), isEmpty);
+        expect(g.contactRequests.map((r) => r.roomId), <String>['!rq:hs.example']);
+      });
+
+      test('C (Neustartzustand): geänderte Geräte von der App gesperrt, kein Pin ⇒ identityChanged, Raum wird angelegt; kein TOFU beim Prüfen; echtes notReachable bleibt', () async {
+        final (hs, g) = await ready(policyOut);
+        g.debugDevicesOf = (id) => <bool>[false]; // gesperrte Geräte: encryptToDevice false
+        blockedDevice(g, _fremd);
+        master(g, _fremd, k1);
+        expect(g.debugIdentityChanged, isEmpty, reason: 'Neustart: Sitzungsvermerk leer');
+        armCreate(hs, g);
+        final id = await g.startContactChat(_fremd);
+        expect(id, '!neu:hs.example', reason: 'heute peerNotReachable');
+        await Future<void>.delayed(_settle);
+        final t = contacts(g).singleWhere((t) => t.id == id);
+        expect(t.identity, IdentityStatus.changed, reason: 'gesperrte Geräte zeigen das Banner');
+        await g.openThread(id);
+        await noSend(g.sendMessage('Hallo', threadId: id));
+
+        // Kein TOFU: eine Person ohne Sperre und ohne Pin bekommt beim bloßen Prüfen keinen Pin.
+        final (hs2, g2) = await ready(policyOut);
+        master(g2, _fremd, k1);
+        armCreate(hs2, g2, room: '!neu2:hs.example');
+        await g2.startContactChat(_fremd);
+        master(g2, _fremd, k2);
+        await settle(g2, dmJoined('!neu2:hs.example', _fremd));
+        expect(contacts(g2).single.identity, IdentityStatus.pinned, reason: 'k2 ist der erste gesehene Schlüssel, k1 wurde nie gepinnt');
+
+        // Nur gesperrte Geräte, kein Hauptschlüssel bekannt (Identität nicht berechenbar): die Sperre allein zählt.
+        final (hs4, g4) = await ready(policyOut);
+        g4.debugDevicesOf = (id) => <bool>[false];
+        blockedDevice(g4, _fremd);
+        expect(g4.debugIdentityChanged, isEmpty);
+        armCreate(hs4, g4, room: '!neu4:hs.example');
+        final id4 = await g4.startContactChat(_fremd);
+        expect(id4, '!neu4:hs.example');
+        await Future<void>.delayed(_settle);
+        expect(contacts(g4).single.identity, IdentityStatus.changed, reason: 'Banner allein wegen gesperrter Geräte');
+        // Nach dem Beitritt des Gegenübers (Raum mit Zeitleiste) sperrt allein die Gerätesperre das Senden.
+        await settle(g4, dmJoined(id4, _fremd));
+        await g4.openThread(id4);
+        expect(g4.isThreadOpen(id4), isTrue);
+        await noSend(g4.sendMessage('Hallo', threadId: id4));
+
+        // Echtes notReachable (ohne Sperre) bleibt peerNotReachable.
+        final (_, g3) = await ready(policyOut);
+        g3.debugDevicesOf = (id) => <bool>[false];
+        await expectLater(g3.startContactChat(_fremd), _error(GatewayError.peerNotReachable));
+      });
+
+      test('Zusatz: Bereich aus/an: Thread kehrt zurück, Akzeptieren möglich; aus: Wiederhinzufügen notAllowed; Familienmitglied nie Kontakt', () async {
+        final (_, g) = await ready();
+        await settle(g, dmJoined(ct, _fremd));
+        master(g, _fremd, k1);
+        await kick(g);
+        master(g, _fremd, k2);
+        await kick(g);
+        expect(contacts(g).single.identity, IdentityStatus.changed);
+        g.setContactPolicy(ContactPolicy.off);
+        await Future<void>.delayed(_settle);
+        expect(contacts(g), isEmpty);
+        await expectLater(g.startContactChat(_fremd), _notAllowed());
+        g.setContactPolicy(policy);
+        await Future<void>.delayed(_settle);
+        expect(contacts(g).single.identity, IdentityStatus.changed);
+        await g.acceptIdentityChange(_fremd);
+        await Future<void>.delayed(_settle);
+        expect(contacts(g).single.identity, IdentityStatus.pinned);
+        // Familienmitglied: nie Kontakt, auch nicht mit geändertem Schlüssel.
+        g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_ben: ContactState.outgoing}));
+        g.debugIdentityChanged.add(_ben);
+        await expectLater(g.startContactChat(_ben), _notAllowed());
+      });
+    });
+
+    group('8: Bereich aus (Gate und Abschalten ohne Familie)', () {
+      for (final open in <bool>[false, true]) {
+        test('Abschalten (Zeitleiste ${open ? 'offen' : 'nicht geöffnet'}): Threads, Anfragen, ${open ? 'Zeitleiste' : 'unreadCount'} und das Abo des privaten Raums sind sofort weg', () async {
+          final (_, g) = await noFamily();
+          final update = <String, Object?>{
+            ...privateRoom(),
+            'rooms': <String, Object?>{
+              'join': <String, Object?>{
+                ...(((privateRoom()['rooms']! as Map)['join']!) as Map<String, Object?>),
+                ...(((withUnread(dmJoined(ct, _fremd), ct, 2)['rooms']! as Map)['join']!) as Map<String, Object?>),
+              },
+            },
+            'account_data': <String, Object?>{
+              'events': <Object?>[
+                <String, Object?>{'type': 'de.inneso.familynexus.private_room', 'content': <String, Object?>{'room_id': priv}},
+                <String, Object?>{'type': 'm.direct', 'content': <String, Object?>{_fremd: <String>[ct]}},
+              ],
+            },
+          };
+          await settle(g, update);
+          await settle(g, dmInvite('!rq:hs.example', '@fremd2:hs.example'));
+          if (open) await g.openThread(ct);
+          expect(contacts(g), hasLength(1));
+          expect(g.contactRequests, hasLength(1));
+          expect(g.isThreadOpen(ct), open);
+          if (!open) expect(g.unreadCount, 2);
+          expect(g.debugPrivateTimeline, isNotNull);
+          g.setContactPolicy(ContactPolicy.off);
+          await Future<void>.delayed(_settle);
+          expect(contacts(g), isEmpty);
+          expect(g.contactRequests, isEmpty);
+          expect(g.isThreadOpen(ct), isFalse, reason: 'Zeitleiste geschlossen');
+          expect(g.unreadCount, 0, reason: 'keine Kontakt-Peers mehr');
+          expect(g.debugPrivateTimeline, isNull, reason: 'kein Abo des privaten Raums ohne Familie und ohne Bereich');
+        });
+      }
+
+      test('Gate: Bereich aus, Konto ohne Familie: kein Abo des privaten Raums, kein Kontaktsignal, keine Threads', () async {
+        final (_, g) = await _signedIn(encryption: true, familySynced: false);
+        await settle(g, <String, Object?>{
+          ...privateRoom(),
+          'account_data': <String, Object?>{
+            'events': <Object?>[
+              <String, Object?>{'type': 'de.inneso.familynexus.private_room', 'content': <String, Object?>{'room_id': priv}},
+            ],
+          },
+        });
+        await kick(g);
+        expect(g.debugPrivateTimeline, isNull);
+        expect(g.threads, isEmpty);
+        expect(g.debugContactSignalHistoryLength, 0);
+        expect(g.contactRequests, isEmpty);
+      });
+    });
+
+    test('9: eigener Verlauf für Kontaktsignale: 5001 andere Signale verdrängen ein Kontaktsignal nicht; 2001 Kontaktsignale kappen das älteste; Reihenfolge je Verlauf bleibt', () async {
+      final (_, g) = await _signedIn(encryption: true, familySynced: false);
+      final c0 = ContactSignal(_me, DateTime.utc(2026), <String, Object?>{'i': 0});
+      g.debugEmit(c0);
+      for (var i = 0; i < 5001; i++) {
+        g.debugEmit(PrivateEventSignal(_me, DateTime.utc(2026), <String, Object?>{'i': i}));
+      }
+      final late = <CalendarSignal>[];
+      final sub = g.calendarSignals.listen(late.add);
+      addTearDown(sub.cancel);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(late.whereType<ContactSignal>().map((s) => s.content['i']), <Object?>[0], reason: 'nicht verdrängt');
+      final others = late.whereType<PrivateEventSignal>().toList();
+      expect(others, hasLength(5000), reason: 'übrige Signale: Kappung wie bisher, ältestes zuerst verdrängt');
+      expect(others.first.content['i'], 1);
+      expect(others.last.content['i'], 5000, reason: 'Reihenfolge je Verlauf bleibt');
+      // 2001 Kontaktsignale: das älteste fehlt (Kappung der Ereignisse, ContactLimits.maxRecords).
+      final (_, g2) = await _signedIn(encryption: true, familySynced: false);
+      for (var i = 0; i < 2001; i++) {
+        g2.debugEmit(ContactSignal(_me, DateTime.utc(2026), <String, Object?>{'i': i}));
+      }
+      expect(g2.debugContactSignalHistoryLength, ContactLimits.maxRecords);
+      final late2 = <ContactSignal>[];
+      final sub2 = g2.calendarSignals.listen((s) {
+        if (s is ContactSignal) late2.add(s);
+      });
+      addTearDown(sub2.cancel);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(late2.first.content['i'], 1);
+      expect(late2.last.content['i'], 2000);
     });
   });
 

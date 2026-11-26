@@ -8,12 +8,16 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
   bool? get _encryptionOverride;
   _ContactState get _contacts;
   ContactPolicy get _contactPolicy;
-  int get _dmEpoch;
+  int get _contactEpoch;
   bool get _disposed;
   Set<String> get _identityChanged;
-  Family? get _family;
-  bool get _participantsLoaded;
-  Family _requireFamily();
+  bool _contactMembersComplete();
+  bool _isFamilyId(String userId);
+  bool _anyDeviceBlocked(String uid);
+  Map<String, String> get _contactSessionPins;
+  Map<String, String> get _contactAcceptedPins;
+  LocalIdentityPins get _localPins;
+  IdentityStatus _identityOf(String uid, String me, {bool mirror = true});
   GatewayException _map(Object e);
   Future<void> _refresh();
   void _requestPeerMembership(Room r, String peer);
@@ -72,9 +76,25 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
       }
     }
     _contacts.reachCache.remove(userId);
-    if (_identityChanged.contains(userId)) return ContactReachability.identityChanged;
+    // Geänderter Schlüssel oder von der App gesperrte Geräte (auch nach einem Neustart): erst neu auswerten, dann entscheiden.
+    if (_lockedByIdentity(userId)) return ContactReachability.identityChanged;
     final devices = _devicesOf(userId);
     return ContactReach.of(keysKnown: devices != null, encryptable: devices ?? const <bool>[]);
+  }
+
+  /// Ist [id] durch einen geänderten Schlüssel oder durch von der App gesperrte Geräte gesperrt (Pin-Sackgasse, K3c-1)?
+  /// Nach der frischen Schlüsselabfrage wird die Identität **einmal neu berechnet**, aber nur, wenn die Person schon
+  /// auffällig ist (geändert, gesperrt) oder ein Pin vorliegt. Ohne Sperre und ohne Pin entsteht beim bloßen Prüfen nie ein
+  /// Erstpin (kein TOFU durch Hinsehen): `decide()` liefert bei jedem gesperrten Gerät `changed`, nie `firstSeen`.
+  bool _lockedByIdentity(String id) {
+    final me = _client?.userID;
+    final known = _identityChanged.contains(id) ||
+        _anyDeviceBlocked(id) ||
+        _contactSessionPins.containsKey(id) ||
+        _contactAcceptedPins.containsKey(id) ||
+        _localPins.pins.containsKey(id);
+    if (me != null && known) _identityOf(id, me, mirror: false);
+    return _identityChanged.contains(id) || _anyDeviceBlocked(id);
   }
 
   /// Profil über den direkten Endpunkt (kein SDK-Cache, keine Fremdprofile in der SDK-Datenbank). Nur `M_NOT_FOUND` heißt
@@ -104,21 +124,22 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
     return id;
   }
 
-  void _requireUsable(Family f, String userId) {
+  /// Grundprüfung für jede Person (ohne Familie, K3c-1): angemeldet, gültige Kennung, nicht ich, Bereich an, die Mitglieder-
+  /// liste ist vollständig (**auch** „keine Familie“ muss gesichert sein, sonst könnte ein Familienmitglied wie ein Fremder
+  /// aussehen, B6/I2), nicht blockiert. [me] kommt vom Client.
+  void _requireUsable(String userId) {
     final c = _client;
     if (c == null || !c.isLogged()) throw const GatewayException(GatewayError.notAllowed);
     if (!MatrixIds.isUserId(userId)) throw const GatewayException(GatewayError.invalidInput);
-    // Ohne vollständige Mitgliederliste könnte ein Familienmitglied wie ein Fremder aussehen (fail-closed, B6).
-    if (userId == f.myUserId || !_participantsLoaded || !_contactPolicy.enabled) throw const GatewayException(GatewayError.notAllowed);
+    if (userId == c.userID || !_contactMembersComplete() || !_contactPolicy.enabled) throw const GatewayException(GatewayError.notAllowed);
     if (_contactPolicy.blocked.contains(userId)) throw const GatewayException(GatewayError.notAllowed);
   }
 
   @override
   Future<ContactProbe> probeContact(String rawUserId) async {
-    final f = _requireFamily();
     final userId = _canonical(rawUserId);
-    _requireUsable(f, userId);
-    if (f.member(userId) != null) {
+    _requireUsable(userId);
+    if (_isFamilyId(userId)) {
       return ContactProbe(
         userId: userId,
         existence: ContactExistence.unknown,
@@ -139,7 +160,7 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
     }
     c.probeTimes.add(now);
     c.probedIds.add(userId);
-    final epoch = _dmEpoch;
+    final epoch = _contactEpoch;
     final client = _client;
     final future = _collectProbe(userId, epoch, client);
     c.probeInFlight[userId] = future;
@@ -168,7 +189,11 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
     } catch (e) {
       AppLog.w('gateway', 'Personenprüfung gescheitert (${e.runtimeType})');
     }
-    if (_disposed || epoch != _dmEpoch || _client != client) throw const GatewayException(GatewayError.notAllowed);
+    // Frisch prüfen (nicht über eine Epoche): Ein Familienwechsel während der Abfrage macht die Mitgliederliste unvollständig
+    // oder die Person zum Mitglied; dann kein Ergebnis und kein Eintrag im Zwischenspeicher (fail-closed, I2/I8).
+    if (_disposed || epoch != _contactEpoch || _client != client || !_contactMembersComplete() || _isFamilyId(userId)) {
+      throw const GatewayException(GatewayError.notAllowed);
+    }
     final probe = ContactProbe(userId: userId, existence: existence, displayName: name, reachability: reach);
     // Unbekanntes wird nie zwischengespeichert: ein Netzfehler darf die Wiederholung nicht eine Minute sperren.
     if (existence != ContactExistence.unknown && reach != ContactReachability.unknown) c.probeCache[userId] = (at: DateTime.now(), probe: probe);
@@ -177,22 +202,19 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
 
   /// Gilt der Datensatz `outgoing` jetzt noch (Bereich an, nicht blockiert, kein Familienmitglied, Liste geladen)?
   bool _stillOutgoing(String userId) {
-    final f = _family;
     final p = _contactPolicy;
-    return f != null &&
-        _participantsLoaded &&
+    return _contactMembersComplete() &&
         p.enabled &&
         p.contacts[userId] == ContactState.outgoing &&
         !p.blocked.contains(userId) &&
-        f.member(userId) == null;
+        !_isFamilyId(userId);
   }
 
   @override
   Future<String> startContactChat(String rawUserId) async {
-    final f = _requireFamily();
     final userId = _canonical(rawUserId);
-    _requireUsable(f, userId);
-    if (f.member(userId) != null || _contactPolicy.contacts[userId] != ContactState.outgoing) {
+    _requireUsable(userId);
+    if (_isFamilyId(userId) || _contactPolicy.contacts[userId] != ContactState.outgoing) {
       throw const GatewayException(GatewayError.notAllowed); // ohne Datensatz kein Raum
     }
     final c = _contacts;
@@ -210,14 +232,15 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
     }
     if (!_encryptionAvailable) throw const GatewayException(GatewayError.encryptionUnavailable);
     if (!c.creating.add(userId)) throw const GatewayException(GatewayError.alreadyExists);
-    final epoch = _dmEpoch;
+    final epoch = _contactEpoch;
     try {
       final reach = await _freshReachability(userId);
       if (reach == ContactReachability.notReachable) throw const GatewayException(GatewayError.peerNotReachable);
       if (reach == ContactReachability.unknown) throw const GatewayException(GatewayError.serverUnreachable);
-      // Geänderter Sicherheitsschlüssel: erst nach der Prüfung (B8, K3b-2) ein Raum.
-      if (reach == ContactReachability.identityChanged) throw const GatewayException(GatewayError.notAllowed);
-      if (_disposed || epoch != _dmEpoch || _client != client || !_stillOutgoing(userId)) throw const GatewayException(GatewayError.notAllowed);
+      // Geänderter Schlüssel oder gesperrte Geräte (K3c-1, Revision K3b-1): kein Abbruch mehr. Der Raum darf entstehen
+      // (Wiederhinzufügen nach Entfernen, Neustart mit gesperrten Geräten); Senden bleibt über `_requireContactRoom`
+      // gesperrt, Akzeptieren läuft über das Banner. Sonst wäre der Kontakt eine Sackgasse bis zum Abmelden.
+      if (_disposed || epoch != _contactEpoch || _client != client || !_stillOutgoing(userId)) throw const GatewayException(GatewayError.notAllowed);
       // Nie einen vorhandenen, womöglich unverschlüsselten Raum wiederverwenden (wie `startDirectChat`).
       final roomId = await client.startDirectChat(
         userId,
@@ -229,7 +252,7 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
         ],
       );
       // Während des Anlegens kann sich alles geändert haben: der Raum darf nicht verwaist bleiben.
-      if (_disposed || epoch != _dmEpoch || _client != client || !_stillOutgoing(userId)) {
+      if (_disposed || epoch != _contactEpoch || _client != client || !_stillOutgoing(userId)) {
         final created = client.getRoomById(roomId);
         if (created != null) {
           await _leaveContactRoom(created);

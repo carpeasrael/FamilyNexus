@@ -135,6 +135,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     @visibleForTesting this._joinOpTimeout = roomOpTimeout,
     @visibleForTesting this._joinPollInterval = rejectionPollInterval,
     @visibleForTesting this._participantsRetryBase = participantsRetryDelay,
+    @visibleForTesting this._contactRow2Delay = contactRow2Wait,
     this._accountStore,
     @visibleForTesting bool ensureAvatarPermission = true,
     @visibleForTesting DateTime Function()? now,
@@ -317,6 +318,191 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   bool _syncedOnce = false;
   @override
   Family? _family;
+
+  // ------------------------------------------------- Kontakte ohne Familie (K3c-1)
+
+  /// Wartezeit für ein Zeiger-Relikt (Zeile 2 der Wahrheitstabelle, [ContactScope.familyResolved]); eine zweite Bedingung
+  /// sind [contactRow2Syncs] zählende Syncs.
+  static const Duration contactRow2Wait = Duration(seconds: 60);
+  static const int contactRow2Syncs = 3;
+  final Duration _contactRow2Delay;
+
+  /// Die erste Antwort des Servers dieser Sitzung ist über `client.onSync` eingetroffen (die lokale Datenbank löst `onSync` nicht
+  /// aus). Gesetzt als erste Anweisung im Listener, zurückgesetzt in [_resetLocal] und beim Anlegen eines Clients, **nicht**
+  /// beim Familienwechsel (Kontodaten gehören dem Konto). Bewusst weder `syncNeedsRefresh` (filtert leere Antworten) noch
+  /// `_syncedOnce` (auch nach Zeitüberschreitung und für lokale Daten wahr).
+  bool _accountDataFresh = false;
+
+  /// Epoche des Kontaktpfads: steigt nur beim Abmelden und Kontowechsel ([_resetLocal]). Ein Familienwechsel bricht keine
+  /// Kontakt-Operation ab; die Nachprüfung mit [_contactMembersComplete] entscheidet nach jedem `await` (fail-closed).
+  @override
+  int _contactEpoch = 0;
+
+  /// Zeile 2: Zeiger (Eintrittsmerkmal), Eintrittszeit, zählende Syncs seit Eintritt und der einmalige Timer.
+  String? _row2Pointer;
+  DateTime? _row2Since;
+  int _row2Count = 0;
+  Timer? _row2Timer;
+
+  /// Verlauf der Kontaktsignale, getrennt vom übrigen: Ohne Familie füllt der Replay des privaten Raums (Termine, Jubiläen,
+  /// Kassenbücher) sonst `_signalHistory` und verdrängte Kontaktdatensätze.
+  final List<CalendarSignal> _contactSignalHistory = <CalendarSignal>[];
+
+  /// Nur für Tests: legt ein Signal in den Verlauf und an die Zuhörer (Verlauf und Kappung prüfen).
+  @visibleForTesting
+  void debugEmit(CalendarSignal s) => _emit(s);
+
+  /// Nur für Tests: die offene Zeitleiste eines Kontakt-Gesprächs (`null` ohne).
+  @visibleForTesting
+  Timeline? debugContactTimeline(String threadId) => _contacts.timelines[threadId];
+
+  /// Nur für Tests: Epoche des Kontaktpfads (steigt nur beim Abmelden und Kontowechsel).
+  @visibleForTesting
+  int get debugContactEpoch => _contactEpoch;
+
+  /// Nur für Tests: Einträge im Zwischenspeicher der Personenprüfung.
+  @visibleForTesting
+  int get debugProbeCacheLength => _contacts.probeCache.length;
+
+  /// Nur für Tests: Anzahl der Kontaktsignale im eigenen Verlauf.
+  @visibleForTesting
+  int get debugContactSignalHistoryLength => _contactSignalHistory.length;
+
+  /// Nur für Tests: läuft gerade der Timer für ein Zeiger-Relikt (Zeile 2)?
+  @visibleForTesting
+  bool get debugContactRow2TimerPending => _row2Timer != null;
+
+  /// Nur für Tests: die Zeitleiste des privaten Raums (Abo), `null` ohne.
+  @visibleForTesting
+  Timeline? get debugPrivateTimeline => _privateTimeline;
+
+  /// Nur für Tests: gesicherte „keine Familie“ nach [ContactScope.familyResolved] mit dem jetzigen Stand.
+  @visibleForTesting
+  bool get debugContactFamilyResolved => _contactFamilyResolved();
+
+  /// Nur für Tests: die Mitgliederliste ist für Kontaktentscheidungen vollständig ([ContactScope.membersComplete]).
+  @visibleForTesting
+  bool get debugContactMembersComplete => _contactMembersComplete();
+
+  /// Kennung des Familienraums laut Kontodaten (Zeiger), unabhängig davon, ob der Raum dem Client bekannt ist.
+  String? _familyPointerId() {
+    final client = _client;
+    if (client == null || !client.isLogged()) return null;
+    final id = client.accountData[familyAccountData]?.content['room_id'];
+    return id is String && MatrixIds.isRoomId(id) ? id : null;
+  }
+
+  /// Ist „keine Familie“ gesichert? Liest nur; die Tabelle steht in [ContactScope.familyResolved].
+  bool _contactFamilyResolved() {
+    final client = _client;
+    if (client == null || !client.isLogged()) return false;
+    final id = _familyPointerId();
+    final room = id == null ? null : client.getRoomById(id);
+    return ContactScope.familyResolved(
+      pointerSet: id != null,
+      roomKnown: room != null,
+      membership: room == null
+          ? null
+          : switch (room.membership) {
+              Membership.join => RoomMembership.join,
+              Membership.invite => RoomMembership.invite,
+              _ => RoomMembership.other,
+            },
+      familyBuilt: _family != null,
+      accountDataFresh: _accountDataFresh,
+      row2Settled: id != null &&
+          _row2Pointer == id &&
+          _row2Since != null &&
+          _row2Count >= contactRow2Syncs &&
+          DateTime.now().difference(_row2Since!) >= _contactRow2Delay,
+    );
+  }
+
+  /// Ist die Mitgliederliste für Kontaktentscheidungen vollständig? Mit Familie ihre Liste, ohne Familie erst nach der
+  /// Erstsynchronisation **und** gesicherter „keine Familie“ (nie „noch nicht ermittelt“, I2).
+  @override
+  bool _contactMembersComplete() => ContactScope.membersComplete(
+        hasFamily: _family != null,
+        participantsLoaded: _participantsLoaded,
+        syncedOnce: _syncedOnce,
+        familyResolved: _contactFamilyResolved(),
+      );
+
+  @override
+  bool _isFamilyId(String userId) => _family?.member(userId) != null;
+
+  /// Kontext der Einstufung für Kontakte, mit und ohne Familie. `me` kommt vom Client. Ohne Familie zählt der Zeiger-Raum auch
+  /// unbeigetreten als Familienraum (nie ein Kontakt-Raum), der private Raum behält den Vorrang; Mitglieder gibt es nicht.
+  @override
+  PolicyContext _contactPolicyContext() {
+    final f = _family;
+    if (f != null) return _policyContext(f, f.roomId);
+    return PolicyContext(
+      myUserId: _client?.userID ?? '',
+      familyRoomId: _familyRoomAnyState()?.id,
+      privateRoomId: _privateRoom()?.id,
+      membersLoaded: _contactMembersComplete(),
+      identityChanged: _identityChanged,
+      contactsEnabled: _contactPolicy.enabled,
+      contacts: _contactPolicy.contacts,
+      blockedUsers: _contactPolicy.blocked,
+    );
+  }
+
+  /// Kontaktpfad **ohne Familie** (K3c-1, nur bei eingeschaltetem Bereich, aufgerufen im Abgleich): Räume und Anfragen,
+  /// Einladungen eigener Kontakte annehmen, privaten Raum abonnieren und nach Kontaktdatensätzen absuchen, `threads` nur aus
+  /// Kontakten. Liefert `false`, wenn der Client unterwegs gewechselt hat (der Abgleich bricht dann ab).
+  Future<bool> _syncContactsOnly(Client client) async {
+    await _syncContactChats(client);
+    if (_client != client) return false;
+    _acceptContactInvites(client);
+    await _ensurePrivateTimeline(client);
+    if (_client != client) return false;
+    final private = _privateTimeline;
+    if (private != null && !await _repairEchoes(client, private)) return false;
+    _scanForSignals(_privateTimeline, shared: false);
+    _threads = _contactThreads();
+    return true;
+  }
+
+  /// Zeile 2 beobachten (nur bei eingeschaltetem Bereich und erster Serverantwort): Eintritt merken (Zeit, Zähler 0, einmaliger
+  /// Timer, der einen Abgleich auslöst) und, wenn [countSync], einen zählenden Sync verbuchen (der Eintritts-Sync zählt nicht).
+  /// Außerhalb von Zeile 2 wird alles abgebrochen. Aufgerufen im `onSync`-Listener (zählt) und im Abgleich (zählt nie).
+  void _trackContactRow2({bool countSync = false}) {
+    final client = _client;
+    final id = _familyPointerId();
+    final inRow2 = _contactPolicy.enabled &&
+        _accountDataFresh &&
+        client != null &&
+        id != null &&
+        _family == null &&
+        client.getRoomById(id) == null;
+    if (!inRow2) {
+      _cancelContactRow2();
+      return;
+    }
+    if (_row2Pointer != id || _row2Since == null) {
+      _row2Timer?.cancel();
+      _row2Pointer = id;
+      _row2Since = DateTime.now();
+      _row2Count = 0;
+      _row2Timer = Timer(_contactRow2Delay, () {
+        _row2Timer = null;
+        if (!_disposed) _scheduleRefresh();
+      });
+      return;
+    }
+    if (countSync) _row2Count++;
+  }
+
+  @override
+  void _cancelContactRow2() {
+    _row2Timer?.cancel();
+    _row2Timer = null;
+    _row2Pointer = null;
+    _row2Since = null;
+    _row2Count = 0;
+  }
 
   // ------------------------------------------------- Grundlinie für Meldungen (#254, E-88)
 
@@ -590,14 +776,23 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
 
   @override
   void _emit(CalendarSignal s) {
-    if (_signalHistory.length >= maxSignalHistory) _signalHistory.removeAt(0);
-    _signalHistory.add(s);
+    if (s is ContactSignal) {
+      // Eigener Verlauf, Kappung zählt Ereignisse (nicht Datensätze), ältestes zuerst (K3c-1).
+      if (_contactSignalHistory.length >= ContactLimits.maxRecords) _contactSignalHistory.removeAt(0);
+      _contactSignalHistory.add(s);
+    } else {
+      if (_signalHistory.length >= maxSignalHistory) _signalHistory.removeAt(0);
+      _signalHistory.add(s);
+    }
     _signals.add(s);
   }
 
   @override
   Stream<CalendarSignal> get calendarSignals => Stream<CalendarSignal>.multi((controller) {
         for (final s in List<CalendarSignal>.of(_signalHistory)) {
+          controller.add(s);
+        }
+        for (final s in List<CalendarSignal>.of(_contactSignalHistory)) {
           controller.add(s);
         }
         final sub = _signals.stream.listen(controller.add);
@@ -716,7 +911,13 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     // Neustart, und eine Gruppe fremder Clients erschiene wieder als Familieneinladung.
     client.importantStateEvents.add(EventTypes.RoomJoinRules);
     _client = client;
+    // Neuer Client: noch keine Antwort des Servers in dieser Sitzung (K3c-1).
+    _accountDataFresh = false;
     _syncSub = client.onSync.stream.listen((update) {
+      // Erste Anweisung (vor `_firstRefresh()` und `_scheduleRefresh()`): Die Kontodaten, also der Zeiger auf die Familie, sind
+      // jetzt auf dem Stand des Servers (auch bei leerer Antwort).
+      final firstAnswer = !_accountDataFresh;
+      _accountDataFresh = true;
       _trackLive(client, update);
       if (!_syncedOnce) {
         // „Abgeglichen“ gilt erst, wenn Familie und Sicherheitsstatus aus den ersten Daten berechnet
@@ -726,7 +927,14 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
       _onSyncForJoinRequest(update);
       _retryFailedSends();
       // Leere Long-Poll-Antworten ändern nichts: kein voller Abgleich samt Neuaufbau aller Tabs (#150).
-      if (!_syncedOnce || syncNeedsRefresh(update)) _scheduleRefresh();
+      final relevant = syncNeedsRefresh(update);
+      if (_contactPolicy.enabled) {
+        // Nur bei eingeschaltetem Bereich (I1): Zähler für Zeile 2 hier im Listener (ein Sync, ein Zählschritt; der entprellte
+        // Abgleich fasst mehrere Syncs zusammen) und der Abgleich nach der ersten Antwort, auch wenn sie leer ist.
+        _trackContactRow2(countSync: relevant);
+        if (firstAnswer) _scheduleRefresh();
+      }
+      if (!_syncedOnce || relevant) _scheduleRefresh();
     });
     _loginSub = client.onLoginStateChanged.stream.listen(
       (_) => _scheduleRefresh(),
@@ -1005,13 +1213,18 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     _privateTimeline?.cancelSubscriptions();
     _privateTimeline = null;
     _privateTimelineRoomId = null;
-    _resetDirectChats();
+    _resetFamilyChats();
+    _resetContacts(full: true);
+    _contactEpoch++;
+    _cancelContactRow2();
+    _accountDataFresh = false;
     // Nur hier (Abmelden, Kontowechsel), nicht beim Familienwechsel: Kontakte gehören zum Konto (E-114).
     _contactPolicy = ContactPolicy.off;
     _presence.clear();
     _presenceRoomId = null;
     _signaled.clear();
     _signalHistory.clear();
+    _contactSignalHistory.clear();
     _roomTickets.clear();
     _usedTickets.clear();
     _privateRoomIdCache = null;
@@ -1062,7 +1275,11 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     _participantsLoaded = false;
     _participantsRequested = false;
     _cancelParticipantsRetry();
-    _resetDirectChats();
+    _resetFamilyChats();
+    // Nur was an der Familie hängt; verlassene Räume, laufende Anlagen und Pins bleiben (K3c-1, E-114). Der Verlauf der
+    // Kontaktsignale bleibt ebenfalls (nur `_resetLocal`).
+    _resetContacts(full: false);
+    _cancelContactRow2();
     _resetBooks();
     _bookReconciler.clear();
   }
@@ -1386,6 +1603,8 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
       final live = _liveSince;
       if (live != null) _liveSince = _capLive(_later(live, _maxServerTs)!);
     }
+    // Zeile 2 beobachten oder abbrechen (nur bei eingeschaltetem Bereich); der Abgleich zählt nie (das tut der Listener).
+    _trackContactRow2();
     if (room == null) {
       _timeline?.cancelSubscriptions();
       _timeline = null;
@@ -1395,9 +1614,22 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
       _family = null;
       _updateAvatarSnapshot();
       _messages = const <ChatMessage>[];
-      _resetDirectChats();
+      _resetFamilyChats();
       _presence.clear();
       _presenceRoomId = null;
+      if (_contactPolicy.enabled) {
+        // Kontakte ohne Familie (K3c-1): nur bei eingeschaltetem Bereich; der Zustand bleibt (Familie war nie Voraussetzung).
+        _threads = _contactThreads();
+        if (!await _syncContactsOnly(client)) return;
+      } else {
+        // Wie bisher: kein Abo des privaten Raums, kein Signalverbuchen, keine Kontakt-Threads. Der Teilreset räumt auch,
+        // was beim Ausschalten ohne Familie noch stand (Räume, Zeitleisten, Anfragen, `unreadCount`).
+        _resetContacts(full: false);
+        _contacts.inviteMeta.clear();
+        _privateTimeline?.cancelSubscriptions();
+        _privateTimeline = null;
+        _privateTimelineRoomId = null;
+      }
       // Offene Anfrage nach einem Neustart: weiter auf eine Ablehnung achten, die erste Abfrage sofort.
       // Nicht aus `_knock` heraus: Dort läge noch der alte Vermerk vor.
       if (_joinRequest() != null && !_joinRejected && _rejectionTimer == null) {
@@ -1463,7 +1695,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     await _syncDirectChats(client, _family!, room);
     if (stale()) return;
     _acceptDirectInvites(client, _family!);
-    _acceptContactInvites(client, _family!);
+    _acceptContactInvites(client);
     // Erst nach vollständig geladener Mitgliederliste als Basis (Lazy Loading liefert anfangs nur Teile).
     if (_participantsLoaded) _emitMemberJoins(_family!);
     await _ensurePrivateTimeline(client);
@@ -1591,6 +1823,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     _disposed = true;
     _participantsRetry?.cancel();
     _participantsRetry = null;
+    _cancelContactRow2();
     _debounce?.cancel();
     _stopWatchingJoinRequest();
     _joinRequestGeneration++;
