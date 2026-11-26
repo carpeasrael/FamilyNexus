@@ -2392,7 +2392,10 @@ void main() {
         expect(id4, '!neu4:hs.example');
         await Future<void>.delayed(_settle);
         expect(contacts(g4).single.identity, IdentityStatus.changed, reason: 'Banner allein wegen gesperrter Geräte');
+        // Nach dem Beitritt des Gegenübers (Raum mit Zeitleiste) sperrt allein die Gerätesperre das Senden.
+        await settle(g4, dmJoined(id4, _fremd));
         await g4.openThread(id4);
+        expect(g4.isThreadOpen(id4), isTrue);
         await noSend(g4.sendMessage('Hallo', threadId: id4));
 
         // Echtes notReachable (ohne Sperre) bleibt peerNotReachable.
