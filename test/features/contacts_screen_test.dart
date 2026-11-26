@@ -497,7 +497,7 @@ void main() {
       await tester.tap(find.text('Einstellungen').last);
       await tester.pumpAndSettle();
       expect(app.builtCalendars, isNotEmpty);
-      expect(app.builtCalendars.every((x) => x.contactController == null), isTrue);
+      expect(app.services.contacts, isNull);
       expect(find.text('Chats mit Personen außerhalb der Familie'), findsNothing);
       expect(app.contactStore, isNull);
     });
@@ -513,7 +513,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Einstellungen').last);
       await tester.pumpAndSettle();
-      expect(app.builtCalendars.single.contactController, isNotNull);
+      expect(app.services.contacts?.controller, isNotNull);
       await tester.scrollUntilVisible(find.text('Chats mit Personen außerhalb der Familie'), 300, scrollable: find.byType(Scrollable).first);
       await tester.tap(find.text('Chats mit Personen außerhalb der Familie'));
       await tester.pumpAndSettle();

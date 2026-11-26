@@ -435,10 +435,9 @@ void main() {
       const carla = '@carla:fake.test';
       final room = app.server.createContactRoom(carla, app.gateway.userId!, toJoined: true);
       await _start(tester, app, chatTab: false);
-      final cal = app.builtCalendars.single;
-      await cal.contactController!.setEnabled(true);
-      await cal.contactSync!.service.addAccepted(carla);
-      await cal.contactSync!.pushPolicyNow();
+      await app.services.contacts!.controller.setEnabled(true);
+      await app.services.contacts!.sync.service.addAccepted(carla);
+      await app.services.contacts!.sync.pushPolicyNow();
       await tester.pumpAndSettle();
       await tester.tap(navTab('Chat'));
       await tester.pumpAndSettle();

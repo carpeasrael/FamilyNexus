@@ -71,14 +71,13 @@ void main() {
     await tester.pumpWidget(FamilyNexusApp(services: app.services));
     await tester.pumpAndSettle();
     if (enabled) {
-      final cal = app.builtCalendars.single;
-      await cal.contactController!.setEnabled(true);
+      await app.services.contacts!.controller.setEnabled(true);
       if (toJoined) {
-        await cal.contactSync!.service.addAccepted(carla);
+        await app.services.contacts!.sync.service.addAccepted(carla);
       } else {
-        await cal.contactSync!.service.addOutgoing(carla);
+        await app.services.contacts!.sync.service.addOutgoing(carla);
       }
-      await cal.contactSync!.pushPolicyNow();
+      await app.services.contacts!.sync.pushPolicyNow();
       await tester.pumpAndSettle();
     }
     await tester.tap(navTab('Chat'));
@@ -195,7 +194,7 @@ void main() {
     expect(find.textContaining('erfährt nichts davon'), findsOneWidget);
     await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Blockieren')));
     await tester.pumpAndSettle();
-    final c = app.builtCalendars.single.contactController!;
+    final c = app.services.contacts!.controller;
     expect(c.contacts.where((e) => e.id == carla).single.state, ContactStateView.blocked);
     expect(find.byType(TextField), findsNothing);
     expect(find.byKey(ValueKey<String>('thread-${room.id}')), findsNothing);
@@ -271,7 +270,7 @@ void main() {
     expect(find.textContaining('erfährt nichts davon'), findsOneWidget, reason: 'Kontakt-Dialog, nicht der Familientext');
     await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Blockieren')));
     await tester.pumpAndSettle();
-    final c = app.builtCalendars.single.contactController!;
+    final c = app.services.contacts!.controller;
     expect(c.contacts.where((e) => e.id == carla).single.state, ContactStateView.blocked);
     await end(tester);
   });
@@ -281,7 +280,7 @@ void main() {
     server.post(room, carla, 'm.room.message', <String, Object?>{'body': 'Hallo'});
     await tester.pumpAndSettle();
     expect(find.text('Kontakte (1)'), findsOneWidget);
-    await app.builtCalendars.single.contactController!.block(carla);
+    await app.services.contacts!.controller.block(carla);
     await tester.pumpAndSettle();
     expect(find.text('Kontakte (1)'), findsNothing);
     await end(tester);
@@ -332,7 +331,7 @@ void main() {
     await tester.tap(find.byKey(ValueKey<String>('thread-${room.id}')));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'geheimer Entwurf');
-    final c = app.builtCalendars.single.contactController!;
+    final c = app.services.contacts!.controller;
     await c.setEnabled(false);
     await tester.pumpAndSettle();
     expect(find.text('Familie'), findsNothing);
