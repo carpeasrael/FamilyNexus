@@ -98,9 +98,12 @@ void main() {
     expect(body('void _resetLocal() {'), contains('_contactPolicy = ContactPolicy.off;'));
     expect(body('void _leaveFamilyScope() {'), isNot(contains('_contactPolicy')));
     final d = File('lib/data/matrix/gateway/direct_chats.dart').readAsStringSync();
-    final i = d.indexOf('void _resetDirectChats()');
-    expect(i, greaterThan(0));
-    expect(d.substring(i, d.indexOf('\n  }\n', i)), isNot(contains('_contactPolicy')));
+    // K3c-1: `_resetDirectChats` ist in `_resetFamilyChats` und `_resetContacts` aufgeteilt; beide setzen die Richtlinie nie.
+    for (final sig in <String>['void _resetFamilyChats()', 'void _resetContacts(']) {
+      final i = d.indexOf(sig);
+      expect(i, greaterThan(0), reason: sig);
+      expect(d.substring(i, d.indexOf('\n  }\n', i)), isNot(contains('_contactPolicy')), reason: sig);
+    }
     expect(RegExp(r'_contactPolicy\s*=').allMatches(t + d).length, 3, reason: 'Feld, setContactPolicy und _resetLocal');
     expect(d, contains('ContactPolicy _contactPolicy = ContactPolicy.off;'), reason: 'Standard ohne Anmeldung ist aus');
   });
@@ -200,7 +203,10 @@ void main() {
     expect('_contacts.clearAll();'.allMatches(t).length, 1, reason: 'close');
     expect('_contacts.cancelTimelines();'.allMatches(t).length, 1, reason: 'dispose');
     final d = code(File('lib/data/matrix/gateway/direct_chats.dart').readAsStringSync());
-    expect(d, contains('_contacts.clearAll();'));
+    // K3c-1: genau ein `clearAll()` in direct_chats.dart, in `_resetContacts(full: true)`; `full: false` ruft es nie
+    // (Scope-Wechsel darf `failed`/`creating` nicht löschen).
+    expect('_contacts.clearAll();'.allMatches(d).length, 1);
+    expect(RegExp(r'if \(full\) \{\s*_contacts\.clearAll\(\);\s*return;\s*\}').hasMatch(d), isTrue);
   });
 
   test('probeContact/startContactChat nur im Gateway; Profil über den direkten Endpunkt, nie über den SDK-Cache (kein Fremdprofil in der Datenbank)', () {
@@ -239,6 +245,42 @@ void main() {
     expect(at, greaterThan(0));
     expect(t.substring(at - 120, at), contains('contactsEnabled'));
     expect('ContactSync('.allMatches(t).length, 1);
+  });
+
+  test('K3c-1 (Textwächter, folgen aus der Umsetzung): Kontaktpfad ohne Familie, kein _dmEpoch, me nie aus _family, Kontakt-Epoche nur in _resetLocal, Gate im Abgleich', () {
+    final all = <String, String>{for (final f in libFiles()) f.path: code(f.readAsStringSync())};
+    final add = all['lib/data/matrix/gateway/contact_add.dart']!;
+    final chats = all['lib/data/matrix/gateway/contact_chats.dart']!;
+    final main = all['lib/data/matrix/sdk_matrix_gateway.dart']!;
+    expect(add, isNot(contains('_requireFamily')), reason: 'Kontakte brauchen keine Familie');
+    expect(chats, isNot(contains('_requireFamily')));
+    // Kein `_dmEpoch` im Kontaktpfad (auch nicht als Getter-Deklaration): contact_add.dart und contact_chats.dart.
+    for (final e in <String, String>{'contact_add.dart': add, 'contact_chats.dart': chats}.entries) {
+      expect(e.value, isNot(contains('_dmEpoch')), reason: e.key);
+      expect(e.value, contains('_contactEpoch'), reason: e.key);
+    }
+    // `me` nie aus der Familie: weder `_family` noch `f.myUserId` in den Kontaktpfaden.
+    for (final e in <String, String>{'contact_add.dart': add, 'contact_chats.dart': chats}.entries) {
+      expect(e.value, isNot(contains('_family')), reason: e.key);
+      expect(e.value, isNot(contains('myUserId')), reason: e.key);
+    }
+    expect(chats, contains('final me = _client?.userID;'));
+    // `_resetDirectChats` gibt es nicht mehr; `_resetFamilyChats` räumt keinen Kontaktzustand.
+    for (final e in all.entries) {
+      expect(e.value, isNot(contains('_resetDirectChats')), reason: e.key);
+    }
+    final d = all['lib/data/matrix/gateway/direct_chats.dart']!;
+    final fam = d.substring(d.indexOf('void _resetFamilyChats()'), d.indexOf('void _resetContacts('));
+    expect(fam, isNot(contains('_contacts')));
+    // Die Kontakt-Epoche steigt genau einmal, in `_resetLocal`.
+    expect('_contactEpoch++'.allMatches(all.values.join('\n')).length, 1);
+    final reset = main.substring(main.indexOf('void _resetLocal() {'), main.indexOf('\n  }\n', main.indexOf('void _resetLocal() {')));
+    expect(reset, contains('_contactEpoch++;'));
+    // Gate: der Kontaktpfad im `room == null`-Zweig und die Auslöser (Übergangs-Abgleich, Zähler) nur bei eingeschaltetem Bereich.
+    expect(RegExp(r'if \(_contactPolicy\.enabled\) \{[^}]*_threads = _contactThreads\(\);[^}]*_syncContactsOnly\(client\)').hasMatch(main), isTrue);
+    expect(RegExp(r'if \(_contactPolicy\.enabled\) \{[^}]*_trackContactRow2\(countSync: relevant\);[^}]*if \(firstAnswer\) _scheduleRefresh\(\);').hasMatch(main), isTrue);
+    expect(main, contains('_accountDataFresh = true;'));
+    expect(main.indexOf('_accountDataFresh = true;'), lessThan(main.indexOf('_trackLive(client, update);')), reason: 'erste Anweisung im Listener');
   });
 
   test('die Sperre ist an (Freigabe-PR ändert diesen Test bewusst)', () {
