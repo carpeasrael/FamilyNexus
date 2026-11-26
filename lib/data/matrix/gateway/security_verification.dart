@@ -5,6 +5,9 @@ part of '../sdk_matrix_gateway.dart';
 mixin _SecurityVerificationModule on ChangeNotifier implements MatrixGateway {
   _AppClient? get _client;
   Family? get _family;
+  ContactPolicy get _contactPolicy;
+  bool get _participantsLoaded;
+  String? _contactRoomOf(String peer);
   bool get _syncedOnce;
   KeyVerification? get _verification;
   set _verification(KeyVerification? value);
@@ -86,13 +89,35 @@ mixin _SecurityVerificationModule on ChangeNotifier implements MatrixGateway {
     );
   }
 
-  /// Eingehende Anfragen: nur vom eigenen Konto oder von Mitgliedern der Familie, und nur eine
-  /// zur Zeit (S4). Alles andere wird still abgebrochen (`m.user`), ohne Dialog.
-  void _onIncomingVerification(KeyVerification v) {
+  /// Darf [userId] (im Raum [roomId], `null` = To-Device) verifiziert werden? Eine Regel für Start und Eingang
+  /// ([VerificationPolicy]); [busy] nur für eingehende Anfragen.
+  bool _verificationAllowed(String userId, String? roomId, {bool busy = false}) {
+    final c = _client;
     final f = _family;
-    final known = v.userId == _client?.userID || (f != null && f.member(v.userId)?.status == MemberStatus.joined);
-    final busy = _verification != null && !_verification!.isDone && _verification!.state != KeyVerificationState.error;
-    if (!known || busy) {
+    final p = _contactPolicy;
+    final contactsOn = p.enabled && _participantsLoaded;
+    return VerificationPolicy.allowed(
+      userId: userId,
+      roomId: roomId,
+      me: c?.userID ?? '',
+      familyJoined: f != null && f.member(userId)?.status == MemberStatus.joined,
+      contactState: contactsOn && (f == null || f.member(userId) == null) ? p.contacts[userId] : null,
+      blocked: p.blocked.contains(userId),
+      contactRoomId: _contactRoomOf(userId),
+      busy: busy,
+    );
+  }
+
+  bool _incomingAllowed(String userId, String? roomId) {
+    final v = _verification;
+    final busy = v != null && !v.isDone && v.state != KeyVerificationState.error;
+    return _verificationAllowed(userId, roomId, busy: busy);
+  }
+
+  /// Eingehende Anfragen: nur vom eigenen Konto, von Mitgliedern der Familie und von Kontakten im gewählten Kontakt-Raum
+  /// ([VerificationPolicy]), und nur eine zur Zeit (S4). Alles andere wird still abgebrochen (`m.user`), ohne Dialog.
+  void _onIncomingVerification(KeyVerification v) {
+    if (!_incomingAllowed(v.userId, v.room?.id)) {
       v.cancel('m.user').catchError((Object e) {
         AppLog.w('gateway', 'Verifizierungsanfrage konnte nicht abgelehnt werden');
       }).ignore();
@@ -126,6 +151,10 @@ mixin _SecurityVerificationModule on ChangeNotifier implements MatrixGateway {
   @override
   Future<void> startVerification({required String userId, String? deviceId}) async {
     final c = _client;
+    if (c != null && c.isLogged() && MatrixIds.isUserId(userId) && userId != c.userID && !_verificationAllowed(userId, null)) {
+      // Vor `encryptionUnavailable` und vor der Verzweigung: gilt mit und ohne `deviceId` (B8).
+      throw const GatewayException(GatewayError.notAllowed);
+    }
     if (c == null || !c.isLogged() || c.encryption == null) throw const GatewayException(GatewayError.encryptionUnavailable);
     if (!MatrixIds.isUserId(userId)) throw const GatewayException(GatewayError.invalidInput);
     if (_verification != null && !_verification!.isDone) throw const GatewayException(GatewayError.alreadyExists);
@@ -139,7 +168,17 @@ mixin _SecurityVerificationModule on ChangeNotifier implements MatrixGateway {
       } else {
         final list = c.userDeviceKeys[userId];
         if (list == null) throw const GatewayException(GatewayError.notFound);
-        v = await list.startVerification();
+        if (userId != c.userID && _family?.member(userId) == null) {
+          // Kontakt: nie die SDK-Raumwahl (sie könnte einen anderen Raum nehmen oder einen neuen anlegen), sondern der
+          // gewählte Kontakt-Raum. Dieselben Schritte wie im SDK (`DeviceKeysList.startVerification`, matrix 14.2.0).
+          final roomId = _contactRoomOf(userId);
+          final room = roomId == null ? null : c.getRoomById(roomId);
+          if (room == null) throw const GatewayException(GatewayError.notAllowed);
+          v = KeyVerification(encryption: c.encryption!, room: room, userId: userId);
+          await v.start();
+        } else {
+          v = await list.startVerification();
+        }
       }
       _setVerification(v);
     } on GatewayException {

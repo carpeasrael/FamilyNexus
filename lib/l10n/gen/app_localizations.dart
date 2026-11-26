@@ -1160,6 +1160,66 @@ abstract class AppLocalizations {
   /// **'Kontakte verwalten'**
   String get chatContactsManage;
 
+  /// No description provided for @contactIdentityVerified.
+  ///
+  /// In de, this message translates to:
+  /// **'Persönlich geprüft'**
+  String get contactIdentityVerified;
+
+  /// No description provided for @contactIdentityPinned.
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht persönlich geprüft'**
+  String get contactIdentityPinned;
+
+  /// No description provided for @contactIdentityUnknown.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Schlüssel bekannt'**
+  String get contactIdentityUnknown;
+
+  /// No description provided for @contactIdentityChangedBanner.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Sicherheitsschlüssel von {name} hat sich geändert. Prüft euch persönlich, bevor ihr weiterschreibt.'**
+  String contactIdentityChangedBanner(String name);
+
+  /// No description provided for @contactIdentityChangedComposer.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Sicherheitsschlüssel dieser Person hat sich geändert. Senden ist gesperrt, bis du die Änderung akzeptierst.'**
+  String get contactIdentityChangedComposer;
+
+  /// No description provided for @contactVerifyAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Person prüfen'**
+  String get contactVerifyAction;
+
+  /// No description provided for @contactAcceptChangeAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Änderung akzeptieren'**
+  String get contactAcceptChangeAction;
+
+  /// No description provided for @contactAcceptChangeConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Erst akzeptieren, wenn ihr euch persönlich geprüft habt (z. B. per Emoji-Vergleich). Fortfahren?'**
+  String get contactAcceptChangeConfirm;
+
+  /// No description provided for @contactSendBlockedChanged.
+  ///
+  /// In de, this message translates to:
+  /// **'Senden gesperrt: Der Sicherheitsschlüssel dieser Person hat sich geändert.'**
+  String get contactSendBlockedChanged;
+
+  /// No description provided for @contactAcceptChangeFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Änderung konnte nicht akzeptiert werden.'**
+  String get contactAcceptChangeFailed;
+
   /// No description provided for @errNotAllowed.
   ///
   /// In de, this message translates to:

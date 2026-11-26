@@ -47,6 +47,8 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
   /// Erreichbarkeit synchron und ohne Netz (Anzeige, Senden), je Gegenüber kurz zwischengespeichert.
   // ignore: unused_element
   ContactReachability _reachabilityOf(String peer) {
+    // Geänderter Hauptschlüssel hat Vorrang vor „nicht erreichbar“ (die Geräte sind dann gesperrt, B8).
+    if (_identityChanged.contains(peer)) return ContactReachability.identityChanged;
     final now = DateTime.now();
     final useCache = debugDevicesOf == null;
     final cached = useCache ? _contacts.reachCache[peer] : null;

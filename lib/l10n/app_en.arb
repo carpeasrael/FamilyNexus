@@ -260,6 +260,21 @@
   "chatContactWaiting": "Waiting for acceptance. You can write once the person has joined.",
   "chatContactsEmpty": "No chats with contacts yet.",
   "chatContactsManage": "Manage contacts",
+  "contactIdentityVerified": "Checked in person",
+  "contactIdentityPinned": "Not checked in person",
+  "contactIdentityUnknown": "No keys known yet",
+  "contactIdentityChangedBanner": "The security key of {name} has changed. Check each other in person before you keep writing.",
+  "@contactIdentityChangedBanner": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "contactIdentityChangedComposer": "This person’s security key has changed. Sending is blocked until you accept the change.",
+  "contactVerifyAction": "Check person",
+  "contactAcceptChangeAction": "Accept change",
+  "contactAcceptChangeConfirm": "Only accept after you have checked in person (e.g. via emoji comparison). Continue?",
+  "contactSendBlockedChanged": "Sending blocked: this person’s security key has changed.",
+  "contactAcceptChangeFailed": "The change could not be accepted.",
   "errNotAllowed": "You do not have permission for this.",
   "errAttachmentRejected": "This attachment is not allowed (type or size).",
   "errInvalidInput": "Please check your input.",

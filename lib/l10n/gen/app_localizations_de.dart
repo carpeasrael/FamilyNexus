@@ -616,6 +616,42 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chatContactsManage => 'Kontakte verwalten';
 
   @override
+  String get contactIdentityVerified => 'Persönlich geprüft';
+
+  @override
+  String get contactIdentityPinned => 'Nicht persönlich geprüft';
+
+  @override
+  String get contactIdentityUnknown => 'Noch keine Schlüssel bekannt';
+
+  @override
+  String contactIdentityChangedBanner(String name) {
+    return 'Der Sicherheitsschlüssel von $name hat sich geändert. Prüft euch persönlich, bevor ihr weiterschreibt.';
+  }
+
+  @override
+  String get contactIdentityChangedComposer =>
+      'Der Sicherheitsschlüssel dieser Person hat sich geändert. Senden ist gesperrt, bis du die Änderung akzeptierst.';
+
+  @override
+  String get contactVerifyAction => 'Person prüfen';
+
+  @override
+  String get contactAcceptChangeAction => 'Änderung akzeptieren';
+
+  @override
+  String get contactAcceptChangeConfirm =>
+      'Erst akzeptieren, wenn ihr euch persönlich geprüft habt (z. B. per Emoji-Vergleich). Fortfahren?';
+
+  @override
+  String get contactSendBlockedChanged =>
+      'Senden gesperrt: Der Sicherheitsschlüssel dieser Person hat sich geändert.';
+
+  @override
+  String get contactAcceptChangeFailed =>
+      'Die Änderung konnte nicht akzeptiert werden.';
+
+  @override
   String get errNotAllowed => 'Dafür fehlt die Berechtigung.';
 
   @override

@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:family_nexus/core/app_log.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart' show GatewayError, GatewayException;
@@ -16,11 +17,13 @@ import 'package:family_nexus/domain/chat.dart' show ChatThread, ThreadKind;
 import 'package:family_nexus/domain/contacts.dart';
 import 'package:family_nexus/domain/conversation_policy.dart' show PeerMembership;
 import 'package:family_nexus/domain/data_inventory.dart' show InventoryRoomKind;
+import 'package:family_nexus/domain/family.dart' show IdentityStatus;
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:matrix/matrix.dart' show Event, SyncStatus, SyncStatusUpdate, SyncUpdate;
+import 'package:matrix/encryption.dart' show Encryption, KeyVerification, KeyVerificationState;
+import 'package:matrix/matrix.dart' show CrossSigningKey, DeviceKeysList, Event, SyncStatus, SyncStatusUpdate, SyncUpdate;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../support/memory_stores.dart';
@@ -1412,6 +1415,278 @@ void main() {
     });
   });
 
+  group('Kontakt-Identität: Pinning, Wechsel, Sendesperre, Verifizierung (#119, K3b-2b, B8)', () {
+    const ct = '!ct:hs.example';
+    const k1 = 'KEYONE00000000000000000000000000000000000000';
+    const k2 = 'KEYTWO00000000000000000000000000000000000000';
+    const policy = ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.accepted});
+    const pinsType = SdkMatrixGateway.pinsAccountData;
+
+    /// Setzt den Cross-Signing-Hauptschlüssel [uid] im SDK-Client (ohne `/keys/query`).
+    void master(SdkMatrixGateway g, String uid, String pub) {
+      final c = g.sdkClient!;
+      final list = c.userDeviceKeys[uid] ?? (c.userDeviceKeys[uid] = DeviceKeysList(uid, c));
+      list.crossSigningKeys
+        ..clear()
+        ..[pub] = CrossSigningKey.fromJson(<String, Object?>{
+          'user_id': uid,
+          'usage': <String>['master'],
+          'keys': <String, String>{'ed25519:$pub': pub},
+        }, c);
+    }
+
+    // Ohne Kontenablage (Standard dieses Harness): die lokale Ablage ist inaktiv, nur der Sitzungs-Pin schützt.
+    Future<(_Hs, SdkMatrixGateway)> ready([ContactPolicy p = policy]) async {
+      final (hs, g) = await _signedIn(encryption: true);
+      g.setContactPolicy(p);
+      g.debugDevicesOf = (id) => <bool>[true];
+      return (hs, g);
+    }
+
+    // Ein Namenswechsel des Gegenübers im Kontakt-Raum löst den Abgleich aus (ein leerer Sync tut es nicht).
+    var kicks = 0;
+    Future<void> kick(SdkMatrixGateway g, [Map<String, Object?>? update, String peerState = 'join']) async {
+      await _sync(g, update ?? <String, Object?>{
+        'rooms': <String, Object?>{
+          'join': <String, Object?>{
+            ct: <String, Object?>{
+              'timeline': <String, Object?>{'events': <Object?>[], 'limited': false},
+              'state': <String, Object?>{
+                'events': <Object?>[
+                  _state('m.room.member', _fremd, <String, Object?>{'membership': peerState, 'displayname': 'Fremd ${kicks++}'}, key: _fremd),
+                ],
+              },
+            },
+          },
+        },
+      });
+      await Future<void>.delayed(_settle);
+    }
+
+    ChatThread? thread(SdkMatrixGateway g) => g.threads.where((t) => t.kind == ThreadKind.contact).firstOrNull;
+
+    Iterable<(String, String, String)> pinWrites(_Hs hs) => hs.where('PUT', '/account_data/$pinsType');
+
+    test('ohne Schlüssel: unbekannt; erster Schlüssel: nur vermerkt (Sitzungs-Pin), nie in die Kontodaten geschrieben', () async {
+      final (hs, g) = await ready();
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd)), isNotNull);
+      expect(thread(g)!.identity, IdentityStatus.unknown);
+      master(g, _fremd, k1);
+      await kick(g);
+      expect(thread(g)!.identity, IdentityStatus.pinned);
+      await kick(g);
+      expect(thread(g)!.identity, IdentityStatus.pinned);
+      expect(g.debugIdentityChanged, isEmpty);
+      expect(pinWrites(hs), isEmpty, reason: 'Kontakt-Pins stehen nie in den Kontodaten (datensparsam)');
+    });
+
+    test('anderer Hauptschlüssel bei inaktiver lokaler Ablage: geändert in dieser Sitzung (kein Fail-open), Spiegel bleibt leer', () async {
+      final (hs, g) = await ready();
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd)), isNotNull);
+      master(g, _fremd, k1);
+      await kick(g);
+      master(g, _fremd, k2);
+      await kick(g);
+      expect(thread(g)!.identity, IdentityStatus.changed);
+      expect(g.debugIdentityChanged, contains(_fremd));
+      expect(thread(g)!.reachable, isTrue, reason: 'Schlüssel geändert, nicht „nicht erreichbar“');
+      expect(pinWrites(hs), isEmpty);
+    });
+
+    test('geändert hat Vorrang vor „nicht erreichbar“ (Geräte gesperrt), auch nach Ablauf des Erreichbarkeits-Zwischenspeichers', () async {
+      final (_, g) = await ready();
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd)), isNotNull);
+      await g.openThread(ct);
+      master(g, _fremd, k1);
+      await kick(g);
+      master(g, _fremd, k2);
+      g.debugDevicesOf = (id) => <bool>[false]; // gesperrte Geräte: encryptToDevice false
+      await kick(g);
+      final t = thread(g)!;
+      expect(t.identity, IdentityStatus.changed);
+      expect(t.reachable, isTrue);
+      await expectLater(g.sendMessage('Hallo', threadId: ct), _notAllowed());
+      await expectLater(g.sendAttachment(fileName: 'a.pdf', bytes: Uint8List.fromList('%PDF-1.4\n1 0 obj\n'.codeUnits), threadId: ct), _notAllowed());
+    });
+
+    test('Senden prüft den Schlüssel synchron neu: ein Wechsel zwischen zwei Abgleichen sperrt sofort', () async {
+      final (_, g) = await ready();
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd)), isNotNull);
+      await g.openThread(ct);
+      master(g, _fremd, k1);
+      await kick(g);
+      expect(g.debugIdentityChanged, isEmpty);
+      master(g, _fremd, k2); // ohne weiteren Abgleich
+      await expectLater(g.sendMessage('Hallo', threadId: ct), _notAllowed());
+      expect(g.debugIdentityChanged, contains(_fremd));
+    });
+
+    test('wartender Raum (outgoing, Gegenüber nur eingeladen) wird nicht gepinnt; nach dem Beitritt gilt der Schlüssel dann als erster', () async {
+      final (_, g) = await ready(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}));
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd, peerState: 'invite', joined: 1, invited: 1)), isNotNull);
+      master(g, _fremd, k1);
+      await kick(g, null, 'invite');
+      expect(thread(g)!.pending, isTrue);
+      expect(thread(g)!.identity, IdentityStatus.unknown);
+      master(g, _fremd, k2);
+      await kick(g, null, 'invite');
+      expect(g.debugIdentityChanged, isEmpty, reason: 'nichts gepinnt, also kein Wechsel');
+      await kick(g);
+      expect(thread(g)!.pending, isFalse);
+      expect(thread(g)!.identity, IdentityStatus.pinned);
+    });
+
+    test('Akzeptieren: Kontakt accepted ⇒ nicht mehr geändert, kein Schreiben der Kontodaten; Senden wieder erlaubt', () async {
+      final (hs, g) = await ready();
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd)), isNotNull);
+      await g.openThread(ct);
+      master(g, _fremd, k1);
+      await kick(g);
+      master(g, _fremd, k2);
+      await kick(g);
+      expect(thread(g)!.identity, IdentityStatus.changed);
+      await g.acceptIdentityChange(_fremd);
+      await Future<void>.delayed(_settle);
+      expect(g.debugIdentityChanged, isEmpty);
+      expect(thread(g)!.identity, IdentityStatus.pinned);
+      expect(pinWrites(hs), isEmpty, reason: 'keine Kontodaten-Schreibung für Kontakte');
+      await kick(g);
+      expect(thread(g)!.identity, IdentityStatus.pinned, reason: 'der akzeptierte Schlüssel gilt weiter');
+      try {
+        await g.sendMessage('Hallo', threadId: ct).timeout(const Duration(seconds: 3));
+      } catch (e) {
+        expect(e, isNot(isA<GatewayException>().having((x) => x.error, 'error', GatewayError.notAllowed)));
+      }
+      // Ein weiterer Wechsel wird wieder erkannt.
+      master(g, _fremd, k1);
+      await kick(g);
+      expect(thread(g)!.identity, IdentityStatus.changed);
+    });
+
+    test('Akzeptieren wirkt in der Sitzung auch gegen einen abweichenden Kontodaten-Pin und bei inaktiver Ablage (Vorrang-Slot)', () async {
+      final (_, g) = await ready();
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd)), isNotNull);
+      await kick(g, <String, Object?>{
+        'account_data': <String, Object?>{
+          'events': <Object?>[
+            <String, Object?>{'type': pinsType, 'content': <String, Object?>{_fremd: k1}},
+          ],
+        },
+      });
+      master(g, _fremd, k2);
+      await kick(g);
+      expect(thread(g)!.identity, IdentityStatus.changed, reason: 'Kontodaten-Pin k1 ≠ k2');
+      await g.acceptIdentityChange(_fremd);
+      await Future<void>.delayed(_settle);
+      await kick(g);
+      expect(thread(g)!.identity, IdentityStatus.pinned);
+      expect(g.debugIdentityChanged, isEmpty);
+    });
+
+    test('Akzeptieren verweigert: Fremde, Blockierte, outgoing ohne beigetretenes Gegenüber, ohne erkannte Änderung', () async {
+      final (_, g) = await ready();
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd)), isNotNull);
+      master(g, _fremd, k1);
+      await kick(g);
+      master(g, _dora, k1);
+      await expectLater(g.acceptIdentityChange('@unbekannt:hs.example'), _error(GatewayError.notFound));
+      await expectLater(g.acceptIdentityChange(_fremd), _error(GatewayError.notFound), reason: 'keine Änderung erkannt');
+      master(g, _fremd, k2);
+      await kick(g);
+      g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.accepted}, blocked: {_fremd}));
+      await expectLater(g.acceptIdentityChange(_fremd), _error(GatewayError.notFound), reason: 'blockiert');
+      g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.blocked}, blocked: {_fremd}));
+      await expectLater(g.acceptIdentityChange(_fremd), _error(GatewayError.notFound));
+      g.setContactPolicy(const ContactPolicy(enabled: true));
+      await expectLater(g.acceptIdentityChange(_fremd), _error(GatewayError.notFound), reason: 'ohne Datensatz');
+    });
+
+    test('Akzeptieren: outgoing mit wartendem Gegenüber verweigert', () async {
+      final (_, g) = await ready(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}));
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd, peerState: 'invite', joined: 1, invited: 1)), isNotNull);
+      master(g, _fremd, k1);
+      g.debugIdentityChanged.add(_fremd);
+      await expectLater(g.acceptIdentityChange(_fremd), _error(GatewayError.notFound));
+    });
+
+    test('startVerification: Fremde mit und ohne deviceId ⇒ notAllowed (vor encryptionUnavailable); eigenes Konto und Mitglieder nicht', () async {
+      final (_, g) = await ready();
+      await expectLater(g.startVerification(userId: '@fremd2:hs.example'), _error(GatewayError.notAllowed));
+      await expectLater(g.startVerification(userId: '@fremd2:hs.example', deviceId: 'D1'), _error(GatewayError.notAllowed));
+      await expectLater(g.startVerification(userId: _me, deviceId: 'D1'), _error(GatewayError.encryptionUnavailable), reason: 'eigenes Konto bleibt erlaubt');
+      await expectLater(g.startVerification(userId: _ben), _error(GatewayError.encryptionUnavailable), reason: 'Mitglied bleibt erlaubt');
+      // Kontakt ohne Thread (noch nicht synchronisiert): ebenfalls verweigert.
+      await expectLater(g.startVerification(userId: _fremd), _error(GatewayError.notAllowed));
+    });
+
+    test('eingehende Anfragen: nur im gewählten Kontakt-Raum oder To-Device, nie von Fremden, Blockierten oder ohne Thread', () async {
+      final (_, g) = await ready();
+      expect(g.debugIncomingAllowed(_fremd, null), isFalse, reason: 'noch kein Thread (Neustart, Lazy Loading)');
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd)), isNotNull);
+      expect(g.debugIncomingAllowed(_fremd, null), isTrue);
+      expect(g.debugIncomingAllowed(_fremd, ct), isTrue);
+      expect(g.debugIncomingAllowed(_fremd, '!gruppe:hs.example'), isFalse, reason: 'falscher Raum');
+      expect(g.debugIncomingAllowed('@fremd2:hs.example', ct), isFalse);
+      expect(g.debugIncomingAllowed('@fremd2:hs.example', null), isFalse);
+      expect(g.debugIncomingAllowed(_me, '!x:hs.example'), isTrue);
+      expect(g.debugIncomingAllowed(_ben, '!x:hs.example'), isTrue, reason: 'Mitglied wie bisher');
+      g.setContactPolicy(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.accepted}, blocked: {_fremd}));
+      expect(g.debugIncomingAllowed(_fremd, ct), isFalse, reason: 'blockiert');
+      g.setContactPolicy(ContactPolicy.off);
+      expect(g.debugIncomingAllowed(_fremd, ct), isFalse, reason: 'Bereich aus');
+    });
+
+    test('eingehende Anfrage bei laufender Verifizierung abgewiesen (S4: nur eine zur Zeit), danach wieder erlaubt', () async {
+      final (_, g) = await ready();
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd)), isNotNull);
+      expect(g.debugIncomingAllowed(_fremd, ct), isTrue);
+      final v = KeyVerification(encryption: _NoEncryption(), userId: _fremd);
+      g.debugVerification = v;
+      expect(g.debugIncomingAllowed(_fremd, ct), isFalse, reason: 'läuft (waitingAccept)');
+      expect(g.debugIncomingAllowed(_me, null), isFalse, reason: 'gilt für jeden Absender');
+      v.state = KeyVerificationState.error;
+      expect(g.debugIncomingAllowed(_fremd, ct), isTrue, reason: 'Fehler beendet die Sperre');
+      v.state = KeyVerificationState.askSas;
+      expect(g.debugIncomingAllowed(_fremd, ct), isFalse);
+      v.state = KeyVerificationState.done;
+      expect(g.debugIncomingAllowed(_fremd, ct), isTrue, reason: 'fertig');
+      g.debugVerification = null;
+    });
+
+    test('eingehende Anfrage bei wartendem Raum (outgoing) abgelehnt, nach dem Beitritt erlaubt', () async {
+      final (_, g) = await ready(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}));
+      expect(await contactThreadFor(g, ct, dmJoined(ct, _fremd, peerState: 'invite', joined: 1, invited: 1)), isNotNull);
+      expect(g.debugIncomingAllowed(_fremd, null), isFalse);
+      expect(g.debugContactRoomOf(_fremd), isNull);
+      await kick(g, dmJoined(ct, _fremd));
+      expect(g.debugIncomingAllowed(_fremd, ct), isTrue);
+    });
+
+    test('_contactRoomOf: bei zwei Räumen desselben Gegenübers beigetretener vor wartendem, dann kleinste Raum-ID', () async {
+      const a = '!aa:hs.example';
+      const z = '!zz:hs.example';
+      Map<String, Object?> both(String peerStateA, String peerStateZ) {
+        final ra = (((dmJoined(a, _fremd, peerState: peerStateA, joined: peerStateA == 'join' ? 2 : 1, invited: peerStateA == 'join' ? 0 : 1)['rooms']! as Map)['join']! as Map)[a]) as Map<String, Object?>;
+        final rz = (((dmJoined(z, _fremd, peerState: peerStateZ, joined: peerStateZ == 'join' ? 2 : 1, invited: peerStateZ == 'join' ? 0 : 1)['rooms']! as Map)['join']! as Map)[z]) as Map<String, Object?>;
+        return <String, Object?>{
+          'account_data': <String, Object?>{
+            'events': <Object?>[
+              <String, Object?>{'type': 'm.direct', 'content': <String, Object?>{_fremd: <String>[a, z]}},
+            ],
+          },
+          'rooms': <String, Object?>{'join': <String, Object?>{a: ra, z: rz}},
+        };
+      }
+
+      final (_, g1) = await ready();
+      await kick(g1, both('join', 'join'));
+      expect(g1.debugContactRoomOf(_fremd), a);
+      final (_, g2) = await ready(const ContactPolicy(enabled: true, contacts: {_fremd: ContactState.outgoing}));
+      await kick(g2, both('invite', 'join'));
+      expect(g2.debugContactRoomOf(_fremd), z, reason: 'der wartende Raum mit der kleineren ID zählt nicht');
+    });
+  });
+
   group('Einzelchat-Einstufung (#119, K2a)', () {
     const dm = '!dm:hs.example';
 
@@ -2136,4 +2411,10 @@ void main() {
       expect(g.debugBookTimelineIds, isEmpty);
     });
   });
+}
+
+/// Nur als Platzhalter für `KeyVerification.encryption`: `isDone` und `state` fassen die Verschlüsselung nicht an.
+class _NoEncryption implements Encryption {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError('${invocation.memberName}');
 }

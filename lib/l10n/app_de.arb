@@ -260,6 +260,21 @@
   "chatContactWaiting": "Wartet auf Annahme. Du kannst schreiben, sobald die Person beigetreten ist.",
   "chatContactsEmpty": "Noch keine Gespräche mit Kontakten.",
   "chatContactsManage": "Kontakte verwalten",
+  "contactIdentityVerified": "Persönlich geprüft",
+  "contactIdentityPinned": "Nicht persönlich geprüft",
+  "contactIdentityUnknown": "Noch keine Schlüssel bekannt",
+  "contactIdentityChangedBanner": "Der Sicherheitsschlüssel von {name} hat sich geändert. Prüft euch persönlich, bevor ihr weiterschreibt.",
+  "@contactIdentityChangedBanner": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "contactIdentityChangedComposer": "Der Sicherheitsschlüssel dieser Person hat sich geändert. Senden ist gesperrt, bis du die Änderung akzeptierst.",
+  "contactVerifyAction": "Person prüfen",
+  "contactAcceptChangeAction": "Änderung akzeptieren",
+  "contactAcceptChangeConfirm": "Erst akzeptieren, wenn ihr euch persönlich geprüft habt (z. B. per Emoji-Vergleich). Fortfahren?",
+  "contactSendBlockedChanged": "Senden gesperrt: Der Sicherheitsschlüssel dieser Person hat sich geändert.",
+  "contactAcceptChangeFailed": "Die Änderung konnte nicht akzeptiert werden.",
   "errNotAllowed": "Dafür fehlt die Berechtigung.",
   "errAttachmentRejected": "Dieser Anhang ist nicht erlaubt (Typ oder Größe).",
   "errInvalidInput": "Bitte Eingabe prüfen.",

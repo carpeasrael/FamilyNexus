@@ -33,6 +33,7 @@ import 'package:family_nexus/domain/server.dart';
 import 'package:family_nexus/domain/shopping.dart';
 import 'package:family_nexus/domain/tasks.dart';
 import 'package:family_nexus/domain/username_suggestion.dart';
+import 'package:family_nexus/domain/verification_policy.dart';
 import 'package:flutter/foundation.dart';
 
 /// Ereignis im Fake-Server (entspricht einem verschlüsselten Raumereignis).
@@ -198,6 +199,9 @@ class FakeMatrixServer {
 
   /// Test: Konten, deren Sicherheitsschlüssel sich geändert hat (`probeContact` meldet `identityChanged`).
   final Set<String> identityChangedUsers = <String>{};
+
+  /// Test: Identitätszustand der Kontakte (Standard `unknown`; `identityChangedUsers` hat Vorrang und ergibt `changed`).
+  final Map<String, IdentityStatus> contactIdentities = <String, IdentityStatus>{};
 
   /// Test-Uhr (für Ablauf von Einladungslinks).
   DateTime Function() now = () => DateTime.utc(2026, 10, 21, 12);
@@ -686,6 +690,12 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<void> acceptIdentityChange(String userId) async {
     final room = familyRoom;
+    if (room != null && !room.membership.containsKey(userId) && _contactAllowed(userId)) {
+      // Kontakt (K3b-2b): dieselbe Richtlinie wie im Gateway, ohne Raumbindung.
+      if (!fake.identityChangedUsers.remove(userId)) throw const GatewayException(GatewayError.notFound);
+      fake.notifyAll();
+      return;
+    }
     if (room == null || !room.identityChanged.remove(userId)) throw const GatewayException(GatewayError.notFound);
     fake.notifyAll();
   }
@@ -991,12 +1001,40 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     );
   }
 
+  /// Gewählter Kontakt-Raum mit beigetretenem Gegenüber (wie `_contactRoomOf` im Gateway).
+  String? _contactRoomIdOf(String peer) {
+    String? best;
+    for (final r in fake.contactRooms.values) {
+      if (!r.dmMembers.contains(_userId) || !r.dmMembers.contains(peer) || r.invitedUsers.contains(peer) || r.invitedUsers.contains(_userId)) continue;
+      if (_contactClass(r) != RoomClass.contactDirect) continue;
+      if (best == null || r.id.compareTo(best) < 0) best = r.id;
+    }
+    return best;
+  }
+
+  bool _contactAllowed(String userId) => VerificationPolicy.contactAllowed(
+        contactState: contactPolicy.enabled ? contactPolicy.contacts[userId] : null,
+        blocked: contactPolicy.blocked.contains(userId),
+        contactRoomId: _contactRoomIdOf(userId),
+      );
+
+  /// Dieselbe Regel wie im Gateway ([VerificationPolicy]).
+  bool _verificationAllowed(String userId) => VerificationPolicy.allowed(
+        userId: userId,
+        me: _userId ?? '',
+        familyJoined: familyRoom?.membership[userId] == MemberStatus.joined,
+        contactState: contactPolicy.enabled ? contactPolicy.contacts[userId] : null,
+        blocked: contactPolicy.blocked.contains(userId),
+        contactRoomId: _contactRoomIdOf(userId),
+      );
+
   @override
   Future<void> startVerification({required String userId, String? deviceId}) async {
     _requireSession();
     if (fake.verification != null && !fake.verification!.done && !fake.verification!.cancelled) {
       throw const GatewayException(GatewayError.alreadyExists);
     }
+    if (userId != _userId && !_verificationAllowed(userId)) throw const GatewayException(GatewayError.notAllowed);
     FakeMatrixGateway? peer;
     for (final g in fake._gateways) {
       if (g._userId == userId && !identical(g, this) && (deviceId == null || g.deviceId == deviceId)) peer = g;
@@ -1712,6 +1750,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     if (fake.contactRooms.containsKey(threadId)) {
       final peer = room.dmMembers.firstWhere((m) => m != _userId);
       if (!_opened.contains(threadId) || room.invitedUsers.contains(peer)) throw const GatewayException(GatewayError.notAllowed);
+      if (fake.identityChangedUsers.contains(peer)) throw const GatewayException(GatewayError.notAllowed); // vor „nicht erreichbar“
       if (_reachOf(peer) == ContactReachability.notReachable) throw const GatewayException(GatewayError.peerNotReachable);
     }
     return room;
@@ -1722,6 +1761,11 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final room = _chatRoom(threadId);
     if (text.trim().isEmpty) throw const GatewayException(GatewayError.invalidInput);
     await fake.sendGate?.future;
+    // Wie das Gateway: bei geändertem Schlüssel des Kontakts (auch erst während des Sendens) `notAllowed`.
+    final cr = fake.contactRooms[threadId];
+    if (cr != null && fake.identityChangedUsers.contains(cr.dmMembers.firstWhere((m) => m != _userId))) {
+      throw const GatewayException(GatewayError.notAllowed);
+    }
     fake.post(room, _userId!, 'm.room.message', <String, Object?>{
       'body': text,
       'reply_to': ?replyToId,
@@ -2064,6 +2108,12 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return r != null && _contactClass(r) == RoomClass.contactDirect ? r : null;
   }
 
+  IdentityStatus _contactIdentityOf(String peer, {required bool pending}) {
+    if (pending) return IdentityStatus.unknown;
+    if (fake.identityChangedUsers.contains(peer)) return IdentityStatus.changed;
+    return fake.contactIdentities[peer] ?? IdentityStatus.unknown;
+  }
+
   List<ChatThread> _contactThreads() {
     final me = _userId;
     return <ChatThread>[
@@ -2078,6 +2128,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
             unread: unreadIn(r.id),
             pending: r.invitedUsers.contains(r.dmMembers.firstWhere((m) => m != me)),
             reachable: _reachOf(r.dmMembers.firstWhere((m) => m != me)) != ContactReachability.notReachable,
+            identity: _contactIdentityOf(r.dmMembers.firstWhere((m) => m != me), pending: r.invitedUsers.contains(r.dmMembers.firstWhere((m) => m != me))),
           ),
     ]..sort((a, b) => a.title.compareTo(b.title));
   }

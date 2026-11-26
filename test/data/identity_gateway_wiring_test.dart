@@ -251,6 +251,21 @@ void main() {
           reason: 'ohne local: ginge der lokale Vermerk der Kontodaten-Kopie verloren');
     });
 
+    test('K3b-2b: der Spiegel enthält nur Pins aktueller Mitglieder; Kontakt-Pins bleiben lokal, Einträge ehemaliger Mitglieder bleiben über die Kontodaten', () async {
+      const fremd = '@fremd:hs.example';
+      const ehemalig = '@ehemalig:hs.example';
+      final s = await start(
+        localPins: <String, String>{fremd: _keyOld, ehemalig: _keyCara, _cara: _keyCara},
+        accountPins: <String, String>{ehemalig: _keyCara},
+      );
+      s.master(_ben, _keyOld);
+      await s.refresh('Ben 1');
+      await _until(() => s.hs.pinPuts.isNotEmpty, what: 'Kontodaten geschrieben');
+      expect(s.hs.pinPuts.last.body, <String, Object?>{_ben: _keyOld, _cara: _keyCara, ehemalig: _keyCara},
+          reason: 'Kontakt-Pin (fremd) nie in den Kontodaten; ehemaliges Mitglied bleibt über die Kontodaten');
+      expect(s.g.localIdentityPins[fremd], _keyOld, reason: 'lokal bleibt er');
+    });
+
     test('Schreibfehler: protokolliert, ohne Ausnahme; der Vermerk geht beim nächsten Schreiben mit hinaus', () async {
       final s = await start(accountPins: const <String, String>{});
       s.hs.failPinPuts = true;

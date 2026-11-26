@@ -5,12 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/app_services.dart';
+import '../../core/app_log.dart';
 import '../../core/platform_info.dart';
 import '../../data/matrix/matrix_gateway.dart';
 import '../../data/platform/file_access.dart';
 import '../../domain/chat.dart';
 import '../../domain/chat_read.dart';
 import '../../domain/contacts.dart';
+import '../../domain/family.dart' show IdentityStatus;
 import '../../domain/moderation.dart';
 import '../../domain/presence.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -297,6 +299,40 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     }
   }
 
+  /// Startet den Emoji-Vergleich; den Dialog zeigt der globale `VerificationListener` (K3b-2b, B8).
+  Future<void> _verifyContact(MatrixGateway g, String userId) async {
+    if (userId.isEmpty) return;
+    final l = AppLocalizations.of(context);
+    try {
+      await g.startVerification(userId: userId);
+    } catch (e) {
+      if (mounted) _toast(errorText(l, e));
+    }
+  }
+
+  Future<void> _acceptContactChange(MatrixGateway g, String userId) async {
+    if (userId.isEmpty) return;
+    final l = AppLocalizations.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(l.contactAcceptChangeAction),
+        content: Text(l.contactAcceptChangeConfirm),
+        actions: <Widget>[
+          TextButton(onPressed: () => Navigator.pop(c, false), child: Text(l.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(c, true), child: Text(l.contactAcceptChangeAction)),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    try {
+      await g.acceptIdentityChange(userId);
+    } catch (e) {
+      AppLog.w('chat', 'Schlüsseländerung eines Kontakts konnte nicht akzeptiert werden (${e.runtimeType})');
+      if (mounted) _toast(l.contactAcceptChangeFailed);
+    }
+  }
+
   void _manageContacts() {
     final cc = _services.calendar?.contactController;
     if (cc == null) return;
@@ -409,10 +445,20 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
       // Nur der unveränderte, schon gesendete Stand des gesendeten Gesprächs wird geleert (#119, B4).
       _clearSent(threadId, sentText, sentReply);
     } catch (e) {
-      _toast(errorText(l, e));
+      _toast(_sendErrorText(l, g, threadId, e));
     } finally {
       if (mounted) setState(() => _sending = false);
     }
+  }
+
+  /// Fehlertext beim Senden: `notAllowed` bei geändertem Schlüssel des Kontakts nennt den Grund (B8).
+  String _sendErrorText(AppLocalizations l, MatrixGateway g, String threadId, Object e) {
+    if (e is GatewayException && e.error == GatewayError.notAllowed) {
+      for (final t in g.threads) {
+        if (t.id == threadId && t.isOutside && t.identity == IdentityStatus.changed) return l.contactSendBlockedChanged;
+      }
+    }
+    return errorText(l, e);
   }
 
   Future<void> _attach(AppServices s) async {
@@ -430,7 +476,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     } on FileTooLargeException {
       _toast(l.errAttachmentRejected);
     } catch (e) {
-      _toast(errorText(l, e));
+      _toast(_sendErrorText(l, s.gateway, threadId, e));
     }
   }
 
@@ -723,6 +769,8 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     // Eingabe gesperrt, solange das Gespräch nicht benutzbar ist (wartend, nicht erreichbar, öffnet, fehlgeschlagen).
     final String? composerNote = !outside || current == null
         ? null
+        : current.identity == IdentityStatus.changed && !current.pending
+        ? l.contactIdentityChangedComposer
         : current.pending
         ? l.chatContactWaiting
         : !current.reachable
@@ -764,6 +812,10 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                           ContactNames.title(current.peerName, current.peerId ?? ''),
                         ),
                         onManage: _manageContacts,
+                        identity: current.identity,
+                        pending: current.pending,
+                        onVerify: () => _verifyContact(g, current.peerId ?? ''),
+                        onAccept: () => _acceptContactChange(g, current.peerId ?? ''),
                       ),
                     ],
                   ),
