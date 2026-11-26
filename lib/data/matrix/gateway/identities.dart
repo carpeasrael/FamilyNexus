@@ -187,7 +187,6 @@ mixin _IdentitiesModule on ChangeNotifier implements MatrixGateway {
     _localPins.flushIfDirty().ignore();
     _identityChanged.remove(userId);
     _contacts.reachCache.remove(userId);
-    _contacts.identity.remove(userId);
     _setBlocked(userId, false);
     _scheduleRefresh();
   }
