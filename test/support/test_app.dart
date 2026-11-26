@@ -148,6 +148,8 @@ Future<TestApp> buildTestApp({
   bool contactsEnabled = false,
   MemoryContactStore? contactItems,
   MemoryBlockedList? contactBlocked,
+  // Test (#119, K3c-2): ersetzt die gebauten Kontakt-Dienste (z. B. mit verzögertem `idle`).
+  ContactServices Function(ContactServices built)? contactsDecorate,
   bool roleFromFamily = false,
   // Test: Meldungen zu Chat und Einkauf und Zahl am App-Symbol (#254). Ohne Angabe wie im Browser: keine.
   ActivityPlatform? activity,
@@ -255,15 +257,18 @@ Future<TestApp> buildTestApp({
       builtTasks.add(controller);
       return controller;
     },
-    contactsBuilder: (uid) => buildContactServices(
-      gateway: gateway,
-      userId: uid,
-      contactStore: contactsEnabled ? contactStoreInUse : null,
-      contactsEnabled: contactsEnabled,
-      blockedList: contactsEnabled ? contactBlockedInUse : null,
-      clock: clock,
-      retryInterval: const Duration(hours: 1),
-    ),
+    contactsBuilder: (uid) {
+      final built = buildContactServices(
+        gateway: gateway,
+        userId: uid,
+        contactStore: contactsEnabled ? contactStoreInUse : null,
+        contactsEnabled: contactsEnabled,
+        blockedList: contactsEnabled ? contactBlockedInUse : null,
+        clock: clock,
+        retryInterval: const Duration(hours: 1),
+      );
+      return built == null || contactsDecorate == null ? built : contactsDecorate(built);
+    },
     calendarBuilder: (uid, room) async {
       calendarRooms.add(room);
       await beforeCalendarBuild?.call(uid);

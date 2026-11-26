@@ -1,15 +1,30 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:family_nexus/app/app.dart';
+import 'package:family_nexus/app/bootstrap.dart';
 import 'package:family_nexus/app/contact_factory.dart';
+import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/domain/contact_service.dart';
 import 'package:family_nexus/domain/contacts.dart';
 import 'package:family_nexus/domain/server.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/contact_peer.dart';
 import '../support/fake_matrix.dart';
 import '../support/memory_contact_store.dart';
 import '../support/test_app.dart';
+
+/// Kontakt-Dienste mit einem Auslaufen (`idle`), das der Test von Hand beendet (#119, K3c-2).
+class _SlowIdle extends ContactServices {
+  _SlowIdle(ContactServices built, this.gate) : super(sync: built.sync, controller: built.controller);
+
+  final Completer<void> gate;
+
+  @override
+  Future<void> idle() => gate.future;
+}
 
 /// #119, K2c und K3c-2 (E-114): Verdrahtung der Kontakt-Dienste. Sie gehören zum Konto, nicht zum Kalender und nicht zur
 /// Familie; `AppServices.openContacts`/`closeContacts` steuern den Lebenszyklus. Die Sperre gilt auch hier.
@@ -157,6 +172,102 @@ void main() {
       await app.services.wipeAccountData();
       expect(closedAtWipe, isTrue);
       expect(listeningAtWipe, isFalse, reason: 'kein Dienst hört beim Löschen noch zu');
+    });
+
+    group('Auslaufen der Warteschlange und Abmelden', () {
+      Future<TestApp> slowApp(List<Completer<void>> gates) async {
+        final app = await buildTestApp(
+          contactsEnabled: true,
+          contactsDecorate: (built) {
+            final c = Completer<void>();
+            gates.add(c);
+            return _SlowIdle(built, c);
+          },
+        );
+        addTearDown(() {
+          for (final g in gates) {
+            if (!g.isCompleted) g.complete();
+          }
+          app.services.closeCalendar();
+          app.services.closeContacts();
+        });
+        return app;
+      }
+
+      test('wipeAccountData wartet, bis die Kontakt-Dienste ausgelaufen sind (M1b)', () async {
+        final gates = <Completer<void>>[];
+        final app = await slowApp(gates);
+        await app.services.openCalendar();
+        expect(gates, hasLength(1));
+        var wiped = false;
+        app.services.debugWipeAccountData = () async => wiped = true;
+        app.services.closeCalendar(cancelReminders: true);
+        final done = app.services.wipeAccountData();
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        expect(app.services.contacts, isNull, reason: 'wipeAccountData schliesst zuerst');
+        expect(wiped, isFalse, reason: 'die Warteschlange der Kontakt-Dienste läuft noch aus');
+        gates.single.complete();
+        await done;
+        expect(wiped, isTrue);
+      });
+
+      test('Verkettung: ein früheres Auslaufen bleibt auch nach einem weiteren Schließen maßgeblich (Z5)', () async {
+        final gates = <Completer<void>>[];
+        final app = await slowApp(gates);
+        await app.services.openCalendar();
+        app.services.closeCalendar();
+        app.services.closeContacts(); // Dienst A: idle hängt
+        app.services.openContacts(app.gateway.userId!); // Dienst B
+        expect(gates, hasLength(2));
+        app.services.closeContacts();
+        gates[1].complete(); // nur B läuft aus
+        var wiped = false;
+        app.services.debugWipeAccountData = () async => wiped = true;
+        final done = app.services.wipeAccountData();
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        expect(wiped, isFalse, reason: 'A läuft noch aus');
+        gates[0].complete();
+        await done;
+        expect(wiped, isTrue);
+      });
+
+      test('openCalendar wartet auf das Auslaufen geschlossener Kontakt-Dienste (Z5)', () async {
+        final gates = <Completer<void>>[];
+        final app = await slowApp(gates);
+        await app.services.openCalendar();
+        app.services.closeCalendar();
+        app.services.closeContacts();
+        final opening = app.services.openCalendar();
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        expect(app.services.calendar, isNull, reason: 'nicht vor dem Auslaufen der Kontakt-Dienste');
+        gates.first.complete();
+        await opening;
+        expect(app.services.calendar, isNotNull);
+      });
+    });
+
+    testWidgets('Abmelden über AppRoot schliesst die Kontakt-Dienste (Z1; wipeAccountData schliesst sie ebenfalls)', (tester) async {
+      tester.view.physicalSize = const Size(900, 2400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final app = await buildTestApp(contactsEnabled: true);
+      await tester.pumpWidget(FamilyNexusApp(services: app.services));
+      await tester.pumpAndSettle();
+      expect(app.services.contacts, isNotNull, reason: 'die Hauptansicht öffnet die Kontakt-Dienste');
+      await app.gateway.logout();
+      await tester.pumpAndSettle();
+      expect(app.gateway.session, SessionState.loggedOut);
+      expect(app.services.contacts, isNull);
+    });
+
+    testWidgets('fullLocalReset schliesst die Kontakt-Dienste vor dem Löschen (Z2)', (tester) async {
+      final app = await buildTestApp(contactsEnabled: true);
+      await app.services.openCalendar();
+      expect(app.services.contacts, isNotNull);
+      bool? closedAtWipe;
+      await fullLocalReset(app.services, wipe: () async => closedAtWipe = app.services.contacts == null);
+      expect(closedAtWipe, isTrue);
+      expect(app.services.contacts, isNull);
     });
 
     test('blockedUsers-Wiederherstellung nach dem Anspruch der Familiendaten, auch für einen Besitzer ohne Familie', () async {
