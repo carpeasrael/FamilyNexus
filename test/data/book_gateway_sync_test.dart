@@ -14,11 +14,12 @@ import 'package:family_nexus/domain/book_room.dart';
 import 'package:family_nexus/domain/book_signal.dart';
 import 'package:family_nexus/domain/calendar_signal.dart' show CalendarSignal, ContactSignal, PrivateEventSignal;
 import 'package:family_nexus/domain/cash_book.dart';
-import 'package:family_nexus/domain/chat.dart' show ChatThread, ThreadKind;
+import 'package:family_nexus/domain/chat.dart' show ChatThread, GroupSendLock, ThreadKind;
 import 'package:family_nexus/domain/contacts.dart';
 import 'package:family_nexus/domain/conversation_policy.dart' show PeerMembership;
 import 'package:family_nexus/domain/data_inventory.dart' show InventoryRoomKind;
 import 'package:family_nexus/domain/family.dart' show IdentityStatus;
+import 'package:family_nexus/domain/moderation.dart' show ReportCategory, ReportRequest;
 import 'package:family_nexus/domain/server.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -145,6 +146,9 @@ class _Hs {
   /// Hält `createRoom`, bis die Zukunft endet (Wettlauf beim Anlegen).
   Completer<void>? holdCreate;
 
+  /// Hält `POST …/join`, bis die Zukunft endet (gleichzeitige Beitritte, K4-2a).
+  Completer<void>? holdJoin;
+
   /// Nach `createRoom`: liefert den Sync mit dem angelegten Raum (sonst wartet das SDK darauf).
   void Function(String room)? onCreate;
 
@@ -219,6 +223,7 @@ class _Hs {
         }
         final join = RegExp(r'/rooms/([^/]+)/join$').firstMatch(path);
         if (join != null) {
+          await holdJoin?.future;
           onJoin?.call(join.group(1)!);
           return _json(<String, Object?>{'room_id': join.group(1)});
         }
@@ -2103,7 +2108,11 @@ void main() {
         ],
       };
       await settle(g, group);
-      expect(g.contactRequests.map((r) => r.roomId), <String>['!rq:hs.example'], reason: 'Gruppe ist keine Kontaktanfrage');
+      // K4-2a (bewusste Umkehr, Vorschlag §3.2): Eine Gruppeneinladung mit `join_rule: invite` ist jetzt eine **Gruppenanfrage**
+      // (nie automatisch angenommen, nie eine Familieneinladung); vorher wurde sie ignoriert.
+      expect(g.contactRequests.map((r) => r.roomId), <String>['!rq:hs.example', '!gr:hs.example']);
+      expect(g.contactRequests.where((r) => r.roomId == '!gr:hs.example').single.isGroup, isTrue);
+      expect(g.contactRequests.where((r) => r.roomId == '!rq:hs.example').single.isGroup, isFalse);
       expect(g.invitations, isEmpty, reason: 'Gruppe ohne knock ist nie eine Familieneinladung');
       expect(hs.where('POST', '!gr:hs.example/join'), isEmpty);
       hs.onJoin = (_) {};
@@ -3249,6 +3258,837 @@ void main() {
       await _syncJoined(g, _bookJoin('!anderes:hs.example', family: '!andere:hs.example'));
       await Future<void>.delayed(_settle);
       expect(g.debugBookTimelineIds, isEmpty);
+    });
+  });
+
+  // ---- #119, K4-2a: Gruppen im echten Gateway (Lesen, Anfragen, Anlegen, Beitritt, Verlassen; Senden gesperrt) ----
+  group('Gruppen (#119, K4-2a)', () {
+    const gr = '!gr:hs.example';
+    const anna = '@anna:hs.example';
+    const rec = ContactPolicy(enabled: true, groups: <String>{gr});
+    const recAccepted = ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.accepted}, groups: <String>{gr});
+    const nobody = ContactPolicy(enabled: true);
+
+    Future<(_Hs, SdkMatrixGateway)> signedIn([ContactPolicy p = rec, bool familySynced = true]) async {
+      final (hs, g) = await _signedIn(encryption: true, familySynced: familySynced);
+      g.setContactPolicy(p);
+      g.debugDevicesOf = (id) => <bool>[true];
+      return (hs, g);
+    }
+
+    /// Beigetretene Gruppe: Zähler und Zustand einzeln steuerbar (`null` lässt die Angabe weg).
+    Map<String, Object?> groupJoined(
+      String room, {
+      String name = 'Skatrunde',
+      bool megolm = true,
+      int? joined,
+      int? invited = 0,
+      String? rule = 'invite',
+      String? history = 'invited',
+      List<String>? members,
+      bool direct = false,
+      int? unread,
+      int memberEvents = -1,
+    }) {
+      final all = members ?? <String>[_me, _fremd, anna];
+      final shown = memberEvents < 0 ? all : all.take(memberEvents).toList();
+      final j = joined ?? all.length;
+      return <String, Object?>{
+        if (direct)
+          'account_data': <String, Object?>{
+            'events': <Object?>[
+              <String, Object?>{'type': 'm.direct', 'content': <String, Object?>{_fremd: <String>[room]}},
+            ],
+          },
+        'rooms': <String, Object?>{
+          'join': <String, Object?>{
+            room: <String, Object?>{
+              'summary': <String, Object?>{
+                'm.joined_member_count': j,
+                'm.invited_member_count': ?invited,
+              },
+              if (unread != null) 'unread_notifications': <String, Object?>{'notification_count': unread, 'highlight_count': 0},
+              'state': <String, Object?>{
+                'events': <Object?>[
+                  _state('m.room.create', _me, <String, Object?>{'room_version': '10'}),
+                  if (megolm) _state('m.room.encryption', _me, <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2'}),
+                  _state('m.room.name', _me, <String, Object?>{'name': name}),
+                  if (rule != null) _state('m.room.join_rules', _me, <String, Object?>{'join_rule': rule}),
+                  if (history != null) _state('m.room.history_visibility', _me, <String, Object?>{'history_visibility': history}),
+                  _state('m.room.power_levels', _me, <String, Object?>{'users': <String, int>{_me: 100}, 'users_default': 0, 'state_default': 50, 'invite': 50, 'kick': 50}),
+                  for (final m in shown) _memberEvent(m, 'join'),
+                ],
+              },
+            },
+          },
+        },
+      };
+    }
+
+    /// Gruppen mit unbekannter Beitrittszahl: der Zähler fehlt im `summary`.
+    Map<String, Object?> groupUnknownSize(String room) {
+      final u = groupJoined(room);
+      ((((u['rooms']! as Map)['join']! as Map)[room]! as Map)['summary']! as Map).remove('m.joined_member_count');
+      return u;
+    }
+
+    Map<String, Object?> groupInvite(String room, String from, {String name = 'Skatrunde', String? rule = 'invite', bool direct = false}) => <String, Object?>{
+          'rooms': <String, Object?>{
+            'invite': <String, Object?>{
+              room: <String, Object?>{
+                'invite_state': <String, Object?>{
+                  'events': <Object?>[
+                    <String, Object?>{
+                      'type': 'm.room.member',
+                      'state_key': _me,
+                      'sender': from,
+                      'content': <String, Object?>{'membership': 'invite', if (direct) 'is_direct': true},
+                    },
+                    if (rule != null) <String, Object?>{'type': 'm.room.join_rules', 'state_key': '', 'sender': from, 'content': <String, Object?>{'join_rule': rule}},
+                    <String, Object?>{'type': 'm.room.name', 'state_key': '', 'sender': from, 'content': <String, Object?>{'name': name}},
+                  ],
+                },
+              },
+            },
+          },
+        };
+
+    Map<String, Object?> merge(List<Map<String, Object?>> updates) {
+      final out = <String, Object?>{'rooms': <String, Object?>{'invite': <String, Object?>{}, 'join': <String, Object?>{}}};
+      final rooms = out['rooms']! as Map<String, Object?>;
+      for (final u in updates) {
+        final r = (u['rooms'] as Map?)?.cast<String, Object?>() ?? const <String, Object?>{};
+        for (final k in <String>['invite', 'join']) {
+          (rooms[k]! as Map<String, Object?>).addAll((r[k] as Map?)?.cast<String, Object?>() ?? const <String, Object?>{});
+        }
+      }
+      return out;
+    }
+
+    Future<void> settle(SdkMatrixGateway g, Map<String, Object?> update) async {
+      await _sync(g, update);
+      await Future<void>.delayed(_settle);
+    }
+
+    Future<ChatThread?> groupThread(SdkMatrixGateway g, Map<String, Object?> update, [String room = gr]) async {
+      await settle(g, update);
+      return g.threads.where((t) => t.id == room && t.kind == ThreadKind.group).firstOrNull;
+    }
+
+    int membersCalls(_Hs hs, [String room = gr]) => hs.where('GET', '$room/members').length;
+
+    /// Der Server liefert den Zustand des Raums wie `ContactGroupSpec` ihn verlangt (Nachprüfung nach dem Beitritt).
+    void serveGroup(_Hs hs, String room, {String? rule = 'invite', String? history = 'invited'}) {
+      if (rule != null) hs.serverState['$room|m.room.join_rules'] = <String, Object?>{'join_rule': rule};
+      if (history != null) hs.serverState['$room|m.room.history_visibility'] = <String, Object?>{'history_visibility': history};
+    }
+
+    group('Einstufung und Anzeige', () {
+      test('Kontrollfall: Datensatz, beigetreten, Megolm ⇒ Gruppen-Thread (Titel, Mitglieder, Rechte, keine Sperre, nie ein Einzelchat)', () async {
+        final (_, g) = await signedIn();
+        final t = await groupThread(g, groupJoined(gr));
+        expect(t, isNotNull);
+        expect(t!.title, 'Skatrunde');
+        expect(t.peerId, isNull);
+        expect(t.isOutside, isTrue);
+        expect(t.isFamily, isFalse);
+        expect(t.memberCount, 3);
+        expect(t.canManage, isTrue, reason: 'ich bin Ersteller (100)');
+        expect(t.sendLock, GroupSendLock.keiner);
+        expect(g.threads.where((x) => x.kind == ThreadKind.contact), isEmpty);
+        expect(g.debugGroups, <String, String>{gr: 'Skatrunde'});
+      });
+
+      test('Gegenproben je einzeln: ohne Datensatz, Bereich aus, Liste unvollständig, bewusst verlassen ⇒ kein Gruppen-Thread', () async {
+        for (final p in <ContactPolicy>[nobody, const ContactPolicy(groups: <String>{gr}), ContactPolicy.off]) {
+          final (_, g) = await signedIn(p);
+          expect(await groupThread(g, groupJoined(gr)), isNull, reason: '$p');
+        }
+        final (_, g2) = await _signedIn(encryption: true, familyMembersFail: true);
+        g2.setContactPolicy(rec);
+        expect(await groupThread(g2, groupJoined(gr)), isNull, reason: 'Mitgliederliste der Familie unvollständig');
+        final (hs3, g3) = await signedIn();
+        expect(await groupThread(g3, groupJoined(gr)), isNotNull);
+        await g3.leaveConversation(gr);
+        expect(hs3.where('POST', '$gr/leave'), isNotEmpty);
+        await settle(g3, groupJoined(gr));
+        expect(g3.threads.where((t) => t.kind == ThreadKind.group), isEmpty, reason: 'bewusst verlassene Räume nie wieder zeigen');
+      });
+
+      test('die Einstufung ist von Größe, Regel, Verlauf und Verschlüsselung unabhängig: sichtbar, mit Sperrgrund (nie unsichtbar)', () async {
+        final cases = <String, (Map<String, Object?>, GroupSendLock)>{
+          'zu groß (51)': (groupJoined(gr, joined: 51), GroupSendLock.zuGross),
+          '40 beigetreten + 30 eingeladen (G = 70)': (groupJoined(gr, joined: 40, invited: 30), GroupSendLock.zuGross),
+          '10 000 beigetreten': (groupJoined(gr, joined: 10000), GroupSendLock.zuGross),
+          'Größe unbekannt': (groupUnknownSize(gr), GroupSendLock.groesseUnbekannt),
+          'unverschlüsselt': (groupJoined(gr, megolm: false), GroupSendLock.unverschluesselt),
+          'Regel public': (groupJoined(gr, rule: 'public'), GroupSendLock.regelGeaendert),
+          'Regel fehlt': (groupJoined(gr, rule: null), GroupSendLock.regelGeaendert),
+          'Verlauf shared': (groupJoined(gr, history: 'shared'), GroupSendLock.verlaufGeoeffnet),
+          'Verlauf fehlt (unbekannt zählt als geöffnet)': (groupJoined(gr, history: null), GroupSendLock.verlaufGeoeffnet),
+        };
+        for (final e in cases.entries) {
+          final (_, g) = await signedIn();
+          final t = await groupThread(g, e.value.$1);
+          expect(t, isNotNull, reason: e.key);
+          expect(t!.sendLock, e.value.$2, reason: e.key);
+        }
+      });
+
+      test('ein Gruppen-Datensatz gewinnt gegen m.direct: Gruppe, nie Kontakt-Einzelchat; verlassen als Gruppe, ohne m.direct anzufassen', () async {
+        final (hs, g) = await signedIn(recAccepted);
+        final t = await groupThread(g, groupJoined(gr, direct: true, members: <String>[_me, _fremd], joined: 2));
+        expect(t, isNotNull);
+        expect(g.threads.where((x) => x.kind == ThreadKind.contact), isEmpty);
+        await g.leaveConversation(gr);
+        expect(hs.where('POST', '$gr/leave'), isNotEmpty);
+        expect(hs.where('PUT', 'account_data/m.direct'), isEmpty, reason: 'kein removeFromDirectChat für Gruppen');
+      });
+
+      test('Raum war erst Kontakt-Einzelchat und bekommt dann einen Gruppen-Datensatz: der Einzelchat-Thread verschwindet, die Gruppe erscheint', () async {
+        final (_, g) = await signedIn(const ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.accepted}));
+        final u = groupJoined(gr, direct: true, members: <String>[_me, _fremd], joined: 2);
+        await settle(g, u);
+        expect(g.threads.where((x) => x.id == gr).map((x) => x.kind), <ThreadKind>[ThreadKind.contact]);
+        g.setContactPolicy(recAccepted);
+        await Future<void>.delayed(_settle);
+        expect(g.threads.where((x) => x.id == gr).map((x) => x.kind), <ThreadKind>[ThreadKind.group]);
+      });
+
+      test('Bereich aus oder Datensatz entfällt mitten in der Sitzung: die Gruppe verschwindet ohne weiteren Sync', () async {
+        final (_, g) = await signedIn();
+        expect(await groupThread(g, groupJoined(gr)), isNotNull);
+        g.setContactPolicy(nobody);
+        await Future<void>.delayed(_settle);
+        expect(g.threads.where((t) => t.kind == ThreadKind.group), isEmpty);
+        g.setContactPolicy(rec);
+        await Future<void>.delayed(_settle);
+        expect(g.threads.where((t) => t.kind == ThreadKind.group), hasLength(1));
+        g.setContactPolicy(ContactPolicy.off);
+        await Future<void>.delayed(_settle);
+        expect(g.threads.where((t) => t.kind == ThreadKind.group), isEmpty);
+        expect(g.debugGroups, isEmpty);
+      });
+
+      test('Familienwechsel räumt die Gruppen, die Richtlinie bleibt (Zustand und Epoche)', () async {
+        final (_, g) = await signedIn();
+        expect(await groupThread(g, groupJoined(gr)), isNotNull);
+        await g.openThread(gr);
+        expect(g.debugGroupTimelines, <String>{gr});
+        g.debugLeaveFamilyScope();
+        expect(g.debugContactPolicy, rec);
+        expect(g.threads.where((t) => t.kind == ThreadKind.group), isEmpty);
+        expect(g.debugGroups, isEmpty);
+        expect(g.debugGroupTimelines, isEmpty);
+      });
+
+      test('Abmelden räumt alle Gruppen und erhöht die Kontakt-Epoche', () async {
+        final (_, g) = await signedIn();
+        expect(await groupThread(g, groupJoined(gr)), isNotNull);
+        final epoch = g.debugContactEpoch;
+        await g.logout();
+        expect(g.debugGroups, isEmpty);
+        expect(g.debugGroupTimelines, isEmpty);
+        expect(g.debugContactEpoch, greaterThan(epoch));
+      });
+
+      test('Gruppen-Threads sind sortiert, melden Ausgelassene aus bekannten Schlüsseln und das Gateway liest dafür nie das Netz', () async {
+        final (hs, g) = await signedIn();
+        g.debugDevicesOf = (id) => id == _fremd ? <bool>[false] : <bool>[true];
+        final t = await groupThread(g, groupJoined(gr));
+        expect(t!.unreachableCount, 1);
+        expect(t.identityChangedCount, 0);
+        expect(hs.where('POST', '/keys/query').where((c) => c.$3.contains(_fremd)), isEmpty);
+      });
+
+      test('PolicyContext trägt die Gruppen (mit Familie), bei Bereich aus ändert sich nichts am Verhalten (enabled == false)', () async {
+        final (_, g) = await signedIn();
+        expect(g.debugPolicyContext!.groups, <String>{gr});
+        final (_, off) = await signedIn(const ContactPolicy(groups: <String>{gr}));
+        expect(await groupThread(off, groupJoined(gr)), isNull);
+        expect(off.contactRequests, isEmpty);
+        expect(off.threads.where((t) => t.kind == ThreadKind.family), hasLength(1), reason: 'Familie unverändert');
+        expect(off.unreadCount, 0);
+      });
+
+      test('Datenübersicht: Raumart „Gruppe“, auch gegen m.direct; ohne Datensatz „sonstiger Raum“', () async {
+        final (_, g) = await signedIn(recAccepted);
+        await settle(g, groupJoined(gr, direct: true, members: <String>[_me, _fremd], joined: 2));
+        var inv = await g.dataInventory(refresh: false);
+        expect({for (final r in inv.rooms) r.id: r.kind}[gr], InventoryRoomKind.group);
+        g.setContactPolicy(const ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.accepted}));
+        await Future<void>.delayed(_settle);
+        inv = await g.dataInventory(refresh: false);
+        expect({for (final r in inv.rooms) r.id: r.kind}[gr], isNot(InventoryRoomKind.group));
+      });
+
+      test('importantStateEvents enthält Regel und Verlauf; der Verlauf bleibt nach einem Neustart im Raumzustand', () async {
+        final (_, g) = await signedIn();
+        final important = g.sdkClient!.importantStateEvents;
+        expect(important, contains('m.room.join_rules'));
+        expect(important, contains('m.room.history_visibility'));
+        await _sync(g, groupJoined(gr, history: 'invited'));
+        await Future<void>.delayed(_settle);
+        final dir = _lastDir!;
+        await g.close();
+        final hs2 = _Hs();
+        final g2 = await _restarted(hs2, dir);
+        final room = g2.sdkClient!.getRoomById(gr);
+        expect(room, isNotNull);
+        expect(room!.getState('m.room.history_visibility')?.content['history_visibility'], 'invited');
+        expect(room.getState('m.room.join_rules')?.content['join_rule'], 'invite');
+      });
+
+      test('unreadCount zählt Gruppen, familyUnreadCount nie (B7)', () async {
+        final (_, g) = await signedIn();
+        expect(await groupThread(g, groupJoined(gr, unread: 4)), isNotNull);
+        expect(g.unreadCount, 4);
+        expect(g.familyUnreadCount, 0);
+        expect(g.threads.firstWhere((t) => t.kind == ThreadKind.group).unread, 4);
+      });
+    });
+
+    group('Anfragen', () {
+      test('Gruppenanfrage: Gruppenname, Einladender, inviterIsFamily nach Familie; kein Auto-Beitritt, kein Rauminhalt, nie in invitations', () async {
+        final (hs, g) = await signedIn(nobody);
+        await settle(g, merge(<Map<String, Object?>>[
+          groupInvite('!g1:hs.example', _fremd, name: 'Skat'),
+          groupInvite('!g2:hs.example', _cara, name: 'Familienausflug'),
+        ]));
+        final byRoom = {for (final r in g.contactRequests) r.roomId: r};
+        expect(byRoom.keys, containsAll(<String>['!g1:hs.example', '!g2:hs.example']));
+        expect(byRoom['!g1:hs.example']!.isGroup, isTrue);
+        expect(byRoom['!g1:hs.example']!.groupName, 'Skat');
+        expect(byRoom['!g1:hs.example']!.fromUserId, _fremd);
+        expect(byRoom['!g1:hs.example']!.inviterIsFamily, isFalse);
+        expect(byRoom['!g2:hs.example']!.inviterIsFamily, isTrue, reason: 'Cara ist Familienmitglied (D5: erlaubt, nur Anzeige)');
+        expect(hs.where('POST', '/join'), isEmpty, reason: 'Gruppen werden nie automatisch angenommen (D1)');
+        expect(g.threads.where((t) => t.kind != ThreadKind.family), isEmpty);
+        expect(g.invitations, isEmpty, reason: 'nie als Familieneinladung');
+        expect(g.debugGroupTimelines, isEmpty);
+      });
+
+      test('ohne geladene Familie ist inviterIsFamily false, auch für eine Kennung, die später Familie würde', () async {
+        final (_, g) = await signedIn(nobody, false);
+        expect(g.family, isNull);
+        await settle(g, groupInvite('!g1:hs.example', _cara));
+        expect(g.contactRequests.single.inviterIsFamily, isFalse);
+      });
+
+      test('ein eigener Kontakt lädt in eine Gruppe ein: Anfrage, nie automatisch angenommen', () async {
+        final (hs, g) = await signedIn(recAccepted);
+        await settle(g, groupInvite('!g1:hs.example', _fremd));
+        expect(g.contactRequests.map((r) => r.roomId), <String>['!g1:hs.example']);
+        expect(hs.where('POST', '/join'), isEmpty);
+      });
+
+      test('Gegenproben: Bereich aus, Einladender blockiert, Regel knock/null/public ⇒ keine Gruppenanfrage', () async {
+        final (_, off) = await signedIn(ContactPolicy.off);
+        await settle(off, groupInvite('!g1:hs.example', _fremd));
+        expect(off.contactRequests, isEmpty);
+        final (_, blocked) = await signedIn(const ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.blocked}, blocked: <String>{_fremd}));
+        await settle(blocked, groupInvite('!g1:hs.example', _fremd));
+        expect(blocked.contactRequests, isEmpty);
+        for (final rule in <String?>['knock', null, 'public']) {
+          final (_, g) = await signedIn(nobody);
+          await settle(g, groupInvite('!g1:hs.example', _fremd, rule: rule));
+          expect(g.contactRequests, isEmpty, reason: '$rule');
+        }
+      });
+
+      test('Ablehnen verlässt die Einladung; danach keine Anfrage mehr, ein zweites Ablehnen ist notAllowed', () async {
+        final (hs, g) = await signedIn(nobody);
+        await settle(g, groupInvite('!g1:hs.example', _fremd));
+        await g.declineContactRequest('!g1:hs.example');
+        expect(hs.where('POST', '!g1:hs.example/leave'), isNotEmpty);
+        await expectLater(g.declineContactRequest('!g1:hs.example'), _notAllowed());
+        await Future<void>.delayed(_settle);
+        expect(g.contactRequests, isEmpty);
+      });
+
+      test('Grenzen: je Raum eine, je Einladendem höchstens 3 (Rest „weitere“), je Server höchstens 5, gesamt 50', () async {
+        final (_, g) = await signedIn(nobody);
+        await settle(g, merge(<Map<String, Object?>>[for (var i = 0; i < 5; i++) groupInvite('!a$i:hs.example', '@e1:srv1.example')]));
+        expect(g.contactRequests, hasLength(3), reason: 'je Einladendem höchstens 3');
+        expect(g.contactRequestsHidden, 2);
+        final (_, g2) = await signedIn(nobody);
+        await settle(g2, merge(<Map<String, Object?>>[for (var i = 0; i < 7; i++) groupInvite('!b$i:hs.example', '@u$i:srv2.example')]));
+        expect(g2.contactRequests, hasLength(5), reason: 'je Server höchstens 5');
+        expect(g2.contactRequestsHidden, 2);
+        final (_, g3) = await signedIn(nobody);
+        await settle(g3, merge(<Map<String, Object?>>[for (var i = 0; i < 60; i++) groupInvite('!c${i.toString().padLeft(3, '0')}:hs.example', '@u$i:s$i.example')]));
+        expect(g3.contactRequests, hasLength(50), reason: 'gesamt 50');
+        expect(g3.contactRequestsHidden, 10);
+      });
+
+      test('Einzelchat-Anfrage und Gruppenanfragen desselben Absenders verdrängen sich nicht', () async {
+        final (_, g) = await signedIn(nobody);
+        final dm = <String, Object?>{
+          'rooms': <String, Object?>{
+            'invite': <String, Object?>{
+              '!dm:hs.example': <String, Object?>{
+                'invite_state': <String, Object?>{
+                  'events': <Object?>[
+                    <String, Object?>{'type': 'm.room.member', 'state_key': _me, 'sender': _fremd, 'content': <String, Object?>{'membership': 'invite', 'is_direct': true}},
+                  ],
+                },
+              },
+            },
+          },
+        };
+        await settle(g, merge(<Map<String, Object?>>[dm, groupInvite('!g1:hs.example', _fremd), groupInvite('!g2:hs.example', _fremd)]));
+        expect(g.contactRequests.map((r) => r.roomId).toSet(), <String>{'!dm:hs.example', '!g1:hs.example', '!g2:hs.example'});
+        expect(g.contactRequests.where((r) => r.isGroup), hasLength(2));
+        expect(g.contactRequests.where((r) => !r.isGroup).single.groupName, isNull);
+      });
+
+      test('Abnahme 9: Gruppeneinladung (invite) nie in invitations, nie als Familie annehmbar; knock bleibt Familieneinladung; null bleibt familyInvite', () async {
+        // (1) invite: nie in invitations (mit und ohne Bereich), acceptInvitation ⇒ notAllowed.
+        for (final p in <ContactPolicy>[nobody, ContactPolicy.off]) {
+          final (hs, g) = await signedIn(p);
+          await settle(g, groupInvite('!g1:hs.example', _cara));
+          expect(g.invitations, isEmpty, reason: '$p');
+          hs.serverState['!g1:hs.example|m.room.join_rules'] = <String, Object?>{'join_rule': 'invite'};
+          await expectLater(g.acceptInvitation('!g1:hs.example'), _notAllowed());
+          expect(hs.where('POST', '/join'), isEmpty);
+        }
+        // (2) knock: erscheint nie als Gruppenanfrage, bleibt Familieneinladung.
+        final (_, k) = await signedIn(nobody, false);
+        await settle(k, groupInvite('!k1:hs.example', _fremd, rule: 'knock'));
+        expect(k.contactRequests, isEmpty);
+        expect(k.invitations.map((i) => i.roomId), <String>['!k1:hs.example']);
+        // (3) null (mit und ohne Familie): familyInvite, nicht in contactRequests; die Annahme prüft den Server (invite ⇒ notAllowed).
+        for (final withFamily in <bool>[true, false]) {
+          final (hs, g) = await signedIn(nobody, withFamily);
+          await settle(g, groupInvite('!n1:hs.example', _fremd, rule: null));
+          expect(g.contactRequests, isEmpty, reason: 'null, Familie $withFamily');
+          if (!withFamily) {
+            expect(g.invitations.map((i) => i.roomId), <String>['!n1:hs.example']);
+            hs.serverState['!n1:hs.example|m.room.join_rules'] = <String, Object?>{'join_rule': 'invite'};
+            hs.onJoin = (r) => Future<void>.delayed(const Duration(milliseconds: 100), () => _syncJoined(g, groupJoined(r))).ignore();
+            await expectLater(g.acceptInvitation('!n1:hs.example'), _notAllowed());
+            expect(hs.where('POST', '!n1:hs.example/leave'), isNotEmpty, reason: 'nach dem Beitritt vom Server geprüft, verlassen');
+          }
+        }
+      });
+
+      test('Gruppeneinladung ist nie eine Familien- oder Direktkontakt-Einladung: kein /join, kein Einzelchat-Thread, Gruppen im PolicyContext (Lücke L3)', () async {
+        final (hs, g) = await signedIn(const ContactPolicy(enabled: true, contacts: <String, ContactState>{_cara: ContactState.accepted}, groups: <String>{'!g1:hs.example'}));
+        await settle(g, groupInvite('!g1:hs.example', _cara));
+        expect(hs.where('POST', '/join'), isEmpty);
+        expect(g.threads.where((t) => t.kind == ThreadKind.direct || t.kind == ThreadKind.contact), isEmpty);
+        expect(g.contactRequests.single.inviterIsFamily, isTrue, reason: 'Absturzfall D2: Datensatz da, Einladung offen ⇒ bleibt Anfrage');
+        expect(g.debugPolicyContext!.groups, <String>{'!g1:hs.example'});
+      });
+    });
+
+    group('acceptGroupInvite', () {
+      Future<(_Hs, SdkMatrixGateway)> invited({Map<String, Object?>? joinedState, String? rule = 'invite', String? history = 'invited', ContactPolicy p = rec}) async {
+        final (hs, g) = await signedIn(p);
+        await settle(g, groupInvite(gr, _fremd));
+        serveGroup(hs, gr, rule: rule, history: history);
+        hs.onJoin = (r) => Future<void>.delayed(const Duration(milliseconds: 100), () => _syncJoined(g, joinedState ?? groupJoined(gr))).ignore();
+        return (hs, g);
+      }
+
+      bool wroteFamilyPointer(_Hs hs) => hs.calls.any((c) => c.$1 == 'PUT' && c.$2.contains('account_data') && c.$2.contains('de.inneso.familynexus.family'));
+
+      test('Erfolg: Beitritt, Nachprüfung vom Server, Gruppe sichtbar; schreibt nie familyAccountData und keinen Datensatz', () async {
+        final (hs, g) = await invited();
+        await g.acceptGroupInvite(gr);
+        expect(hs.where('POST', '$gr/join'), hasLength(1));
+        expect(hs.where('POST', '$gr/leave'), isEmpty);
+        expect(wroteFamilyPointer(hs), isFalse);
+        await Future<void>.delayed(_settle);
+        expect(g.threads.where((t) => t.kind == ThreadKind.group).map((t) => t.id), <String>[gr]);
+        expect(g.contactRequests, isEmpty);
+        await g.acceptGroupInvite(gr); // idempotent (erneuter Tipp)
+        expect(hs.where('POST', '$gr/join'), hasLength(1));
+      });
+
+      test('Nachprüfung: Verstoß ⇒ Raum sofort verlassen und notAllowed, je Fall einzeln', () async {
+        final cases = <String, ({Map<String, Object?> joined, String? rule, String? history})>{
+          'unverschlüsselt': (joined: groupJoined(gr, megolm: false), rule: 'invite', history: 'invited'),
+          'Regel knock': (joined: groupJoined(gr), rule: 'knock', history: 'invited'),
+          'Regel nicht abrufbar': (joined: groupJoined(gr), rule: null, history: 'invited'),
+          'Verlauf shared': (joined: groupJoined(gr), rule: 'invite', history: 'shared'),
+          'Verlauf nicht abrufbar': (joined: groupJoined(gr), rule: 'invite', history: null),
+          'bekannt 51': (joined: groupJoined(gr, joined: 51), rule: 'invite', history: 'invited'),
+          '40 + 30 eingeladen': (joined: groupJoined(gr, joined: 40, invited: 30), rule: 'invite', history: 'invited'),
+        };
+        for (final e in cases.entries) {
+          final (hs, g) = await invited(joinedState: e.value.joined, rule: e.value.rule, history: e.value.history);
+          await expectLater(g.acceptGroupInvite(gr), _notAllowed(), reason: e.key);
+          expect(hs.where('POST', '$gr/leave'), isNotEmpty, reason: e.key);
+          await Future<void>.delayed(_settle);
+          expect(g.threads.where((t) => t.kind == ThreadKind.group), isEmpty, reason: e.key);
+          expect(wroteFamilyPointer(hs), isFalse, reason: e.key);
+        }
+      });
+
+      test('unbekannte Beitrittszahl: nicht verlassen, Gruppe sichtbar und sendegesperrt (nicht unsichtbar)', () async {
+        final (hs, g) = await invited(joinedState: groupUnknownSize(gr));
+        await g.acceptGroupInvite(gr);
+        expect(hs.where('POST', '$gr/leave'), isEmpty);
+        await Future<void>.delayed(_settle);
+        final t = g.threads.where((x) => x.kind == ThreadKind.group).single;
+        expect(t.sendLock, GroupSendLock.groesseUnbekannt);
+      });
+
+      test('Vorbedingungen: Einzelchat-Einladung, keine Einladung, ungültige ID, Bereich aus, Blockierter, Regel nicht invite ⇒ kein /join', () async {
+        final (hs, g) = await signedIn(nobody);
+        await settle(g, groupInvite('!dm:hs.example', _fremd, direct: true));
+        await expectLater(g.acceptGroupInvite('!dm:hs.example'), _notAllowed(), reason: 'Einzelchat-Einladung');
+        await expectLater(g.acceptGroupInvite('!gibtsnicht:hs.example'), _error(GatewayError.notFound));
+        await expectLater(g.acceptGroupInvite('kein-raum'), _error(GatewayError.invalidInput));
+        await settle(g, groupInvite('!kn:hs.example', _fremd, rule: 'knock'));
+        await expectLater(g.acceptGroupInvite('!kn:hs.example'), _notAllowed(), reason: 'knock ist keine Gruppenanfrage');
+        g.setContactPolicy(const ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.blocked}, blocked: <String>{_fremd}));
+        await settle(g, groupInvite('!bl:hs.example', _fremd));
+        await expectLater(g.acceptGroupInvite('!bl:hs.example'), _notAllowed(), reason: 'blockierter Einladender');
+        g.setContactPolicy(ContactPolicy.off);
+        await settle(g, groupInvite('!off:hs.example', anna));
+        await expectLater(g.acceptGroupInvite('!off:hs.example'), _notAllowed(), reason: 'Bereich aus');
+        expect(hs.where('POST', '/join'), isEmpty);
+      });
+
+      test('zweiter gleichzeitiger Tipp für dieselbe Gruppe: alreadyExists; mehr als 4 gleichzeitige Beitritte: rateLimited', () async {
+        final (hs, g) = await invited();
+        final first = g.acceptGroupInvite(gr);
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        await expectLater(g.acceptGroupInvite(gr), _error(GatewayError.alreadyExists));
+        await first;
+        expect(hs.where('POST', '$gr/join'), hasLength(1));
+
+        final ids = <String>[for (var i = 0; i < 5; i++) '!p$i:hs.example'];
+        final (hs2, g2) = await signedIn(ContactPolicy(enabled: true, groups: ids.toSet()));
+        await settle(g2, merge(<Map<String, Object?>>[for (final id in ids) groupInvite(id, _fremd)]));
+        for (final id in ids) {
+          serveGroup(hs2, id);
+        }
+        hs2.holdJoin = Completer<void>();
+        hs2.onJoin = (r) => Future<void>.delayed(const Duration(milliseconds: 100), () => _syncJoined(g2, groupJoined(r))).ignore();
+        final running = <Future<void>>[for (final id in ids.take(4)) g2.acceptGroupInvite(id)];
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        await expectLater(g2.acceptGroupInvite(ids.last), _error(GatewayError.rateLimited));
+        hs2.holdJoin!.complete();
+        await Future.wait(running);
+      });
+
+      test('Abmelden während des Beitritts: der Raum wird verlassen, notAllowed', () async {
+        final (hs, g) = await invited();
+        hs.onJoin = (r) => Future<void>.delayed(const Duration(milliseconds: 200), () => _syncJoined(g, groupJoined(gr))).ignore();
+        final f = g.acceptGroupInvite(gr);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        await g.logout();
+        await expectLater(f.timeout(const Duration(seconds: 5)), throwsA(isA<Object>()));
+        expect(g.debugGroups, isEmpty);
+      });
+    });
+
+    group('createGroup', () {
+      void armCreate(_Hs hs, SdkMatrixGateway g, {String room = '!neu:hs.example', int joined = 1}) {
+        hs.createdRoom = room;
+        hs.onCreate = (r) => Future<void>.delayed(
+              const Duration(milliseconds: 100),
+              () => _syncJoined(g, groupJoined(r, name: 'Neue Gruppe', members: <String>[_me], joined: joined)),
+            ).ignore();
+      }
+
+      test('Anlegen nur über ContactGroupSpec: privat, Version 10, Megolm, Verlauf invited, Regel invite, Schwellen 100, ohne Einladungen und ohne Datensatz', () async {
+        final (hs, g) = await signedIn(nobody);
+        armCreate(hs, g);
+        final id = await g.createGroup('  Neue Gruppe ');
+        expect(id, '!neu:hs.example');
+        final body = hs.where('POST', '/createRoom').single.$3;
+        final m = json.decode(body) as Map<String, Object?>;
+        expect(m['room_version'], '10');
+        expect(m['preset'], 'private_chat');
+        expect(m['visibility'], 'private');
+        expect(m['name'], 'Neue Gruppe');
+        expect(m.containsKey('invite'), isFalse, reason: 'ohne Mitglieder (D3)');
+        final initial = {for (final s in m['initial_state']! as List) (s as Map)['type']: s['content']};
+        expect(initial['m.room.encryption'], <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2'});
+        expect(initial['m.room.history_visibility'], <String, Object?>{'history_visibility': 'invited'});
+        expect(initial['m.room.join_rules'], <String, Object?>{'join_rule': 'invite'});
+        final events = ((m['power_level_content_override']! as Map)['events']! as Map);
+        expect(events['m.room.join_rules'], 100);
+        expect(events['m.room.history_visibility'], 100);
+        expect(events['m.room.encryption'], 100);
+        expect(hs.calls.where((c) => c.$1 == 'PUT' && (c.$2.contains('/send/') || c.$2.contains('account_data'))), isEmpty, reason: 'kein Datensatz, keine Zuordnung');
+        expect(g.debugCreatingGroups, <String>{'!neu:hs.example'});
+        expect(g.threads.where((t) => t.kind == ThreadKind.group), isEmpty, reason: 'ohne Datensatz keine Gruppe');
+      });
+
+      test('Vorbedingungen: Name, Bereich aus, Liste nicht geladen, keine Verschlüsselung, 50 Gruppen ⇒ kein Raum', () async {
+        final (hs, g) = await signedIn(nobody);
+        await expectLater(g.createGroup('   '), _error(GatewayError.invalidInput));
+        await expectLater(g.createGroup('x' * 61), _error(GatewayError.invalidInput));
+        await expectLater(g.createGroup('\u202E·'), _error(GatewayError.invalidInput), reason: 'nach der Bereinigung leer');
+        g.setContactPolicy(ContactPolicy.off);
+        await expectLater(g.createGroup('Gruppe'), _notAllowed());
+        g.setContactPolicy(ContactPolicy(enabled: true, groups: <String>{for (var i = 0; i < ContactLimits.maxGroups; i++) '!x$i:hs.example'}));
+        await expectLater(g.createGroup('Gruppe'), _notAllowed(), reason: '50 Gruppen');
+        final (hs2, g2) = await _signedIn(encryption: true, familyMembersFail: true);
+        g2.setContactPolicy(nobody);
+        await expectLater(g2.createGroup('Gruppe'), _notAllowed());
+        final (hs3, g3) = await _signedIn(encryption: false);
+        g3.setContactPolicy(nobody);
+        await expectLater(g3.createGroup('Gruppe'), _error(GatewayError.encryptionUnavailable));
+        for (final h in <_Hs>[hs, hs2, hs3]) {
+          expect(h.where('POST', '/createRoom'), isEmpty);
+        }
+      });
+
+      test('Doppelstart ⇒ alreadyExists; nach einem Fehler beim Anlegen ist ein neuer Versuch möglich, nichts bleibt stehen', () async {
+        final (hs, g) = await signedIn(nobody);
+        hs.holdCreate = Completer<void>();
+        armCreate(hs, g);
+        final first = g.createGroup('Eins');
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await expectLater(g.createGroup('Zwei'), _error(GatewayError.alreadyExists));
+        hs.holdCreate!.complete();
+        expect(await first, '!neu:hs.example');
+        expect(hs.where('POST', '/createRoom'), hasLength(1));
+      });
+
+      test('Abmelden während des Anlegens: der Raum wird verlassen (kein verwaister Raum)', () async {
+        final (hs, g) = await signedIn(nobody);
+        hs.holdCreate = Completer<void>();
+        hs.createdRoom = '!neu:hs.example';
+        hs.onCreate = (r) => Future<void>.delayed(const Duration(milliseconds: 100), () => _syncJoined(g, groupJoined(r, members: <String>[_me], joined: 1))).ignore();
+        final f = g.createGroup('Eins');
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await g.logout();
+        hs.holdCreate!.complete();
+        await expectLater(f.timeout(const Duration(seconds: 5)), throwsA(isA<Object>()));
+        expect(g.debugCreatingGroups, isEmpty, reason: 'der Raum gehört nicht mehr in diesen Zustand');
+      });
+
+      test('Familienwechsel mit unvollständiger Liste während des Anlegens: der Raum wird verlassen, notAllowed', () async {
+        final (hs, g) = await signedIn(nobody);
+        hs.holdCreate = Completer<void>();
+        armCreate(hs, g);
+        final f = g.createGroup('Eins');
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        hs.familyMembersFail = true;
+        g.debugLeaveFamilyScope();
+        final done = expectLater(f, _notAllowed());
+        hs.holdCreate!.complete();
+        await done;
+        expect(hs.where('POST', '!neu:hs.example/leave'), isNotEmpty);
+        expect(g.debugCreatingGroups, isEmpty);
+      });
+
+      test('eine angelegte Gruppe ohne sichtbaren Datensatz lässt sich verlassen (Rücknahme durch den Controller, D3); mit Datensatz räumt der Sync den Schwebezustand', () async {
+        final (hs, g) = await signedIn(nobody);
+        armCreate(hs, g);
+        final id = await g.createGroup('Eins');
+        await g.leaveConversation(id);
+        expect(hs.where('POST', '$id/leave'), isNotEmpty);
+        expect(g.debugCreatingGroups, isEmpty);
+        // Mit Datensatz: der nächste Abgleich nimmt die Gruppe auf und beendet den Schwebezustand.
+        final (hs2, g2) = await signedIn(nobody);
+        armCreate(hs2, g2, room: '!zwei:hs.example');
+        final id2 = await g2.createGroup('Zwei');
+        g2.setContactPolicy(ContactPolicy(enabled: true, groups: <String>{id2}));
+        await Future<void>.delayed(_settle);
+        expect(g2.debugCreatingGroups, isEmpty);
+        expect(g2.threads.where((t) => t.kind == ThreadKind.group).map((t) => t.id), <String>[id2]);
+      });
+
+      test('createGroup liest sich nicht als Gruppe, solange kein Datensatz da ist; ein fremder Raum lässt sich über leaveConversation nie verlassen', () async {
+        final (hs, g) = await signedIn(nobody);
+        await settle(g, groupJoined('!fremd:hs.example'));
+        await expectLater(g.leaveConversation('!fremd:hs.example'), _notAllowed());
+        expect(hs.where('POST', '/leave'), isEmpty);
+      });
+    });
+
+    group('leaveConversation und leftGroupRooms', () {
+      test('Erfolg räumt Zustand und Zeitleiste; leftGroupRooms nennt die Gruppe; Familie und Einzelchats bleiben ausgeschlossen', () async {
+        final (hs, g) = await signedIn();
+        expect(await groupThread(g, groupJoined(gr)), isNotNull);
+        await g.openThread(gr);
+        expect(g.leftGroupRooms, isEmpty);
+        await g.leaveConversation(gr);
+        expect(hs.where('POST', '$gr/leave'), hasLength(1));
+        expect(g.debugGroups, isEmpty);
+        expect(g.debugGroupTimelines, isEmpty);
+        await Future<void>.delayed(_settle);
+        expect(g.threads.where((t) => t.kind == ThreadKind.group), isEmpty);
+        expect(g.leftGroupRooms, <String>{gr});
+        await expectLater(g.leaveConversation(ChatThread.familyId), _notAllowed());
+      });
+
+      test('Fehler beim Verlassen lässt alles unverändert, ein zweiter Versuch ist möglich', () async {
+        final (hs, g) = await signedIn();
+        expect(await groupThread(g, groupJoined(gr)), isNotNull);
+        hs.failLeave = true;
+        await expectLater(g.leaveConversation(gr), throwsA(isA<GatewayException>()));
+        expect(g.debugGroups, <String, String>{gr: 'Skatrunde'});
+        expect(g.leftGroupRooms, isEmpty);
+        hs.failLeave = false;
+        await g.leaveConversation(gr);
+        expect(g.debugGroups, isEmpty);
+      });
+
+      test('auch überfüllte, unbekannt große, unverschlüsselte und sendegesperrte Gruppen lassen sich verlassen', () async {
+        final cases = <String, Map<String, Object?>>{
+          'überfüllt': groupJoined(gr, joined: 60),
+          '40 + 30': groupJoined(gr, joined: 40, invited: 30),
+          'unbekannt groß': groupUnknownSize(gr),
+          'unverschlüsselt': groupJoined(gr, megolm: false),
+          'Regel public': groupJoined(gr, rule: 'public'),
+          'Verlauf shared': groupJoined(gr, history: 'shared'),
+        };
+        for (final e in cases.entries) {
+          final (hs, g) = await signedIn();
+          final t = await groupThread(g, e.value);
+          expect(t, isNotNull, reason: e.key);
+          expect(t!.sendLock, isNot(GroupSendLock.keiner), reason: e.key);
+          await g.leaveConversation(gr);
+          expect(hs.where('POST', '$gr/leave'), hasLength(1), reason: e.key);
+        }
+      });
+
+      test('leftGroupRooms: Mitgliedschaft leave/ban (auch nach Entfernen durch andere) und bewusst verlassen; nie unbekannte Räume', () async {
+        const gone = '!weg:hs.example';
+        const banned = '!ban:hs.example';
+        const unknown = '!unbekannt:hs.example';
+        final (_, g) = await signedIn(const ContactPolicy(enabled: true, groups: <String>{gr, gone, banned, unknown}));
+        await settle(g, merge(<Map<String, Object?>>[groupJoined(gr), groupJoined(gone), groupJoined(banned)]));
+        expect(g.debugGroups.keys.toSet(), <String>{gr, gone, banned});
+        expect(g.leftGroupRooms, isEmpty, reason: 'beigetreten und unbekannt zählen nie');
+        // Entfernen durch andere und Verbannen: das SDK wirft verlassene Räume aus `client.rooms` (kein `includeLeave`).
+        await settle(g, <String, Object?>{
+          'rooms': <String, Object?>{
+            'leave': <String, Object?>{
+              for (final id in <String>[gone, banned])
+                id: <String, Object?>{
+                  'state': <String, Object?>{
+                    'events': <Object?>[
+                      _state('m.room.member', id == banned ? _fremd : _me, <String, Object?>{'membership': id == banned ? 'ban' : 'leave'}, key: _me),
+                    ],
+                  },
+                },
+            },
+          },
+        });
+        expect(g.debugGroups.keys.toSet(), <String>{gr});
+        expect(g.leftGroupRooms, <String>{gone, banned}, reason: 'bekannt gewesene Gruppen, jetzt weg; `unbekannt` nie');
+      });
+
+      test('Lesen, Melden und Ungelesen laufen über den Raum der Gruppe; Ereignisse einer Gruppe landen nie in den Kontakt-Zeitleisten', () async {
+        final (_, g) = await signedIn();
+        expect(await groupThread(g, groupJoined(gr)), isNotNull);
+        await g.openThread(gr);
+        expect(g.debugGroupTimelines, <String>{gr});
+        expect(g.debugContactTimelines, isEmpty);
+        await expectLater(g.reportMessage(ReportRequest(threadId: gr, messageId: r'$gibtsnicht', category: ReportCategory.spam)), _error(GatewayError.notFound));
+      });
+    });
+
+    group('Zeitleiste öffnen', () {
+      test('isThreadOpen erst nach openThread, idempotent; messagesIn leer', () async {
+        final (_, g) = await signedIn();
+        expect(await groupThread(g, groupJoined(gr)), isNotNull);
+        expect(g.isThreadOpen(gr), isFalse);
+        await g.openThread(gr);
+        await g.openThread(gr);
+        expect(g.isThreadOpen(gr), isTrue);
+        expect(g.debugGroupTimelines, <String>{gr});
+        expect(g.messagesIn(gr), isEmpty);
+      });
+
+      test('Datensatz entfällt oder Familienwechsel während des Öffnens ⇒ keine Zeitleiste', () async {
+        final (_, g) = await signedIn();
+        expect(await groupThread(g, groupJoined(gr)), isNotNull);
+        final open = g.openThread(gr);
+        g.setContactPolicy(nobody);
+        await open;
+        expect(g.debugGroupTimelines, isEmpty);
+        g.setContactPolicy(rec);
+        await Future<void>.delayed(_settle);
+        final open2 = g.openThread(gr);
+        g.debugLeaveFamilyScope();
+        await open2;
+        expect(g.debugGroupTimelines, isEmpty);
+      });
+    });
+
+    group('Senden in Gruppen ist gesperrt (Platzhalter bis K4-2b)', () {
+      test('Text, Antwort, Anhang, Reaktion und Wiederholen: notAllowed, auch bei bester Lage; nichts geht an den Server', () async {
+        final (hs, g) = await signedIn();
+        expect(await groupThread(g, groupJoined(gr)), isNotNull);
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _notAllowed(), reason: 'vor openThread');
+        await g.openThread(gr);
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _notAllowed());
+        await expectLater(g.sendMessage('Hallo', threadId: gr, replyToId: r'$x'), _notAllowed());
+        await expectLater(g.sendAttachment(fileName: 'a.pdf', bytes: Uint8List.fromList('%PDF-1.4\n1 0 obj\n'.codeUnits), threadId: gr), _notAllowed());
+        await expectLater(g.sendReaction(r'$e', '👍', threadId: gr), _notAllowed());
+        await expectLater(g.retryMessage(r'$e', threadId: gr), throwsA(isA<GatewayException>()));
+        expect(hs.sends, isEmpty);
+      });
+    });
+
+    group('Große Gruppen: kein Abruf der Mitgliederliste (Aufrufzähler)', () {
+      test('G > 50 oder Größe unbekannt: nie requestParticipants, weder im Sync noch in openThread', () async {
+        final cases = <String, Map<String, Object?>>{
+          '51': groupJoined(gr, joined: 51, memberEvents: 1),
+          '10 000': groupJoined(gr, joined: 10000, memberEvents: 1),
+          '40 + 30 (G = 70, Beitrittszahl ≤ 50)': groupJoined(gr, joined: 40, invited: 30, memberEvents: 1),
+          'unbekannt': (() {
+            final u = groupJoined(gr, memberEvents: 1);
+            ((((u['rooms']! as Map)['join']! as Map)[gr]! as Map)['summary']! as Map).remove('m.joined_member_count');
+            return u;
+          })(),
+        };
+        for (final e in cases.entries) {
+          final (hs, g) = await signedIn();
+          final t = await groupThread(g, e.value);
+          expect(t, isNotNull, reason: e.key);
+          await g.openThread(gr);
+          await _sync(g, <String, Object?>{'account_data': <String, Object?>{'events': <Object?>[<String, Object?>{'type': 'x.kick', 'content': <String, Object?>{'n': _n++}}]}});
+          await Future<void>.delayed(_settle);
+          expect(membersCalls(hs), 0, reason: e.key);
+          expect(g.debugGroupMembers, isEmpty, reason: e.key);
+        }
+      });
+
+      test('G ≤ 50 und lokal vollständig: kein Serverabruf, Mitglieder aus dem lokalen Zustand', () async {
+        final (hs, g) = await signedIn();
+        await groupThread(g, groupJoined(gr));
+        expect(membersCalls(hs), 0);
+        expect(g.debugGroupMembers[gr]!.keys.toSet(), <String>{_me, _fremd, anna});
+      });
+
+      test('G ≤ 50, lokal unvollständig: ein Abruf; Drosselung: viele Syncs ⇒ höchstens ein Abruf je Raum (Einladungszahl unbekannt ⇒ nie „vollständig“)', () async {
+        final (hs, g) = await signedIn();
+        hs.members = <String>[_me, _fremd, anna];
+        await groupThread(g, groupJoined(gr, invited: null, memberEvents: 1));
+        for (var i = 0; i < 4; i++) {
+          await _sync(g, <String, Object?>{'account_data': <String, Object?>{'events': <Object?>[<String, Object?>{'type': 'x.kick', 'content': <String, Object?>{'n': _n++}}]}});
+          await Future<void>.delayed(_settle);
+        }
+        expect(membersCalls(hs), 1);
+        expect(g.debugGroupMembers[gr]!.keys.toSet(), <String>{_me, _fremd, anna});
+      });
+
+      test('nach dem Abruf ist G exakt: 40 beigetreten, Einladungszahl unbekannt, Liste mit 30 Eingeladenen ⇒ G = 70, zuGross', () async {
+        final (hs, g) = await signedIn();
+        hs.members = <String>[_me, for (var i = 0; i < 39; i++) '@m$i:hs.example'];
+        for (var i = 0; i < 30; i++) {
+          hs.extra['@i$i:hs.example'] = 'invite';
+        }
+        final t = await groupThread(g, groupJoined(gr, joined: 40, invited: null, memberEvents: 1));
+        expect(membersCalls(hs), 1, reason: 'summary G = 40 ≤ 50 ⇒ ein Abruf');
+        expect(t!.sendLock, GroupSendLock.keiner, reason: 'vor dem Abruf unbekannt viele Eingeladene');
+        await Future<void>.delayed(_settle);
+        final after = g.threads.firstWhere((x) => x.kind == ThreadKind.group);
+        expect(after.memberCount, 70);
+        expect(after.sendLock, GroupSendLock.zuGross);
+      });
     });
   });
 }

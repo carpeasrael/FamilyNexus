@@ -39,6 +39,7 @@ import '../../domain/event_themes.dart';
 import '../../domain/family.dart';
 import '../../domain/family_code.dart';
 import '../../domain/family_invitation.dart';
+import '../../domain/group_rights.dart';
 import '../../domain/invite_link.dart';
 import '../../domain/invite_ticket.dart';
 import '../../domain/key_value_store.dart';
@@ -63,6 +64,7 @@ import 'background_image_work.dart';
 import 'book_room_spec.dart';
 import 'book_signal_scan.dart';
 import 'chat_mapper.dart';
+import 'contact_group_spec.dart';
 import 'contact_signal_scan.dart';
 import 'event_trust.dart';
 import 'family_room_spec.dart';
@@ -85,6 +87,7 @@ part 'gateway/calendar_data.dart';
 part 'gateway/chat.dart';
 part 'gateway/contact_add.dart';
 part 'gateway/contact_chats.dart';
+part 'gateway/contact_groups.dart';
 part 'gateway/connection.dart';
 part 'gateway/data_inventory.dart';
 part 'gateway/direct_chats.dart';
@@ -122,7 +125,7 @@ bool sessionEndedByServerFor(SessionClearReason reason) => switch (reason) {
 /// * Lesebestätigungen sind standardmäßig öffentlich (`m.read`), wenn „Lesebestätigung senden“ an ist (E-106, #526); aus: nur privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyncModule, _AccountDeletionModule, _BooksModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _AvatarsModule, _FamilyModule, _DirectChatsModule, _ContactChatsModule, _ContactAddModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyncModule, _AccountDeletionModule, _BooksModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _AvatarsModule, _FamilyModule, _DirectChatsModule, _ContactChatsModule, _ContactGroupsModule, _ContactAddModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
@@ -262,6 +265,10 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   /// Kontakt-Einzelchats (#119, K3a-2): Zustand in einem Halter, Logik in `gateway/contact_chats.dart`.
   @override
   final _ContactState _contacts = _ContactState();
+
+  /// Gruppen mit Personen außerhalb der Familie (#119, K4-2a): eigener Zustand, Logik in `gateway/contact_groups.dart`.
+  @override
+  final _GroupState _groups = _GroupState();
   @override
   List<ChatThread> _threads = const <ChatThread>[];
 
@@ -623,6 +630,24 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   @visibleForTesting
   Set<String> get debugContactTimelines => _contacts.timelines.keys.toSet();
 
+  /// Nur für Tests: die eingestuften Gruppen (Raum-ID → Titel).
+  @visibleForTesting
+  Map<String, String> get debugGroups => Map<String, String>.of(_groups.groups);
+
+  /// Nur für Tests: die Räume der geöffneten Gruppen-Zeitleisten.
+  @visibleForTesting
+  Set<String> get debugGroupTimelines => _groups.timelines.keys.toSet();
+
+  /// Nur für Tests: Räume, die diese Sitzung angelegt hat und die noch keinen sichtbaren Datensatz haben.
+  @visibleForTesting
+  Set<String> get debugCreatingGroups => Set<String>.of(_groups.creatingGroups);
+
+  /// Nur für Tests: bekannte Mitglieder (beigetreten und eingeladen) je Gruppe aus dem Zwischenspeicher.
+  @visibleForTesting
+  Map<String, Map<String, GroupMembership>> get debugGroupMembers => <String, Map<String, GroupMembership>>{
+        for (final e in _groups.members.entries) e.key: Map<String, GroupMembership>.of(e.value),
+      };
+
   /// Nur für Tests: verlässt den Familienbereich wie bei einem Familienwechsel; die Kontaktrichtlinie bleibt dabei stehen.
   @visibleForTesting
   void debugLeaveFamilyScope() => _leaveFamilyScope();
@@ -764,7 +789,9 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
 
   @override
   List<ChatMessage> messagesIn(String threadId) =>
-      threadId == ChatThread.familyId ? _messages : (_dmMessages[threadId] ?? _contacts.messages[threadId] ?? const <ChatMessage>[]);
+      threadId == ChatThread.familyId
+          ? _messages
+          : (_dmMessages[threadId] ?? _contacts.messages[threadId] ?? _groups.messages[threadId] ?? const <ChatMessage>[]);
 
   @override
   bool get initialSyncDone => _syncedOnce;
@@ -802,7 +829,9 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
 
   @override
   int get unreadCount =>
-      familyUnreadCount + _contacts.peers.keys.where((id) => !_dmTimelines.containsKey(id)).fold<int>(0, (a, id) => a + unreadIn(id));
+      familyUnreadCount +
+      _contacts.peers.keys.where((id) => !_dmTimelines.containsKey(id)).fold<int>(0, (a, id) => a + unreadIn(id)) +
+      _groups.groups.keys.fold<int>(0, (a, id) => a + unreadIn(id));
 
   /// Nur der Bereich Familie (Familienchat und Einzelchats mit Mitgliedern), nie Kontakte (B7).
   @override
@@ -911,6 +940,9 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     // `m.room.join_rules` bleibt im Speicher (#119, B1): Sonst fehlt der Einladungszustand eines Raums nach einem
     // Neustart, und eine Gruppe fremder Clients erschiene wieder als Familieneinladung.
     client.importantStateEvents.add(EventTypes.RoomJoinRules);
+    // Auch der Verlauf (K4-2a, §3.6): Sonst fehlt `m.room.history_visibility` nach einem Neustart, und `GroupHealth` hielte
+    // eine Gruppe mit geöffnetem Verlauf für unverdächtig (unbekannt zählt zwar als geöffnet, die Gruppe bliebe aber gesperrt).
+    client.importantStateEvents.add(EventTypes.HistoryVisibility);
     _client = client;
     // Neuer Client: noch keine Antwort des Servers in dieser Sitzung (K3c-1).
     _accountDataFresh = false;
@@ -1087,6 +1119,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
     }
     _dmTimelines.clear();
     _contacts.clearAll();
+    _groups.clearAll();
     _dropOAuth();
     final c = _client;
     _client = null;
@@ -1840,6 +1873,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
       t.cancelSubscriptions();
     }
     _contacts.cancelTimelines();
+    _groups.cancelTimelines();
     _signals.close().ignore();
     _disposeBooks();
     _presenceAsks.close().ignore();

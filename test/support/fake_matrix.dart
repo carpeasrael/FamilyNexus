@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:family_nexus/data/matrix/contact_group_spec.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
 import 'package:family_nexus/domain/account_deletion.dart';
 import 'package:family_nexus/domain/anniversaries.dart';
@@ -21,6 +22,7 @@ import 'package:family_nexus/domain/event_theme_codec.dart';
 import 'package:family_nexus/domain/event_themes.dart';
 import 'package:family_nexus/domain/family.dart';
 import 'package:family_nexus/domain/family_code.dart';
+import 'package:family_nexus/domain/group_rights.dart';
 import 'package:family_nexus/domain/invite_link.dart';
 import 'package:family_nexus/domain/member_avatars.dart';
 import 'package:family_nexus/domain/moderation.dart';
@@ -84,6 +86,13 @@ class FakeRoom {
 
   /// Nur Kontakt-Räume (#119): Beteiligte, die nur eingeladen sind (noch nicht beigetreten).
   final Set<String> invitedUsers = <String>{};
+
+  /// Nur Gruppen (#119, K4-2a): Einladender, Regel, Verlauf, Verschlüsselung und Stufen. Alle Beteiligten (beigetreten und
+  /// eingeladen) stehen in [dmMembers], die nur eingeladenen zusätzlich in [invitedUsers].
+  String? groupInviter;
+  String? joinRule = 'invite';
+  String? history = 'invited';
+  bool groupEncrypted = true;
 }
 
 class _Account {
@@ -126,6 +135,20 @@ class FakeMatrixServer {
     final room = FakeRoom('${nextId('!ct')}:$host', 'ct')..dmMembers.addAll(<String>[from, to]);
     if (!toJoined) room.invitedUsers.add(to);
     contactRooms[room.id] = room;
+    notifyAll();
+    return room;
+  }
+
+  /// Gruppen mit Personen außerhalb der Familie (#119, K4-2a).
+  final Map<String, FakeRoom> groupRooms = <String, FakeRoom>{};
+
+  /// Legt eine Gruppe an: [joined] sind beigetreten (der Ersteller [creator] zuerst), [invited] nur eingeladen, [inviter] lädt ein.
+  FakeRoom createGroupRoom(String creator, String name, {List<String> joined = const <String>[], List<String> invited = const <String>[], String? inviter}) {
+    final room = FakeRoom('${nextId('!gr')}:$host', name)
+      ..dmMembers.addAll(<String>[creator, ...joined, ...invited])
+      ..invitedUsers.addAll(invited)
+      ..groupInviter = inviter;
+    groupRooms[room.id] = room;
     notifyAll();
     return room;
   }
@@ -724,7 +747,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   /// Raum eines Gesprächs aus Sicht dieses Nutzers (Einzelchats nur mit aktuellen Familienmitgliedern).
   FakeRoom? _roomOf(String threadId) {
     if (threadId == ChatThread.familyId) return familyRoom;
-    if (!fake.dmRooms.containsKey(threadId)) return _contactRoomOf(threadId);
+    if (!fake.dmRooms.containsKey(threadId)) return _contactRoomOf(threadId) ?? _groupRoomOf(threadId);
     final room = fake.dmRooms[threadId];
     final me = _userId;
     if (room == null || me == null || !room.dmMembers.contains(me)) return null;
@@ -736,7 +759,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   List<ChatThread> get threads {
     final f = family;
     // Wie das Gateway seit K3c-1: ohne Familie nur Kontakt-Gespräche.
-    if (f == null) return _contactThreads();
+    if (f == null) return <ChatThread>[..._contactThreads(), ..._groupThreads()];
     final dms = <ChatThread>[
       for (final r in fake.dmRooms.values)
         if (_roomOf(r.id) != null && !hiddenThreads.contains(r.id))
@@ -752,6 +775,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       ChatThread(id: ChatThread.familyId, kind: ThreadKind.family, title: f.name, unread: unreadIn(ChatThread.familyId)),
       ...dms,
       ..._contactThreads(),
+      ..._groupThreads(),
     ];
   }
 
@@ -760,7 +784,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final room = _roomOf(threadId);
     if (room == null) return const <ChatMessage>[];
     // Kontakt-Zeitleisten gibt es erst nach `openThread` (Konzept §7.1).
-    if (fake.contactRooms.containsKey(threadId) && !_opened.contains(threadId)) return const <ChatMessage>[];
+    if ((fake.contactRooms.containsKey(threadId) || fake.groupRooms.containsKey(threadId)) && !_opened.contains(threadId)) return const <ChatMessage>[];
     final reactions = <String, Map<String, Set<String>>>{};
     for (final e in room.events.where((e) => e.type == 'm.reaction')) {
       final target = e.content['target']! as String;
@@ -855,7 +879,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   int unreadIn(String threadId) {
     // Wie die Raum-Zähler des SDK: Auch ein Kontakt-Gespräch ohne geöffnete Zeitleiste hat Ungelesenes.
-    final cr = fake.contactRooms[threadId];
+    final cr = fake.contactRooms[threadId] ?? fake.groupRooms[threadId];
     if (cr != null && !_opened.contains(threadId)) {
       return cr.events.where((e) => e.type == 'm.room.message' && e.sender != _userId).length;
     }
@@ -1747,6 +1771,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _requireSession();
     final room = _roomOf(threadId);
     if (room == null) throw const GatewayException(GatewayError.notFound);
+    // Gruppen (K4-2a): Senden ist wie im Gateway gesperrt (Platzhalter bis K4-2b).
+    if (fake.groupRooms.containsKey(threadId)) throw const GatewayException(GatewayError.notAllowed);
     // Kontakt-Räume: Senden nur nach `openThread` und bei beigetretenem Gegenüber (nie in wartenden Räumen).
     if (fake.contactRooms.containsKey(threadId)) {
       final peer = room.dmMembers.firstWhere((m) => m != _userId);
@@ -2077,6 +2103,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
       contacts: contactPolicy.contacts,
       blockedUsers: contactPolicy.blocked,
       familyIds: <String>{for (final m in f?.members ?? const <FamilyMember>[]) m.userId},
+      groups: contactPolicy.groups,
     );
   }
 
@@ -2153,10 +2180,130 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     }
   }
 
+  // ------------------------------------------------ Gruppen (#119, K4-2a)
+
+  /// Test: `createGroup` scheitert mit diesem Fehler; `acceptGroupInvite` scheitert beim Beitritt mit diesem Fehler.
+  GatewayError? createGroupError;
+  GatewayError? acceptGroupError;
+  final Set<String> _createdGroups = <String>{};
+  final Set<String> _leftGroups = <String>{};
+  /// Test: simuliert eine laufende Anlage (die zweite ergibt `alreadyExists`).
+  bool groupCreationRunning = false;
+
+  /// Test: Zahl der Aufrufe von `createGroup` und `acceptGroupInvite`.
+  int createGroupCalls = 0;
+  int acceptGroupCalls = 0;
+
+  RoomFacts? _groupFacts(FakeRoom r) {
+    final me = _userId;
+    if (me == null || !r.dmMembers.contains(me)) return null;
+    final invited = r.invitedUsers.length;
+    final joined = r.dmMembers.length - invited;
+    if (r.invitedUsers.contains(me)) {
+      return RoomFacts(id: r.id, membership: RoomMembership.invite, inviterId: r.groupInviter, joinRule: r.joinRule, joinedCount: joined, invitedCount: invited);
+    }
+    return RoomFacts(id: r.id, membership: RoomMembership.join, megolm: r.groupEncrypted, joinedCount: joined, invitedCount: invited);
+  }
+
+  RoomClass _groupClass(FakeRoom r) {
+    final ctx = _contactContext();
+    final facts = _groupFacts(r);
+    if (ctx == null || facts == null) return RoomClass.ignored;
+    return ConversationPolicy.classify(facts, ctx);
+  }
+
+  FakeRoom? _groupRoomOf(String threadId) {
+    final r = fake.groupRooms[threadId];
+    return r != null && _groupClass(r) == RoomClass.contactGroup ? r : null;
+  }
+
+  List<ChatThread> _groupThreads() => <ChatThread>[
+        for (final r in fake.groupRooms.values)
+          if (_groupClass(r) == RoomClass.contactGroup)
+            ChatThread(
+              id: r.id,
+              kind: ThreadKind.group,
+              title: ContactNames.groupTitle(r.name),
+              unread: unreadIn(r.id),
+              memberCount: r.dmMembers.length,
+              canManage: (r.power[_userId] ?? 0) >= PowerLevels.moderator,
+              sendLock: GroupHealth.evaluate(
+                megolm: r.groupEncrypted,
+                joinRule: r.joinRule,
+                historyVisibility: r.history,
+                joined: r.dmMembers.length,
+                invited: 0,
+              ),
+            ),
+      ];
+
+  @override
+  Future<String> createGroup(String name) async {
+    createGroupCalls++;
+    final title = ContactNames.groupTitle(name);
+    if (title.isEmpty || name.trim().length > ContactGroupSpec.nameMax) throw const GatewayException(GatewayError.invalidInput);
+    _requireSession();
+    final me = _userId;
+    if (me == null || !contactPolicy.enabled || contactPolicy.groups.length >= ContactLimits.maxGroups) throw const GatewayException(GatewayError.notAllowed);
+    if (groupCreationRunning) throw const GatewayException(GatewayError.alreadyExists);
+    final failure = createGroupError;
+    if (failure != null) throw GatewayException(failure);
+    final room = fake.createGroupRoom(me, title);
+    room.power[me] = PowerLevels.admin;
+    _createdGroups.add(room.id);
+    return room.id;
+  }
+
+  @override
+  Future<void> acceptGroupInvite(String roomId) async {
+    acceptGroupCalls++;
+    final r = fake.groupRooms[roomId];
+    final me = _userId;
+    if (r == null || me == null) throw const GatewayException(GatewayError.notFound);
+    if (_groupClass(r) == RoomClass.contactGroup) return; // idempotent
+    if (_groupClass(r) != RoomClass.contactRequest) throw const GatewayException(GatewayError.notAllowed);
+    final failure = acceptGroupError;
+    if (failure != null) throw GatewayException(failure);
+    r.invitedUsers.remove(me);
+    final ok = ContactGroupSpec.verifyJoined(
+      encryptionAlgorithm: r.groupEncrypted ? ContactGroupSpec.megolm : null,
+      joinRule: r.joinRule,
+      historyVisibility: r.history,
+      joined: r.dmMembers.length - r.invitedUsers.length,
+      invited: r.invitedUsers.length,
+    );
+    if (!ok) {
+      r.dmMembers.remove(me);
+      _leftGroups.add(roomId);
+      fake.notifyAll();
+      throw const GatewayException(GatewayError.notAllowed);
+    }
+    fake.notifyAll();
+  }
+
+  @override
+  Set<String> get leftGroupRooms => <String>{
+        for (final id in contactPolicy.groups)
+          if (_leftGroups.contains(id) || (fake.groupRooms[id] != null && !fake.groupRooms[id]!.dmMembers.contains(_userId))) id,
+      };
+
   @override
   List<ContactRequest> get contactRequests {
     final ctx = _contactContext();
     if (ctx == null) return const <ContactRequest>[];
+    final groupRequests = <ContactRequest>[
+      for (final r in fake.groupRooms.values)
+        if (_groupClass(r) == RoomClass.contactRequest && r.groupInviter != null)
+          ContactRequest(
+            roomId: r.id,
+            fromUserId: r.groupInviter!,
+            fromName: ContactNames.title(fake.displayNameOf(r.groupInviter!), r.groupInviter!),
+            name: ContactNames.cleanName(fake.displayNameOf(r.groupInviter!)),
+            groupName: ContactNames.groupTitle(r.name),
+            isGroup: true,
+            inviterIsFamily: family?.member(r.groupInviter!) != null,
+          ),
+    ];
     final bySender = <String, FakeRoom>{};
     for (final r in fake.contactRooms.values) {
       final facts = _contactFacts(r);
@@ -2172,6 +2319,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
           fromName: ContactNames.title(fake.displayNameOf(e.key), e.key),
           name: ContactNames.cleanName(fake.displayNameOf(e.key)),
         ),
+      ...groupRequests,
     ]..sort((a, b) => a.roomId.compareTo(b.roomId));
   }
 
@@ -2250,6 +2398,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   bool isThreadOpen(String threadId) {
     if (threadId == ChatThread.familyId || fake.dmRooms.containsKey(threadId)) return true;
+    if (fake.groupRooms.containsKey(threadId)) return _opened.contains(threadId) && _groupRoomOf(threadId) != null;
     final r = fake.contactRooms[threadId];
     // Wie das SDK: wartende Räume bekommen nie eine Zeitleiste.
     return r != null && _opened.contains(threadId) && _contactRoomOf(threadId) != null && !r.invitedUsers.contains(r.dmMembers.firstWhere((m) => m != _userId));
@@ -2263,6 +2412,10 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> openThread(String threadId) async {
     openCalls.update(threadId, (n) => n + 1, ifAbsent: () => 1);
     if (failOpenThread) return;
+    if (_groupRoomOf(threadId) != null) {
+      _opened.add(threadId);
+      return;
+    }
     final r = _contactRoomOf(threadId);
     if (r != null && !r.invitedUsers.contains(r.dmMembers.firstWhere((m) => m != _userId))) _opened.add(threadId);
   }
@@ -2271,6 +2424,15 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   Future<void> declineContactRequest(String roomId) async {
     final failure = declineError;
     if (failure != null) throw GatewayException(failure);
+    final g = fake.groupRooms[roomId];
+    if (g != null) {
+      if (_groupClass(g) != RoomClass.contactRequest) throw const GatewayException(GatewayError.notAllowed);
+      g.dmMembers.remove(_userId);
+      g.invitedUsers.remove(_userId);
+      _leftGroups.add(roomId);
+      fake.notifyAll();
+      return;
+    }
     final r = fake.contactRooms[roomId];
     if (r == null || _contactClass(r) != RoomClass.contactRequest) throw const GatewayException(GatewayError.notAllowed);
     r.dmMembers.remove(_userId);
@@ -2281,6 +2443,18 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<void> leaveConversation(String threadId) async {
     if (failLeaveConversation) throw const GatewayException(GatewayError.serverUnreachable);
+    final grp = fake.groupRooms[threadId];
+    if (grp != null) {
+      // Eine Gruppe lässt sich immer verlassen (auch unverschlüsselt, zu groß), nie ohne Beitritt.
+      if (_groupClass(grp) != RoomClass.contactGroup && !_createdGroups.contains(threadId)) throw const GatewayException(GatewayError.notAllowed);
+      grp.dmMembers.remove(_userId);
+      grp.invitedUsers.remove(_userId);
+      _createdGroups.remove(threadId);
+      _leftGroups.add(threadId);
+      _opened.remove(threadId);
+      fake.notifyAll();
+      return;
+    }
     final r = _contactRoomOf(threadId);
     if (r == null) throw const GatewayException(GatewayError.notAllowed);
     r.dmMembers.remove(_userId);

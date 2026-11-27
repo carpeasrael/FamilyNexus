@@ -6,7 +6,9 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
   _AppClient? get _client;
   bool? get _encryptionOverride;
   _ContactState get _contacts;
+  _GroupState get _groups;
   Room _requireContactRoom(String threadId, Room room);
+  Room _requireGroupRoom(String threadId, Room room);
   Map<String, String> get _dmPeers;
   Map<String, Timeline> get _dmTimelines;
   Family? get _family;
@@ -24,13 +26,13 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
   Room? _roomForThread(String threadId) {
     if (threadId == ChatThread.familyId) return _familyRoom();
     // Mitglieder-Pfad zuerst (unverändert); Kontakt-Threads sind auch ohne Zeitleiste bekannt (Ungelesenes).
-    if (!_dmTimelines.containsKey(threadId) && !_contacts.peers.containsKey(threadId)) return null;
+    if (!_dmTimelines.containsKey(threadId) && !_contacts.peers.containsKey(threadId) && !_groups.groups.containsKey(threadId)) return null;
     final room = _client?.getRoomById(threadId);
     return (room != null && room.membership == Membership.join) ? room : null;
   }
 
   Timeline? _timelineFor(String threadId) =>
-      threadId == ChatThread.familyId ? _timeline : (_dmTimelines[threadId] ?? _contacts.timelines[threadId]);
+      threadId == ChatThread.familyId ? _timeline : (_dmTimelines[threadId] ?? _contacts.timelines[threadId] ?? _groups.timelines[threadId]);
 
   /// Senden nur, wenn der Client Verschlüsselung kann UND der Raum Megolm nutzt.
   /// Das SDK würde sonst stillschweigend im Klartext senden. Einzelchats nur mit aktuellen
@@ -41,6 +43,8 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
     if (threadId == ChatThread.familyId && !_isCurrentFamily(room)) {
       throw const GatewayException(GatewayError.serverUnreachable);
     }
+    // Eine Gruppe (K4-2a): Senden ist gesperrt, bis K4-2b das volle Tor liefert (Platzhalter wirft immer).
+    if (threadId != ChatThread.familyId && _groups.groups.containsKey(threadId)) return _requireGroupRoom(threadId, room);
     // Kein Mitglieder-Einzelchat: ein Kontakt-Thread, geprüft über die Einstufung (nur nach `openThread`, nur bei
     // beigetretenem Gegenüber).
     if (threadId != ChatThread.familyId && !_dmTimelines.containsKey(threadId)) return _requireContactRoom(threadId, room);

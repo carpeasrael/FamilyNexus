@@ -543,8 +543,24 @@ abstract class MatrixGateway implements Listenable {
   /// Blockierte; nicht erreichbare Personen ergeben `peerNotReachable`, ein Abfragefehler `serverUnreachable`.
   Future<String> startContactChat(String userId);
 
-  /// Verlässt ein Kontakt-Gespräch; nie den Familienchat und nie einen Einzelchat mit einem Mitglied (`notAllowed`).
+  /// Verlässt ein Kontakt-Gespräch oder eine Gruppe; nie den Familienchat und nie einen Einzelchat mit einem Mitglied
+  /// (`notAllowed`). Eine Gruppe lässt sich immer verlassen, auch eine überfüllte, sendegesperrte oder unverschlüsselte (K4).
   Future<void> leaveConversation(String threadId);
+
+  /// Legt eine Gruppe mit Personen außerhalb der Familie **ohne Mitglieder** an und gibt die Raum-ID zurück (#119, K4,
+  /// D3). Verlangt eingeschalteten Bereich, vollständige Mitgliederliste und Verschlüsselung; höchstens 50 Gruppen, Name
+  /// 1 bis 60 Zeichen (`invalidInput`); eine zweite Anlage zugleich ergibt `alreadyExists`. Schreibt **keinen** Datensatz
+  /// (das tut der Controller) und lädt niemanden ein.
+  Future<String> createGroup(String name);
+
+  /// Nimmt die Einladung in eine Gruppe an (nach Tipp, nie automatisch) und prüft nach dem Beitritt Verschlüsselung, Regel,
+  /// Verlauf und Größe vom Server; ein Verstoß verlässt den Raum (`notAllowed`). Nur für eine Gruppenanfrage
+  /// (`contactRequest`, kein Einzelchat), sonst `notAllowed`. Schreibt keinen Datensatz und nie die Familienzuordnung.
+  Future<void> acceptGroupInvite(String roomId);
+
+  /// Gruppen mit Datensatz, die verlassen, abgelehnt oder vom Server entfernt wurden (Mitgliedschaft `leave`/`ban` oder
+  /// bewusst verlassen): Quelle für das Aufräumen der Datensätze durch den Controller (K4-3). Nie unbekannte Räume.
+  Set<String> get leftGroupRooms;
 
   // ------------------------------------------------------------ Avatare
 
