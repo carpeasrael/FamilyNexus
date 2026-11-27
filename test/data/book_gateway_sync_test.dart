@@ -149,6 +149,9 @@ class _Hs {
   /// Hält `POST …/join`, bis die Zukunft endet (gleichzeitige Beitritte, K4-2a).
   Completer<void>? holdJoin;
 
+  /// `createRoom` scheitert mit 500 (nach einem Fehler beim Anlegen ist ein neuer Versuch möglich, K4-2a).
+  bool failCreate = false;
+
   /// Nach `createRoom`: liefert den Sync mit dem angelegten Raum (sonst wartet das SDK darauf).
   void Function(String room)? onCreate;
 
@@ -211,6 +214,7 @@ class _Hs {
         if (failLeave && path.endsWith('/leave')) return _json(<String, Object?>{'errcode': 'M_FORBIDDEN', 'error': 'x'}, 403);
         if (path == '/_matrix/client/v3/createRoom') {
           await holdCreate?.future;
+          if (failCreate) return _json(<String, Object?>{'errcode': 'M_UNKNOWN', 'error': 'Fehler'}, 500);
           onCreate?.call(createdRoom);
           return _json(<String, Object?>{'room_id': createdRoom});
         }
@@ -4090,6 +4094,143 @@ void main() {
         final after = g.threads.firstWhere((x) => x.kind == ThreadKind.group);
         expect(after.memberCount, 70);
         expect(after.sendLock, GroupSendLock.zuGross);
+      });
+
+      test('Grenzfall G == 50 (L-D): Abruf erlaubt (40 + 10 und 50 + 0); G == 51 nicht', () async {
+        final cases = <String, (Map<String, Object?>, int)>{
+          '50 beigetreten, 0 eingeladen': (groupJoined(gr, joined: 50, invited: 0, memberEvents: 1), 1),
+          '40 beigetreten, 10 eingeladen': (groupJoined(gr, joined: 40, invited: 10, memberEvents: 1), 1),
+          '51 beigetreten': (groupJoined(gr, joined: 51, invited: 0, memberEvents: 1), 0),
+          '40 beigetreten, 11 eingeladen': (groupJoined(gr, joined: 40, invited: 11, memberEvents: 1), 0),
+        };
+        for (final e in cases.entries) {
+          final (hs, g) = await signedIn();
+          expect(await groupThread(g, e.value.$1), isNotNull, reason: e.key);
+          expect(membersCalls(hs), e.value.$2, reason: e.key);
+        }
+      });
+    });
+
+    group('Testlücken aus dem Testbericht (K4-2a)', () {
+      Map<String, Object?> withTimeline(Map<String, Object?> u, List<Object?> events, [String room = gr]) {
+        (((u['rooms']! as Map)['join']! as Map)[room]! as Map)['timeline'] = <String, Object?>{'events': events, 'limited': false};
+        return u;
+      }
+
+      /// Eine Nachricht, wie sie in einem verschlüsselten Raum ankommt (`m.room.encrypted`, ohne Schlüssel nicht lesbar):
+      /// Klartext zeigt die App dort nie, die Nachricht erscheint als „nicht entschlüsselbar“ mit Absender und Kennung.
+      Map<String, Object?> textMsg(String id, {String from = _fremd}) => <String, Object?>{
+            'type': 'm.room.encrypted',
+            'event_id': id,
+            'sender': from,
+            'origin_server_ts': DateTime.now().millisecondsSinceEpoch + _n++,
+            'content': <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2', 'ciphertext': 'x', 'session_id': 's', 'sender_key': 'k', 'device_id': 'D'},
+          };
+
+      test('L-C: 500 fremde Einladungen (Regel public) zuerst, danach eine echte Gruppeneinladung ⇒ genau diese ist eine Anfrage', () async {
+        final (_, g) = await signedIn(nobody);
+        await settle(g, merge(<Map<String, Object?>>[
+          for (var i = 0; i < 500; i++) groupInvite('!p${i.toString().padLeft(3, '0')}:hs.example', '@u$i:hs.example', rule: 'public'),
+        ]));
+        expect(g.contactRequests, isEmpty, reason: 'Regel public ist nie eine Gruppenanfrage');
+        await settle(g, groupInvite('!real:hs.example', _fremd));
+        expect(g.contactRequests.map((r) => r.roomId), <String>['!real:hs.example'], reason: 'fremde Regeln verdrängen die echte Anfrage nicht');
+      }, timeout: const Timeout(Duration(minutes: 3)));
+
+      test('N17: nach einem Fehler beim Anlegen ist die Sperre gelöst, ein neuer Versuch gelingt', () async {
+        final (hs, g) = await signedIn(nobody);
+        hs.failCreate = true;
+        await expectLater(g.createGroup('Eins'), throwsA(isA<GatewayException>().having((e) => e.error, 'error', isNot(GatewayError.alreadyExists))));
+        expect(g.debugCreatingGroups, isEmpty, reason: 'nichts bleibt stehen');
+        hs.failCreate = false;
+        hs.createdRoom = '!neu:hs.example';
+        hs.onCreate = (r) => Future<void>.delayed(
+              const Duration(milliseconds: 100),
+              () => _syncJoined(g, groupJoined(r, members: <String>[_me], joined: 1)),
+            ).ignore();
+        expect(await g.createGroup('Eins'), '!neu:hs.example', reason: 'kein alreadyExists nach dem Fehler');
+        expect(hs.where('POST', '/createRoom'), hasLength(2));
+      });
+
+      test('N36/N37: Nachrichten einer geöffneten Gruppe erscheinen (Absender und Kennung, aus der Zeitleiste der Gruppe) und neue Nachrichten folgen dem Sync', () async {
+        final (_, g) = await signedIn();
+        expect(await groupThread(g, withTimeline(groupJoined(gr), <Object?>[textMsg(r'$erste')])), isNotNull);
+        expect(g.messagesIn(gr), isEmpty, reason: 'ohne openThread keine Zeitleiste und keine Nachrichten');
+        await g.openThread(gr);
+        await Future<void>.delayed(_settle);
+        expect(g.messagesIn(gr).map((m) => m.id), contains(r'$erste'), reason: 'N36: Zeitleiste der Gruppe wird gefunden');
+        await settle(g, withTimeline(groupJoined(gr), <Object?>[textMsg(r'$zweite')]));
+        expect(g.messagesIn(gr).map((m) => m.id), containsAll(<String>[r'$erste', r'$zweite']), reason: 'N37: der Sync bildet die Nachrichten neu ab');
+        expect(g.messagesIn(gr).every((m) => m.senderId == _fremd), isTrue);
+      });
+
+      test('L-G / N27: Fehler nach dem Beitritt (Abgleich scheitert) ⇒ der Raum wird verlassen, kein Zustand bleibt', () async {
+        final (hs, g) = await signedIn();
+        await settle(g, groupInvite(gr, _fremd));
+        serveGroup(hs, gr);
+        hs.onJoin = (r) => Future<void>.delayed(const Duration(milliseconds: 100), () => _syncJoined(g, groupJoined(gr))).ignore();
+        g.debugBeforeRefresh = () async {
+          if (hs.where('POST', '$gr/join').isNotEmpty) throw StateError('Netzfehler');
+        };
+        await expectLater(g.acceptGroupInvite(gr), throwsA(isA<GatewayException>()));
+        expect(hs.where('POST', '$gr/leave'), isNotEmpty, reason: 'nie unverifiziert Mitglied bleiben');
+        g.debugBeforeRefresh = null;
+        await settle(g, <String, Object?>{'account_data': <String, Object?>{'events': <Object?>[<String, Object?>{'type': 'x.kick', 'content': <String, Object?>{'n': _n++}}]}});
+        expect(g.threads.where((t) => t.kind == ThreadKind.group), isEmpty);
+        expect(g.debugGroups, isEmpty);
+        expect(g.leftGroupRooms, <String>{gr});
+      });
+
+      test('L-B / N6 (Ist-Verhalten): eine Gruppe fehlt vorübergehend im Sync und kehrt zurück ⇒ sie ist wieder sichtbar und nicht mehr in leftGroupRooms', () async {
+        final (_, g) = await signedIn();
+        expect(await groupThread(g, groupJoined(gr)), isNotNull);
+        await settle(g, <String, Object?>{
+          'rooms': <String, Object?>{
+            'leave': <String, Object?>{
+              gr: <String, Object?>{
+                'state': <String, Object?>{
+                  'events': <Object?>[_state('m.room.member', _fremd, <String, Object?>{'membership': 'leave'}, key: _me)],
+                },
+              },
+            },
+          },
+        });
+        expect(g.debugGroups, isEmpty);
+        expect(g.leftGroupRooms, <String>{gr}, reason: 'zwischenzeitlich entfernt');
+        expect(await groupThread(g, groupJoined(gr)), isNotNull, reason: 'wieder beigetreten');
+        expect(g.leftGroupRooms, isEmpty, reason: 'Rückkehr nimmt die Gruppe aus dem Aufräumen (der Controller darf sie nicht löschen)');
+      });
+
+      test('N34: der Familienwechsel behält „verlassen“ (left überlebt clearRooms)', () async {
+        final (_, g) = await signedIn();
+        expect(await groupThread(g, groupJoined(gr)), isNotNull);
+        await settle(g, <String, Object?>{
+          'rooms': <String, Object?>{
+            'leave': <String, Object?>{
+              gr: <String, Object?>{
+                'state': <String, Object?>{
+                  'events': <Object?>[_state('m.room.member', _fremd, <String, Object?>{'membership': 'leave'}, key: _me)],
+                },
+              },
+            },
+          },
+        });
+        expect(g.leftGroupRooms, <String>{gr});
+        g.debugLeaveFamilyScope();
+        expect(g.leftGroupRooms, <String>{gr}, reason: 'sonst würde der Controller die Entfernung nie erfahren');
+      });
+
+      test('L-F / N44: in Gruppen nie eine öffentliche Lesebestätigung (nur privat und fully_read), auch bei eingeschalteter Einstellung', () async {
+        final (hs, g) = await signedIn();
+        expect(await groupThread(g, withTimeline(groupJoined(gr, unread: 1), <Object?>[textMsg(r'$hallo')])), isNotNull);
+        await g.openThread(gr);
+        await Future<void>.delayed(_settle);
+        await g.markChatRead(threadId: gr);
+        final marks = hs.where('POST', '$gr/read_markers').toList();
+        expect(marks, hasLength(1), reason: 'die Gelesen-Markierung wurde gesendet');
+        final body = json.decode(marks.single.$3) as Map<String, Object?>;
+        expect(body.containsKey('m.read'), isFalse, reason: 'nie öffentlich');
+        expect(body.containsKey('m.read.private'), isTrue);
       });
     });
   });
