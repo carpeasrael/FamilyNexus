@@ -66,6 +66,13 @@ enum GatewayError {
 
   /// Das Gegenüber hat keine Schlüssel, mit denen es Nachrichten lesen könnte (Cross-Signing fehlt, #119, §8.3).
   peerNotReachable,
+
+  /// In der Gruppe ist außer mir niemand beigetreten oder eingeladen (#119, K4-2b, §3.3 Zeile 6): Senden gesperrt.
+  groupNoOtherMembers,
+
+  /// Die Gruppe wird gerade aktualisiert (Schlüsselwechsel nach einem Weggang läuft oder ist gescheitert, #119, K4-2b,
+  /// §3.3 Zeile 1): Senden vorübergehend gesperrt.
+  groupBusy,
   unknown,
 }
 

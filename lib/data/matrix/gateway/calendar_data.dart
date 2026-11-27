@@ -4,6 +4,7 @@ part of '../sdk_matrix_gateway.dart';
 /// `_privateRoomIdCache` und `_privateVerified` liegen hier, die Klasse setzt sie in `_resetLocal` zurück.
 mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
   _AppClient? get _client;
+  bool? get _encryptionOverride;
   Future<void>? get _creatingPrivateRoom;
   set _creatingPrivateRoom(Future<void>? value);
   void _emit(CalendarSignal s);
@@ -223,7 +224,8 @@ mixin _CalendarDataModule on ChangeNotifier implements MatrixGateway {
   }
 
   Future<String?> _sendCalendar(Room room, String type, Map<String, Object?> content, {String? txid}) async {
-    if (!(_client?.encryptionEnabled ?? false) || room.encryptionAlgorithm != FamilyRoomSpec.megolm) {
+    // Test-Naht `encryptionAvailable` (null in der Produktion = `client.encryptionEnabled`), wie `_canEncryptIn`.
+    if (!(_encryptionOverride ?? _client?.encryptionEnabled ?? false) || room.encryptionAlgorithm != FamilyRoomSpec.megolm) {
       throw const GatewayException(GatewayError.encryptionUnavailable);
     }
     final id = await room.sendEvent(content, type: type, txid: txid);

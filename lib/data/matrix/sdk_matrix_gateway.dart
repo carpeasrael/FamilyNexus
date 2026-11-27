@@ -74,6 +74,7 @@ import 'identity_pins.dart';
 import 'local_identity_pins.dart';
 import 'local_sends.dart';
 import 'matrix_gateway.dart';
+import 'outbound_session_port.dart';
 import 'server_probe.dart';
 import 'sync_relevance.dart';
 
@@ -629,6 +630,29 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
   /// Nur für Tests: die Räume der geöffneten Kontakt-Zeitleisten.
   @visibleForTesting
   Set<String> get debugContactTimelines => _contacts.timelines.keys.toSet();
+
+  /// Nur für Tests: ersetzt den Zugriff auf die Außensitzung des SDK (Harness ohne vodozemac, `test/support/fake_outbound_session_port.dart`).
+  @visibleForTesting
+  OutboundSessionPort? debugOutboundPort;
+
+  @override
+  OutboundSessionPort? get _outboundPort {
+    final seam = debugOutboundPort;
+    if (seam != null) return seam;
+    final c = _client;
+    return c == null ? null : SdkOutboundSessionPort(c);
+  }
+
+  /// Nur für Tests: Räume mit laufendem Wechsel, fälligem oder gescheitertem Wisch.
+  @visibleForTesting
+  Set<String> get debugGroupOps => Set<String>.of(_groups.groupOps);
+
+  @visibleForTesting
+  Set<String> get debugPendingWipe => Set<String>.of(_groups.pendingWipe);
+
+  /// Nur für Tests: macht die Mitgliederliste [age] alt (Gate Zeile 4, Frische 10 Minuten).
+  @visibleForTesting
+  void debugAgeGroupMembers(String roomId, Duration age) => _groups.membersAt[roomId] = DateTime.now().subtract(age);
 
   /// Nur für Tests: die eingestuften Gruppen (Raum-ID → Titel).
   @visibleForTesting
