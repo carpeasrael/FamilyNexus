@@ -330,4 +330,39 @@ void main() {
     final t = File('lib/domain/contacts.dart').readAsStringSync();
     expect(RegExp(r'class ContactFlags \{[^}]*static const bool enabled = false;').hasMatch(t), isTrue);
   });
+
+  test('K4-1 (Textwächter): ContactGroupSpec liegt nur in seiner Datei; keine neue createRoom-Stelle für Gruppen', () {
+    final users = <String>[
+      for (final f in libFiles())
+        if (f.path != 'lib/data/matrix/contact_group_spec.dart' && code(f.readAsStringSync()).contains('ContactGroupSpec')) f.path,
+    ];
+    expect(users, isEmpty, reason: 'Spec bis K4-2 ohne Verbraucher; danach nur contact_groups.dart (Wächter dann erweitern)');
+    final creators = <String>[
+      for (final f in libFiles())
+        if (code(f.readAsStringSync()).contains('createRoom(')) f.path,
+    ]..sort();
+    expect(creators, <String>[
+      'lib/data/matrix/gateway/books.dart',
+      'lib/data/matrix/gateway/calendar_data.dart',
+      'lib/data/matrix/gateway/family.dart',
+    ], reason: 'K4-1 legt keinen Raum an; die Gruppenanlage kommt mit K4-2 in contact_groups.dart');
+  });
+
+  test('K4-1 (Textwächter): die Gruppen-Domäne bleibt reine Domäne ohne SDK und ohne data/', () {
+    for (final path in <String>['lib/domain/group_rights.dart', 'lib/domain/conversation_policy.dart', 'lib/domain/chat.dart']) {
+      final imports = code(File(path).readAsStringSync()).split('\n').where((l) => l.startsWith('import '));
+      for (final i in imports) {
+        expect(i, isNot(contains('package:matrix')), reason: path);
+        expect(i, isNot(contains('data/')), reason: path);
+        expect(i, isNot(contains('features/')), reason: path);
+      }
+    }
+  });
+
+  test('K4-1 (Textwächter): das Gateway reicht die Gruppen im PolicyContext durch, beide Kontexte (mit und ohne Familie)', () {
+    final a = code(File('lib/data/matrix/gateway/direct_chats.dart').readAsStringSync());
+    final b = code(File('lib/data/matrix/sdk_matrix_gateway.dart').readAsStringSync());
+    expect(a, contains('groups: _contactPolicy.groups'));
+    expect(b, contains('groups: _contactPolicy.groups'));
+  });
 }

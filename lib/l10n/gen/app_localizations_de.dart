@@ -1952,6 +1952,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get roomKindContact => 'Kontakt-Chat';
 
   @override
+  String get roomKindGroup => 'Gruppe';
+
+  @override
   String chatThreadDirect(String name) {
     return 'Einzelchat mit $name';
   }

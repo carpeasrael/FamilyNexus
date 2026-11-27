@@ -67,21 +67,26 @@ abstract class LocalDataInventory {
 }
 
 /// Art eines Raums in der Datenübersicht. [book] ist ein Kassenbuch (#311, E-113).
-enum InventoryRoomKind { family, private, direct, contact, book, other }
+/// [group]: Gruppe mit Personen außerhalb der Familie (#119, K4).
+enum InventoryRoomKind { family, private, direct, contact, group, book, other }
 
 /// Art eines Raums in der Datenübersicht. Die Reihenfolge ist Absicht: Familie und privater Raum gehen vor, dann der
 /// Einzelchat, erst dann das Kassenbuch; ein Raum, der sich als Buch kennzeichnet, aber die Familie, der private Raum
 /// oder ein Einzelchat ist, bleibt, was er ist (#311, E-113).
 /// Ein Kontakt-Einzelchat (Person außerhalb der Familie, #119) geht dem Einzelchat voran; er ist zugleich ein `m.direct`-Raum.
+/// Ein Gruppen-Datensatz (K4-1, D4) gewinnt gegen `m.direct` und gegen den Kontakt: [isGroup] wird nach dem privaten Raum und
+/// vor [isContact] und [isDirect] geprüft.
 InventoryRoomKind inventoryRoomKind({
   required bool isFamily,
   required bool isPrivate,
   required bool isDirect,
   required bool isBook,
   bool isContact = false,
+  bool isGroup = false,
 }) {
   if (isFamily) return InventoryRoomKind.family;
   if (isPrivate) return InventoryRoomKind.private;
+  if (isGroup) return InventoryRoomKind.group;
   if (isContact) return InventoryRoomKind.contact;
   if (isDirect) return InventoryRoomKind.direct;
   if (isBook) return InventoryRoomKind.book;

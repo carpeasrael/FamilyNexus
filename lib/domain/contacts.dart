@@ -359,7 +359,12 @@ class Contacts {
 /// ([ContactPolicy.of]) und vom [ContactSync] ins Gateway geschoben. Das Gateway liest ihn nur. Standard und Rückfall:
 /// [off] (Bereich ausgeschaltet, nichts bekannt).
 class ContactPolicy {
-  const ContactPolicy({this.enabled = false, this.contacts = const <String, ContactState>{}, this.blocked = const <String>{}});
+  const ContactPolicy({
+    this.enabled = false,
+    this.contacts = const <String, ContactState>{},
+    this.blocked = const <String>{},
+    this.groups = const <String>{},
+  });
 
   static const ContactPolicy off = ContactPolicy();
 
@@ -372,11 +377,16 @@ class ContactPolicy {
   /// Blockierte Kennungen: aktive `blocked`-Datensätze und die lokale Blockierliste (E-48).
   final Set<String> blocked;
 
+  /// Raum-IDs der Gruppen mit aktivem Datensatz (K4-1, #119): nur diese Räume stuft die Einstufung als Gruppe ein (D1/D4,
+  /// nie ohne eigenen Datensatz). Löschmarken fehlen.
+  final Set<String> groups;
+
   /// Baut den Wert aus allen Datensätzen. [localBlocked]: die lokale Blockierliste.
   factory ContactPolicy.of(Iterable<ContactRecord> records, {Iterable<String> localBlocked = const <String>[]}) {
     var enabled = false;
     final contacts = <String, ContactState>{};
     final blocked = <String>{...localBlocked};
+    final groups = <String>{};
     for (final r in records) {
       if (r.deleted) continue;
       switch (r) {
@@ -385,19 +395,30 @@ class ContactPolicy {
         case final Contact c:
           contacts[c.id] = c.state;
           if (c.state == ContactState.blocked) blocked.add(c.id);
+        case final GroupRecord g:
+          groups.add(g.id);
         default:
           break;
       }
     }
-    return ContactPolicy(enabled: enabled, contacts: Map<String, ContactState>.unmodifiable(contacts), blocked: Set<String>.unmodifiable(blocked));
+    return ContactPolicy(
+      enabled: enabled,
+      contacts: Map<String, ContactState>.unmodifiable(contacts),
+      blocked: Set<String>.unmodifiable(blocked),
+      groups: Set<String>.unmodifiable(groups),
+    );
   }
 
   @override
   bool operator ==(Object other) =>
-      other is ContactPolicy && other.enabled == enabled && _sameMap(other.contacts, contacts) && _sameSet(other.blocked, blocked);
+      other is ContactPolicy &&
+      other.enabled == enabled &&
+      _sameMap(other.contacts, contacts) &&
+      _sameSet(other.blocked, blocked) &&
+      _sameSet(other.groups, groups);
 
   @override
-  int get hashCode => Object.hash(enabled, contacts.length, blocked.length);
+  int get hashCode => Object.hash(enabled, contacts.length, blocked.length, groups.length);
 
   static bool _sameMap(Map<String, ContactState> a, Map<String, ContactState> b) {
     if (a.length != b.length) return false;
@@ -418,9 +439,17 @@ class ContactNames {
 
   static const int maxName = 40;
 
+  /// Höchstlänge eines Gruppennamens (K4-1, §8.5; gleich `ContactGroupSpec.nameMax`).
+  static const int maxGroupName = 60;
+
   /// Bereinigter Name; leer, wenn nichts übrig bleibt.
   static String cleanName(String? name) =>
       TextSanitizer.clean((name ?? '').replaceAll(RegExp('[\\u00B7\\u2022\\u2219\\u22C5\\u30FB]'), ' '), max: maxName);
+
+  /// Bereinigter Gruppenname (höchstens [maxGroupName] Zeichen, ohne das Trennzeichen „·“, Steuer-, Format- und
+  /// Bidi-Zeichen); leer, wenn nichts übrig bleibt. Der Name kann von einem Fremden stammen (Gruppenanfrage).
+  static String groupTitle(String? name) =>
+      TextSanitizer.clean((name ?? '').replaceAll(RegExp('[\\u00B7\\u2022\\u2219\\u22C5\\u30FB]'), ' '), max: maxGroupName);
 
   /// „Name · server“; bei leerem Namen der lokale Teil der ID.
   static String title(String? name, String userId) {

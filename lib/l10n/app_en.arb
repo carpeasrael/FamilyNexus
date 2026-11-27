@@ -974,6 +974,7 @@
   },
   "chatContactNote": "Outside the family. Calendar items, lists and online status are not shared here.",
   "roomKindContact": "Contact chat",
+  "roomKindGroup": "Group",
   "chatThreadDirect": "Direct chat with {name}",
   "@chatThreadDirect": {
     "placeholders": {

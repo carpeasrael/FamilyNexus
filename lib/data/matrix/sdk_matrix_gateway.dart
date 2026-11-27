@@ -446,6 +446,7 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
       contactsEnabled: _contactPolicy.enabled,
       contacts: _contactPolicy.contacts,
       blockedUsers: _contactPolicy.blocked,
+      groups: _contactPolicy.groups,
     );
   }
 

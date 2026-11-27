@@ -126,6 +126,47 @@ void main() {
       expect(local('de', [room(InventoryRoomKind.contact, name: 'Carla')]), isNot(contains('Carla')));
     });
 
+    test('Gruppe (#119, K4-1): Reihenfolge, Gruppen-Datensatz gewinnt gegen Einzelchat und Kontakt, nie gegen Familie/privat', () {
+      InventoryRoomKind k({bool f = false, bool p = false, bool d = false, bool c = false, bool g = false, bool b = false}) =>
+          inventoryRoomKind(isFamily: f, isPrivate: p, isDirect: d, isBook: b, isContact: c, isGroup: g);
+      expect(k(g: true), InventoryRoomKind.group);
+      expect(k(g: true, d: true), InventoryRoomKind.group, reason: 'm.direct-Eintrag gewinnt nicht (D4)');
+      expect(k(g: true, c: true, d: true), InventoryRoomKind.group);
+      expect(k(g: true, b: true), InventoryRoomKind.group);
+      expect(k(f: true, g: true), InventoryRoomKind.family);
+      expect(k(p: true, g: true), InventoryRoomKind.private);
+      expect(k(c: true, d: true), InventoryRoomKind.contact, reason: 'ohne Gruppen-Kennzeichen unverändert');
+      expect(inventoryRoomKind(isFamily: false, isPrivate: false, isDirect: true, isBook: false), InventoryRoomKind.direct,
+          reason: 'isGroup hat den Standard false');
+    });
+
+    test('Bericht: Gruppe trägt den Namen nur online mit Mitgliedern, nie die Raum-ID (de und en)', () {
+      final rooms = [room(InventoryRoomKind.group, name: 'Skatrunde')];
+      final r = online('de', rooms);
+      expect(r, contains('- Gruppe „Skatrunde“\n'));
+      expect(r, isNot(contains('!abc123')));
+      expect(online('en', rooms), contains('- Group „Skatrunde“\n'));
+      for (final loc in <String>['de', 'en']) {
+        expect(local(loc, rooms), isNot(contains('Skatrunde')), reason: 'lokaler Bericht ohne Gruppennamen ($loc)');
+      }
+      expect(local('de', rooms), contains('- Gruppe\n'));
+      expect(local('en', rooms), contains('- Group\n'));
+    });
+
+    test('jede Raumart hat in beiden Sprachen einen nicht leeren, von den anderen verschiedenen Text', () {
+      for (final loc in <String>['de', 'en']) {
+        final texts = <String>{};
+        for (final kind in InventoryRoomKind.values) {
+          final r = online(loc, [room(kind)]);
+          final line = r.split('\n').firstWhere((l) => l.startsWith('- '));
+          final t = line.substring(2).split(' (').first.trim();
+          expect(t, isNotEmpty, reason: '$kind $loc');
+          texts.add(t);
+        }
+        expect(texts, hasLength(InventoryRoomKind.values.length), reason: 'verschiedene Texte ($loc)');
+      }
+    });
+
     test('Kassenbuch: Art ohne Namen (er ist der feste Raumname der App) und ohne Raum-ID, in beiden Sprachen und beiden Berichten', () {
       final rooms = [room(InventoryRoomKind.book, name: 'FamilyNexus', id: '!buch:fake.test')];
       for (final r in [online('de', rooms), local('de', rooms)]) {

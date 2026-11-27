@@ -192,6 +192,17 @@ class ContactService {
         return next;
       });
 
+  /// Bedingte Löschung für die Rücknahme eines gescheiterten Gruppenbeitritts oder einer gescheiterten Anlage (K4-1, #119,
+  /// Vorbild [removeIfVersion]): löscht (Löschmarke) **nur**, wenn der Datensatz aktiv ist und genau diese [version] hat;
+  /// sonst `false`. Eine zwischenzeitliche Änderung macht die Rücknahme damit zu einem No-op (innerhalb der Serialisierung).
+  Future<bool> removeGroupIfVersion(String roomId, {required int version}) => _serial(() async {
+        final current = (await store.get(ContactKind.group, roomId)) as GroupRecord?;
+        if (current == null || current.deleted || current.version != version) return false;
+        await store.put(current.copyWith(version: _nextVersion(current), updatedAt: _now, deleted: true));
+        _changed();
+        return true;
+      });
+
   Future<void> removeGroup(String roomId) => _serial(() async {
         final current = (await store.get(ContactKind.group, roomId)) as GroupRecord?;
         if (current == null || current.deleted) throw const ContactException(ContactError.notFound);

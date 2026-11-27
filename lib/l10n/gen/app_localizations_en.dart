@@ -1933,6 +1933,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roomKindContact => 'Contact chat';
 
   @override
+  String get roomKindGroup => 'Group';
+
+  @override
   String chatThreadDirect(String name) {
     return 'Direct chat with $name';
   }

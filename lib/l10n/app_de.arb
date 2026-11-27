@@ -975,6 +975,7 @@
   },
   "chatContactNote": "Außerhalb der Familie. Termine, Listen und Online-Status werden hier nicht geteilt.",
   "roomKindContact": "Kontakt-Chat",
+  "roomKindGroup": "Gruppe",
   "chatThreadDirect": "Einzelchat mit {name}",
   "@chatThreadDirect": {
     "placeholders": {
