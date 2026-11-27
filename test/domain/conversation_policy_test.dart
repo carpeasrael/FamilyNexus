@@ -546,13 +546,13 @@ void main() {
     });
 
     test('Z. 3: ohne Datensatz bleibt der Einzelchat mit Familienmitglied familyDirect', () {
-      final f = RoomFacts(id: '!dm:hs.example', membership: RoomMembership.join, peerId: ben, megolm: true, joinedCount: 2, invitedCount: 0);
+      const f = RoomFacts(id: '!dm:hs.example', membership: RoomMembership.join, peerId: ben, megolm: true, joinedCount: 2, invitedCount: 0);
       expect(k(f, gc()), RoomClass.familyDirect);
       expect(k(f, gc(groups: const <String>{})), RoomClass.familyDirect);
     });
 
     test('Z. 4: ohne Datensatz bleibt der Kontakt-Einzelchat contactDirect', () {
-      final f = RoomFacts(
+      const f = RoomFacts(
         id: '!dm:hs.example',
         membership: RoomMembership.join,
         peerId: carla,
@@ -561,13 +561,13 @@ void main() {
         invitedCount: 0,
         peerMembership: PeerMembership.join,
       );
-      final c = PolicyContext(
+      const c = PolicyContext(
         myUserId: me,
         membersLoaded: true,
         contactsEnabled: true,
-        contacts: const <String, ContactState>{carla: ContactState.accepted},
-        familyIds: const <String>{me, ben},
-        groups: const <String>{grp},
+        contacts: <String, ContactState>{carla: ContactState.accepted},
+        familyIds: <String>{me, ben},
+        groups: <String>{grp},
       );
       expect(k(f, c), RoomClass.contactDirect);
     });

@@ -141,10 +141,10 @@ void main() {
   group('ContactNames.groupTitle (K4-1)', () {
     test('bereinigt Steuer-, Bidi- und Trennzeichen, höchstens 60 Zeichen, leer bei nichts Brauchbarem', () {
       expect(ContactNames.groupTitle('  Familie  Müller '), 'Familie Müller');
-      expect(ContactNames.groupTitle('A · B‮​'), 'A B');
+      expect(ContactNames.groupTitle('A · B\u202E\u200B'), 'A B');
       expect(ContactNames.groupTitle('x' * 100).length, 60);
       expect(ContactNames.groupTitle(null), '');
-      expect(ContactNames.groupTitle('‮​'), '');
+      expect(ContactNames.groupTitle('\u202E\u200B'), '');
       expect(ContactNames.maxGroupName, 60);
     });
 
