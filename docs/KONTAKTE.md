@@ -88,7 +88,7 @@ Person ausdrücklich als Kontakt hinzufügt und sie zustimmt.
 | Gruppe | Privater Raum nach neuer `ContactGroupSpec`: Raumversion 10, `private_chat`, nicht im Verzeichnis, `join_rules: invite`, Megolm, Verlauf `invited`. Bis 50 Mitglieder. |
 | Rechte in Gruppen | Wie `FamilyRoomSpec.powerLevels`: Ersteller 100, Schwellen 50 für `invite`, `kick`, `ban`, `redact`, Zustände; Tombstone und Server-ACL unerreichbar. In der App: **Gruppen-Admin** (ab 50) und Mitglied. |
 | Kontaktliste | Datensätze im **privaten Raum** (E-09) als `de.inneso.familynexus.contact`, Megolm, nur eigene Geräte; lokal in SQLCipher. Nie im Familienraum. |
-| Familie im Raum | Kontakträume tragen keinerlei Familienbezug (kein Name, keine Familien-ID, keine eigenen Ereignistypen). |
+| Familie im Raum | Kontakträume tragen keinerlei Familienbezug (kein Name, keine Familien-ID, keine eigenen Ereignistypen **außer der verschlüsselten Reaktion `de.inneso.familynexus.reaction`**, K4-2b: nur Anzeige, keine Signale; Element zeigt sie nicht). |
 | Klartext-Metadaten | Gruppenname (`m.room.name`) ist wie der Familienname für Server lesbar. Die App sagt das beim Anlegen. Im Familienraum ist zusätzlich die Avatar-Wahl sichtbar (E-101); Kontakt- und Gruppenräume tragen sie nicht. |
 
 `invited` als Verlauf: Neu Hinzugefügte sehen nichts aus der Zeit vor ihrer Einladung. Das SDK verteilt neue
@@ -168,6 +168,16 @@ höchstens 3, je Server höchstens 5, gesamt 50; sie werden nie automatisch ange
 überfüllte, sendegesperrte und unverschlüsselte Gruppen. Die Mitgliederliste wird nur abgerufen, wenn die Größe G bekannt und
 höchstens 50 ist (nie bei G > 50 oder unbekannter Größe), je Raum höchstens alle 10 Minuten. **Senden in Gruppen ist bis K4-2b
 gesperrt** (`notAllowed`); die Reaktionssperre für Kontakt-Räume bleibt.
+
+**Stand K4-2b (Senden in Gruppen, Schlüsselwisch bei Weggang, Reaktionen; ohne Wirkung bis zur Freigabe):** Das Senden in einer
+Gruppe (Text, Antwort, Anhang, Reaktion, Wiederholen) läuft durch ein fail-closed Tor (`_requireGroupRoom`): Zeitleiste offen und
+kein Wechsel im Gang (`groupBusy`), Verschlüsselung, Einstufung und `GroupHealth` (zu groß ab G > 50, Größe unbekannt, Regel,
+Verlauf), eine höchstens 10 Minuten alte Mitgliederliste (das Senden ruft sie selbst ab, nur bei G ≤ 50), niemand außer mir
+(`groupNoOtherMembers`), mindestens ein anderes Mitglied erreichbar. Bei einem Weggang eines Mitglieds, auch eines nur
+Eingeladenen, wischt die App die Außensitzung (Megolm): erst **laden**, dann wischen, dann **belegen** (der Rückgabewert des SDK
+zählt nie); bis zum Beleg ist das Senden gesperrt. §8.5 „Entfernen lässt das SDK die Sitzung rotieren“ gilt damit nicht mehr nur
+lazy: die App rotiert eager und sperrt bis zum Beleg. Reaktionen (Abnahme 7) gehen in Kontakt- und Gruppenräumen als eigener
+verschlüsselter Typ zwischen App-Nutzern; die Pauschalsperre ist entfallen. Die Bedienung folgt in K4-3/K4-4.
 
 ### 6.3 Familieneinladungen sicher erkennen (B1)
 - Familienräume haben immer `join_rules: knock` (E-12), Gruppen `invite`. Der Wert gehört zum Zustand, den Server
