@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:family_nexus/data/matrix/contact_group_spec.dart';
 import 'package:family_nexus/data/matrix/matrix_gateway.dart';
+import 'package:family_nexus/data/matrix/sdk_matrix_gateway.dart' show groupSendLockError;
 import 'package:family_nexus/domain/account_deletion.dart';
 import 'package:family_nexus/domain/anniversaries.dart';
 import 'package:family_nexus/domain/anniversary_codec.dart';
@@ -37,6 +38,8 @@ import 'package:family_nexus/domain/tasks.dart';
 import 'package:family_nexus/domain/username_suggestion.dart';
 import 'package:family_nexus/domain/verification_policy.dart';
 import 'package:flutter/foundation.dart';
+
+import 'fake_outbound_session_port.dart';
 
 /// Ereignis im Fake-Server (entspricht einem verschlüsselten Raumereignis).
 class FakeEvent {
@@ -1771,8 +1774,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     _requireSession();
     final room = _roomOf(threadId);
     if (room == null) throw const GatewayException(GatewayError.notFound);
-    // Gruppen (K4-2a): Senden ist wie im Gateway gesperrt (Platzhalter bis K4-2b).
-    if (fake.groupRooms.containsKey(threadId)) throw const GatewayException(GatewayError.notAllowed);
+    // Gruppen (K4-2b): das Tor wie im Gateway (§3.3), auf dem für das Gateway sichtbaren Mitgliederstand.
+    if (fake.groupRooms.containsKey(threadId)) _requireGroupGate(room, threadId);
     // Kontakt-Räume: Senden nur nach `openThread` und bei beigetretenem Gegenüber (nie in wartenden Räumen).
     if (fake.contactRooms.containsKey(threadId)) {
       final peer = room.dmMembers.firstWhere((m) => m != _userId);
@@ -1801,9 +1804,15 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   @override
   Future<void> sendReaction(String messageId, String emoji, {String threadId = ChatThread.familyId}) async {
-    if (fake.contactRooms.containsKey(threadId)) throw const GatewayException(GatewayError.notAllowed);
+    // Seit K4-2b (§3.5) auch in Kontakt- und Gruppenräumen, über dieselben Tore wie der Text; kein Ziel eines Blockierten.
     final room = _chatRoom(threadId);
     if (emoji.isEmpty || emoji.length > 16) throw const GatewayException(GatewayError.invalidInput);
+    final target = room.events.where((e) => e.id == messageId).firstOrNull;
+    if (target != null &&
+        (fake.contactRooms.containsKey(threadId) || fake.groupRooms.containsKey(threadId)) &&
+        contactPolicy.blocked.contains(target.sender)) {
+      throw const GatewayException(GatewayError.notAllowed);
+    }
     fake.post(room, _userId!, 'm.reaction', <String, Object?>{'target': messageId, 'emoji': emoji});
   }
 
@@ -2217,25 +2226,109 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     return r != null && _groupClass(r) == RoomClass.contactGroup ? r : null;
   }
 
-  List<ChatThread> _groupThreads() => <ChatThread>[
-        for (final r in fake.groupRooms.values)
-          if (_groupClass(r) == RoomClass.contactGroup)
-            ChatThread(
-              id: r.id,
-              kind: ThreadKind.group,
-              title: ContactNames.groupTitle(r.name),
-              unread: unreadIn(r.id),
-              memberCount: r.dmMembers.length,
-              canManage: (r.power[_userId] ?? 0) >= PowerLevels.moderator,
-              sendLock: GroupHealth.evaluate(
-                megolm: r.groupEncrypted,
-                joinRule: r.joinRule,
-                historyVisibility: r.history,
-                joined: r.dmMembers.length,
-                invited: 0,
-              ),
-            ),
-      ];
+  // ---- Gruppen: Mitgliederwechsel, Zustandsverzögerung und Wisch (K4-2b)
+
+  /// Außensitzung der Gruppen (Fake des SDK-Verhaltens, `fake_outbound_session_port.dart`).
+  final FakeOutboundSessionPort outboundPort = FakeOutboundSessionPort();
+  final Map<String, Set<String>> _lastGroupMembers = <String, Set<String>>{};
+  final Map<String, Set<String>> _laggedMembers = <String, Set<String>>{};
+
+  /// Räume mit fälligem oder gescheitertem Wisch: Senden `groupBusy`.
+  final Set<String> groupPendingWipe = <String>{};
+
+  /// Mitglieder (beigetreten und eingeladen), wie das Gateway sie sieht; mit [lagGroupState] bleibt der alte Stand sichtbar.
+  Set<String> _visibleMembers(FakeRoom r) => _laggedMembers[r.id] ?? r.dmMembers.toSet();
+
+  /// Test: das Gateway sieht Änderungen der Mitglieder dieser Gruppe erst nach [releaseGroupState] (Zustandsverzögerung).
+  void lagGroupState(String roomId) => _laggedMembers[roomId] = fake.groupRooms[roomId]!.dmMembers.toSet();
+
+  Future<void> releaseGroupState(String roomId) async {
+    _laggedMembers.remove(roomId);
+    await syncGroups();
+  }
+
+  /// Test: ein Mitglied verlässt die Gruppe oder wird entfernt (auch ein nur Eingeladener).
+  void removeGroupMember(String roomId, String userId) {
+    final r = fake.groupRooms[roomId]!;
+    r.dmMembers.remove(userId);
+    r.invitedUsers.remove(userId);
+    fake.notifyAll();
+  }
+
+  /// Der Mitgliederabgleich des Gateways (je Sync): Weggang ⇒ Laden, Wisch, Beleg; ohne Beleg bleibt der Raum gesperrt.
+  Future<void> syncGroups() async {
+    for (final r in fake.groupRooms.values.toList()) {
+      if (_groupClass(r) != RoomClass.contactGroup) continue;
+      final cur = _visibleMembers(r);
+      final base = _lastGroupMembers[r.id];
+      final lost = base != null && base.difference(cur).isNotEmpty;
+      if (lost || groupPendingWipe.contains(r.id)) {
+        await outboundPort.load(r.id);
+        if (outboundPort.recipients(r.id) != null) await outboundPort.wipe(r.id);
+        if (outboundPort.recipients(r.id) == null) {
+          groupPendingWipe.remove(r.id);
+        } else {
+          groupPendingWipe.add(r.id);
+        }
+      }
+      _lastGroupMembers[r.id] = cur;
+    }
+    fake.notifyAll();
+  }
+
+  void _requireGroupGate(FakeRoom room, String threadId) {
+    final me = _userId;
+    if (!_opened.contains(threadId)) throw const GatewayException(GatewayError.notAllowed);
+    if (groupPendingWipe.contains(threadId)) throw GatewayException(groupSendLockError(GroupSendLock.wechsel)!);
+    final lock = _groupLock(room);
+    final e = groupSendLockError(lock);
+    if (e != null) throw GatewayException(e);
+    final others = _visibleMembers(room).where((m) => m != me).toList();
+    if (others.isEmpty) throw GatewayException(groupSendLockError(GroupSendLock.keineMitglieder)!);
+    var reachable = 0;
+    var unreachable = 0;
+    for (final m in others) {
+      final r = fake.identityChangedUsers.contains(m) ? ContactReachability.identityChanged : _reachOf(m);
+      if (r == ContactReachability.reachable) {
+        reachable++;
+      } else if (r != ContactReachability.unknown) {
+        unreachable++;
+      }
+    }
+    if (reachable == 0) throw GatewayException(unreachable > 0 ? GatewayError.peerNotReachable : GatewayError.serverUnreachable);
+  }
+
+  GroupSendLock _groupLock(FakeRoom r) {
+    if (groupPendingWipe.contains(r.id)) return GroupSendLock.wechsel;
+    final health = GroupHealth.evaluate(
+      megolm: r.groupEncrypted,
+      joinRule: r.joinRule,
+      historyVisibility: r.history,
+      joined: _visibleMembers(r).length,
+      invited: 0,
+    );
+    if (health != GroupSendLock.keiner) return health;
+    return _visibleMembers(r).where((m) => m != _userId).isEmpty ? GroupSendLock.keineMitglieder : GroupSendLock.keiner;
+  }
+
+  List<ChatThread> _groupThreads() {
+    for (final r in fake.groupRooms.values) {
+      if (_groupClass(r) == RoomClass.contactGroup) _lastGroupMembers.putIfAbsent(r.id, () => _visibleMembers(r));
+    }
+    return <ChatThread>[
+      for (final r in fake.groupRooms.values)
+        if (_groupClass(r) == RoomClass.contactGroup)
+          ChatThread(
+            id: r.id,
+            kind: ThreadKind.group,
+            title: ContactNames.groupTitle(r.name),
+            unread: unreadIn(r.id),
+            memberCount: _visibleMembers(r).length,
+            canManage: (r.power[_userId] ?? 0) >= PowerLevels.moderator,
+            sendLock: _groupLock(r),
+          ),
+    ];
+  }
 
   @override
   Future<String> createGroup(String name) async {

@@ -112,12 +112,54 @@ void main() {
     await expectLater(gw.createGroup('Noch eine'), error(GatewayError.notAllowed));
   });
 
-  test('Senden in Gruppen ist gesperrt (Platzhalter bis K4-2b): Text und Reaktion notAllowed', () async {
-    final r = app.server.createGroupRoom(carla, 'Skat', joined: <String>[me]);
-    gw.setContactPolicy(policy(groups: <String>{r.id}));
-    await gw.openThread(r.id);
-    expect(gw.isThreadOpen(r.id), isTrue);
-    await expectLater(gw.sendMessage('Hallo', threadId: r.id), error(GatewayError.notAllowed));
-    await expectLater(gw.sendReaction('x', '👍', threadId: r.id), error(GatewayError.notAllowed));
+  // K4-2b: ersetzt „Senden in Gruppen ist gesperrt (Platzhalter bis K4-2b): Text und Reaktion notAllowed“ (K4-2a) ausdrücklich; der
+  // Fake bildet jetzt das Tor des Gateways ab, die Gegenproben stehen unten.
+  group('Senden in Gruppen (K4-2b, Fake spiegelt das Tor)', () {
+    Future<FakeRoom> openGroup({List<String> joined = const <String>[]}) async {
+      final r = app.server.createGroupRoom(carla, 'Skat', joined: <String>[me, ...joined]);
+      gw.setContactPolicy(policy(groups: <String>{r.id}));
+      await gw.openThread(r.id);
+      return r;
+    }
+
+    test('Text und Reaktion gehen durch, Blockierte als Reaktionsziel nicht', () async {
+      final r = await openGroup();
+      await gw.sendMessage('Hallo', threadId: r.id);
+      final id = gw.messagesIn(r.id).single.id;
+      await gw.sendReaction(id, '👍', threadId: r.id);
+      expect(gw.messagesIn(r.id).single.reactions['👍'], isNotNull);
+      gw.setContactPolicy(policy(groups: <String>{r.id}, blocked: <String>{me}));
+      await expectLater(gw.sendReaction(id, '🎉', threadId: r.id), error(GatewayError.notAllowed));
+    });
+
+    test('nicht geöffnet ⇒ notAllowed; nur ich ⇒ groupNoOtherMembers; zu groß ⇒ notAllowed', () async {
+      final r = app.server.createGroupRoom(me, 'Allein');
+      gw.setContactPolicy(policy(groups: <String>{r.id}));
+      await expectLater(gw.sendMessage('x', threadId: r.id), error(GatewayError.notAllowed));
+      await gw.openThread(r.id);
+      await expectLater(gw.sendMessage('x', threadId: r.id), error(GatewayError.groupNoOtherMembers));
+      expect(groups().single.sendLock, GroupSendLock.keineMitglieder);
+      r.dmMembers.addAll(<String>[for (var i = 0; i < 51; i++) '@u$i:fake.test']);
+      await expectLater(gw.sendMessage('x', threadId: r.id), error(GatewayError.notAllowed));
+    });
+
+    test('Weggang bei verzögertem Zustand: kein Wisch vor dem Zustandswechsel, danach genau einer; gescheitert ⇒ groupBusy', () async {
+      final r = await openGroup(joined: <String>[carla]);
+      gw.outboundPort.createSession(r.id, <String>{me, carla});
+      gw.lagGroupState(r.id);
+      gw.removeGroupMember(r.id, carla);
+      await gw.syncGroups();
+      expect(gw.outboundPort.wipes, 0, reason: 'das Gateway sieht den Weggang noch nicht');
+      await gw.sendMessage('noch', threadId: r.id); // alter Stand: Carla noch da
+      gw.outboundPort.wipeIneffective = true;
+      await gw.releaseGroupState(r.id);
+      expect(gw.outboundPort.wipes, 1);
+      await expectLater(gw.sendMessage('x', threadId: r.id), error(GatewayError.groupBusy));
+      expect(groups().single.sendLock, GroupSendLock.wechsel);
+      gw.outboundPort.wipeIneffective = false;
+      await gw.syncGroups();
+      expect(gw.outboundPort.recipients(r.id), isNull);
+      await expectLater(gw.sendMessage('x', threadId: r.id), error(GatewayError.groupNoOtherMembers));
+    });
   });
 }

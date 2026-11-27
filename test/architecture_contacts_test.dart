@@ -235,10 +235,15 @@ void main() {
     expect(RegExp(r"AppLog\.[dwe]\('gateway',[^;]*\$userId").hasMatch(t), isFalse);
   });
 
-  test('Kontakt-Räume: keine App-Ereignisse hinein (Reaktion verweigert, Terminverweise nur im Familienraum, Lesebestätigung privat)', () {
+  // K4-2b: ersetzt „Kontakt-Räume: keine App-Ereignisse hinein (Reaktion verweigert, …)“ AUSDRÜCKLICH: die Pauschalsperre für
+  // Reaktionen ist durch Nutzerentscheidung (§3.5) entfallen; Reaktionen gehen durch dieselben Tore wie der Text. Geblieben ist
+  // der Kontakt-Pfad für Texte.
+  test('Kontakt-Räume (K4-2b): Reaktionen laufen über das Tor des Raums (keine Pauschalsperre mehr), Kontakt-Pfad für Text unverändert', () {
     final c = code(File('lib/data/matrix/gateway/chat.dart').readAsStringSync());
-    expect(c, contains('_contacts.peers.containsKey(threadId)) {\n      throw const GatewayException(GatewayError.notAllowed);'));
+    expect(c, isNot(contains('_contacts.peers.containsKey(threadId)) {\n      throw const GatewayException(GatewayError.notAllowed);')));
     expect(c, contains('return _requireContactRoom(threadId, room);'));
+    final r = c.substring(c.indexOf('Future<void> sendReaction('), c.indexOf('Future<void> reportMessage('));
+    expect(r, contains('_requireEncryptedRoom(threadId)'));
   });
 
   test('bootstrap reicht den Blockierlisten-Adapter an die Factory durch', () {
@@ -421,14 +426,48 @@ void main() {
     }
   });
 
-  test('K4-2a (Textwächter): Senden in Gruppen ist gesperrt (Platzhalter wirft immer), und das Tor liegt vor dem Kontakt-Pfad', () {
+  // K4-2b: ersetzt den K4-2a-Wächter „Senden in Gruppen ist gesperrt (Platzhalter wirft immer)“ und „Reaktions-Pauschalsperre bleibt“
+  // AUSDRÜCKLICH durch Wächter für das volle Tor und die entfallene Pauschalsperre (nicht abgeschwächt).
+  test('K4-2b (Textwächter): das Tor liegt vor dem Kontakt-Pfad, ist kein Platzhalter mehr, und alle Sendewege bereiten die Gruppe vor', () {
     final g = code(File('lib/data/matrix/gateway/contact_groups.dart').readAsStringSync());
-    expect(g, contains('Room _requireGroupRoom(String threadId, Room room) => throw const GatewayException(GatewayError.notAllowed);'));
+    expect(g, isNot(contains('Room _requireGroupRoom(String threadId, Room room) => throw')), reason: 'kein Platzhalter mehr');
+    final a = g.indexOf('Room _requireGroupRoom(String threadId, Room room) {');
+    expect(a, greaterThan(0));
+    final body = g.substring(a, g.indexOf('\n  }\n', a));
+    for (final need in <String>['groupOps.contains', 'pendingWipe.contains', '_canEncryptIn(room)', '_stillGroup(room)', '_groupHealthOf(room)', 'listFreshFor', '_otherMembers(room)', 'GroupSendLock.keineMitglieder', 'ContactReachability.reachable']) {
+      expect(body, contains(need), reason: 'Zeile des Tors: $need');
+    }
     final c = code(File('lib/data/matrix/gateway/chat.dart').readAsStringSync());
     expect(c, contains('_groups.groups.containsKey(threadId)) return _requireGroupRoom(threadId, room);'));
     expect(c.indexOf('_requireGroupRoom(threadId, room)'), lessThan(c.indexOf('_requireContactRoom(threadId, room)')));
-    // Die Reaktions-Pauschalsperre für Kontakt-Threads bleibt (K4-2b ersetzt sie).
-    expect(c, contains('_contacts.peers.containsKey(threadId)) {\n      throw const GatewayException(GatewayError.notAllowed);'));
+    // Text, Anhang, Reaktion und Wiederholen bereiten die Gruppe vor (Liste, Schlüssel), bevor das Tor entscheidet.
+    expect('await _prepareGroupSend(threadId);'.allMatches(c).length, 4);
+    // Die Reaktions-Pauschalsperre für Kontakt-Threads (K3a-2a) ist weg.
+    expect(c, isNot(contains('_contacts.peers.containsKey(threadId)) {\n      throw const GatewayException(GatewayError.notAllowed);')));
+    final r = c.substring(c.indexOf('Future<void> sendReaction('), c.indexOf('Future<void> reportMessage('));
+    expect(r, contains('_requireEncryptedRoom(threadId)'));
+    expect(r, isNot(contains('_contacts.peers')), reason: 'keine Pauschalsperre mehr');
+    expect(r, contains('_contactPolicy.blocked.contains(target.senderId)'));
+  });
+
+  test('K4-2b (Textwächter): clearOrUseOutboundGroupSession steht nur im Port, dort mit loadOutboundGroupSession davor; getOutboundGroupSession nur im Port', () {
+    const port = 'lib/data/matrix/outbound_session_port.dart';
+    for (final name in <String>['clearOrUseOutboundGroupSession(', 'getOutboundGroupSession(', 'loadOutboundGroupSession(']) {
+      final users = <String>[for (final f in libFiles()) if (code(f.readAsStringSync()).contains(name)) f.path];
+      expect(users, <String>[port], reason: '$name nur im Port');
+    }
+    final t = code(File(port).readAsStringSync());
+    final wipe = t.indexOf('Future<void> wipe(String roomId) async {');
+    final body = t.substring(wipe, t.indexOf('\n  }\n', wipe));
+    expect(body.indexOf('loadOutboundGroupSession('), greaterThan(0));
+    expect(body.indexOf('loadOutboundGroupSession('), lessThan(body.indexOf('clearOrUseOutboundGroupSession(roomId, wipe: true)')));
+    // Das Gateway wischt nur über den Port, mit Laden und Beleg; der Rückgabewert des SDK wird nie ausgewertet.
+    final g = code(File('lib/data/matrix/gateway/contact_groups.dart').readAsStringSync());
+    final w = g.substring(g.indexOf('Future<_WipeResult> _wipeOutbound('), g.indexOf('Future<void> _prepareGroupSend('));
+    expect(w.indexOf('_loadedRecipients(roomId)'), lessThan(w.indexOf('port.wipe(roomId)')));
+    expect(w, contains('port.recipients(roomId) == null ? _WipeResult.wiped : _WipeResult.failed'));
+    expect(w, isNot(contains('= await port.wipe')));
+    expect(g, isNot(contains('clearOrUseOutboundGroupSession')));
   });
 
   test('K4-2a (Textwächter): der Verlauf steht in importantStateEvents, die Datenübersicht kennt die Gruppe, der Gruppenzustand wird mit den Kontakten geräumt', () {

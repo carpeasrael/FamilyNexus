@@ -28,6 +28,7 @@ import 'package:matrix/encryption.dart' show Encryption, KeyVerification, KeyVer
 import 'package:matrix/matrix.dart' show CrossSigningKey, DeviceKeys, DeviceKeysList, Event, SyncStatus, SyncStatusUpdate, SyncUpdate;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+import '../support/fake_outbound_session_port.dart';
 import '../support/memory_stores.dart';
 
 const String _me = '@n2:hs.example';
@@ -166,6 +167,9 @@ class _Hs {
   /// Die Mitgliederliste des Buchs ist leer (unbrauchbare Antwort).
   bool emptyMembers = false;
 
+  /// `GET …/members` scheitert für Räume außer der Familie mit 500 (Gruppen, K4-2b).
+  bool membersFail = false;
+
   /// Antwort auf `/messages`: `create` (das Raum-Ereignis, Ende des Verlaufs), `endless` (immer eine weitere Seite).
   String messagesMode = 'create';
   int messagesCalls = 0;
@@ -233,6 +237,7 @@ class _Hs {
         }
         if (path.endsWith('/members')) {
           if (familyMembersFail && path.contains(_familyRoom)) return _json(<String, Object?>{'errcode': 'M_UNKNOWN', 'error': 'Fehler'}, 500);
+          if (membersFail && !path.contains(_familyRoom)) return _json(<String, Object?>{'errcode': 'M_UNKNOWN', 'error': 'Fehler'}, 500);
           if (emptyMembers && !path.contains(_familyRoom)) return _json(<String, Object?>{'chunk': <Object?>[]});
           return _json(<String, Object?>{
             'chunk': <Object?>[
@@ -3290,6 +3295,7 @@ void main() {
       String? rule = 'invite',
       String? history = 'invited',
       List<String>? members,
+      List<String> invitedMembers = const <String>[],
       bool direct = false,
       int? unread,
       int memberEvents = -1,
@@ -3297,6 +3303,7 @@ void main() {
       final all = members ?? <String>[_me, _fremd, anna];
       final shown = memberEvents < 0 ? all : all.take(memberEvents).toList();
       final j = joined ?? all.length;
+      if (invitedMembers.isNotEmpty) invited = invitedMembers.length;
       return <String, Object?>{
         if (direct)
           'account_data': <String, Object?>{
@@ -3321,6 +3328,7 @@ void main() {
                   if (history != null) _state('m.room.history_visibility', _me, <String, Object?>{'history_visibility': history}),
                   _state('m.room.power_levels', _me, <String, Object?>{'users': <String, int>{_me: 100}, 'users_default': 0, 'state_default': 50, 'invite': 50, 'kick': 50}),
                   for (final m in shown) _memberEvent(m, 'join'),
+                  for (final m in invitedMembers) _memberEvent(m, 'invite', sender: _me),
                 ],
               },
             },
@@ -3328,6 +3336,18 @@ void main() {
         },
       };
     }
+
+    /// Ein Weggang (oder Beitritt) in der Gruppe: Mitgliedsereignis und neue Zähler.
+    Map<String, Object?> memberChange(String user, String membership, {required int joined, int invited = 0, String room = gr}) => <String, Object?>{
+          'rooms': <String, Object?>{
+            'join': <String, Object?>{
+              room: <String, Object?>{
+                'summary': <String, Object?>{'m.joined_member_count': joined, 'm.invited_member_count': invited},
+                'state': <String, Object?>{'events': <Object?>[_memberEvent(user, membership)]},
+              },
+            },
+          },
+        };
 
     /// Gruppen mit unbekannter Beitrittszahl: der Zähler fehlt im `summary`.
     Map<String, Object?> groupUnknownSize(String room) {
@@ -4021,18 +4041,411 @@ void main() {
       });
     });
 
-    group('Senden in Gruppen ist gesperrt (Platzhalter bis K4-2b)', () {
-      test('Text, Antwort, Anhang, Reaktion und Wiederholen: notAllowed, auch bei bester Lage; nichts geht an den Server', () async {
-        final (hs, g) = await signedIn();
-        expect(await groupThread(g, groupJoined(gr)), isNotNull);
-        await expectLater(g.sendMessage('Hallo', threadId: gr), _notAllowed(), reason: 'vor openThread');
-        await g.openThread(gr);
+    // K4-2b: Das Senden in Gruppen (Tor Zeilen 1-7, §3.3) ersetzt den Platzhalter-Test „Senden in Gruppen ⇒ notAllowed“
+    // (K4-2a) AUSDRÜCKLICH; er wird nicht abgeschwächt, sondern durch die folgenden Tests ersetzt, die das Gegenteil (Erfolg bei
+    // bester Lage) und jede einzelne Sperre prüfen. Hinweis: Der Harness läuft ohne vodozemac; ein „erfolgreiches“ Senden zeigt
+    // sich als Anfrage an den Server (`hs.sends`), im Klartext (kein Client mit Verschlüsselung).
+    group('Senden in Gruppen: das Tor (K4-2b, §3.3)', () {
+      Future<(_Hs, SdkMatrixGateway, FakeOutboundSessionPort)> ready({
+        Map<String, Object?>? update,
+        ContactPolicy policy = rec,
+        bool open = true,
+        bool session = false,
+      }) async {
+        final (hs, g) = await signedIn(policy);
+        final port = FakeOutboundSessionPort();
+        g.debugOutboundPort = port;
+        expect(await groupThread(g, update ?? groupJoined(gr)), isNotNull);
+        if (session) port.createSession(gr, <String>{_me, _fremd, anna});
+        if (open) await g.openThread(gr);
+        await Future<void>.delayed(_settle);
+        return (hs, g, port);
+      }
+
+      int groupSends(_Hs hs) => hs.sends.where((s) => s.$1.contains(gr)).length;
+
+      test('Kontrollfall: Text läuft durch das Tor, der Server bekommt die Sendung (Anhänge brauchen den Medien-Upload, hier nur gesperrt prüfbar)', () async {
+        final (hs, g, _) = await ready();
+        await g.sendMessage('Hallo', threadId: gr);
+        expect(groupSends(hs), 1);
+        expect(g.threads.firstWhere((t) => t.kind == ThreadKind.group).sendLock, GroupSendLock.keiner);
+      });
+
+      test('Zeile 1: Zeitleiste nicht offen ⇒ notAllowed, nichts geht an den Server', () async {
+        final (hs, g, _) = await ready(open: false);
         await expectLater(g.sendMessage('Hallo', threadId: gr), _notAllowed());
-        await expectLater(g.sendMessage('Hallo', threadId: gr, replyToId: r'$x'), _notAllowed());
-        await expectLater(g.sendAttachment(fileName: 'a.pdf', bytes: Uint8List.fromList('%PDF-1.4\n1 0 obj\n'.codeUnits), threadId: gr), _notAllowed());
         await expectLater(g.sendReaction(r'$e', '👍', threadId: gr), _notAllowed());
-        await expectLater(g.retryMessage(r'$e', threadId: gr), throwsA(isA<GatewayException>()));
-        expect(hs.sends, isEmpty);
+        expect(groupSends(hs), 0);
+      });
+
+      test('Zeile 2: Raum ohne Megolm ⇒ encryptionUnavailable', () async {
+        final (hs, g, _) = await ready(update: groupJoined(gr, megolm: false));
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _error(GatewayError.encryptionUnavailable));
+        expect(groupSends(hs), 0);
+      });
+
+      test('Zeile 3: Regel, Verlauf, zu groß (auch 40 + 30), Größe unbekannt ⇒ gesperrt mit der Fehlerart der Abbildung; sichtbar bleibt die Gruppe', () async {
+        final cases = <String, (Map<String, Object?>, GatewayError, GroupSendLock)>{
+          'Regel public': (groupJoined(gr, rule: 'public'), GatewayError.notAllowed, GroupSendLock.regelGeaendert),
+          'Regel null': (groupJoined(gr, rule: null), GatewayError.notAllowed, GroupSendLock.regelGeaendert),
+          'Verlauf shared': (groupJoined(gr, history: 'shared'), GatewayError.notAllowed, GroupSendLock.verlaufGeoeffnet),
+          'Verlauf null': (groupJoined(gr, history: null), GatewayError.notAllowed, GroupSendLock.verlaufGeoeffnet),
+          '51 beigetreten': (groupJoined(gr, joined: 51, memberEvents: 1), GatewayError.notAllowed, GroupSendLock.zuGross),
+          '40 + 30': (groupJoined(gr, joined: 40, invited: 30, memberEvents: 1), GatewayError.notAllowed, GroupSendLock.zuGross),
+          'joinedCount == null': (groupUnknownSize(gr), GatewayError.serverUnreachable, GroupSendLock.groesseUnbekannt),
+        };
+        for (final e in cases.entries) {
+          final (hs, g, _) = await ready(update: e.value.$1);
+          await expectLater(g.sendMessage('Hallo', threadId: gr), _error(e.value.$2), reason: e.key);
+          await expectLater(g.sendReaction(r'$e', '👍', threadId: gr), throwsA(isA<GatewayException>()), reason: e.key);
+          expect(groupSends(hs), 0, reason: e.key);
+          expect(g.threads.where((t) => t.kind == ThreadKind.group).single.sendLock, e.value.$3, reason: '${e.key}: sichtbar und gesperrt');
+        }
+      });
+
+      test('Zeile 3: Datensatz entfällt ⇒ kein Senden mehr (die Gruppe ist keine mehr)', () async {
+        final (hs, g, _) = await ready();
+        g.setContactPolicy(nobody);
+        await Future<void>.delayed(_settle);
+        await expectLater(g.sendMessage('Hallo', threadId: gr), throwsA(isA<GatewayException>()));
+        expect(groupSends(hs), 0);
+      });
+
+      test('Zeile 4: Liste älter als 10 Minuten ⇒ das Senden ruft sie selbst ab (ein Abruf), danach geht es; scheitert der Abruf ⇒ serverUnreachable', () async {
+        // Einladungszahl unbekannt: die lokale Liste gilt nie als vollständig, also geht der Abruf zum Server.
+        final (hs, g, _) = await ready(update: groupJoined(gr, invited: null));
+        hs.members = <String>[_me, _fremd, anna];
+        g.debugAgeGroupMembers(gr, const Duration(minutes: 11));
+        final before = membersCalls(hs);
+        await g.sendMessage('Hallo', threadId: gr);
+        expect(membersCalls(hs), before + 1, reason: 'genau ein Abruf durch das Senden');
+        expect(groupSends(hs), 1);
+        await g.sendMessage('Zwei', threadId: gr);
+        expect(membersCalls(hs), before + 1, reason: 'frische Liste: kein weiterer Abruf');
+
+        final (hs2, g2, _) = await ready(update: groupJoined(gr, invited: null));
+        hs2.membersFail = true;
+        g2.debugAgeGroupMembers(gr, const Duration(minutes: 11));
+        await expectLater(g2.sendMessage('Hallo', threadId: gr), _error(GatewayError.serverUnreachable));
+        await expectLater(g2.sendReaction(r'$e', '👍', threadId: gr), throwsA(isA<GatewayException>()));
+        expect(groupSends(hs2), 0);
+      });
+
+      test('Zeile 4: der Zeitstempel wird bei nicht vollständiger Liste nicht „bei jedem Sync“ erneuert (Hinweis 1)', () async {
+        final (hs, g) = await signedIn();
+        g.debugOutboundPort = FakeOutboundSessionPort();
+        hs.members = <String>[_me, _fremd, anna];
+        await groupThread(g, groupJoined(gr, invited: null, memberEvents: 1));
+        await g.openThread(gr);
+        await Future<void>.delayed(_settle);
+        g.debugAgeGroupMembers(gr, const Duration(minutes: 11));
+        hs.membersFail = true;
+        for (var i = 0; i < 3; i++) {
+          await _sync(g, <String, Object?>{'account_data': <String, Object?>{'events': <Object?>[<String, Object?>{'type': 'x.kick', 'content': <String, Object?>{'n': _n++}}]}});
+          await Future<void>.delayed(_settle);
+        }
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _error(GatewayError.serverUnreachable), reason: 'Syncs erneuern die Frische nicht');
+      });
+
+      test('Zeile 6: nur ich in der Gruppe (frisch angelegt oder alle gegangen) ⇒ groupNoOtherMembers; nur Eingeladene zählen als Mitglieder', () async {
+        final (hs, g, _) = await ready(update: groupJoined(gr, members: <String>[_me]));
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _error(GatewayError.groupNoOtherMembers));
+        await expectLater(g.sendReaction(r'$e', '👍', threadId: gr), throwsA(isA<GatewayException>()));
+        await expectLater(g.sendAttachment(fileName: 'a.pdf', bytes: Uint8List.fromList('%PDF-1.4\n1 0 obj\n'.codeUnits), threadId: gr), _error(GatewayError.groupNoOtherMembers));
+        expect(groupSends(hs), 0);
+        expect(g.threads.where((t) => t.kind == ThreadKind.group).single.sendLock, GroupSendLock.keineMitglieder);
+        await g.leaveConversation(gr); // verlassbar
+
+        final (hs2, g2, _) = await ready(update: groupJoined(gr, members: <String>[_me], invitedMembers: <String>[anna]));
+        await g2.sendMessage('Hallo', threadId: gr);
+        expect(groupSends(hs2), 1, reason: 'ein Eingeladener ist ein Mitglied');
+      });
+
+      test('Zeile 7: alle anderen unknown ⇒ ein Abruf, danach neu bewertet; bleibt unknown ⇒ serverUnreachable; notReachable ⇒ peerNotReachable; ein reachable genügt', () async {
+        final (hs, g, _) = await ready();
+        var lookups = 0;
+        g.debugDevicesOf = (id) => ++lookups > 2 ? <bool>[true] : null;
+        await g.sendMessage('Hallo', threadId: gr);
+        expect(groupSends(hs), 1, reason: 'erst der Abruf macht die Schlüssel bekannt');
+
+        g.debugDevicesOf = (id) => null;
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _error(GatewayError.serverUnreachable));
+        g.debugDevicesOf = (id) => <bool>[false];
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _error(GatewayError.peerNotReachable));
+        g.debugDevicesOf = (id) => id == _fremd ? <bool>[true] : null;
+        await g.sendMessage('Zwei', threadId: gr);
+        expect(groupSends(hs), 2, reason: 'ein reachable, Rest unknown: sendet');
+        g.debugDevicesOf = (id) => id == _fremd ? <bool>[true] : <bool>[false];
+        await g.sendMessage('Drei', threadId: gr);
+        expect(groupSends(hs), 3, reason: 'ein reachable, ein nicht erreichbares Mitglied: sendet');
+      });
+
+      test('Abbildung Sperrgrund → Fehlerart für jeden GroupSendLock-Wert (erschöpfend)', () {
+        final expected = <GroupSendLock, GatewayError?>{
+          GroupSendLock.keiner: null,
+          GroupSendLock.zuGross: GatewayError.notAllowed,
+          GroupSendLock.groesseUnbekannt: GatewayError.serverUnreachable,
+          GroupSendLock.unverschluesselt: GatewayError.encryptionUnavailable,
+          GroupSendLock.regelGeaendert: GatewayError.notAllowed,
+          GroupSendLock.verlaufGeoeffnet: GatewayError.notAllowed,
+          GroupSendLock.keineMitglieder: GatewayError.groupNoOtherMembers,
+          GroupSendLock.wechsel: GatewayError.groupBusy,
+        };
+        expect(expected.keys.toSet(), GroupSendLock.values.toSet(), reason: 'jeder Wert steht in der Tabelle');
+        for (final l in GroupSendLock.values) {
+          expect(groupSendLockError(l), expected[l], reason: l.name);
+        }
+      });
+    });
+
+    group('Wisch der Außensitzung und Weggang (K4-2b, §3.3a)', () {
+      Future<(_Hs, SdkMatrixGateway, FakeOutboundSessionPort)> ready({
+        Map<String, Object?>? update,
+        Set<String>? persisted,
+        Set<String>? inMemory,
+      }) async {
+        final (hs, g) = await signedIn();
+        final port = FakeOutboundSessionPort();
+        if (persisted != null) port.persisted[gr] = persisted;
+        g.debugOutboundPort = port;
+        expect(await groupThread(g, update ?? groupJoined(gr)), isNotNull);
+        if (inMemory != null) port.createSession(gr, inMemory);
+        await g.openThread(gr);
+        await Future<void>.delayed(_settle);
+        return (hs, g, port);
+      }
+
+      int groupSends(_Hs hs) => hs.sends.where((s) => s.$1.contains(gr)).length;
+      Future<void> nudge(SdkMatrixGateway g, [Map<String, Object?>? update]) async {
+        await _sync(g, update ?? <String, Object?>{'account_data': <String, Object?>{'events': <Object?>[<String, Object?>{'type': 'x.kick', 'content': <String, Object?>{'n': _n++}}]}});
+        await Future<void>.delayed(_settle);
+      }
+
+      test('Entfernen durch andere: vor dem Sync des Weggangs kein Wisch; danach genau einer (Laden vor Wisch, Beleg), Senden entsperrt', () async {
+        final (hs, g, port) = await ready(inMemory: <String>{_me, _fremd, anna});
+        expect(port.wipes, 0, reason: 'vor dem Weggang kein Wisch');
+        await nudge(g);
+        expect(port.wipes, 0, reason: 'ein Sync ohne Weggang wischt nicht');
+        await nudge(g, memberChange(anna, 'leave', joined: 2));
+        expect(port.wipes, 1);
+        expect(port.recipients(gr), isNull, reason: 'Beleg: keine Sitzung mehr im Speicher');
+        expect(port.persisted.containsKey(gr), isFalse);
+        expect(port.log.indexOf('load:$gr'), lessThan(port.log.indexOf('wipe:$gr')), reason: 'Laden vor Wisch');
+        expect(g.debugGroupOps, isEmpty);
+        expect(g.debugPendingWipe, isEmpty);
+        await g.sendMessage('Danach', threadId: gr);
+        expect(groupSends(hs), 1);
+        await nudge(g);
+        expect(port.wipes, 1, reason: 'nicht noch einmal');
+      });
+
+      test('Weggang eines nur Eingeladenen (zurückgezogen/abgelehnt) löst ebenfalls einen Wisch aus', () async {
+        final (_, g, port) = await ready(
+          update: groupJoined(gr, members: <String>[_me, _fremd], invitedMembers: <String>[anna]),
+          inMemory: <String>{_me, _fremd, anna},
+        );
+        await nudge(g, memberChange(anna, 'leave', joined: 2, invited: 0));
+        expect(port.wipes, 1);
+        expect(port.recipients(gr), isNull);
+      });
+
+      test('Hinzukommen löst keinen Wisch aus', () async {
+        final (_, g, port) = await ready(inMemory: <String>{_me, _fremd, anna});
+        await nudge(g, memberChange('@neu:hs.example', 'join', joined: 4));
+        expect(port.wipes, 0);
+        expect(port.recipients(gr), isNotNull);
+      });
+
+      test('Wisch ohne Wirkung ⇒ pendingWipe, Senden groupBusy (Thread wechsel), jeder Sync versucht es erneut, erst nach Wirkung entsperrt', () async {
+        final (hs, g, port) = await ready(inMemory: <String>{_me, _fremd, anna});
+        port.wipeIneffective = true;
+        await nudge(g, memberChange(anna, 'leave', joined: 2));
+        expect(port.wipes, 1);
+        expect(g.debugPendingWipe, <String>{gr}, reason: 'der Rückgabewert true zählt nicht, der Beleg fehlt');
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _error(GatewayError.groupBusy));
+        await expectLater(g.sendReaction(r'$e', '👍', threadId: gr), throwsA(isA<GatewayException>()));
+        expect(groupSends(hs), 0);
+        expect(g.threads.firstWhere((t) => t.kind == ThreadKind.group).sendLock, GroupSendLock.wechsel);
+        await nudge(g);
+        expect(port.wipes, 2, reason: 'jeder Sync versucht es erneut, auch ohne neuen Weggang');
+        expect(g.debugPendingWipe, <String>{gr});
+        port.wipeIneffective = false;
+        await nudge(g);
+        expect(port.wipes, 3);
+        expect(g.debugPendingWipe, isEmpty);
+        await g.sendMessage('Danach', threadId: gr);
+        expect(groupSends(hs), 1);
+      });
+
+      test('Wisch wirft ⇒ pendingWipe, Senden gesperrt', () async {
+        final (_, g, port) = await ready(inMemory: <String>{_me, _fremd, anna});
+        port.wipeError = StateError('Datenbank');
+        await nudge(g, memberChange(anna, 'leave', joined: 2));
+        expect(g.debugPendingWipe, <String>{gr});
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _error(GatewayError.groupBusy));
+      });
+
+      test('Wechsel läuft (groupOps): Senden ist gesperrt, bis der Wisch fertig ist', () async {
+        final (hs, g, port) = await ready(inMemory: <String>{_me, _fremd, anna});
+        port.holdWipe = Completer<void>();
+        await _sync(g, memberChange(anna, 'leave', joined: 2));
+        await Future<void>.delayed(_settle);
+        expect(g.debugGroupOps, <String>{gr});
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _error(GatewayError.groupBusy));
+        expect(groupSends(hs), 0);
+        port.holdWipe!.complete();
+        await Future<void>.delayed(_settle);
+        expect(g.debugGroupOps, isEmpty);
+        await g.sendMessage('Danach', threadId: gr);
+        expect(groupSends(hs), 1);
+      });
+
+      test('Neustart (persistiert, nicht geladen): die Basis kommt aus der geladenen Sitzung; der Weggegangene wird erkannt, geladen VOR dem Wisch', () async {
+        const caro = '@caro:hs.example';
+        final (hs, g, port) = await ready(persisted: <String>{_me, _fremd, anna, caro});
+        expect(port.wipes, 1, reason: 'caro steht in der Sitzung, aber nicht mehr im Raum');
+        expect(port.log.first, 'load:$gr', reason: 'Laden vor Wisch');
+        expect(port.persisted.containsKey(gr), isFalse, reason: 'die persistierte Sitzung ist weg, nicht nur die im Speicher');
+        expect(g.debugPendingWipe, isEmpty);
+        await g.sendMessage('Hallo', threadId: gr);
+        expect(groupSends(hs), 1);
+        await nudge(g);
+        await nudge(g);
+        expect(port.loads, lessThanOrEqualTo(2), reason: 'die Basis wird einmal je Prozess und Raum gebildet, danach gilt lastMembers');
+        expect(port.wipes, 1);
+      });
+
+      test('Neustart: Sitzung passt zu den Mitgliedern ⇒ kein Wisch; ohne persistierte Sitzung ⇒ nichts zu wischen, entsperrt', () async {
+        final (_, g1, p1) = await ready(persisted: <String>{_me, _fremd, anna});
+        expect(p1.wipes, 0);
+        expect(g1.debugPendingWipe, isEmpty);
+        final (_, g2, p2) = await ready();
+        expect(p2.wipes, 0);
+        expect(g2.debugGroupOps, isEmpty);
+        expect(g2.debugPendingWipe, isEmpty);
+      });
+
+      test('Neustart: ein vor dem Neustart gescheiterter Wisch (Weggegangener steht noch in der Sitzung) wird beim ersten Abgleich erneut erkannt', () async {
+        const caro = '@caro:hs.example';
+        final (_, g, port) = await ready(persisted: <String>{_me, _fremd, anna, caro});
+        expect(port.wipes, 1);
+        expect(g.debugPendingWipe, isEmpty);
+      });
+
+      test('load wirft ⇒ kein Beleg: pendingWipe, Senden gesperrt; auch spätere Syncs belegen nichts (das SDK lädt nur einmal je Raum)', () async {
+        const caro = '@caro:hs.example';
+        final port0 = FakeOutboundSessionPort()..loadError = StateError('Datenbank');
+        final (hs, g) = await signedIn();
+        port0.persisted[gr] = <String>{_me, _fremd, anna, caro};
+        g.debugOutboundPort = port0;
+        expect(await groupThread(g, groupJoined(gr)), isNotNull);
+        await g.openThread(gr);
+        await Future<void>.delayed(_settle);
+        expect(g.debugPendingWipe, <String>{gr});
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _error(GatewayError.groupBusy));
+        await nudge(g);
+        await nudge(g);
+        expect(g.debugPendingWipe, <String>{gr}, reason: 'ein späteres recipients == null ist kein Beleg');
+        expect(port0.wipes, 0);
+        expect(groupSends(hs), 0);
+      });
+
+      test('Wächter: das Gateway wischt nur über den Port, mit load davor (Wisch auf Ungeladenes wäre ein No-op)', () async {
+        // Der Fake wischt nur Geladenes: ein Wisch ohne vorheriges Laden ließe die persistierte Sitzung stehen.
+        const caro = '@caro:hs.example';
+        final (_, g, port) = await ready(persisted: <String>{_me, _fremd, anna, caro});
+        expect(port.persisted, isEmpty);
+        expect(g.debugPendingWipe, isEmpty);
+      });
+    });
+
+    // Reaktionen in Gruppen- und Kontakträumen (K4-2b, §3.5): Verhaltensumkehr gegenüber K3a-2a. Die Pauschalsperre ist weg; die
+    // Tests unten ersetzen die Aussage „Reaktion im Kontaktraum ⇒ notAllowed“ durch Erfolg im offenen Thread plus die bleibenden
+    // Ablehnungsfälle (nicht offen, Ziel unbekannt, Ziel eines Blockierten, gesperrte Gruppe).
+    group('Reaktionen in Gruppen und Kontakträumen (K4-2b, §3.5)', () {
+      Map<String, Object?> encMsg(String id, String from) => <String, Object?>{
+            'type': 'm.room.encrypted',
+            'event_id': id,
+            'sender': from,
+            'origin_server_ts': DateTime.now().millisecondsSinceEpoch + _n++,
+            'content': <String, Object?>{'algorithm': 'm.megolm.v1.aes-sha2', 'ciphertext': 'x', 'session_id': 's', 'sender_key': 'k', 'device_id': 'D'},
+          };
+      Map<String, Object?> withEvents(Map<String, Object?> u, String room, List<Object?> events) {
+        (((u['rooms']! as Map)['join']! as Map)[room]! as Map)['timeline'] = <String, Object?>{'events': events, 'limited': false};
+        return u;
+      }
+
+      int reactionSends(_Hs hs) => hs.sends.where((s) => s.$1.contains('de.inneso.familynexus.reaction')).length;
+
+      test('Gruppe: Reaktion auf eine Nachricht eines Mitglieds geht als eigener Typ an den Server; nicht offen, Ziel unbekannt, Ziel eines Blockierten, Sperre ⇒ abgelehnt', () async {
+        final (hs, g) = await signedIn();
+        g.debugOutboundPort = FakeOutboundSessionPort();
+        expect(await groupThread(g, withEvents(groupJoined(gr), gr, <Object?>[encMsg(r'$t1', _fremd)])), isNotNull);
+        await expectLater(g.sendReaction(r'$t1', '👍', threadId: gr), _notAllowed(), reason: 'Thread nicht offen');
+        await g.openThread(gr);
+        await Future<void>.delayed(_settle);
+        await g.sendReaction(r'$t1', '👍', threadId: gr);
+        expect(reactionSends(hs), 1);
+        await expectLater(g.sendReaction(r'$unbekannt', '👍', threadId: gr), _error(GatewayError.notFound));
+        g.setContactPolicy(const ContactPolicy(enabled: true, groups: <String>{gr}, blocked: <String>{_fremd}));
+        await Future<void>.delayed(_settle);
+        await expectLater(g.sendReaction(r'$t1', '🎉', threadId: gr), _notAllowed(), reason: 'Ziel eines Blockierten');
+        expect(reactionSends(hs), 1);
+      });
+
+      test('Gruppe gesperrt (Regel public) ⇒ auch keine Reaktion', () async {
+        final (hs, g) = await signedIn();
+        g.debugOutboundPort = FakeOutboundSessionPort();
+        await groupThread(g, withEvents(groupJoined(gr, rule: 'public'), gr, <Object?>[encMsg(r'$t1', _fremd)]));
+        await g.openThread(gr);
+        await Future<void>.delayed(_settle);
+        await expectLater(g.sendReaction(r'$t1', '👍', threadId: gr), _notAllowed());
+        expect(reactionSends(hs), 0);
+      });
+
+      test('Kontakt-Einzelchat: Reaktion im offenen Thread geht durch (Umkehr der Pauschalsperre), davor und auf Blockierte nicht', () async {
+        const ct = '!ct:hs.example';
+        const pol = ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.accepted});
+        final (hs, g) = await _signedIn(encryption: true);
+        g.setContactPolicy(pol);
+        g.debugDevicesOf = (id) => <bool>[true];
+        final u = dmJoined(ct, _fremd);
+        (((u['rooms']! as Map)['join']! as Map)[ct]! as Map)['timeline'] = <String, Object?>{'events': <Object?>[encMsg(r'$t1', _fremd)], 'limited': false};
+        expect(await contactThreadFor(g, ct, u), isNotNull);
+        await expectLater(g.sendReaction(r'$t1', '👍', threadId: ct), _notAllowed(), reason: 'nicht offen');
+        await g.openThread(ct);
+        await Future<void>.delayed(_settle);
+        await g.sendReaction(r'$t1', '👍', threadId: ct);
+        expect(reactionSends(hs), 1);
+        g.setContactPolicy(const ContactPolicy(enabled: true, contacts: <String, ContactState>{_fremd: ContactState.accepted}, blocked: <String>{_fremd}));
+        await Future<void>.delayed(_settle);
+        await expectLater(g.sendReaction(r'$t1', '🎉', threadId: ct), throwsA(isA<GatewayException>()));
+        expect(reactionSends(hs), 1);
+      });
+    });
+
+    group('Quelltext-Wächter und I4 (K4-2b)', () {
+      test('Gruppenzeitleisten gehen nie in den Signal-Scan: Reaktionstyp und Kalender-/Aufgaben-Ereignisse in der Gruppe bleiben ohne Signal', () async {
+        final (_, g) = await signedIn();
+        final signals = <CalendarSignal>[];
+        g.calendarSignals.listen(signals.add);
+        final events = <Object?>[
+          for (final t in <String>['de.inneso.familynexus.reaction', 'de.inneso.familynexus.event_shared', 'de.inneso.familynexus.task', 'de.inneso.familynexus.shopping_item'])
+            <String, Object?>{
+              'type': t,
+              'event_id': '\$x${_n++}',
+              'sender': _fremd,
+              'origin_server_ts': DateTime.now().millisecondsSinceEpoch + _n,
+              'content': <String, Object?>{'v': 1, 'target': r'$a', 'key': '👍', 'sender': _fremd},
+            },
+        ];
+        final u = groupJoined(gr);
+        (((u['rooms']! as Map)['join']! as Map)[gr]! as Map)['timeline'] = <String, Object?>{'events': events, 'limited': false};
+        await groupThread(g, u);
+        await g.openThread(gr);
+        await Future<void>.delayed(_settle);
+        expect(signals, isEmpty);
+        expect(g.messagesIn(gr), isEmpty, reason: 'Fremdtypen sind keine Nachrichten');
       });
     });
 
