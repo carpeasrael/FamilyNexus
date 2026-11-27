@@ -16,6 +16,7 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
   Map<String, List<ChatMessage>> get _dmMessages;
   Map<String, String> get _dmPeers;
   _ContactState get _contacts;
+  _GroupState get _groups;
   bool get _disposed;
   PeerMembership _peerMembershipOf(Room r, String peer);
   List<ChatThread> _contactThreads();
@@ -56,6 +57,12 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
   /// (`creating`), Einladungszustand, Missbrauchsgrenzen und Mitgliedszustand im Raum überleben (kein doppeltes Anlegen,
   /// nie wieder sichtbar). [full] `true` (Abmelden, Kontowechsel, `_resetLocal`): alles.
   void _resetContacts({required bool full}) {
+    // Gruppen (K4-2a) folgen demselben Schnitt: voll nur bei Abmelden, sonst nur Räume (Anlagen und Beitritte bleiben).
+    if (full) {
+      _groups.clearAll();
+    } else {
+      _groups.clearRooms();
+    }
     if (full) {
       _contacts.clearAll();
       return;

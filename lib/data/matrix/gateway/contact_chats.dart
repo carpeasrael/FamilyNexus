@@ -112,9 +112,14 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
   _AppClient? get _client;
   bool _canEncryptIn(Room? room);
   _ContactState get _contacts;
+  _GroupState get _groups;
   ContactPolicy get _contactPolicy;
   int get _contactEpoch;
   bool _contactMembersComplete();
+  Future<bool> _syncGroupRooms(Client client, PolicyContext ctx, String me);
+  List<ChatThread> _groupThreads();
+  Future<void> _openGroupThread(String threadId);
+  Future<void> _leaveGroup(String threadId);
   PolicyContext _contactPolicyContext();
   bool _isFamilyId(String userId);
   bool _anyDeviceBlocked(String uid);
@@ -208,7 +213,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     return meta;
   }
 
-  /// Kontakt-Threads für `threads` (nach Titel sortiert).
+  /// Kontakt-Threads und Gruppen-Threads (K4-2a) für `threads` (nach Titel sortiert).
   // ignore: unused_element
   List<ChatThread> _contactThreads() => <ChatThread>[
         for (final e in _contacts.peers.entries)
@@ -224,6 +229,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
               reachable: _reachabilityOf(e.value) != ContactReachability.notReachable,
               identity: (_identityChanged.contains(e.value) || _anyDeviceBlocked(e.value)) ? IdentityStatus.changed : (_contacts.identity[e.key] ?? IdentityStatus.unknown),
             ),
+        ..._groupThreads(),
       ]..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
 
   /// Gleicht Kontakt-Räume, Zeitleisten und Anfragen mit der Richtlinie ab. Solange die Mitgliederliste der Familie nicht
@@ -234,6 +240,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     final me = client.userID;
     if (me == null || !_contactMembersComplete() || !_contactPolicy.enabled) {
       c.clearRooms();
+      _groups.clearRooms();
       if (!_contactPolicy.enabled) c.inviteMeta.clear();
       return;
     }
@@ -292,7 +299,11 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
       c.messages[e.key] = ChatMapper.messages(e.value, threadId: e.key, sends: _localSends, showReadBy: _showReadBy);
     }
 
-    // 2. Anfragen: Einladungen `is_direct` von Fremden ohne Datensatz, ohne Rauminhalt.
+    // Gruppen (K4-2a): eigener Zustand, nur mit Datensatz; ein Gruppen-Datensatz gewinnt gegen `m.direct` (Schritt 1 hat
+    // einen solchen Raum nicht als Einzelchat gewählt, `classify` liefert `contactGroup`).
+    if (!await _syncGroupRooms(client, ctx, me)) return;
+
+    // 2. Anfragen: Einladungen `is_direct` von Fremden ohne Datensatz und Gruppeneinladungen, ohne Rauminhalt.
     _rebuildRequests(client, ctx, me);
   }
 
@@ -307,20 +318,33 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     }
     c.inviteMeta.removeWhere((id, _) => !liveIds.contains(id));
     c.requestSeen.removeWhere((id, _) => !liveIds.contains(id));
-    // Aufwandsgrenze: nur die ersten 500 Direkteinladungen in der Reihenfolge der Erstsichtung (stabil, nicht verdrängbar).
+    // Aufwandsgrenze: nur die ersten 500 Direkteinladungen und die ersten 500 Gruppeneinladungen in der Reihenfolge der
+    // Erstsichtung (stabil, nicht verdrängbar).
     final direct = <Room>[];
+    final groupInvites = <Room>[];
     for (final r in invites) {
       if (c.failed.contains(r.id)) continue;
       final meta = _inviteMetaOf(r, me);
-      if (!meta.direct || meta.from == null) continue;
+      if (meta.from == null) continue;
+      if (!meta.direct) {
+        // Gruppeneinladung (K4-2a): nur mit `join_rule: invite`; jede Einladung ist eine eigene Anfrage (nie automatisch
+        // angenommen, auch nicht von einem Kontakt).
+        if (_roomFacts(r, me).joinRule != 'invite') continue;
+        c.requestSeen.putIfAbsent(r.id, () => c.requestSeq++);
+        groupInvites.add(r);
+        continue;
+      }
       if (_contactPolicy.contacts.containsKey(meta.from)) continue; // Kontakte nehmen den Weg der Auto-Annahme
       c.requestSeen.putIfAbsent(r.id, () => c.requestSeq++);
       direct.add(r);
     }
-    direct.sort((a, b) {
+    int bySeen(Room a, Room b) {
       final k = c.requestSeen[a.id]!.compareTo(c.requestSeen[b.id]!);
       return k != 0 ? k : a.id.compareTo(b.id);
-    });
+    }
+
+    direct.sort(bySeen);
+    groupInvites.sort(bySeen);
     final bySender = <String, Room>{};
     for (final r in direct.take(500)) {
       if (ConversationPolicy.classify(_roomFacts(r, me), ctx) != RoomClass.contactRequest) continue;
@@ -328,14 +352,25 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
       final cur = bySender[from];
       if (cur == null || r.id.compareTo(cur.id) < 0) bySender[from] = r;
     }
-    final ordered = bySender.values.toList()
-      ..sort((a, b) {
-        final k = c.requestSeen[a.id]!.compareTo(c.requestSeen[b.id]!);
-        return k != 0 ? k : a.id.compareTo(b.id);
-      });
+    // Gruppenanfragen: je Raum eine, je Einladendem höchstens 3 (die ältesten in der Reihenfolge der Erstsichtung); sie
+    // verdrängen Einzelchat-Anfragen nicht und umgekehrt.
+    final groupOrdered = <Room>[];
+    final perInviter = <String, int>{};
+    var hidden = 0;
+    for (final r in groupInvites.take(500)) {
+      if (ConversationPolicy.classify(_roomFacts(r, me), ctx) != RoomClass.contactRequest) continue;
+      final from = c.inviteMeta[r.id]!.from!;
+      final n = perInviter[from] ?? 0;
+      if (n >= 3) {
+        hidden++;
+        continue;
+      }
+      perInviter[from] = n + 1;
+      groupOrdered.add(r);
+    }
+    final ordered = <Room>[...bySender.values, ...groupOrdered]..sort(bySeen);
     final perServer = <String, int>{};
     final out = <ContactRequest>[];
-    var hidden = 0;
     for (final r in ordered) {
       final from = c.inviteMeta[r.id]!.from!;
       final server = MatrixIds.serverName(from) ?? '';
@@ -346,11 +381,16 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
       }
       perServer[server] = n + 1;
       final name = r.getState(EventTypes.RoomMember, from)?.content['displayname'];
+      final isGroup = !c.inviteMeta[r.id]!.direct;
+      final groupName = r.getState(EventTypes.RoomName)?.content['name'];
       out.add(ContactRequest(
         roomId: r.id,
         fromUserId: from,
         fromName: ContactNames.title(name is String ? name : null, from),
         name: ContactNames.cleanName(name is String ? name : null),
+        isGroup: isGroup,
+        groupName: isGroup ? ContactNames.groupTitle(groupName is String ? groupName : null) : null,
+        inviterIsFamily: isGroup && _isFamilyId(from),
       ));
     }
     c.requests = out;
@@ -457,11 +497,15 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
 
   @override
   bool isThreadOpen(String threadId) =>
-      threadId == ChatThread.familyId || _dmTimelines.containsKey(threadId) || _contacts.timelines.containsKey(threadId);
+      threadId == ChatThread.familyId ||
+      _dmTimelines.containsKey(threadId) ||
+      _contacts.timelines.containsKey(threadId) ||
+      _groups.timelines.containsKey(threadId);
 
   @override
   Future<void> openThread(String threadId) async {
     final c = _contacts;
+    if (_groups.groups.containsKey(threadId)) return _openGroupThread(threadId);
     if (!c.peers.containsKey(threadId) || _dmPeers.containsKey(threadId) || c.timelines.containsKey(threadId)) return;
     if (!c.opening.add(threadId)) return;
     final epoch = _contactEpoch;
@@ -552,6 +596,13 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
   @override
   Future<void> leaveConversation(String threadId) async {
     final c = _contacts;
+    // Gruppen (K4-2a): auch überfüllte, sendegesperrte und unverschlüsselte; auch eine von dieser Sitzung angelegte Gruppe,
+    // deren Datensatz noch nicht sichtbar ist (Rücknahme durch den Controller, D3). Nie Familie oder Einzelchat.
+    if (threadId != ChatThread.familyId &&
+        !_dmPeers.containsKey(threadId) &&
+        (_groups.groups.containsKey(threadId) || _groups.creatingGroups.contains(threadId))) {
+      return _leaveGroup(threadId);
+    }
     final room = _client?.getRoomById(threadId);
     if (threadId == ChatThread.familyId || _dmPeers.containsKey(threadId) || !c.peers.containsKey(threadId) || room == null) {
       throw const GatewayException(GatewayError.notAllowed);

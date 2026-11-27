@@ -336,7 +336,7 @@ void main() {
       for (final f in libFiles())
         if (f.path != 'lib/data/matrix/contact_group_spec.dart' && code(f.readAsStringSync()).contains('ContactGroupSpec')) f.path,
     ];
-    expect(users, isEmpty, reason: 'Spec bis K4-2 ohne Verbraucher; danach nur contact_groups.dart (Wächter dann erweitern)');
+    expect(users, <String>['lib/data/matrix/gateway/contact_groups.dart'], reason: 'K4-2a: die Spec hat genau einen Verbraucher, die Gruppenanlage');
     final creators = <String>[
       for (final f in libFiles())
         if (code(f.readAsStringSync()).contains('createRoom(')) f.path,
@@ -344,8 +344,9 @@ void main() {
     expect(creators, <String>[
       'lib/data/matrix/gateway/books.dart',
       'lib/data/matrix/gateway/calendar_data.dart',
+      'lib/data/matrix/gateway/contact_groups.dart',
       'lib/data/matrix/gateway/family.dart',
-    ], reason: 'K4-1 legt keinen Raum an; die Gruppenanlage kommt mit K4-2 in contact_groups.dart');
+    ], reason: 'K4-2a: genau eine Gruppenanlage, in contact_groups.dart (Spec-gebunden)');
   });
 
   test('K4-1 (Textwächter): die Gruppen-Domäne bleibt reine Domäne ohne SDK und ohne data/', () {
@@ -364,5 +365,83 @@ void main() {
     final b = code(File('lib/data/matrix/sdk_matrix_gateway.dart').readAsStringSync());
     expect(a, contains('groups: _contactPolicy.groups'));
     expect(b, contains('groups: _contactPolicy.groups'));
+  });
+
+  // ---- K4-2a: Gruppen im Gateway (Textwächter) ----
+
+  test('K4-2a (Textwächter): _scanForSignals hat genau die drei bekannten Aufrufe, jeder auf _timeline oder _privateTimeline, nie auf Kontakt-/Gruppenzeitleisten', () {
+    final calls = <String>[];
+    for (final f in libFiles()) {
+      final t = code(f.readAsStringSync());
+      for (final m in RegExp(r'(?<!void )_scanForSignals\(([^,)]*)').allMatches(t)) {
+        calls.add('${f.path}|${m.group(1)!.trim()}');
+      }
+    }
+    calls.sort();
+    expect(calls.length, 3, reason: 'ein vierter Aufruf lässt den Wächter rot werden (alle drei Aufrufstellen erfasst)');
+    for (final c in calls) {
+      expect(<String>['_timeline', '_privateTimeline'].contains(c.split('|').last), isTrue, reason: c);
+    }
+    expect(calls.where((c) => c.startsWith('lib/data/matrix/sdk_matrix_gateway.dart|')), hasLength(3));
+  });
+
+  test('K4-2a (Textwächter): acceptGroupInvite nennt familyAccountData nie und nimmt nie über acceptInvitation oder _joinContact an', () {
+    final t = code(File('lib/data/matrix/gateway/contact_groups.dart').readAsStringSync());
+    final a = t.indexOf('Future<void> acceptGroupInvite(String roomId) async {');
+    expect(a, greaterThan(0));
+    final body = t.substring(a, t.indexOf('\n  }\n', a));
+    expect(body, isNot(contains('familyAccountData')));
+    expect(body, isNot(contains('acceptInvitation')));
+    expect(body, isNot(contains('_joinContact')));
+    expect(t, isNot(contains('familyAccountData')), reason: 'das Gruppenmodul schreibt nie die Familienzuordnung');
+    expect(t, isNot(contains('setAccountData')), reason: 'kein Datensatz, keine Zuordnung (das tut der Controller, K4-3)');
+    expect(t, isNot(contains('.peers')), reason: 'Gruppen sind kein Einzelchat-Zustand (eigener Halter)');
+    expect(t, contains('ContactGroupSpec.verifyJoined('), reason: 'Nachprüfung nach dem Beitritt');
+  });
+
+  test('K4-2a (Textwächter): Gruppenanfragen werden nie automatisch angenommen; Beitritt nur in acceptGroupInvite', () {
+    final chats = code(File('lib/data/matrix/gateway/contact_chats.dart').readAsStringSync());
+    expect(chats, contains('if (!meta.direct || from == null || !_contactPolicy.contacts.containsKey(from)) continue;'), reason: 'Auto-Annahme nur für is_direct');
+    final joiners = <String>[
+      for (final f in libFiles())
+        if (RegExp(r'joinRoomById\(').hasMatch(code(f.readAsStringSync()))) f.path,
+    ];
+    expect(joiners, contains('lib/data/matrix/gateway/contact_groups.dart'));
+    final groups = code(File('lib/data/matrix/gateway/contact_groups.dart').readAsStringSync());
+    expect('joinRoomById('.allMatches(groups).length, 1);
+    expect(groups.contains('.join('), isFalse, reason: 'kein room.join(waitForSync:) wie bei der Auto-Annahme');
+  });
+
+  test('K4-2a (Textwächter): kein AppLog im Gruppenmodul nennt Raum-ID, Kennung, Name oder die Ausnahme-Texte (nur Fehlerart)', () {
+    final t = code(File('lib/data/matrix/gateway/contact_groups.dart').readAsStringSync());
+    final logs = RegExp(r"AppLog\.[dwe]\('gateway', '([^']*)'").allMatches(t).map((m) => m.group(1)!).toList();
+    expect(logs, isNotEmpty);
+    for (final l in logs) {
+      expect(l.replaceAll(r'${e.runtimeType}', ''), isNot(contains(r'$')), reason: l);
+    }
+  });
+
+  test('K4-2a (Textwächter): Senden in Gruppen ist gesperrt (Platzhalter wirft immer), und das Tor liegt vor dem Kontakt-Pfad', () {
+    final g = code(File('lib/data/matrix/gateway/contact_groups.dart').readAsStringSync());
+    expect(g, contains('Room _requireGroupRoom(String threadId, Room room) => throw const GatewayException(GatewayError.notAllowed);'));
+    final c = code(File('lib/data/matrix/gateway/chat.dart').readAsStringSync());
+    expect(c, contains('_groups.groups.containsKey(threadId)) return _requireGroupRoom(threadId, room);'));
+    expect(c.indexOf('_requireGroupRoom(threadId, room)'), lessThan(c.indexOf('_requireContactRoom(threadId, room)')));
+    // Die Reaktions-Pauschalsperre für Kontakt-Threads bleibt (K4-2b ersetzt sie).
+    expect(c, contains('_contacts.peers.containsKey(threadId)) {\n      throw const GatewayException(GatewayError.notAllowed);'));
+  });
+
+  test('K4-2a (Textwächter): der Verlauf steht in importantStateEvents, die Datenübersicht kennt die Gruppe, der Gruppenzustand wird mit den Kontakten geräumt', () {
+    final main = code(File('lib/data/matrix/sdk_matrix_gateway.dart').readAsStringSync());
+    expect(main, contains('client.importantStateEvents.add(EventTypes.HistoryVisibility);'));
+    expect(main, contains('client.importantStateEvents.add(EventTypes.RoomJoinRules);'));
+    expect(main, contains('_groups.clearAll();'));
+    expect(main, contains('_groups.cancelTimelines();'));
+    expect(code(File('lib/data/matrix/gateway/data_inventory.dart').readAsStringSync()), contains('isGroup: _groups.groups.containsKey(r.id),'));
+    final d = code(File('lib/data/matrix/gateway/direct_chats.dart').readAsStringSync());
+    expect(d, contains('_groups.clearAll();'));
+    expect(d, contains('_groups.clearRooms();'));
+    // Familienwechsel und Bereich aus räumen nur Räume: clearAll steht nur im Zweig `full`.
+    expect(RegExp(r'if \(full\) \{\s*_groups\.clearAll\(\);\s*\} else \{\s*_groups\.clearRooms\(\);').hasMatch(d), isTrue);
   });
 }

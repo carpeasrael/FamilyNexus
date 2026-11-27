@@ -3,6 +3,7 @@ part of '../sdk_matrix_gateway.dart';
 /// Datenprotokoll (AP-5): Inventar der Online- und lokalen Daten für den Datenbericht (#261).
 mixin _DataInventoryModule on ChangeNotifier implements MatrixGateway {
   _ContactState get _contacts;
+  _GroupState get _groups;
   _AppClient? get _client;
   Family? get _family;
   Room? _privateRoom();
@@ -97,6 +98,7 @@ mixin _DataInventoryModule on ChangeNotifier implements MatrixGateway {
           isPrivate: r.id == privateId,
           isDirect: r.isDirectChat,
           isContact: _contacts.peers.containsKey(r.id),
+          isGroup: _groups.groups.containsKey(r.id),
           isBook: BookRoomMarker.isBook(r.getState(EventTypes.RoomCreate)?.content),
         ),
         name: r.isDirectChat && refresh ? _peerName(r) : TextSanitizer.clean(r.name, max: 80),
