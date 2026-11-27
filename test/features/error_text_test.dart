@@ -46,7 +46,7 @@ void main() {
     expect(errorText(de, busy), 'Die Gruppe wird gerade aktualisiert. Bitte warte einen Moment.');
     expect(errorText(en, busy), 'The group is being updated. Please wait a moment.');
     for (final e in <GatewayException>[none, busy]) {
-      for (final l in <dynamic>[de, en]) {
+      for (final l in <AppLocalizations>[de, en]) {
         expect(errorText(l, e), isNot(l.errUnknown));
         expect(errorText(l, e), isNot(l.errServerUnreachable));
         expect(errorText(l, e), isNot(l.errPeerNotReachable));
