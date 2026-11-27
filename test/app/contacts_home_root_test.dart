@@ -347,6 +347,64 @@ void main() {
       expect(await app.services.enterContactsOnly(), isFalse, reason: 'die Familie gewinnt');
     });
 
+    test('Familie entsteht, während der Anspruch hinter dem der Familiendienste wartet: Besitzer bleibt, kein Anspruch ohne Familie', () async {
+      final owners = <String>[];
+      final gate = Completer<void>();
+      final app = await buildTestApp(
+        contactsEnabled: true,
+        familyDataClaim: (o) async {
+          owners.add(o);
+          if (owners.length == 1) await gate.future; // der erste Anspruch (Familiendienste) hält die Kette an
+        },
+      );
+      addTearDown(() {
+        app.services.closeCalendar();
+        app.services.closeContacts();
+      });
+      final room = app.server.addFamilyRoom('Familie', '@anna:fake.test').id;
+      app.gateway.attachFamilyRoom(room);
+      final calendar = app.services.openCalendar();
+      await Future<void>.delayed(Duration.zero);
+      app.gateway.detachFamilyRoom(); // Lage zur Entscheidung von AppRoot: keine Familie
+      final opening = app.services.openContactsAccount();
+      await Future<void>.delayed(Duration.zero);
+      app.gateway.attachFamilyRoom(room); // Familie entsteht, bevor der Anspruch an der Reihe ist
+      gate.complete();
+      await calendar;
+      await opening;
+      expect(owners, <String>['@anna:fake.test|$room'], reason: 'nie der Anspruch `uid|` über laufende Familiendaten');
+    });
+
+    test('enterContactsOnly: Familie entsteht während des Anspruchs oder davor in der Kette: kein Anspruch, nichts gemerkt', () async {
+      final owners = <String>[];
+      final gate = Completer<void>();
+      var hold = false;
+      final app = await buildTestApp(
+        contactsEnabled: true,
+        familyDataClaim: (o) async {
+          owners.add(o);
+          if (hold && owners.length == 1) await gate.future;
+        },
+      );
+      addTearDown(() {
+        app.services.closeCalendar();
+        app.services.closeContacts();
+      });
+      app.gateway.detachFamilyRoom();
+      await app.services.openContactsAccount();
+      owners.clear();
+      hold = true;
+      final first = app.services.enterContactsOnly(); // Anspruch läuft und hängt
+      final second = app.services.enterContactsOnly(); // wartet in der Kette
+      await Future<void>.delayed(Duration.zero);
+      app.gateway.attachFamilyRoom(app.server.addFamilyRoom('Familie', '@anna:fake.test').id);
+      gate.complete();
+      expect(await first, isFalse, reason: 'nach dem await gewinnt die Familie');
+      expect(await second, isFalse, reason: 'in der Kette vor dem Anspruch gewinnt die Familie');
+      expect(owners, <String>['@anna:fake.test|'], reason: 'der zweite Anspruch entfällt');
+      expect(app.services.settings.settings.contactsOnly, isFalse);
+    });
+
     testWidgets('Kein Anspruch vor dem ersten Abgleich: ein Familienkonto verliert beim Start nie seine Daten', (tester) async {
       final owners = <String>[];
       final app = await buildTestApp(contactsEnabled: true, familyDataClaim: (o) async => owners.add(o));

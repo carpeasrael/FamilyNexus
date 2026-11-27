@@ -303,8 +303,16 @@ class AppServices {
   }
 
   /// Reiht den Anspruch [claim] auf die lokalen Daten für [owner] in die Kette ein ([_claimRun]).
-  Future<void> _claim(Future<void> Function(String owner) claim, String owner) {
-    final run = _claimRun.then((_) => claim(owner));
+  ///
+  /// [unless] wird erst in der Kette geprüft, unmittelbar vor dem Schreiben des Besitzers: Wartet der Anspruch hinter einem
+  /// anderen (etwa dem der Familiendienste), kann sich die Lage bis dahin geändert haben. `true` ⇒ kein Anspruch; das
+  /// Ergebnis ist `true`, wenn der Anspruch ausgeführt wurde.
+  Future<bool> _claim(Future<void> Function(String owner) claim, String owner, {bool Function()? unless}) {
+    final run = _claimRun.then((_) async {
+      if (unless != null && unless()) return false;
+      await claim(owner);
+      return true;
+    });
     _claimRun = run.then<void>((_) {}, onError: (Object _) {});
     return run;
   }
@@ -329,7 +337,11 @@ class AppServices {
     if (built == null) return; // keine Freigabe: nichts anfassen
     await Future.wait<void>(<Future<void>>[_closing, _contactsClosing]);
     final claim = familyDataClaim;
-    if (claim != null) await _claim(claim, '$uid|');
+    // Die Familie gewinnt: Der Anspruch für ein Konto ohne Familie (`'$uid|'`) liefe sonst über die Familiendaten einer
+    // inzwischen laufenden HomeShell (Rennen mit `openCalendar`), darum erst in der Kette geprüft.
+    if (gateway.family != null) return;
+    if (claim != null && !await _claim(claim, '$uid|', unless: () => gateway.family != null || gateway.userId != uid)) return;
+    if (gateway.family != null) return;
     // Währenddessen anderes Konto, Abmelden oder die Familiendienste haben die Dienste geöffnet: nicht doppelt öffnen. Die
     // ungestartet verworfenen Dienste halten nichts (kein `dispose`: es setzte die Richtlinie der offenen Dienste zurück).
     if (gateway.userId != uid || gateway.session != SessionState.ready || (contacts != null && _contactsUser == uid)) return;
@@ -347,7 +359,8 @@ class AppServices {
     final uid = gateway.userId;
     if (uid == null || contacts == null || _contactsUser != uid || gateway.family != null) return false;
     final claim = familyDataClaim;
-    if (claim != null) await _claim(claim, '$uid|');
+    if (claim != null && !await _claim(claim, '$uid|', unless: () => gateway.family != null || gateway.userId != uid)) return false;
+    if (gateway.family != null || gateway.userId != uid) return false; // die Familie gewinnt, auch während des Anspruchs
     return settings.update((c) => c.copyWith(onboardingDone: true, contactsOnly: true));
   }
 
