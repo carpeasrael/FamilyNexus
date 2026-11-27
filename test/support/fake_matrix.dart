@@ -735,7 +735,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   List<ChatThread> get threads {
     final f = family;
-    if (f == null) return const <ChatThread>[];
+    // Wie das Gateway seit K3c-1: ohne Familie nur Kontakt-Gespräche.
+    if (f == null) return _contactThreads();
     final dms = <ChatThread>[
       for (final r in fake.dmRooms.values)
         if (_roomOf(r.id) != null && !hiddenThreads.contains(r.id))
@@ -2063,18 +2064,19 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   /// Dieselbe reine Einstufung wie im echten Gateway ([ConversationPolicy]), damit beide nicht auseinanderlaufen.
   PolicyContext? _contactContext() {
+    // Wie das Gateway seit K3c-1: Der Kontext braucht keine Familie (das Konto genügt).
     final f = family;
     final me = _userId;
-    if (f == null || me == null) return null;
+    if (me == null) return null;
     return PolicyContext(
       myUserId: me,
-      familyRoomId: f.roomId,
-      joinedMembers: <String>{for (final m in f.joined) m.userId},
+      familyRoomId: f?.roomId,
+      joinedMembers: <String>{for (final m in f?.joined ?? const <FamilyMember>[]) m.userId},
       membersLoaded: true,
       contactsEnabled: contactPolicy.enabled,
       contacts: contactPolicy.contacts,
       blockedUsers: contactPolicy.blocked,
-      familyIds: <String>{for (final m in f.members) m.userId},
+      familyIds: <String>{for (final m in f?.members ?? const <FamilyMember>[]) m.userId},
     );
   }
 
@@ -2192,8 +2194,8 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
 
   void _requireProbeable(String userId) {
     _requireSession();
-    final f = family;
-    if (f == null || _userId == null) throw const GatewayException(GatewayError.notAllowed);
+    // Wie das Gateway seit K3c-1: Kontakte brauchen keine Familie (das Konto genügt).
+    if (_userId == null) throw const GatewayException(GatewayError.notAllowed);
     if (!MatrixIds.isUserId(userId)) throw const GatewayException(GatewayError.invalidInput);
     if (userId == _userId || !contactPolicy.enabled || contactPolicy.blocked.contains(userId)) {
       throw const GatewayException(GatewayError.notAllowed);
@@ -2209,7 +2211,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<ContactProbe> probeContact(String userId) async {
     _requireProbeable(userId);
-    if (family!.member(userId) != null) {
+    if (family?.member(userId) != null) {
       return ContactProbe(userId: userId, existence: ContactExistence.unknown, displayName: '', reachability: ContactReachability.unknown, isFamilyMember: true);
     }
     final failure = fake.probeError;
@@ -2227,7 +2229,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<String> startContactChat(String userId) async {
     _requireProbeable(userId);
-    if (family!.member(userId) != null || contactPolicy.contacts[userId] != ContactState.outgoing) {
+    if (family?.member(userId) != null || contactPolicy.contacts[userId] != ContactState.outgoing) {
       throw const GatewayException(GatewayError.notAllowed);
     }
     for (final r in fake.contactRooms.values) {
@@ -2237,7 +2239,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     final reach = _reachOf(userId);
     if (reach == ContactReachability.notReachable) throw const GatewayException(GatewayError.peerNotReachable);
     if (reach == ContactReachability.unknown) throw const GatewayException(GatewayError.serverUnreachable);
-    if (reach == ContactReachability.identityChanged) throw const GatewayException(GatewayError.notAllowed);
+    // Pin-Sackgasse (K3c-1): Bei geändertem Schlüssel oder gesperrten Geräten entsteht der Raum trotzdem, Senden bleibt gesperrt.
     final failure = startError;
     if (failure != null && !startFailsAfterCreate) throw GatewayException(failure);
     final room = fake.createContactRoom(_userId!, userId);

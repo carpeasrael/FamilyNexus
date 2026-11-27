@@ -253,6 +253,24 @@ void main() {
       expect(server.contactRooms, isEmpty);
     });
 
+    test('Fake wie das Gateway seit K3c-1: bei geändertem Schlüssel legt startContactChat den Raum an, Senden bleibt gesperrt', () async {
+      await on();
+      server.identityChangedUsers.add(carla);
+      await c.check(carla);
+      await c.addAnyway(carla);
+      await c.idle();
+      expect(server.contactRooms, hasLength(1));
+    });
+
+    test('Fake: Kontakte brauchen keine Familie (Prüfen und Anlegen ohne Familie)', () async {
+      peer.gateway.detachFamilyRoom();
+      await on();
+      expect((await c.check(carla)).outcome, ContactCheckOutcome.ready);
+      await c.add(carla);
+      await c.idle();
+      expect(server.contactRooms, hasLength(1));
+    });
+
     test('lokal blockiertes Familienmitglied: „Familienmitglied“, nicht „lokal blockiert“', () async {
       await on();
       peer.blockedList.list.add(emil);
@@ -447,5 +465,77 @@ void main() {
     await peer.sync.idle();
     // kein Fehler (kein Aufruf nach dispose); tearDown ruft dispose erneut nicht auf
     c = ContactController(gateway: peer.gateway, sync: peer.sync);
+  });
+
+  group('Trotzdem hinzufügen (K3c-3, Pin-Sackgasse)', () {
+    Future<void> changed(String id) async {
+      await on();
+      server.identityChangedUsers.add(id);
+      expect((await c.check(id)).outcome, ContactCheckOutcome.identityChanged);
+    }
+
+    test('nach der Prüfung identityChanged: addAnyway legt Datensatz und Raum an; der normale Weg bleibt gesperrt', () async {
+      await changed(carla);
+      await expectLater(c.add(carla), throwsA(isA<GatewayException>().having((e) => e.error, 'error', GatewayError.notAllowed)));
+      expect(server.contactRooms, isEmpty, reason: 'ohne ausdrückliches „Trotzdem“ entsteht nichts');
+      expect(await peer.service.contact(carla), isNull);
+      await c.addAnyway(carla);
+      await c.idle();
+      expect(server.contactRooms, hasLength(1));
+      expect((await peer.service.contact(carla))!.state, ContactState.outgoing);
+    });
+
+    test('ohne vorherige Prüfung oder nach anderem Ergebnis: notAllowed, nichts angelegt', () async {
+      await on();
+      await expectLater(c.addAnyway(carla), fails(ContactError.notAllowed));
+      // bereit
+      expect((await c.check(carla)).outcome, ContactCheckOutcome.ready);
+      await expectLater(c.addAnyway(carla), fails(ContactError.notAllowed));
+      // nicht erreichbar
+      server.unreachableUsers.add(dora);
+      expect((await c.check(dora)).outcome, ContactCheckOutcome.notReachable);
+      await expectLater(c.addAnyway(dora), fails(ContactError.notAllowed));
+      // Familienmitglied
+      expect((await c.check(emil)).outcome, ContactCheckOutcome.familyMember);
+      await expectLater(c.addAnyway(emil), fails(ContactError.notAllowed));
+      // nicht gefunden
+      expect((await c.check('@niemand:fake.test')).outcome, ContactCheckOutcome.notFound);
+      await expectLater(c.addAnyway('@niemand:fake.test'), fails(ContactError.notAllowed));
+      expect(server.contactRooms, isEmpty);
+      expect((await peer.store.all()).whereType<Contact>(), isEmpty, reason: 'kein Datensatz');
+    });
+
+    test('eine neue Prüfung mit anderem Ergebnis nimmt die Erlaubnis zurück; nach dem Hinzufügen gilt sie nicht noch einmal', () async {
+      await changed(carla);
+      server.identityChangedUsers.remove(carla);
+      expect((await c.check(carla)).outcome, ContactCheckOutcome.ready);
+      await expectLater(c.addAnyway(carla), fails(ContactError.notAllowed));
+      server.identityChangedUsers.add(carla);
+      await c.check(carla);
+      await c.addAnyway(carla);
+      await expectLater(c.addAnyway(carla), fails(ContactError.notAllowed), reason: 'verbraucht');
+    });
+
+    test('ungültige Kennung: invalid', () async {
+      await on();
+      await expectLater(c.addAnyway('kein-konto'), fails(ContactError.invalid));
+    });
+
+    test('Fehler beim Anlegen: Datensatz wird zurückgenommen (wie bei add)', () async {
+      await changed(carla);
+      peer.gateway.startError = GatewayError.serverUnreachable;
+      await expectLater(c.addAnyway(carla), throwsA(isA<GatewayException>()));
+      await c.idle();
+      final rec = await peer.store.get(ContactKind.contact, carla);
+      expect(rec == null || rec.deleted, isTrue, reason: 'zurückgenommen über removeIfVersion');
+      expect(server.contactRooms, isEmpty);
+    });
+
+    test('blockierte Kennung und eigener Bereich aus: notAllowed vor jedem Datensatz', () async {
+      await changed(carla);
+      peer.blockedList.list.add(carla);
+      await expectLater(c.addAnyway(carla), fails(ContactError.notAllowed));
+      expect(server.contactRooms, isEmpty);
+    });
   });
 }

@@ -530,7 +530,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contactsCheckIdentity =>
-      'This person’s security key has changed. Adding is only possible after verification.';
+      'This person’s security key has changed. You can still add them; you can only write after you have checked and accepted the change.';
 
   @override
   String get contactsCheckUnknown =>
@@ -598,6 +598,74 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get chatContactWaiting =>
       'Waiting for acceptance. You can write once the person has joined.';
+
+  @override
+  String get contactsAddAnyway => 'Add anyway';
+
+  @override
+  String get contactsAddAnywayTitle => 'Add anyway?';
+
+  @override
+  String contactsAddAnywayBody(String name, String id) {
+    return 'The security key of $name ($id) has changed or was blocked by the app. This can be a new device, but also an attack.\n\nA conversation will be created. You can only write after you have checked the person (e.g. via emoji comparison) and accepted the change.';
+  }
+
+  @override
+  String get contactsHomeNoFamily =>
+      'You are using the app without a family. Here you only have contacts, no events, shopping or family chat.';
+
+  @override
+  String get contactsHomeSetupFamily => 'Create or join a family';
+
+  @override
+  String get contactsHomeInviteTitle => 'Invitation to a family';
+
+  @override
+  String contactsHomeInviteBody(String name, String inviter) {
+    return '“$name”, invited by $inviter. It is only accepted in the setup, not here.';
+  }
+
+  @override
+  String get contactsHomeInviteAction => 'Open setup';
+
+  @override
+  String get contactsHomeJoinPending =>
+      'Your join request is waiting for confirmation. More in the setup.';
+
+  @override
+  String get contactsHomeJoinRejected =>
+      'Your join request was declined. More in the setup.';
+
+  @override
+  String contactsHomeRequests(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new contact requests',
+      one: '1 new contact request',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get contactsHomeRequestsAction => 'View requests';
+
+  @override
+  String get contactsHomeAdd => 'Add contact';
+
+  @override
+  String get contactsHomeSettings => 'Open settings';
+
+  @override
+  String get onbContactsOnly => 'Continue without a family (contacts only)';
+
+  @override
+  String get onbContactsOnlyHint =>
+      'You can create or join a family at any time later. Until then you only have contacts outside the family.';
+
+  @override
+  String get onbContactsOnlyFailed =>
+      'The choice could not be saved. Please try again.';
 
   @override
   String get chatContactsEmpty => 'No chats with contacts yet.';

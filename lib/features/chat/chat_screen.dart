@@ -46,10 +46,13 @@ part 'widgets/thread_list.dart';
 const List<String> _quickReactions = <String>['👍', '❤️', '😂', '🎉', '😮', '🙏'];
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key, this.active = true});
+  const ChatScreen({super.key, this.active = true, this.contactsOnly = false});
 
   /// Der Chat ist gerade sichtbar: Nachrichten gelten dann als gelesen.
   final bool active;
+
+  /// Nur der Kontakte-Bereich, ohne Umschalter und ohne Familien-Bereich (#119, K3c-3: `ContactsHome` ohne Familie).
+  final bool contactsOnly;
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -167,6 +170,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _services = AppScope.read(context);
+    if (widget.contactsOnly) _scope = ChatScope.contacts;
     _services.chatRequest.addListener(_openRequested);
     WidgetsBinding.instance.addObserver(this);
     _foreground = _isForeground(WidgetsBinding.instance.lifecycleState);
@@ -646,7 +650,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
             for (final t in visible)
               if (t.isOutside) t,
         ];
-        if (!enabled && (_scope == ChatScope.contacts || _openContact != null)) {
+        if (!enabled && !widget.contactsOnly && (_scope == ChatScope.contacts || _openContact != null)) {
           // Kontakte ausgeschaltet: zurück zur Familie, Kontakt-Gespräche verworfen.
           if (_openContact != null) _dropContact(_openContact!);
           _scope = ChatScope.family;
@@ -657,7 +661,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
             : _familyContent(services, threads);
         return Column(
           children: <Widget>[
-            if (enabled)
+            if (enabled && !widget.contactsOnly)
               _ScopeSwitcher(
                 scope: _scope,
                 familyUnread: g.familyUnreadCount,

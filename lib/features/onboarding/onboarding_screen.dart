@@ -234,7 +234,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final l = AppLocalizations.of(context);
     final canGoBack = _step == _Step.server || _step == _Step.inviteLink || _step == _Step.account || _step == _Step.login;
     return ListenableBuilder(
-      listenable: _s.gateway,
+      listenable: Listenable.merge(<Listenable>[_s.gateway, _s.contactsRevision]),
       builder: (context, _) => Scaffold(
         appBar: AppBar(
           title: Text(_title(l)),
@@ -300,7 +300,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ]);
       case _Step.family:
-        return FamilyStep(
+        final family = FamilyStep(
           mode: switch (_path) {
             OnboardingPath.create => FamilyStepMode.create,
             OnboardingPath.invited => FamilyStepMode.join,
@@ -308,6 +308,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           },
           onFamilyReady: _finish,
         );
+        // „Ohne Familie fortfahren (nur Kontakte)“ (#119, K3c-3): nur bei freigeschalteten Kontakten und solange es keine
+        // Familie gibt; ausdrücklich, nie automatisch (die Familie gewinnt immer).
+        if (_s.contacts == null || _s.gateway.family != null) return family;
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+          family,
+          const SizedBox(height: 16),
+          const Divider(),
+          Text(l.onbContactsOnlyHint, style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton(onPressed: _contactsOnly, child: Text(l.onbContactsOnly)),
+          ),
+        ]);
     }
+  }
+
+  Future<void> _contactsOnly() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final failed = AppLocalizations.of(context).onbContactsOnlyFailed;
+    if (!await _s.enterContactsOnly()) messenger.showSnackBar(SnackBar(content: Text(failed)));
   }
 }

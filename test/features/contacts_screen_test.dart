@@ -251,6 +251,101 @@ void main() {
     });
   });
 
+  group('Trotzdem hinzufügen (K3c-3, Pin-Sackgasse)', () {
+    Future<void> openAddAndCheck(WidgetTester tester, String id, {String lang = 'de', double textScale = 1}) async {
+      await show(tester, lang: lang, textScale: textScale);
+      await c.setEnabled(true);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), id);
+      await tester.tap(find.byType(FilledButton).first);
+      await tester.pumpAndSettle();
+    }
+
+    ctest('geänderter Schlüssel: Hinweis, Name und Kennung und die Taste; Hinzufügen gibt es nicht', (tester) async {
+      server.identityChangedUsers.add(carla);
+      await openAddAndCheck(tester, carla);
+      expect(find.textContaining('Du kannst sie trotzdem hinzufügen'), findsOneWidget);
+      expect(find.text('Trotzdem hinzufügen'), findsOneWidget);
+      expect(find.text('Kennung: ${isolateText(carla)}'), findsOneWidget);
+      expect(find.widgetWithText(FilledButton, 'Hinzufügen'), findsNothing, reason: 'der normale Weg bleibt gesperrt');
+      expect(server.contactRooms, isEmpty, reason: 'schon das Prüfen legt nichts an');
+    });
+
+    ctest('Abbrechen im Dialog: nichts entsteht; Bestätigen legt Datensatz und Raum an, Senden bleibt gesperrt', (tester) async {
+      server.identityChangedUsers.add(carla);
+      await openAddAndCheck(tester, carla);
+      await tester.tap(find.text('Trotzdem hinzufügen'));
+      await tester.pumpAndSettle();
+      expect(find.text('Trotzdem hinzufügen?'), findsOneWidget);
+      expect(find.textContaining('hat sich geändert oder wurde von der App gesperrt'), findsOneWidget);
+      expect(find.textContaining('Schreiben kannst du erst, nachdem du die Person geprüft'), findsOneWidget);
+      expect(find.textContaining(isolateText(carla)), findsWidgets);
+      await tapDialog(tester, 'Abbrechen');
+      expect(server.contactRooms, isEmpty);
+      expect(await peer.service.contact(carla), isNull);
+      await tester.tap(find.text('Trotzdem hinzufügen'));
+      await tester.pumpAndSettle();
+      await tapDialog(tester, 'Trotzdem hinzufügen');
+      await c.idle();
+      await tester.pumpAndSettle();
+      expect(server.contactRooms, hasLength(1));
+      expect((await peer.service.contact(carla))!.state, ContactState.outgoing);
+      expect(find.text('Wartet auf Annahme'), findsOneWidget);
+    });
+
+    for (final (String name, String id, void Function() arrange) in <(String, String, void Function())>[
+      ('nicht erreichbar', dora, () => server.unreachableUsers.add(dora)),
+      ('bereit', carla, () {}),
+      ('nicht gefunden', '@niemand:fake.test', () {}),
+      ('Familienmitglied', emil, () {}),
+    ]) {
+      ctest('nie die Taste bei „$name“', (tester) async {
+        arrange();
+        await openAddAndCheck(tester, id);
+        expect(find.text('Trotzdem hinzufügen'), findsNothing);
+        expect(server.contactRooms, isEmpty);
+      });
+    }
+
+    ctest('Namensgleichheit: Bestätigung „Nicht deine Familie“ vor der Taste', (tester) async {
+      server.addAccount('fritz', 'pw-fritz', displayName: 'Emil');
+      const fritz = '@fritz:fake.test';
+      server.identityChangedUsers.add(fritz);
+      await openAddAndCheck(tester, fritz);
+      OutlinedButton anyway() => tester.widget<OutlinedButton>(find.widgetWithText(OutlinedButton, 'Trotzdem hinzufügen'));
+      expect(find.textContaining('Nicht deine Familie'), findsOneWidget);
+      expect(anyway().onPressed, isNull, reason: 'ohne Bestätigung nicht aktiv');
+      await tester.tap(find.byType(CheckboxListTile));
+      await tester.pump();
+      expect(anyway().onPressed, isNotNull);
+    });
+
+    ctest('Schriftfaktor 2,0: kein Überlauf, Taste erreichbar; Semantik trägt Text und Rolle', (tester) async {
+      final handle = tester.ensureSemantics();
+      server.identityChangedUsers.add(carla);
+      await openAddAndCheck(tester, carla, textScale: 2);
+      await tester.ensureVisible(find.text('Trotzdem hinzufügen'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('Trotzdem hinzufügen'), findsOneWidget);
+      expect(tester.getSemantics(find.widgetWithText(OutlinedButton, 'Trotzdem hinzufügen')), matchesSemantics(label: 'Trotzdem hinzufügen', isButton: true, hasTapAction: true, hasFocusAction: true, isEnabled: true, hasEnabledState: true, isFocusable: true));
+      handle.dispose();
+    });
+
+    ctest('englisch: Texte und Dialog', (tester) async {
+      server.identityChangedUsers.add(carla);
+      await openAddAndCheck(tester, carla, lang: 'en');
+      expect(find.text('Add anyway'), findsOneWidget);
+      expect(find.textContaining('You can still add them'), findsOneWidget);
+      await tester.tap(find.text('Add anyway'));
+      await tester.pumpAndSettle();
+      expect(find.text('Add anyway?'), findsOneWidget);
+      expect(find.textContaining('can only write after you have checked the person'), findsOneWidget);
+    });
+  });
+
   group('Anfragen', () {
     ctest('Anfrage: Name und volle Kennung; Annehmen verlangt Bestätigung mit der Kennung; danach bestätigt', (tester) async {
       await show(tester);

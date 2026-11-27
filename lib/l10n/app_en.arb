@@ -222,7 +222,7 @@
   "contactsCheckFamily": "This is a member of your family. Write to them in the family chat.",
   "contactsCheckNotFound": "This account was not found. Check the spelling.",
   "contactsCheckNotReachable": "This person needs to set up the security check in their app before you can message each other.",
-  "contactsCheckIdentity": "This person’s security key has changed. Adding is only possible after verification.",
+  "contactsCheckIdentity": "This person’s security key has changed. You can still add them; you can only write after you have checked and accepted the change.",
   "contactsCheckUnknown": "The person could not be checked right now. Please check again later.",
   "contactsCheckRateLimited": "Too many checks (at most 20 per hour). Please try again later.",
   "contactsCheckNotReady": "This is not possible right now (the family is still loading or the person is blocked). Please wait a moment and try again.",
@@ -258,6 +258,40 @@
   "chatContactOpenFailed": "The chat could not be opened.",
   "chatContactRetry": "Try again",
   "chatContactWaiting": "Waiting for acceptance. You can write once the person has joined.",
+  "contactsAddAnyway": "Add anyway",
+  "contactsAddAnywayTitle": "Add anyway?",
+  "contactsAddAnywayBody": "The security key of {name} ({id}) has changed or was blocked by the app. This can be a new device, but also an attack.\n\nA conversation will be created. You can only write after you have checked the person (e.g. via emoji comparison) and accepted the change.",
+  "@contactsAddAnywayBody": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "id": {"type": "String"}
+    }
+  },
+  "contactsHomeNoFamily": "You are using the app without a family. Here you only have contacts, no events, shopping or family chat.",
+  "contactsHomeSetupFamily": "Create or join a family",
+  "contactsHomeInviteTitle": "Invitation to a family",
+  "contactsHomeInviteBody": "“{name}”, invited by {inviter}. It is only accepted in the setup, not here.",
+  "@contactsHomeInviteBody": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "inviter": {"type": "String"}
+    }
+  },
+  "contactsHomeInviteAction": "Open setup",
+  "contactsHomeJoinPending": "Your join request is waiting for confirmation. More in the setup.",
+  "contactsHomeJoinRejected": "Your join request was declined. More in the setup.",
+  "contactsHomeRequests": "{count, plural, =1{1 new contact request} other{{count} new contact requests}}",
+  "@contactsHomeRequests": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "contactsHomeRequestsAction": "View requests",
+  "contactsHomeAdd": "Add contact",
+  "contactsHomeSettings": "Open settings",
+  "onbContactsOnly": "Continue without a family (contacts only)",
+  "onbContactsOnlyHint": "You can create or join a family at any time later. Until then you only have contacts outside the family.",
+  "onbContactsOnlyFailed": "The choice could not be saved. Please try again.",
   "chatContactsEmpty": "No chats with contacts yet.",
   "chatContactsManage": "Manage contacts",
   "contactIdentityVerified": "Checked in person",

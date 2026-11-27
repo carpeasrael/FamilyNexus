@@ -538,7 +538,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get contactsCheckIdentity =>
-      'Der Sicherheitsschlüssel dieser Person hat sich geändert. Hinzufügen ist erst nach der Prüfung möglich.';
+      'Der Sicherheitsschlüssel dieser Person hat sich geändert. Du kannst sie trotzdem hinzufügen; schreiben kannst du erst, nachdem du die Änderung geprüft und akzeptiert hast.';
 
   @override
   String get contactsCheckUnknown =>
@@ -608,6 +608,74 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get chatContactWaiting =>
       'Wartet auf Annahme. Du kannst schreiben, sobald die Person beigetreten ist.';
+
+  @override
+  String get contactsAddAnyway => 'Trotzdem hinzufügen';
+
+  @override
+  String get contactsAddAnywayTitle => 'Trotzdem hinzufügen?';
+
+  @override
+  String contactsAddAnywayBody(String name, String id) {
+    return 'Der Sicherheitsschlüssel von $name ($id) hat sich geändert oder wurde von der App gesperrt. Das kann ein neues Gerät sein, aber auch ein Angriff.\n\nEs entsteht ein Gespräch. Schreiben kannst du erst, nachdem du die Person geprüft (z. B. per Emoji-Vergleich) und die Änderung akzeptiert hast.';
+  }
+
+  @override
+  String get contactsHomeNoFamily =>
+      'Du nutzt die App ohne Familie. Hier gibt es nur Kontakte, keine Termine, Einkäufe oder Familienchat.';
+
+  @override
+  String get contactsHomeSetupFamily => 'Familie gründen oder beitreten';
+
+  @override
+  String get contactsHomeInviteTitle => 'Einladung in eine Familie';
+
+  @override
+  String contactsHomeInviteBody(String name, String inviter) {
+    return '„$name“, eingeladen von $inviter. Angenommen wird sie nur in der Einrichtung, nicht hier.';
+  }
+
+  @override
+  String get contactsHomeInviteAction => 'Einrichtung öffnen';
+
+  @override
+  String get contactsHomeJoinPending =>
+      'Deine Beitrittsanfrage wartet auf Bestätigung. Mehr dazu in der Einrichtung.';
+
+  @override
+  String get contactsHomeJoinRejected =>
+      'Deine Beitrittsanfrage wurde abgelehnt. Mehr dazu in der Einrichtung.';
+
+  @override
+  String contactsHomeRequests(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count neue Kontaktanfragen',
+      one: '1 neue Kontaktanfrage',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get contactsHomeRequestsAction => 'Anfragen ansehen';
+
+  @override
+  String get contactsHomeAdd => 'Kontakt hinzufügen';
+
+  @override
+  String get contactsHomeSettings => 'Einstellungen öffnen';
+
+  @override
+  String get onbContactsOnly => 'Ohne Familie fortfahren (nur Kontakte)';
+
+  @override
+  String get onbContactsOnlyHint =>
+      'Du kannst später jederzeit eine Familie gründen oder beitreten. Bis dahin gibt es nur Kontakte außerhalb der Familie.';
+
+  @override
+  String get onbContactsOnlyFailed =>
+      'Die Auswahl konnte nicht gespeichert werden. Versuche es noch einmal.';
 
   @override
   String get chatContactsEmpty => 'Noch keine Gespräche mit Kontakten.';

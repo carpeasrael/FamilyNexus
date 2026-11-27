@@ -171,6 +171,12 @@ class AppServices {
   ContactServices? contacts;
   String? _contactsUser;
 
+  /// Zählt jedes Öffnen und Schließen der Kontakt-Dienste, damit `AppRoot` neu aufbaut (#119, K3c-3).
+  final ValueNotifier<int> contactsRevision = ValueNotifier<int>(0);
+
+  /// Meldet die Änderung erst nach dem aktuellen Aufbau (die Dienste öffnen und schließen auch aus `initState` heraus).
+  void _bumpContacts() => Future<void>.microtask(() => contactsRevision.value++);
+
   /// Wartet auf die Warteschlange der geschlossenen Kontakt-Dienste, bevor etwas die Ablage der Kontakte löscht.
   Future<void> _contactsClosing = Future<void>.value();
   ShoppingController? shopping;
@@ -225,10 +231,7 @@ class AppServices {
       if (attempt != _openAttempt) return;
       final claim = familyDataClaim;
       if (claim != null) {
-        final owner = '$uid|${room ?? ''}';
-        final run = _claimRun.then((_) => claim(owner));
-        _claimRun = run.then<void>((_) {}, onError: (Object _) {});
-        await run;
+        await _claim(claim, '$uid|${room ?? ''}');
         if (attempt != _openAttempt) return;
       }
       final c = await build(uid, room);
@@ -299,6 +302,71 @@ class AppServices {
     }
   }
 
+  /// Reiht den Anspruch [claim] auf die lokalen Daten für [owner] in die Kette ein ([_claimRun]).
+  ///
+  /// [unless] wird erst in der Kette geprüft, unmittelbar vor dem Schreiben des Besitzers: Wartet der Anspruch hinter einem
+  /// anderen (etwa dem der Familiendienste), kann sich die Lage bis dahin geändert haben. `true` ⇒ kein Anspruch; das
+  /// Ergebnis ist `true`, wenn der Anspruch ausgeführt wurde.
+  Future<bool> _claim(Future<void> Function(String owner) claim, String owner, {bool Function()? unless}) {
+    final run = _claimRun.then((_) async {
+      if (unless != null && unless()) return false;
+      await claim(owner);
+      return true;
+    });
+    _claimRun = run.then<void>((_) {}, onError: (Object _) {});
+    return run;
+  }
+
+  /// Kennung der laufenden Eröffnung der Kontakt-Dienste ohne Familie (#119, K3c-3); `null` = keine.
+  Future<void>? _contactsAccountOpening;
+
+  /// Öffnet die Kontakt-Dienste des angemeldeten Kontos **ohne Familie** (#119, K3c-3): Ohne Freigabe baut die Fabrik nichts,
+  /// dann bleibt alles unberührt (kein Anspruch, keine Ablage). Sonst zuerst der Anspruch auf die lokalen Daten für das
+  /// Konto ohne Familie (Besitzerschlüssel `'$uid|'`, K3c-2), dann der Start. Idempotent; mit Familie öffnet
+  /// [openCalendar] die Dienste.
+  Future<void> openContactsAccount() {
+    final uid = gateway.userId;
+    final build = contactsBuilder;
+    if (uid == null || build == null) return Future<void>.value();
+    if (contacts != null && _contactsUser == uid) return Future<void>.value();
+    return _contactsAccountOpening ??= _openContactsAccount(uid, build).whenComplete(() => _contactsAccountOpening = null);
+  }
+
+  Future<void> _openContactsAccount(String uid, ContactsBuilder build) async {
+    final built = build(uid);
+    if (built == null) return; // keine Freigabe: nichts anfassen
+    await Future.wait<void>(<Future<void>>[_closing, _contactsClosing]);
+    final claim = familyDataClaim;
+    // Die Familie gewinnt: Der Anspruch für ein Konto ohne Familie (`'$uid|'`) liefe sonst über die Familiendaten einer
+    // inzwischen laufenden HomeShell (Rennen mit `openCalendar`), darum erst in der Kette geprüft.
+    if (gateway.family != null) return;
+    if (claim != null && !await _claim(claim, '$uid|', unless: () => gateway.family != null || gateway.userId != uid)) return;
+    if (gateway.family != null) return;
+    // Währenddessen anderes Konto, Abmelden oder die Familiendienste haben die Dienste geöffnet: nicht doppelt öffnen. Die
+    // ungestartet verworfenen Dienste halten nichts (kein `dispose`: es setzte die Richtlinie der offenen Dienste zurück).
+    if (gateway.userId != uid || gateway.session != SessionState.ready || (contacts != null && _contactsUser == uid)) return;
+    closeContacts();
+    contacts = built;
+    _contactsUser = uid;
+    built.start();
+    _bumpContacts();
+  }
+
+  /// Der ausdrückliche Weg „Ohne Familie fortfahren (nur Kontakte)“ (#119, K3c-3, Entscheidung des Nutzers): braucht
+  /// geöffnete Kontakt-Dienste (Freigabe), beansprucht die lokalen Daten für das Konto ohne Familie (Daten einer früheren
+  /// Familie werden entfernt) und merkt die Wahl lokal. `false`, wenn nichts gemerkt wurde.
+  Future<bool> enterContactsOnly() async {
+    final uid = gateway.userId;
+    if (uid == null || contacts == null || _contactsUser != uid || gateway.family != null) return false;
+    final claim = familyDataClaim;
+    if (claim != null && !await _claim(claim, '$uid|', unless: () => gateway.family != null || gateway.userId != uid)) return false;
+    if (gateway.family != null || gateway.userId != uid) return false; // die Familie gewinnt, auch während des Anspruchs
+    return settings.update((c) => c.copyWith(onboardingDone: true, contactsOnly: true));
+  }
+
+  /// Nimmt die Wahl „nur Kontakte“ zurück (Karte „Familie gründen oder beitreten“): `AppRoot` zeigt dann die Einrichtung.
+  Future<bool> leaveContactsOnly() => settings.update((c) => c.copyWith(contactsOnly: false));
+
   /// Öffnet die Kontakt-Dienste des Kontos [uid] (idempotent je Konto). Sie hängen nicht an der Familie: Ein Familienwechsel
   /// ([closeCalendar], [openCalendar]) baut sie nicht neu auf. Ohne Freigabe entsteht nichts.
   void openContacts(String uid) {
@@ -311,6 +379,7 @@ class AppServices {
     contacts = s;
     _contactsUser = uid;
     s.start();
+    _bumpContacts();
   }
 
   /// Beendet die Kontakt-Dienste des Kontos: Abmelden, Konto wechseln, lokale Löschung. Zuerst der Controller, dann die
@@ -320,6 +389,7 @@ class AppServices {
     _contactsUser = null;
     if (s == null) return;
     contacts = null;
+    _bumpContacts();
     _contactsClosing = Future.wait<void>(<Future<void>>[_contactsClosing, s.idle()]).then<void>((_) {}, onError: (Object _) {});
     s.dispose();
   }
@@ -355,7 +425,7 @@ class AppServices {
     // Blockierliste (#450) und gemerktes Gespräch (E-107) gehören zu den lokalen Familiendaten. Gezielt und ohne Neulesen: `AppRoot` ruft diese
     // Methode bei jedem Aufbau ohne Sitzung auf, auch in der Einrichtung; ein Neulesen überschriebe dort einen eben
     // gesetzten Einladungslink. Bei leerer Liste ändert sich nichts und niemand wird benachrichtigt.
-    await settings.update((c) => c.copyWith(blockedUsers: const <String>[], lastChatThread: null));
+    await settings.update((c) => c.copyWith(blockedUsers: const <String>[], lastChatThread: null, contactsOnly: false));
   }
 
   /// Verwirft den vorgemerkten Einladungslink (Ablage und Speicher). Nur beim Ende einer Sitzung (#450): Der Link
@@ -397,6 +467,8 @@ class AppServices {
     // Kontakte gehören zum Konto (#119, E-114): Sie werden **immer** entfernt, auch ohne gesetzten Besitzer (der frühe
     // Rückgabepunkt unten gilt nur den Familiendaten).
     await SqlContactStore(db).wipe();
+    // Die Wahl „nur Kontakte“ (K3c-3) gehört zum Konto auf diesem Gerät und endet mit der Sitzung, auch ohne Besitzer.
+    await kv.apply(deletes: <String>[AppSettings.contactsOnlyKey]);
     if ((await kv.readAll())[calendarOwnerKey] == null) return;
     await SqlEventStore(db).wipe();
     await SqlShoppingStore(db).wipe();

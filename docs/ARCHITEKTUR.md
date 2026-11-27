@@ -108,6 +108,11 @@ Löschung, beim Kontowechsel und in `wipeAccountData` vor dem Löschen. Start: S
 dann Synchronisation (danach geht kein Aufruf mehr an Gateway oder Dienst). Ohne Freigabe (`ContactFlags.enabled`) oder Ablage
 entsteht nichts; Oberflächen lesen `services.contacts?.controller`, nie über den Kalender.
 
+**Ohne Familie (K3c-3):** Ein angemeldetes, gesichertes Konto ohne Familie öffnet die Dienste über `AppServices.openContactsAccount()`
+(nur bei Freigabe; Anspruch auf die lokalen Daten für das Konto ohne Familie vor dem Start). `AppRoot` zeigt danach die Einrichtung
+mit dem Knopf „Ohne Familie fortfahren (nur Kontakte)“ oder, nach dieser ausdrücklichen Wahl (`AppSettings.contactsOnly`), die schlanke
+`ContactsHome`. Eine Familie gewinnt immer (`HomeShell`). `AppServices.contactsRevision` meldet Öffnen und Schließen.
+
 ## Melden und Blockieren (E-48)
 - `domain/moderation.dart`: `ReportRequest` (Kategorie + bereinigter Freitext → Grundtext), `BlockedUsers` (defensives Lesen,
   Obergrenze 200), `visibleMessages`/`visibleThreads` (Filter). Die Blockierliste liegt als `blockedUsers` in `AppSettings`

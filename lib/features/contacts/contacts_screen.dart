@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../app/app_services.dart';
 import '../../data/matrix/matrix_gateway.dart' show GatewayException;
 import '../../domain/chat.dart' show ContactRequest;
+import '../../domain/family.dart' show PendingInvitation;
 import '../../l10n/gen/app_localizations.dart';
+import '../../ui/layout/adaptive.dart';
 import '../../ui/widgets/glass.dart';
+import '../chat/chat_screen.dart';
 import '../common/error_text.dart';
+import '../common/syncing_view.dart';
+import '../settings/settings_screen.dart';
 import 'add_contact_screen.dart';
 import 'contact_controller.dart';
 import 'contact_text.dart';
 import 'not_your_family_warning.dart';
+
+part 'contacts_home.dart';
 
 /// Kontakte (#119, K3b-1, §8.1, §8.4): ausgeschaltet eine Erklärseite mit Einwilligung, eingeschaltet Anfragen, Liste,
 /// „Kontakt hinzufügen“ und die eigene Kontakt-ID. Alles läuft über den [ContactController].
@@ -124,7 +132,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           if (!c.loaded) {
             return Center(child: Semantics(label: l.contactsLoading, child: const CircularProgressIndicator()));
           }
-          if (!c.enabled) return _Intro(onTurnOn: () => _run(() => c.setEnabled(true)));
+          if (!c.enabled) return ContactsIntro(onTurnOn: () => _run(() => c.setEnabled(true)));
           return ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, 96), children: <Widget>[
             if (c.requests.isNotEmpty || c.requestsHidden > 0)
               Padding(
@@ -223,8 +231,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
 }
 
 /// Erklärseite (§8.1): Standard ist **aus**; erst die ausdrückliche Taste schaltet ein.
-class _Intro extends StatelessWidget {
-  const _Intro({required this.onTurnOn});
+class ContactsIntro extends StatelessWidget {
+  const ContactsIntro({super.key, required this.onTurnOn});
 
   final VoidCallback onTurnOn;
 

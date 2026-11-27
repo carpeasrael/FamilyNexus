@@ -31,6 +31,7 @@ class AppSettings {
     this.pendingInvite,
     this.restoreLastChat = false,
     this.lastChatThread,
+    this.contactsOnly = false,
   });
 
   /// Vorlaufzeit der Geburts- und Gedenktage auf „Heute“ in Tagen (E-104): Standard 7, 0 = nur am Tag selbst.
@@ -96,6 +97,14 @@ class AppSettings {
   /// an ist. `null` = Liste oder nichts gemerkt.
   final String? lastChatThread;
 
+  /// Schlüssel in der Ablage; die Wahl gehört zum Konto auf diesem Gerät und wird beim Ende der Sitzung gelöscht (#119, K3c-3).
+  static const String contactsOnlyKey = 'contactsOnly';
+
+  /// Die Person hat ausdrücklich „Ohne Familie fortfahren (nur Kontakte)“ gewählt (#119, K3c-3, E-114): Ohne Familie zeigt
+  /// die App dann die schlanke Kontakte-Oberfläche statt der Einrichtung. Nie automatisch gesetzt, nur lokal. Eine
+  /// Familie hat immer Vorrang; sie hebt die Wahl auf.
+  final bool contactsOnly;
+
   AppSettings copyWith({
     Object? languageCode = _unset,
     AppThemeMode? themeMode,
@@ -117,6 +126,7 @@ class AppSettings {
     Object? pendingInvite = _unset,
     bool? restoreLastChat,
     Object? lastChatThread = _unset,
+    bool? contactsOnly,
   }) =>
       AppSettings(
         languageCode:
@@ -140,6 +150,7 @@ class AppSettings {
         pendingInvite: identical(pendingInvite, _unset) ? this.pendingInvite : _validInvite(pendingInvite as String?),
         restoreLastChat: restoreLastChat ?? this.restoreLastChat,
         lastChatThread: identical(lastChatThread, _unset) ? this.lastChatThread : _validThread(lastChatThread as String?),
+        contactsOnly: contactsOnly ?? this.contactsOnly,
       );
 
   static const Object _unset = Object();
@@ -165,6 +176,7 @@ class AppSettings {
         'pendingInvite': ?pendingInvite,
         'restoreLastChat': '$restoreLastChat',
         lastChatThreadKey: ?lastChatThread,
+        if (contactsOnly) contactsOnlyKey: 'true',
       };
 
   /// Liest Einstellungen defensiv: unbekannte oder ungültige Werte fallen auf
@@ -205,6 +217,7 @@ class AppSettings {
       pendingInvite: _validInvite(m['pendingInvite']),
       restoreLastChat: m['restoreLastChat'] == 'true',
       lastChatThread: _validThread(m[lastChatThreadKey]),
+      contactsOnly: m[contactsOnlyKey] == 'true',
     );
   }
 

@@ -197,9 +197,15 @@ wachsen, kommt die Raumlogik in `data/matrix/contact_rooms.dart` (intern vom Gat
   Anfragen, Auto-Annahme, privater Raum, Probe, Anlegen, Akzeptieren) läuft bei eingeschaltetem Bereich **auch ohne Familie**;
   `me` kommt vom Client. „Keine Familie“ gilt erst als gesichert (`ContactScope.familyResolved`, `_accountDataFresh`, Rückfall
   für ein Zeiger-Relikt nach 60 s und 3 zählenden Syncs), sonst keine Kontakt-Threads und keine Anfragen (fail-closed).
-  Die Kontakt-Epoche (`_contactEpoch`) steigt nur beim Abmelden, die Nachprüfung entscheidet nach jedem `await`. Die App-Hülle
-  ohne Familie (`AppRoot`, `ContactsHome`) folgt in K3c-3; bis dahin ist die
-  Oberfläche ohne Familie auf die Einrichtung beschränkt, die Räume bleiben auf dem Server erhalten.
+  Die Kontakt-Epoche (`_contactEpoch`) steigt nur beim Abmelden, die Nachprüfung entscheidet nach jedem `await`.
+- **K3c-3:** Die App-Hülle ohne Familie ist die schlanke `ContactsHome` (`lib/features/contacts/contacts_home.dart`), nicht
+  `HomeShell` mit ausgeblendeten Tabs. `AppRoot` zeigt sie nur nach dem **ausdrücklichen Knopf** „Ohne Familie fortfahren (nur
+  Kontakte)“ im Familienschritt der Einrichtung (`AppSettings.contactsOnly`, lokal, nur bei freigeschalteten Kontakten
+  `services.contacts != null` und ohne Familie), nie automatisch; eine **Familie gewinnt immer** (`HomeShell`) und hebt die Wahl
+  auf. Die Hülle zeigt Gespräche mit Kontakten (`ChatScreen(contactsOnly: true)`), Anfragen, „Kontakt hinzufügen“, Einstellungen
+  (mit Abmelden) und Karten für Familieneinladung, Beitrittsanfrage und „Familie gründen oder beitreten“. **Sie nimmt keine
+  Einladung und keine Beitrittsanfrage an**, sie führt nur in die Einrichtung (E-49). Abmelden und lokale Löschung beenden die
+  Wahl. Siehe ENTSCHEIDUNGEN K3c-3.
 - **K3c-2:** Die Kontakt-Dienste (`ContactSync`, `ContactController`) hängen nicht mehr am Kalender: `AppServices.contacts`
   (`openContacts`/`closeContacts`), Bündel `ContactServices` in `lib/app/contact_factory.dart`. Sie überleben den Familienwechsel,
   schließen beim Abmelden vor dem Löschen der lokalen Daten und stellen die Blockierliste nach dem Anspruch der Familiendaten aus
@@ -237,6 +243,11 @@ Menü → **Kontakte**. Beim ersten Öffnen erklärt eine Seite, was sich änder
 Standard ist **aus** (I1). Der Zustand gilt fürs Konto (`rec: prefs`). Ausschalten verbirgt die Bereiche und ignoriert neue
 Anfragen; Räume und Datensätze bleiben, nichts wird gelöscht.
 
+**Ohne Familie (K3c-3):** Wer kein Mitglied einer Familie ist, erreicht die Kontakte über den ausdrücklichen Knopf „Ohne Familie
+fortfahren (nur Kontakte)“ am Ende der Einrichtung (nur bei freigeschalteten Kontakten). Die Wahl ist lokal (`contactsOnly`) und
+endet mit Abmelden oder lokaler Löschung. Die Hülle (`ContactsHome`) zeigt als erstes die Erklärseite, solange der Bereich aus ist;
+„Familie gründen oder beitreten“ führt jederzeit zurück in die Einrichtung.
+
 ### 8.2 Kontakt hinzufügen
 1. Eingabe `@name:server` oder `matrix.to`-Link (`ContactId`); zusätzlich „Meine Kontakt-ID“ zum Kopieren.
 2. `probeContact`: Konto vorhanden, Schlüssel vorhanden. Ist die ID ein Familienmitglied: Hinweis, Weg über „Nachricht
@@ -258,10 +269,13 @@ darf auch bei `identityChanged` oder von der App gesperrten Geräten **angelegt*
 Sperre bleibt in der SDK-Datenbank, Sitzungsvermerk leer) oder **beigetreten** werden (B: Einladung der Gegenseite). Er entsteht
 `pending` mit Banner `changed`; **Senden bleibt gesperrt**, solange `changed` oder gesperrt (`_requireContactRoom`), Akzeptieren
 nach dem Beitritt des Gegenübers über das Banner. Beim bloßen Prüfen einer Person ohne Sperre und ohne Pin entsteht kein Pin.
-Die Taste „Trotzdem hinzufügen“ in der Oberfläche folgt in K3c-3; bis dahin ist der Pfad nur über das Gateway erreichbar.
+**Gelöst in K3c-3 (Oberfläche):** „Kontakt hinzufügen“ zeigt bei einer Prüfung mit dem Ergebnis `identityChanged` (Schlüssel geändert
+**oder** von der App gesperrte Geräte) die Taste **„Trotzdem hinzufügen“** mit Name, voller Kennung, Bestätigung bei Namensgleichheit
+und einem Dialog mit eigenem Hinweistext. Der Controller erlaubt diesen Weg nur für eine so geprüfte Kennung (`addAnyway`); bei nicht
+erreichbar, nicht gefunden, Familienmitglied oder ungeprüft nie, und der normale Weg „Hinzufügen“ bleibt für sie gesperrt.
 **Restrisiko B:** Das Gegenüber kann nach der automatischen Annahme Nachrichten in den Thread schreiben (sichtbar, Senden gesperrt).
 
-**Pinning von Kontakten (K3b-2b):** Der erste gesehene Hauptschlüssel gilt lokal (verschlüsselte Ablage dieses Geräts) und als Sitzungs-Pin im Speicher (kein Fail-open bei inaktiver Ablage). Kontakt-Pins stehen **nie** im Konto-Spiegel `identity_pins`. Akzeptieren schreibt keine Kontodaten, sondern setzt einen Vorrang-Eintrag im Speicher und ersetzt den lokalen Pin. Wartende Räume werden nicht gepinnt. **Restrisiken:** Fenster, bis die Schlüssel erstmals bekannt sind (TOFU); auf einem zweiten Gerät beginnt TOFU neu; Kontakt-Pins bleiben nach dem Entfernen des Kontakts bis zum Abmelden lokal; ein später zum Mitglied gewordener Kontakt hat keinen Kontodaten-Eintrag; das Sendefenster zwischen Schlüsselwechsel und nächster Auswertung (nicht Code-testbar); bei falschem Raum sendet der Abbruch `m.user` ein Ereignis in diesen Raum; der Familienpfad von `startVerification` ohne `deviceId` nutzt weiter die SDK-Raumwahl; die Sackgasse bei entferntem Kontakt im Zustand „geändert“ löst K3c.
+**Pinning von Kontakten (K3b-2b):** Der erste gesehene Hauptschlüssel gilt lokal (verschlüsselte Ablage dieses Geräts) und als Sitzungs-Pin im Speicher (kein Fail-open bei inaktiver Ablage). Kontakt-Pins stehen **nie** im Konto-Spiegel `identity_pins`. Akzeptieren schreibt keine Kontodaten, sondern setzt einen Vorrang-Eintrag im Speicher und ersetzt den lokalen Pin. Wartende Räume werden nicht gepinnt. **Restrisiken:** Fenster, bis die Schlüssel erstmals bekannt sind (TOFU); auf einem zweiten Gerät beginnt TOFU neu; Kontakt-Pins bleiben nach dem Entfernen des Kontakts bis zum Abmelden lokal; ein später zum Mitglied gewordener Kontakt hat keinen Kontodaten-Eintrag; das Sendefenster zwischen Schlüsselwechsel und nächster Auswertung (nicht Code-testbar); bei falschem Raum sendet der Abbruch `m.user` ein Ereignis in diesen Raum; der Familienpfad von `startVerification` ohne `deviceId` nutzt weiter die SDK-Raumwahl; die Sackgasse bei entferntem Kontakt im Zustand „geändert“ ist gelöst (K3c-1 Gateway, K3c-3 Taste).
 
 In Gruppen zeigt die Mitgliederliste die nicht erreichbaren Personen; Senden bleibt möglich, sobald mindestens eine Person
 erreichbar ist, und der Sendebereich nennt die Zahl der Ausgelassenen.
