@@ -3338,11 +3338,11 @@ void main() {
     }
 
     /// Ein Weggang (oder Beitritt) in der Gruppe: Mitgliedsereignis und neue Zähler.
-    Map<String, Object?> memberChange(String user, String membership, {required int joined, int invited = 0, String room = gr}) => <String, Object?>{
+    Map<String, Object?> memberChange(String user, String membership, {required int joined, int? invited = 0, String room = gr}) => <String, Object?>{
           'rooms': <String, Object?>{
             'join': <String, Object?>{
               room: <String, Object?>{
-                'summary': <String, Object?>{'m.joined_member_count': joined, 'm.invited_member_count': invited},
+                'summary': <String, Object?>{'m.joined_member_count': joined, 'm.invited_member_count': ?invited},
                 'state': <String, Object?>{'events': <Object?>[_memberEvent(user, membership)]},
               },
             },
@@ -4180,6 +4180,39 @@ void main() {
         expect(groupSends(hs), 3, reason: 'ein reachable, ein nicht erreichbares Mitglied: sendet');
       });
 
+      test('Zeile 3 (frisch): die Gruppe ist nach einem Datensatz-Wechsel noch im Zustand, aber keine Gruppe mehr ⇒ notAllowed, nichts geht raus', () async {
+        final (hs, g, _) = await ready();
+        g.setContactPolicy(nobody); // sofort senden, bevor der Abgleich den Zustand räumt
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _notAllowed());
+        expect(groupSends(hs), 0);
+      });
+
+      test('G exakt nach dem Abruf (40 beigetreten, Einladungszahl unbekannt, Liste mit 30 Eingeladenen): das Senden ruft ab und wird dann notAllowed', () async {
+        final (hs, g) = await signedIn();
+        g.debugOutboundPort = FakeOutboundSessionPort();
+        hs.members = <String>[_me, for (var i = 0; i < 39; i++) '@m$i:hs.example'];
+        for (var i = 0; i < 30; i++) {
+          hs.extra['@i$i:hs.example'] = 'invite';
+        }
+        expect(await groupThread(g, groupJoined(gr, joined: 40, invited: null, memberEvents: 1)), isNotNull);
+        await g.openThread(gr);
+        g.debugAgeGroupMembers(gr, const Duration(minutes: 11));
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _notAllowed());
+        expect(groupSends(hs), 0);
+      });
+
+      test('Zeile 7: sind alle anderen unknown, fragt das Senden die Schlüssel mit EINER gemeinsamen Anfrage ab; mit einem bekannten Mitglied gar nicht', () async {
+        final (_, g, _) = await ready();
+        g.debugDevicesOf = (id) => null;
+        final before = g.debugFreshQueries;
+        await expectLater(g.sendMessage('Hallo', threadId: gr), _error(GatewayError.serverUnreachable));
+        expect(g.debugFreshQueries, before + 1, reason: 'eine Anfrage für beide Mitglieder, nicht je Person');
+        g.debugDevicesOf = (id) => id == _fremd ? <bool>[true] : null;
+        final before2 = g.debugFreshQueries;
+        await g.sendMessage('Zwei', threadId: gr);
+        expect(g.debugFreshQueries, before2, reason: 'ein bekanntes Mitglied: keine Abfrage nötig');
+      });
+
       test('Abbildung Sperrgrund → Fehlerart für jeden GroupSendLock-Wert (erschöpfend)', () {
         final expected = <GroupSendLock, GatewayError?>{
           GroupSendLock.keiner: null,
@@ -4246,6 +4279,21 @@ void main() {
         );
         await nudge(g, memberChange(anna, 'leave', joined: 2, invited: 0));
         expect(port.wipes, 1);
+        expect(port.recipients(gr), isNull);
+      });
+
+      test('Weggang aus dem lokalen Zustand (Mitgliedsereignis) wird auch bei nie „vollständiger“ Liste sofort erkannt (Einladungszahl unbekannt)', () async {
+        final (hs, g) = await signedIn();
+        final port = FakeOutboundSessionPort();
+        g.debugOutboundPort = port;
+        hs.members = <String>[_me, _fremd, anna];
+        expect(await groupThread(g, groupJoined(gr, invited: null, memberEvents: 1)), isNotNull);
+        await g.openThread(gr);
+        await Future<void>.delayed(_settle);
+        expect(g.debugGroupMembers[gr]!.keys.toSet(), <String>{_me, _fremd, anna});
+        port.createSession(gr, <String>{_me, _fremd, anna});
+        await nudge(g, memberChange(anna, 'leave', joined: 2, invited: null));
+        expect(port.wipes, 1, reason: 'die Liste ist noch die alte (Abruf höchstens alle 10 Minuten), der lokale Zustand zeigt den Weggang');
         expect(port.recipients(gr), isNull);
       });
 

@@ -37,6 +37,10 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
   @visibleForTesting
   List<bool>? Function(String userId)? debugDevicesOf;
 
+  /// Nur für Tests: Zahl der gemeinsamen Schlüsselabfragen für Gruppen ([_freshReachabilityMany]).
+  @visibleForTesting
+  int debugFreshQueries = 0;
+
   bool get _encryptionAvailable => _encryptionOverride ?? _client?.encryptionEnabled ?? false;
 
   /// Geräte der Person aus den **bereits bekannten** Schlüsseln, ohne Netz: je Gerät `encryptToDevice`; `null`, wenn keine
@@ -90,6 +94,7 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
   /// SDK, deshalb zählt nur, was danach vorliegt. Die Sondergrenzen von `probeContact` (20/h) gelten hier nicht.
   // ignore: unused_element
   Future<Map<String, ContactReachability>> _freshReachabilityMany(Iterable<String> userIds) async {
+    debugFreshQueries++;
     final ids = userIds.toSet().take(maxFreshUsers).toSet();
     if (ids.isEmpty) return const <String, ContactReachability>{};
     if (debugDevicesOf == null) {

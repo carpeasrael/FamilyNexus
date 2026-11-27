@@ -537,7 +537,8 @@ mixin _ContactGroupsModule on ChangeNotifier implements MatrixGateway {
     if (!g.membersLoaded.contains(threadId) || at == null || DateTime.now().difference(at) > _GroupState.listFreshFor) {
       throw GatewayException(groupSendLockError(GroupSendLock.groesseUnbekannt)!);
     }
-    _throwIfLocked(_groupHealthOf(room)); // G exakt aus der frischen Liste
+    // G ist nach dem Abruf exakt: `_groupSizeOf` nimmt den größeren Wert aus `summary` und der frischen Liste, die Prüfung in
+    // Zeile 3 hat die Liste also schon eingerechnet (`_prepareGroupSend` ruft sie vor dem Tor ab).
     // 5 und 6
     final others = _otherMembers(room);
     if (others == null) throw GatewayException(groupSendLockError(GroupSendLock.groesseUnbekannt)!);
