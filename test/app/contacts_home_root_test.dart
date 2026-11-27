@@ -61,6 +61,20 @@ void main() {
       expect(app.services.settings.settings.contactsOnly, isFalse);
     });
 
+    testWidgets('entsteht in der Einrichtung eine Familie, verschwindet der Knopf sofort (die Familie gewinnt)', (tester) async {
+      final app = await noFamily();
+      await app.services.settings.update((c) => c.copyWith(onboardingDone: false));
+      await start(tester, app);
+      expect(find.text(button), findsOneWidget);
+      app.gateway.attachFamilyRoom(app.server.addFamilyRoom('Familie Neu', '@anna:fake.test').id);
+      await tester.pump();
+      expect(find.byType(OnboardingScreen), findsOneWidget, reason: 'der Familienschritt schließt erst im nächsten Schritt ab');
+      expect(find.text(button), findsNothing);
+      await tester.pumpAndSettle();
+      expect(find.byType(HomeShell), findsOneWidget);
+      expect(app.services.settings.settings.contactsOnly, isFalse);
+    });
+
     testWidgets('der Knopf merkt die Wahl lokal und zeigt die ContactsHome; kein Kalender, keine Tabs', (tester) async {
       final app = await noFamily();
       await start(tester, app);
@@ -99,6 +113,10 @@ void main() {
       await start(tester, app);
       expect(find.byType(ContactsHome), findsOneWidget);
       app.gateway.attachFamilyRoom(app.server.addFamilyRoom('Familie Neu', '@anna:fake.test').id);
+      // Schon im ersten Bild nach dem Wechsel gewinnt die Familie, nicht erst nach dem Aufheben der gemerkten Wahl.
+      await tester.pump();
+      expect(find.byType(HomeShell), findsOneWidget);
+      expect(find.byType(ContactsHome), findsNothing);
       await tester.pumpAndSettle();
       expect(find.byType(HomeShell), findsOneWidget);
       expect(find.byType(ContactsHome), findsNothing);
