@@ -130,6 +130,16 @@ void main() {
       expect(r(100).canSetAdmin(me, 100, admin: true), isFalse);
     });
 
+    test('Ernennen: ein Ziel mit genau Stufe 50 ist schon Admin und wird auch von einem 100er nicht erneut ernannt', () {
+      expect(r(100).canSetAdmin(other, 50, admin: true), isFalse);
+      expect(r(100).canSetAdmin(other, 49, admin: true), isTrue);
+    });
+
+    test('Selbstbeförderung nie, auch wenn die Schwelle von m.room.power_levels niedrig ist', () {
+      expect(r(30, pl: 0).canSetAdmin(me, 30, admin: true), isFalse);
+      expect(r(30, pl: 0).canSetAdmin(other, 0, admin: true), isTrue, reason: 'mit niedriger Schwelle darf ich andere ernennen');
+    });
+
     test('Zielstufe: Ernennen 50 (nie 100), Entziehen 0', () {
       expect(GroupRights.levelFor(admin: true), PowerLevels.moderator);
       expect(GroupRights.levelFor(admin: true), isNot(PowerLevels.admin));

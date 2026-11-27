@@ -1,6 +1,8 @@
 import 'package:family_nexus/data/matrix/contact_group_spec.dart';
 import 'package:family_nexus/data/matrix/family_room_spec.dart';
+import 'package:family_nexus/domain/chat.dart';
 import 'package:family_nexus/domain/contacts.dart';
+import 'package:family_nexus/domain/group_rights.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// #119, K4-1 (KONTAKTE §5): Anlagedaten und Schwellen der Gruppe und die Nachprüfung beim Beitritt.
@@ -98,6 +100,31 @@ void main() {
       expect(ok(joined: null, rule: 'public'), isFalse);
       expect(ok(joined: null, history: 'shared'), isFalse);
       expect(ok(joined: null, algo: null), isFalse);
+    });
+  });
+
+  group('verifyJoined und GroupHealth.evaluate sind dieselbe Regel', () {
+    test('über alle Kombinationen: bleiben genau dann, wenn nicht gesperrt (außer unbekannter Größe)', () {
+      for (final megolm in <bool>[true, false]) {
+        for (final rule in <String?>['invite', 'public', null]) {
+          for (final history in <String?>['invited', 'shared', null]) {
+            for (final joined in <int?>[null, 1, 50, 51]) {
+              for (final invited in <int?>[null, 0, 1]) {
+                final lock = GroupHealth.evaluate(
+                    megolm: megolm, joinRule: rule, historyVisibility: history, joined: joined, invited: invited);
+                final stays = ContactGroupSpec.verifyJoined(
+                    encryptionAlgorithm: megolm ? ContactGroupSpec.megolm : 'm.other',
+                    joinRule: rule,
+                    historyVisibility: history,
+                    joined: joined,
+                    invited: invited);
+                final expected = lock == GroupSendLock.keiner || lock == GroupSendLock.groesseUnbekannt;
+                expect(stays, expected, reason: '$megolm/$rule/$history/$joined/$invited -> $lock');
+              }
+            }
+          }
+        }
+      }
     });
   });
 }
