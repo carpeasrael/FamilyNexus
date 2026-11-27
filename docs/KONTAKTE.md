@@ -157,6 +157,18 @@ unsichere Gruppe bleibt sichtbar, sendegesperrt und verlassbar. Eine **Gruppenan
 Familienmitglied); ein vorhandener Datensatz ändert bei Einladungen nichts (Absturzfall: bleibt Anfrage). Gruppen nimmt die App
 nie automatisch an.
 
+**Stand K4-2a (Gateway lesen, anfragen, anlegen, beitreten, verlassen; Senden in Gruppen gesperrt, ohne Wirkung bis zur Freigabe):**
+Das Gateway stuft Gruppen über `contactGroup` ein und hält sie in einem eigenen Zustand (`_GroupState`), nie in `peers`.
+`createGroup(name)` legt den Raum nur über `ContactGroupSpec` an, ohne Mitglieder und ohne Datensatz (§7.2 weicht ab: kein
+`members`-Parameter, der Controller schreibt zuerst den Datensatz und lädt dann ein). `acceptGroupInvite(roomId)` nimmt eine
+Gruppenanfrage nach Tipp an und prüft nach dem Beitritt vom Server Megolm, Regel `invite`, Verlauf `invited` und G ≤ 50 (§8.4),
+sonst verlässt es den Raum; es schreibt nie einen Datensatz und nie die Familienzuordnung. Gruppenanfragen (§8.4) erscheinen
+mit Gruppenname, Einladendem und dem Kennzeichen „Einladender ist Familie“ (nur Anzeige), je Raum eine, je Einladendem
+höchstens 3, je Server höchstens 5, gesamt 50; sie werden nie automatisch angenommen. `leaveConversation` verlässt auch
+überfüllte, sendegesperrte und unverschlüsselte Gruppen. Die Mitgliederliste wird nur abgerufen, wenn die Größe G bekannt und
+höchstens 50 ist (nie bei G > 50 oder unbekannter Größe), je Raum höchstens alle 10 Minuten. **Senden in Gruppen ist bis K4-2b
+gesperrt** (`notAllowed`); die Reaktionssperre für Kontakt-Räume bleibt.
+
 ### 6.3 Familieneinladungen sicher erkennen (B1)
 - Familienräume haben immer `join_rules: knock` (E-12), Gruppen `invite`. Der Wert gehört zum Zustand, den Server
   Eingeladenen mitliefern.
