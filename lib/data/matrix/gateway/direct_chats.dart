@@ -118,6 +118,7 @@ mixin _DirectChatsModule on ChangeNotifier implements MatrixGateway {
         contacts: _contactPolicy.contacts,
         blockedUsers: _contactPolicy.blocked,
         familyIds: <String>{for (final m in f.members) m.userId},
+        groups: _contactPolicy.groups,
       );
 
   /// Verschlüsselte Einzelchat-Räume mit aktuellen, beigetretenen Familienmitgliedern

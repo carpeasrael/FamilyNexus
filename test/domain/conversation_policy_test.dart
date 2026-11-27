@@ -285,7 +285,8 @@ void main() {
       expect(ConversationPolicy.classify(invite(from: me, direct: true), cc()), RoomClass.ignored);
       expect(ConversationPolicy.classify(invite(from: null, direct: true), cc()), RoomClass.ignored);
       expect(ConversationPolicy.classify(invite(from: dora, direct: true, book: true), cc()), RoomClass.ignored);
-      expect(ConversationPolicy.classify(invite(from: dora, rule: 'invite'), cc()), RoomClass.ignored, reason: 'ohne is_direct (Gruppe, K4)');
+      // K4-1: ohne is_direct und mit Regel invite ist es eine Gruppenanfrage (vorher ignored); ohne Regel nie eine Anfrage.
+      expect(ConversationPolicy.classify(invite(from: dora, rule: 'invite'), cc()), RoomClass.contactRequest, reason: 'Gruppenanfrage (K4-1)');
       expect(ConversationPolicy.classify(invite(from: dora), cc()), isNot(RoomClass.contactRequest));
     });
 
@@ -310,9 +311,12 @@ void main() {
       expect(ConversationPolicy.classify(invite(from: carla, direct: true), cc(contacts: const <String, ContactState>{})), RoomClass.contactRequest);
     });
 
-    test('Einladung ohne is_direct von einem eigenen Kontakt ist nie Anfrage und nie Annahme', () {
-      expect(ConversationPolicy.classify(invite(from: carla, rule: 'invite'), cc()), RoomClass.ignored);
-      expect(ConversationPolicy.classify(invite(from: carla), cc()), isNot(RoomClass.contactRequest));
+    // K4-1 (Planung §5a): vor K4 war eine Einladung ohne is_direct und mit join_rule invite `ignored`. Seit K4-1 ist sie eine
+    // Gruppenanfrage (Anhang A Z. 7, Wahrheitstafel unten); die Aussage „nie Annahme“ (D1: Gruppen nie automatisch) und
+    // „ohne Regel keine Anfrage“ bleiben unverändert.
+    test('Einladung ohne is_direct von einem eigenen Kontakt wird nie automatisch angenommen (Gruppenanfrage, K4-1)', () {
+      expect(ConversationPolicy.classify(invite(from: carla, rule: 'invite'), cc()), RoomClass.contactRequest);
+      expect(ConversationPolicy.classify(invite(from: carla), cc()), isNot(RoomClass.contactRequest), reason: 'ohne Regel keine Anfrage');
       expect(ConversationPolicy.autoAcceptContact(invite(from: carla), cc()), isFalse);
     });
   });
@@ -451,6 +455,207 @@ void main() {
         expect(ContactScope.familyResolved(pointerSet: true, roomKnown: true, membership: RoomMembership.join, familyBuilt: false, accountDataFresh: true, row2Settled: settled), isFalse);
         expect(ContactScope.familyResolved(pointerSet: true, roomKnown: false, membership: null, familyBuilt: false, accountDataFresh: false, row2Settled: settled), isFalse);
       }
+    });
+  });
+
+
+  // ----------------------------------------------------------------------------- K4-1: Gruppen (Anhang A der Planung)
+  const grp = '!gruppe:hs.example';
+  const gruppenCtx = PolicyContext(
+    myUserId: me,
+    familyRoomId: '!familie:hs.example',
+    privateRoomId: priv,
+    joinedMembers: <String>{me, ben},
+    membersLoaded: true,
+    contactsEnabled: true,
+    familyIds: <String>{me, ben},
+    groups: <String>{grp},
+  );
+
+  PolicyContext gc({
+    bool enabled = true,
+    bool loaded = true,
+    Set<String> groups = const <String>{grp},
+    Set<String> blocked = const <String>{},
+    Set<String> family = const <String>{me, ben},
+  }) =>
+      PolicyContext(
+        myUserId: me,
+        familyRoomId: '!familie:hs.example',
+        privateRoomId: priv,
+        joinedMembers: const <String>{me, ben},
+        membersLoaded: loaded,
+        contactsEnabled: enabled,
+        blockedUsers: blocked,
+        familyIds: family,
+        groups: groups,
+      );
+
+  RoomFacts groupJoined({
+    String id = grp,
+    String? peer,
+    bool megolm = true,
+    int? joinedCount = 3,
+    int? invitedCount = 0,
+    String? rule = 'invite',
+    PeerMembership peerMembership = PeerMembership.unknown,
+  }) =>
+      RoomFacts(
+        id: id,
+        membership: RoomMembership.join,
+        peerId: peer,
+        megolm: megolm,
+        joinedCount: joinedCount,
+        invitedCount: invitedCount,
+        joinRule: rule,
+        peerMembership: peerMembership,
+      );
+
+  RoomFacts groupInvite({String id = grp, String? from = carla, String? rule = 'invite', bool direct = false, bool book = false}) => RoomFacts(
+        id: id,
+        membership: RoomMembership.invite,
+        inviterId: from,
+        inviteIsDirect: direct,
+        isBook: book,
+        joinRule: rule,
+      );
+
+  group('Gruppen (K4-1, Wahrheitstafel Anhang A, jede Zeile ein Test)', () {
+    RoomClass k(RoomFacts f, PolicyContext c) => ConversationPolicy.classify(f, c);
+
+    test('Z. 1: Familienraum und privater Raum haben Vorrang vor der Gruppe, auch mit Datensatz', () {
+      final c = gc(groups: const <String>{grp, '!familie:hs.example', priv});
+      expect(k(groupJoined(id: '!familie:hs.example'), c), RoomClass.family);
+      expect(k(groupJoined(id: priv), c), RoomClass.private);
+    });
+
+    test('Z. 2: beigetreten mit Datensatz ist contactGroup, unabhängig von Größe, Regel, Verlauf, Megolm und peerId', () {
+      expect(k(groupJoined(), gc()), RoomClass.contactGroup);
+      for (final f in <String, RoomFacts>{
+        'zu groß (51)': groupJoined(joinedCount: 51),
+        '40 + 30 eingeladen': groupJoined(joinedCount: 40, invitedCount: 30),
+        'Größe unbekannt': groupJoined(joinedCount: null, invitedCount: null),
+        'Regel public': groupJoined(rule: 'public'),
+        'Regel knock': groupJoined(rule: 'knock'),
+        'Regel null': groupJoined(rule: null),
+        'unverschlüsselt': groupJoined(megolm: false),
+        'allein (nur ich)': groupJoined(joinedCount: 1),
+      }.entries) {
+        expect(k(f.value, gc()), RoomClass.contactGroup, reason: f.key);
+      }
+    });
+
+    test('Z. 3: ohne Datensatz bleibt der Einzelchat mit Familienmitglied familyDirect', () {
+      final f = RoomFacts(id: '!dm:hs.example', membership: RoomMembership.join, peerId: ben, megolm: true, joinedCount: 2, invitedCount: 0);
+      expect(k(f, gc()), RoomClass.familyDirect);
+      expect(k(f, gc(groups: const <String>{})), RoomClass.familyDirect);
+    });
+
+    test('Z. 4: ohne Datensatz bleibt der Kontakt-Einzelchat contactDirect', () {
+      final f = RoomFacts(
+        id: '!dm:hs.example',
+        membership: RoomMembership.join,
+        peerId: carla,
+        megolm: true,
+        joinedCount: 2,
+        invitedCount: 0,
+        peerMembership: PeerMembership.join,
+      );
+      final c = PolicyContext(
+        myUserId: me,
+        membersLoaded: true,
+        contactsEnabled: true,
+        contacts: const <String, ContactState>{carla: ContactState.accepted},
+        familyIds: const <String>{me, ben},
+        groups: const <String>{grp},
+      );
+      expect(k(f, c), RoomClass.contactDirect);
+    });
+
+    test('Z. 5: ohne Datensatz ist ein beigetretener Mehrpersonenraum ignored (nie von selbst eine Gruppe)', () {
+      expect(k(groupJoined(), gc(groups: const <String>{})), RoomClass.ignored);
+      expect(k(groupJoined(id: '!andere:hs.example'), gc()), RoomClass.ignored);
+    });
+
+    test('Z. 6: der Datensatz gewinnt gegen m.direct (peerId), auch gegen Familie und Kontakt als Gegenüber', () {
+      for (final peer in <String>[ben, carla, fremd]) {
+        expect(k(groupJoined(peer: peer, joinedCount: 2, peerMembership: PeerMembership.join), gc()), RoomClass.contactGroup, reason: peer);
+      }
+    });
+
+    test('Z. 7: Einladung mit join_rule invite ist eine Gruppenanfrage, auch von einem Familienmitglied (D5)', () {
+      expect(k(groupInvite(), gc()), RoomClass.contactRequest);
+      expect(k(groupInvite(from: ben), gc()), RoomClass.contactRequest, reason: 'Familienmitglied darf einladen');
+    });
+
+    test('Z. 7b: Einladung mit Datensatz (Absturzfall D2) bleibt Anfrage, nie ignored und nie beigetreten', () {
+      expect(k(groupInvite(), gc(groups: const <String>{grp})), RoomClass.contactRequest);
+      expect(k(groupInvite(), gc(groups: const <String>{})), RoomClass.contactRequest, reason: 'der Datensatz ändert bei Einladungen nichts');
+      expect(k(groupInvite(from: me), gc()), RoomClass.ignored, reason: '7b mit Einladendem ich: wie Z. 8');
+      expect(k(groupInvite(from: carla), gc(blocked: const <String>{carla})), RoomClass.ignored, reason: '7b mit Blockiertem: wie Z. 8');
+    });
+
+    test('Z. 8: Einladender blockiert, ich oder unbekannt ⇒ ignored', () {
+      expect(k(groupInvite(from: carla), gc(blocked: const <String>{carla})), RoomClass.ignored);
+      expect(k(groupInvite(from: me), gc()), RoomClass.ignored);
+      expect(k(groupInvite(from: null), gc()), RoomClass.ignored);
+    });
+
+    test('Z. 9: knock bleibt familyInvite, nie eine Gruppenanfrage', () {
+      expect(k(groupInvite(rule: 'knock'), gc()), RoomClass.familyInvite);
+      expect(k(groupInvite(rule: 'knock', from: carla), gc(groups: const <String>{})), RoomClass.familyInvite);
+    });
+
+    test('Z. 10: fehlende Regel bleibt familyInvite, mit und ohne Familie (Nutzerentscheidung 5)', () {
+      expect(k(groupInvite(rule: null), gc()), RoomClass.familyInvite);
+      expect(k(groupInvite(rule: null), gc(family: const <String>{})), RoomClass.familyInvite);
+      expect(k(groupInvite(rule: null), const PolicyContext(myUserId: me)), RoomClass.familyInvite);
+    });
+
+    test('Z. 11: andere Regeln (public, restricted, …) ⇒ ignored', () {
+      for (final rule in <String>['public', 'restricted', 'knock_restricted', 'Invite', '']) {
+        expect(k(groupInvite(rule: rule), gc()), RoomClass.ignored, reason: rule);
+      }
+    });
+
+    test('Z. 12: Buch-Einladung ist nie eine Gruppenanfrage', () {
+      expect(k(groupInvite(book: true), gc()), RoomClass.ignored);
+    });
+
+    test('Z. 13: Einladung in einen Einzelchat bleibt wie K3 (nie eine Gruppenanfrage über die Gruppenzeile)', () {
+      expect(k(groupInvite(direct: true, rule: 'invite', from: carla), gc()), RoomClass.contactRequest, reason: 'Einzelchat-Anfrage wie K3');
+      expect(k(groupInvite(direct: true, rule: 'invite', from: ben), gc()), RoomClass.ignored, reason: 'Einzelchat: Familie nie (K3)');
+      expect(k(groupInvite(direct: true, rule: 'knock'), gc()), RoomClass.contactRequest, reason: 'die Regel ist bei Einzelchats unerheblich (K3)');
+    });
+
+    test('Bereich aus oder Liste unvollständig: nie eine Gruppenklasse (I1, B6)', () {
+      for (final c in <PolicyContext>[gc(enabled: false), gc(loaded: false)]) {
+        expect(k(groupJoined(), c), RoomClass.ignored);
+        expect(k(groupJoined(peer: carla), c), isNot(RoomClass.contactGroup));
+        expect(k(groupInvite(), c), RoomClass.ignored, reason: 'Gruppenanfrage nur mit Bereich und Liste');
+      }
+    });
+
+    test('ohne Bereich nie eine Gruppenklasse in keiner Kombination', () {
+      final c = gc(enabled: false);
+      for (final m in RoomMembership.values) {
+        for (final rule in <String?>[null, 'invite', 'knock', 'public']) {
+          final f = RoomFacts(id: grp, membership: m, inviterId: carla, megolm: true, joinedCount: 3, joinRule: rule);
+          final r = ConversationPolicy.classify(f, c);
+          expect(r == RoomClass.contactGroup || r == RoomClass.contactRequest, isFalse, reason: '$m $rule');
+        }
+      }
+    });
+
+    test('eine Gruppeneinladung ist nie eine Familieneinladung, wenn der Server join_rules liefert (Abnahme 9)', () {
+      for (final c in <PolicyContext>[gc(), gc(enabled: false), gc(loaded: false), gc(family: const <String>{})]) {
+        expect(k(groupInvite(rule: 'invite'), c), isNot(RoomClass.familyInvite));
+      }
+    });
+
+    test('PolicyContext.groups hat den Standard leer (Bestandscode unverändert)', () {
+      expect(const PolicyContext(myUserId: me).groups, isEmpty);
+      expect(gruppenCtx.groups, <String>{grp});
     });
   });
 

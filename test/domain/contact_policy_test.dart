@@ -30,7 +30,13 @@ void main() {
   test('Einstellung: der Datensatz entscheidet; Gruppen sind kein Kontakt', () {
     expect(ContactPolicy.of(<ContactRecord>[ContactPrefs(enabled: true, version: 1, updatedAt: t)]).enabled, isTrue);
     expect(ContactPolicy.of(<ContactRecord>[ContactPrefs(enabled: false, version: 2, updatedAt: t)]).enabled, isFalse);
-    expect(ContactPolicy.of(<ContactRecord>[GroupRecord(id: '!g:example.org', version: 1, updatedAt: t)]), ContactPolicy.off, reason: 'Gruppen sind kein Kontakt');
+    // K4-1: Ein Gruppen-Datensatz ist kein Kontakt (contacts/blocked bleiben leer), steht aber in `groups`; deshalb ist der
+    // Wert nicht mehr gleich `off` (die frühere Aussage „gleich off“ galt, solange `groups` fehlte).
+    final g = ContactPolicy.of(<ContactRecord>[GroupRecord(id: '!g:example.org', version: 1, updatedAt: t)]);
+    expect(g.contacts, isEmpty, reason: 'Gruppen sind kein Kontakt');
+    expect(g.blocked, isEmpty);
+    expect(g.enabled, isFalse);
+    expect(g.groups, <String>{'!g:example.org'});
   });
 
   test('die lokale Blockierliste fließt in blocked ein', () {
@@ -95,6 +101,56 @@ void main() {
       expect(ContactReach.of(keysKnown: true, encryptable: const <bool>[false, false]), ContactReachability.notReachable);
       expect(ContactReach.of(keysKnown: true, encryptable: const <bool>[false, true]), ContactReachability.reachable);
       expect(ContactReach.of(keysKnown: true, encryptable: const <bool>[true]), ContactReachability.reachable);
+    });
+  });
+
+  group('Gruppen (K4-1)', () {
+    GroupRecord grp(String id, {bool deleted = false}) => GroupRecord(id: id, version: 1, updatedAt: t, deleted: deleted);
+
+    test('groups aus aktiven Datensätzen; Löschmarken fehlen; unveränderlich; Standard leer', () {
+      final p = ContactPolicy.of(<ContactRecord>[grp('!a:example.org'), grp('!b:example.org', deleted: true), c(carla, ContactState.accepted)]);
+      expect(p.groups, <String>{'!a:example.org'});
+      expect(p.contacts.keys, <String>[carla]);
+      expect(() => p.groups.add('!x:example.org'), throwsUnsupportedError);
+      expect(ContactPolicy.off.groups, isEmpty);
+    });
+
+    test('== unterscheidet den Gruppen-Datensatz (löst setContactPolicy aus)', () {
+      final base = ContactPolicy.of(<ContactRecord>[c(carla, ContactState.accepted)]);
+      final withGroup = ContactPolicy.of(<ContactRecord>[c(carla, ContactState.accepted), grp('!a:example.org')]);
+      expect(withGroup, isNot(base));
+      expect(base, isNot(withGroup));
+      expect(withGroup, ContactPolicy.of(<ContactRecord>[grp('!a:example.org'), c(carla, ContactState.accepted)]));
+      expect(
+        ContactPolicy.of(<ContactRecord>[grp('!a:example.org')]),
+        isNot(ContactPolicy.of(<ContactRecord>[grp('!b:example.org')])),
+        reason: 'gleiche Zahl, andere Räume',
+      );
+    });
+
+    test('hashCode unterscheidet sich bei anderer Zahl der Gruppen', () {
+      final none = ContactPolicy.of(const <ContactRecord>[]);
+      final one = ContactPolicy.of(<ContactRecord>[grp('!a:example.org')]);
+      final two = ContactPolicy.of(<ContactRecord>[grp('!a:example.org'), grp('!b:example.org')]);
+      expect(one.hashCode, isNot(none.hashCode));
+      expect(two.hashCode, isNot(one.hashCode));
+      expect(one.hashCode, ContactPolicy.of(<ContactRecord>[grp('!a:example.org')]).hashCode);
+    });
+  });
+
+  group('ContactNames.groupTitle (K4-1)', () {
+    test('bereinigt Steuer-, Bidi- und Trennzeichen, höchstens 60 Zeichen, leer bei nichts Brauchbarem', () {
+      expect(ContactNames.groupTitle('  Familie  Müller '), 'Familie Müller');
+      expect(ContactNames.groupTitle('A · B‮​'), 'A B');
+      expect(ContactNames.groupTitle('x' * 100).length, 60);
+      expect(ContactNames.groupTitle(null), '');
+      expect(ContactNames.groupTitle('‮​'), '');
+      expect(ContactNames.maxGroupName, 60);
+    });
+
+    test('der Gruppenname lässt sich mit collides gegen Familiennamen vergleichen (Aufrufer gibt den Familiennamen mit)', () {
+      expect(ContactNames.collides(ContactNames.groupTitle('Familie Müller'), <String>['Familie Muller']), isTrue);
+      expect(ContactNames.collides(ContactNames.groupTitle('Skatrunde'), <String>['Familie Muller']), isFalse);
     });
   });
 }

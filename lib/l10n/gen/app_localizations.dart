@@ -3314,6 +3314,12 @@ abstract class AppLocalizations {
   /// **'Kontakt-Chat'**
   String get roomKindContact;
 
+  /// No description provided for @roomKindGroup.
+  ///
+  /// In de, this message translates to:
+  /// **'Gruppe'**
+  String get roomKindGroup;
+
   /// No description provided for @chatThreadDirect.
   ///
   /// In de, this message translates to:

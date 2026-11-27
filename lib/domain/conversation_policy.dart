@@ -5,7 +5,8 @@ import 'family_invitation.dart';
 /// Domäne, ohne SDK-Typen: Das Gateway liest die [RoomFacts] aus dem Raum und fragt [ConversationPolicy].
 ///
 /// Unbekanntes ist immer [ignored] (I2: Positivliste). [contactDirect] und [contactRequest] liefert [ConversationPolicy.classify]
-/// ab K3a-1 nur bei eingeschaltetem Bereich ([PolicyContext.contactsEnabled]); [contactGroup] gibt es ab K4.
+/// ab K3a-1 nur bei eingeschaltetem Bereich ([PolicyContext.contactsEnabled]); [contactGroup] liefert sie ab K4-1 nur für
+/// beigetretene Räume mit eigenem Gruppen-Datensatz ([PolicyContext.groups]) und [contactRequest] auch für Gruppeneinladungen.
 enum RoomClass { family, private, familyDirect, contactDirect, contactGroup, familyInvite, contactRequest, ignored }
 
 /// Mitgliedschaft des **Gegenübers** im Raum (aus `m.room.member`, nicht aus Zählern): [join] beigetreten, [invite] nur
@@ -69,6 +70,7 @@ class PolicyContext {
     this.contacts = const <String, ContactState>{},
     this.blockedUsers = const <String>{},
     this.familyIds = const <String>{},
+    this.groups = const <String>{},
   });
 
   final String myUserId;
@@ -96,6 +98,10 @@ class PolicyContext {
   /// Alle Mitglieder der Familie in jedem Status (beigetreten, eingeladen, angefragt): nie ein Kontakt. Entfernte
   /// Mitglieder gehören nicht dazu und gelten als Fremde (E-114).
   final Set<String> familyIds;
+
+  /// Raum-IDs der Gruppen mit aktivem Datensatz (K4-1, #119, D4): ein eigener Datensatz bestimmt die Klasse eines
+  /// beigetretenen Raums, nie ein Fremder.
+  final Set<String> groups;
 }
 
 /// Wann die Mitgliederliste für Kontaktentscheidungen vollständig ist (B6, fail-closed). Mit Familie: erst wenn ihre Liste
@@ -152,6 +158,10 @@ class ConversationPolicy {
       case RoomMembership.join:
         if (r.id == c.familyRoomId) return RoomClass.family;
         if (r.id == c.privateRoomId) return RoomClass.private;
+        // Gruppe (K4-1, D4, Anhang A Z. 2 und 6): nur mit eigenem Datensatz, vor den Zweier-Zeilen (der Datensatz gewinnt
+        // gegen `m.direct`). Größe, Regel, Verlauf und Verschlüsselung gehören nicht zur Einstufung, sondern zu
+        // `GroupHealth`: eine unsichere Gruppe bleibt sichtbar, sendegesperrt und verlassbar.
+        if (c.contactsEnabled && c.membersLoaded && c.groups.contains(r.id)) return RoomClass.contactGroup;
         final peer = r.peerId;
         if (peer != null &&
             peer != c.myUserId &&
@@ -182,6 +192,14 @@ class ConversationPolicy {
           final from = r.inviterId;
           if (from == null || !_contactPeerOk(from, c) || !(r.joinedCount == null || r.isPair)) return RoomClass.ignored;
           return c.contacts.containsKey(from) ? RoomClass.ignored : RoomClass.contactRequest;
+        }
+        // Gruppenanfrage (K4-1, Anhang A Z. 7 und 7b): nicht-direkte Einladung mit `join_rule == invite`, Einladender
+        // bekannt, nicht ich, nicht blockiert; ein Familienmitglied darf einladen (D5). `id ∈ groups` ändert nichts
+        // (Absturzfall D2: Datensatz da, Einladung noch offen, bleibt Anfrage). `null` und `knock` bleiben Familieneinladung.
+        if (r.joinRule == 'invite') {
+          final from = r.inviterId;
+          final ok = c.contactsEnabled && c.membersLoaded && from != null && from != c.myUserId && !c.blockedUsers.contains(from);
+          return ok ? RoomClass.contactRequest : RoomClass.ignored;
         }
         return isFamilyInvitation(joinRule: r.joinRule, isDirect: false, isBook: false) ? RoomClass.familyInvite : RoomClass.ignored;
       case RoomMembership.other:

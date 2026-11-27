@@ -538,4 +538,37 @@ void main() {
       expect((p as ContactPrefs).enabled, isTrue);
     });
   });
+
+  group('removeGroupIfVersion (K4-1: Rücknahme nur bei gleicher Version)', () {
+    const room = '!gruppe:hs.example';
+
+    test('löscht (Löschmarke, Version +1, onChanged) nur bei aktivem Datensatz mit gleicher Version', () async {
+      var calls = 0;
+      final g = await svc.addGroup(room);
+      svc.onChanged = () => calls++;
+      expect(await svc.removeGroupIfVersion(room, version: g.version), isTrue);
+      expect(calls, 1);
+      final rec = (await store.get(ContactKind.group, room))! as GroupRecord;
+      expect((rec.deleted, rec.version), (true, g.version + 1));
+      expect((await svc.groups()).any((x) => x.id == room), isFalse);
+    });
+
+    test('andere Version, schon gelöscht oder unbekannt: keine Änderung', () async {
+      final g = await svc.addGroup(room);
+      expect(await svc.removeGroupIfVersion(room, version: g.version + 1), isFalse);
+      expect(await svc.removeGroupIfVersion('!unbekannt:hs.example', version: 1), isFalse);
+      expect((await store.get(ContactKind.group, room))!.deleted, isFalse);
+      await svc.removeGroup(room);
+      expect(await svc.removeGroupIfVersion(room, version: g.version + 1), isFalse, reason: 'schon gelöscht');
+    });
+
+    test('neu angelegt nach Löschung: die alte Version löscht den neuen Stand nicht', () async {
+      final g1 = await svc.addGroup(room);
+      await svc.removeGroup(room);
+      final g2 = await svc.addGroup(room);
+      expect(g2.version, greaterThan(g1.version));
+      expect(await svc.removeGroupIfVersion(room, version: g1.version), isFalse);
+      expect(await svc.removeGroupIfVersion(room, version: g2.version), isTrue);
+    });
+  });
 }

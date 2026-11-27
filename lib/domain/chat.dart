@@ -1,3 +1,4 @@
+import 'contacts.dart' show ContactReachability;
 import 'family.dart' show IdentityStatus;
 
 enum MessageStatus { sending, sent, failed }
@@ -93,7 +94,43 @@ class ChatMessage {
 }
 
 /// [contact]: Einzelchat mit einer Person **außerhalb der Familie** (#119, K3a-2); nie mit Familientexten kennzeichnen.
-enum ThreadKind { family, direct, contact }
+/// [group]: Gruppe mit Personen außerhalb der Familie (#119, K4); wie [contact] nie mit Familientexten kennzeichnen.
+enum ThreadKind { family, direct, contact, group }
+
+/// Warum das Senden in einer Gruppe gesperrt ist (#119, K4-1, §3.3/§3.6). [keiner]: erlaubt. Die Räume-Gründe liefert
+/// `GroupHealth`; [keineMitglieder] und [wechsel] setzt das Gateway aus seinem Zustand (K4-2). Die Gruppe bleibt in allen
+/// Fällen sichtbar und verlassbar.
+enum GroupSendLock { keiner, zuGross, groesseUnbekannt, unverschluesselt, regelGeaendert, verlaufGeoeffnet, keineMitglieder, wechsel }
+
+/// Mitgliedschaft eines Gruppenmitglieds (nur beigetreten oder eingeladen zählen als Mitglied).
+enum GroupMembership { join, invite }
+
+/// Ein Mitglied einer Gruppe für Liste und Verwaltung (#119, K4-1). [power] ist die Stufe aus dem Raumzustand.
+class GroupMember {
+  const GroupMember({
+    required this.userId,
+    required this.displayName,
+    required this.membership,
+    this.power = 0,
+    this.reachability = ContactReachability.unknown,
+    this.identity = IdentityStatus.unknown,
+    this.isFamily = false,
+    this.isMe = false,
+  });
+
+  final String userId;
+
+  /// Bereinigter Anzeigename (Fremdtext).
+  final String displayName;
+  final GroupMembership membership;
+  final int power;
+  final ContactReachability reachability;
+  final IdentityStatus identity;
+
+  /// Beigetretenes oder eingeladenes Familienmitglied (Kennzeichen „Familie“).
+  final bool isFamily;
+  final bool isMe;
+}
 
 /// Ein Gespräch: der Familienchat oder ein Einzelchat mit einem Mitglied (E-39).
 class ChatThread {
@@ -107,6 +144,11 @@ class ChatThread {
     this.reachable = true,
     this.peerName = '',
     this.identity = IdentityStatus.unknown,
+    this.memberCount = 0,
+    this.unreachableCount = 0,
+    this.canManage = false,
+    this.identityChangedCount = 0,
+    this.sendLock = GroupSendLock.keiner,
   });
 
   /// Feste Kennung des Familienchats; Einzelchats tragen ihre Raum-ID.
@@ -136,15 +178,38 @@ class ChatThread {
   /// Hauptschlüssel hat sich geändert, Senden ist gesperrt, bis die Änderung akzeptiert wird.
   final IdentityStatus identity;
 
+  /// Nur [ThreadKind.group]: Zahl der Mitglieder (beigetreten und eingeladen); sonst 0.
+  final int memberCount;
+
+  /// Nur [ThreadKind.group]: Mitglieder, die nach bekannten Schlüsseln nicht mitlesen können; sonst 0.
+  final int unreachableCount;
+
+  /// Nur [ThreadKind.group]: Ich darf die Gruppe verwalten (Stufe laut Raumzustand).
+  final bool canManage;
+
+  /// Nur [ThreadKind.group]: Mitglieder mit ungeklärtem Schlüsselwechsel; sonst 0.
+  final int identityChangedCount;
+
+  /// Nur [ThreadKind.group]: Sperrgrund für das Senden; [GroupSendLock.keiner] heißt erlaubt.
+  final GroupSendLock sendLock;
+
   bool get isFamily => kind == ThreadKind.family;
 
-  /// Gespräch mit einer Person außerhalb der Familie: kein Online-Status, kein Familientext.
-  bool get isOutside => kind == ThreadKind.contact;
+  /// Gespräch mit Personen außerhalb der Familie (Einzelkontakt oder Gruppe): kein Online-Status, kein Familientext.
+  bool get isOutside => kind == ThreadKind.contact || kind == ThreadKind.group;
 }
 
 /// Eingehende Kontaktanfrage (#119, K3a-2): nur Absender und Server, **kein** Rauminhalt vor der Annahme.
 class ContactRequest {
-  const ContactRequest({required this.roomId, required this.fromUserId, required this.fromName, this.name = ''});
+  const ContactRequest({
+    required this.roomId,
+    required this.fromUserId,
+    required this.fromName,
+    this.name = '',
+    this.groupName,
+    this.isGroup = false,
+    this.inviterIsFamily = false,
+  });
 
   final String roomId;
   final String fromUserId;
@@ -154,4 +219,14 @@ class ContactRequest {
 
   /// Bereinigter Anzeigename mit Server („Name · server“, [ContactNames.title]).
   final String fromName;
+
+  /// Nur Gruppenanfragen (K4): bereinigter Gruppenname ([ContactNames.groupTitle]); sonst `null`.
+  final String? groupName;
+
+  /// Die Anfrage betrifft eine Gruppe (K4), nicht einen Einzelchat.
+  final bool isGroup;
+
+  /// Der Einladende ist ein Familienmitglied (K4, D5): steuert nur die Anzeige („Familie“ an der Anfragekarte), nie die
+  /// Einstufung. Ohne geladene Familie `false`.
+  final bool inviterIsFamily;
 }
