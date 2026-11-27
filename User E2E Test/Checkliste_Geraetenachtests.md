@@ -49,6 +49,7 @@ Quelle: letzte Kommentare der offenen Issues. Jeder Punkt schließt nur dann ein
 
 ## Eigener Testserver + Gerät
 - [ ] **#259 (B-21, B-22, F-01, F-06, H-08):** Konto mit Anbieter-Adresse `matrix-synapse-3ues…` (Matrix-ID-Servername `matrix.chaostribunal.de`): Einstellungen → Konto → „Server“, Speicherorte und Dialog „Konto löschen?“ zeigen die eingegebene Anbieter-Adresse. Beachten: Eine vor dem Update angemeldete Sitzung zeigt bis zur nächsten Anmeldung weiter den aufgelösten Server.
+- [ ] **#119 K4-1 (Gruppen, Domäne):** Gegen den eigenen Synapse: Liefert der Server `join_rules` im Einladungszustand einer Gruppeneinladung (Abnahme 9: ohne den Wert würde sie wie eine Familieneinladung angezeigt, bliebe aber nie annehmbar)? Gruppe mit der Schwelle 100 für `join_rules`, `history_visibility` und `encryption` anlegen (K4-2): kann ein ernannter Admin (50) sie ändern, kann ein 50er einen anderen 50er entmachten? Datenübersicht (Einstellungen): Zeile „Gruppe“/„Group“ lesbar bei großer Schrift und mit Screenreader. **Nicht Code-testbar, Release-Gate, bis dahin nicht getestet.**
 - [x] **#150 (H-20):** entfällt. Issue am 07.11.2026 mit dem jetzigen Stand geschlossen (E-85); bei später auffallender Last neues Issue mit Messung.
 
 ## Browser (Web)

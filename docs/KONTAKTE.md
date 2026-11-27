@@ -147,13 +147,25 @@ Kontakte und bestätigte Gruppen, Blockierliste und den Schalter `enabled`.
 | Sonstige Einladung | Liste geladen, Bereich eingeschaltet, nicht blockiert, Obergrenze nicht erreicht | `contactRequest` |
 | Alles andere | – | `ignored` |
 
+**Stand K4-1 (Domäne, ohne Wirkung bis zur Freigabe; Anhang A der Planung, Test über alle Zeilen in `conversation_policy_test`):**
+`contactGroup` gilt für jeden **beigetretenen** Raum mit aktivem `group`-Datensatz (`PolicyContext.groups`, aus `ContactPolicy.groups`),
+bei eingeschaltetem Bereich und geladener Liste, **unabhängig von Größe, Regel, Verlauf und Verschlüsselung** und vor den
+Einzelchat-Zeilen (der Datensatz gewinnt gegen `m.direct`). Ob eine Gruppe sendefähig ist, entscheidet nicht die Einstufung,
+sondern `GroupHealth` (Megolm, Regel `invite`, Verlauf `invited`, Größe G = beigetreten + eingeladen höchstens 50): eine
+unsichere Gruppe bleibt sichtbar, sendegesperrt und verlassbar. Eine **Gruppenanfrage** ist jede nicht direkte Einladung mit
+`join_rule == invite` (Einladender bekannt, nicht ich, nicht blockiert, Liste geladen, Bereich an; auch von einem
+Familienmitglied); ein vorhandener Datensatz ändert bei Einladungen nichts (Absturzfall: bleibt Anfrage). Gruppen nimmt die App
+nie automatisch an.
+
 ### 6.3 Familieneinladungen sicher erkennen (B1)
 - Familienräume haben immer `join_rules: knock` (E-12), Gruppen `invite`. Der Wert gehört zum Zustand, den Server
   Eingeladenen mitliefern.
 - **Noch nachzuweisen (K0):** dass Synapse und matrix.org `m.room.join_rules` im Einladungszustand liefern und das SDK ihn
   über `getState` bereitstellt.
-- Fehlt der Wert, bleibt für Konten ohne Familie das heutige Verhalten mit Warnkarte (E-49), damit der Beitritt nicht
-  bricht. Für Konten mit Familie gilt die Einladung als `contactRequest`.
+- Fehlt der Wert, bleibt das heutige Verhalten mit Warnkarte (E-49), damit der Beitritt nicht bricht. **Geändert in K4
+  (Nutzerentscheidung, Stand K4-1):** Auch für Konten **mit** Familie bleibt die Einladung ohne `join_rules` eine
+  `familyInvite` (nicht `contactRequest`); die frühere Regel „mit Familie `contactRequest`“ wird bewusst nicht umgesetzt. Sie
+  bleibt nie annehmbar, weil `acceptInvitation` den Wert vom Server fail-closed prüft.
 - `acceptInvitation` prüft dieselbe Einstufung. Ein Raum ohne `knock` wird nie zur Familie (zusätzlich zur Prüfung auf
   Verschlüsselung nach dem Beitritt).
 - Bösartig gesetztes `knock` auf einer Gruppe führt nur zum Zustand von heute: Warnkarte und ausdrückliche Annahme.
@@ -283,7 +295,10 @@ erreichbar ist, und der Sendebereich nennt die Zahl der Ausgelassenen.
 ### 8.4 Anfrage erhalten
 Im Bereich **Anfragen** stehen Name, volle ID, Server, „Gruppe: <Name>“ und bei Gruppen der Einladende. Vor der Annahme ist
 kein Nachrichteninhalt verfügbar. Aktionen: **Annehmen**, **Ablehnen**, **Blockieren**. Nach dem Beitritt prüft die App
-Megolm und Größe; sonst verlässt sie den Raum sofort (wie `_joinDirect`). Höchstens 50 offene Anfragen werden angezeigt,
+Megolm und Größe; sonst verlässt sie den Raum sofort (wie `_joinDirect`). **Geändert in K4-1 (`ContactGroupSpec.verifyJoined`):**
+Größe ist G = beigetreten + eingeladen; bei G > 50 mit bekannter Beitrittszahl verlässt sie den Raum, bei **unbekannter**
+Beitrittszahl bleibt die Gruppe sichtbar und sendegesperrt (Nutzerentscheidung 7); verlassen wird außerdem bei Regel ≠ `invite`
+und Verlauf ≠ `invited`. Höchstens 50 offene Anfragen werden angezeigt,
 ältere bleiben unbeantwortet liegen.
 
 ### 8.5 Gruppe gründen und verwalten
@@ -417,7 +432,9 @@ Gate-Regeln aus `docs/PLAN.md` gelten je Phase.
 7. Eine Gruppe mit mindestens drei Konten auf zwei Servern funktioniert mit Text, Antworten, Reaktionen und Anhängen.
 8. Eine entfernte Person kann danach gesendete Nachrichten nicht entschlüsseln; neu Eingeladene lesen nichts aus der Zeit
    vor der Einladung.
-9. Eine Gruppeneinladung wird nie als Familieneinladung gezeigt und kann nie zur Familie werden.
+9. Eine Gruppeneinladung wird nie als Familieneinladung gezeigt und kann nie zur Familie werden. **Präzisiert (K4-1):** „nie
+   gezeigt“ gilt, wenn der Server `join_rules` im Einladungszustand liefert (Beleg im E2E, Plattform-Pflichtschritt); liefert er
+   ihn nicht, wird die Einladung wie bisher angezeigt, bleibt aber nie annehmbar.
 10. Eine Sperre durch Moderatoren schaltet den Bereich beim Mitglied ab und ist nur von Moderatoren annehmbar.
 11. Entwürfe bleiben je Gespräch getrennt, Kennzeichnung ist in beiden Sprachen und für Screenreader vorhanden.
 12. Keine Matrix-IDs von Kontakten oder Inhalte im Log (`AppLog`), Datenauskunft nennt die neuen Räume.
