@@ -64,7 +64,7 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 16),
             ],
             if (AppScope.of(context).calendar?.cashBookController != null) CashBookSettingsTile(controller: AppScope.of(context).calendar!.cashBookController!),
-            if (AppScope.of(context).calendar?.contactController != null) ContactSettingsTile(controller: AppScope.of(context).calendar!.contactController!),
+            if (AppScope.of(context).contacts != null) ContactSettingsTile(controller: AppScope.of(context).contacts!.controller),
             _PrivacySection(settings: s, controller: controller),
             const SizedBox(height: 16),
             const _AboutSection(),

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:family_nexus/app/app_services.dart';
 import 'package:family_nexus/app/calendar_factory.dart';
+import 'package:family_nexus/app/contact_factory.dart';
 import 'package:family_nexus/data/platform/browser_launcher.dart';
 import 'package:family_nexus/data/platform/file_access.dart';
 import 'package:family_nexus/data/platform/oauth_redirect.dart';
@@ -21,6 +22,7 @@ import 'package:family_nexus/features/settings/settings_controller.dart';
 import 'package:family_nexus/features/shopping/shopping_controller.dart';
 import 'package:family_nexus/features/tasks/tasks_controller.dart';
 import 'package:flutter/widgets.dart' show GlobalKey, NavigatorState;
+import 'package:flutter_test/flutter_test.dart' show addTearDown;
 
 import 'contact_peer.dart' show MemoryBlockedList;
 import 'fake_browser.dart';
@@ -146,6 +148,8 @@ Future<TestApp> buildTestApp({
   bool contactsEnabled = false,
   MemoryContactStore? contactItems,
   MemoryBlockedList? contactBlocked,
+  // Test (#119, K3c-2): ersetzt die gebauten Kontakt-Dienste (z. B. mit verzögertem `idle`).
+  ContactServices Function(ContactServices built)? contactsDecorate,
   bool roleFromFamily = false,
   // Test: Meldungen zu Chat und Einkauf und Zahl am App-Symbol (#254). Ohne Angabe wie im Browser: keine.
   ActivityPlatform? activity,
@@ -253,6 +257,18 @@ Future<TestApp> buildTestApp({
       builtTasks.add(controller);
       return controller;
     },
+    contactsBuilder: (uid) {
+      final built = buildContactServices(
+        gateway: gateway,
+        userId: uid,
+        contactStore: contactsEnabled ? contactStoreInUse : null,
+        contactsEnabled: contactsEnabled,
+        blockedList: contactsEnabled ? contactBlockedInUse : null,
+        clock: clock,
+        retryInterval: const Duration(hours: 1),
+      );
+      return built == null || contactsDecorate == null ? built : contactsDecorate(built);
+    },
     calendarBuilder: (uid, room) async {
       calendarRooms.add(room);
       await beforeCalendarBuild?.call(uid);
@@ -270,9 +286,6 @@ Future<TestApp> buildTestApp({
         avatarPhotosEnabled: avatarPhotosEnabled,
         cashBookStore: cashBookItems,
         cashBooksEnabled: cashBooksEnabled,
-        contactStore: contactsEnabled ? contactStoreInUse : null,
-        contactsEnabled: contactsEnabled,
-        blockedList: contactsEnabled ? contactBlockedInUse : null,
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
         // #431: nur auf Wunsch kennt der Kalender die Rollen (sonst Standard: niemand, bestehende Tests unverändert).
         roleOf: roleFromFamily ? (id) => Permissions.roleOf(gateway.family, id) : null,
@@ -281,6 +294,8 @@ Future<TestApp> buildTestApp({
       return controller;
     },
   );
+  // K3c-2: Kontakt-Dienste gehören zum Konto und enden nicht mit der Hauptansicht; der Test räumt sie selbst ab.
+  if (contactsEnabled) addTearDown(services.closeContacts);
   return TestApp(
     services: services,
     protection: protection,

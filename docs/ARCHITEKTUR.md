@@ -98,6 +98,16 @@ geteilt: Familienraum, privat: nur privater Raum des eigenen Kontos (Geräte-Syn
 - Einrichtung: `FamilyStep` zeigt bei vorhandener Einladung die Einladungskarte statt der Auswahl Gründen/Beitreten, bei einem
   vorgemerkten Link die Beitrittskarte; eigene, bestätigte Beitrittsanfragen werden automatisch angenommen.
 
+## Kontakt-Dienste (#119, E-114, K3c-2)
+
+`ContactSync` und `ContactController` bilden `ContactServices` (`lib/app/contact_factory.dart`, `buildContactServices`) und gehören
+zum **Konto**, nicht zur Familie und nicht zum Kalender. `AppServices.contacts` (`openContacts`/`closeContacts`) steuert den
+Lebenszyklus: `openCalendar` öffnet sie nach dem Anspruch der Familiendaten (`familyDataClaim`), idempotent je Konto; ein
+Familienwechsel (`closeCalendar`/`openCalendar`) baut sie nicht neu auf. Geschlossen werden sie beim Abmelden, bei der lokalen
+Löschung, beim Kontowechsel und in `wipeAccountData` vor dem Löschen. Start: Synchronisation, dann Controller; Ende: Controller,
+dann Synchronisation (danach geht kein Aufruf mehr an Gateway oder Dienst). Ohne Freigabe (`ContactFlags.enabled`) oder Ablage
+entsteht nichts; Oberflächen lesen `services.contacts?.controller`, nie über den Kalender.
+
 ## Melden und Blockieren (E-48)
 - `domain/moderation.dart`: `ReportRequest` (Kategorie + bereinigter Freitext → Grundtext), `BlockedUsers` (defensives Lesen,
   Obergrenze 200), `visibleMessages`/`visibleThreads` (Filter). Die Blockierliste liegt als `blockedUsers` in `AppSettings`

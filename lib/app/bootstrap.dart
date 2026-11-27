@@ -45,6 +45,7 @@ import '../features/tasks/tasks_controller.dart';
 import '../l10n/gen/app_localizations.dart';
 import 'app_services.dart';
 import 'calendar_factory.dart';
+import 'contact_factory.dart';
 import 'embedded_opener.dart';
 
 /// Leitet alle unbehandelten Fehler in den redigierenden [AppLog] um, damit
@@ -235,14 +236,18 @@ Future<AppServices> bootstrap({
         anniversaryStore: SqlAnniversaryStore(database.db),
         avatarPhotoStore: SqlAvatarPhotoStore(database.db),
         cashBookStore: SqlCashBookStore(database.db),
-        contactStore: SqlContactStore(database.db),
-        blockedList: SettingsBlockedList(settings),
         files: fileAccess,
         familyRoom: familyRoom,
         isModerator: (id) => Permissions.isModeratorId(gateway.family, id),
         roleOf: (id) => Permissions.roleOf(gateway.family, id),
       );
     },
+    contactsBuilder: (userId) => buildContactServices(
+      gateway: gateway,
+      userId: userId,
+      contactStore: SqlContactStore(database.db),
+      blockedList: SettingsBlockedList(settings),
+    ),
     shoppingBuilder: (userId, familyRoom) async {
       final store = SqlShoppingStore(database.db);
       final service = ShoppingService(store: store, myUserId: userId);
@@ -319,6 +324,7 @@ Future<void> fullLocalReset(AppServices s, {@visibleForTesting Future<void> Func
     AppLog.w('reset', 'Offline-Meldung vor dem Löschen nicht gesendet (${e.runtimeType})');
   }
   s.closeCalendar(cancelReminders: true);
+  s.closeContacts();
   try {
     await s.gateway.logout();
   } catch (e) {

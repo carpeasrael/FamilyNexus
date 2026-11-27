@@ -138,6 +138,7 @@ class _AppRootState extends State<AppRoot> {
           final lostReady = _wasReady;
           WidgetsBinding.instance.addPostFrameCallback((_) {
             services.closeCalendar(cancelReminders: !session && !services.keepAccountData);
+            if (!session) services.closeContacts(); // Abmelden: Kontakt-Dienste vor dem Löschen der lokalen Daten
             // Sitzung beendet (Abmelden, Konto wechseln, auf einem anderen Gerät entfernt): Familiendaten vom Gerät.
             if (!session && !services.accountDeletionPending) {
               services.wipeAccountData().catchError((Object e) => AppLog.e('app', 'Lokale Familiendaten nicht gelöscht', e)).ignore();

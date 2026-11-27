@@ -36,6 +36,8 @@ import '../features/settings/settings_controller.dart';
 import '../features/shopping/shopping_controller.dart';
 import '../features/tasks/tasks_controller.dart';
 
+import 'contact_factory.dart';
+
 export 'app_scope.dart';
 
 /// Erzeugt den Kalender für den angemeldeten Nutzer (inkl. lokaler Ablage) und dessen Familie [familyRoom].
@@ -46,6 +48,9 @@ typedef ShoppingBuilder = Future<ShoppingController> Function(String userId, Str
 
 /// Erzeugt die Aufgabenlisten für den angemeldeten Nutzer (inkl. lokaler Ablage) und dessen Familie [familyRoom].
 typedef TasksBuilder = Future<TasksController> Function(String userId, String? familyRoom);
+
+/// Erzeugt die Kontakt-Dienste für den angemeldeten Nutzer (#119, K3c-2); `null`, wenn keine entstehen (gesperrte Freigabe).
+typedef ContactsBuilder = ContactServices? Function(String userId);
 
 /// Gemeinsame Dienste der App; wird über [AppScope] bereitgestellt.
 class AppServices {
@@ -63,6 +68,7 @@ class AppServices {
     this.calendarBuilder,
     this.shoppingBuilder,
     this.tasksBuilder,
+    this.contactsBuilder,
     this.familyDataClaim,
     this.scheduler,
     this.activityPlatform,
@@ -133,6 +139,9 @@ class AppServices {
   final ShoppingBuilder? shoppingBuilder;
   final TasksBuilder? tasksBuilder;
 
+  /// Baut die Kontakt-Dienste (#119, K3c-2); `null` in Widget-Tests ohne Kontakte.
+  final ContactsBuilder? contactsBuilder;
+
   /// Beansprucht die lokalen Familiendaten für `<Nutzer>|<Raum>`, vor dem Aufbau der Dienste (#140);
   /// siehe [claimFamilyData]. `null` in Widget-Tests ohne Datenbank.
   final Future<void> Function(String owner)? familyDataClaim;
@@ -156,6 +165,14 @@ class AppServices {
   }
 
   CalendarController? calendar;
+
+  /// Kontakt-Dienste des Kontos (#119, K3c-2): offen von [openContacts] bis [closeContacts], also über Familienwechsel
+  /// hinweg (nicht an den Kalender gebunden). `null` ohne Freigabe (`ContactFlags.enabled`) oder ohne Sitzung.
+  ContactServices? contacts;
+  String? _contactsUser;
+
+  /// Wartet auf die Warteschlange der geschlossenen Kontakt-Dienste, bevor etwas die Ablage der Kontakte löscht.
+  Future<void> _contactsClosing = Future<void>.value();
   ShoppingController? shopping;
   TasksController? tasks;
   PresenceSync? presence;
@@ -200,10 +217,11 @@ class AppServices {
     final room = gateway.family?.roomId;
     if (calendar != null && _calendarUser == uid && _calendarRoom == room) return;
     closeCalendar();
+    if (_contactsUser != uid) closeContacts(); // anderes Konto: nie mit fremden Kontakt-Diensten weiterlaufen
     final attempt = _openAttempt;
     _calendarRoom = room;
     try {
-      await _closing;
+      await Future.wait<void>(<Future<void>>[_closing, _contactsClosing]);
       if (attempt != _openAttempt) return;
       final claim = familyDataClaim;
       if (claim != null) {
@@ -221,6 +239,7 @@ class AppServices {
       calendar = c;
       _calendarUser = uid;
       c.start(familyRoom: room);
+      openContacts(uid);
       final ap = activityPlatform;
       final a = ap == null
           ? null
@@ -280,6 +299,31 @@ class AppServices {
     }
   }
 
+  /// Öffnet die Kontakt-Dienste des Kontos [uid] (idempotent je Konto). Sie hängen nicht an der Familie: Ein Familienwechsel
+  /// ([closeCalendar], [openCalendar]) baut sie nicht neu auf. Ohne Freigabe entsteht nichts.
+  void openContacts(String uid) {
+    final build = contactsBuilder;
+    if (build == null) return;
+    if (contacts != null && _contactsUser == uid) return;
+    closeContacts();
+    final s = build(uid);
+    if (s == null) return;
+    contacts = s;
+    _contactsUser = uid;
+    s.start();
+  }
+
+  /// Beendet die Kontakt-Dienste des Kontos: Abmelden, Konto wechseln, lokale Löschung. Zuerst der Controller, dann die
+  /// Synchronisation; deren Warteschlange läuft aus ([wipeAccountData] und [openCalendar] warten darauf).
+  void closeContacts() {
+    final s = contacts;
+    _contactsUser = null;
+    if (s == null) return;
+    contacts = null;
+    _contactsClosing = Future.wait<void>(<Future<void>>[_contactsClosing, s.idle()]).then<void>((_) {}, onError: (Object _) {});
+    s.dispose();
+  }
+
   /// Zählt jedes Schließen: Ein Öffnungslauf, der das bemerkt, ist veraltet.
   int _openAttempt = 0;
 
@@ -294,6 +338,9 @@ class AppServices {
   /// Abmelden hieß bisher nur „Sitzung beenden“; die Daten blieben bis zur Anmeldung eines anderen Kontos liegen
   /// (Pen-Test F-02).
   Future<void> wipeAccountData() async {
+    // Kontakte gehören zum Konto: erst die Dienste schließen und auslaufen lassen, dann löschen (#119, K3c-2).
+    closeContacts();
+    await _contactsClosing;
     // Zuerst lesen: Der Vermerk (#134) darf nicht hinter die Rundreise des Aufräumens rücken.
     final keep = keepAccountData;
     final wipe = debugWipeAccountData;

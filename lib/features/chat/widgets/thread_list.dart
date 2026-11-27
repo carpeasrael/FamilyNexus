@@ -71,7 +71,7 @@ class _ThreadRowTile extends StatelessWidget {
     // Ohne Nachricht: Online-Status (Einzelchat) bzw. „Noch keine Nachrichten“ (Familienchat).
     final second = hasPreview ? preview : (status ?? l.emptyChat);
     // Namensgleichheit mit einem Familienmitglied (§9.1): Warnung in der Zeile, live berechnet.
-    final collides = thread.isOutside && (services.calendar?.contactController?.collides(thread.peerName) ?? false);
+    final collides = thread.isOutside && (services.contacts?.controller.collides(thread.peerName) ?? false);
     final label = thread.isFamily
         ? l.chatThreadFamily(thread.title)
         : thread.isOutside

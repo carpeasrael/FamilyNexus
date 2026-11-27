@@ -199,7 +199,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
 
   /// Ein bekanntes Kontakt-Gespräch öffnet den Kontakte-Bereich, alles andere läuft wie bisher.
   void _selectAny(String id) {
-    final cc = _services.calendar?.contactController;
+    final cc = _services.contacts?.controller;
     final known = (cc?.enabled ?? false) && _services.gateway.threads.any((t) => t.id == id && t.isOutside);
     if (known) {
       _selectContact(id);
@@ -277,7 +277,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _blockContact(String userId, String name) async {
-    final cc = _services.calendar?.contactController;
+    final cc = _services.contacts?.controller;
     if (cc == null) return;
     final l = AppLocalizations.of(context);
     final ok = await showDialog<bool>(
@@ -334,7 +334,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   }
 
   void _manageContacts() {
-    final cc = _services.calendar?.contactController;
+    final cc = _services.contacts?.controller;
     if (cc == null) return;
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ContactsScreen(controller: cc)));
   }
@@ -630,7 +630,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final services = AppScope.of(context);
     final g = services.gateway;
-    final cc = services.calendar?.contactController;
+    final cc = services.contacts?.controller;
     return ListenableBuilder(
       listenable: Listenable.merge(<Listenable>[g, services.settings, services.lock, ?cc]),
       builder: (context, _) {
@@ -765,7 +765,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
     final current = view.current;
     if (outside && current != null) _ensureContactOpen(g, current);
     final contactOpen = !outside || g.isThreadOpen(view.shownId!);
-    final cc = services.calendar?.contactController;
+    final cc = services.contacts?.controller;
     // Eingabe gesperrt, solange das Gespräch nicht benutzbar ist (wartend, nicht erreichbar, öffnet, fehlgeschlagen).
     final String? composerNote = !outside || current == null
         ? null

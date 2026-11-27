@@ -57,7 +57,7 @@ class _Bubble extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final t = AuroraTokens.of(context);
     final m = message;
-    final contacts = outside ? services.calendar?.contactController : null;
+    final contacts = outside ? services.contacts?.controller : null;
     final from = outside ? isolateText(ContactNames.title(m.senderName, m.senderId)) : m.senderLabel(l);
     final collides = outside && !mine && (contacts?.collides(m.senderName) ?? false);
     // Nachrichten anderer: Avatar links neben der Blase (#422); die Blase nimmt den Platz des Avatars aus `maxWidth`.
