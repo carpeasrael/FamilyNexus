@@ -4081,10 +4081,12 @@ void main() {
         for (var i = 0; i < 30; i++) {
           hs.extra['@i$i:hs.example'] = 'invite';
         }
-        final t = await groupThread(g, groupJoined(gr, joined: 40, invited: null, memberEvents: 1));
+        expect(await groupThread(g, groupJoined(gr, joined: 40, invited: null, memberEvents: 1)), isNotNull);
         expect(membersCalls(hs), 1, reason: 'summary G = 40 ≤ 50 ⇒ ein Abruf');
-        expect(t!.sendLock, GroupSendLock.keiner, reason: 'vor dem Abruf unbekannt viele Eingeladene');
-        await Future<void>.delayed(_settle);
+        // Der Abruf läuft im Hintergrund: warten, bis die Liste im Zustand ist (kein fester Zeitpunkt, kein Wettlauf).
+        for (var i = 0; i < 30 && g.threads.where((x) => x.kind == ThreadKind.group).first.memberCount != 70; i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+        }
         final after = g.threads.firstWhere((x) => x.kind == ThreadKind.group);
         expect(after.memberCount, 70);
         expect(after.sendLock, GroupSendLock.zuGross);
