@@ -483,4 +483,83 @@ void main() {
     // Familienwechsel und Bereich aus räumen nur Räume: clearAll steht nur im Zweig `full`.
     expect(RegExp(r'if \(full\) \{\s*_groups\.clearAll\(\);\s*\} else \{\s*_groups\.clearRooms\(\);').hasMatch(d), isTrue);
   });
+
+  // K4-3: Die Verwaltungsaufrufe des SDK haben je genau eine Stelle, in genau einer Methode (Textwächter, nur diese Datei: die
+  // Bestandsstellen in books.dart und invitations.dart bleiben unberührt).
+  String methodBody(String t, String signature) {
+    final a = t.indexOf(signature);
+    expect(a, greaterThan(0), reason: signature);
+    return t.substring(a, t.indexOf('\n  }\n', a));
+  }
+
+  test('K4-3 (Textwächter): kick, invite und setRoomStateWithKey stehen je genau einmal, in ihrer Methode, und nirgends sonst im Gruppenmodul', () {
+    final t = code(File('lib/data/matrix/gateway/contact_groups.dart').readAsStringSync());
+    expect('.kick('.allMatches(t).length, 1);
+    expect('.invite('.allMatches(t).length, 1);
+    expect('setRoomStateWithKey('.allMatches(t).length, 1);
+    expect(methodBody(t, 'Future<void> removeFromGroup('), contains('.kick('));
+    expect(methodBody(t, 'Future<void> inviteToGroup('), contains('.invite('));
+    final admin = methodBody(t, 'Future<void> setGroupAdmin(');
+    expect(admin, contains('setRoomStateWithKey(roomId, EventTypes.RoomPowerLevels,'));
+    for (final other in <String>['Future<void> acceptGroupInvite(', 'Future<void> _leaveGroup(', 'Future<String> createGroup(']) {
+      final b = methodBody(t, other);
+      for (final call in <String>['.kick(', '.invite(', 'setRoomStateWithKey(']) {
+        expect(b, isNot(contains(call)), reason: '$other nennt $call nicht');
+      }
+    }
+    expect('createRoom('.allMatches(t).length, 1, reason: 'keine zusätzliche Anlagestelle');
+    // Das Entfernen sperrt über `removing` (vor dem kick), der Schlüsselwisch bleibt allein in _wipeOutbound.
+    final remove = methodBody(t, 'Future<void> removeFromGroup(');
+    expect(remove.indexOf('g.removing.putIfAbsent'), lessThan(remove.indexOf('.kick(')), reason: 'Sperre vor dem kick');
+    expect(remove, isNot(contains('pendingWipe')));
+    expect(remove, isNot(contains('port.wipe')));
+    expect('port.wipe('.allMatches(t).length, 1, reason: 'kein zweiter Wischpfad');
+  });
+
+  test('K4-3 (Textwächter): die Einladung prüft Gesundheit, Recht, Ziel, Größe (ohne Netz) und Erreichbarkeit in dieser Reihenfolge; die Größe vor jedem Abruf', () {
+    final t = code(File('lib/data/matrix/gateway/contact_groups.dart').readAsStringSync());
+    final b = methodBody(t, 'Future<void> inviteToGroup(');
+    final order = <String>[
+      'GroupHealth.evaluate(',
+      '.canInvite',
+      'ContactState.accepted',
+      'final size = _groupSizeOf(room);',
+      'GatewayError.groupFull',
+      'await _awaitMembers(room)',
+      'await _freshReachability(userId)',
+      '.invite(',
+    ];
+    var last = -1;
+    for (final o in order) {
+      final i = b.indexOf(o);
+      expect(i, greaterThan(last), reason: o);
+      last = i;
+    }
+    expect(b, contains('waitForSync: false'));
+    expect(t, contains('GatewayError.groupFull'));
+    expect(t, contains('GroupRights.isLastAdmin('), reason: 'Sperre der Selbstabstufung im Gateway');
+  });
+
+  test('K4-3 (Textwächter): der Controller weist Gruppenanfragen in accept ab (vor addAccepted) und entprellt das Aufräumen mit Versionsvergleich', () {
+    final t = code(File('lib/features/contacts/contact_controller.dart').readAsStringSync());
+    final accept = methodBody(t, 'Future<void> accept(String roomId) async {');
+    expect(accept.indexOf('r.isGroup'), greaterThan(0));
+    expect(accept.indexOf('r.isGroup'), lessThan(accept.indexOf('addAccepted(')));
+    expect(t, contains('static const int pruneRuns = 3;'));
+    expect(t, contains('static const Duration pruneAfter = Duration(minutes: 10);'));
+    expect(t, contains('removeGroupIfVersion(g.id, version: g.version)'));
+    expect('removeGroupIfVersion('.allMatches(t).length, 3, reason: 'Prune, acceptGroup (Rücknahme) und leaveGroup, alle mit Version');
+    expect(t.contains('.removeGroup('), isFalse, reason: 'nie ohne Versionsvergleich löschen');
+  });
+
+  test('K4-3 (Textwächter): die Pin-Obergrenze ist 500 und es gibt keine Pin-Löschung (keine neue API in LocalIdentityPins)', () {
+    expect(File('lib/domain/contacts.dart').readAsStringSync(), contains('static const int maxGroupPins = 500;'));
+    final pins = code(File('lib/data/matrix/local_identity_pins.dart').readAsStringSync());
+    expect(pins, isNot(contains('void remove')));
+    expect(pins, isNot(contains('void delete')));
+    expect(pins, isNot(contains('void forgetUser')));
+    final g = code(File('lib/data/matrix/gateway/contact_groups.dart').readAsStringSync());
+    expect(g, isNot(contains('_contactSessionPins.remove')));
+    expect(g, isNot(contains('_localPins.forget')));
+  });
 }
