@@ -330,6 +330,28 @@ Einladung. Ältere App-Versionen ignorieren solche Einladungen. `GroupInfoScreen
 Umbenennen (Admin), Verlassen, Blockieren einzelner Personen. Entfernen lässt das SDK die Sitzung rotieren. Verlässt der
 letzte Admin die Gruppe, warnt die App vorher.
 
+**Stand K4-3 (Verwaltung im Gateway und Controller; ohne Oberfläche, ohne Wirkung bis zur Freigabe):**
+- **Einladen** nur bestätigte Kontakte und Familienmitglieder (Nutzerentscheidung), nur mit dem Recht aus dem Raumzustand (Schwelle
+  `invite`), nur in eine gesunde Gruppe (Megolm, Regel `invite`, Verlauf `invited`); Größe G + 1 ≤ 50 (beigetreten und eingeladen
+  zusammen), sonst `groupFull`, bei unbekannter Größe `serverUnreachable`, beides ohne Abruf der Mitgliederliste; die
+  Erreichbarkeit wird frisch geprüft (`peerNotReachable`, geänderter Schlüssel ⇒ `notAllowed`). Es entsteht weder ein Datensatz
+  noch ein Pin (der Pin erst beim Beitritt).
+- **Entfernen** (kick) nur für Personen, die im lokalen Raumzustand beigetreten oder eingeladen sind, nie ich selbst, nie Stufe ≥
+  meiner. Danach ist das Senden in der Gruppe gesperrt („Die Gruppe wird gerade aktualisiert“), bis der Weggang im Zustand belegt
+  ist und die Außensitzung gewischt wurde (K4-2b); kam der `kick` nicht an, fällt die Sperre spätestens nach 10 Minuten. Die
+  entfernte Person wird nicht blockiert.
+- **Admin ernennen und abstufen:** Stufe 50 (nie 100) oder 0, die Stufen kommen frisch vom Server; der **einzige Admin kann sich nicht
+  abstufen**. Verlassen bleibt für den letzten Admin eine Warnung der Oberfläche (K4-4), keine Sperre.
+- **Gruppenanfragen** macht der Controller nie zu Kontakten: Annehmen legt den Gruppen-Datensatz an (nie `addAccepted`), der
+  Einladende bleibt ein Fremder.
+- **Aufräumen:** Der Datensatz einer verlassenen oder entfernten Gruppe wird erst nach 3 Läufen und 10 Minuten gelöscht
+  (Entprellung im Controller). Auch ein Entfernen durch andere bereinigt den Datensatz damit erst nach etwa 10 Minuten; das
+  Löschen gilt für alle Geräte.
+- **Identität:** Fremde in Gruppen werden wie Kontakte gepinnt (nur lokal, nie in den Kontodaten, nie Familienmitglieder), bis zu
+  500 Pins; darüber bleiben **neue** Fremde ungepinnt, bestehende Pins gelten weiter. Pins werden beim Verlassen oder Entfernen
+  **nicht** gelöscht (sonst ließe ein Wiederbeitritt mit neuem Schlüssel den Wechsel unbemerkt). Eine Schlüsseländerung eines
+  Gruppenmitglieds lässt sich akzeptieren, auch ohne Kontakt-Datensatz.
+
 ### 8.6 Chat-Oberfläche
 - *Hinweis: Chip-Leiste durch Liste ersetzt (E-100, #423); der Umschalter wäre jetzt über der Gesprächsliste anzuordnen.* Der Chat-Tab zeigt über der Gesprächsliste den Umschalter **Familie | Kontakte** mit getrennten Abzeichen, nur wenn
   Kontakte eingeschaltet sind. Sonst ist der Tab pixelgleich zu 1.2.1. Die fünf Tabs bleiben.
