@@ -83,6 +83,28 @@ class ContactCheck {
   final bool collides;
 }
 
+/// Ergebnis einer Einladung beim Anlegen einer Gruppe ([ContactController.createGroup]): [error] ist `null`, wenn die Person
+/// eingeladen wurde.
+@immutable
+class GroupInviteResult {
+  const GroupInviteResult(this.userId, [this.error]);
+
+  final String userId;
+  final GatewayError? error;
+
+  bool get ok => error == null;
+}
+
+/// Ergebnis von [ContactController.createGroup]: die neue Gruppe und je eingeladener Person ein Ergebnis (nie ein Abbruch bei
+/// einem Fehler, #119, K4-3).
+@immutable
+class GroupCreation {
+  const GroupCreation(this.roomId, this.invites);
+
+  final String roomId;
+  final List<GroupInviteResult> invites;
+}
+
 /// Oberfläche der Kontakte (#119, K3b-1, E-114): Dienst, Synchronisation und Gateway zu einer Ansicht. Die Reihenfolge der
 /// Abläufe ist festgelegt: **Datensatz zuerst, dann Richtlinie schieben, dann Gateway**; Entfernen verlässt zuerst den Raum
 /// und löscht dann den Datensatz; Blockieren verlässt nie einen Raum und beantwortet keine Einladung (§9.3).
@@ -99,6 +121,11 @@ class ContactController extends ChangeNotifier {
 
   static const Duration checkCooldown = Duration(seconds: 60);
 
+  /// Entprellung des Aufräumens von Gruppen-Datensätzen (#119, K4-3, vom Nutzer bestätigt): erst nach so vielen Läufen **und** so
+  /// langer Zeit in `leftGroupRooms` wird der Datensatz gelöscht (das SDK meldet „Raum fehlt“ auch bei kurzen Aussetzern).
+  static const int pruneRuns = 3;
+  static const Duration pruneAfter = Duration(minutes: 10);
+
   bool _loaded = false;
   bool _enabled = false;
   bool _disposed = false;
@@ -110,6 +137,9 @@ class ContactController extends ChangeNotifier {
   DateTime? _checkBlockedUntil;
   final Set<String> _busy = <String>{};
   bool _checking = false;
+
+  /// Gruppen-Datensätze, deren Raum in `leftGroupRooms` steht: erste Sichtung und Zahl der Läufe (Entprellung). Nur Speicher.
+  final Map<String, ({DateTime since, int seen})> _pruneSeen = <String, ({DateTime since, int seen})>{};
 
   /// Kennungen, deren letzte Prüfung `identityChanged` ergab (Schlüssel geändert oder Geräte von der App gesperrt, K3c-3):
   /// nur für sie gilt [addAnyway]. Jede neue Prüfung derselben Kennung ersetzt den Eintrag.
@@ -150,6 +180,7 @@ class ContactController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _pruneSeen.clear();
     if (_started) {
       _sync.revision.removeListener(_onChanged);
       gateway.removeListener(_onChanged);
@@ -177,6 +208,8 @@ class ContactController extends ChangeNotifier {
         final enabled = await _service.isEnabled();
         final records = await _service.contacts();
         if (_disposed) return;
+        await _pruneGroups(enabled);
+        if (_disposed) return;
         final entries = <ContactEntry>[for (final c in records) _entryOf(c)]..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
         final requests = enabled ? gateway.contactRequests : const <ContactRequest>[];
         final hidden = enabled ? gateway.contactRequestsHidden : 0;
@@ -201,6 +234,39 @@ class ContactController extends ChangeNotifier {
     } finally {
       _reloading = false;
     }
+  }
+
+  /// Räumt Datensätze von Gruppen auf, die verlassen oder entfernt wurden (`leftGroupRooms`), **mit Entprellung im Controller**
+  /// (das Gateway meldet sofort): erst bei [pruneRuns] Läufen und [pruneAfter] Zeit, nie ohne Versionsvergleich
+  /// ([ContactService.removeGroupIfVersion]), nie für unbekannte Räume (`leftGroupRooms` nennt nur Gruppen mit Datensatz, die diese
+  /// Sitzung als Gruppe kannte), nie bei ausgeschaltetem Bereich und nie, solange für die Gruppe gerade [acceptGroup] läuft. Kehrt
+  /// die Gruppe zurück (ID verschwindet aus der Menge), beginnt die Entprellung neu. **Folge:** auch ein echtes Entfernen durch
+  /// andere bereinigt den Datensatz erst nach etwa 10 Minuten, und das Löschen gilt über den Kontodaten-Spiegel für alle Geräte.
+  Future<void> _pruneGroups(bool enabled) async {
+    if (!enabled) {
+      _pruneSeen.clear();
+      return;
+    }
+    final left = gateway.leftGroupRooms;
+    _pruneSeen.removeWhere((id, _) => !left.contains(id));
+    if (left.isEmpty) return;
+    final groups = await _service.groups();
+    if (_disposed) return;
+    final now = _clock();
+    var removed = false;
+    for (final g in groups) {
+      if (!left.contains(g.id) || _busy.contains(g.id)) continue;
+      final seen = _pruneSeen[g.id];
+      final next = (since: seen?.since ?? now, seen: (seen?.seen ?? 0) + 1);
+      _pruneSeen[g.id] = next;
+      if (next.seen < pruneRuns || now.difference(next.since) < pruneAfter) continue;
+      if (await _service.removeGroupIfVersion(g.id, version: g.version)) {
+        _pruneSeen.remove(g.id);
+        removed = true;
+      }
+      if (_disposed) return;
+    }
+    if (removed) await _pushPolicy();
   }
 
   ChatThread? _threadOf(String id) {
@@ -383,6 +449,8 @@ class ContactController extends ChangeNotifier {
   Future<void> accept(String roomId) async {
     final r = _request(roomId);
     if (r == null) throw const ContactException(ContactError.notFound);
+    // Eine Gruppenanfrage macht den Einladenden nie zum bestätigten Kontakt (I6): sie wird über [acceptGroup] angenommen.
+    if (r.isGroup) throw const ContactException(ContactError.notAllowed);
     await _service.addAccepted(r.fromUserId);
     await _pushPolicy();
     _onChanged();
@@ -395,6 +463,91 @@ class ContactController extends ChangeNotifier {
     } on GatewayException catch (e) {
       if (e.error != GatewayError.notAllowed) rethrow;
     }
+    _onChanged();
+  }
+
+  // ------------------------------------------------------------------- Gruppen (K4-3)
+
+  /// Legt eine Gruppe an: Raum ([MatrixGateway.createGroup]) → Datensatz → Richtlinie → Einladungen. Scheitert das Schreiben des
+  /// Datensatzes, verlässt der Controller den Raum wieder (D3). Die Einladungen laufen erst **nach** dem Datensatz, einzeln; ein
+  /// Fehler bei einer Person bricht nie ab, jede bekommt ein Ergebnis.
+  Future<GroupCreation> createGroup(String name, {List<String> invite = const <String>[]}) async {
+    if (!_enabled) throw const ContactException(ContactError.notAllowed);
+    final roomId = await gateway.createGroup(name);
+    try {
+      await _service.addGroup(roomId);
+    } catch (_) {
+      try {
+        await gateway.leaveConversation(roomId);
+      } catch (e) {
+        AppLog.e('contacts', 'Gruppe konnte nach einem Fehler nicht verlassen werden (${e.runtimeType})', null);
+      }
+      rethrow;
+    }
+    await _pushPolicy();
+    _onChanged();
+    final results = <GroupInviteResult>[];
+    for (final id in invite) {
+      try {
+        await gateway.inviteToGroup(roomId, id);
+        results.add(GroupInviteResult(id));
+      } on GatewayException catch (e) {
+        results.add(GroupInviteResult(id, e.error));
+      } catch (_) {
+        results.add(GroupInviteResult(id, GatewayError.unknown));
+      }
+    }
+    _onChanged();
+    return GroupCreation(roomId, results);
+  }
+
+  /// Nimmt eine Gruppenanfrage an: **Datensatz zuerst**, dann Richtlinie, dann [MatrixGateway.acceptGroupInvite]. Ist schon ein
+  /// aktiver Datensatz da (Absturz oder gescheiterte Richtlinie nach dem Schreiben), gilt das als gültiger Zustand und die
+  /// Annahme läuft weiter. Scheitert sie, wird der Datensatz **nur zurückgenommen, wenn dieser Aufruf ihn geschrieben hat** (und
+  /// nur mit dessen Version); sonst bleibt er und die Anfrage sichtbar.
+  Future<void> acceptGroup(String roomId) async {
+    final r = _request(roomId);
+    if (r == null) throw const ContactException(ContactError.notFound);
+    if (!r.isGroup) throw const ContactException(ContactError.notAllowed);
+    if (!_busy.add(roomId)) return; // Doppeltipp
+    try {
+      GroupRecord? wrote;
+      try {
+        wrote = await _service.addGroup(roomId);
+      } on ContactException catch (e) {
+        if (e.error != ContactError.duplicate) rethrow;
+      }
+      _pruneSeen.remove(roomId);
+      await _pushPolicy();
+      try {
+        await gateway.acceptGroupInvite(roomId);
+      } catch (_) {
+        if (wrote != null && await _service.removeGroupIfVersion(roomId, version: wrote.version)) await _pushPolicy();
+        rethrow;
+      }
+    } finally {
+      _busy.remove(roomId);
+      _onChanged();
+    }
+  }
+
+  /// Lehnt eine Gruppenanfrage ab (verlässt die Einladung), ohne Datensatz. Ist sie inzwischen weg (`notAllowed`), ist das kein
+  /// Fehler.
+  Future<void> declineGroup(String roomId) async {
+    final r = _request(roomId);
+    if (r == null) throw const ContactException(ContactError.notFound);
+    if (!r.isGroup) throw const ContactException(ContactError.notAllowed);
+    await decline(roomId);
+  }
+
+  /// Verlässt eine Gruppe: **erst den Raum verlassen**, dann den Datensatz löschen (mit Versionsvergleich). Scheitert das
+  /// Verlassen, bleibt der Datensatz.
+  Future<void> leaveGroup(String roomId) async {
+    final record = (await _service.groups()).where((g) => g.id == roomId).firstOrNull;
+    if (record == null) throw const ContactException(ContactError.notFound);
+    await gateway.leaveConversation(roomId);
+    _pruneSeen.remove(roomId);
+    if (await _service.removeGroupIfVersion(roomId, version: record.version)) await _pushPolicy();
     _onChanged();
   }
 
