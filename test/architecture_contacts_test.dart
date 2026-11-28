@@ -493,23 +493,25 @@ void main() {
   }
 
   test('K4-3 (Textwächter): kick, invite und setRoomStateWithKey stehen je genau einmal, in ihrer Methode, und nirgends sonst im Gruppenmodul', () {
-    final t = code(File('lib/data/matrix/gateway/contact_groups.dart').readAsStringSync());
+    final adminFile = code(File('lib/data/matrix/gateway/contact_group_admin.dart').readAsStringSync());
+    final groupsFile = code(File('lib/data/matrix/gateway/contact_groups.dart').readAsStringSync());
+    final t = '$groupsFile\n$adminFile'; // das Gruppenmodul: Zustand und Verwaltung
     expect('.kick('.allMatches(t).length, 1);
     expect('.invite('.allMatches(t).length, 1);
     expect('setRoomStateWithKey('.allMatches(t).length, 1);
-    expect(methodBody(t, 'Future<void> removeFromGroup('), contains('.kick('));
-    expect(methodBody(t, 'Future<void> inviteToGroup('), contains('.invite('));
-    final admin = methodBody(t, 'Future<void> setGroupAdmin(');
+    expect(methodBody(adminFile, 'Future<void> removeFromGroup('), contains('.kick('));
+    expect(methodBody(adminFile, 'Future<void> inviteToGroup('), contains('.invite('));
+    final admin = methodBody(adminFile, 'Future<void> setGroupAdmin(');
     expect(admin, contains('setRoomStateWithKey(roomId, EventTypes.RoomPowerLevels,'));
     for (final other in <String>['Future<void> acceptGroupInvite(', 'Future<void> _leaveGroup(', 'Future<String> createGroup(']) {
-      final b = methodBody(t, other);
+      final b = methodBody(groupsFile, other);
       for (final call in <String>['.kick(', '.invite(', 'setRoomStateWithKey(']) {
         expect(b, isNot(contains(call)), reason: '$other nennt $call nicht');
       }
     }
     expect('createRoom('.allMatches(t).length, 1, reason: 'keine zusätzliche Anlagestelle');
     // Das Entfernen sperrt über `removing` (vor dem kick), der Schlüsselwisch bleibt allein in _wipeOutbound.
-    final remove = methodBody(t, 'Future<void> removeFromGroup(');
+    final remove = methodBody(adminFile, 'Future<void> removeFromGroup(');
     expect(remove.indexOf('g.removing.putIfAbsent'), lessThan(remove.indexOf('.kick(')), reason: 'Sperre vor dem kick');
     expect(remove, isNot(contains('pendingWipe')));
     expect(remove, isNot(contains('port.wipe')));
@@ -517,7 +519,7 @@ void main() {
   });
 
   test('K4-3 (Textwächter): die Einladung prüft Gesundheit, Recht, Ziel, Größe (ohne Netz) und Erreichbarkeit in dieser Reihenfolge; die Größe vor jedem Abruf', () {
-    final t = code(File('lib/data/matrix/gateway/contact_groups.dart').readAsStringSync());
+    final t = code(File('lib/data/matrix/gateway/contact_group_admin.dart').readAsStringSync());
     final b = methodBody(t, 'Future<void> inviteToGroup(');
     final order = <String>[
       'GroupHealth.evaluate(',
@@ -538,6 +540,16 @@ void main() {
     expect(b, contains('waitForSync: false'));
     expect(t, contains('GatewayError.groupFull'));
     expect(t, contains('GroupRights.isLastAdmin('), reason: 'Sperre der Selbstabstufung im Gateway');
+    expect(t, isNot(contains('ContactGroupSpec')), reason: 'die Spec hat genau einen Verbraucher, die Gruppenanlage');
+    expect(t, isNot(contains('familyAccountData')));
+    expect(t, isNot(contains('setAccountData')));
+    expect(t, isNot(contains('.peers')));
+    expect(t.contains('.join('), isFalse, reason: 'auch kein Iterable.join (Bestandswächter)');
+    final logs = RegExp(r"AppLog\.[dwe]\('gateway', '([^']*)'").allMatches(t).map((m) => m.group(1)!).toList();
+    expect(logs, isNotEmpty);
+    for (final l in logs) {
+      expect(l.replaceAll(r'${e.runtimeType}', ''), isNot(contains(r'$')), reason: l);
+    }
   });
 
   test('K4-3 (Textwächter): der Controller weist Gruppenanfragen in accept ab (vor addAccepted) und entprellt das Aufräumen mit Versionsvergleich', () {

@@ -493,7 +493,8 @@ class ContactController extends ChangeNotifier {
         results.add(GroupInviteResult(id));
       } on GatewayException catch (e) {
         results.add(GroupInviteResult(id, e.error));
-      } catch (_) {
+      } catch (e) {
+        AppLog.e('contacts', 'Einladung in die Gruppe fehlgeschlagen (${e.runtimeType})', null);
         results.add(GroupInviteResult(id, GatewayError.unknown));
       }
     }

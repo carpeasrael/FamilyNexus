@@ -89,6 +89,7 @@ part 'gateway/chat.dart';
 part 'gateway/contact_add.dart';
 part 'gateway/contact_chats.dart';
 part 'gateway/contact_groups.dart';
+part 'gateway/contact_group_admin.dart';
 part 'gateway/connection.dart';
 part 'gateway/data_inventory.dart';
 part 'gateway/direct_chats.dart';
@@ -126,7 +127,7 @@ bool sessionEndedByServerFor(SessionClearReason reason) => switch (reason) {
 /// * Lesebestätigungen sind standardmäßig öffentlich (`m.read`), wenn „Lesebestätigung senden“ an ist (E-106, #526); aus: nur privat (`receiptsPublicByDefault: false`).
 /// * Gesendet wird nur in Räumen mit aktivierter Verschlüsselung.
 /// * Reaktionen sind ein eigener verschlüsselter Ereignistyp (E-86); `m.reaction` ginge im Klartext hinaus.
-class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyncModule, _AccountDeletionModule, _BooksModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _AvatarsModule, _FamilyModule, _DirectChatsModule, _ContactChatsModule, _ContactGroupsModule, _ContactAddModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
+class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyncModule, _AccountDeletionModule, _BooksModule, _SecurityVerificationModule, _InvitationsModule, _CalendarDataModule, _ChatModule, _PasswordChangeModule, _PresenceModule, _AvatarsModule, _FamilyModule, _DirectChatsModule, _ContactChatsModule, _ContactGroupAdminModule, _ContactGroupsModule, _ContactAddModule, _IdentitiesModule, _LiveBaselineModule, _DataInventoryModule, _ConnectionModule, _RegistrationModule, _GatewayErrorsModule implements MatrixGateway {
   /// [databaseOpener] und [httpClient] sind nur für Tests gedacht (Host ohne
   /// SQLCipher-Plugin bzw. selbstsigniertes Testzertifikat), ebenso [joinOpTimeout]
   /// und [joinPollInterval] (kurze bzw. lange Zeiten für die Beitrittsanfrage).
