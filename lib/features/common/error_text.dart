@@ -42,6 +42,7 @@ String errorText(AppLocalizations l, Object error) {
       GatewayError.peerNotReachable => l.errPeerNotReachable,
       GatewayError.groupNoOtherMembers => l.errGroupNoOtherMembers,
       GatewayError.groupBusy => l.errGroupBusy,
+      GatewayError.groupFull => l.errGroupFull,
       GatewayError.unknown => l.errUnknown,
     };
   }

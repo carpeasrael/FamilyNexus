@@ -672,6 +672,40 @@ class SdkMatrixGateway extends ChangeNotifier with _BookReceiptsModule, _BookSyn
         for (final e in _groups.members.entries) e.key: Map<String, GroupMembership>.of(e.value),
       };
 
+  /// Nur für Tests: Räume mit laufender Verwaltungsoperation (Einladen, Entfernen, Admin ändern, K4-3).
+  @visibleForTesting
+  Set<String> get debugAdminOps => Set<String>.of(_groups.adminOps);
+
+  /// Nur für Tests: laufende Entfernungen (Raum-ID → Ziele, K4-3).
+  @visibleForTesting
+  Map<String, Set<String>> get debugRemoving => <String, Set<String>>{
+        for (final e in _groups.removing.entries) e.key: e.value.keys.toSet(),
+      };
+
+  /// Nur für Tests: macht die Einträge eines Entfernens [age] alt (Obergrenze von 10 Minuten).
+  @visibleForTesting
+  void debugAgeRemoving(String roomId, Duration age) {
+    for (final e in (_groups.removing[roomId] ?? const <String, _Removal>{}).values) {
+      e.since = DateTime.now().subtract(age);
+    }
+  }
+
+  /// Nur für Tests: Identität der fremden Gruppenmitglieder aus dem letzten Lauf (K4-3).
+  @visibleForTesting
+  Map<String, IdentityStatus> get debugGroupIdentity => Map<String, IdentityStatus>.of(_groups.identity);
+
+  /// Nur für Tests: legt Sitzungs-Pins für [ids] an (Pin-Bestand füllen, Obergrenze K4-3).
+  @visibleForTesting
+  void debugSeedSessionPins(Iterable<String> ids) {
+    for (final id in ids) {
+      _contactSessionPins[id] = 'SEED$id';
+    }
+  }
+
+  /// Nur für Tests: lokale Pins und Sitzungs-Pins (Schlüssel) zum Prüfen der Obergrenze und des Nichtlöschens (K4-3).
+  @visibleForTesting
+  Set<String> get debugContactSessionPinIds => _contactSessionPins.keys.toSet();
+
   /// Nur für Tests: verlässt den Familienbereich wie bei einem Familienwechsel; die Kontaktrichtlinie bleibt dabei stehen.
   @visibleForTesting
   void debugLeaveFamilyScope() => _leaveFamilyScope();

@@ -356,6 +356,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Gruppe wird gerade aktualisiert. Bitte warte einen Moment.';
 
   @override
+  String get errGroupFull =>
+      'Die Gruppe ist voll: Sie hat höchstens 50 Mitglieder, eingeladene mitgezählt.';
+
+  @override
   String get contactsTitle => 'Kontakte';
 
   @override

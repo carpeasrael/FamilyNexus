@@ -716,6 +716,12 @@ abstract class AppLocalizations {
   /// **'Die Gruppe wird gerade aktualisiert. Bitte warte einen Moment.'**
   String get errGroupBusy;
 
+  /// No description provided for @errGroupFull.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Gruppe ist voll: Sie hat höchstens 50 Mitglieder, eingeladene mitgezählt.'**
+  String get errGroupFull;
+
   /// No description provided for @contactsTitle.
   ///
   /// In de, this message translates to:

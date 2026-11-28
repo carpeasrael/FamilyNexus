@@ -2279,7 +2279,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   void _requireGroupGate(FakeRoom room, String threadId) {
     final me = _userId;
     if (!_opened.contains(threadId)) throw const GatewayException(GatewayError.notAllowed);
-    if (groupPendingWipe.contains(threadId)) throw GatewayException(groupSendLockError(GroupSendLock.wechsel)!);
+    if (groupPendingWipe.contains(threadId) || _removingGroups.contains(threadId)) throw GatewayException(groupSendLockError(GroupSendLock.wechsel)!);
     final lock = _groupLock(room);
     final e = groupSendLockError(lock);
     if (e != null) throw GatewayException(e);
@@ -2299,7 +2299,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   }
 
   GroupSendLock _groupLock(FakeRoom r) {
-    if (groupPendingWipe.contains(r.id)) return GroupSendLock.wechsel;
+    if (groupPendingWipe.contains(r.id) || _removingGroups.contains(r.id)) return GroupSendLock.wechsel;
     final health = GroupHealth.evaluate(
       megolm: r.groupEncrypted,
       joinRule: r.joinRule,
@@ -2330,6 +2330,121 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
     ];
   }
 
+  // ---- Gruppen: Verwaltung (K4-3)
+
+  /// Räume mit laufendem Entfernen: das Senden ist `groupBusy`, bis der Test [completeRemoval] ruft (der Weggang ist dann im
+  /// Zustand angekommen und der Abgleich gelaufen).
+  final Set<String> _removingGroups = <String>{};
+
+  /// Test: die nächste Verwaltungsoperation (Einladen, Entfernen, Admin ändern, Mitglieder) scheitert mit diesem Fehler.
+  GatewayError? groupAdminError;
+
+  /// Test: wird zu Beginn von `inviteToGroup` bzw. `acceptGroupInvite` gerufen (Reihenfolge und Wettläufe prüfen).
+  Future<void> Function(String roomId, String userId)? onInviteToGroup;
+  Future<void> Function(String roomId)? beforeAcceptGroup;
+
+  /// Zahl der Aufrufe je Operation (Einladen, Entfernen, Admin ändern).
+  int inviteToGroupCalls = 0;
+  int removeFromGroupCalls = 0;
+  int setGroupAdminCalls = 0;
+
+  /// Test: der Weggang des Entfernten ist angekommen; der Abgleich wischt, danach ist das Senden wieder frei.
+  Future<void> completeRemoval(String roomId) async {
+    _removingGroups.remove(roomId);
+    await syncGroups();
+  }
+
+  FakeRoom _adminRoom(String roomId) {
+    _requireSession();
+    final r = _groupRoomOf(roomId);
+    if (r == null || !contactPolicy.enabled) throw const GatewayException(GatewayError.notAllowed);
+    final e = groupAdminError;
+    if (e != null) throw GatewayException(e);
+    return r;
+  }
+
+  GroupRights _myRights(FakeRoom r) => GroupRights(myUserId: _userId!, myLevel: r.power[_userId] ?? 0);
+
+  @override
+  Future<List<GroupMember>> groupMembers(String roomId) async {
+    final r = _adminRoom(roomId);
+    final me = _userId!;
+    return <GroupMember>[
+      for (final m in _visibleMembers(r))
+        GroupMember(
+          userId: m,
+          displayName: ContactNames.title(fake.displayNameOf(m), m),
+          membership: r.invitedUsers.contains(m) ? GroupMembership.invite : GroupMembership.join,
+          power: r.power[m] ?? 0,
+          reachability: m == me ? ContactReachability.unknown : _reachOf(m),
+          isFamily: m != me && family?.member(m) != null,
+          isMe: m == me,
+        ),
+    ]..sort((a, b) => a.isMe != b.isMe ? (a.isMe ? -1 : 1) : a.userId.compareTo(b.userId));
+  }
+
+  @override
+  Future<void> inviteToGroup(String roomId, String userId) async {
+    inviteToGroupCalls++;
+    await onInviteToGroup?.call(roomId, userId);
+    final r = _adminRoom(roomId);
+    final me = _userId!;
+    if (!_myRights(r).canInvite) throw const GatewayException(GatewayError.notAllowed);
+    if (userId == me || contactPolicy.blocked.contains(userId)) throw const GatewayException(GatewayError.notAllowed);
+    if (family?.member(userId) == null && contactPolicy.contacts[userId] != ContactState.accepted) throw const GatewayException(GatewayError.notAllowed);
+    if (r.dmMembers.contains(userId)) throw const GatewayException(GatewayError.alreadyExists);
+    if (r.dmMembers.length >= ContactGroupSpec.maxMembers) throw const GatewayException(GatewayError.groupFull);
+    final reach = fake.identityChangedUsers.contains(userId) ? ContactReachability.identityChanged : _reachOf(userId);
+    switch (reach) {
+      case ContactReachability.reachable:
+        break;
+      case ContactReachability.notReachable:
+        throw const GatewayException(GatewayError.peerNotReachable);
+      case ContactReachability.unknown:
+        throw const GatewayException(GatewayError.serverUnreachable);
+      case ContactReachability.identityChanged:
+        throw const GatewayException(GatewayError.notAllowed);
+    }
+    r.dmMembers.add(userId);
+    r.invitedUsers.add(userId);
+    fake.notifyAll();
+  }
+
+  @override
+  Future<void> removeFromGroup(String roomId, String userId) async {
+    removeFromGroupCalls++;
+    final r = _adminRoom(roomId);
+    if (!r.dmMembers.contains(userId)) throw const GatewayException(GatewayError.notFound);
+    if (!_myRights(r).canRemove(userId, r.power[userId] ?? 0)) throw const GatewayException(GatewayError.notAllowed);
+    _removingGroups.add(roomId);
+    r.dmMembers.remove(userId);
+    r.invitedUsers.remove(userId);
+    fake.notifyAll();
+  }
+
+  @override
+  Future<void> setGroupAdmin(String roomId, String userId, {required bool admin}) async {
+    setGroupAdminCalls++;
+    final r = _adminRoom(roomId);
+    final me = _userId!;
+    final target = r.power[userId] ?? 0;
+    if (!_myRights(r).canSetAdmin(userId, target, admin: admin)) throw const GatewayException(GatewayError.notAllowed);
+    if (userId != me && (!r.dmMembers.contains(userId) || r.invitedUsers.contains(userId))) throw const GatewayException(GatewayError.notFound);
+    if (userId == me && !admin) {
+      final members = <GroupMember>[
+        for (final m in r.dmMembers)
+          GroupMember(userId: m, displayName: '', membership: r.invitedUsers.contains(m) ? GroupMembership.invite : GroupMembership.join, power: r.power[m] ?? 0, isMe: m == me),
+      ];
+      if (GroupRights.isLastAdmin(members)) throw const GatewayException(GatewayError.notAllowed);
+    }
+    if (admin) {
+      r.power[userId] = GroupRights.levelFor(admin: true);
+    } else {
+      r.power.remove(userId);
+    }
+    fake.notifyAll();
+  }
+
   @override
   Future<String> createGroup(String name) async {
     createGroupCalls++;
@@ -2350,6 +2465,7 @@ class FakeMatrixGateway extends ChangeNotifier implements MatrixGateway {
   @override
   Future<void> acceptGroupInvite(String roomId) async {
     acceptGroupCalls++;
+    await beforeAcceptGroup?.call(roomId);
     final r = fake.groupRooms[roomId];
     final me = _userId;
     if (r == null || me == null) throw const GatewayException(GatewayError.notFound);
