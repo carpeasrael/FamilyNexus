@@ -18,6 +18,10 @@ class ChatMapper {
 
   static const int maxReactionKeys = 12;
 
+  /// Höchstens so viele verschiedene Emoji je Absender und Ziel (#119, K4-2b, §3.5): ein einzelnes Mitglied füllt nicht alle
+  /// [maxReactionKeys] Plätze. Darüber verwirft der Mapper deterministisch, die ältesten bleiben.
+  static const int maxReactionsPerSenderTarget = 10;
+
   static const Set<String> _fileTypes = <String>{
     MessageTypes.Image,
     MessageTypes.File,
@@ -44,19 +48,21 @@ class ChatMapper {
     String? myUserId,
     bool showReadBy = false,
     bool allowEventRefs = false,
+    Set<String> hide = const <String>{},
+    bool reactorsMustBeJoined = false,
   }) {
     final me = myUserId ?? timeline.room.client.userID;
     // Gegenseitigkeit (E-106): Ist die eigene Lesebestätigung aus, zeigt die App auch bei anderen nichts.
     final markers = showReadBy ? ReadMarkers.of(timeline, me) : ReadMarkers.none;
     final joinedAt = me == null ? null : _joinedAt(timeline, me);
     final pastNames = _pastNames(timeline);
-    final encryptedReactions = _encryptedReactions(timeline, me);
+    final encryptedReactions = _encryptedReactions(timeline, me, hide: hide, mustBeJoined: reactorsMustBeJoined);
     final out = <ChatMessage>[];
     var hidden = 0;
     DateTime? firstHidden;
     for (final e in timeline.events.reversed) {
       try {
-        final m = _map(timeline, e, pastNames, me, threadId, sends, encryptedReactions, markers, allowEventRefs);
+        final m = _map(timeline, e, pastNames, me, threadId, sends, encryptedReactions, markers, allowEventRefs, hide);
         if (m == null) continue;
         if (m.undecryptable && joinedAt != null && m.time.isBefore(joinedAt)) {
           hidden++;
@@ -79,15 +85,26 @@ class ChatMapper {
 
   /// Reaktionen vom eigenen Typ je Ziel und Emoji (E-86), mit dem Absender des Ereignisses. Fremde zählen nur verschlüsselt
   /// angekommen, eigene noch lokale (`sending`, `sent` ohne Quelle) nur auf dem eigenen Gerät.
-  static Map<String, Map<String, Set<String>>> _encryptedReactions(Timeline timeline, String? me) {
+  ///
+  /// [hide] (blockierte Absender) wird **vor** dem Zählen angewandt: Blockierte belegen keine der [maxReactionKeys] Plätze
+  /// (Blockieren gibt sie frei). [mustBeJoined] (Kontakt- und Gruppenräume): nur Absender, die nach dem Raumzustand **jetzt**
+  /// beigetreten sind (Ex-Mitglieder-Flut); die eigenen zählen immer. Je Absender und Ziel höchstens
+  /// [maxReactionsPerSenderTarget] verschiedene Emoji.
+  static Map<String, Map<String, Set<String>>> _encryptedReactions(Timeline timeline, String? me, {Set<String> hide = const <String>{}, bool mustBeJoined = false}) {
     final out = <String, Map<String, Set<String>>>{};
+    final perSender = <String, Set<String>>{};
     for (final e in timeline.events.reversed) {
       try {
         if (e.type != ReactionCodec.type || e.redacted || e.status.isError) continue;
+        if (hide.contains(e.senderId)) continue;
         final local = e.senderId == me && (e.status.isSending || e.status == EventStatus.sent);
         if (!arrivedEncrypted(e) && !local) continue;
+        if (mustBeJoined && e.senderId != me && timeline.room.getState(EventTypes.RoomMember, e.senderId)?.content['membership'] != 'join') continue;
         final r = ReactionCodec.decode(e.content, sender: e.senderId);
         if (r == null) continue;
+        final mine = perSender.putIfAbsent('${e.senderId}\n${r.target}', () => <String>{});
+        if (!mine.contains(r.key) && mine.length >= maxReactionsPerSenderTarget) continue;
+        mine.add(r.key);
         out.putIfAbsent(r.target, () => <String, Set<String>>{}).putIfAbsent(r.key, () => <String>{}).add(e.senderId);
       } catch (err) {
         AppLog.e('chat', 'Reaktion konnte nicht gelesen werden', err);
@@ -247,6 +264,7 @@ class ChatMapper {
     Map<String, Map<String, Set<String>>> encryptedReactions,
     ReadMarkers markers,
     bool allowEventRefs,
+    Set<String> hide,
   ) {
     final name = _senderName(e, pastNames);
     final status = _status(e, sends);
@@ -299,7 +317,7 @@ class ChatMapper {
 
     for (final r in e.aggregatedEvents(timeline, RelationshipTypes.reaction)) {
       final key = _legacyReactionKey(r);
-      if (key == null || !TextSanitizer.isReactionKey(key)) continue;
+      if (key == null || !TextSanitizer.isReactionKey(key) || hide.contains(r.senderId)) continue;
       addReaction(key, <String>[r.senderId]);
     }
     encryptedReactions[e.eventId]?.forEach(addReaction);

@@ -36,6 +36,24 @@ void main() {
     expect(errorText(en, e), isNot(en.errUnknown));
   });
 
+  test('groupNoOtherMembers und groupBusy (#119, K4-2b): eigene Texte, de und en, nie der allgemeine, nie der Servertext', () {
+    final de = AppLocalizationsDe();
+    final en = AppLocalizationsEn();
+    const none = GatewayException(GatewayError.groupNoOtherMembers);
+    const busy = GatewayException(GatewayError.groupBusy);
+    expect(errorText(de, none), 'In dieser Gruppe ist noch niemand. Lade zuerst jemanden ein.');
+    expect(errorText(en, none), 'Nobody else is in this group yet. Invite someone first.');
+    expect(errorText(de, busy), 'Die Gruppe wird gerade aktualisiert. Bitte warte einen Moment.');
+    expect(errorText(en, busy), 'The group is being updated. Please wait a moment.');
+    for (final e in <GatewayException>[none, busy]) {
+      for (final l in <AppLocalizations>[de, en]) {
+        expect(errorText(l, e), isNot(l.errUnknown));
+        expect(errorText(l, e), isNot(l.errServerUnreachable));
+        expect(errorText(l, e), isNot(l.errPeerNotReachable));
+      }
+    }
+  });
+
   test('ContactException (#119, K3b-1): jeder Fall hat seinen eigenen Text, de und en', () {
     final de = AppLocalizationsDe();
     final en = AppLocalizationsEn();

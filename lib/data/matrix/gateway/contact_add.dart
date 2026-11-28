@@ -29,10 +29,17 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
   static const int maxProbedIds = 50;
   static const int maxProbesInFlight = 4;
 
+  /// Obergrenze der Personen je gemeinsamer Schlüsselabfrage ([_freshReachabilityMany]): Gruppen haben höchstens 50 Mitglieder.
+  static const int maxFreshUsers = 50;
+
   /// Nur für Tests: Geräte der Person ohne Schlüsselabfrage (`null` = unbekannt; sonst je Gerät, ob Raumschlüssel dorthin
   /// geteilt würden). Ersetzt Abfrage **und** Lesen (Harness ohne vodozemac und Schlüsselserver).
   @visibleForTesting
   List<bool>? Function(String userId)? debugDevicesOf;
+
+  /// Nur für Tests: Zahl der gemeinsamen Schlüsselabfragen für Gruppen ([_freshReachabilityMany]).
+  @visibleForTesting
+  int debugFreshQueries = 0;
 
   bool get _encryptionAvailable => _encryptionOverride ?? _client?.encryptionEnabled ?? false;
 
@@ -80,6 +87,37 @@ mixin _ContactAddModule on ChangeNotifier implements MatrixGateway {
     if (_lockedByIdentity(userId)) return ContactReachability.identityChanged;
     final devices = _devicesOf(userId);
     return ContactReach.of(keysKnown: devices != null, encryptable: devices ?? const <bool>[]);
+  }
+
+  /// Fragt die Schlüssel **mehrerer** Personen mit **einer** Anfrage ab (Gruppen, #119, K4-2b, §3.3 Zeile 7), höchstens
+  /// [maxFreshUsers]; darüber hinaus wird nicht gefragt (diese bleiben `unknown`). Wie [_freshReachability]: Fehler verschluckt das
+  /// SDK, deshalb zählt nur, was danach vorliegt. Die Sondergrenzen von `probeContact` (20/h) gelten hier nicht.
+  // ignore: unused_element
+  Future<Map<String, ContactReachability>> _freshReachabilityMany(Iterable<String> userIds) async {
+    debugFreshQueries++;
+    final ids = userIds.toSet().take(maxFreshUsers).toSet();
+    if (ids.isEmpty) return const <String, ContactReachability>{};
+    if (debugDevicesOf == null) {
+      final c = _client;
+      if (c == null || !_encryptionAvailable) return <String, ContactReachability>{for (final id in ids) id: ContactReachability.unknown};
+      try {
+        await c.updateUserDeviceKeys(additionalUsers: ids);
+      } catch (e) {
+        AppLog.w('gateway', 'Schlüsselabfrage gescheitert (${e.runtimeType})');
+        return <String, ContactReachability>{for (final id in ids) id: ContactReachability.unknown};
+      }
+    }
+    final out = <String, ContactReachability>{};
+    for (final id in ids) {
+      _contacts.reachCache.remove(id);
+      if (_lockedByIdentity(id)) {
+        out[id] = ContactReachability.identityChanged;
+        continue;
+      }
+      final devices = _devicesOf(id);
+      out[id] = ContactReach.of(keysKnown: devices != null, encryptable: devices ?? const <bool>[]);
+    }
+    return out;
   }
 
   /// Ist [id] durch einen geänderten Schlüssel oder durch von der App gesperrte Geräte gesperrt (Pin-Sackgasse, K3c-1)?

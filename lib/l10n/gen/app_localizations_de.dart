@@ -348,6 +348,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.';
 
   @override
+  String get errGroupNoOtherMembers =>
+      'In dieser Gruppe ist noch niemand. Lade zuerst jemanden ein.';
+
+  @override
+  String get errGroupBusy =>
+      'Die Gruppe wird gerade aktualisiert. Bitte warte einen Moment.';
+
+  @override
   String get contactsTitle => 'Kontakte';
 
   @override

@@ -321,6 +321,90 @@ void main() {
         expect(m.reactions, isEmpty);
       });
 
+      // ---- K4-2b (#119, §3.5): Kontakt- und Gruppenräume
+      ChatMessage inGroup(List<Event> reactions, {Set<String> hide = const <String>{}, bool joinedOnly = true}) {
+        final events = <Event>[ev(r'$a', text('Hi'), ts: 1), ...reactions];
+        return ChatMapper.messages(
+          timeline(events.reversed.toList()),
+          threadId: '!gr:fake.test',
+          sends: sends,
+          myUserId: me,
+          hide: hide,
+          reactorsMustBeJoined: joinedOnly,
+        ).single;
+      }
+
+      void join(String id, [String membership = 'join']) => room.setState(Event.fromJson(<String, Object?>{
+            'type': 'm.room.member',
+            'state_key': id,
+            'sender': id,
+            'content': <String, Object?>{'membership': membership},
+            'event_id': '\$m${id.hashCode}',
+            'origin_server_ts': 1,
+          }, room));
+
+      test('K4-2b hide: Reaktionen Blockierter zählen nicht und sind nicht sichtbar', () {
+        join(ben);
+        join('@cara:fake.test');
+        final m = inGroup(<Event>[neu(r'$r1', '👍'), neu(r'$r2', '👍', sender: '@cara:fake.test')], hide: <String>{ben});
+        expect(m.reactions['👍'], <String>{'@cara:fake.test'});
+      });
+
+      test('K4-2b hide gilt VOR dem Zählen der Schlüssel: zwei Absender mit je 10 Emoji füllen die 12 Plätze, ein dritter ist unsichtbar; nach hide eines von beiden erscheint er', () {
+        const cara = '@cara:fake.test';
+        const dora = '@dora:fake.test';
+        for (final u in <String>[ben, cara, dora]) {
+          join(u);
+        }
+        List<Event> flood() => <Event>[
+              for (var i = 0; i < 10; i++) neu('\$b$i', String.fromCharCode(0x1F600 + i), sender: ben),
+              for (var i = 10; i < 20; i++) neu('\$c$i', String.fromCharCode(0x1F600 + i), sender: cara),
+              neu(r'$d', '🎉', sender: dora),
+            ];
+        final full = inGroup(flood());
+        expect(full.reactions.length, ChatMapper.maxReactionKeys);
+        expect(full.reactions.containsKey('🎉'), isFalse, reason: 'dritter Absender unsichtbar (Restrisiko §5.20)');
+        final after = inGroup(flood(), hide: <String>{ben});
+        expect(after.reactions.containsKey('🎉'), isTrue, reason: 'Blockieren gibt die Plätze frei');
+      });
+
+      test('K4-2b maxReactionsPerSenderTarget: ein Absender zeigt höchstens 10 verschiedene Emoji je Ziel (die ältesten bleiben)', () {
+        join(ben);
+        final m = inGroup(<Event>[for (var i = 0; i < 40; i++) neu('\$r$i', String.fromCharCode(0x1F600 + i))]);
+        expect(m.reactions.length, ChatMapper.maxReactionsPerSenderTarget);
+        expect(m.reactions.containsKey(String.fromCharCode(0x1F600)), isTrue);
+        expect(m.reactions.containsKey(String.fromCharCode(0x1F600 + 39)), isFalse);
+        expect(ChatMapper.maxReactionsPerSenderTarget, lessThan(ChatMapper.maxReactionKeys));
+      });
+
+      test('K4-2b nur beigetretene Absender: Ex-Mitglieder und Unbekannte werden verworfen, eigene zählen immer; im Familienraum (Standard) gilt die Regel nicht', () {
+        join(ben, 'leave');
+        const cara = '@cara:fake.test';
+        join(cara);
+        final m = inGroup(<Event>[
+          neu(r'$r1', '👍'), // ben ist weg
+          neu(r'$r2', '👍', sender: cara),
+          neu(r'$r3', '🎉', sender: '@fremd:fake.test'), // unbekannt
+          neu('txn4', '😀', sender: me, encrypted: false, status: EventStatus.sending),
+        ]);
+        expect(m.reactions.keys, unorderedEquals(<String>['👍', '😀']));
+        expect(m.reactions['👍'], <String>{cara});
+        final fam = withMessage(<Event>[neu(r'$r1', '👍')]);
+        expect(fam.reactions['👍'], <String>{ben}, reason: 'Standard ohne Mitgliederprüfung');
+      });
+
+      test('K4-2b Spoofing in der Gruppe: Mitglied B sendet eine Reaktion mit sender: A ⇒ verworfen', () {
+        join(ben);
+        join('@cara:fake.test');
+        final m = inGroup(<Event>[neu(r'$r1', '👍', sender: ben, claimed: '@cara:fake.test')]);
+        expect(m.reactions, isEmpty);
+      });
+
+      test('K4-2b Ungelesen: eine Reaktion erhöht den Zähler nicht (nicht lesbare Textnachrichten zählen nur lesbare)', () {
+        final t = timeline(<Event>[neu(r'$r1', '👍')]);
+        expect(ChatMapper.unreadReadable(t, serverCount: 5, myUserId: me), 0);
+      });
+
       test('Fehler und Redaktionen zählen nicht', () {
         final m = withMessage(<Event>[
           neu('txn1', '👍', sender: me, encrypted: false, status: EventStatus.error),

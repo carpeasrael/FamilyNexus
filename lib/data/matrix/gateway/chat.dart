@@ -9,6 +9,8 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
   _GroupState get _groups;
   Room _requireContactRoom(String threadId, Room room);
   Room _requireGroupRoom(String threadId, Room room);
+  Future<void> _prepareGroupSend(String threadId);
+  ContactPolicy get _contactPolicy;
   Map<String, String> get _dmPeers;
   Map<String, Timeline> get _dmTimelines;
   Family? get _family;
@@ -43,7 +45,7 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
     if (threadId == ChatThread.familyId && !_isCurrentFamily(room)) {
       throw const GatewayException(GatewayError.serverUnreachable);
     }
-    // Eine Gruppe (K4-2a): Senden ist gesperrt, bis K4-2b das volle Tor liefert (Platzhalter wirft immer).
+    // Eine Gruppe (K4-2b): das volle Tor (§3.3), fail-closed.
     if (threadId != ChatThread.familyId && _groups.groups.containsKey(threadId)) return _requireGroupRoom(threadId, room);
     // Kein Mitglieder-Einzelchat: ein Kontakt-Thread, geprüft über die Einstufung (nur nach `openThread`, nur bei
     // beigetretenem Gegenüber).
@@ -88,6 +90,7 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
     if (text.trim().isEmpty || text.length > SdkMatrixGateway.maxMessageLength) {
       throw const GatewayException(GatewayError.invalidInput);
     }
+    await _prepareGroupSend(threadId);
     final room = _requireEncryptedRoom(threadId);
     final target = _replyTarget(replyToId, threadId);
     final roomId = room.id;
@@ -115,14 +118,18 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
   @override
   Future<void> sendReaction(String messageId, String emoji, {String threadId = ChatThread.familyId}) async {
     if (!TextSanitizer.isReactionKey(emoji)) throw const GatewayException(GatewayError.invalidInput);
-    // App-eigene Ereignistypen (Reaktionen) gehören nicht in Räume mit Fremden: sie erreichten Fremdclients.
-    if (threadId != ChatThread.familyId && !_dmTimelines.containsKey(threadId) && _contacts.peers.containsKey(threadId)) {
-      throw const GatewayException(GatewayError.notAllowed);
-    }
+    // Reaktionen in Kontakt- und Gruppenräumen (K4-2b, §3.5, Nutzerentscheidung): der eigene verschlüsselte Typ geht zwischen
+    // App-Nutzern; die Pauschalsperre von K3a-2a entfällt. Die Absicherung bleibt: dieselben Tore wie beim Text (Kontakt:
+    // `_requireContactRoom`, Gruppe: `_requireGroupRoom`), offener Thread, verschlüsselt, Ziel bekannt und gesendet.
+    await _prepareGroupSend(threadId);
     final room = _requireEncryptedRoom(threadId);
     final target = _findEvent(messageId, threadId);
     if (target == null || !target.status.isSent || !ReactionCodec.isTarget(messageId)) {
       throw const GatewayException(GatewayError.notFound);
+    }
+    // Das Ziel eines blockierten Absenders ist ausgeblendet: keine Reaktion darauf (nur Kontakt- und Gruppenräume).
+    if (threadId != ChatThread.familyId && !_dmTimelines.containsKey(threadId) && _contactPolicy.blocked.contains(target.senderId)) {
+      throw const GatewayException(GatewayError.notAllowed);
     }
     // Im Chiffretext erkennt der Server Duplikate nicht. Bis zum `add` läuft alles ohne `await`.
     final me = room.client.userID!;
@@ -169,6 +176,7 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
     if (AttachmentPolicy.check(fileName: name, bytes: bytes) != null) {
       throw const GatewayException(GatewayError.attachmentRejected);
     }
+    await _prepareGroupSend(threadId);
     final room = _requireEncryptedRoom(threadId);
     final target = _replyTarget(replyToId, threadId);
     final roomId = room.id;
@@ -200,6 +208,7 @@ mixin _ChatModule on ChangeNotifier implements MatrixGateway {
     final e = _findEvent(messageId, threadId);
     // `sending` zählt mit: Ohne laufende Sendung zeigt der Chat das als gescheitert (Ausnahme ohne Fehler-Echo).
     if (e == null || e.status.isSent) throw const GatewayException(GatewayError.notFound);
+    await _prepareGroupSend(threadId);
     if (!_canEncryptIn(_roomForThread(threadId))) throw const GatewayException(GatewayError.encryptionUnavailable);
     if (_localSends.isRunning(messageId)) return;
     final tl = _timelineFor(threadId);

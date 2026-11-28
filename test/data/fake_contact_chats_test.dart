@@ -84,14 +84,19 @@ void main() {
     await expectLater(gw.sendMessage('Hallo', threadId: r.id), throwsA(isA<GatewayException>()));
   });
 
-  test('Senden nur nach openThread und bei beigetretenem Gegenüber; Reaktionen nie; messagesIn erst nach openThread', () async {
+  test('Senden nur nach openThread und bei beigetretenem Gegenüber; Reaktionen seit K4-2b (§3.5) über dasselbe Tor, nie auf Blockierte; messagesIn erst nach openThread', () async {
     final r = app.server.createContactRoom(carla, me, toJoined: true);
     gw.setContactPolicy(policy({carla: ContactState.accepted}));
     await expectLater(gw.sendMessage('Hallo', threadId: r.id), throwsA(isA<GatewayException>()));
     await gw.openThread(r.id);
     await gw.sendMessage('Hallo', threadId: r.id);
     expect(gw.messagesIn(r.id).map((m) => m.body), <String>['Hallo']);
-    await expectLater(gw.sendReaction(gw.messagesIn(r.id).single.id, '👍', threadId: r.id), throwsA(isA<GatewayException>()));
+    // Verhaltensumkehr (Nutzerentscheidung, K4-2b): die Pauschalsperre fällt, die Reaktion geht in den offenen Kontakt-Thread.
+    final target = gw.messagesIn(r.id).single.id;
+    await gw.sendReaction(target, '👍', threadId: r.id);
+    expect(gw.messagesIn(r.id).single.reactions['👍'], isNotNull);
+    gw.setContactPolicy(policy({carla: ContactState.accepted}, blocked: {me}));
+    await expectLater(gw.sendReaction(target, '🎉', threadId: r.id), throwsA(isA<GatewayException>()));
   });
 
   test('familyUnreadCount zählt Kontakte nie, unreadCount schon', () async {

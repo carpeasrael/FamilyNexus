@@ -296,7 +296,7 @@ mixin _ContactChatsModule on ChangeNotifier implements MatrixGateway {
     for (final e in c.timelines.entries.toList()) {
       if (!await _repairEchoes(client, e.value)) return;
       if (!identical(c.timelines[e.key], e.value)) continue;
-      c.messages[e.key] = ChatMapper.messages(e.value, threadId: e.key, sends: _localSends, showReadBy: _showReadBy);
+      c.messages[e.key] = ChatMapper.messages(e.value, threadId: e.key, sends: _localSends, showReadBy: _showReadBy, hide: _contactPolicy.blocked, reactorsMustBeJoined: true);
     }
 
     // Gruppen (K4-2a): eigener Zustand, nur mit Datensatz; ein Gruppen-Datensatz gewinnt gegen `m.direct` (Schritt 1 hat

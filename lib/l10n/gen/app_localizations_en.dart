@@ -343,6 +343,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'This person needs to set up the security check in their app before you can message each other.';
 
   @override
+  String get errGroupNoOtherMembers =>
+      'Nobody else is in this group yet. Invite someone first.';
+
+  @override
+  String get errGroupBusy =>
+      'The group is being updated. Please wait a moment.';
+
+  @override
   String get contactsTitle => 'Contacts';
 
   @override

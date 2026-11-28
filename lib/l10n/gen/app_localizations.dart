@@ -704,6 +704,18 @@ abstract class AppLocalizations {
   /// **'Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.'**
   String get errPeerNotReachable;
 
+  /// No description provided for @errGroupNoOtherMembers.
+  ///
+  /// In de, this message translates to:
+  /// **'In dieser Gruppe ist noch niemand. Lade zuerst jemanden ein.'**
+  String get errGroupNoOtherMembers;
+
+  /// No description provided for @errGroupBusy.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Gruppe wird gerade aktualisiert. Bitte warte einen Moment.'**
+  String get errGroupBusy;
+
   /// No description provided for @contactsTitle.
   ///
   /// In de, this message translates to:

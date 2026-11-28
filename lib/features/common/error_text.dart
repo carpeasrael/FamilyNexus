@@ -40,6 +40,8 @@ String errorText(AppLocalizations l, Object error) {
       GatewayError.oauthAborted => l.errOAuthAborted,
       GatewayError.passwordChangeUnavailable => l.passwordChangeUnavailable,
       GatewayError.peerNotReachable => l.errPeerNotReachable,
+      GatewayError.groupNoOtherMembers => l.errGroupNoOtherMembers,
+      GatewayError.groupBusy => l.errGroupBusy,
       GatewayError.unknown => l.errUnknown,
     };
   }
