@@ -54,6 +54,19 @@ void main() {
     }
   });
 
+  test('groupFull (#119, K4-3): eigener Text, de und en, nie der allgemeine, nie der Servertext', () {
+    final de = AppLocalizationsDe();
+    final en = AppLocalizationsEn();
+    const full = GatewayException(GatewayError.groupFull);
+    expect(errorText(de, full), 'Die Gruppe ist voll: Sie hat höchstens 50 Mitglieder, eingeladene mitgezählt.');
+    expect(errorText(en, full), 'The group is full: it has at most 50 members, invited people included.');
+    for (final l in <AppLocalizations>[de, en]) {
+      expect(errorText(l, full), isNot(l.errUnknown));
+      expect(errorText(l, full), isNot(l.errServerUnreachable));
+      expect(errorText(l, full), isNot(l.errPeerNotReachable));
+    }
+  });
+
   test('ContactException (#119, K3b-1): jeder Fall hat seinen eigenen Text, de und en', () {
     final de = AppLocalizationsDe();
     final en = AppLocalizationsEn();

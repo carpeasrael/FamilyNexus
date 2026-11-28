@@ -16,6 +16,9 @@ mixin _IdentitiesModule on ChangeNotifier implements MatrixGateway {
   Family? get _family;
   ContactPolicy get _contactPolicy;
   bool _contactMembersComplete();
+
+  /// Beigetretenes Mitglied einer eingestuften Gruppe (K4-3, `contact_groups.dart`): darf seine Schlüsseländerung akzeptieren.
+  bool _groupMemberAcceptable(String userId);
   LocalIdentityPins get _localPins;
   IdentityPinBook get _pinBook;
   Set<String> get _pinConflictLogged;
@@ -56,7 +59,13 @@ mixin _IdentitiesModule on ChangeNotifier implements MatrixGateway {
   /// [mirror] `false` für Kontakte außerhalb der Familie: kein Eintrag im Spiegel der Kontodaten (`_pinBook.remember`,
   /// `_persistPins`), kein Konfliktvermerk; der erste Schlüssel gilt lokal ([_localPins]) und als Sitzungs-Pin (auch bei
   /// inaktiver lokaler Ablage), ein ausdrücklich akzeptierter Schlüssel hat Vorrang.
-  IdentityStatus _identityOf(String uid, String me, {bool mirror = true}) {
+  IdentityStatus _identityOf(String uid, String me, {bool mirror = true}) =>
+      _identityOfWith(uid, me, mirror: mirror, allowNewPin: true, accountPins: null, local: null);
+
+  /// Wie [_identityOf], mit vorab gelesenen Pins ([accountPins], [local]; `null` liest sie hier) und [allowNewPin]: nur für
+  /// Kontakte ohne Spiegel (`mirror` `false`, Gruppen-Fremde, K4-3) legt `false` bei `firstSeen` weder einen Sitzungs-Pin noch
+  /// einen lokalen Vermerk an (Status `unknown`, Obergrenze der Pins); bestehende Pins werden immer ausgewertet.
+  IdentityStatus _identityOfWith(String uid, String me, {required bool mirror, required bool allowNewPin, required Map<String, String>? accountPins, required Map<String, String>? local}) {
     final c = _client;
     if (c == null) return IdentityStatus.unknown;
     if (uid == me) return IdentityStatus.verified;
@@ -66,35 +75,40 @@ mixin _IdentitiesModule on ChangeNotifier implements MatrixGateway {
     final userId = c.userID;
     // Nur mit angemeldetem Client: Ein verspäteter Abgleich nach dem Abmelden legt nichts neu an (#142).
     if (c.isLogged() && userId != null) _localPins.bind(userId);
-    final accountPins = _pins();
-    if (mirror) _pinBook.synced(accountPins);
-    final local = _localPins.pins;
+    final accountPinMap = accountPins ?? _pins();
+    if (mirror) _pinBook.synced(accountPinMap);
+    final localMap = local ?? _localPins.pins;
     final r = resolvePin(
       accepted: mirror ? _pinBook.accepted(uid) : _contactAcceptedPins[uid],
-      local: local[uid],
-      account: accountPins[uid],
+      local: localMap[uid],
+      account: accountPinMap[uid],
       pending: mirror ? _pinBook.pending(uid) : _contactSessionPins[uid],
       pub: pub,
       anyBlocked: _anyDeviceBlocked(uid),
     );
     final pinned = r.pinned;
-    final localPin = local[uid];
-    final accountPin = accountPins[uid];
+    final localPin = localMap[uid];
+    final accountPin = accountPinMap[uid];
     if (mirror && localPin != null && accountPin != localPin && _pinConflictLogged.add(uid)) {
       // Einmal je Mitglied, ohne Schlüssel: Die Kontodaten weichen vom lokalen Vermerk ab oder fehlen.
       AppLog.w('gateway', 'Identitätsvermerk in den Kontodaten weicht vom lokalen Stand ab; lokal gilt');
     }
     final IdentityStatus status;
+    var adopt = r.adopt;
     switch (r.decision) {
       case IdentityDecision.firstSeen:
         _identityChanged.remove(uid);
         if (mirror) {
           _pinBook.remember(uid, pub);
           _persistPins().ignore();
-        } else {
+          status = master.verified ? IdentityStatus.verified : IdentityStatus.pinned;
+        } else if (allowNewPin) {
           _contactSessionPins[uid] = pub;
+          status = master.verified ? IdentityStatus.verified : IdentityStatus.pinned;
+        } else {
+          adopt = false; // Obergrenze erreicht: kein neuer Pin, auch nicht lokal
+          status = IdentityStatus.unknown;
         }
-        status = master.verified ? IdentityStatus.verified : IdentityStatus.pinned;
       case IdentityDecision.changed:
         _identityChanged.add(uid);
         if (!mirror) _contacts.reachCache.remove(uid);
@@ -105,7 +119,7 @@ mixin _IdentitiesModule on ChangeNotifier implements MatrixGateway {
         _identityChanged.remove(uid);
         status = master.verified ? IdentityStatus.verified : IdentityStatus.pinned;
     }
-    if (r.adopt) _localPins.adopt(uid, pub);
+    if (adopt) _localPins.adopt(uid, pub);
     _localPins.flushIfDirty().ignore();
     return status;
   }
@@ -167,11 +181,13 @@ mixin _IdentitiesModule on ChangeNotifier implements MatrixGateway {
   }
 
   /// Ob [userId] ein Kontakt ist, dessen Änderung akzeptiert werden darf (Richtlinie ohne Raumbindung).
-  bool _contactAcceptable(String userId) => VerificationPolicy.contactAllowed(
+  bool _contactAcceptable(String userId) =>
+      VerificationPolicy.contactAllowed(
         contactState: _contactPolicy.enabled && _contactMembersComplete() ? _contactPolicy.contacts[userId] : null,
         blocked: _contactPolicy.blocked.contains(userId),
         contactRoomId: _contactRoomOf(userId),
-      );
+      ) ||
+      _groupMemberAcceptable(userId);
 
   /// Akzeptieren für einen **Kontakt**: kein `setAccountData`, kein `await` (keine Race zwischen Prüfung und Wirkung);
   /// der Schlüssel gilt nur im Speicher ([_contactAcceptedPins], höchster Vorrang) und lokal ([_localPins], wenn aktiv).

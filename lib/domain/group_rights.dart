@@ -3,7 +3,8 @@ import 'contacts.dart' show ContactLimits;
 import 'family.dart' show PowerLevels;
 
 /// Was ich in einer Gruppe darf (#119, K4-1, KONTAKTE §8.5), aus den Stufen des **Raumzustands** (nie aus Datensätzen).
-/// Reine Regel ohne SDK; der Server prüft ohnehin, die App erlaubt nur, was der Zustand erlaubt. Bis K4-3 ohne Aufrufer.
+/// Reine Regel ohne SDK; der Server prüft ohnehin, die App erlaubt nur, was der Zustand erlaubt. Aufrufer: das Gruppenmodul des
+/// Gateways (K4-3).
 ///
 /// Admin ist, wer mindestens Stufe 50 hat; ernannt wird auf höchstens 50 (nie 100).
 class GroupRights {
@@ -52,8 +53,10 @@ class GroupRights {
   /// Zielstufe beim Ernennen (50, nie 100) bzw. Entziehen (0).
   static int levelFor({required bool admin}) => admin ? PowerLevels.moderator : PowerLevels.member;
 
-  /// Bin ich der letzte beigetretene Admin (Warnung beim Verlassen, keine Sperre)? Nur beigetretene Mitglieder mit Stufe
-  /// ≥ 50 zählen; ohne Eintrag für mich liefert die Funktion `false`.
+  /// Bin ich der letzte beigetretene Admin? Nur beigetretene Mitglieder mit Stufe ≥ 50 zählen; ohne Eintrag für mich liefert
+  /// die Funktion `false`. Beim **Verlassen** ist das nur eine Warnung (K4-4), keine Sperre. Das Gateway nutzt sie **zusätzlich als
+  /// Sperre der Selbstabstufung** (K4-3, `setGroupAdmin`): der einzige Admin darf sich nicht abstufen. [canSetAdmin] bleibt dafür
+  /// unverändert.
   static bool isLastAdmin(Iterable<GroupMember> members) {
     var meAdmin = false;
     for (final m in members) {

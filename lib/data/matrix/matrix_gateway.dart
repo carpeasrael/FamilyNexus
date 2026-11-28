@@ -73,6 +73,10 @@ enum GatewayError {
   /// Die Gruppe wird gerade aktualisiert (Schlüsselwechsel nach einem Weggang läuft oder ist gescheitert, #119, K4-2b,
   /// §3.3 Zeile 1): Senden vorübergehend gesperrt.
   groupBusy,
+
+  /// Die Gruppe hat die Höchstgröße erreicht: mit einer weiteren Person wären es mehr als 50 (beigetreten und eingeladen
+  /// zusammen, #119, K4-3, §8.5). Es wird nicht eingeladen.
+  groupFull,
   unknown,
 }
 
@@ -568,6 +572,26 @@ abstract class MatrixGateway implements Listenable {
   /// Gruppen mit Datensatz, die verlassen, abgelehnt oder vom Server entfernt wurden (Mitgliedschaft `leave`/`ban` oder
   /// bewusst verlassen): Quelle für das Aufräumen der Datensätze durch den Controller (K4-3). Nie unbekannte Räume.
   Set<String> get leftGroupRooms;
+
+  /// Die Mitglieder einer Gruppe für die Verwaltung (#119, K4-3): beigetretene und eingeladene, mit Stufe aus dem Raumzustand,
+  /// Erreichbarkeit (Zwischenspeicher, kein Netz), Familienkennzeichen und Identität. Bei einer Gruppe mit mehr als 50 oder
+  /// unbekannter Größe nur die lokal bekannten Einträge: **möglicherweise unvollständig, nie ein Beleg für „leer“**. Nur für
+  /// eine beigetretene, eingestufte Gruppe, sonst `notAllowed`.
+  Future<List<GroupMember>> groupMembers(String roomId);
+
+  /// Lädt eine Person in eine Gruppe ein (nur Admin, Stufe ≥ Schwelle `invite`). Zulässig nur für einen bestätigten Kontakt
+  /// oder ein Familienmitglied (sonst `notAllowed`); bei G + 1 > 50 `groupFull` (ohne Abruf), bei unbekannter Größe
+  /// `serverUnreachable`; schon Mitglied oder eingeladen ⇒ `alreadyExists`; nicht erreichbar ⇒ `peerNotReachable`.
+  Future<void> inviteToGroup(String roomId, String userId);
+
+  /// Entfernt ein Mitglied (kick; nur Admin, nie ich selbst, nie Stufe ≥ meiner). Das Ziel muss im lokalen Raumzustand
+  /// beigetreten oder eingeladen sein (`notFound`). Bis der Weggang im Zustand sichtbar ist, ist das Senden in der Gruppe
+  /// gesperrt (`groupBusy`).
+  Future<void> removeFromGroup(String roomId, String userId);
+
+  /// Ernennt ein Mitglied zum Admin (Stufe 50, nie 100) oder entzieht ihm die Stufe (Stufe 0). Die Stufen werden frisch vom
+  /// Server gelesen. Die Selbstabstufung ist für den einzigen Admin gesperrt (`notAllowed`).
+  Future<void> setGroupAdmin(String roomId, String userId, {required bool admin});
 
   // ------------------------------------------------------------ Avatare
 

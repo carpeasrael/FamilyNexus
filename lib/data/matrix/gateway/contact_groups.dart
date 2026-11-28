@@ -1,5 +1,13 @@
 part of '../sdk_matrix_gateway.dart';
 
+/// Ein laufendes Entfernen (kick, K4-3): bis der Weggang im Raumzustand und in der Mitgliederliste sichtbar ist, bleibt das Senden
+/// in der Gruppe gesperrt. [fetchedOnce]: die eine umgehende frische Abfrage dieses Eintrags wurde gestartet (auch bei Fehlschlag).
+class _Removal {
+  _Removal(this.since);
+  DateTime since;
+  bool fetchedOnce = false;
+}
+
 /// Zustand der Gruppen mit Personen außerhalb der Familie (#119, K4-2a, E-114): alles in einem Halter, getrennt von
 /// [_ContactState] (dessen `peers` gehören den Einzelchats; eine Gruppe darf nie wie eine Person behandelt werden).
 /// Gruppen entstehen **nur** über [ConversationPolicy] (`contactGroup`, nur mit eigenem Datensatz).
@@ -56,7 +64,25 @@ class _GroupState {
   /// Sitzung“ wäre zu stark, Hinweis 4). Solange der Prozess läuft, gilt der Wisch als nicht belegbar (Senden bleibt gesperrt).
   final Set<String> loadFailed = <String>{};
 
+  /// Verwaltungsoperationen (Einladen, Entfernen, Admin ändern, K4-3): je Raum eine zugleich (sonst `groupBusy`). **Nicht**
+  /// [groupOps]: sperrt das Senden nicht und stört [_ContactGroupsModule._reconcileGroup] nicht. Nur Speicher.
+  final Set<String> adminOps = <String>{};
+
+  /// Laufende Serverabrufe der Mitgliederliste je Raum (ein Aufrufer, der auf die frische Liste angewiesen ist, wartet darauf).
+  final Map<String, Future<bool>> fetchFutures = <String, Future<bool>>{};
+
+  /// Laufende Entfernungen je Raum und Ziel (Sperre des Sendens, eigener Grund, nicht [pendingWipe]). **Nur Speicher**; überlebt
+  /// [forget] und [clearRooms] (ein zurückkehrender Raum bleibt gesperrt) bis [clearAll] oder bis die Gruppe in [left] steht.
+  final Map<String, Map<String, _Removal>> removing = <String, Map<String, _Removal>>{};
+
+  /// Identität der fremden Mitglieder (K4-3, abgeleitete Daten): je Sync-Lauf ersetzt, bei [clearRooms] und [clearAll] geleert,
+  /// nie persistiert.
+  final Map<String, IdentityStatus> identity = <String, IdentityStatus>{};
+
   static const Duration fetchEvery = Duration(minutes: 10);
+
+  /// Obergrenze eines Entfernen-Eintrags ([removing]): danach fällt die Sperre, auch wenn der `kick` nie ankam.
+  static const Duration removeCap = Duration(minutes: 10);
 
   /// Höchstalter der Mitgliederliste beim Senden (§3.3 Zeile 4).
   static const Duration listFreshFor = Duration(minutes: 10);
@@ -91,11 +117,15 @@ class _GroupState {
     membersAt.clear();
     lastMembers.clear();
     pendingWipe.clear();
+    identity.clear();
   }
 
   void clearAll() {
     clearRooms();
     groupOps.clear();
+    adminOps.clear();
+    removing.clear();
+    fetchFutures.clear();
     loadFailed.clear();
     creatingGroups.clear();
     left.clear();
@@ -136,6 +166,15 @@ mixin _ContactGroupsModule on ChangeNotifier implements MatrixGateway {
   LocalSends get _localSends;
   bool get _showReadBy;
   GatewayException _map(Object e);
+  bool _isFamilyId(String userId);
+  Map<String, String> get _contactSessionPins;
+  LocalIdentityPins get _localPins;
+  Map<String, String> _pins();
+  IdentityStatus _identityOfWith(String uid, String me, {required bool mirror, required bool allowNewPin, required Map<String, String> accountPins, required Map<String, String> local});
+
+  /// Nur für Tests: Zahl der Identitätsauswertungen für Gruppen-Fremde (einmal je eindeutiger Kennung und Lauf, K4-3).
+  @visibleForTesting
+  int debugGroupIdentityEvals = 0;
 
   /// Gruppen, die diese Sitzung verlassen oder die der Server entfernt hat (Quelle für das Aufräumen der Datensätze durch
   /// den Controller, K4-3): Räume mit Datensatz, deren Mitgliedschaft `leave`/`ban` ist, oder die bewusst verlassen oder
@@ -168,13 +207,16 @@ mixin _ContactGroupsModule on ChangeNotifier implements MatrixGateway {
   /// ([GroupHealth]), dann „keine anderen Mitglieder“ (nur bei bekannter Liste; ist sie unbekannt, bleibt es bei `keiner`, das
   /// Gate verlangt sie fail-closed in Zeile 4).
   GroupSendLock _groupLockOf(Room r) {
-    if (_groups.groupOps.contains(r.id) || _groups.pendingWipe.contains(r.id)) return GroupSendLock.wechsel;
+    if (_groups.groupOps.contains(r.id) || _groups.pendingWipe.contains(r.id) || _isRemoving(r.id)) return GroupSendLock.wechsel;
     final health = _groupHealthOf(r);
     if (health != GroupSendLock.keiner) return health;
     final others = _otherMembers(r);
     if (others != null && others.isEmpty) return GroupSendLock.keineMitglieder;
     return GroupSendLock.keiner;
   }
+
+  /// Läuft in der Gruppe ein Entfernen (kick), dessen Weggang noch nicht belegt ist?
+  bool _isRemoving(String roomId) => _groups.removing[roomId]?.isNotEmpty ?? false;
 
   /// Andere beigetretene oder eingeladene Mitglieder aus der bekannten Liste (`null`: Liste unbekannt).
   List<String>? _otherMembers(Room r) {
@@ -251,7 +293,10 @@ mixin _ContactGroupsModule on ChangeNotifier implements MatrixGateway {
       if (eligible.containsKey(id)) continue;
       // Verschwunden oder verlassen/verbannt (nicht: Datensatz entfallen, Bereich aus): merken für den Prune des Controllers.
       final gone = client.getRoomById(id);
-      if (gone == null || gone.membership == Membership.leave || gone.membership == Membership.ban) g.left.add(id);
+      if (gone == null || gone.membership == Membership.leave || gone.membership == Membership.ban) {
+        g.left.add(id);
+        g.removing.remove(id); // die Gruppe gehört uns nicht mehr: nichts mehr zu sperren
+      }
       g.forget(id);
     }
     g.left.removeWhere(eligible.containsKey);
@@ -262,7 +307,9 @@ mixin _ContactGroupsModule on ChangeNotifier implements MatrixGateway {
       _updateGroupMembers(r);
       await _reconcileGroup(r);
       if (_disposed || _client != client) return false;
+      _releaseRemoving(r);
     }
+    _evaluateGroupIdentities(eligible.values);
     for (final e in g.timelines.entries.toList()) {
       if (!await _repairEchoes(client, e.value)) return false;
       if (!identical(g.timelines[e.key], e.value)) continue;
@@ -316,7 +363,26 @@ mixin _ContactGroupsModule on ChangeNotifier implements MatrixGateway {
   /// Ruft die Mitgliederliste vom Server ab (ein Abruf je Raum gleichzeitig) und gleicht danach ab. Der Aufrufer sichert die
   /// Größenregel (nur G bekannt und ≤ 50, [_updateGroupMembers], [_prepareGroupSend]). Liefert `true`, wenn die Liste frisch
   /// im Zwischenspeicher steht.
-  Future<bool> _fetchGroupMembersNow(Room r) async {
+  ///
+  /// Der Abruf wird in [_GroupState.fetchFutures] geführt: wer auf die frische Liste angewiesen ist ([_awaitMembers]), wartet
+  /// auf den laufenden Abruf. Das Rückgabeverhalten (`false` bei laufendem Abruf) bleibt für alle Bestandsaufrufer gleich.
+  Future<bool> _fetchGroupMembersNow(Room r) {
+    final g = _groups;
+    if (g.fetching.contains(r.id)) return Future<bool>.value(false);
+    final f = _runGroupMembersFetch(r);
+    g.fetchFutures[r.id] = f;
+    f.whenComplete(() {
+      if (identical(g.fetchFutures[r.id], f)) g.fetchFutures.remove(r.id);
+    }).ignore();
+    return f;
+  }
+
+  /// Wartet auf die frische Mitgliederliste: läuft für den Raum schon ein Abruf (z. B. der nach `createGroup`), wartet sie auf
+  /// diesen, sonst startet sie einen. `false`: der Abruf ist gescheitert oder wurde verworfen.
+  // ignore: unused_element
+  Future<bool> _awaitMembers(Room r) => _groups.fetchFutures[r.id] ?? _fetchGroupMembersNow(r);
+
+  Future<bool> _runGroupMembersFetch(Room r) async {
     final g = _groups;
     if (!g.fetching.add(r.id)) return false;
     g.fetchedAt[r.id] = DateTime.now();
@@ -376,6 +442,122 @@ mixin _ContactGroupsModule on ChangeNotifier implements MatrixGateway {
     } finally {
       g.opening.remove(threadId);
     }
+  }
+
+  /// Gibt die Sperre eines Entfernens frei, sobald der Weggang belegt ist. Aufgerufen am Ende jedes [_syncGroupRooms]-Durchlaufs
+  /// für den Raum, **unabhängig davon, welchen Rückkehrpfad** [_reconcileGroup] nahm. Ein Ziel fällt aus der Sperre, wenn es im
+  /// lokalen Raumzustand `leave` oder `ban` ist **oder** nicht (mehr) in `lastMembers` steht (`lastMembers == null` gilt
+  /// nie als „weg“), **und** der Raum weder in `groupOps` noch in `pendingWipe` steht (ein fälliger Wisch hält die Sperre). Die
+  /// eine umgehende frische Abfrage läuft je Eintrag höchstens einmal (bewusste, einmalige Umgehung der 10-Minuten-Drosselung);
+  /// danach beendet die Obergrenze ([_GroupState.removeCap]) den Eintrag in jedem Fall. Bei G > 50 oder unbekannter Größe gibt es
+  /// keine Abfrage (Regel K4-2a): der Eintrag fällt mit dem lokalen Weggang oder nach der Obergrenze. Der Eintrag überlebt
+  /// `forget` und `clearRooms` bis `clearAll` (nur Speicher).
+  void _releaseRemoving(Room r) {
+    final g = _groups;
+    final map = g.removing[r.id];
+    if (map == null) return;
+    if (g.groupOps.contains(r.id) || g.pendingWipe.contains(r.id)) return;
+    final last = g.lastMembers[r.id];
+    final size = _groupSizeOf(r);
+    final canFetch = size != null && size <= ContactGroupSpec.maxMembers;
+    final now = DateTime.now();
+    var fetch = false;
+    for (final t in map.keys.toList()) {
+      final e = map[t]!;
+      // Nur ein belegtes `leave`/`ban` zählt (fail-closed): ein fehlender Eintrag (teilweise geladener Raum) ist kein Weggang.
+      final localGone = _leftLocally(r, t);
+      final listGone = last != null && !last.contains(t);
+      if (localGone || listGone) {
+        map.remove(t);
+        continue;
+      }
+      if (g.fetching.contains(r.id)) continue; // ein Abruf läuft: dessen Ergebnis abwarten
+      if (canFetch && !e.fetchedOnce) {
+        e.fetchedOnce = true;
+        fetch = true;
+        continue;
+      }
+      if (now.difference(e.since) > _GroupState.removeCap) map.remove(t);
+    }
+    if (map.isEmpty) g.removing.remove(r.id);
+    if (fetch) _fetchGroupMembersNow(r).ignore();
+  }
+
+  // ------------------------------------------------------------ Identität in Gruppen (K4-3, §8.5)
+
+  /// Wertet die Identität der fremden Mitglieder aus (`!isMe`, `!_isFamilyId`) **einmal je eindeutiger Kennung**, mit einmal
+  /// gelesenen Pins und einem einmal berechneten, fortgezählten Pin-Bestand. **Obergrenze 500** zählt den realen Bestand
+  /// `|Schlüssel(_localPins.pins) ∪ Schlüssel(_contactSessionPins)|` ohne Familienmitglieder (richtig nach einem Neustart; bei
+  /// inaktiver Ablage zählen die Sitzungs-Pins); darüber wird für **neue** Fremde kein Pin angelegt (Status `unknown`), bestehende
+  /// Pins werden immer ausgewertet (ein Wechsel sperrt die Geräte wie bei Kontakten). Pins werden nie gelöscht.
+  Map<String, IdentityStatus> _evaluateStrangers(Iterable<String> uids) {
+    final c = _client;
+    final me = c?.userID;
+    final out = <String, IdentityStatus>{};
+    if (c == null || me == null) return out;
+    if (c.isLogged()) _localPins.bind(me);
+    final accountPins = _pins();
+    final local = _localPins.pins;
+    final pinned = <String>{
+      for (final k in local.keys)
+        if (!_isFamilyId(k)) k,
+      for (final k in _contactSessionPins.keys)
+        if (!_isFamilyId(k)) k,
+    };
+    var count = pinned.length;
+    for (final uid in uids) {
+      if (uid == me || out.containsKey(uid) || _isFamilyId(uid)) continue;
+      final had = pinned.contains(uid);
+      debugGroupIdentityEvals++;
+      out[uid] = _identityOfWith(uid, me, mirror: false, allowNewPin: count < ContactLimits.maxGroupPins, accountPins: accountPins, local: local);
+      if (!had && (_contactSessionPins.containsKey(uid) || _localPins.pins.containsKey(uid))) {
+        pinned.add(uid);
+        count++;
+      }
+    }
+    return out;
+  }
+
+  /// Je Sync (aus [_syncGroupRooms]): alle fremden Mitglieder aller eingestuften Gruppen mit bekannter Liste und G ≤ 50.
+  void _evaluateGroupIdentities(Iterable<Room> rooms) {
+    final uids = <String>{};
+    for (final r in rooms) {
+      final size = _groupSizeOf(r);
+      if (size == null || size > ContactGroupSpec.maxMembers || !_groups.membersLoaded.contains(r.id)) continue;
+      uids.addAll((_groups.members[r.id] ?? const <String, GroupMembership>{}).keys);
+    }
+    final result = _evaluateStrangers(uids);
+    _groups.identity
+      ..clear()
+      ..addAll(result);
+  }
+
+  /// Im Tor ([_requireGroupRoom], synchron, ohne `await`): Auswertung der Mitglieder **dieser** Gruppe (≤ 50), damit Wechsel
+  /// unabhängig von `groupMembers` und vom nächsten Sync gesehen werden.
+  void _evaluateGroupIdentitiesIn(Room room) {
+    final size = _groupSizeOf(room);
+    if (size == null || size > ContactGroupSpec.maxMembers) return;
+    final result = _evaluateStrangers((_groups.members[room.id] ?? const <String, GroupMembership>{}).keys);
+    _groups.identity.addAll(result);
+  }
+
+  /// Ist [userId] ein beigetretenes Mitglied einer **eingestuften** Gruppe (Liste vollständig), nicht blockiert, Bereich an?
+  /// Dann darf eine Schlüsseländerung akzeptiert werden, auch ohne Kontakt-Datensatz.
+  // ignore: unused_element
+  bool _groupMemberAcceptable(String userId) {
+    var inGroup = false;
+    for (final id in _groups.groups.keys) {
+      if (_groups.membersLoaded.contains(id) && _groups.members[id]?[userId] == GroupMembership.join) {
+        inGroup = true;
+        break;
+      }
+    }
+    return groupMemberAcceptable(
+      enabled: _contactPolicy.enabled,
+      membersComplete: _contactMembersComplete(),
+      blocked: _contactPolicy.blocked.contains(userId),
+      inClassifiedGroup: inGroup,
+    );
   }
 
   // ------------------------------------------------------------ Mitgliederabgleich und Wisch (K4-2b, §3.3a)
@@ -526,7 +708,7 @@ mixin _ContactGroupsModule on ChangeNotifier implements MatrixGateway {
     final me = client?.userID;
     // 1
     if (me == null || !g.timelines.containsKey(threadId)) throw const GatewayException(GatewayError.notAllowed);
-    if (g.groupOps.contains(threadId) || g.pendingWipe.contains(threadId)) throw GatewayException(groupSendLockError(GroupSendLock.wechsel)!);
+    if (g.groupOps.contains(threadId) || g.pendingWipe.contains(threadId) || _isRemoving(threadId)) throw GatewayException(groupSendLockError(GroupSendLock.wechsel)!);
     // 2
     if (!_canEncryptIn(room)) throw const GatewayException(GatewayError.encryptionUnavailable);
     // 3
@@ -539,6 +721,8 @@ mixin _ContactGroupsModule on ChangeNotifier implements MatrixGateway {
     }
     // G ist nach dem Abruf exakt: `_groupSizeOf` nimmt den größeren Wert aus `summary` und der frischen Liste, die Prüfung in
     // Zeile 3 hat die Liste also schon eingerechnet (`_prepareGroupSend` ruft sie vor dem Tor ab).
+    // Identität der Mitglieder dieser Gruppe synchron auswerten (K4-3): Wechsel sperren die Geräte, bevor Zeile 5 bis 7 zählen.
+    _evaluateGroupIdentitiesIn(room);
     // 5 und 6
     final others = _otherMembers(room);
     if (others == null) throw GatewayException(groupSendLockError(GroupSendLock.groesseUnbekannt)!);
@@ -724,6 +908,12 @@ mixin _ContactGroupsModule on ChangeNotifier implements MatrixGateway {
     _scheduleRefresh();
   }
 }
+
+/// Darf eine Schlüsseländerung von [userId] akzeptiert werden, weil die Person beigetretenes Mitglied einer eingestuften
+/// Gruppe ist (K4-3)? Reine Regel: Bereich an, Mitgliederliste der Familie vollständig, nicht blockiert.
+@visibleForTesting
+bool groupMemberAcceptable({required bool enabled, required bool membersComplete, required bool blocked, required bool inClassifiedGroup}) =>
+    enabled && membersComplete && !blocked && inClassifiedGroup;
 
 /// Ergebnis von `_wipeOutbound`: gewischt (Beleg: keine Sitzung mehr im Speicher), nach dem Laden nichts zu wischen, oder
 /// fehlgeschlagen (Laden, Wisch oder Beleg).

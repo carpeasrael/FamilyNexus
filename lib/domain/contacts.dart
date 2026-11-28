@@ -24,6 +24,10 @@ class ContactLimits {
   /// Mitglieder einer Gruppe (Konzept §5; wirksam ab K4).
   static const int maxGroupMembers = 50;
 
+  /// Obergrenze des lokalen Pin-Bestands für Fremde (Kontakte und Gruppenmitglieder außerhalb der Familie, #119, K4-3, §8.5):
+  /// darüber entsteht für **neue** Fremde in Gruppen kein Pin mehr.
+  static const int maxGroupPins = 500;
+
   /// Zeichen des Spitznamens.
   static const int maxNick = 40;
 

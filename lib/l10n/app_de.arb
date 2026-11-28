@@ -132,6 +132,7 @@
   "errPeerNotReachable": "Diese Person muss in ihrer App die Sicherheitsprüfung einrichten, bevor ihr euch schreiben könnt.",
   "errGroupNoOtherMembers": "In dieser Gruppe ist noch niemand. Lade zuerst jemanden ein.",
   "errGroupBusy": "Die Gruppe wird gerade aktualisiert. Bitte warte einen Moment.",
+  "errGroupFull": "Die Gruppe ist voll: Sie hat höchstens 50 Mitglieder, eingeladene mitgezählt.",
   "contactsTitle": "Kontakte",
   "contactsSettingsSubtitle": "Chats mit Personen außerhalb der Familie",
   "contactsIntroTitle": "Kontakte einschalten?",
